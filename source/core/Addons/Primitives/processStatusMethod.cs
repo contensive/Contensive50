@@ -57,7 +57,7 @@ namespace Contensive.Core.Addons.Primitives {
                 } else {
                     result = "Contensive Error Count = " + cpCore.doc.errorCount;
                 }
-                result = cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(false, false);
+                result = cpCore.html.getHtmlBodyEnd(false, false);
                 cpCore.doc.continueProcessing = false;
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

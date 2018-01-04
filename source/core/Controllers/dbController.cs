@@ -1738,9 +1738,9 @@ namespace Contensive.Core.Controllers {
                         //
                         if (!tempVar.dt.Columns.Contains(FieldName.ToLower())) {
                             if (tempVar.Updateable) {
-                                throw new ApplicationException("Field [" + fieldNameTrim + "] was Not found in [" + tempVar.ContentName + "] with selected fields [" + tempVar.SelectTableFieldList + "]");
+                                throw new ApplicationException("Field [" + fieldNameTrim + "] was not found in [" + tempVar.ContentName + "] with selected fields [" + tempVar.SelectTableFieldList + "]");
                             } else {
-                                throw new ApplicationException("Field [" + fieldNameTrim + "] was Not found in sql [" + tempVar.Source + "]");
+                                throw new ApplicationException("Field [" + fieldNameTrim + "] was not found in sql [" + tempVar.Source + "]");
                             }
                         } else {
                             returnValue = genericController.encodeText(tempVar.dt.Rows[tempVar.readCacheRowPtr][FieldName.ToLower()]);

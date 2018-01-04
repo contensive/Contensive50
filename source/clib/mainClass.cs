@@ -5,52 +5,39 @@ using System.Collections.Generic;
 using Contensive.Core.Controllers;
 using Contensive.Core.Models.Context;
 
-namespace Contensive.CLI
-{
-    class mainClass
-    {
-        static  void Main(string[] args)
-        {
-            try
-            { 
+namespace Contensive.CLI {
+    class mainClass {
+        static void Main(string[] args) {
+            try {
                 string appName;
                 //
                 // create cp for cluster work, with no application
                 //
                 //System.IO.File.WriteAllText("c:\\tmp\\clib.log", String.Join(",",args) );
-                if (args.Length == 0)
-                {
+                if (args.Length == 0) {
                     Console.WriteLine(helpText); // Check for null array
-                }
-                else
-                {
+                } else {
                     //
                     // -- create an instance of cp to execute commands
-                    using (Core.CPClass cp = new Core.CPClass())
-                    {
+                    using (Core.CPClass cp = new Core.CPClass()) {
                         //
                         // start by creating an application event log entry - because you must be admin to make this entry so making it here will create the "source"
                         string eventLogSource = "Contensive";
                         string eventLogLog = "Application";
                         string eventLogEvent = "command line:";
-                        for (int argPtr = 0; argPtr < args.Length; argPtr++)
-                        {
+                        for (int argPtr = 0; argPtr < args.Length; argPtr++) {
                             eventLogEvent += " " + args[argPtr];
                         }
                         if (!EventLog.SourceExists(eventLogSource)) EventLog.CreateEventSource(eventLogSource, eventLogLog);
                         EventLog.WriteEntry(eventLogSource, eventLogEvent, EventLogEntryType.Information);
                         //
                         // -- set programfiles path if emptry
-                        if (String.IsNullOrEmpty(cp.core.serverConfig.programFilesPath))
-                        {
+                        if (String.IsNullOrEmpty(cp.core.serverConfig.programFilesPath)) {
                             string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-                            if (executePath.ToLower().IndexOf("\\git\\") == 0)
-                            {
+                            if (executePath.ToLower().IndexOf("\\git\\") == 0) {
                                 //  -- save if not in developer execution path
                                 cp.core.serverConfig.programFilesPath = executePath;
-                            }
-                            else
-                            {
+                            } else {
                                 //  -- developer, fake a path
                                 cp.core.serverConfig.programFilesPath = "c:\\Program Files (x86)\\kma\\Contensive5\\";
                             }
@@ -60,11 +47,42 @@ namespace Contensive.CLI
                         // -- loop through arguments and execute each command
                         for (int argPtr = 0; argPtr < args.Length; argPtr++) // Loop through array
                         {
-                            createAppClass createApp = new createAppClass();
                             string argument = args[argPtr];
                             bool exitArgumentProcessing = false;
-                            switch (argument.ToLower())
-                            {
+                            switch (argument.ToLower()) {
+                                case "--housekeepall":
+                                    //
+                                    foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                        String upgradeAppName = kvp.Key;
+                                        using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(upgradeAppName)) {
+                                            cpApp.Doc.SetProperty("force", "1");
+                                            cpApp.executeAddon(Contensive.Core.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
+                                        }
+                                    }
+                                    exitArgumentProcessing = true;
+                                    break;
+                                case "-h":
+                                case "--housekeep":
+                                    //
+                                    // -- upgrade the app in the argument list, or prompt for it
+                                    if (argPtr == (args.Length + 1)) {
+                                        Console.WriteLine("Application name?");
+                                        appName = Console.ReadLine();
+                                    } else {
+                                        argPtr++;
+                                        appName = args[argPtr];
+                                    }
+                                    if (string.IsNullOrEmpty(appName)) {
+                                        Console.WriteLine("ERROR: housekeep requires a valid app name.");
+                                        argPtr = args.Length;
+                                    } else {
+                                        using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
+                                            cpApp.Doc.SetProperty("force", "1");
+                                            cpApp.executeAddon(Contensive.Core.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
+                                        }
+                                    }
+                                    exitArgumentProcessing = true;
+                                    break;
                                 case "--version":
                                 case "-v":
                                     //
@@ -76,6 +94,7 @@ namespace Contensive.CLI
                                 case "-n":
                                     //
                                     // -- start the new app wizard
+                                    createAppClass createApp = new createAppClass();
                                     createApp.createApp();
                                     exitArgumentProcessing = true;
                                     break;
@@ -89,17 +108,14 @@ namespace Contensive.CLI
                                 case "-s":
                                     //
                                     // -- display ServerGroup and application status
-                                    if (!cp.serverOk)
-                                    {
+                                    if (!cp.serverOk) {
                                         //
                                         // -- something went wrong with server initialization
                                         Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] not found or not valid. Run clib --configure");
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         Console.WriteLine("Configuration File [c:\\ProgramData\\Contensive\\config.json] found.");
                                         Console.WriteLine("ServerGroup name: " + cp.core.serverConfig.name);
-                                        Console.WriteLine("Cache: " + cp.core.serverConfig.name);
+                                        Console.WriteLine("Cache: ");
                                         Console.WriteLine("    enableLocalMemoryCache: " + cp.core.serverConfig.enableLocalMemoryCache);
                                         Console.WriteLine("    enableLocalFileCache: " + cp.core.serverConfig.enableLocalFileCache);
                                         Console.WriteLine("    enableRemoteCache: " + cp.core.serverConfig.enableRemoteCache);
@@ -118,8 +134,7 @@ namespace Contensive.CLI
                                         Console.WriteLine("Logging:");
                                         Console.WriteLine("    enableLogging: " + cp.core.serverConfig.enableLogging.ToString());
                                         Console.WriteLine("Applications: " + cp.core.serverConfig.apps.Count);
-                                        foreach (KeyValuePair<string, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps)
-                                        {
+                                        foreach (KeyValuePair<string, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
                                             serverConfigModel.appConfigModel app = kvp.Value;
                                             Console.WriteLine("    name: " + app.name);
                                             Console.WriteLine("        enabled: " + app.enabled);
@@ -128,8 +143,7 @@ namespace Contensive.CLI
                                             Console.WriteLine("        privateFilesPath: " + app.privateFilesPath);
                                             Console.WriteLine("        cdnFilesPath: " + app.cdnFilesPath);
                                             Console.WriteLine("        cdnFilesNetprefix: " + app.cdnFilesNetprefix);
-                                            foreach (string domain in app.domainList)
-                                            {
+                                            foreach (string domain in app.domainList) {
                                                 Console.WriteLine("        domain: " + domain);
                                             }
                                         }
@@ -140,25 +154,18 @@ namespace Contensive.CLI
                                 case "-u":
                                     //
                                     // -- upgrade the app in the argument list, or prompt for it
-                                    if (argPtr == (args.Length + 1))
-                                    {
+                                    if (argPtr == (args.Length + 1)) {
                                         Console.WriteLine("Application name?");
                                         appName = Console.ReadLine();
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         argPtr++;
                                         appName = args[argPtr];
                                     }
-                                    if (string.IsNullOrEmpty(appName))
-                                    {
+                                    if (string.IsNullOrEmpty(appName)) {
                                         Console.WriteLine("ERROR: upgrade requires a valid app name.");
                                         argPtr = args.Length;
-                                    }
-                                    else
-                                    {
-                                        using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName))
-                                        {
+                                    } else {
+                                        using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
                                             Core.Controllers.appBuilderController.upgrade(cpApp.core, false);
                                         }
                                         //installFiles = new coreFileSystemClass(cp.core, cp.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
@@ -169,12 +176,10 @@ namespace Contensive.CLI
                                 case "--upgradeall":
                                     //
                                     // upgrade all apps in the server group
-                                    foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps)
-                                    {
+                                    foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
                                         String upgradeAppName = kvp.Key;
-                                        using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(upgradeAppName))
-                                        {
-                                            Core.Controllers.appBuilderController.upgrade(upgradeApp.core,false);
+                                        using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(upgradeAppName)) {
+                                            Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false);
                                         }
                                     }
                                     exitArgumentProcessing = true;
@@ -182,11 +187,9 @@ namespace Contensive.CLI
                                 case "--taskscheduler":
                                     //
                                     // -- manage the task scheduler
-                                    if (argPtr != (args.Length + 1))
-                                    {
+                                    if (argPtr != (args.Length + 1)) {
                                         argPtr++;
-                                        if (args[argPtr].ToLower() == "run")
-                                        {
+                                        if (args[argPtr].ToLower() == "run") {
                                             //
                                             // run the taskscheduler in the console
                                             Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
@@ -197,9 +200,7 @@ namespace Contensive.CLI
                                             object keyStroke = Console.ReadKey();
                                             taskScheduler.stopTimerEvents();
                                             exitArgumentProcessing = true;
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             //
                                             // turn the windows service scheduler on/off
                                             cp.core.serverConfig.allowTaskSchedulerService = Contensive.Core.Controllers.genericController.encodeBoolean(args[argPtr]);
@@ -211,11 +212,9 @@ namespace Contensive.CLI
                                 case "--taskrunner":
                                     //
                                     // -- manager the task runner
-                                    if (argPtr != (args.Length + 1))
-                                    {
+                                    if (argPtr != (args.Length + 1)) {
                                         argPtr++;
-                                        if (args[argPtr].ToLower() == "run")
-                                        {
+                                        if (args[argPtr].ToLower() == "run") {
                                             //
                                             // -- run the taskrunner in the console
                                             Console.WriteLine("Beginning command line taskRunner. Hit any key to exit");
@@ -224,9 +223,7 @@ namespace Contensive.CLI
                                             object keyStroke = Console.ReadKey();
                                             taskRunner.stopTimerEvents();
                                             exitArgumentProcessing = true;
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             //
                                             // -- turn the windows service scheduler on/off
                                             cp.core.serverConfig.allowTaskRunnerService = Contensive.Core.Controllers.genericController.encodeBoolean(args[argPtr]);
@@ -238,11 +235,9 @@ namespace Contensive.CLI
                                 case "--tasks":
                                     //
                                     // -- turn on, off or run both services together
-                                    if (argPtr != (args.Length + 1))
-                                    {
+                                    if (argPtr != (args.Length + 1)) {
                                         argPtr++;
-                                        if (args[argPtr].ToLower() == "run")
-                                        {
+                                        if (args[argPtr].ToLower() == "run") {
                                             //
                                             // run the tasks in the console
                                             //
@@ -259,9 +254,7 @@ namespace Contensive.CLI
                                             object keyStroke = Console.ReadKey();
                                             taskRunner.stopTimerEvents();
                                             exitArgumentProcessing = true;
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             //
                                             // turn the windows service scheduler on/off
                                             //
@@ -293,9 +286,7 @@ namespace Contensive.CLI
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Console.WriteLine("There was an error that forced the program to close. Details follow.\n\n" + ex.ToString());
             }
         }
@@ -310,6 +301,12 @@ namespace Contensive.CLI
             + "\r\n"
             + "\r\n--upgradeall"
             + "\r\n    run application upgrade on all applications"
+            + "\r\n"
+            + "\r\n--housekeep appName (-h appname)"
+            + "\r\n    run application housekeeping"
+            + "\r\n"
+            + "\r\n--housekeepall"
+            + "\r\n    run application housekeeping on all applications"
             + "\r\n"
             + "\r\n--version (-v)"
             + "\r\n    display code version"

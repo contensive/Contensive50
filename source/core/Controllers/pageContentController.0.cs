@@ -2397,13 +2397,14 @@ namespace Contensive.Core.Controllers {
                     //---------------------------------------------------------------------------------
                     // ----- Store page javascript
                     //---------------------------------------------------------------------------------
+                    // todo -- assets should all come from addons !!!
                     //
                     cpCore.html.addScriptCode_onLoad(cpCore.doc.page.JSOnLoad, "page content");
-                    cpCore.html.addScriptCode_head(cpCore.doc.page.JSHead, "page content");
+                    cpCore.html.addScriptCode(cpCore.doc.page.JSHead, "page content");
                     if (cpCore.doc.page.JSFilename != "") {
-                        cpCore.html.addScriptLink_Head(genericController.getCdnFileLink(cpCore, cpCore.doc.page.JSFilename), "page content");
+                        cpCore.html.addScriptLinkSrc(genericController.getCdnFileLink(cpCore, cpCore.doc.page.JSFilename), "page content");
                     }
-                    cpCore.html.addScriptCode_body(cpCore.doc.page.JSEndBody, "page content");
+                    cpCore.html.addScriptCode(cpCore.doc.page.JSEndBody, "page content");
                     //
                     //---------------------------------------------------------------------------------
                     // Set the Meta Content flag

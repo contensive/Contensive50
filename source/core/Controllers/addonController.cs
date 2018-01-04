@@ -64,7 +64,12 @@ namespace Contensive.Core.Controllers {
         public string execute(Models.Entity.addonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
             string result = "";
             bool rootLevelAddon = cpCore.doc.addonsCurrentlyRunningIdList.Count.Equals(0);
+            bool save_forceJavascriptToHead = executeContext.forceJavascriptToHead;
             try {
+                //
+                // -- test point message
+                long addonStart = cpCore.doc.appStopWatch.ElapsedMilliseconds;
+                debugController.testPoint(cpCore, "execute enter [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                 if (addon == null) {
                     //
                     // -- addon not found
@@ -89,6 +94,9 @@ namespace Contensive.Core.Controllers {
                     cpCore.docProperties.setProperty("instanceId", executeContext.instanceGuid);
                     cpCore.doc.addonsCurrentlyRunningIdList.Add(addon.id);
                     //
+                    // -- if the addon's javascript is required in the head, set it in the executeContext now so it will propigate into the dependant addons as well
+                    executeContext.forceJavascriptToHead = executeContext.forceJavascriptToHead || addon.javascriptForceHead;
+                    //
                     // -- run included add-ons before their parent
                     List<Models.Entity.addonIncludeRuleModel> addonIncludeRules = addonIncludeRuleModel.createList(cpCore, "(addonid=" + addon.id + ")");
                     if (addonIncludeRules.Count > 0) {
@@ -103,9 +111,6 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                     }
-                    //
-                    // -- add test point message after dependancies so debug list shows them in the order they ran, not the order they were called.
-                    debugController.testPoint(cpCore, "execute [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                     //
                     // -- properties referenced multiple time 
                     bool allowAdvanceEditor = cpCore.visitProperty.getBoolean("AllowAdvancedEditor");
@@ -452,33 +457,34 @@ namespace Contensive.Core.Controllers {
                             }
                             result += "<SCRIPT LANGUAGE=\"JAVASCRIPT\" SRC=\"" + callBackLink + "\"></SCRIPT>";
                         }
+                        string AddedByName = addon.name + " addon";
                         //
-                        // -- html assets (js,styles,head tags), set flag to block duplicates 
+                        // -- js head links
+                        if (addon.JSHeadScriptSrc != "") {
+                            cpCore.html.addScriptLinkSrc(addon.JSHeadScriptSrc, AddedByName + " Javascript Head Src", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
+                        }
+                        //
+                        // -- js head code
+                        if (addon.JSFilename.filename != "") {
+                            string scriptFilename = cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, addon.JSFilename.filename);
+                            cpCore.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead),addon.id);
+                        }
+                        //
+                        // -- non-js html assets (styles,head tags), set flag to block duplicates 
                         if (!cpCore.doc.addonIdListRunInThisDoc.Contains(addon.id)) {
                             cpCore.doc.addonIdListRunInThisDoc.Add(addon.id);
-                            string AddedByName = addon.name + " addon";
                             cpCore.html.addTitle(addon.PageTitle, AddedByName);
                             cpCore.html.addMetaDescription(addon.MetaDescription, AddedByName);
                             cpCore.html.addMetaKeywordList(addon.MetaKeywordList, AddedByName);
                             cpCore.html.addHeadTag(addon.OtherHeadTags, AddedByName);
-                            //
-                            // -- js head links
-                            if (addon.JSHeadScriptSrc != "") {
-                                cpCore.html.addScriptLink_Head(addon.JSHeadScriptSrc, AddedByName + " Javascript Head Src");
-                            }
-                            //
-                            // -- js head code
-                            if (addon.JSFilename.filename != "") {
-                                cpCore.html.addScriptLink_Head(cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, addon.JSFilename.filename), AddedByName + " Javascript Head Code");
-                            }
-                            //
-                            // -- js body links
-                            if (addon.JSBodyScriptSrc != "") {
-                                cpCore.html.addScriptLink_Body(addon.JSBodyScriptSrc, AddedByName + " Javascript Body Src");
-                            }
-                            //
-                            // -- js body code
-                            cpCore.html.addScriptCode_body(addon.JavaScriptBodyEnd, AddedByName + " Javascript Body Code");
+                            ////
+                            //// -- js body links
+                            //if (addon.JSBodyScriptSrc != "") {
+                            //    cpCore.html.addScriptLink_Body(addon.JSBodyScriptSrc, AddedByName + " Javascript Body Src");
+                            //}
+                            ////
+                            //// -- js body code
+                            //cpCore.html.addScriptCode_body(addon.JavaScriptBodyEnd, AddedByName + " Javascript Body Code");
                             //
                             // -- styles
                             if (addon.StylesFilename.filename != "") {
@@ -533,7 +539,7 @@ namespace Contensive.Core.Controllers {
                             if (IncludeEditWrapper) {
                                 //
                                 // Edit Icon
-                                string EditWrapperHTMLID = "eWrapper" + cpCore.doc.pageAddonCnt;
+                                string EditWrapperHTMLID = "eWrapper" + cpCore.doc.addonInstanceCnt;
                                 string DialogList = "";
                                 string HelpIcon = getHelpBubble(addon.id, addon.Help, addon.CollectionID, ref DialogList);
                                 if (cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) {
@@ -574,14 +580,25 @@ namespace Contensive.Core.Controllers {
                     // -- restore the parent's instanceId
                     cpCore.docProperties.setProperty("instanceId", parentInstanceId);
                     cpCore.doc.addonsCurrentlyRunningIdList.Remove(addon.id);
-                    cpCore.doc.pageAddonCnt = cpCore.doc.pageAddonCnt + 1;
+                    cpCore.doc.addonInstanceCnt = cpCore.doc.addonInstanceCnt + 1;
                 }
+                //
+                // -- test point message
+                debugController.testPoint(cpCore, "execute exit (" + (cpCore.doc.appStopWatch.ElapsedMilliseconds- addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             } finally {
                 if (addon != null) {
+                    //
+                    // -- restore the forceJavascriptToHead value of the caller
+                    executeContext.forceJavascriptToHead = save_forceJavascriptToHead;
+                    //
+                    // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
                     if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
-                        result = cpCore.html.getHtmlDoc(result, "<body>"); // "<body class=""ccBodyAdmin ccCon"">"
+                        result = cpCore.html.getHtmlDoc(result, "<body>");
+                        if (!cpCore.doc.visitPropertyAllowDebugging) {
+                            result = NUglify.Uglify.Html(result).Code;
+                        }
                     }
                 }
             }
@@ -1439,7 +1456,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(EntryPoint)) {
                     //
                     // -- compatibility mode, if no entry point given, if the code starts with "function myFuncton()" and add "call myFunction()"
-                    int pos = WorkingCode.IndexOf("function");
+                    int pos = WorkingCode.IndexOf("function",StringComparison.CurrentCultureIgnoreCase);
                     if (pos >= 0) {
                         EntryPoint = WorkingCode.Substring(pos + 8);
                         pos = EntryPoint.IndexOf("\r");
@@ -3469,7 +3486,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //   Apply a wrapper to content
-        //
+        // todo -- wrapper should be an addon !!!
         private string addWrapperToResult(string Content, int WrapperID, string WrapperSourceForComment = "") {
             string s = "";
             try {
@@ -3497,13 +3514,13 @@ namespace Contensive.Core.Controllers {
                         SourceComment = SourceComment + " for " + WrapperSourceForComment;
                     }
                     cpCore.html.addScriptCode_onLoad(cpCore.db.csGetText(CS, "javascriptonload"), SourceComment);
-                    cpCore.html.addScriptCode_body(cpCore.db.csGetText(CS, "javascriptbodyend"), SourceComment);
+                    cpCore.html.addScriptCode(cpCore.db.csGetText(CS, "javascriptbodyend"), SourceComment);
                     cpCore.html.addHeadTag(cpCore.db.csGetText(CS, "OtherHeadTags"), SourceComment);
                     //
                     JSFilename = cpCore.db.csGetText(CS, "jsfilename");
                     if (!string.IsNullOrEmpty(JSFilename)) {
                         JSFilename = cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, JSFilename);
-                        cpCore.html.addScriptLink_Head(JSFilename, SourceComment);
+                        cpCore.html.addScriptLinkSrc(JSFilename, SourceComment);
                     }
                     Copy = cpCore.db.csGetText(CS, "stylesfilename");
                     if (!string.IsNullOrEmpty(Copy)) {

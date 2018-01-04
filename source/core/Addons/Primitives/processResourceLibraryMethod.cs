@@ -38,7 +38,7 @@ namespace Contensive.Core.Addons.Primitives {
                     // Open a page compatible with a dialog
                     //
                     cpCore.doc.addRefreshQueryString("EditorObjectName", EditorObjectName);
-                    cpCore.html.addScriptLink_Head("/ccLib/ClientSide/dialogs.js", "Resource Library");
+                    cpCore.html.addScriptLinkSrc("/ccLib/ClientSide/dialogs.js", "Resource Library");
                     //Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                     cpCore.doc.setMetaContent(0, 0);
                     cpCore.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Resource Library");
@@ -48,7 +48,7 @@ namespace Contensive.Core.Addons.Primitives {
                         + cr2 + "<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"spacer\" src=\"/ccLib/images/spacer.gif\" width=1 height=1></div>"
                         + genericController.htmlIndent(Copy) + "\r</td></tr>"
                         + "\r<tr><td>"
-                        + genericController.htmlIndent(cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(false, false)) + "\r</td></tr></table>"
+                        + genericController.htmlIndent(cpCore.html.getHtmlBodyEnd(false, false)) + "\r</td></tr></table>"
                         + "\r<script language=javascript type=\"text/javascript\">fixDialog();</script>"
                         + "";
                     string htmlBodyTag = "<body class=\"ccBodyAdmin ccCon\" style=\"overflow:scroll\">";
@@ -58,7 +58,7 @@ namespace Contensive.Core.Addons.Primitives {
                     //
                     // Open a page compatible with a dialog
                     cpCore.doc.addRefreshQueryString("LinkObjectName", LinkObjectName);
-                    cpCore.html.addScriptLink_Head("/ccLib/ClientSide/dialogs.js", "Resource Library");
+                    cpCore.html.addScriptLinkSrc("/ccLib/ClientSide/dialogs.js", "Resource Library");
                     cpCore.doc.setMetaContent(0, 0);
                     cpCore.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Resource Library");
                     string htmlBody = ""

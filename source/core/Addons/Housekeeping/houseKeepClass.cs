@@ -40,7 +40,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 // -- ok to cast cpbase to cp because they build from the same solution
                 //this.cp = (CPClass)cp;
                 coreClass cpCore = ((CPClass)cp).core;
-                HouseKeep(cpCore, false);
+                HouseKeep(cpCore, cpCore.docProperties.getBoolean("force"));
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }
@@ -48,432 +48,358 @@ namespace Contensive.Core.Addons.Housekeeping {
         }        //
         //
         //
-        public void HouseKeep(coreClass cpCore, bool DebugMode) {
-            int EmailDropArchiveAgeDays = 0;
-            int Pos = 0;
-            string DomainNamePrimary = null;
-            DateTime workingDate = default(DateTime);
-            DateTime OldestVisitSummaryWeCareAbout = default(DateTime);
-            string DefaultMemberName = null;
-            int PeopleCID = 0;
-            string RegisterList = "";
-            string Content = null;
-            string ErrorMessage = null;
-            DateTime Yesterday = default(DateTime);
-            DateTime LastTimeSummaryWasRun = default(DateTime);
-            DateTime NextSummaryStartDate = default(DateTime);
-            DateTime ALittleWhileAgo = default(DateTime);
-            DateTime PeriodStartDate = default(DateTime);
-            double PeriodDatePtr = 0;
-            double PeriodStep = 0;
-            DateTime StartOfHour = default(DateTime);
-            int HoursPerDay = 0;
-            DateTime OldestDateAdded = default(DateTime);
-            object emptyData = null;
-            bool NeedToClearCache = false;
-            int ArchiveParentID = 0;
-            int RecordID = 0;
-            int CS = 0;
-            XmlDocument LibraryCollections = new XmlDocument();
-            XmlDocument LocalCollections = new XmlDocument();
-            XmlDocument Doc = new XmlDocument();
-            string AlarmTimeString = null;
-            double AlarmTimeMinutesSinceMidnight = 0;
-            string FolderName = null;
-            int VisitArchiveAgeDays = 0;
-            int GuestArchiveAgeDays = 0;
-            DateTime VisitArchiveDate = default(DateTime);
-            bool RunServerHousekeep = false;
-            bool NewHour = false;
-            DateTime rightNow = default(DateTime);
-            double LastCheckMinutesFromMidnight = 0;
-            double minutesSinceMidnight = 0;
-            string ConfigFilename = null;
-            string Config = null;
-            string[] ConfigLines = null;
-            string Line = null;
-            int LineCnt = 0;
-            int LinePtr = 0;
-            string[] NameValue = null;
-            string SQLNow = null;
-            string SQL = null;
-            int DataSourceType = 0;
-            CPClass cp = null;
-            List<string> nonCriticalErrorList = new List<string>();
-            //
-            // put token in a config file
-            //
-            cp = new CPClass();
-            //
-            rightNow = DateTime.Now;
-            Yesterday = rightNow.AddDays(-1).Date;
-            ALittleWhileAgo = rightNow.AddDays(-90).Date;
-            SQLNow = cpCore.db.encodeSQLDate(rightNow);
-            DateTime LastCheckDateTime = cpCore.siteProperties.getDate("housekeep, last check", default(DateTime));
-            int ServerHousekeepHour = cpCore.siteProperties.getInteger("housekeep, run time hour", 2);
-            //
-            // ----- Run Server Housekeep
-            //
-            if (rightNow.Date > LastCheckDateTime.Date) {
+        public void HouseKeep(coreClass cpCore, bool force) {
+            try {
+                DateTime LastCheckDateTime = cpCore.siteProperties.getDate("housekeep, last check", default(DateTime));
+                int ServerHousekeepHour = cpCore.siteProperties.getInteger("housekeep, run time hour", 2);
                 //
-                // new day since lastcheck, is alarm less then now
+                // ----- Run Server Housekeep
                 //
-                RunServerHousekeep = (ServerHousekeepHour < rightNow.Hour);
-                //} else {
-                //    //
-                //    // same day as lastcheck, is alarm between now and last time check
-                //    //
-                //    RunServerHousekeep = (rightNow > ServerHousekeepHour) && (LastCheckDateTime < ServerHousekeepHour);
-            }
-            NewHour = rightNow.Hour != LastCheckDateTime.Hour;
-            if (DebugMode || RunServerHousekeep) {
-                cpCore.siteProperties.setProperty("housekeep, last check", rightNow);
-                //
-                // it is the next day, remove old log files
-                //
-                logController.housekeepLogFolder(cpCore);
-                //
-                // Download Updates
-                //
-                DownloadUpdates(cpCore);
-                //
-                // Set LogCheckDate
-                //
-                LogCheckDateLast = DateTime.Now.Date;
-            }
-            //
-            // Register and unregister files in the Addon folder
-            //
-            housekeepAddonFolder(cpCore);
-            //
-            // Upgrade Local Collections, and all applications that use them
-            //
-            ErrorMessage = "";
-            AppendClassLog(cpCore, "", "HouseKeep", "Updating local collections from library, see Upgrade log for details during this period.");
-            string ignoreRefactorText = "";
-            bool ignoreRefactorBoolean = false;
-            if (!collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpCore, ref ErrorMessage, ref ignoreRefactorText, ref ignoreRefactorBoolean, false, ref nonCriticalErrorList)) {
-                if (string.IsNullOrEmpty(ErrorMessage)) {
-                    ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
-                }
-                AppendClassLog(cpCore, "", "HouseKeep", "Updating local collections from Library returned an error, " + ErrorMessage);
-            }
-            //
-            // Verify core installation
-            //
-            collectionController.installCollectionFromRemoteRepo(cpCore, CoreCollectionGuid, ref ErrorMessage, "", false, ref nonCriticalErrorList);
-            //
-            DomainNamePrimary = cpCore.serverConfig.appConfig.domainList[0];
-            Pos = genericController.vbInstr(1, DomainNamePrimary, ",");
-            if (Pos > 1) {
-                DomainNamePrimary = DomainNamePrimary.Left(Pos - 1);
-            }
-            //dataBuildVersion = cpCore.app.getSiteProperty("BuildVersion", "0")
-            DataSourceType = cpCore.db.getDataSourceType("default");
-            //
-            DefaultMemberName = "";
-            PeopleCID = Models.Complex.cdefModel.getContentId(cpCore, "people");
-            SQL = "select defaultvalue from ccfields where name='name' and contentid=(" + PeopleCID + ")";
-            CS = cpCore.db.csOpenSql_rev("default", SQL);
-            if (cpCore.db.csOk(CS)) {
-                DefaultMemberName = cpCore.db.csGetText(CS, "defaultvalue");
-            }
-            cpCore.db.csClose(ref CS);
-            //
-            // Get ArchiveAgeDays - use this as the oldest data they care about
-            //
-            VisitArchiveAgeDays = genericController.encodeInteger(cpCore.siteProperties.getText("ArchiveRecordAgeDays", "365"));
-            if (VisitArchiveAgeDays < 2) {
-                VisitArchiveAgeDays = 2;
-                cpCore.siteProperties.setProperty("ArchiveRecordAgeDays", "2");
-            }
-            VisitArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date;
-            OldestVisitSummaryWeCareAbout = DateTime.Now.Date.AddDays(-120);
-            if (OldestVisitSummaryWeCareAbout < VisitArchiveDate) {
-                OldestVisitSummaryWeCareAbout = VisitArchiveDate;
-            }
-            //OldestVisitSummaryWeCareAbout = now.date - VisitArchiveAgeDays
-            //
-            // Get GuestArchiveAgeDays
-            //
-            GuestArchiveAgeDays = genericController.encodeInteger(cpCore.siteProperties.getText("ArchivePeopleAgeDays", "2"));
-            if (GuestArchiveAgeDays < 2) {
-                GuestArchiveAgeDays = 2;
-                cpCore.siteProperties.setProperty("ArchivePeopleAgeDays", GuestArchiveAgeDays.ToString());
-            }
-            //
-            // Get EmailDropArchiveAgeDays
-            //
-            EmailDropArchiveAgeDays = genericController.encodeInteger(cpCore.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
-            if (EmailDropArchiveAgeDays < 2) {
-                EmailDropArchiveAgeDays = 2;
-                cpCore.siteProperties.setProperty("ArchiveEmailDropAgeDays", EmailDropArchiveAgeDays.ToString());
-            }
-            //
-            // Do non-optional housekeeping
-            //
-            if (RunServerHousekeep || DebugMode) {
-                if (true) // 3.3.971" Then
-                {
+                DateTime rightNow = DateTime.Now;
+                bool RunServerHousekeep = ((rightNow.Date > LastCheckDateTime.Date) && (ServerHousekeepHour < rightNow.Hour));
+                if (force || RunServerHousekeep) {
+                    cpCore.siteProperties.setProperty("housekeep, last check", rightNow);
+                    //CPClass cp = new CPClass();
+                    DateTime Yesterday = rightNow.AddDays(-1).Date;
+                    DateTime ALittleWhileAgo = rightNow.AddDays(-90).Date;
+                    string SQLNow = cpCore.db.encodeSQLDate(rightNow);
                     //
-                    // Move Archived pages from their current parent to their archive parent
+                    // it is the next day, remove old log files
                     //
-                    AppendClassLog(cpCore, cpCore.serverConfig.appConfig.name, "HouseKeep", "Archive update for pages on [" + cpCore.serverConfig.appConfig.name + "]");
-                    SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + SQLNow + "))and(active<>0)";
-                    CS = cpCore.db.csOpenSql_rev("default", SQL);
-                    while (cpCore.db.csOk(CS)) {
-                        ArchiveParentID = cpCore.db.csGetInteger(CS, "ArchiveParentID");
-                        if (ArchiveParentID == 0) {
-                            SQL = "update ccpagecontent set DateArchive=null where (id=" + RecordID + ")";
-                            cpCore.db.executeQuery(SQL);
-                        } else {
-                            RecordID = cpCore.db.csGetInteger(CS, "ID");
-                            SQL = "update ccpagecontent set ArchiveParentID=null,DateArchive=null,parentid=" + ArchiveParentID + " where (id=" + RecordID + ")";
-                            cpCore.db.executeQuery(SQL);
-                            NeedToClearCache = true;
+                    logController.housekeepLogFolder(cpCore);
+                    //
+                    // Download Updates
+                    DownloadUpdates(cpCore);
+                    //
+                    // Register and unregister files in the Addon folder
+                    housekeepAddonFolder(cpCore);
+                    //
+                    // Upgrade Local Collections, and all applications that use them
+                    string ErrorMessage = "";
+                    AppendClassLog(cpCore, "Updating local collections from library, see Upgrade log for details during this period.");
+                    string ignoreRefactorText = "";
+                    bool ignoreRefactorBoolean = false;
+                    List<string> nonCriticalErrorList = new List<string>();
+                    if (!collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpCore, ref ErrorMessage, ref ignoreRefactorText, ref ignoreRefactorBoolean, false, ref nonCriticalErrorList)) {
+                        if (string.IsNullOrEmpty(ErrorMessage)) {
+                            ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
                         }
-                        cpCore.db.csGoNext(CS);
+                        AppendClassLog(cpCore, "Updating local collections from Library returned an error, " + ErrorMessage);
+                    }
+                    //
+                    // Verify core installation
+                    //
+                    collectionController.installCollectionFromRemoteRepo(cpCore, CoreCollectionGuid, ref ErrorMessage, "", false, ref nonCriticalErrorList);
+                    //
+                    string DomainNamePrimary = cpCore.serverConfig.appConfig.domainList[0];
+                    int Pos = genericController.vbInstr(1, DomainNamePrimary, ",");
+                    if (Pos > 1) {
+                        DomainNamePrimary = DomainNamePrimary.Left(Pos - 1);
+                    }
+                    int DataSourceType = cpCore.db.getDataSourceType("default");
+                    //
+                    string DefaultMemberName = "";
+                    int PeopleCID = Models.Complex.cdefModel.getContentId(cpCore, "people");
+                    string SQL = "select defaultvalue from ccfields where name='name' and contentid=(" + PeopleCID + ")";
+                    int CS = cpCore.db.csOpenSql_rev("default", SQL);
+                    if (cpCore.db.csOk(CS)) {
+                        DefaultMemberName = cpCore.db.csGetText(CS, "defaultvalue");
                     }
                     cpCore.db.csClose(ref CS);
                     //
-                    // Clear caches
+                    // Get ArchiveAgeDays - use this as the oldest data they care about
                     //
-                    if (NeedToClearCache) {
-                        emptyData = null;
-                        cpCore.cache.invalidate("Page Content");
-                        cpCore.cache.setObject("PCC", emptyData);
+                    int VisitArchiveAgeDays = genericController.encodeInteger(cpCore.siteProperties.getText("ArchiveRecordAgeDays", "365"));
+                    if (VisitArchiveAgeDays < 2) {
+                        VisitArchiveAgeDays = 2;
+                        cpCore.siteProperties.setProperty("ArchiveRecordAgeDays", "2");
                     }
-                }
-                if (true) {
+                    DateTime VisitArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date;
+                    DateTime OldestVisitSummaryWeCareAbout = DateTime.Now.Date.AddDays(-120);
+                    if (OldestVisitSummaryWeCareAbout < VisitArchiveDate) {
+                        OldestVisitSummaryWeCareAbout = VisitArchiveDate;
+                    }
+                    //OldestVisitSummaryWeCareAbout = now.date - VisitArchiveAgeDays
                     //
-                    // Delete any daily visit summary duplicates during this period(keep the first)
+                    // Get GuestArchiveAgeDays
                     //
-                    SQL = "delete from ccvisitsummary"
-                        + " where id in ("
-                        + " select d.id from ccvisitsummary d,ccvisitsummary f"
-                        + " where f.datenumber=d.datenumber"
-                        + " and f.datenumber>" + cpCore.db.encodeSQLDate(OldestVisitSummaryWeCareAbout) + " and f.datenumber<" + cpCore.db.encodeSQLDate(Yesterday) + " and f.TimeDuration=24"
-                        + " and d.TimeDuration=24"
-                        + " and f.id<d.id"
-                        + ")";
-                    cpCore.db.executeQuery(SQL);
+                    int GuestArchiveAgeDays = genericController.encodeInteger(cpCore.siteProperties.getText("ArchivePeopleAgeDays", "2"));
+                    if (GuestArchiveAgeDays < 2) {
+                        GuestArchiveAgeDays = 2;
+                        cpCore.siteProperties.setProperty("ArchivePeopleAgeDays", GuestArchiveAgeDays.ToString());
+                    }
                     //
-                    // Find missing daily summaries, summarize that date
+                    // Get EmailDropArchiveAgeDays
                     //
-                    SQL = cpCore.db.GetSQLSelect("default", "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
-                    CS = cpCore.db.csOpenSql_rev("default", SQL);
-                    DateTime datePtr = OldestVisitSummaryWeCareAbout;
-                    while (datePtr <= Yesterday) {
-                        if (!cpCore.db.csOk(CS)) {
+                    int EmailDropArchiveAgeDays = genericController.encodeInteger(cpCore.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
+                    if (EmailDropArchiveAgeDays < 2) {
+                        EmailDropArchiveAgeDays = 2;
+                        cpCore.siteProperties.setProperty("ArchiveEmailDropAgeDays", EmailDropArchiveAgeDays.ToString());
+                    }
+                    //
+                    // Do non-optional housekeeping
+                    //
+                    if (RunServerHousekeep || force) {
+                        if (true) // 3.3.971" Then
+                        {
                             //
-                            // Out of data, start with this DatePtr
+                            // Move Archived pages from their current parent to their archive parent
                             //
-                            HouseKeep_VisitSummary(cpCore, datePtr, datePtr, 24, cpCore.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
-                            //Exit For
-                        } else {
-                            workingDate = DateTime.MinValue.AddDays(cpCore.db.csGetInteger(CS, "DateNumber"));
-                            if (datePtr < workingDate) {
-                                //
-                                // There are missing dates, update them
-                                //
-                                HouseKeep_VisitSummary(cpCore, datePtr, workingDate.AddDays(-1), 24, cpCore.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                            bool NeedToClearCache = false;
+                            AppendClassLog(cpCore, "Archive update for pages on [" + cpCore.serverConfig.appConfig.name + "]");
+                            SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + SQLNow + "))and(active<>0)";
+                            CS = cpCore.db.csOpenSql_rev("default", SQL);
+                            while (cpCore.db.csOk(CS)) {
+                                int RecordID = cpCore.db.csGetInteger(CS, "ID");
+                                int ArchiveParentID = cpCore.db.csGetInteger(CS, "ArchiveParentID");
+                                if (ArchiveParentID == 0) {
+                                    SQL = "update ccpagecontent set DateArchive=null where (id=" + RecordID + ")";
+                                    cpCore.db.executeQuery(SQL);
+                                } else {
+                                    SQL = "update ccpagecontent set ArchiveParentID=null,DateArchive=null,parentid=" + ArchiveParentID + " where (id=" + RecordID + ")";
+                                    cpCore.db.executeQuery(SQL);
+                                    NeedToClearCache = true;
+                                }
+                                cpCore.db.csGoNext(CS);
+                            }
+                            cpCore.db.csClose(ref CS);
+                            //
+                            // Clear caches
+                            //
+                            if (NeedToClearCache) {
+                                object emptyData = null;
+                                cpCore.cache.invalidate("Page Content");
+                                cpCore.cache.setObject("PCC", emptyData);
                             }
                         }
-                        if (cpCore.db.csOk(CS)) {
+                        if (true) {
                             //
-                            // if there is more data, go to the next record
+                            // Delete any daily visit summary duplicates during this period(keep the first)
                             //
-                            cpCore.db.csGoNext(CS);
+                            SQL = "delete from ccvisitsummary"
+                                + " where id in ("
+                                + " select d.id from ccvisitsummary d,ccvisitsummary f"
+                                + " where f.datenumber=d.datenumber"
+                                + " and f.datenumber>" + OldestVisitSummaryWeCareAbout.ToOADate() + " and f.datenumber<" + Yesterday.ToOADate() + " and f.TimeDuration=24"
+                                + " and d.TimeDuration=24"
+                                + " and f.id<d.id"
+                                + ")";
+                            cpCore.db.executeQuery(SQL);
+                            //
+                            // Find missing daily summaries, summarize that date
+                            //
+                            SQL = cpCore.db.GetSQLSelect("default", "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
+                            CS = cpCore.db.csOpenSql_rev("default", SQL);
+                            DateTime datePtr = OldestVisitSummaryWeCareAbout;
+                            while (datePtr <= Yesterday) {
+                                if (!cpCore.db.csOk(CS)) {
+                                    //
+                                    // Out of data, start with this DatePtr
+                                    //
+                                    HouseKeep_VisitSummary(cpCore, datePtr, datePtr, 24, cpCore.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                                    //Exit For
+                                } else {
+                                    DateTime workingDate = DateTime.MinValue.AddDays(cpCore.db.csGetInteger(CS, "DateNumber"));
+                                    if (datePtr < workingDate) {
+                                        //
+                                        // There are missing dates, update them
+                                        //
+                                        HouseKeep_VisitSummary(cpCore, datePtr, workingDate.AddDays(-1), 24, cpCore.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                                    }
+                                }
+                                if (cpCore.db.csOk(CS)) {
+                                    //
+                                    // if there is more data, go to the next record
+                                    //
+                                    cpCore.db.csGoNext(CS);
+                                }
+                                datePtr = datePtr.AddDays(1).Date;
+                            }
+                            cpCore.db.csClose(ref CS);
                         }
-                        datePtr = datePtr.AddDays(1).Date;
-                    }
-                    cpCore.db.csClose(ref CS);
-                }
-                //
-                // Remote Query Expiration
-                //
-                SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" + cpCore.db.encodeSQLDate(DateTime.Now) + ")";
-                cpCore.db.executeQuery(SQL);
-                if (true) {
-                    //
-                    // Clean Navigation
-                    //
-                    if (DataSourceType == DataSourceTypeODBCMySQL) {
-                        SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null";
-                    } else {
-                        SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null)";
-                    }
-                    cpCore.db.executeQuery(SQL);
-                    //
-                    if (DataSourceType == DataSourceTypeODBCMySQL) {
-                        SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.helpaddonid where m.helpaddonid<>0 and a.id is null";
-                    } else {
-                        SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.helpaddonid where m.helpaddonid<>0 and a.id is null)";
-                    }
-                    cpCore.db.executeQuery(SQL);
-                    //
-                    if (DataSourceType == DataSourceTypeODBCMySQL) {
-                        SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.helpcollectionid where m.helpcollectionid<>0 and a.id is null";
-                    } else {
-                        SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAddonCollections c on c.id=m.helpcollectionid Where m.helpcollectionid <> 0 And c.Id Is Null)";
-                    }
-                    cpCore.db.executeQuery(SQL);
-                }
-                //
-                // Page View Summary
-                //
-                if (true) // 4.1.187" Then
-                {
-                    //
-                    // Delete duplicates
-                    //
-                    //SQL = "delete from ccviewingsummary" _
-                    //    & " where id in (" _
-                    //    & " select d.id from ccviewingsummary d,ccviewingsummary f" _
-                    //    & " where f.datenumber=d.datenumber" _
-                    //    & " and f.datenumber>" & encodeSQLDate(OldestVisitSummaryWeCareAbout) _
-                    //    & " and f.datenumber<" & encodeSQLDate(Yesterday) _
-                    //    & " and f.TimeDuration=24" _
-                    //    & " and d.TimeDuration=24" _
-                    //    & " and f.id<d.id" _
-                    //    & ")"
-                    //Call cpCore.app.ExecuteSQL( SQL)
-                    //
-                    // Find the day of the last entry in the viewing summary table as start there
-                    // PageViewSummary should always add at least one entry for each day, even if 0
-                    //
-                    if (true) {
-                        DateTime datePtr = default(DateTime);
-                        SQL = cpCore.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1);
-                        CS = cpCore.db.csOpenSql_rev("default", SQL);
-                        if (!cpCore.db.csOk(CS)) {
-                            datePtr = OldestVisitSummaryWeCareAbout;
+                        //
+                        // Remote Query Expiration
+                        //
+                        SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" + cpCore.db.encodeSQLDate(DateTime.Now) + ")";
+                        cpCore.db.executeQuery(SQL);
+                        if (DataSourceType == DataSourceTypeODBCMySQL) {
+                            SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null";
                         } else {
-                            datePtr = DateTime.MinValue.AddDays(cpCore.db.csGetInteger(CS, "DateNumber"));
+                            SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null)";
+                        }
+                        cpCore.db.executeQuery(SQL);
+                        //
+                        if (DataSourceType == DataSourceTypeODBCMySQL) {
+                            SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.helpaddonid where m.helpaddonid<>0 and a.id is null";
+                        } else {
+                            SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.helpaddonid where m.helpaddonid<>0 and a.id is null)";
+                        }
+                        cpCore.db.executeQuery(SQL);
+                        //
+                        if (DataSourceType == DataSourceTypeODBCMySQL) {
+                            SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.helpcollectionid where m.helpcollectionid<>0 and a.id is null";
+                        } else {
+                            SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAddonCollections c on c.id=m.helpcollectionid Where m.helpcollectionid <> 0 And c.Id Is Null)";
+                        }
+                        cpCore.db.executeQuery(SQL);
+                        //
+                        // Page View Summary
+                        //
+                        if (true) // 4.1.187" Then
+                        {
+                            //
+                            // Delete duplicates
+                            //
+                            //SQL = "delete from ccviewingsummary" _
+                            //    & " where id in (" _
+                            //    & " select d.id from ccviewingsummary d,ccviewingsummary f" _
+                            //    & " where f.datenumber=d.datenumber" _
+                            //    & " and f.datenumber>" & encodeSQLDate(OldestVisitSummaryWeCareAbout) _
+                            //    & " and f.datenumber<" & encodeSQLDate(Yesterday) _
+                            //    & " and f.TimeDuration=24" _
+                            //    & " and d.TimeDuration=24" _
+                            //    & " and f.id<d.id" _
+                            //    & ")"
+                            //Call cpCore.app.ExecuteSQL( SQL)
+                            //
+                            // Find the day of the last entry in the viewing summary table as start there
+                            // PageViewSummary should always add at least one entry for each day, even if 0
+                            //
+                            if (true) {
+                                DateTime datePtr = default(DateTime);
+                                SQL = cpCore.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1);
+                                CS = cpCore.db.csOpenSql_rev("default", SQL);
+                                if (!cpCore.db.csOk(CS)) {
+                                    datePtr = OldestVisitSummaryWeCareAbout;
+                                } else {
+                                    datePtr = DateTime.MinValue.AddDays(cpCore.db.csGetInteger(CS, "DateNumber"));
+                                }
+                                cpCore.db.csClose(ref CS);
+                                if (datePtr < OldestVisitSummaryWeCareAbout) {
+                                    datePtr = OldestVisitSummaryWeCareAbout;
+                                }
+                                HouseKeep_PageViewSummary(cpCore, datePtr, Yesterday, 24, cpCore.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                            }
+                        }
+                    }
+                    //
+                    // Each hour, summarize the visits and viewings into the Visit Summary table
+                    //
+                    bool NewHour = (rightNow.Hour != LastCheckDateTime.Hour);
+                    if (force || NewHour) {
+                        //
+                        // Set NextSummaryStartDate based on the last time we ran hourly summarization
+                        //
+                        DateTime LastTimeSummaryWasRun = VisitArchiveDate;
+                        //LastTimeSummaryWasRun = ALittleWhileAgo
+                        //sql="select top 1 dateadded from ccvisitsummary where (timeduration=1)and(Dateadded>" & encodeSQLDate(ALittleWhileAgo) & ") order by id desc"
+                        SQL = cpCore.db.GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + cpCore.db.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1);
+                        //SQL = cpCore.app.csv_GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" & encodeSQLDate(ALittleWhileAgo) & ")", "id Desc", , 1)
+                        CS = cpCore.db.csOpenSql_rev("default", SQL);
+                        if (cpCore.db.csOk(CS)) {
+                            LastTimeSummaryWasRun = cpCore.db.csGetDate(CS, "DateAdded");
+                            AppendClassLog(cpCore, "Update hourly visit summary, last time summary was run was [" + LastTimeSummaryWasRun + "]");
+                        } else {
+                            AppendClassLog(cpCore, "Update hourly visit summary, no hourly summaries were found, set start to [" + LastTimeSummaryWasRun + "]");
                         }
                         cpCore.db.csClose(ref CS);
-                        if (datePtr < OldestVisitSummaryWeCareAbout) {
-                            datePtr = OldestVisitSummaryWeCareAbout;
+                        DateTime NextSummaryStartDate = LastTimeSummaryWasRun;
+                        //
+                        // Each hourly entry includes visits that started during that hour, but we do not know when they finished (maybe during last hour)
+                        //   Find the oldest starttime of all the visits with endtimes after the LastTimeSummaryWasRun. Resummarize all periods
+                        //   from then to now
+                        //
+                        //   For the past 24 hours, find the oldest visit with the last viewing during the last hour
+                        //
+                        //OldestDateAdded = LastTimeSummaryWasRun
+                        //PeriodStep = CDbl(1) / CDbl(24)
+                        DateTime StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
+                        DateTime OldestDateAdded = StartOfHour;
+                        SQL = cpCore.db.GetSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + cpCore.db.encodeSQLDate(StartOfHour), "dateadded", "", 1);
+                        //SQL = "select top 1 Dateadded from ccvisits where LastVisitTime>" & encodeSQLDate(StartOfHour) & " order by DateAdded"
+                        CS = cpCore.db.csOpenSql_rev("default", SQL);
+                        if (cpCore.db.csOk(CS)) {
+                            OldestDateAdded = cpCore.db.csGetDate(CS, "DateAdded");
+                            if (OldestDateAdded < NextSummaryStartDate) {
+                                NextSummaryStartDate = OldestDateAdded;
+                                AppendClassLog(cpCore, "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" + OldestDateAdded + "], before the last summary was run.");
+                            }
                         }
-                        HouseKeep_PageViewSummary(cpCore, datePtr, Yesterday, 24, cpCore.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                        cpCore.db.csClose(ref CS);
+                        //
+                        // Verify there are 24 hour records for every day back the past 90 days
+                        //
+                        DateTime DateofMissingSummary = DateTime.MinValue;
+                        //Call AppendClassLog(cpCore, cpCore.appEnvironment.name, "HouseKeep", "Verify there are 24 hour records for the past 90 days")
+                        DateTime PeriodStartDate = rightNow.Date.AddDays(-90);
+                        double PeriodStep = 1;
+                        int HoursPerDay = 0;
+                        for (double PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
+                            SQL = "select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber";
+                            //SQL = "select count(id) as HoursPerDay from ccVisitSummary group by DateNumber having DateNumber=" & CLng(PeriodDatePtr)
+                            CS = cpCore.db.csOpenSql_rev("default", SQL);
+                            if (cpCore.db.csOk(CS)) {
+                                HoursPerDay = cpCore.db.csGetInteger(CS, "HoursPerDay");
+                            }
+                            cpCore.db.csClose(ref CS);
+                            if (HoursPerDay < 24) {
+                                DateofMissingSummary = DateTime.FromOADate(PeriodDatePtr);
+                                break;
+                            }
+                        }
+                        if ((DateofMissingSummary != DateTime.MinValue) && (DateofMissingSummary < NextSummaryStartDate)) {
+                            AppendClassLog(cpCore, "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
+                            NextSummaryStartDate = DateofMissingSummary;
+                        }
+                        //
+                        // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
+                        //
+                        AppendClassLog(cpCore, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
+                        PeriodStep = (double)1 / (double)24;
+                        //PeriodStart = (Int(OldestDateAdded * 24) / 24)
+                        HouseKeep_VisitSummary(cpCore, NextSummaryStartDate, rightNow, 1, cpCore.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                    }
+                    //
+                    // OK to run archive
+                    // During archive, non-cookie records are removed, so this has to run after summarizing
+                    // and we can only delete non-cookie records older than 2 days (so we can be sure they have been summarized)
+                    //
+                    if (force) {
+                        //
+                        // debug mode - run achive if no times are given
+                        //
+                        HouseKeep_App_Daily(cpCore, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, cpCore.siteProperties.dataBuildVersion);
+                    } else {
+                        //
+                        // Check for site's archive time of day
+                        //
+                        string AlarmTimeString = cpCore.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM");
+                        if (string.IsNullOrEmpty(AlarmTimeString)) {
+                            AlarmTimeString = "12:00:00 AM";
+                            cpCore.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
+                        }
+                        if (!dateController.IsDate(AlarmTimeString)) {
+                            AlarmTimeString = "12:00:00 AM";
+                            cpCore.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
+                        }
+                        //AlarmTimeMinutesSinceMidnight = genericController.encodeDate(AlarmTimeString).TimeOfDay.TotalMinutes;
+                        double minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes;
+                        double LastCheckMinutesFromMidnight = LastCheckDateTime.TimeOfDay.TotalMinutes;
+                        if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
+                            //
+                            // Same Day - Midnight is before last and after current
+                            //
+                            HouseKeep_App_Daily(cpCore, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, cpCore.siteProperties.dataBuildVersion);
+                        } else if ((LastCheckMinutesFromMidnight > minutesSinceMidnight) && ((LastCheckMinutesFromMidnight < minutesSinceMidnight))) {
+                            //
+                            // New Day - Midnight is between Last and Set
+                            //
+                            HouseKeep_App_Daily(cpCore, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, cpCore.siteProperties.dataBuildVersion);
+                        }
                     }
                 }
-            }
-            //
-            // Each hour, summarize the visits and viewings into the Visit Summary table
-            //
-            if (DebugMode || NewHour) {
-                //
-                // Set NextSummaryStartDate based on the last time we ran hourly summarization
-                //
-                LastTimeSummaryWasRun = VisitArchiveDate;
-                //LastTimeSummaryWasRun = ALittleWhileAgo
-                //sql="select top 1 dateadded from ccvisitsummary where (timeduration=1)and(Dateadded>" & encodeSQLDate(ALittleWhileAgo) & ") order by id desc"
-                SQL = cpCore.db.GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + cpCore.db.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1);
-                //SQL = cpCore.app.csv_GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" & encodeSQLDate(ALittleWhileAgo) & ")", "id Desc", , 1)
-                CS = cpCore.db.csOpenSql_rev("default", SQL);
-                if (cpCore.db.csOk(CS)) {
-                    LastTimeSummaryWasRun = cpCore.db.csGetDate(CS, "DateAdded");
-                    AppendClassLog(cpCore, cpCore.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, last time summary was run was [" + LastTimeSummaryWasRun + "]");
-                } else {
-                    AppendClassLog(cpCore, cpCore.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, no hourly summaries were found, set start to [" + LastTimeSummaryWasRun + "]");
-                }
-                cpCore.db.csClose(ref CS);
-                NextSummaryStartDate = LastTimeSummaryWasRun;
-                //
-                // Each hourly entry includes visits that started during that hour, but we do not know when they finished (maybe during last hour)
-                //   Find the oldest starttime of all the visits with endtimes after the LastTimeSummaryWasRun. Resummarize all periods
-                //   from then to now
-                //
-                //   For the past 24 hours, find the oldest visit with the last viewing during the last hour
-                //
-                //OldestDateAdded = LastTimeSummaryWasRun
-                //PeriodStep = CDbl(1) / CDbl(24)
-                StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
-                OldestDateAdded = StartOfHour;
-                SQL = cpCore.db.GetSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + cpCore.db.encodeSQLDate(StartOfHour), "dateadded", "", 1);
-                //SQL = "select top 1 Dateadded from ccvisits where LastVisitTime>" & encodeSQLDate(StartOfHour) & " order by DateAdded"
-                CS = cpCore.db.csOpenSql_rev("default", SQL);
-                if (cpCore.db.csOk(CS)) {
-                    OldestDateAdded = cpCore.db.csGetDate(CS, "DateAdded");
-                    if (OldestDateAdded < NextSummaryStartDate) {
-                        NextSummaryStartDate = OldestDateAdded;
-                        AppendClassLog(cpCore, cpCore.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" + OldestDateAdded + "], before the last summary was run.");
-                    }
-                }
-                cpCore.db.csClose(ref CS);
-                //
-                // Verify there are 24 hour records for every day back the past 90 days
-                //
-                DateTime DateofMissingSummary = DateTime.MinValue;
-                //Call AppendClassLog(cpCore, cpCore.appEnvironment.name, "HouseKeep", "Verify there are 24 hour records for the past 90 days")
-                PeriodStartDate = rightNow.Date.AddDays(-90);
-                PeriodStep = 1;
-                //INSTANT C# TODO TASK: The step increment was not confirmed to be positive - confirm that the stopping condition is appropriate:
-                //ORIGINAL LINE: For PeriodDatePtr = PeriodStartDate.ToOADate To OldestDateAdded.ToOADate Step PeriodStep
-                for (PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
-                    SQL = "select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber";
-                    //SQL = "select count(id) as HoursPerDay from ccVisitSummary group by DateNumber having DateNumber=" & CLng(PeriodDatePtr)
-                    CS = cpCore.db.csOpenSql_rev("default", SQL);
-                    HoursPerDay = 0;
-                    if (cpCore.db.csOk(CS)) {
-                        HoursPerDay = cpCore.db.csGetInteger(CS, "HoursPerDay");
-                    }
-                    cpCore.db.csClose(ref CS);
-                    if (HoursPerDay < 24) {
-                        DateofMissingSummary = DateTime.FromOADate(PeriodDatePtr);
-                        break;
-                    }
-                }
-                if ((DateofMissingSummary != DateTime.MinValue) && (DateofMissingSummary < NextSummaryStartDate)) {
-                    AppendClassLog(cpCore, cpCore.serverConfig.appConfig.name, "HouseKeep", "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
-                    NextSummaryStartDate = DateofMissingSummary;
-                }
-                //
-                // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
-                //
-                AppendClassLog(cpCore, cpCore.serverConfig.appConfig.name, "HouseKeep", "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
-                PeriodStep = (double)1 / (double)24;
-                //PeriodStart = (Int(OldestDateAdded * 24) / 24)
-                HouseKeep_VisitSummary(cpCore, NextSummaryStartDate, rightNow, 1, cpCore.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
-            }
-            //
-            // OK to run archive
-            // During archive, non-cookie records are removed, so this has to run after summarizing
-            // and we can only delete non-cookie records older than 2 days (so we can be sure they have been summarized)
-            //
-            if (DebugMode) {
-                //
-                // debug mode - run achive if no times are given
-                //
-                HouseKeep_App_Daily(cpCore, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, cpCore.siteProperties.dataBuildVersion);
-            } else {
-                //
-                // Check for site's archive time of day
-                //
-                AlarmTimeString = cpCore.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM");
-                if (string.IsNullOrEmpty(AlarmTimeString)) {
-                    AlarmTimeString = "12:00:00 AM";
-                    cpCore.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
-                }
-                if (!dateController.IsDate(AlarmTimeString)) {
-                    AlarmTimeString = "12:00:00 AM";
-                    cpCore.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
-                }
-                AlarmTimeMinutesSinceMidnight = genericController.encodeDate(AlarmTimeString).TimeOfDay.TotalMinutes;
-                minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes;
-                LastCheckMinutesFromMidnight = LastCheckDateTime.TimeOfDay.TotalMinutes;
-                if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
-                    //
-                    // Same Day - Midnight is before last and after current
-                    //
-                    HouseKeep_App_Daily(cpCore, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, cpCore.siteProperties.dataBuildVersion);
-                } else if ((LastCheckMinutesFromMidnight > minutesSinceMidnight) && ((LastCheckMinutesFromMidnight < minutesSinceMidnight))) {
-                    //
-                    // New Day - Midnight is between Last and Set
-                    //
-                    HouseKeep_App_Daily(cpCore, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, cpCore.siteProperties.dataBuildVersion);
-                }
+            } catch (Exception) {
+                throw;
             }
         }
         //
@@ -572,7 +498,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     // delete members from the non-cookie visits
                     // legacy records without createdbyvisit will have to be corrected by hand (or upgrade)
                     //
-                    AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting members from visits with no cookie support older than Midnight, Two Days Ago");
+                    AppendClassLog(cpCore, "Deleting members from visits with no cookie support older than Midnight, Two Days Ago");
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
                             SQL = "delete m.*"
@@ -642,7 +568,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     // delete viewings from the non-cookie visits
                     //
-                    AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting viewings from visits with no cookie support older than Midnight, Two Days Ago");
+                    AppendClassLog(cpCore, "Deleting viewings from visits with no cookie support older than Midnight, Two Days Ago");
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
                             SQL = "delete h.*"
@@ -671,7 +597,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     // delete visitors from the non-cookie visits
                     //
-                    AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting visitors from visits with no cookie support older than Midnight, Two Days Ago");
+                    AppendClassLog(cpCore, "Deleting visitors from visits with no cookie support older than Midnight, Two Days Ago");
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
                             SQL = "delete r.*"
@@ -699,23 +625,23 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     // delete visits from the non-cookie visits
                     //
-                    AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting visits with no cookie support older than Midnight, Two Days Ago");
+                    AppendClassLog(cpCore, "Deleting visits with no cookie support older than Midnight, Two Days Ago");
                     cpCore.db.DeleteTableRecordChunks("default", "ccvisits", "(CookieSupport=0)and(LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")", 1000, 10000);
                 }
                 //
                 // Visits with no DateAdded
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting visits with no DateAdded");
+                AppendClassLog(cpCore, "Deleting visits with no DateAdded");
                 cpCore.db.DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" + cpCore.db.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
                 //
                 // Visits with no visitor
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting visits with no DateAdded");
+                AppendClassLog(cpCore, "Deleting visits with no DateAdded");
                 cpCore.db.DeleteTableRecordChunks("default", "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000);
                 //
                 // viewings with no visit
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting viewings with null or invalid VisitID");
+                AppendClassLog(cpCore, "Deleting viewings with null or invalid VisitID");
                 cpCore.db.DeleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000);
                 //
                 // Get Oldest Visit
@@ -733,9 +659,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //   this is to prevent the entire server from being bogged down for one site change
                 //
                 if (OldestVisitDate == DateTime.MinValue) {
-                    AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "No records were removed because no visit records were found while requesting the oldest visit.");
+                    AppendClassLog(cpCore, "No records were removed because no visit records were found while requesting the oldest visit.");
                 } else if (VisitArchiveAgeDays <= 0) {
-                    AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "No records were removed because Housekeep ArchiveRecordAgeDays is 0.");
+                    AppendClassLog(cpCore, "No records were removed because Housekeep ArchiveRecordAgeDays is 0.");
                 } else {
                     ArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date;
                     DaystoRemove = encodeInteger(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
@@ -743,9 +669,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                         ArchiveDate = OldestVisitDate.AddDays(30);
                     }
                     if (OldestVisitDate >= ArchiveDate) {
-                        AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "No records were removed because Oldest Visit Date [" + OldestVisitDate + "] >= ArchiveDate [" + ArchiveDate + "].");
+                        AppendClassLog(cpCore, "No records were removed because Oldest Visit Date [" + OldestVisitDate + "] >= ArchiveDate [" + ArchiveDate + "].");
                     } else {
-                        AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Removing records from [" + OldestVisitDate + "] to [" + ArchiveDate + "].");
+                        AppendClassLog(cpCore, "Removing records from [" + OldestVisitDate + "] to [" + ArchiveDate + "].");
                         SingleDate = OldestVisitDate;
                         do {
                             HouseKeep_App_Daily_RemoveVisitRecords(cpCore, SingleDate, DataSourceType);
@@ -761,7 +687,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // delete 'guests' Members with one visits but no valid visit record
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
+                AppendClassLog(cpCore, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete m.*"
@@ -818,7 +744,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // delete 'guests' Members created before ArchivePeopleAgeDays
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
+                AppendClassLog(cpCore, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete m.*"
@@ -863,7 +789,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // delete email drops older than archive.
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting email drops older then " + EmailDropArchiveAgeDays + " days");
+                AppendClassLog(cpCore, "Deleting email drops older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
                 //INSTANT C# TODO TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
                 ////On Error //Resume Next
@@ -878,7 +804,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // delete email log entries not realted to a drop, older than archive.
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting non-drop email logs older then " + EmailDropArchiveAgeDays + " days");
+                AppendClassLog(cpCore, "Deleting non-drop email logs older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
                 //INSTANT C# TODO TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
                 ////On Error //Resume Next
@@ -893,7 +819,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // delete email log entries without email drops
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting drop email log entries for drops without a valid drop record.");
+                AppendClassLog(cpCore, "Deleting drop email log entries for drops without a valid drop record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete l.*"
@@ -934,7 +860,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // block duplicate redirect fields (match contentid+fieldtype+caption)
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Inactivate duplicate redirect fields");
+                AppendClassLog(cpCore, "Inactivate duplicate redirect fields");
                 CS = cpCore.db.csOpenSql_rev("Default", "Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + FieldTypeIdRedirect + ") Order By ContentID, Caption, ID");
                 FieldLast = "";
                 while (cpCore.db.csOk(CS)) {
@@ -953,7 +879,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // block duplicate non-redirect fields (match contentid+fieldtype+name)
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Inactivate duplicate non-redirect fields");
+                AppendClassLog(cpCore, "Inactivate duplicate non-redirect fields");
                 CS = cpCore.db.csOpenSql_rev("Default", "Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" + FieldTypeIdRedirect + ") Order By ContentID, Name, Type, ID");
                 FieldLast = "";
                 while (cpCore.db.csOk(CS)) {
@@ -972,7 +898,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Activities with no Member
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting activities with no member record.");
+                AppendClassLog(cpCore, "Deleting activities with no member record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccactivitylog.*"
@@ -996,7 +922,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Member Properties with no member
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting member properties with no member record.");
+                AppendClassLog(cpCore, "Deleting member properties with no member record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccProperties.*"
@@ -1023,7 +949,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Visit Properties with no visits
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting visit properties with no visit record.");
+                AppendClassLog(cpCore, "Deleting visit properties with no visit record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccProperties.*"
@@ -1050,7 +976,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Visitor Properties with no visitor
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting visitor properties with no visitor record.");
+                AppendClassLog(cpCore, "Deleting visitor properties with no visitor record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccProperties.*"
@@ -1077,7 +1003,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // MemberRules with bad MemberID
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting Member Rules with bad MemberID.");
+                AppendClassLog(cpCore, "Deleting Member Rules with bad MemberID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete " + SQLTableMemberRules + ".*"
@@ -1104,7 +1030,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // MemberRules with bad GroupID
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting Member Rules with bad GroupID.");
+                AppendClassLog(cpCore, "Deleting Member Rules with bad GroupID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete " + SQLTableMemberRules + ".*"
@@ -1132,7 +1058,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 // GroupRules with bad ContentID
                 //   Handled record by record removed to prevent CDEF reload
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting Group Rules with bad ContentID.");
+                AppendClassLog(cpCore, "Deleting Group Rules with bad ContentID.");
                 SQL = "Select ccGroupRules.ID"
                     + " From ccGroupRules LEFT JOIN ccContent on ccContent.ID=ccGroupRules.ContentID"
                     + " WHERE (ccContent.ID is null)";
@@ -1145,7 +1071,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // GroupRules with bad GroupID
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting Group Rules with bad GroupID.");
+                AppendClassLog(cpCore, "Deleting Group Rules with bad GroupID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccGroupRules.*"
@@ -1211,7 +1137,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 // ContentWatch with bad CContentID
                 //     must be deleted manually
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting Content Watch with bad ContentID.");
+                AppendClassLog(cpCore, "Deleting Content Watch with bad ContentID.");
                 SQL = "Select ccContentWatch.ID"
                     + " From ccContentWatch LEFT JOIN ccContent on ccContent.ID=ccContentWatch.ContentID"
                     + " WHERE (ccContent.ID is null)or(ccContent.Active=0)or(ccContent.Active is null)";
@@ -1224,7 +1150,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // ContentWatchListRules with bad ContentWatchID
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting ContentWatchList Rules with bad ContentWatchID.");
+                AppendClassLog(cpCore, "Deleting ContentWatchList Rules with bad ContentWatchID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccContentWatchListRules.*"
@@ -1251,7 +1177,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // ContentWatchListRules with bad ContentWatchListID
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting ContentWatchList Rules with bad ContentWatchListID.");
+                AppendClassLog(cpCore, "Deleting ContentWatchList Rules with bad ContentWatchListID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccContentWatchListRules.*"
@@ -1278,7 +1204,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Field help with no field
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting field help with no field.");
+                AppendClassLog(cpCore, "Deleting field help with no field.");
                 SQL = ""
                     + "delete from ccfieldhelp where id in ("
                     + " select h.id"
@@ -1289,7 +1215,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Field help duplicates - messy, but I am not sure where they are coming from, and this patchs the edit page performance problem
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Deleting duplicate field help records.");
+                AppendClassLog(cpCore, "Deleting duplicate field help records.");
                 SQL = ""
                     + "delete from ccfieldhelp where id in ("
                     + " select b.id"
@@ -1307,7 +1233,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // convert FieldTypeLongText + htmlContent to FieldTypeHTML
                 //
-                AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "convert FieldTypeLongText + htmlContent to FieldTypeHTML.");
+                AppendClassLog(cpCore, "convert FieldTypeLongText + htmlContent to FieldTypeHTML.");
                 SQL = "update ccfields set type=" + FieldTypeIdHTML + " where type=" + FieldTypeIdLongText + " and ( htmlcontent<>0 )";
                 cpCore.db.executeQuery(SQL);
                 //
@@ -1331,7 +1257,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 if (genericController.encodeBoolean(cpCore.siteProperties.getText("ArchiveAllowFileClean", "false"))) {
                     //
                     int DSType = cpCore.db.getDataSourceType("");
-                    AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "Content TextFile types with no controlling record.");
+                    AppendClassLog(cpCore, "Content TextFile types with no controlling record.");
                     SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName"
                         + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID"
                         + " Where (((ccFields.Type) = 10))"
@@ -1533,17 +1459,17 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     // Visits older then archive age
                     //
-                    AppendClassLog(cpCore, cpCore.serverConfig.appConfig.name, "HouseKeep_App_Daily_RemoveVisitRecords(" + appName + ")", "Deleting visits before [" + DeleteBeforeDateSQL + "]");
+                    AppendClassLog(cpCore, "Deleting visits before [" + DeleteBeforeDateSQL + "]");
                     cpCore.db.DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" + DeleteBeforeDateSQL + ")", 1000, 10000);
                     //
                     // Viewings with visits before the first
                     //
-                    AppendClassLog(cpCore, appName, "HouseKeep_App_Daily_RemoveVisitRecords(" + appName + ")", "Deleting viewings with visitIDs lower then the lowest ccVisits.ID");
+                    AppendClassLog(cpCore, "Deleting viewings with visitIDs lower then the lowest ccVisits.ID");
                     cpCore.db.DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
                     //
                     // Visitors with no visits
                     //
-                    AppendClassLog(cpCore, appName, "HouseKeep_App_Daily_RemoveVisitRecords(" + appName + ")", "Deleting visitors with no visits");
+                    AppendClassLog(cpCore, "Deleting visitors with no visits");
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
                             SQL = "delete ccVisitors.*"
@@ -1687,7 +1613,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //   with no username (they are not planning on returning)
                     //   with 1 visit (not created with 0 visits, has not returned)
                     //
-                    AppendClassLog(cpCore, appName, "HouseKeep_App_Daily_RemoveGuestRecords(" + appName + ")", "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");
+                    AppendClassLog(cpCore,   "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");
                     SQLCriteria = ""
                         + " (LastVisit<" + DeleteBeforeDateSQL + ")"
                         + " and(createdbyvisit=1)"
@@ -2064,36 +1990,18 @@ namespace Contensive.Core.Addons.Housekeeping {
         //   Log a reported error
         //======================================================================================
         //
-        public void AppendClassLog(coreClass cpcore, string ApplicationName, string MethodName, string LogCopy) {
-            logController.appendLogWithLegacyRow(cpcore, ApplicationName, LogCopy, "ccHouseKeep", "HouseKeepClass", MethodName, 0, "", "", false, true, "", "HouseKeep", "");
+        public void AppendClassLog(coreClass cpcore, string LogCopy) {
+            logController.appendLog( cpcore, LogCopy, "housekeeping");
         }
         //
-        //Private Sub HandleClassTrapError(ByVal ApplicationName As String, ByVal MethodName As String, ByVal Cause As String, ByVal ResumeNext As Boolean)
-        //    '
-        //    //throw new ApplicationException("Unexpected exception")
-        //    '
-        //End Sub
-        //
-        // ----- temp solution to convert error reporting without spending the time right now
-        //
-        //Private Sub HandleClassInternalError(ByVal ApplicationName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal Cause As String)
-        //    '
-        //    //throw new ApplicationException("Unexpected exception")
-        //    '
-        //End Sub
-        //
-        //
+        //====================================================================================================
         //
         private void HouseKeep_App_Daily_LogFolder(coreClass cpCore, string FolderName, DateTime LastMonth) {
             try {
                 //
                 FileInfo[] FileList = null;
-                string[] FileArray = null;
-                int FileArrayCount = 0;
-                int FileArrayPointer = 0;
-                string[] FileSplit = null;
                 //
-                AppendClassLog(cpCore, cpCore.serverConfig.appConfig.name, "HouseKeep_App_Daily_LogFolder(" + cpCore.serverConfig.appConfig.name + ")", "Deleting files from folder [" + FolderName + "] older than " + LastMonth);
+                AppendClassLog(cpCore,  "Deleting files from folder [" + FolderName + "] older than " + LastMonth);
                 FileList = cpCore.privateFiles.getFileList(FolderName);
                 foreach (FileInfo file in FileList) {
                     if (file.CreationTime < LastMonth) {
@@ -2105,19 +2013,14 @@ namespace Contensive.Core.Addons.Housekeeping {
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception");
         }
         //
-        //
+        //====================================================================================================
         //
         private bool DownloadUpdates(coreClass cpCore) {
-            bool tempDownloadUpdates = false;
             bool loadOK = true;
             try {
                 XmlDocument Doc = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode CDefSection = null;
                 string URL = null;
                 string Copy = null;
                 //
@@ -2125,45 +2028,35 @@ namespace Contensive.Core.Addons.Housekeeping {
                 URL = "http://support.contensive.com/GetUpdates?iv=" + cpCore.codeVersion();
                 loadOK = true;
                 Doc.Load(URL);
-                if (Doc.DocumentElement.Name.ToLower() != genericController.vbLCase("ContensiveUpdate")) {
-                    tempDownloadUpdates = false;
-                } else {
-                    if (Doc.DocumentElement.ChildNodes.Count == 0) {
-                        tempDownloadUpdates = false;
-                    } else {
-                        foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
-                            Copy = CDefSection.InnerText;
-                            switch (genericController.vbLCase(CDefSection.Name)) {
-                                case "mastervisitnamelist":
-                                    //
-                                    // Read in the interfaces and save to Add-ons
-                                    //
-                                    cpCore.privateFiles.saveFile("config\\VisitNameList.txt", Copy);
-                                    //Call cpCore.app.privateFiles.SaveFile(getAppPath & "\config\DefaultBotNameList.txt", copy)
-                                    break;
-                                case "masteremailbouncefilters":
-                                    //
-                                    // save the updated filters file
-                                    //
-                                    cpCore.privateFiles.saveFile("config\\EmailBounceFilters.txt", Copy);
-                                    //Call cpCore.app.privateFiles.SaveFile(getAppPath & "\cclib\config\Filters.txt", copy)
-                                    break;
-                                case "mastermobilebrowserlist":
-                                    //
-                                    // save the updated filters file
-                                    //
-                                    cpCore.privateFiles.saveFile("config\\MobileBrowserList.txt", Copy);
-                                    break;
-                            }
+                if ((Doc.DocumentElement.Name.ToLower() == genericController.vbLCase("ContensiveUpdate"))&& (Doc.DocumentElement.ChildNodes.Count != 0)) {
+                    foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
+                        Copy = CDefSection.InnerText;
+                        switch (genericController.vbLCase(CDefSection.Name)) {
+                            case "mastervisitnamelist":
+                                //
+                                // Read in the interfaces and save to Add-ons
+                                //
+                                cpCore.privateFiles.saveFile("config\\VisitNameList.txt", Copy);
+                                //Call cpCore.app.privateFiles.SaveFile(getAppPath & "\config\DefaultBotNameList.txt", copy)
+                                break;
+                            case "masteremailbouncefilters":
+                                //
+                                // save the updated filters file
+                                //
+                                cpCore.privateFiles.saveFile("config\\EmailBounceFilters.txt", Copy);
+                                //Call cpCore.app.privateFiles.SaveFile(getAppPath & "\cclib\config\Filters.txt", copy)
+                                break;
+                            case "mastermobilebrowserlist":
+                                //
+                                // save the updated filters file
+                                //
+                                cpCore.privateFiles.saveFile("config\\MobileBrowserList.txt", Copy);
+                                break;
                         }
                     }
                 }
             } catch (Exception ex) {
-                //
-                // error - Need a way to reach the user that submitted the file
-                //
-                tempDownloadUpdates = false;
-                //throw new ApplicationException("Unexpected exception");
+                cpCore.handleException(ex);
             }
             return loadOK;
         }
@@ -2177,88 +2070,24 @@ namespace Contensive.Core.Addons.Housekeeping {
         //=========================================================================================
         //
         public void HouseKeep_PageViewSummary(coreClass cpCore, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
+            int hint = 0;
+            string hinttxt = "";
             try {
                 //
                 //
                 string baseCriteria = null;
-                DateTime StartDate = default(DateTime);
-                //Dim StartTime As Date
+                //DateTime StartDate = default(DateTime);
                 DateTime PeriodStart = default(DateTime);
-                //Dim TotalTimeOnSite
-                int MultiPageVisitCnt = 0;
-                int MultiPageHitCnt = 0;
-                double MultiPageTimetoLastHitSum = 0;
-                double TimeOnSite = 0;
                 double PeriodStep = 0;
                 DateTime PeriodDatePtr = default(DateTime);
-                DateTime StartOfHour = default(DateTime);
                 int DateNumber = 0;
                 int TimeNumber = 0;
-                double SumStartTime = 0;
-                double SumStopTime = 0;
-                int HoursPerDay = 0;
                 DateTime DateStart = default(DateTime);
                 DateTime DateEnd = default(DateTime);
-                int NewVisitorVisits = 0;
-                int SinglePageVisits = 0;
-                int AuthenticatedVisits = 0;
-                int NoCookieVisits = 0;
-                double AveTimeOnSite = 0;
-                int HitCnt = 0;
-                int VisitCnt = 0;
-                DateTime OldestDateAdded = default(DateTime);
-                object EmptyVariant = null;
-                bool NeedToClearCache = false;
-                int ArchiveParentID = 0;
-                int RecordID = 0;
                 int CS = 0;
-                //Dim AddonInstall As New addonInstallClass
-                int LoopPtr = 0;
-                int Ptr = 0;
-                string LocalFile = null;
-                string LocalFilename = null;
-                string[] Folders = null;
-                int FolderCnt = 0;
-                string CollectionGUID = null;
-                string CollectionName = null;
-                int Pos = 0;
-                string LastChangeDate = null;
-                string SubFolderList = null;
-                string[] SubFolders = null;
-                string SubFolder = null;
-                int Cnt = 0;
-                string LocalGUID = null;
-                string LocalLastChangeDateStr = null;
-                DateTime LocalLastChangeDate = default(DateTime);
-                string LibGUID = null;
-                string LibLastChangeDateStr = null;
-                DateTime LibLastChangeDate = default(DateTime);
-                XmlNode LibListNode = null;
-                XmlNode LocalListNode = null;
-                XmlNode CollectionNode = null;
                 XmlDocument LibraryCollections = new XmlDocument();
                 XmlDocument LocalCollections = new XmlDocument();
                 XmlDocument Doc = new XmlDocument();
-                //Dim AppService As appServicesClass
-                //Dim KernelService As KernelServicesClass
-                string SetTimeCheckString = null;
-                double SetTimeCheck = 0;
-                DateTime LogDate = default(DateTime);
-                string FolderName = null;
-                string FileList = null;
-                string[] FileArray = null;
-                int FileArrayCount = 0;
-                int FileArrayPointer = 0;
-                string[] FileSplit = null;
-                string FolderList = null;
-                string[] FolderArray = null;
-                int FolderArrayCount = 0;
-                int FolderArrayPointer = 0;
-                string[] FolderSplit = null;
-                //Dim fs As New fileSystemClass
-                int VisitArchiveAgeDays = 0;
-                bool NewDay = false;
-                bool NewHour = false;
                 int CSPages = 0;
                 int PageID = 0;
                 string PageTitle = null;
@@ -2267,49 +2096,25 @@ namespace Contensive.Core.Addons.Housekeeping {
                 int AuthenticatedPageViews = 0;
                 int MobilePageViews = 0;
                 int BotPageViews = 0;
-                //
-                DateTime LastTimeCheck = default(DateTime);
-                //
-                string ConfigFilename = null;
-                string Config = null;
-                string[] ConfigLines = null;
-                //
-                string Line = null;
-                int LineCnt = 0;
-                int LinePtr = 0;
-                string[] NameValue = null;
-                string SQLNow = null;
                 string SQL = null;
-                int AveReadTime = 0;
-
-                //
                 if (string.CompareOrdinal(BuildVersion, cpCore.codeVersion()) < 0) {
                     cpCore.handleException(new ApplicationException("Can not summarize analytics until this site's data needs been upgraded."));
                 } else {
+                    hint = 1;
                     PeriodStart = StartTimeDate;
                     if (PeriodStart < OldestVisitSummaryWeCareAbout) {
                         PeriodStart = OldestVisitSummaryWeCareAbout;
                     }
-                    StartDate = PeriodStart.Date;
+                    PeriodDatePtr = PeriodStart.Date;
                     PeriodStep = (double)HourDuration / 24.0F;
                     while (PeriodDatePtr < EndTimeDate) {
+                        hint = 2;
                         //
+                        hinttxt = ", HourDuration [" + HourDuration + "], PeriodDatePtr [" + PeriodDatePtr + "], PeriodDatePtr.AddHours(HourDuration / 2.0) [" + PeriodDatePtr.AddHours(HourDuration / 2.0) + "]";
                         DateNumber = encodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
                         TimeNumber = encodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
                         DateStart = PeriodDatePtr.Date;
                         DateEnd = PeriodDatePtr.AddHours(HourDuration).Date;
-                        //
-                        VisitCnt = 0;
-                        HitCnt = 0;
-                        SumStartTime = 0;
-                        SumStopTime = 0;
-                        NewVisitorVisits = 0;
-                        SinglePageVisits = 0;
-                        MultiPageVisitCnt = 0;
-                        MultiPageTimetoLastHitSum = 0;
-                        AuthenticatedVisits = 0;
-                        NoCookieVisits = 0;
-                        AveTimeOnSite = 0;
                         PageTitle = "";
                         PageID = 0;
                         PageViews = 0;
@@ -2332,6 +2137,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + " and (h.dateadded<" + cpCore.db.encodeSQLDate(DateEnd) + ")"
                             + " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))"
                             + "order by recordid";
+                        hint = 3;
                         CSPages = cpCore.db.csOpenSql_rev("default", SQL);
                         if (!cpCore.db.csOk(CSPages)) {
                             //
@@ -2359,7 +2165,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 }
                             }
                             cpCore.db.csClose(ref CS);
+                            hint = 4;
                         } else {
+                            hint = 5;
                             //
                             // add an entry for each page hit on this day
                             //
@@ -2377,6 +2185,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 if (!string.IsNullOrEmpty(PageTitle)) {
                                     baseCriteria = baseCriteria + "and(h.pagetitle=" + cpCore.db.encodeSQLText(PageTitle) + ")";
                                 }
+                                hint = 6;
                                 //
                                 // Total Page Views
                                 //
@@ -2389,6 +2198,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     PageViews = cpCore.db.csGetInteger(CS, "cnt");
                                 }
                                 cpCore.db.csClose(ref CS);
+                                hint = 7;
                                 //
                                 // Authenticated Visits
                                 //
@@ -2402,6 +2212,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     AuthenticatedPageViews = cpCore.db.csGetInteger(CS, "cnt");
                                 }
                                 cpCore.db.csClose(ref CS);
+                                hint = 8;
                                 //
                                 // No Cookie Page Views
                                 //
@@ -2414,6 +2225,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     NoCookiePageViews = cpCore.db.csGetInteger(CS, "NoCookiePageViews");
                                 }
                                 cpCore.db.csClose(ref CS);
+                                hint = 9;
                                 //
                                 if (true) {
                                     //
@@ -2443,6 +2255,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     }
                                     cpCore.db.csClose(ref CS);
                                 }
+                                hint = 10;
                                 //
                                 // Add or update the Visit Summary Record
                                 //
@@ -2453,6 +2266,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 }
                                 //
                                 if (cpCore.db.csOk(CS)) {
+                                    hint = 11;
                                     string PageName = null;
 
                                     if (string.IsNullOrEmpty(PageTitle)) {
@@ -2470,6 +2284,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     cpCore.db.csSet(CS, "PageID", PageID);
                                     cpCore.db.csSet(CS, "AuthenticatedPageViews", AuthenticatedPageViews);
                                     cpCore.db.csSet(CS, "NoCookiePageViews", NoCookiePageViews);
+                                    hint = 12;
                                     if (true) {
                                         cpCore.db.csSet(CS, "MobilePageViews", MobilePageViews);
                                         cpCore.db.csSet(CS, "BotPageViews", BotPageViews);
@@ -2486,10 +2301,8 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 return;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                cpCore.handleException(ex,"hint [" + hint + "]");
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception");
         }
         //
         //====================================================================================================
@@ -2520,25 +2333,25 @@ namespace Contensive.Core.Addons.Housekeeping {
                 int Ptr = 0;
                 string collectionFileFilename = null;
                 //
-                AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "Entering RegisterAddonFolder");
+                AppendClassLog(cpCore, "Entering RegisterAddonFolder");
                 //
                 bool loadOK = true;
                 try {
                     collectionFileFilename = cpCore.privateFiles.rootLocalPath + cpCore.addon.getPrivateFilesAddonPath() + "Collections.xml";
                     Doc.Load(collectionFileFilename);
                 } catch (Exception) {
-                    AppendClassLog(cpCore, "Server", "", "RegisterAddonFolder, Hint=[" + hint + "], Error loading Collections.xml file.");
+                    AppendClassLog(cpCore, "RegisterAddonFolder, Hint=[" + hint + "], Error loading Collections.xml file.");
                     loadOK = false;
                 }
                 if (loadOK) {
                     //
-                    AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "Collection.xml loaded ok");
+                    AppendClassLog(cpCore, "Collection.xml loaded ok");
                     //
                     if (genericController.vbLCase(Doc.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
-                        AppendClassLog(cpCore, "Server", "", "RegisterAddonFolder, Hint=[" + hint + "], The Collections.xml file has an invalid root node, [" + Doc.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.");
+                        AppendClassLog(cpCore, "RegisterAddonFolder, Hint=[" + hint + "], The Collections.xml file has an invalid root node, [" + Doc.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.");
                     } else {
                         //
-                        AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "Collection.xml root name ok");
+                        AppendClassLog(cpCore, "Collection.xml root name ok");
                         //
                         if (true) {
                             //If genericController.vbLCase(.name) <> "collectionlist" Then
@@ -2579,14 +2392,14 @@ namespace Contensive.Core.Addons.Housekeeping {
                                         break;
                                 }
                                 //
-                                AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "Node[" + NodeCnt + "], LocalName=[" + LocalName + "], LastChangeDate=[" + LastChangeDate + "], CollectionPath=[" + CollectionPath + "], LocalGuid=[" + LocalGuid + "]");
+                                AppendClassLog(cpCore, "Node[" + NodeCnt + "], LocalName=[" + LocalName + "], LastChangeDate=[" + LastChangeDate + "], CollectionPath=[" + CollectionPath + "], LocalGuid=[" + LocalGuid + "]");
                                 //
                                 // Go through all subpaths of the collection path, register the version match, unregister all others
                                 //
                                 //fs = New fileSystemClass
                                 if (string.IsNullOrEmpty(CollectionPath)) {
                                     //
-                                    AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "no collection path, skipping");
+                                    AppendClassLog(cpCore, "no collection path, skipping");
                                     //
                                 } else {
                                     CollectionPath = genericController.vbLCase(CollectionPath);
@@ -2594,7 +2407,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     Pos = CollectionRootPath.LastIndexOf("\\") + 1;
                                     if (Pos <= 0) {
                                         //
-                                        AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "CollectionPath has no '\\', skipping");
+                                        AppendClassLog(cpCore, "CollectionPath has no '\\', skipping");
                                         //
                                     } else {
                                         CollectionRootPath = CollectionRootPath.Left(Pos - 1);
@@ -2610,7 +2423,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                         }
                                         if (FolderList.Length == 0) {
                                             //
-                                            AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "no subfolders found in physical path [" + Path + "], skipping");
+                                            AppendClassLog(cpCore, "no subfolders found in physical path [" + Path + "], skipping");
                                             //
                                         } else {
                                             foreach (DirectoryInfo dir in FolderList) {
@@ -2620,17 +2433,17 @@ namespace Contensive.Core.Addons.Housekeeping {
                                                 //
                                                 if (string.IsNullOrEmpty(dir.Name)) {
                                                     //
-                                                    AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "....empty folder [" + dir.Name + "], skipping");
+                                                    AppendClassLog(cpCore, "....empty folder [" + dir.Name + "], skipping");
                                                     //
                                                 } else {
                                                     //
-                                                    AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "....Folder [" + dir.Name + "]");
+                                                    AppendClassLog(cpCore, "....Folder [" + dir.Name + "]");
                                                     IsActiveFolder = (CollectionRootPath + "\\" + dir.Name == CollectionPath);
                                                     if (IsActiveFolder && (FolderPtr != (FolderList.Length - 1))) {
                                                         //
                                                         // This one is active, but not the last
                                                         //
-                                                        AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "....Active addon is not the most current, this folder is the active folder, but there are more recent folders. This folder will be preserved.");
+                                                        AppendClassLog(cpCore, "....Active addon is not the most current, this folder is the active folder, but there are more recent folders. This folder will be preserved.");
                                                     }
                                                     // 20161005 - no longer need to register activeX
                                                     //FileList = cpCore.app.privateFiles.GetFolderFiles(Path & "\" & dir.Name)
@@ -2661,7 +2474,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                                         //IsActiveFolder = IsActiveFolder;
                                                     } else {
                                                         if (FolderPtr < (FolderList.Length - 3)) {
-                                                            AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "....Deleting path because non-active and not one of the newest 2 [" + Path + dir.Name + "]");
+                                                            AppendClassLog(cpCore, "....Deleting path because non-active and not one of the newest 2 [" + Path + dir.Name + "]");
                                                             cpCore.privateFiles.deleteFolder(Path + dir.Name);
                                                         }
                                                     }
@@ -2676,7 +2489,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                                     RegisterPath = RegisterPaths[Ptr].Trim(' ');
                                                     if (!string.IsNullOrEmpty(RegisterPath)) {
                                                         Cmd = "%comspec% /c regsvr32 \"" + RegisterPath + "\" /s";
-                                                        AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "....Register DLL [" + Cmd + "]");
+                                                        AppendClassLog(cpCore, "....Register DLL [" + Cmd + "]");
                                                         runProcess(cpCore, Cmd, "", true);
                                                     }
                                                 }
@@ -2706,7 +2519,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     }
                 }
                 //
-                AppendClassLog(cpCore, "Server", "RegisterAddonFolder", "Exiting RegisterAddonFolder");
+                AppendClassLog(cpCore, "Exiting RegisterAddonFolder");
             } catch (Exception ex) {
                 throw new ApplicationException("Unexpected Exception", ex);
             }

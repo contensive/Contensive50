@@ -113,9 +113,13 @@ namespace Contensive.BaseClasses
             /// When true, the environment is run from the task subsystem, without a UI. Assemblies from base collection run from program files. Addon return is ignored.
             /// </summary>
             public bool backgroundProcess { get; set; } = false;
-		}
+            /// <summary>
+            /// When true, an addon's javascript will be put in the head. This also forces javascript for all dependant addons to the head.
+            /// </summary>
+            public bool forceJavascriptToHead { get; set; } = false;
+        }
 
-		public abstract string ConvertHTML2Text(string Source);
+        public abstract string ConvertHTML2Text(string Source);
 		public abstract string ConvertText2HTML(string Source);
 		public abstract string CreateGuid();
 		public abstract string DecodeUrl(string Url);

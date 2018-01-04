@@ -109,7 +109,7 @@ namespace Contensive.Core.Controllers {
         public int checkListCnt { get; set; } = 0; // cnt of the main_GetFormInputCheckList calls - used for javascript
         //
         // -- todo
-        public string includedAddonIDList { get; set; } = "";
+        //public string includedAddonIDList { get; set; } = "";
         //
         // -- todo
         public int inputDateCnt { get; set; } = 0;
@@ -196,7 +196,7 @@ namespace Contensive.Core.Controllers {
         internal List<int> addonsCurrentlyRunningIdList { get; set; } = new List<int>();
         //
         // -- todo
-        public int pageAddonCnt { get; set; } = 0;
+        public int addonInstanceCnt { get; set; } = 0;
         //
         // -- persistant store for cdef complex model
         internal Dictionary<string, Models.Complex.cdefModel> cdefDictionary { get; set; }

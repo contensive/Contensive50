@@ -27,32 +27,24 @@ namespace Contensive.Core.Controllers {
         //       If main_PageTestPointPrinting print a string, value paior
         //========================================================================
         //
-        public static void testPoint(coreClass cpcore, string Message) {
+        public static void testPoint(coreClass cpcore, string message) {
             //
-            double ElapsedTime = 0;
-            string iMessage = null;
-            //
-            if (cpcore.doc.visitPropertyAllowDebugging) {
-                //
-                // write to stream
-                //
-                ElapsedTime = Convert.ToSingle(cpcore.doc.appStopWatch.ElapsedMilliseconds) / 1000;
-                iMessage = genericController.encodeText(Message);
-                iMessage = (ElapsedTime).ToString("00.000") + " - " + iMessage;
-                cpcore.doc.testPointMessage = cpcore.doc.testPointMessage + "<nobr>" + iMessage + "</nobr><br>";
-                //writeAltBuffer ("<nobr>" & iMessage & "</nobr><br>")
-            }
-            if (cpcore.siteProperties.allowTestPointLogging) {
-                //
-                // write to debug log in virtual files - to read from a test verbose viewer
-                //
-                iMessage = genericController.encodeText(Message);
-                iMessage = genericController.vbReplace(iMessage, "\r\n", " ");
-                iMessage = genericController.vbReplace(iMessage, "\r", " ");
-                iMessage = genericController.vbReplace(iMessage, "\n", " ");
-                iMessage = DateTime.Now.ToString("") + "\t" + (ElapsedTime).ToString("00.000") + "\t" + cpcore.doc.sessionContext.visit.id + "\t" + iMessage;
-                //
-                logController.appendLog(cpcore, iMessage, "", "testPoints_" + cpcore.serverConfig.appConfig.name);
+            if ((cpcore != null) && (cpcore.serverConfig != null) && (cpcore.serverConfig.appConfig != null)) {
+                bool debugging = cpcore.doc.visitPropertyAllowDebugging;
+                bool logging = cpcore.siteProperties.allowTestPointLogging;
+                double ElapsedTime = 0;
+                if (logging || debugging) {
+                    ElapsedTime = Convert.ToSingle(cpcore.doc.appStopWatch.ElapsedMilliseconds) / 1000;
+                }
+                if (debugging) {
+                    message = (ElapsedTime).ToString("00.000") + " - " + message;
+                    cpcore.doc.testPointMessage = cpcore.doc.testPointMessage + "<nobr>" + message + "</nobr><br>";
+                }
+                if (logging) {
+                    message = message.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
+                    message = DateTime.Now.ToString("") + "\t" + (ElapsedTime).ToString("00.000") + "\t" + cpcore.doc.sessionContext.visit.id + "\t" + message;
+                    logController.appendLog(cpcore, message, "", "testPoints_" + cpcore.serverConfig.appConfig.name);
+                }
             }
         }
         //

@@ -46,11 +46,12 @@ namespace Contensive.Core.Models.Entity {
         public int IconWidth { get; set; }
         public bool InFrame { get; set; }
         public bool IsInline { get; set; }
-        public string JavaScriptBodyEnd { get; set; }
-        //Public Property JavaScriptOnLoad As String
+        public bool javascriptForceHead { get; set; }
         public string JSHeadScriptSrc { get; set; }
-        public string JSBodyScriptSrc { get; set; }
         public fieldTypeJavascriptFile JSFilename { get; set; }
+        //public string JavaScriptBodyEnd { get; set; }
+        //Public Property JavaScriptOnLoad As String
+        //public string JSBodyScriptSrc { get; set; }
         public string Link { get; set; }
         public string MetaDescription { get; set; }
         public string MetaKeywordList { get; set; }

@@ -551,7 +551,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (includeFancyBox) {
                         cpCore.addon.executeDependency(addonModel.create(cpCore, addonGuidjQueryFancyBox), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() { addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin });
                         //Call cpCore.addon.execute_legacy4(addonGuidjQueryFancyBox)
-                        cpCore.html.addScriptCode_head("jQuery(document).ready(function() {" + fancyBoxHeadJS + "});", "");
+                        cpCore.html.addScriptCode("jQuery(document).ready(function() {" + fancyBoxHeadJS + "});", "");
                     }
                     //
                     // Pickup user errors
@@ -578,7 +578,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //Call Stream.Add(cr & "ButtonObjectCount = " & ButtonObjectCount & ";")
                     //Call Stream.Add(cr & "</script>")
                     JavaScriptString += "\rButtonObjectCount = " + ButtonObjectCount + ";";
-                    cpCore.html.addScriptCode_body(JavaScriptString, "Admin Site");
+                    cpCore.html.addScriptCode(JavaScriptString, "Admin Site");
                 }
                 result = errorController.getDocExceptionHtmlList(cpCore) + Stream.Text;
             } catch (Exception ex) {
@@ -12064,7 +12064,7 @@ namespace Contensive.Core.Addons.AdminSite {
         private string GetForm_EditFormStart(int AdminFormID) {
             string s = "";
             try {
-                cpCore.html.addScriptCode_head("var docLoaded=false", "Form loader");
+                cpCore.html.addScriptCode("var docLoaded=false", "Form loader");
                 cpCore.html.addScriptCode_onLoad("docLoaded=true;", "Form loader");
                 s = cpCore.html.formStartMultipart();
                 s = genericController.vbReplace(s, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\">");

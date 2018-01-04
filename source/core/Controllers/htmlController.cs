@@ -37,10 +37,9 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string getHtmlDoc_beforeEndOfBodyHtml(bool AllowLogin, bool AllowTools) {
+        public string getHtmlBodyEnd(bool AllowLogin, bool AllowTools) {
             List<string> result = new List<string>();
             try {
-                List<string> bodyScript = new List<string>();
                 //
                 // -- content extras like tool panel
                 if (cpCore.doc.sessionContext.isAuthenticatedContentManager(cpCore) & (cpCore.doc.sessionContext.user.AllowToolsPanel)) {
@@ -65,11 +64,6 @@ namespace Contensive.Core.Controllers {
                 // -- output the menu system
                 if (cpCore.menuFlyout != null) {
                     result.Add(cpCore.menuFlyout.menu_GetClose());
-                }
-                //
-                // -- Add onload javascript
-                foreach (htmlAssetClass asset in cpCore.doc.htmlAssetList.FindAll((a) => (a.assetType == htmlAssetTypeEnum.OnLoadScript) && (!string.IsNullOrEmpty(a.content)))) {
-                    result.Add("<script Language=\"JavaScript\" type=\"text/javascript\">window.addEventListener('load', function(){" + asset.content + "});</script>");
                 }
                 //
                 // -- body Javascript
@@ -345,7 +339,7 @@ namespace Contensive.Core.Controllers {
                                     }
                                     if (cpCore.siteProperties.selectFieldWidthLimit != 0) {
                                         if (Copy.Length > cpCore.siteProperties.selectFieldWidthLimit) {
-                                            Copy = Copy.Left( cpCore.siteProperties.selectFieldWidthLimit) + "...+";
+                                            Copy = Copy.Left(cpCore.siteProperties.selectFieldWidthLimit) + "...+";
                                         }
                                     }
                                     FastString.Add(">" + genericController.encodeHTML(Copy) + "</option>");
@@ -374,7 +368,7 @@ namespace Contensive.Core.Controllers {
                                         SelectedFound = true;
                                         if (cpCore.siteProperties.selectFieldWidthLimit != 0) {
                                             if (Copy.Length > cpCore.siteProperties.selectFieldWidthLimit) {
-                                                Copy = Copy.Left( cpCore.siteProperties.selectFieldWidthLimit) + "...+";
+                                                Copy = Copy.Left(cpCore.siteProperties.selectFieldWidthLimit) + "...+";
                                             }
                                         }
                                         FastString.Add(">" + genericController.encodeHTML(Copy) + "</option>");
@@ -623,7 +617,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                         if (cpCore.siteProperties.selectFieldWidthLimit != 0) {
                                             if (Copy.Length > cpCore.siteProperties.selectFieldWidthLimit) {
-                                                Copy = Copy.Left( cpCore.siteProperties.selectFieldWidthLimit) + "...+";
+                                                Copy = Copy.Left(cpCore.siteProperties.selectFieldWidthLimit) + "...+";
                                             }
                                         }
                                         FastString.Add(">" + Copy + "</option>");
@@ -703,7 +697,7 @@ namespace Contensive.Core.Controllers {
                             //SelectedFound = True
                         }
                         if (Copy.Length > SelectFieldWidthLimit) {
-                            Copy = Copy.Left( SelectFieldWidthLimit) + "...+";
+                            Copy = Copy.Left(SelectFieldWidthLimit) + "...+";
                         }
                         FastString.Add(">" + Copy + "</option>");
                     }
@@ -744,7 +738,7 @@ namespace Contensive.Core.Controllers {
                         result = result + "<a href=\"" + genericController.encodeHTML(Link) + "\" >";
                     }
                     IconFilename = cpCore.siteProperties.LoginIconFilename;
-                    if (genericController.vbLCase(IconFilename.Left( 7)) != "/ccLib/") {
+                    if (genericController.vbLCase(IconFilename.Left(7)) != "/ccLib/") {
                         IconFilename = genericController.getCdnFileLink(cpCore, IconFilename);
                     }
                     result = result + "<img alt=\"Login\" src=\"" + IconFilename + "\" border=\"0\" >";
@@ -926,7 +920,7 @@ namespace Contensive.Core.Controllers {
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
-                                                                    //
+            //
             return temphtml_GetFormStart;
         }
         //
@@ -940,7 +934,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string inputText(string TagName, string DefaultValue = "", string Height = "", string Width = "", string Id = "", bool PasswordField = false) {
-            return inputText(TagName, DefaultValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width ), Id, PasswordField, false);
+            return inputText(TagName, DefaultValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), Id, PasswordField, false);
         }
         //
         //====================================================================================================
@@ -983,7 +977,7 @@ namespace Contensive.Core.Controllers {
                     //
                     if (PasswordField) {
                         temphtml_GetFormInputText2 = "<input TYPE=\"password\" NAME=\"" + htmlName + "\" SIZE=\"" + iWidth + "\" VALUE=\"" + iDefaultValue + "\"" + TagID + TagDisabled + ">";
-                    } else if ((iHeight == 1) && (iDefaultValue.IndexOf("\"")  == -1)) {
+                    } else if ((iHeight == 1) && (iDefaultValue.IndexOf("\"") == -1)) {
                         temphtml_GetFormInputText2 = "<input TYPE=\"Text\" NAME=\"" + htmlName + "\" SIZE=\"" + iWidth.ToString() + "\" VALUE=\"" + iDefaultValue + "\"" + TagID + TagDisabled + ">";
                     } else {
                         temphtml_GetFormInputText2 = "<textarea NAME=\"" + htmlName + "\" ROWS=\"" + iHeight.ToString() + "\" COLS=\"" + iWidth.ToString() + "\"" + TagID + TagDisabled + ">" + iDefaultValue + "</TEXTAREA>";
@@ -1129,8 +1123,8 @@ namespace Contensive.Core.Controllers {
                     + "\r\nvar cal = new CalendarPopup();"
                     + "\r\ncal.showNavigationDropdowns();"
                     + "\r\n</SCRIPT>";
-                    addScriptLink_Head("/ccLib/mktree/CalendarPopup.js", "Calendar Popup");
-                    addScriptCode_head("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup");
+                    addScriptLinkSrc("/ccLib/mktree/CalendarPopup.js", "Calendar Popup");
+                    addScriptCode("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup");
                 }
 
                 if (dateController.IsDate(iDefaultValue)) {
@@ -1216,7 +1210,7 @@ namespace Contensive.Core.Controllers {
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
-                                                                    //
+            //
             return temphtml_GetFormInputRadioBox;
         }
         //
@@ -1313,7 +1307,7 @@ namespace Contensive.Core.Controllers {
                     CanSeeHiddenFields = cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore);
                     while (cpCore.db.csOk(CS)) {
                         GroupName = cpCore.db.csGetText(CS, "GroupName");
-                        if ((GroupName.Left( 1) != "_") || CanSeeHiddenFields) {
+                        if ((GroupName.Left(1) != "_") || CanSeeHiddenFields) {
                             RecordID = cpCore.db.csGetInteger(CS, "ID");
                             GroupCaption = cpCore.db.csGetText(CS, "GroupCaption");
                             if (string.IsNullOrEmpty(GroupCaption)) {
@@ -1431,7 +1425,7 @@ namespace Contensive.Core.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
                                     } else {
-                                        returnResult = getFormInputHTML(FieldName, FieldValueText,"", Width.ToString());
+                                        returnResult = getFormInputHTML(FieldName, FieldValueText, "", Width.ToString());
                                     }
                                     //
                                     // html files, read from cdnFiles and use html editor
@@ -1446,7 +1440,7 @@ namespace Contensive.Core.Controllers {
                                         returnResult = FieldValueText;
                                     } else {
                                         //Height = encodeEmptyInteger(Height, 4)
-                                        returnResult = getFormInputHTML(FieldName, FieldValueText,"", Width.ToString());
+                                        returnResult = getFormInputHTML(FieldName, FieldValueText, "", Width.ToString());
                                     }
                                     //
                                     // text cdnFiles files, read from cdnFiles and use text editor
@@ -1714,7 +1708,7 @@ namespace Contensive.Core.Controllers {
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
-                                                                    //
+            //
             return temphtml_GetWindowOpenJScript;
         }
         //
@@ -1765,7 +1759,7 @@ namespace Contensive.Core.Controllers {
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
-                                                                    //
+            //
             return temphtml_GetWindowDialogJScript;
         }
         //
@@ -1963,7 +1957,7 @@ namespace Contensive.Core.Controllers {
                             MTMRuleContent = Models.Complex.cdefModel.getContentNameByID(cpCore, tempVar.manyToManyRuleContentID);
                             MTMRuleField0 = tempVar.ManyToManyRulePrimaryField;
                             MTMRuleField1 = tempVar.ManyToManyRuleSecondaryField;
-                            result = getCheckList(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1,"","", false);
+                            result = getCheckList(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false);
                             //result = getInputCheckListCategories(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, HtmlValue)
                             break;
                         }
@@ -1972,7 +1966,7 @@ namespace Contensive.Core.Controllers {
                             //
                             //
                             GroupID = genericController.encodeInteger(Models.Complex.cdefModel.GetContentFieldProperty(cpCore, ContentName, FieldName, "memberselectgroupid"));
-                            result = selectUserFromGroup(InputName, genericController.encodeInteger(HtmlValue), GroupID,"","", HtmlId);
+                            result = selectUserFromGroup(InputName, genericController.encodeInteger(HtmlValue), GroupID, "", "", HtmlId);
                             if (!string.IsNullOrEmpty(HtmlClass)) {
                                 result = genericController.vbReplace(result, ">", " class=\"" + HtmlClass + "\">");
                             }
@@ -2165,7 +2159,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Watch Lists
                         //
-                        CSLists = cpCore.db.csOpen("Content Watch Lists","", "Name,ID", false, 0, false, false, "Name,ID", 20, 1);
+                        CSLists = cpCore.db.csOpen("Content Watch Lists", "", "Name,ID", false, 0, false, false, "Name,ID", 20, 1);
                         if (cpCore.db.csOk(CSLists)) {
                             while (cpCore.db.csOk(CSLists)) {
                                 FieldName = encodeText(cpCore.db.csGetText(CSLists, "name")).Trim(' ');
@@ -2494,7 +2488,7 @@ namespace Contensive.Core.Controllers {
                             FnArgList = (Choice.Substring((Pos + FnLen) - 1)).Trim(' ');
                             ContentName = "";
                             ContentCriteria = "";
-                            if ((FnArgList.Left( 1) == "(") && (FnArgList.Substring(FnArgList.Length - 1) == ")")) {
+                            if ((FnArgList.Left(1) == "(") && (FnArgList.Substring(FnArgList.Length - 1) == ")")) {
                                 //
                                 // set ContentName and ContentCriteria from argument list
                                 //
@@ -2503,17 +2497,17 @@ namespace Contensive.Core.Controllers {
                                 FnArgCnt = FnArgs.GetUpperBound(0) + 1;
                                 if (FnArgCnt > 0) {
                                     ContentName = FnArgs[0].Trim(' ');
-                                    if ((ContentName.Left( 1) == "\"") && (ContentName.Substring(ContentName.Length - 1) == "\"")) {
+                                    if ((ContentName.Left(1) == "\"") && (ContentName.Substring(ContentName.Length - 1) == "\"")) {
                                         ContentName = (ContentName.Substring(1, ContentName.Length - 2)).Trim(' ');
-                                    } else if ((ContentName.Left( 1) == "'") && (ContentName.Substring(ContentName.Length - 1) == "'")) {
+                                    } else if ((ContentName.Left(1) == "'") && (ContentName.Substring(ContentName.Length - 1) == "'")) {
                                         ContentName = (ContentName.Substring(1, ContentName.Length - 2)).Trim(' ');
                                     }
                                 }
                                 if (FnArgCnt > 1) {
                                     ContentCriteria = FnArgs[1].Trim(' ');
-                                    if ((ContentCriteria.Left( 1) == "\"") && (ContentCriteria.Substring(ContentCriteria.Length - 1) == "\"")) {
+                                    if ((ContentCriteria.Left(1) == "\"") && (ContentCriteria.Substring(ContentCriteria.Length - 1) == "\"")) {
                                         ContentCriteria = (ContentCriteria.Substring(1, ContentCriteria.Length - 2)).Trim(' ');
-                                    } else if ((ContentCriteria.Left( 1) == "'") && (ContentCriteria.Substring(ContentCriteria.Length - 1) == "'")) {
+                                    } else if ((ContentCriteria.Left(1) == "'") && (ContentCriteria.Substring(ContentCriteria.Length - 1) == "'")) {
                                         ContentCriteria = (ContentCriteria.Substring(1, ContentCriteria.Length - 2)).Trim(' ');
                                     }
                                 }
@@ -2524,9 +2518,9 @@ namespace Contensive.Core.Controllers {
                                 // ContentList - Open the Content and build the options from the names
                                 //
                                 if (!string.IsNullOrEmpty(ContentCriteria)) {
-                                    CS = cpCore.db.csOpen(ContentName, ContentCriteria, "name",true,0,false,false, "ID,Name");
+                                    CS = cpCore.db.csOpen(ContentName, ContentCriteria, "name", true, 0, false, false, "ID,Name");
                                 } else {
-                                    CS = cpCore.db.csOpen(ContentName,"", "name",true,0,false,false, "ID,Name");
+                                    CS = cpCore.db.csOpen(ContentName, "", "name", true, 0, false, false, "ID,Name");
                                 }
                             } else if (IsListField) {
                                 //
@@ -2534,7 +2528,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 CID = Models.Complex.cdefModel.getContentId(cpCore, ContentName);
                                 if (CID > 0) {
-                                    CS = cpCore.db.csOpen("Content Fields", "Contentid=" + CID, "name",true,0,false,false, "ID,Name");
+                                    CS = cpCore.db.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, false, false, "ID,Name");
                                 }
                             }
 
@@ -2549,7 +2543,7 @@ namespace Contensive.Core.Controllers {
                                     if (string.IsNullOrEmpty(RecordName)) {
                                         RecordName = "record " + RecordID;
                                     } else if (RecordName.Length > 50) {
-                                        RecordName = RecordName.Left( 50) + "...";
+                                        RecordName = RecordName.Left(50) + "...";
                                     }
                                     RecordName = genericController.encodeNvaArgument(RecordName);
                                     list = list + "|" + RecordName;
@@ -3027,7 +3021,7 @@ namespace Contensive.Core.Controllers {
                                     PosIDEnd = genericController.vbInstr(PosIDStart, Copy, "\"");
                                     if (PosIDEnd != 0) {
                                         ParseOK = true;
-                                        Copy = Copy.Left( PosIDStart - 1) + genericController.encodeHTML(addonOption_String) + Copy.Substring(PosIDEnd - 1);
+                                        Copy = Copy.Left(PosIDStart - 1) + genericController.encodeHTML(addonOption_String) + Copy.Substring(PosIDEnd - 1);
                                         cpCore.db.csSet(CS, FieldName, Copy);
                                         needToClearCache = true;
                                     }
@@ -3298,7 +3292,7 @@ namespace Contensive.Core.Controllers {
                                 DivName = TagName + ".All";
                                 while (cpCore.db.csOk(CS)) {
                                     OptionName = cpCore.db.csGetText(CS, "OptionName");
-                                    if ((OptionName.Left( 1) != "_") || CanSeeHiddenFields) {
+                                    if ((OptionName.Left(1) != "_") || CanSeeHiddenFields) {
                                         //
                                         // Current checkbox is visible
                                         //
@@ -3376,7 +3370,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         cpCore.db.csClose(ref CS);
-                        addScriptCode_head(javaScriptRequired, "CheckList Categories");
+                        addScriptCode(javaScriptRequired, "CheckList Categories");
                     }
                     //End If
                     cpCore.doc.checkListCnt = cpCore.doc.checkListCnt + 1;
@@ -3500,7 +3494,7 @@ namespace Contensive.Core.Controllers {
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
-                                                                    //
+            //
             return tempmain_GetRecordEditLink2;
         }
         //
@@ -3548,7 +3542,7 @@ namespace Contensive.Core.Controllers {
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
-                                                                    //
+            //
             return tempmain_cs_getRecordAddLink;
         }
         //
@@ -3635,7 +3629,7 @@ namespace Contensive.Core.Controllers {
                         throw (new ApplicationException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
                     } else {
                         iContentID = Models.Complex.cdefModel.getContentId(cpCore, iContentName);
-                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + iContentID,"",true,0,false,false, "id");
+                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + iContentID, "", true, 0, false, false, "id");
                         useFlyout = cpCore.db.csOk(csChildContent);
                         cpCore.db.csClose(ref csChildContent);
                         //
@@ -3657,7 +3651,7 @@ namespace Contensive.Core.Controllers {
                         } else {
                             //
                             MenuName = genericController.GetRandomInteger(cpCore).ToString();
-                            cpCore.menuFlyout.menu_AddEntry(MenuName,"", "/ccLib/images/IconContentAdd.gif","","","", "stylesheet", "stylesheethover");
+                            cpCore.menuFlyout.menu_AddEntry(MenuName, "", "/ccLib/images/IconContentAdd.gif", "", "", "", "stylesheet", "stylesheethover");
                             LowestRequiredMenuName = getRecordAddLink_AddMenuEntry(iContentName, iPresetNameValueList, "", MenuName, MenuName);
                         }
                         //
@@ -3746,7 +3740,7 @@ namespace Contensive.Core.Controllers {
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
-                                                                    //
+            //
             return tempmain_GetRecordAddLink2;
         }
         //
@@ -3883,11 +3877,11 @@ namespace Contensive.Core.Controllers {
                                 Link = Link + "&wc=" + genericController.EncodeRequestVariable(PresetNameValueList);
                             }
                         }
-                        cpCore.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName,"","", Link, ButtonCaption, "", "", true);
+                        cpCore.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName, "", "", Link, ButtonCaption, "", "", true);
                         //
                         // Create child submenu if Child Entries found
                         //
-                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + ContentID,"",true,0,false,false, "name");
+                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + ContentID, "", true, 0, false, false, "name");
                         if (!cpCore.db.csOk(csChildContent)) {
                             //
                             // No child menu
@@ -3960,33 +3954,33 @@ namespace Contensive.Core.Controllers {
             //
             s0 = ""
                 + "\r<td style=\"padding:" + MyPadding + "px;vertical-align:top\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(genericController.encodeText(content)) 
+                + genericController.htmlIndent(genericController.encodeText(content))
                 + "\r</td>"
                 + "";
             //
             s1 = ""
                 + "\r<tr>"
-                + genericController.htmlIndent(s0) 
+                + genericController.htmlIndent(s0)
                 + "\r</tr>"
                 + "";
             s2 = ""
                 + "\r<table style=\"width:" + contentPanelWidthStyle + ";border:0px;\" class=\"" + MyStylePanel + "\" cellspacing=\"0\">"
-                + genericController.htmlIndent(s1) 
+                + genericController.htmlIndent(s1)
                 + "\r</table>"
                 + "";
             s3 = ""
                 + "\r<td colspan=\"3\" width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(s2) 
+                + genericController.htmlIndent(s2)
                 + "\r</td>"
                 + "";
             s4 = ""
                 + "\r<tr>"
-                + genericController.htmlIndent(s3) 
+                + genericController.htmlIndent(s3)
                 + "\r</tr>"
                 + "";
             result = ""
                 + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(s4) 
+                + genericController.htmlIndent(s4)
                 + "\r</table>"
                 + "";
             return result;
@@ -4057,7 +4051,7 @@ namespace Contensive.Core.Controllers {
             //
             // --- center row with Panel
             //
-            tempmain_GetPanelTop = tempmain_GetPanelTop 
+            tempmain_GetPanelTop = tempmain_GetPanelTop
                 + cr2 + "<tr>"
                 + cr3 + "<td colspan=\"3\" width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
                 + cr4 + "<table border=\"0\" cellpadding=\"" + MyPadding + "\" cellspacing=\"0\" width=\"" + ContentPanelWidth + "\" class=\"" + MyStylePanel + "\">"
@@ -4432,14 +4426,11 @@ namespace Contensive.Core.Controllers {
                                 Copy += "\r<br>" + genericController.encodeHTML(docProperty.NameValue);
                             }
                         }
-                        DebugPanel = DebugPanel + getDebugPanelRow("Render Time &gt;= ", ((cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec");
-                        if (true) {
-                            VisitHrs = encodeInteger(cpCore.doc.sessionContext.visit.TimeToLastHit / 3600);
-                            VisitMin = encodeInteger(cpCore.doc.sessionContext.visit.TimeToLastHit / 60) - (60 * VisitHrs);
-                            VisitSec = cpCore.doc.sessionContext.visit.TimeToLastHit % 60;
-                            DebugPanel = DebugPanel + getDebugPanelRow("Visit Length", encodeText(cpCore.doc.sessionContext.visit.TimeToLastHit) + " sec, (" + VisitHrs + " hrs " + VisitMin + " mins " + VisitSec + " secs)");
-                            //DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(main_VisitTimeToLastHit) & " sec, (" & Int(main_VisitTimeToLastHit / 60) & " min " & (main_VisitTimeToLastHit Mod 60) & " sec)")
-                        }
+                        DebugPanel = DebugPanel + getDebugPanelRow("Render Time &gt;= ", (Convert.ToSingle(cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec");
+                        VisitHrs = encodeInteger(cpCore.doc.sessionContext.visit.TimeToLastHit / 3600);
+                        VisitMin = encodeInteger(cpCore.doc.sessionContext.visit.TimeToLastHit / 60) - (60 * VisitHrs);
+                        VisitSec = cpCore.doc.sessionContext.visit.TimeToLastHit % 60;
+                        DebugPanel = DebugPanel + getDebugPanelRow("Visit Length", encodeText(cpCore.doc.sessionContext.visit.TimeToLastHit) + " sec, (" + VisitHrs + " hrs " + VisitMin + " mins " + VisitSec + " secs)");
                         DebugPanel = DebugPanel + getDebugPanelRow("Addon Profile", "<hr><ul class=\"ccPanel\"><li>tbd</li>\r</ul>");
                         //
                         DebugPanel = DebugPanel + "</table>";
@@ -4483,7 +4474,7 @@ namespace Contensive.Core.Controllers {
             string result = genericController.getSimpleNameValue(OptionName, addonOptionString, "", "&");
             int Pos = genericController.vbInstr(1, result, "[");
             if (Pos > 0) {
-                result = result.Left( Pos - 1);
+                result = result.Left(Pos - 1);
             }
             return encodeText(genericController.decodeNvaArgument(result)).Trim(' ');
         }
@@ -4504,12 +4495,12 @@ namespace Contensive.Core.Controllers {
             try {
                 string encoding = genericController.encodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"));
                 addHeadTag("<meta http-equiv=\"content-type\" content=\"text/html; charset=" + encoding + "\">");
-                addHeadTag("<meta http-equiv=\"content-language\" content=\"en-us\">");
-                addHeadTag("<meta http-equiv=\"cache-control\" content=\"no-cache\">");
-                addHeadTag("<meta http-equiv=\"expires\" content=\"-1\">");
-                addHeadTag("<meta http-equiv=\"pragma\" content=\"no-cache\">");
+                //addHeadTag("<meta http-equiv=\"content-language\" content=\"en-us\">");
+                //addHeadTag("<meta http-equiv=\"cache-control\" content=\"no-cache\">");
+                //addHeadTag("<meta http-equiv=\"expires\" content=\"-1\">");
+                //addHeadTag("<meta http-equiv=\"pragma\" content=\"no-cache\">");
                 string htmlHead = getHtmlHead();
-                string htmlBeforeEndOfBody = getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools);
+                string htmlBeforeEndOfBody = getHtmlBodyEnd(allowLogin, allowTools);
                 result = ""
                     + cpCore.siteProperties.docTypeDeclaration
                     + "\r\n<html>"
@@ -4574,7 +4565,7 @@ namespace Contensive.Core.Controllers {
                     string content = "";
                     foreach (var asset in cpCore.doc.htmlMetaContent_TitleList) {
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- added by " + asset.addedByMessage + " -->");
+                            headList.Add("<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
                         }
                         content += " | " + asset.content;
                     }
@@ -4584,7 +4575,7 @@ namespace Contensive.Core.Controllers {
                     string content = "";
                     foreach (var asset in cpCore.doc.htmlMetaContent_KeyWordList.FindAll((a) => (!string.IsNullOrEmpty(a.content)))) {
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- '" + genericController.encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
+                            headList.Add("<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
                         }
                         content += "," + asset.content;
                     }
@@ -4596,7 +4587,7 @@ namespace Contensive.Core.Controllers {
                     string content = "";
                     foreach (var asset in cpCore.doc.htmlMetaContent_Description) {
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- '" + genericController.encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
+                            headList.Add("<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
                         }
                         content += "," + asset.content;
                     }
@@ -4605,7 +4596,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- favicon
                 string VirtualFilename = cpCore.siteProperties.getText("faviconfilename");
-                switch ( Path.GetExtension(VirtualFilename).ToLower()) {
+                switch (Path.GetExtension(VirtualFilename).ToLower()) {
                     case ".ico":
                         headList.Add("<link rel=\"icon\" type=\"image/vnd.microsoft.icon\" href=\"" + genericController.getCdnFileLink(cpCore, VirtualFilename) + "\" >");
                         break;
@@ -4644,14 +4635,14 @@ namespace Contensive.Core.Controllers {
                     headList.Add("<base href=\"" + BaseHref + "\" >");
                 }
                 //
+                // -- css and js
+                // -- go through reverse order, for js, first found in reverse order triggers the in-head mode
                 if (cpCore.doc.htmlAssetList.Count > 0) {
-                    List<string> scriptList = new List<string>();
+                    List<string> headScriptList = new List<string>();
                     List<string> styleList = new List<string>();
                     foreach (var asset in cpCore.doc.htmlAssetList.FindAll((htmlAssetClass item) => (item.inHead))) {
-                        if (cpCore.doc.allowDebugLog) {
-                            if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                                headList.Add("<!-- '" + genericController.encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
-                            }
+                        if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
+                            headList.Add("<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
                         }
                         if (asset.assetType.Equals(htmlAssetTypeEnum.style)) {
                             if (asset.isLink) {
@@ -4660,23 +4651,22 @@ namespace Contensive.Core.Controllers {
                                 styleList.Add("<style>" + asset.content + "</style>");
                             }
                         } else if (asset.assetType.Equals(htmlAssetTypeEnum.script)) {
-
                             if (asset.isLink) {
-                                scriptList.Add("<script type=\"text/javascript\" src=\"" + asset.content + "\"></script>");
+                                headScriptList.Add("<script type=\"text/javascript\" src=\"" + asset.content + "\"></script>");
                             } else {
-                                scriptList.Add("<script type=\"text/javascript\">" + asset.content + "</script>");
+                                headScriptList.Add("<script type=\"text/javascript\">" + asset.content + "</script>");
                             }
                         }
                     }
                     headList.AddRange(styleList);
-                    headList.AddRange(scriptList);
+                    headList.AddRange(headScriptList);
                 }
                 //
                 // -- other head tags - always last
                 foreach (var asset in cpCore.doc.htmlMetaContent_OtherTags.FindAll((a) => (!string.IsNullOrEmpty(a.content)))) {
                     if (cpCore.doc.allowDebugLog) {
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- '" + genericController.encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
+                            headList.Add("<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
                         }
                     }
                     headList.Add(asset.content);
@@ -4704,36 +4694,33 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
             }
         }
+
         //
         //====================================================================================================
         //
-        public void addScriptCode_body(string code, string addedByMessage) {
+        public void addScriptCode(string code, string addedByMessage, bool forceHead = false, int sourceAddonId = 0) {
             try {
-                if (!string.IsNullOrEmpty(code)) {
-                    cpCore.doc.htmlAssetList.Add(new htmlAssetClass() {
-                        assetType = htmlAssetTypeEnum.script,
-                        addedByMessage = addedByMessage,
-                        isLink = false,
-                        content = genericController.removeScriptTag(code)
-                    });
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public void addScriptCode_head(string code, string addedByMessage) {
-            try {
-                if (!string.IsNullOrEmpty(code)) {
-                    cpCore.doc.htmlAssetList.Add(new htmlAssetClass() {
-                        assetType = htmlAssetTypeEnum.script,
-                        inHead = true,
-                        addedByMessage = addedByMessage,
-                        isLink = false,
-                        content = genericController.removeScriptTag(code)
-                    });
+                if (!string.IsNullOrWhiteSpace(code)) {
+                    htmlAssetClass asset = null;
+                    if (sourceAddonId != 0) {
+                        asset = cpCore.doc.htmlAssetList.Find(t => t.sourceAddonId == sourceAddonId);
+                    }
+                    if (asset != null) {
+                        //
+                        // already in list, just mark it forceHead
+                        asset.inHead = asset.inHead || forceHead;
+                    } else {
+                        //
+                        // add to list
+                        cpCore.doc.htmlAssetList.Add(new htmlAssetClass() {
+                            assetType = htmlAssetTypeEnum.script,
+                            inHead = true,
+                            addedByMessage = addedByMessage,
+                            isLink = forceHead,
+                            content = genericController.removeScriptTag(code),
+                            sourceAddonId = sourceAddonId
+                        });
+                    }
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -4742,38 +4729,51 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================================
         //
-        public void addScriptLink_Head(string Filename, string addedByMessage) {
+        public void addScriptLinkSrc(string scriptLinkSrc, string addedByMessage, bool forceHead = false, int sourceAddonId = 0) {
             try {
-                if (!string.IsNullOrEmpty(Filename)) {
-                    cpCore.doc.htmlAssetList.Add(new htmlAssetClass {
-                        assetType = htmlAssetTypeEnum.script,
-                        addedByMessage = addedByMessage,
-                        isLink = true,
-                        inHead = true,
-                        content = Filename
-                    });
+                if (!string.IsNullOrWhiteSpace(scriptLinkSrc)) {
+                    htmlAssetClass asset = null;
+                    if (sourceAddonId != 0) {
+                        asset = cpCore.doc.htmlAssetList.Find(t => t.sourceAddonId == sourceAddonId);
+                    }
+                    if (asset != null) {
+                        //
+                        // already in list, just mark it forceHead
+                        asset.inHead = asset.inHead || forceHead;
+                    } else {
+                        //
+                        // add to list
+                        cpCore.doc.htmlAssetList.Add(new htmlAssetClass {
+                            assetType = htmlAssetTypeEnum.script,
+                            addedByMessage = addedByMessage,
+                            isLink = true,
+                            inHead = forceHead,
+                            content = scriptLinkSrc,
+                            sourceAddonId = sourceAddonId
+                        });
+                    }
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
         }
-        //
-        //=========================================================================================================
-        //
-        public void addScriptLink_Body(string Filename, string addedByMessage) {
-            try {
-                if (!string.IsNullOrEmpty(Filename)) {
-                    cpCore.doc.htmlAssetList.Add(new htmlAssetClass {
-                        assetType = htmlAssetTypeEnum.script,
-                        addedByMessage = addedByMessage,
-                        isLink = true,
-                        content = Filename
-                    });
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-        }
+        ////
+        ////=========================================================================================================
+        ////
+        //public void addScriptLink_Body(string Filename, string addedByMessage) {
+        //    try {
+        //        if (!string.IsNullOrEmpty(Filename)) {
+        //            cpCore.doc.htmlAssetList.Add(new htmlAssetClass {
+        //                assetType = htmlAssetTypeEnum.script,
+        //                addedByMessage = addedByMessage,
+        //                isLink = true,
+        //                content = Filename
+        //            });
+        //        }
+        //    } catch (Exception ex) {
+        //        cpCore.handleException(ex);
+        //    }
+        //}
         //
         //=========================================================================================================
         //
@@ -4912,7 +4912,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // honestly, not sure what to do with 'return_ErrorMessage'
                 //
-                CS = cpCore.db.csOpen("copy content", "Name=" + cpCore.db.encodeSQLText(CopyName), "ID",true, 0,false,false, "Name,ID,Copy,modifiedBy");
+                CS = cpCore.db.csOpen("copy content", "Name=" + cpCore.db.encodeSQLText(CopyName), "ID", true, 0, false, false, "Name,ID,Copy,modifiedBy");
                 if (!cpCore.db.csOk(CS)) {
                     cpCore.db.csClose(ref CS);
                     CS = cpCore.db.csInsertRecord("copy content", 0);
@@ -5228,7 +5228,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static string div( string innerHtml, string htmlName = "", string htmlClass = "", string htmlId = "") {
+        public static string div(string innerHtml, string htmlName = "", string htmlClass = "", string htmlId = "") {
             return genericBlockTag("div", innerHtml, htmlName, htmlClass, htmlId);
         }
     }

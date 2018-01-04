@@ -33,7 +33,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="textToInsert"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string insertOuterHTML(coreClass cpCore, string layout, string Key, string textToInsert) {
+        public static string setOuter(coreClass cpCore, string layout, string Key, string textToInsert) {
             string returnValue = "";
             try {
                 if (string.IsNullOrEmpty(Key)) {
@@ -59,7 +59,7 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        public static  string insertInnerHTML(coreClass cpCore, string layout, string Key, string textToInsert) {
+        public static  string setInner(coreClass cpCore, string layout, string Key, string textToInsert) {
             string returnValue = "";
             try {
                 int posStart = 0;
@@ -103,7 +103,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="Key"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string getInnerHTML(coreClass cpCore, string layout, string Key) {
+        public static string getInner(coreClass cpCore, string layout, string Key) {
             string returnValue = "";
             try {
                 int posStart = 0;
@@ -155,7 +155,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="Key"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string getOuterHTML(coreClass cpCore, string layout, string Key) {
+        public static string getOuter(coreClass cpCore, string layout, string Key) {
             string returnValue = "";
             try {
                 int posStart = 0;

@@ -1829,8 +1829,6 @@ namespace Contensive.Core.Controllers {
                 bool SortReverse = false;
                 string AdminURL = null;
                 //
-                htmlToTextControllers converthtmlToText = null;
-                //
                 int iPersonalizationPeopleId = personalizationPeopleId;
                 if (iPersonalizationPeopleId == 0) {
                     iPersonalizationPeopleId = cpCore.doc.sessionContext.user.id;
@@ -1868,7 +1866,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Do Plain Text Conversion
                     //
                     if (PlainText) {
-                        result = htmlToTextControllers.convert(cpCore, result);
+                        result = NUglify.Uglify.HtmlToText(result).Code; // htmlToTextControllers.convert(cpCore, result);
                     }
                     //
                     // Process Active Content that must be run here to access webclass objects

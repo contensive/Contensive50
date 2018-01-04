@@ -43,6 +43,7 @@ namespace Contensive.Core {
         public const string addonGuidManageAddon = "{DBA354AB-5D3E-4882-8718-CF23CAAB7927}";
         //
         // -- addons
+        public const string addonGuidHousekeep = "{7208D069-8FE3-4BD1-AB76-B25C40C89A45}";
         public const string addonGuidBaseStlyles = "{0dd7df28-4924-4881-a1d8-421824f5c2d1}";
         public const string addonGuidAdminSite = "{c2de2acf-ca39-4668-b417-aa491e7d8460}";
         public const string addonGuidDashboard = "{4BA7B4A2-ED6C-46C5-9C7B-8CE251FC8FF5}";
@@ -1933,12 +1934,13 @@ namespace Contensive.Core {
         }
         //
         // -- assets to be added to the head section (and end-of-body) of html documents
-        public struct htmlAssetClass {
+        public class htmlAssetClass {
             public htmlAssetTypeEnum assetType; // the type of asset
             public bool inHead; // if true, asset goes in head else it goes at end of body
             public bool isLink; // asset is a link, else it is content
             public string content; // either link or content
             public string addedByMessage; // message used during debug to show where the asset came from
+            public int sourceAddonId; // if this asset was added from an addon, this is the addonId.
         }
         //
         // -- metaDescription
