@@ -368,127 +368,69 @@ namespace Contensive.Core.Addons.AdminSite {
                     } else if (AdminForm != 0) {
                         //
                         // No content so far, try the forms
-                        //
-                        //INSTANT C# NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
-                        //						Select Case Int(AdminForm)
-                        //ORIGINAL LINE: Case AdminFormBuilderCollection
+                        // todo - convert this to switch
                         if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormBuilderCollection) {
                             ContentCell = GetForm_BuildCollection();
-                        }
-                        //ORIGINAL LINE: Case AdminFormSecurityControl
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormSecurityControl) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormSecurityControl) {
                             AddonGuid = AddonGuidPreferences;
-                            //    ContentCell = GetForm_SecurityControl()
-                        }
-                        //ORIGINAL LINE: Case AdminFormMetaKeywordTool
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormMetaKeywordTool) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormMetaKeywordTool) {
                             ContentCell = GetForm_MetaKeywordTool();
-                        }
-                        //ORIGINAL LINE: Case AdminFormMobileBrowserControl, AdminFormPageControl, AdminFormEmailControl
-                        else if ((encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormMobileBrowserControl) || (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormPageControl) || (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormEmailControl)) {
+                        } else if ((encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormMobileBrowserControl) || (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormPageControl) || (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormEmailControl)) {
                             ContentCell = cpCore.addon.execute(addonModel.create(cpCore, AddonGuidPreferences), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorCaption = "Preferences"
                             });
-                            //ContentCell = cpCore.addon.execute_legacy4(AddonGuidPreferences, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
-                        }
-                        //ORIGINAL LINE: Case AdminFormClearCache
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormClearCache) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormClearCache) {
                             ContentCell = GetForm_ClearCache();
-                            //Case AdminFormEDGControl
-                            //    ContentCell = GetForm_StaticPublishControl()
-                        }
-                        //ORIGINAL LINE: Case AdminFormSpiderControl
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormSpiderControl) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormSpiderControl) {
                             ContentCell = cpCore.addon.execute(addonModel.createByName(cpCore, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorCaption = "Content Spider Control"
                             });
-                            //ContentCell = cpCore.addon.execute_legacy4("Content Spider Control", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
-                        }
-                        //ORIGINAL LINE: Case AdminFormResourceLibrary
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormResourceLibrary) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormResourceLibrary) {
                             ContentCell = cpCore.html.getResourceLibrary2("", false, "", "", true);
-                        }
-                        //ORIGINAL LINE: Case AdminFormQuickStats
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormQuickStats) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormQuickStats) {
                             ContentCell = (GetForm_QuickStats());
-                        }
-                        //ORIGINAL LINE: Case AdminFormIndex
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormIndex) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormIndex) {
                             ContentCell = (GetForm_Index(AdminContent, editRecord, (AdminContent.ContentTableName.ToLower() == "ccemail")));
-                        }
-                        //ORIGINAL LINE: Case AdminFormEdit
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormEdit) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormEdit) {
                             ContentCell = GetForm_Edit(AdminContent, editRecord);
-                        }
-                        //ORIGINAL LINE: Case AdminFormClose
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormClose) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormClose) {
                             Stream.Add("<Script Language=\"JavaScript\" type=\"text/javascript\"> window.close(); </Script>");
-                        }
-                        //ORIGINAL LINE: Case AdminFormPublishing
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormPublishing) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormPublishing) {
                             ContentCell = (GetForm_Publish());
-                        }
-                        //ORIGINAL LINE: Case AdminFormContentChildTool
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormContentChildTool) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormContentChildTool) {
                             ContentCell = (GetContentChildTool());
-                        }
-                        //ORIGINAL LINE: Case AdminformPageContentMap
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminformPageContentMap) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminformPageContentMap) {
                             ContentCell = (GetForm_PageContentMap());
-                        }
-                        //ORIGINAL LINE: Case AdminformHousekeepingControl
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminformHousekeepingControl) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminformHousekeepingControl) {
                             ContentCell = (GetForm_HouseKeepingControl());
-                        }
-                        //ORIGINAL LINE: Case AdminFormTools, 100 To 199
-                        else if ((encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormTools) || (encodeInteger(Math.Floor(encodeNumber(AdminForm))) >= 100 && encodeInteger(Math.Floor(encodeNumber(AdminForm))) <= 199)) {
+                        } else if ((encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormTools) || (encodeInteger(Math.Floor(encodeNumber(AdminForm))) >= 100 && encodeInteger(Math.Floor(encodeNumber(AdminForm))) <= 199)) {
                             legacyToolsClass Tools = new legacyToolsClass(cpCore);
                             ContentCell = Tools.GetForm();
-                        }
-                        //ORIGINAL LINE: Case AdminFormStyleEditor
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormStyleEditor) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormStyleEditor) {
                             ContentCell = (admin_GetForm_StyleEditor());
-                        }
-                        //ORIGINAL LINE: Case AdminFormDownloads
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormDownloads) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormDownloads) {
                             ContentCell = (GetForm_Downloads());
-                        }
-                        //ORIGINAL LINE: Case AdminformRSSControl
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminformRSSControl) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminformRSSControl) {
                             ContentCell = cpCore.webServer.redirect("?cid=" +cdefModel.getContentId(cpCore, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
-                        }
-                        //ORIGINAL LINE: Case AdminFormImportWizard
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormImportWizard) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormImportWizard) {
                             ContentCell = cpCore.addon.execute(addonModel.create(cpCore, addonGuidImportWizard), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorCaption = "Import Wizard"
                             });
-                            //ContentCell = cpCore.addon.execute_legacy4(addonGuidImportWizard, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
-                        }
-                        //ORIGINAL LINE: Case AdminFormCustomReports
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormCustomReports) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormCustomReports) {
                             ContentCell = GetForm_CustomReports();
-                        }
-                        //ORIGINAL LINE: Case AdminFormFormWizard
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormFormWizard) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormFormWizard) {
                             ContentCell = cpCore.addon.execute(addonModel.create(cpCore, addonGuidFormWizard), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorCaption = "Form Wizard"
                             });
-                            //ContentCell = cpCore.addon.execute_legacy4(addonGuidFormWizard, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
-                        }
-                        //ORIGINAL LINE: Case AdminFormLegacyAddonManager
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormLegacyAddonManager) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormLegacyAddonManager) {
                             ContentCell = addonController.GetAddonManager(cpCore);
-                        }
-                        //ORIGINAL LINE: Case AdminFormEditorConfig
-                        else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormEditorConfig) {
+                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormEditorConfig) {
                             ContentCell = GetForm_EditConfig();
-                        }
-                        //ORIGINAL LINE: Case Else
-                        else {
+                        } else {
                             ContentCell = "<p>The form requested is not supported</p>";
                         }
                     } else if ((addonId != 0) | (!string.IsNullOrEmpty(AddonGuid)) | (!string.IsNullOrEmpty(AddonName))) {
@@ -551,7 +493,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (includeFancyBox) {
                         cpCore.addon.executeDependency(addonModel.create(cpCore, addonGuidjQueryFancyBox), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() { addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin });
                         //Call cpCore.addon.execute_legacy4(addonGuidjQueryFancyBox)
-                        cpCore.html.addScriptCode("jQuery(document).ready(function() {" + fancyBoxHeadJS + "});", "");
+                        cpCore.html.addScriptCode_onLoad(fancyBoxHeadJS, "");
                     }
                     //
                     // Pickup user errors
@@ -560,23 +502,9 @@ namespace Contensive.Core.Addons.AdminSite {
                         ContentCell = "<div class=\"ccAdminMsg\">" + errorController.getUserError(cpCore) + "</div>" + ContentCell;
                     }
                     //
-                    // If blank, must be an addon with a setting form that returned blank, do the dashboard again
-                    //
-                    //If ContentCell = "" Then
-                    //    '
-                    //    ' must use the root as a default - bc forms and add-ons may return blank, meaning return to root
-                    //    ' throw errors only if there is a user error
-                    //    '
-                    //    ContentCell = GetForm_Root()
-                    //    'ContentCell = "<div class=""ccAdminMsg"">The form you requested did not return a valid response.</div>"
-                    //End If
-                    //
                     Stream.Add('\r' + GetForm_Top());
                     Stream.Add(genericController.htmlIndent(ContentCell));
                     Stream.Add('\r' + AdminFormBottom);
-                    //Call Stream.Add(cr & "<script language=""javascript1.2"" type=""text/javascript"">" & JavaScriptString)
-                    //Call Stream.Add(cr & "ButtonObjectCount = " & ButtonObjectCount & ";")
-                    //Call Stream.Add(cr & "</script>")
                     JavaScriptString += "\rButtonObjectCount = " + ButtonObjectCount + ";";
                     cpCore.html.addScriptCode(JavaScriptString, "Admin Site");
                 }

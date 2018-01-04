@@ -1930,7 +1930,7 @@ namespace Contensive.Core {
         public enum htmlAssetTypeEnum {
             script, // -- script at end of body (code or link)
             style, // -- css style at end of body (code or link)
-            OnLoadScript // -- special case, text is assumed to be script to run on load
+            scriptOnLoad // -- special case, text is assumed to be script to run on load
         }
         //
         // -- assets to be added to the head section (and end-of-body) of html documents

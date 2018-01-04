@@ -68,15 +68,31 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- body Javascript
                 bool allowDebugging = cpCore.visitProperty.getBoolean("AllowDebugging");
-                foreach (var jsBody in cpCore.doc.htmlAssetList.FindAll((a) => (a.assetType == htmlAssetTypeEnum.script) & (!a.inHead) && (!string.IsNullOrEmpty(a.content)))) {
-                    if ((jsBody.addedByMessage != "") && allowDebugging) {
-                        result.Add("<!-- from " + jsBody.addedByMessage + " -->");
+                var scriptOnLoad = new List<string>();
+                foreach (var asset in cpCore.doc.htmlAssetList.FindAll((a) => ((a.assetType == htmlAssetTypeEnum.script) || (a.assetType == htmlAssetTypeEnum.scriptOnLoad)) && (!a.inHead) && (!string.IsNullOrEmpty(a.content)))) {
+                    if ((asset.addedByMessage != "") && allowDebugging) {
+                        result.Add("<!-- from " + asset.addedByMessage + " -->");
                     }
-                    if (!jsBody.isLink) {
-                        result.Add("<script Language=\"JavaScript\" type=\"text/javascript\">" + jsBody.content + "</script>");
+                    if (asset.assetType == htmlAssetTypeEnum.scriptOnLoad) {
+                        scriptOnLoad.Add( asset.content + ";" );
+                    } if (!asset.isLink) {
+                        result.Add("<script Language=\"JavaScript\" type=\"text/javascript\">" + asset.content + "</script>");
                     } else {
-                        result.Add("<script type=\"text/javascript\" src=\"" + jsBody.content + "\"></script>");
+                        result.Add("<script type=\"text/javascript\" src=\"" + asset.content + "\"></script>");
                     }
+                }
+                if (scriptOnLoad.Count>0) {
+                    result.Add(""
+                        + "\r\n<script Language=\"JavaScript\" type=\"text/javascript\">" 
+                        + "function ready(callback){" 
+                            + "if (document.readyState!='loading') callback(); "
+                            + "else if (document.addEventListener) document.addEventListener('DOMContentLoaded', callback); "
+                            + "else document.attachEvent('onreadystatechange', function(){"
+                                + "if (document.readyState=='complete') callback();"
+                            + "});"
+                        + "} ready(function(){" + string.Join("\r\n", scriptOnLoad) + "\r\n});"
+                        + "</script>");
+
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -4565,49 +4581,49 @@ namespace Contensive.Core.Controllers {
                     string content = "";
                     foreach (var asset in cpCore.doc.htmlMetaContent_TitleList) {
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
+                            headList.Add("\r\n<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
                         }
                         content += " | " + asset.content;
                     }
-                    headList.Add("<title>" + genericController.encodeHTML(content.Substring(3)) + "</title>");
+                    headList.Add("\r\n<title>" + genericController.encodeHTML(content.Substring(3)) + "</title>");
                 }
                 if (cpCore.doc.htmlMetaContent_KeyWordList.Count > 0) {
                     string content = "";
                     foreach (var asset in cpCore.doc.htmlMetaContent_KeyWordList.FindAll((a) => (!string.IsNullOrEmpty(a.content)))) {
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
+                            headList.Add("\r\n<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
                         }
                         content += "," + asset.content;
                     }
                     if (!string.IsNullOrEmpty(content)) {
-                        headList.Add("<meta name=\"keywords\" content=\"" + genericController.encodeHTML(content.Substring(1)) + "\" >");
+                        headList.Add("\r\n<meta name=\"keywords\" content=\"" + genericController.encodeHTML(content.Substring(1)) + "\" >");
                     }
                 }
                 if (cpCore.doc.htmlMetaContent_Description.Count > 0) {
                     string content = "";
                     foreach (var asset in cpCore.doc.htmlMetaContent_Description) {
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
+                            headList.Add("\r\n<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
                         }
                         content += "," + asset.content;
                     }
-                    headList.Add("<meta name=\"description\" content=\"" + genericController.encodeHTML(content.Substring(1)) + "\" >");
+                    headList.Add("\r\n<meta name=\"description\" content=\"" + genericController.encodeHTML(content.Substring(1)) + "\" >");
                 }
                 //
                 // -- favicon
                 string VirtualFilename = cpCore.siteProperties.getText("faviconfilename");
                 switch (Path.GetExtension(VirtualFilename).ToLower()) {
                     case ".ico":
-                        headList.Add("<link rel=\"icon\" type=\"image/vnd.microsoft.icon\" href=\"" + genericController.getCdnFileLink(cpCore, VirtualFilename) + "\" >");
+                        headList.Add("\r\n<link rel=\"icon\" type=\"image/vnd.microsoft.icon\" href=\"" + genericController.getCdnFileLink(cpCore, VirtualFilename) + "\" >");
                         break;
                     case ".png":
-                        headList.Add("<link rel=\"icon\" type=\"image/png\" href=\"" + genericController.getCdnFileLink(cpCore, VirtualFilename) + "\" >");
+                        headList.Add("\r\n<link rel=\"icon\" type=\"image/png\" href=\"" + genericController.getCdnFileLink(cpCore, VirtualFilename) + "\" >");
                         break;
                     case ".gif":
-                        headList.Add("<link rel=\"icon\" type=\"image/gif\" href=\"" + genericController.getCdnFileLink(cpCore, VirtualFilename) + "\" >");
+                        headList.Add("\r\n<link rel=\"icon\" type=\"image/gif\" href=\"" + genericController.getCdnFileLink(cpCore, VirtualFilename) + "\" >");
                         break;
                     case ".jpg":
-                        headList.Add("<link rel=\"icon\" type=\"image/jpg\" href=\"" + genericController.getCdnFileLink(cpCore, VirtualFilename) + "\" >");
+                        headList.Add("\r\n<link rel=\"icon\" type=\"image/jpg\" href=\"" + genericController.getCdnFileLink(cpCore, VirtualFilename) + "\" >");
                         break;
                 }
                 //
@@ -4618,12 +4634,12 @@ namespace Contensive.Core.Controllers {
                 //headList.Add("<meta http-equiv=\"cache-control\" content=\"no-cache\">");
                 //headList.Add("<meta http-equiv=\"expires\" content=\"-1\">");
                 //headList.Add("<meta http-equiv=\"pragma\" content=\"no-cache\">");
-                headList.Add("<meta name=\"generator\" content=\"Contensive\">");
+                headList.Add("\r\n<meta name=\"generator\" content=\"Contensive\">");
                 //
                 // -- no-follow
                 if (cpCore.webServer.response_NoFollow) {
-                    headList.Add("<meta name=\"robots\" content=\"nofollow\" >");
-                    headList.Add("<meta name=\"mssmarttagspreventparsing\" content=\"true\" >");
+                    headList.Add("\r\n<meta name=\"robots\" content=\"nofollow\" >");
+                    headList.Add("\r\n<meta name=\"mssmarttagspreventparsing\" content=\"true\" >");
                 }
                 //
                 // -- base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
@@ -4632,7 +4648,7 @@ namespace Contensive.Core.Controllers {
                     if (!string.IsNullOrEmpty(cpCore.doc.refreshQueryString)) {
                         BaseHref += "?" + cpCore.doc.refreshQueryString;
                     }
-                    headList.Add("<base href=\"" + BaseHref + "\" >");
+                    headList.Add("\r\n<base href=\"" + BaseHref + "\" >");
                 }
                 //
                 // -- css and js
@@ -4641,16 +4657,19 @@ namespace Contensive.Core.Controllers {
                     List<string> headScriptList = new List<string>();
                     List<string> styleList = new List<string>();
                     foreach (var asset in cpCore.doc.htmlAssetList.FindAll((htmlAssetClass item) => (item.inHead))) {
+                        string debugComment = "\r\n";
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
+                            debugComment = "\r\n<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->";
                         }
                         if (asset.assetType.Equals(htmlAssetTypeEnum.style)) {
+                            styleList.Add(debugComment);
                             if (asset.isLink) {
                                 styleList.Add("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + asset.content + "\" >");
                             } else {
                                 styleList.Add("<style>" + asset.content + "</style>");
                             }
                         } else if (asset.assetType.Equals(htmlAssetTypeEnum.script)) {
+                            headScriptList.Add(debugComment);
                             if (asset.isLink) {
                                 headScriptList.Add("<script type=\"text/javascript\" src=\"" + asset.content + "\"></script>");
                             } else {
@@ -4664,10 +4683,8 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- other head tags - always last
                 foreach (var asset in cpCore.doc.htmlMetaContent_OtherTags.FindAll((a) => (!string.IsNullOrEmpty(a.content)))) {
-                    if (cpCore.doc.allowDebugLog) {
-                        if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
-                        }
+                    if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
+                        headList.Add("\r\n<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
                     }
                     headList.Add(asset.content);
                 }
@@ -4684,7 +4701,7 @@ namespace Contensive.Core.Controllers {
             try {
                 if (!string.IsNullOrEmpty(code)) {
                     cpCore.doc.htmlAssetList.Add(new htmlAssetClass() {
-                        assetType = htmlAssetTypeEnum.OnLoadScript,
+                        assetType = htmlAssetTypeEnum.scriptOnLoad,
                         addedByMessage = addedByMessage,
                         isLink = false,
                         content = code
@@ -4714,9 +4731,9 @@ namespace Contensive.Core.Controllers {
                         // add to list
                         cpCore.doc.htmlAssetList.Add(new htmlAssetClass() {
                             assetType = htmlAssetTypeEnum.script,
-                            inHead = true,
+                            inHead = forceHead,
                             addedByMessage = addedByMessage,
-                            isLink = forceHead,
+                            isLink = false,
                             content = genericController.removeScriptTag(code),
                             sourceAddonId = sourceAddonId
                         });
