@@ -51,7 +51,7 @@ namespace Contensive.Core.Controllers {
         ~_blankController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
-            //INSTANT C# NOTE: The base class Finalize method is automatically called from the destructor:
+            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();
         }
         //

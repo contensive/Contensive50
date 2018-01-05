@@ -293,7 +293,7 @@ namespace Contensive.Core.Controllers {
                     MaxPointer = store.ArrayCount - 2;
                     for (SlowPointer = MaxPointer; SlowPointer >= 0; SlowPointer--) {
                         CleanPass = true;
-                        //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of MaxPointer - SlowPointer for every iteration:
+                        //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of MaxPointer - SlowPointer for every iteration:
                         int tempVar = MaxPointer - SlowPointer;
                         for (FastPointer = MaxPointer; FastPointer >= tempVar; FastPointer--) {
                             if (string.CompareOrdinal(store.UcaseKeyArray[FastPointer], store.UcaseKeyArray[FastPointer + PointerDelta]) > 0) {

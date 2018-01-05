@@ -63,7 +63,7 @@ namespace Contensive.Core.Controllers {
                 var scriptOnLoad = new List<string>();
                 foreach (var asset in cpCore.doc.htmlAssetList.FindAll((a) => ((a.assetType == htmlAssetTypeEnum.script) || (a.assetType == htmlAssetTypeEnum.scriptOnLoad)) && (!a.inHead) && (!string.IsNullOrEmpty(a.content)))) {
                     if ((asset.addedByMessage != "") && allowDebugging) {
-                        result.Add("<!-- from " + asset.addedByMessage + " -->");
+                        result.Add("\r\n<!-- from " + asset.addedByMessage + " -->\r\n");
                     }
                     if (asset.assetType == htmlAssetTypeEnum.scriptOnLoad) {
                         scriptOnLoad.Add( asset.content + ";" );
@@ -2932,7 +2932,7 @@ namespace Contensive.Core.Controllers {
                                         // found the instance
                                         //
                                         PosACInstanceID = PosACInstanceID + 13;
-                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                         //ORIGINAL LINE: Exit Do
                                         goto ExitLabel1;
                                     }
@@ -4117,23 +4117,13 @@ namespace Contensive.Core.Controllers {
         public string getToolsPanel() {
             string result = "";
             try {
-                string copyNameValue = null;
-                string CopyName = null;
-                string copyValue = null;
-                string[] copyNameValueSplit = null;
-                int VisitMin = 0;
-                int VisitHrs = 0;
-                int VisitSec = 0;
                 string DebugPanel = "";
                 string Copy = null;
-                string[] CopySplit = null;
-                int Ptr = 0;
                 string EditTagID = null;
                 string QuickEditTagID = null;
                 string AdvancedEditTagID = null;
                 string WorkflowTagID = null;
                 string Tag = null;
-                string MethodName = null;
                 string TagID = null;
                 stringBuilderLegacyController ToolsPanel = null;
                 string OptionsPanel = "";
@@ -4146,8 +4136,6 @@ namespace Contensive.Core.Controllers {
                 adminUIController Adminui = new adminUIController(cpCore);
                 bool ShowLegacyToolsPanel = false;
                 string QS = null;
-                //
-                MethodName = "main_GetToolsPanel";
                 //
                 if (cpCore.doc.sessionContext.user.AllowToolsPanel) {
                     ShowLegacyToolsPanel = cpCore.siteProperties.getBoolean("AllowLegacyToolsPanel", true);
@@ -4392,61 +4380,17 @@ namespace Contensive.Core.Controllers {
                         //LinkPanel.Add( "WebClient " & main_WebClientVersion & " | "
                         LinkPanel.Add("Contensive " + cpCore.codeVersion() + " | ");
                         LinkPanel.Add(cpCore.doc.profileStartTime.ToString("G") + " | ");
-                        LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http: //support.Contensive.com/\">Support</A> | ");
+                        LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http://support.Contensive.com/\">Support</A> | ");
                         LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + genericController.encodeHTML("/" + cpCore.serverConfig.appConfig.adminRoute) + "\">Admin Home</A> | ");
                         LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + genericController.encodeHTML("http://" + cpCore.webServer.requestDomain) + "\">Public Home</A> | ");
-                        LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"" + genericController.encodeHTML("/" + cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameHardCodedPage + "=" + HardCodedPageMyProfile) + "\">My Profile</A> | ");
+                        LinkPanel.Add("Render " + (Convert.ToSingle(cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec | ");
                         LinkPanel.Add("</span>");
-                        //
-                        //
-                        //
-                        //DebugPanel = DebugPanel & main_GetPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", "5")
                         //
                         DebugPanel +=  "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                             + cr2 + "<tr>"
                             + cr3 + "<td width=\"100\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100\" height=\"1\" ></td>"
                             + cr3 + "<td width=\"100%\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"1\" ></td>"
                             + cr2 + "</tr>";
-                        //
-                        DebugPanel +=  getDebugPanelRow("DOM", "<a class=\"ccAdminLink\" href=\"/ccLib/clientside/DOMViewer.htm\" target=\"_blank\">Click</A>");
-                        DebugPanel +=  getDebugPanelRow("Trap Errors", genericController.encodeHTML(cpCore.siteProperties.trapErrors.ToString()));
-                        DebugPanel +=  getDebugPanelRow("Trap Email", genericController.encodeHTML(cpCore.siteProperties.getText("TrapEmail")));
-                        DebugPanel +=  getDebugPanelRow("main_ServerLink", genericController.encodeHTML(cpCore.webServer.requestUrl));
-                        DebugPanel +=  getDebugPanelRow("main_ServerDomain", genericController.encodeHTML(cpCore.webServer.requestDomain));
-                        DebugPanel +=  getDebugPanelRow("main_ServerProtocol", genericController.encodeHTML(cpCore.webServer.requestProtocol));
-                        DebugPanel +=  getDebugPanelRow("main_ServerHost", genericController.encodeHTML(cpCore.webServer.requestDomain));
-                        DebugPanel +=  getDebugPanelRow("main_ServerPath", genericController.encodeHTML(cpCore.webServer.requestPath));
-                        DebugPanel +=  getDebugPanelRow("main_ServerPage", genericController.encodeHTML(cpCore.webServer.requestPage));
-                        Copy = "";
-                        if (cpCore.webServer.requestQueryString != "") {
-                            CopySplit = cpCore.webServer.requestQueryString.Split('&');
-                            for (Ptr = 0; Ptr <= CopySplit.GetUpperBound(0); Ptr++) {
-                                copyNameValue = CopySplit[Ptr];
-                                if (!string.IsNullOrEmpty(copyNameValue)) {
-                                    copyNameValueSplit = copyNameValue.Split('=');
-                                    CopyName = genericController.DecodeResponseVariable(copyNameValueSplit[0]);
-                                    copyValue = "";
-                                    if (copyNameValueSplit.GetUpperBound(0) > 0) {
-                                        copyValue = genericController.DecodeResponseVariable(copyNameValueSplit[1]);
-                                    }
-                                    Copy += "\r<br>" + genericController.encodeHTML(CopyName + "=" + copyValue);
-                                }
-                            }
-                            Copy = Copy.Substring(7);
-                        }
-                        DebugPanel +=  getDebugPanelRow("main_ServerQueryString", Copy);
-                        Copy = "";
-                        foreach (string key in cpCore.docProperties.getKeyList()) {
-                            docPropertiesClass docProperty = cpCore.docProperties.getProperty(key);
-                            if (docProperty.IsForm) {
-                                Copy += "\r<br>" + genericController.encodeHTML(docProperty.NameValue);
-                            }
-                        }
-                        DebugPanel +=  getDebugPanelRow("Render Time &gt;= ", (Convert.ToSingle(cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec");
-                        VisitHrs = encodeInteger(cpCore.doc.sessionContext.visit.TimeToLastHit / 3600);
-                        VisitMin = encodeInteger(cpCore.doc.sessionContext.visit.TimeToLastHit / 60) - (60 * VisitHrs);
-                        VisitSec = cpCore.doc.sessionContext.visit.TimeToLastHit % 60;
-                        DebugPanel +=  getDebugPanelRow("Visit Length", encodeText(cpCore.doc.sessionContext.visit.TimeToLastHit) + " sec, (" + VisitHrs + " hrs " + VisitMin + " mins " + VisitSec + " secs)");
                         DebugPanel +=  "</table>";
                         //
                         if (ShowLegacyToolsPanel) {

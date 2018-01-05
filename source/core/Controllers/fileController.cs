@@ -651,7 +651,7 @@ namespace Contensive.Core.Controllers {
                     DirectoryInfo srcDirectoryInfo = new DirectoryInfo(physicalSrc);
                     DirectoryInfo dstDiretoryInfo = new DirectoryInfo(physicalDst);
                     DirectoryInfo dstCopy = null;
-                    //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                    //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                     //					DirectoryInfo srcCopy = null;
                     //
                     // copy each file into destination
@@ -1044,7 +1044,7 @@ namespace Contensive.Core.Controllers {
         }
         ~fileController() {
             Dispose(false);
-            //INSTANT C# NOTE: The base class Finalize method is automatically called from the destructor:
+            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();
         }
         #endregion

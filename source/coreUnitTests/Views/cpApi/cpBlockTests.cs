@@ -323,7 +323,7 @@ namespace integrationTests {
             string haystack = "abcdefgabcdefgabcdefgabcdefg";
             string needle = "c";
             Assert.AreEqual("?".IndexOf("?") + 1, vbInstr(1, "?", "?"));
-            //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of haystack.Length for every iteration:
+            //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of haystack.Length for every iteration:
             int tempVar = haystack.Length;
             for (int ptr = 1; ptr <= tempVar; ptr++) {
                 Assert.AreEqual(haystack.IndexOf(needle, ptr - 1) + 1, vbInstr(ptr, haystack, needle, 2));

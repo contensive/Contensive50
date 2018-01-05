@@ -122,7 +122,6 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
                 throw;
             }
-            return 0;
         }
         //
         //=============================================================================================

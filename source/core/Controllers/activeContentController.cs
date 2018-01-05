@@ -1699,7 +1699,7 @@ namespace Contensive.Core.Controllers {
                                                                                                         // image load failed, use raw filename
                                                                                                         //
                                                                                                         throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
-                                                                                                                                                                  //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                                                                                                                                  //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                                                                                                                                                                   //Microsoft.VisualBasic.Information.Err().Clear();
                                                                                                         NewImageFilename = ImageFilename;
                                                                                                     } else {
@@ -2364,7 +2364,7 @@ namespace Contensive.Core.Controllers {
                                                                         } else {
                                                                             EndPos = 0;
                                                                         }
-                                                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                                         //ORIGINAL LINE: Exit For
                                                                         goto ExitLabel1;
                                                                     case "\"":
@@ -2372,7 +2372,7 @@ namespace Contensive.Core.Controllers {
                                                                         // Quoted, ends is '"'
                                                                         //
                                                                         EndPos = genericController.vbInstr(1, FilenameSegment, "\"");
-                                                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                                         //ORIGINAL LINE: Exit For
                                                                         goto ExitLabel1;
                                                                     case "(":
@@ -2388,7 +2388,7 @@ namespace Contensive.Core.Controllers {
                                                                         } else {
                                                                             EndPos = genericController.vbInstr(1, FilenameSegment, ")");
                                                                         }
-                                                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                                         //ORIGINAL LINE: Exit For
                                                                         goto ExitLabel1;
                                                                     case "'":
@@ -2396,7 +2396,7 @@ namespace Contensive.Core.Controllers {
                                                                         // Delimited within a javascript pair of apostophys
                                                                         //
                                                                         EndPos = genericController.vbInstr(1, FilenameSegment, "'");
-                                                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                                         //ORIGINAL LINE: Exit For
                                                                         goto ExitLabel1;
                                                                     case ">":
@@ -2405,7 +2405,7 @@ namespace Contensive.Core.Controllers {
                                                                         // Skip this link
                                                                         //
                                                                         ParseError = true;
-                                                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                                         //ORIGINAL LINE: Exit For
                                                                         goto ExitLabel1;
                                                                 }

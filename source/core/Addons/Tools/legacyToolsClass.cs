@@ -1349,14 +1349,7 @@ namespace Contensive.Core.Addons.Tools {
                             // display the column if it is not in use
                             //
                             if (skipField) {
-                                if (false) {
-                                    // this causes more problems then it fixes
-                                    //If Not .Authorable Then
-                                    //
-                                    // not authorable
-                                    //
-                                    Stream.Add("<IMG src=\"/ccLib/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (not authorable field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileText) {
+                                if (field.fieldTypeId == FieldTypeIdFileText) {
                                     //
                                     // text filename can not be search
                                     //

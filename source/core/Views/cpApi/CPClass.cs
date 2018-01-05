@@ -528,7 +528,7 @@ namespace Contensive.Core {
         //
         ~CPClass() {
             Dispose(false);
-            //INSTANT C# NOTE: The base class Finalize method is automatically called from the destructor:
+            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();
         }
         //

@@ -722,15 +722,15 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                 }
-                //INSTANT C# TODO TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
+                //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
                 ////On Error //Resume Next
 
                 cpCore.db.executeQuery(SQL);
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 if (0 != 0) {
                     //throw new ApplicationException("Unexpected exception");
                 }
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
                 // moved to upgrade code
                 //    '
@@ -776,45 +776,45 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                 }
-                //INSTANT C# TODO TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
+                //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
                 ////On Error //Resume Next
 
                 cpCore.db.executeQuery(SQL);
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 if (0 != 0) {
                     //throw new ApplicationException("Unexpected exception");
                 }
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
                 //
                 // delete email drops older than archive.
                 //
                 AppendClassLog(cpCore, "Deleting email drops older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
-                //INSTANT C# TODO TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
+                //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
                 ////On Error //Resume Next
 
                 cpCore.db.deleteContentRecords("Email drops", "(DateAdded is null)or(DateAdded<=" + cpCore.db.encodeSQLDate(ArchiveEmailDropDate) + ")");
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 if (0 != 0) {
                     //throw new ApplicationException("Unexpected exception");
                 }
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
                 //
                 // delete email log entries not realted to a drop, older than archive.
                 //
                 AppendClassLog(cpCore, "Deleting non-drop email logs older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
-                //INSTANT C# TODO TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
+                //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
                 ////On Error //Resume Next
 
                 cpCore.db.deleteContentRecords("Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" + cpCore.db.encodeSQLDate(ArchiveEmailDropDate) + "))");
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 if (0 != 0) {
                     //throw new ApplicationException("Unexpected exception");
                 }
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
                 //
                 // delete email log entries without email drops
@@ -846,15 +846,15 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + "";
                         break;
                 }
-                //INSTANT C# TODO TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
+                //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
                 ////On Error //Resume Next
 
                 cpCore.db.executeQuery(SQL);
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 if (0 != 0) {
                     //throw new ApplicationException("Unexpected exception");
                 }
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
 
                 //
@@ -2321,9 +2321,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                 string LocalPath = null;
                 string LocalGuid = null;
                 XmlDocument Doc = new XmlDocument();
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CollectionNode = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode LocalListNode = null;
                 int FolderPtr = 0;
                 string CollectionPath = null;
@@ -2415,9 +2415,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                                         FolderList = new DirectoryInfo[0];
                                         if (cpCore.privateFiles.pathExists(Path)) {
                                             FolderList = cpCore.privateFiles.getFolderList(Path);
-                                            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                            //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                                             if (0 != 0) {
-                                                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                                                 //Microsoft.VisualBasic.Information.Err().Clear();
                                             }
                                         }

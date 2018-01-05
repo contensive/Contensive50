@@ -164,7 +164,7 @@ namespace Contensive.WindowsServices {
                 HTTPInProcess = true;
                 HTTPLastError = 0;
                 URLWorking = Contensive.Core.Controllers.genericController.EncodeURL(Link);
-                //INSTANT C# TODO TASK: The 'On Error Resume Next' statement is not converted by Instant C#:
+                //todo  TASK: The 'On Error Resume Next' statement is not converted by Instant C#:
 
                 kmaHTTP.timeout = RequestTimeout;
                 tempGetDoc = kmaHTTP.getURL(ref URLWorking);
@@ -555,7 +555,7 @@ namespace Contensive.WindowsServices {
                                         //
                                         AppLogPtr = AppLogCnt;
                                         AppLogCnt = AppLogCnt + 1;
-                                        //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
+                                        //todo  TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
                                         //ReDim Preserve AppLog[AppLogPtr];
                                         AppLog[AppLogPtr].Name = AppName;
                                     }
@@ -701,7 +701,7 @@ namespace Contensive.WindowsServices {
             ErrorTrap:
             ServiceInProcess = false;
             HandleMonitorError("monitorAllSites_returnEmailBody", "TrapError");
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+            //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
             //Microsoft.VisualBasic.Information.Err().Clear();
             return tempmonitorAllSites_returnEmailBody;
         }

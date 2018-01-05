@@ -25,7 +25,7 @@ namespace Contensive.Core.Controllers {
         //
         //private struct fieldTypePrivate {
         //    public string Name;
-        //    //INSTANT C# NOTE: This member was renamed since members cannot have the same name as their enclosing type in C#:
+        //    //todo  NOTE: This member was renamed since members cannot have the same name as their enclosing type in C#:
         //    public int fieldTypePrivate_Renamed;
         //}
         //        '

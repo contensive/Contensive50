@@ -52,7 +52,7 @@ namespace Contensive.Core.Controllers {
             string[] prefixes = null;
             int prefixesCnt = 0;
             IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+            //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
             //			IPAddress ipAddressInfo = null;
             IPHostEntry HostEntry = Dns.GetHostEntry(System.Net.Dns.GetHostName());
             int ptr = 0;

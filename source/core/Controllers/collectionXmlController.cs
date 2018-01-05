@@ -523,7 +523,7 @@ namespace Contensive.Core.Controllers {
         //    string tempGetXMLAttribute = null;
         //    try {
         //        //
-        //        //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+        //        //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
         //        //				XmlAttribute NodeAttribute = null;
         //        XmlNode ResultNode = null;
         //        string UcaseName = null;
@@ -670,7 +670,7 @@ namespace Contensive.Core.Controllers {
                     if (!string.IsNullOrEmpty(IndexList)) {
                         string[] ListRows = genericController.stringSplit(IndexList, "\r\n");
                         string IndexName = "";
-                        //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of UBound(ListRows) + 1 for every iteration:
+                        //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of UBound(ListRows) + 1 for every iteration:
                         int tempVar = ListRows.GetUpperBound(0) + 1;
                         string IndexFields = "";
                         for (int Ptr = 0; Ptr <= tempVar; Ptr++) {

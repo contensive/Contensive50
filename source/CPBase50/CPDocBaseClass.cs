@@ -1,14 +1,14 @@
-﻿//========================================================================
-// This conversion was produced by the Free Edition of
-// Instant C# courtesy of Tangible Software Solutions.
-// Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
-//========================================================================
+﻿
+
+
+
+
 
 //
 // documentation should be in a new project that inherits these classes. The class names should be the object names in the actual cp project
 //
 
-//INSTANT C# NOTE: Formerly VB project-level imports:
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -49,16 +49,16 @@ namespace Contensive.BaseClasses
 		public abstract double GetNumber(string PropertyName, string DefaultValue = "");
 		public abstract bool IsProperty(string PropertyName);
         public abstract bool IsAdminSite {get;}
-        //INSTANT C# NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
+        //todo  NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
         //ORIGINAL LINE: Public MustOverride Property GlobalVar(ByVal Index As String) As String
         //public abstract string GlobalVar(string Index);
-        ////INSTANT C# NOTE: C# does not support parameterized properties - the following property has been rewritten as a function:
+        ////todo  NOTE: C# does not support parameterized properties - the following property has been rewritten as a function:
         ////ORIGINAL LINE: Public MustOverride ReadOnly Property IsGlobalVar(ByVal Index As String) As Boolean
         //public abstract bool IsGlobalVar(string Index);
-        ////INSTANT C# NOTE: C# does not support parameterized properties - the following property has been rewritten as a function:
+        ////todo  NOTE: C# does not support parameterized properties - the following property has been rewritten as a function:
         ////ORIGINAL LINE: Public MustOverride ReadOnly Property IsVar(ByVal Index As String) As Boolean
         //public abstract bool IsVar(string Index);
-        ////INSTANT C# NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
+        ////todo  NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
         ////ORIGINAL LINE: Public MustOverride Property Var(ByVal Index As String) As String
         //public abstract string Var(string Index);
 

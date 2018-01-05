@@ -229,7 +229,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+            //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
             handleLegacyClassError("AddEntry", 0, "", "");
         }
         //
@@ -268,7 +268,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+            //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
             handleLegacyClassError("ReadLine", 0, "", "");
             return tempReadLine;
         }
@@ -554,7 +554,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+            //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
             handleLegacyClassError("GetMenuFlyoutPanel", 0, "", "");
             return tempGetMenuFlyoutPanel;
         }

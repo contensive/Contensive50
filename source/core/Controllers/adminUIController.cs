@@ -250,7 +250,7 @@ namespace Contensive.Core {
                 if (!string.IsNullOrEmpty(ButtonList.Trim(' '))) {
                     Buttons = ButtonList.Split(',');
                     for (Ptr = 0; Ptr <= Buttons.GetUpperBound(0); Ptr++) {
-                        //INSTANT C# NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
+                        //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
                         //						Select Case Trim(Buttons[Ptr])
                         //ORIGINAL LINE: Case Trim(ButtonDelete)
                         if (Buttons[Ptr].Trim(' ') == encodeText(ButtonDelete).Trim(' ')) {

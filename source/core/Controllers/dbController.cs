@@ -1790,16 +1790,9 @@ namespace Contensive.Core.Controllers {
                     throw new ApplicationException("data set is not valid");
                 } else {
                     var tempVar = contentSetStore[CSPointer];
-                    if (useCSReadCacheMultiRow) {
-                        while ((string.IsNullOrEmpty(returnFieldName)) && (tempVar.fieldPointer < tempVar.resultColumnCount)) {
-                            returnFieldName = tempVar.fieldNames[tempVar.fieldPointer];
-                            tempVar.fieldPointer = tempVar.fieldPointer + 1;
-                        }
-                    } else {
-                        while ((string.IsNullOrEmpty(returnFieldName)) && (tempVar.fieldPointer < tempVar.dt.Columns.Count)) {
-                            returnFieldName = tempVar.dt.Columns[tempVar.fieldPointer].ColumnName;
-                            tempVar.fieldPointer = tempVar.fieldPointer + 1;
-                        }
+                    while ((string.IsNullOrEmpty(returnFieldName)) && (tempVar.fieldPointer < tempVar.resultColumnCount)) {
+                        returnFieldName = tempVar.fieldNames[tempVar.fieldPointer];
+                        tempVar.fieldPointer = tempVar.fieldPointer + 1;
                     }
                 }
             } catch (Exception ex) {
@@ -5308,7 +5301,7 @@ namespace Contensive.Core.Controllers {
         }
         ~dbController() {
             Dispose(false);
-            //INSTANT C# NOTE: The base class Finalize method is automatically called from the destructor:
+            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();
         }
         #endregion

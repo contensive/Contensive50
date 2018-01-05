@@ -655,9 +655,9 @@ namespace Contensive.Core.Controllers {
                 string Name = "";
                 string Description = "";
                 XmlDocument Doc = new XmlDocument();
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode TabNode = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode SettingNode = null;
                 int CS = 0;
                 string FieldName = null;
@@ -1167,9 +1167,9 @@ namespace Contensive.Core.Controllers {
 
                                                             } catch (Exception ex) {
 
-                                                                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                                                                 ErrorNumber = 0;
-                                                                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                                                                 ErrorDescription = "";
                                                                 loadOK = false;
                                                             }
@@ -1184,7 +1184,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // ----- Error
                                                                 //
-                                                                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                                                                 Copy = "Error: ";
                                                             } else if (!isDataTableOk(dt)) {
                                                                 //
@@ -2506,9 +2506,9 @@ namespace Contensive.Core.Controllers {
                 string Name = "";
                 string Description = "";
                 XmlDocument Doc = new XmlDocument();
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode TabNode = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode SettingNode = null;
                 int CS = 0;
                 string FieldName = null;
@@ -3046,7 +3046,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // ----- Error
                                                                 //
-                                                                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                                                                 Copy = "Error: ";
                                                             } else if (dt.Rows.Count <= 0) {
                                                                 //
@@ -3559,7 +3559,7 @@ namespace Contensive.Core.Controllers {
             string result = "";
             try {
                 //
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlAttribute NodeAttribute = null;
                 XmlNode ResultNode = null;
                 string UcaseName = null;
@@ -3891,7 +3891,7 @@ namespace Contensive.Core.Controllers {
         ~addonController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
-            //INSTANT C# NOTE: The base class Finalize method is automatically called from the destructor:
+            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();
         }
         //

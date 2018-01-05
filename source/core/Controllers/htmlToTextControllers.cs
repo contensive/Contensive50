@@ -403,7 +403,7 @@
 //                    if (!string.IsNullOrEmpty(DirtyText)) {
 //                        BodyBuffer = genericController.vbReplace(DirtyText, "\r\n", "\r");
 //                        BodyBuffer = genericController.vbReplace(BodyBuffer, "\n", "\r");
-//                        //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(BodyBuffer) for every iteration:
+//                        //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(BodyBuffer) for every iteration:
 //                        int tempVar = BodyBuffer.Length;
 //                        for (Pointer = 1; Pointer <= tempVar; Pointer++) {
 //                            ChrTest = BodyBuffer.Substring(Pointer - 1, 1);

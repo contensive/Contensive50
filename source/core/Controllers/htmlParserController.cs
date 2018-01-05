@@ -359,7 +359,7 @@ namespace Contensive.Core.Controllers {
                 if (ElementPointer < LocalElementCount) {
                     if (LocalElements[ElementPointer].AttributeCount > 0) {
                         UcaseName = genericController.vbUCase(Name);
-                        //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of LocalElements(ElementPointer).AttributeCount for every iteration:
+                        //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of LocalElements(ElementPointer).AttributeCount for every iteration:
                         int tempVar = LocalElements[ElementPointer].AttributeCount;
                         for (AttributePointer = 0; AttributePointer < tempVar; AttributePointer++) {
                             if (LocalElements[ElementPointer].Attributes[AttributePointer].UcaseName == UcaseName) {

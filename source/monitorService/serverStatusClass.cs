@@ -64,7 +64,7 @@ namespace Contensive.WindowsServices {
             int Cnt = 0;
             tempStatusLine = Environment.NewLine + "<BR>";
             if (Indent > 0) {
-                //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Indent * 2 for every iteration:
+                //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Indent * 2 for every iteration:
                 int tempVar = Indent * 2;
                 for (Cnt = 1; Cnt <= tempVar; Cnt++) {
                     tempStatusLine = tempStatusLine + "&nbsp;";
@@ -170,7 +170,7 @@ namespace Contensive.WindowsServices {
                         Meg = Meg * 1024;
                         LoopCount = 0;
                         System.IO.DriveInfo[] drives2 = null;
-                        //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                        //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                         //						System.IO.DriveInfo drive2 = null;
                         drives2 = System.IO.DriveInfo.GetDrives();
                         foreach (System.IO.DriveInfo drive2 in drives2) {

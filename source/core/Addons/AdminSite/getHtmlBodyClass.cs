@@ -1219,28 +1219,12 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // Add-ons
                     //
-                    if (true) // 4.0.321" Then
-                    {
-                        //$$$$$ cache this
-                        CS = cpCore.db.csOpen(cnAddons, "CollectionID=" + HelpCollectionID, "name");
-                        while (cpCore.db.csOk(CS)) {
-                            IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(cpCore.db.csGetInteger(CS, "ID"), "") + "</div>";
-                            cpCore.db.csGoNext(CS);
-                        }
-                        cpCore.db.csClose(ref CS);
-                    } else {
-                        // addoncollectionrules deprecated for collectionid
-                        SQL = "select AddonID from ccAddonCollectionRules where CollectionID=" + HelpCollectionID;
-                        CS = cpCore.db.csOpenSql_rev("default", SQL);
-                        while (cpCore.db.csOk(CS)) {
-                            addonId = cpCore.db.csGetInteger(CS, "AddonID");
-                            if (addonId != 0) {
-                                IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(addonId, "") + "</div>";
-                            }
-                            cpCore.db.csGoNext(CS);
-                        }
-                        cpCore.db.csClose(ref CS);
+                    CS = cpCore.db.csOpen(cnAddons, "CollectionID=" + HelpCollectionID, "name");
+                    while (cpCore.db.csOk(CS)) {
+                        IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(cpCore.db.csGetInteger(CS, "ID"), "") + "</div>";
+                        cpCore.db.csGoNext(CS);
                     }
+                    cpCore.db.csClose(ref CS);
                     //
                     if ((string.IsNullOrEmpty(CollectionHelpLink)) && (string.IsNullOrEmpty(CollectionHelpCopy))) {
                         CollectionHelpCopy = "<p>No help information could be found for this collection. Please use the online resources at <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com by email.</p>";
@@ -1585,7 +1569,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<" + cpCore.db.encodeSQLNumber(FindWordValueInteger) + ")";
                                                         break;
                                                 }
-                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                 //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
 
@@ -1613,7 +1597,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<" + cpCore.db.encodeSQLNumber(FindWordValueDouble) + ")";
                                                         break;
                                                 }
-                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                 //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                             case FieldTypeIdFile:
@@ -1629,7 +1613,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
                                                         break;
                                                 }
-                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                 //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                             case FieldTypeIdDate:
@@ -1658,7 +1642,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<" + cpCore.db.encodeSQLDate(findDate) + ")";
                                                         break;
                                                 }
-                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                 //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                             case FieldTypeIdLookup:
@@ -1713,7 +1697,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                             break;
                                                     }
                                                 }
-                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                 //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                             case FieldTypeIdBoolean:
@@ -1735,7 +1719,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                         return_SQLWhere += "AND((" + adminContent.ContentTableName + "." + FindWordName + "=0)or(" + adminContent.ContentTableName + "." + FindWordName + " is null))";
                                                         break;
                                                 }
-                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                 //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                             default:
@@ -1758,7 +1742,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLText(FindWordValue) + ")";
                                                         break;
                                                 }
-                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                 //ORIGINAL LINE: Exit For
                                                 goto ExitLabel1;
                                         }
@@ -3088,7 +3072,7 @@ namespace Contensive.Core.Addons.AdminSite {
             string tempGetXMLAttribute = null;
             try {
                 //
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlAttribute NodeAttribute = null;
                 XmlNode ResultNode = null;
                 string UcaseName = null;
@@ -6144,7 +6128,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             } else {
                                 tableName = cdefModel.getContentTablename(cpCore, editRecord.contentControlId_Name);
                             }
-                            //INSTANT C# NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
+                            //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
                             //							Select Case tableName.ToLower()
                             var  tempVar = tableName.ToLower();
                             //ORIGINAL LINE: Case linkAliasModel.contentTableName.ToLower()
@@ -6872,7 +6856,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 // ----- Create edit page
                                 //
-                                //INSTANT C# NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
+                                //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
                                 //				Select Case genericController.vbUCase(adminContent.ContentTableName)
                                 //ORIGINAL LINE: Case genericController.vbUCase("ccMembers")
                 if (genericController.vbUCase(adminContent.ContentTableName) == genericController.vbUCase("ccMembers")) {
@@ -12119,7 +12103,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     if (!(cpCore.doc.debug_iUserError != "")) {
-                        //INSTANT C# NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
+                        //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
                         //						Select Case genericController.vbUCase(adminContent.ContentTableName)
                         //ORIGINAL LINE: Case genericController.vbUCase("ccMembers")
                         if (genericController.vbUCase(adminContent.ContentTableName) == genericController.vbUCase("ccMembers")) {

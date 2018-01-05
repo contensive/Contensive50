@@ -139,37 +139,21 @@ namespace Contensive.Core.Addons.Email {
                         }
                         cpCore.db.csClose(ref CSDrop);
                         //
-                        // Select the people
-                        //
-                        if (false) {
-                            //
-                            // Select all people for this email
-                            //
-                            SQL = "select " + SQLTablePeople + ".ID as MemberID"
-                                + " From " + SQLTablePeople + ""
-                                + " where (" + SQLTablePeople + ".active<>0)"
-                                + " and (" + SQLTablePeople + ".AllowBulkEmail<>0)"
-                                + " and (" + SQLTablePeople + ".email<>'')"
-                                + " order by " + SQLTablePeople + ".email";
-                        } else {
-                            //
-                            // Select all people in the groups for this email
-                            //
-                            SQL = "select Distinct " + SQLTablePeople + ".ID as MemberID," + SQLTablePeople + ".email"
-                                + " From ((((ccemail"
-                                + " left join ccEmailGroups on ccEmailGroups.EmailID=ccEmail.ID)"
-                                + " left join " + SQLTableGroups + " on " + SQLTableGroups + ".ID = ccEmailGroups.GroupID)"
-                                + " left join " + SQLTableMemberRules + " on " + SQLTableGroups + ".ID = " + SQLTableMemberRules + ".GroupID)"
-                                + " left join " + SQLTablePeople + " on " + SQLTablePeople + ".ID = " + SQLTableMemberRules + ".MemberID)"
-                                + " Where (ccEmail.ID=" + emailID + ")"
-                                + " and (" + SQLTableGroups + ".active<>0)"
-                                + " and (" + SQLTableGroups + ".AllowBulkEmail<>0)"
-                                + " and (" + SQLTablePeople + ".active<>0)"
-                                + " and (" + SQLTablePeople + ".AllowBulkEmail<>0)"
-                                + " and (" + SQLTablePeople + ".email<>'')"
-                                + " and ((" + SQLTableMemberRules + ".DateExpires is null)or(" + SQLTableMemberRules + ".DateExpires>" + SQLDateNow + "))"
-                                + " order by " + SQLTablePeople + ".email," + SQLTablePeople + ".id";
-                        }
+                        // Select all people in the groups for this email
+                        SQL = "select Distinct " + SQLTablePeople + ".ID as MemberID," + SQLTablePeople + ".email"
+                            + " From ((((ccemail"
+                            + " left join ccEmailGroups on ccEmailGroups.EmailID=ccEmail.ID)"
+                            + " left join " + SQLTableGroups + " on " + SQLTableGroups + ".ID = ccEmailGroups.GroupID)"
+                            + " left join " + SQLTableMemberRules + " on " + SQLTableGroups + ".ID = " + SQLTableMemberRules + ".GroupID)"
+                            + " left join " + SQLTablePeople + " on " + SQLTablePeople + ".ID = " + SQLTableMemberRules + ".MemberID)"
+                            + " Where (ccEmail.ID=" + emailID + ")"
+                            + " and (" + SQLTableGroups + ".active<>0)"
+                            + " and (" + SQLTableGroups + ".AllowBulkEmail<>0)"
+                            + " and (" + SQLTablePeople + ".active<>0)"
+                            + " and (" + SQLTablePeople + ".AllowBulkEmail<>0)"
+                            + " and (" + SQLTablePeople + ".email<>'')"
+                            + " and ((" + SQLTableMemberRules + ".DateExpires is null)or(" + SQLTableMemberRules + ".DateExpires>" + SQLDateNow + "))"
+                            + " order by " + SQLTablePeople + ".email," + SQLTablePeople + ".id";
                         CSPeople = cpCore.db.csOpenSql_rev("default", SQL);
                         //
                         // Send the email to all selected people
@@ -241,7 +225,7 @@ namespace Contensive.Core.Addons.Email {
             }
             //ErrorTrap:
             throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
-                                                                      //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                                      //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
             //Microsoft.VisualBasic.Information.Err().Clear();
         }
         //
@@ -494,7 +478,7 @@ namespace Contensive.Core.Addons.Email {
             }
             //ErrorTrap:
             throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
-                                                                      //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                                      //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
             //Microsoft.VisualBasic.Information.Err().Clear();
         }
         //
@@ -685,7 +669,7 @@ namespace Contensive.Core.Addons.Email {
                 //Call cpCore.app.closeCS(CSLog)
             } catch (Exception ex) {
                 throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
-                                                                          //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                                          //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
             } finally {
                 cpCore.db.csClose(ref CSPeople);
@@ -727,7 +711,7 @@ namespace Contensive.Core.Addons.Email {
             }
             //ErrorTrap:
             throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
-                                                                      //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                                      //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
             //Microsoft.VisualBasic.Information.Err().Clear();
             return tempGetEmailTemplate;
         }

@@ -336,7 +336,7 @@ namespace Contensive.Core {
                 CP.core.doc.sessionContext.user.AutoLogin = true;
                 CP.core.doc.sessionContext.user.save(cpCore);
             }
-            //INSTANT C# NOTE: Inserted the following 'return' since all code paths must return a value in C#:
+            //todo  NOTE: Inserted the following 'return' since all code paths must return a value in C#:
             return false;
         }
         //
@@ -505,7 +505,7 @@ namespace Contensive.Core {
         }
         ~CPUserClass() {
             Dispose(false);
-            //INSTANT C# NOTE: The base class Finalize method is automatically called from the destructor:
+            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();
         }
         #endregion

@@ -2307,61 +2307,6 @@ namespace Contensive.Core.Controllers {
         }
         //
         //==========================================================================================
-        //   the current process to a high priority
-        //       Should be called once from the objects parent when it is first created.
-        //
-        //   taken from an example labeled
-        //       KPD-Team 2000
-        //       URL: http://www.allapi.net/
-        //       Email: KPDTeam@Allapi.net
-        //==========================================================================================
-        //
-        //Public shared sub SetProcessHighPriority()
-        //    Dim hProcess As Integer
-        //    '
-        //    'set the new priority class
-        //    '
-        //    hProcess = GetCurrentProcess
-        //    Call SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS)
-        //    '
-        //End Sub
-        //
-        //==========================================================================================
-        //   Format the current error object into a standard string
-        //==========================================================================================
-        //
-        public static string GetErrString(Microsoft.VisualBasic.ErrObject ErrorObject = null) {
-            string tempGetErrString = null;
-            string Copy = null;
-            if (ErrorObject == null) {
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (0 == 0) {
-                    tempGetErrString = "[no error]";
-                } else {
-                    //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                    Copy = "";
-                    Copy = vbReplace(Copy, "\r\n", "-");
-                    Copy = vbReplace(Copy, "\n", "-");
-                    Copy = vbReplace(Copy, "\r\n", "");
-                    //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                    tempGetErrString = "[ #" + 0 + ", " + Copy + "]";
-                }
-            } else {
-                if (ErrorObject.Number == 0) {
-                    tempGetErrString = "[no error]";
-                } else {
-                    Copy = ErrorObject.Description;
-                    Copy = vbReplace(Copy, "\r\n", "-");
-                    Copy = vbReplace(Copy, "\n", "-");
-                    Copy = vbReplace(Copy, "\r\n", "");
-                    tempGetErrString = "[" + ErrorObject.Source + " #" + ErrorObject.Number + ", " + Copy + "]";
-                }
-            }
-            //
-            return tempGetErrString;
-        }
-        //
-        //==========================================================================================
         //   Format the current error object into a standard string
         //==========================================================================================
         //
@@ -4185,7 +4130,7 @@ namespace Contensive.Core.Controllers {
             //			if (!string.IsNullOrEmpty(Source))
             //			{
             //				localSource = Source;
-            ////INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(localSource) for every iteration:
+            ////todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(localSource) for every iteration:
             //				int tempVar = localSource.Length;
             //				for (SourcePointer = 1; SourcePointer <= tempVar; SourcePointer++)
             //				{
@@ -4280,7 +4225,7 @@ namespace Contensive.Core.Controllers {
         //			if (!string.IsNullOrEmpty(iDirtyText))
         //			{
         //				result = "";
-        ////INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(iDirtyText) for every iteration:
+        ////todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(iDirtyText) for every iteration:
         //				int tempVar = iDirtyText.Length;
         //				for (Pointer = 1; Pointer <= tempVar; Pointer++)
         //				{
@@ -4573,7 +4518,7 @@ namespace Contensive.Core.Controllers {
                 // scrambled starts with _
                 //
                 Base = 50;
-                //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(Copy) for every iteration:
+                //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(Copy) for every iteration:
                 int tempVar = Copy.Length;
                 for (CPtr = 1; CPtr <= tempVar; CPtr++) {
                     C = Copy.Substring(CPtr - 1, 1);

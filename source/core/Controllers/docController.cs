@@ -462,7 +462,7 @@ namespace Contensive.Core.Controllers {
         //   returns the site structure xml
         //==========================================================================
         //
-        //INSTANT C# NOTE: C# does not support parameterized properties - the following property has been rewritten as a function:
+        //todo  NOTE: C# does not support parameterized properties - the following property has been rewritten as a function:
         //ORIGINAL LINE: Public ReadOnly Property main_SiteStructure(cpcore As coreClass) As String
         public string get_main_SiteStructure(coreClass cpcore) {
             bool returnStatus = false;
@@ -2100,15 +2100,7 @@ namespace Contensive.Core.Controllers {
                 // main_Get ID, Description, Title
                 //
                 Criteria = "(ContentID=" + iContentID + ")and(RecordID=" + iRecordID + ")";
-                if (false) //.3.550" Then
-                {
-                    FieldList = "ID,Name,MetaDescription,'' as OtherHeadTags,'' as MetaKeywordList";
-                } else if (false) //.3.930" Then
-                  {
-                    FieldList = "ID,Name,MetaDescription,OtherHeadTags,'' as MetaKeywordList";
-                } else {
-                    FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList";
-                }
+                FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList";
                 CS = cpCore.db.csOpen("Meta Content", Criteria, "", false, 0, false, false, FieldList);
                 if (cpCore.db.csOk(CS)) {
                     MetaContentID = cpCore.db.csGetInteger(CS, "ID");

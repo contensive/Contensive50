@@ -113,9 +113,9 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 string Description = null;
                 string ButtonList = "";
                 string CollectionFilename = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CDef_Node = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CollectionNode = null;
                 string status = "";
                 bool AllowInstallFromFolder = false;
@@ -476,7 +476,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 AllowInstallFromFolder = true;
                             }
                             //
-                            //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of cpCore.docProperties.getInteger("UploadCount") for every iteration:
+                            //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of cpCore.docProperties.getInteger("UploadCount") for every iteration:
                             int tempVar = cpCore.docProperties.getInteger("UploadCount");
                             for (Ptr = 0; Ptr < tempVar; Ptr++) {
                                 if (cpCore.privateFiles.upload("Upload" + Ptr, InstallFolder, ref CollectionFilename)) {
@@ -691,7 +691,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                                     bool IsOnServer = false;
                                                     bool IsOnSite = false;
                                                     if (RowPtr >= Cells3.GetUpperBound(0)) {
-                                                        //INSTANT C# NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
+                                                        //todo  NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
                                                         //ORIGINAL LINE: ReDim Preserve Cells3(RowPtr + 100, ColumnCnt)
                                                         string[,] tempVar2 = new string[RowPtr + 101, ColumnCnt + 1];
                                                         if (Cells3 != null) {
@@ -824,7 +824,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     DisplaySystem = true;
                                     CS = cpCore.db.csOpen("Add-on Collections", "", "Name");
                                 }
-                                //INSTANT C# NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
+                                //todo  NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
                                 //ORIGINAL LINE: ReDim Preserve Cells(cpCore.db.csGetRowCount(CS), ColumnCnt)
                                 string[,] tempVar3 = new string[cpCore.db.csGetRowCount(CS) + 1, ColumnCnt + 1];
                                 if (Cells != null) {
@@ -958,7 +958,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
             string tempGetXMLAttribute = null;
             try {
                 //
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlAttribute NodeAttribute = null;
                 XmlNode ResultNode = null;
                 string UcaseName = null;

@@ -950,7 +950,7 @@ namespace Contensive.Core {
         public static string GetXMLAttribute(coreClass cpCore, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
             string returnAttr = "";
             try {
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlAttribute NodeAttribute = null;
                 XmlNode ResultNode = null;
                 string UcaseName = null;
@@ -1372,11 +1372,11 @@ namespace Contensive.Core {
                 string Collectionname = null;
                 int Pos = 0;
                 string UserError = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CDefSection = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CDefInterfaces = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode ActiveXNode = null;
                 string errorPrefix = null;
                 int downloadRetry = 0;
@@ -1663,11 +1663,11 @@ namespace Contensive.Core {
                 string LibLastChangeDateStr = null;
                 string LibContensiveVersion = "";
                 DateTime LibLastChangeDate = default(DateTime);
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode LibListNode = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode LocalListNode = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CollectionNode = null;
                 XmlNode LocalLastChangeNode = null;
                 XmlDocument LibraryCollections = new XmlDocument();
@@ -2045,7 +2045,7 @@ namespace Contensive.Core {
                 string AOName = null;
                 bool IsFound = false;
                 string Filename = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CDefSection = null;
                 XmlDocument Doc = new XmlDocument();
                 XmlNode CDefInterfaces = null;
@@ -2461,7 +2461,7 @@ namespace Contensive.Core {
                         }
                         //
                         // -- Process the other files
-                        //INSTANT C# NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
+                        //todo  NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
                         bool CollectionblockNavigatorNode_fileValueOK = false;
                         foreach (FileInfo file in srcFileInfoArray) {
                             if (genericController.vbLCase(file.Name.Substring(file.Name.Length - 4)) == ".xml") {
@@ -3402,9 +3402,9 @@ namespace Contensive.Core {
                 string LocalFilename = null;
                 string LocalGuid = null;
                 XmlDocument Doc = new XmlDocument();
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CollectionNode = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode LocalListNode = null;
                 XmlNode NewCollectionNode = null;
                 XmlNode NewAttrNode = null;
@@ -3431,7 +3431,7 @@ namespace Contensive.Core {
                                                 case "guid":
                                                     //
                                                     LocalGuid = genericController.vbLCase(CollectionNode.InnerText);
-                                                    //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                    //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                                     //ORIGINAL LINE: Exit For
                                                     goto ExitLabel1;
                                             }
@@ -3452,7 +3452,7 @@ namespace Contensive.Core {
                                                         break;
                                                 }
                                             }
-                                            //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                            //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
                                             //ORIGINAL LINE: Exit For
                                             goto ExitLabel2;
                                         }
@@ -3524,9 +3524,9 @@ namespace Contensive.Core {
                 string LocalPath = null;
                 string LocalGuid = "";
                 XmlDocument Doc = new XmlDocument();
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CollectionNode = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode LocalListNode = null;
                 bool CollectionFound = false;
                 string CollectionPath = "";
@@ -3825,10 +3825,10 @@ namespace Contensive.Core {
                 string ScriptingEntryPoint = null;
                 int ScriptingTimeout = 0;
                 string ScriptingLanguage = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode ScriptingNode = null;
                 XmlNode PageInterface = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode TriggerNode = null;
                 bool NavDeveloperOnly = false;
                 string StyleSheet = null;
@@ -4416,7 +4416,7 @@ namespace Contensive.Core {
                 int IncludeAddonID = 0;
                 string UserError = null;
                 int CS2 = 0;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode PageInterface = null;
                 bool NavDeveloperOnly = false;
                 string StyleSheet = null;
@@ -5159,12 +5159,12 @@ namespace Contensive.Core {
                 string MenuGuid = null;
                
                 XmlNode CDef_Node = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CDefChildNode = null;
                 string DataSourceName = null;
                 XmlDocument srcXmlDom = new XmlDocument();
                 string NodeName = null;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode FieldChildNode = null;
                 //
                 logController.appendLogInstall(cpCore, "Application: " + cpCore.serverConfig.appConfig.name + ", UpgradeCDef_LoadDataToCollection");

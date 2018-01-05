@@ -288,7 +288,7 @@ namespace Contensive.Core.Controllers {
         public string GetAttrNames() {
             string tempGetAttrNames = null;
             //
-            //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
+            //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
             //			XmlAttribute NodeAttribute = null;
             //
             tempGetAttrNames = "";

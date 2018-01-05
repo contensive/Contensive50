@@ -356,7 +356,7 @@ namespace Contensive.Core.Controllers {
                         try {
                             cmdDictionary = cpCore.json.Deserialize<Dictionary<string, object>>(cmdSrc);
                         } catch (Exception ex) {
-                            cpCore.handleException(ex, "Error parsing JSON command list [" + GetErrString() + "]");
+                            cpCore.handleException(ex);
                             throw;
                         }
                         //

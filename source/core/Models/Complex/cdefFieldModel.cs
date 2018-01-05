@@ -159,7 +159,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        //INSTANT C# NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
+        //todo  NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
         //ORIGINAL LINE: Public Property RedirectContentName(cpCore As coreClass) As String
         public string get_RedirectContentName(coreClass cpCore) {
             if (_RedirectContentName == null) {
@@ -180,7 +180,7 @@ namespace Contensive.Core.Models.Complex {
         ////
         ////====================================================================================================
         ////
-        ////INSTANT C# NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
+        ////todo  NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
         ////ORIGINAL LINE: Public Property MemberSelectGroupName(cpCore As coreClass) As String
         //public string get_MemberSelectGroupName(coreClass cpCore) {
         //    if (_MemberSelectGroupName == null) {
@@ -201,7 +201,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        //INSTANT C# NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
+        //todo  NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
         //ORIGINAL LINE: Public Property ManyToManyContentName(cpCore As coreClass) As String
         public string get_ManyToManyContentName(coreClass cpCore) {
             if (_ManyToManyRuleContentName == null) {
@@ -222,7 +222,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        //INSTANT C# NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
+        //todo  NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
         //ORIGINAL LINE: Public Property ManyToManyRuleContentName(cpCore As coreClass) As String
         public string get_ManyToManyRuleContentName(coreClass cpCore) {
             if (_ManyToManyRuleContentName == null) {
@@ -243,7 +243,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        //INSTANT C# NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
+        //todo  NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
         //ORIGINAL LINE: Public Property lookupContentName(cpCore As coreClass) As String
         public string get_lookupContentName(coreClass cpCore) {
             if (_lookupContentName == null) {

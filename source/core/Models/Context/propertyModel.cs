@@ -126,7 +126,7 @@ namespace Contensive.Core.Models.Context {
                 if (Ptr < 0) {
                     Ptr = propertyCacheCnt;
                     propertyCacheCnt = propertyCacheCnt + 1;
-                    //INSTANT C# NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
+                    //todo  NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
                     //ORIGINAL LINE: ReDim Preserve propertyCache(2, Ptr)
                     string[,] tempVar = new string[3, Ptr + 1];
                     if (propertyCache != null) {
