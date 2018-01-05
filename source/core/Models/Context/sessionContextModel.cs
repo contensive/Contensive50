@@ -1229,7 +1229,7 @@ namespace Contensive.Core.Models.Context {
         public bool isAuthenticatedMember(coreClass cpCore) {
             bool result = false;
             try {
-                result = visit.VisitAuthenticated & (Models.Complex.cdefModel.isWithinContent(cpCore, user.ContentControlID, cdefModel.getContentId(cpCore, "members")));
+                result = visit.VisitAuthenticated & (Models.Complex.cdefModel.isWithinContent(cpCore, user.contentControlID, cdefModel.getContentId(cpCore, "members")));
                 //If (Not property_user_isMember_isLoaded) And (visit_initialized) Then
                 //    property_user_isMember = isAuthenticated() And cpCore.IsWithinContent(user.ContentControlID, cpCore.main_GetContentID("members"))
                 //    property_user_isMember_isLoaded = True

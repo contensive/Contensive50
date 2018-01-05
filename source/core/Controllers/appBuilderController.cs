@@ -459,9 +459,9 @@ namespace Contensive.Core.Controllers {
                         pageTemplateModel defaultTemplate = pageTemplateModel.createByName(cpcore, "Default");
                         if (defaultTemplate == null) {
                             defaultTemplate = pageTemplateModel.add(cpcore);
-                            defaultTemplate.Name = "Default";
+                            defaultTemplate.name = "Default";
                         }
-                        domain.DefaultTemplateId = defaultTemplate.ID;
+                        domain.DefaultTemplateId = defaultTemplate.id;
                         domain.name = primaryDomain;
                         domain.PageNotFoundPageID = landingPage.id;
                         domain.RootPageID = landingPage.id;
@@ -469,11 +469,11 @@ namespace Contensive.Core.Controllers {
                         domain.Visited = false;
                         domain.save(cpcore);
                         //
-                        landingPage.TemplateID = defaultTemplate.ID;
+                        landingPage.TemplateID = defaultTemplate.id;
                         landingPage.Copyfilename.content = constants.defaultLandingPageHtml;
                         landingPage.save(cpcore);
                         //
-                        defaultTemplate.BodyHTML = cpcore.appRootFiles.readFile(defaultTemplateHomeFilename);
+                        defaultTemplate.bodyHTML = cpcore.appRootFiles.readFile(defaultTemplateHomeFilename);
                         defaultTemplate.save(cpcore);
                         //
                         if (cpcore.siteProperties.getInteger("LandingPageID", landingPage.id) == 0) {
@@ -2360,7 +2360,7 @@ namespace Contensive.Core.Controllers {
                         entry.ContentID = contentId;
                     }
                     entry.LinkPage = LinkPage;
-                    entry.SortOrder = SortOrder;
+                    entry.sortOrder = SortOrder;
                     entry.AdminOnly = AdminOnly;
                     entry.DeveloperOnly = DeveloperOnly;
                     entry.NewWindow = NewWindow;

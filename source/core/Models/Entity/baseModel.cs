@@ -157,13 +157,13 @@ namespace Contensive.Core.Models.Entity {
         public string name { get; set; }
         public string ccguid { get; set; }
         public bool active { get; set; }
-        public int ContentControlID { get; set; }
-        public int CreatedBy { get; set; }
-        public int CreateKey { get; set; }
-        public DateTime DateAdded { get; set; }
-        public int ModifiedBy { get; set; }
-        public DateTime ModifiedDate { get; set; }
-        public string SortOrder { get; set; }
+        public int contentControlID { get; set; }
+        public int createdBy { get; set; }
+        public int createKey { get; set; }
+        public DateTime dateAdded { get; set; }
+        public int modifiedBy { get; set; }
+        public DateTime modifiedDate { get; set; }
+        public string sortOrder { get; set; }
         //
         //====================================================================================================
         private static string derivedContentName(Type derivedType) {

@@ -514,9 +514,11 @@ namespace Contensive.Core.Controllers {
                         cpCore.doc.setMetaContent(0, 0);
                         result = ""
                             + cpCore.siteProperties.docTypeDeclaration + "\r\n<html>"
-                            + "\r<head>"
-                            + "\r\n" + htmlIndent(cpCore.html.getHtmlHead()) + "\r</head>"
-                            + '\r' + TemplateDefaultBodyTag + "\r</body>"
+                            + "\r\n<head>"
+                            + cpCore.html.getHtmlHead() 
+                            + "\r\n</head>"
+                            + "\r\n" + TemplateDefaultBodyTag 
+                            + "\r\n</body>"
                             + "\r\n</html>";
                     } else if (addon.AsAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
                         //

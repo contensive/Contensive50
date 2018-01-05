@@ -957,7 +957,7 @@ namespace Contensive.Core.Controllers {
                     }
                     bool blockContentComposite = false;
                     if (childPage.BlockContent | childPage.BlockPage) {
-                        blockContentComposite = !bypassContentBlock(childPage.ContentControlID, childPage.id);
+                        blockContentComposite = !bypassContentBlock(childPage.contentControlID, childPage.id);
                     }
                     string LinkedText = genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML(link) + "\">", pageMenuHeadline);
                     if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.ParentListName != "") & (!isAuthoring)) {

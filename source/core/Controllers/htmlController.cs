@@ -4184,7 +4184,7 @@ namespace Contensive.Core.Controllers {
                         string helpLink = "";
                         //helpLink = main_GetHelpLink("2", "Contensive Tools Panel", BubbleCopy)
                         BubbleCopy = "Use the Tools Panel to enable features such as editing and debugging tools. It also includes links to the admin site, the support site and the My Profile page.";
-                        result = result + getPanelHeader("Contensive Tools Panel" + helpLink);
+                        result += getPanelHeader("Contensive Tools Panel" + helpLink);
                         //
                         ToolsPanel.Add(cpCore.html.formStart(WorkingQueryString));
                         ToolsPanel.Add(cpCore.html.inputHidden("Type", FormTypeToolsPanel));
@@ -4372,9 +4372,9 @@ namespace Contensive.Core.Controllers {
                         + genericController.htmlIndent(Copy) + "\r</table>";
                         ToolsPanel.Add(getPanelInput(Copy));
                         ToolsPanel.Add(cpCore.html.formEnd());
-                        result = result + getPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                        result += getPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         //
-                        result = result + getPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                        result += getPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         //
                         LinkPanel = null;
                         ToolsPanel = null;
@@ -4402,21 +4402,21 @@ namespace Contensive.Core.Controllers {
                         //
                         //DebugPanel = DebugPanel & main_GetPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", "5")
                         //
-                        DebugPanel = DebugPanel + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
+                        DebugPanel +=  "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                             + cr2 + "<tr>"
                             + cr3 + "<td width=\"100\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100\" height=\"1\" ></td>"
                             + cr3 + "<td width=\"100%\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"1\" ></td>"
                             + cr2 + "</tr>";
                         //
-                        DebugPanel = DebugPanel + getDebugPanelRow("DOM", "<a class=\"ccAdminLink\" href=\"/ccLib/clientside/DOMViewer.htm\" target=\"_blank\">Click</A>");
-                        DebugPanel = DebugPanel + getDebugPanelRow("Trap Errors", genericController.encodeHTML(cpCore.siteProperties.trapErrors.ToString()));
-                        DebugPanel = DebugPanel + getDebugPanelRow("Trap Email", genericController.encodeHTML(cpCore.siteProperties.getText("TrapEmail")));
-                        DebugPanel = DebugPanel + getDebugPanelRow("main_ServerLink", genericController.encodeHTML(cpCore.webServer.requestUrl));
-                        DebugPanel = DebugPanel + getDebugPanelRow("main_ServerDomain", genericController.encodeHTML(cpCore.webServer.requestDomain));
-                        DebugPanel = DebugPanel + getDebugPanelRow("main_ServerProtocol", genericController.encodeHTML(cpCore.webServer.requestProtocol));
-                        DebugPanel = DebugPanel + getDebugPanelRow("main_ServerHost", genericController.encodeHTML(cpCore.webServer.requestDomain));
-                        DebugPanel = DebugPanel + getDebugPanelRow("main_ServerPath", genericController.encodeHTML(cpCore.webServer.requestPath));
-                        DebugPanel = DebugPanel + getDebugPanelRow("main_ServerPage", genericController.encodeHTML(cpCore.webServer.requestPage));
+                        DebugPanel +=  getDebugPanelRow("DOM", "<a class=\"ccAdminLink\" href=\"/ccLib/clientside/DOMViewer.htm\" target=\"_blank\">Click</A>");
+                        DebugPanel +=  getDebugPanelRow("Trap Errors", genericController.encodeHTML(cpCore.siteProperties.trapErrors.ToString()));
+                        DebugPanel +=  getDebugPanelRow("Trap Email", genericController.encodeHTML(cpCore.siteProperties.getText("TrapEmail")));
+                        DebugPanel +=  getDebugPanelRow("main_ServerLink", genericController.encodeHTML(cpCore.webServer.requestUrl));
+                        DebugPanel +=  getDebugPanelRow("main_ServerDomain", genericController.encodeHTML(cpCore.webServer.requestDomain));
+                        DebugPanel +=  getDebugPanelRow("main_ServerProtocol", genericController.encodeHTML(cpCore.webServer.requestProtocol));
+                        DebugPanel +=  getDebugPanelRow("main_ServerHost", genericController.encodeHTML(cpCore.webServer.requestDomain));
+                        DebugPanel +=  getDebugPanelRow("main_ServerPath", genericController.encodeHTML(cpCore.webServer.requestPath));
+                        DebugPanel +=  getDebugPanelRow("main_ServerPage", genericController.encodeHTML(cpCore.webServer.requestPage));
                         Copy = "";
                         if (cpCore.webServer.requestQueryString != "") {
                             CopySplit = cpCore.webServer.requestQueryString.Split('&');
@@ -4434,7 +4434,7 @@ namespace Contensive.Core.Controllers {
                             }
                             Copy = Copy.Substring(7);
                         }
-                        DebugPanel = DebugPanel + getDebugPanelRow("main_ServerQueryString", Copy);
+                        DebugPanel +=  getDebugPanelRow("main_ServerQueryString", Copy);
                         Copy = "";
                         foreach (string key in cpCore.docProperties.getKeyList()) {
                             docPropertiesClass docProperty = cpCore.docProperties.getProperty(key);
@@ -4442,25 +4442,23 @@ namespace Contensive.Core.Controllers {
                                 Copy += "\r<br>" + genericController.encodeHTML(docProperty.NameValue);
                             }
                         }
-                        DebugPanel = DebugPanel + getDebugPanelRow("Render Time &gt;= ", (Convert.ToSingle(cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec");
+                        DebugPanel +=  getDebugPanelRow("Render Time &gt;= ", (Convert.ToSingle(cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec");
                         VisitHrs = encodeInteger(cpCore.doc.sessionContext.visit.TimeToLastHit / 3600);
                         VisitMin = encodeInteger(cpCore.doc.sessionContext.visit.TimeToLastHit / 60) - (60 * VisitHrs);
                         VisitSec = cpCore.doc.sessionContext.visit.TimeToLastHit % 60;
-                        DebugPanel = DebugPanel + getDebugPanelRow("Visit Length", encodeText(cpCore.doc.sessionContext.visit.TimeToLastHit) + " sec, (" + VisitHrs + " hrs " + VisitMin + " mins " + VisitSec + " secs)");
-                        DebugPanel = DebugPanel + getDebugPanelRow("Addon Profile", "<hr><ul class=\"ccPanel\"><li>tbd</li>\r</ul>");
-                        //
-                        DebugPanel = DebugPanel + "</table>";
+                        DebugPanel +=  getDebugPanelRow("Visit Length", encodeText(cpCore.doc.sessionContext.visit.TimeToLastHit) + " sec, (" + VisitHrs + " hrs " + VisitMin + " mins " + VisitSec + " secs)");
+                        DebugPanel +=  "</table>";
                         //
                         if (ShowLegacyToolsPanel) {
                             //
                             // Debug Panel as part of legacy tools panel
                             //
-                            result = result + getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                            result += getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         } else {
                             //
                             // Debug Panel without Legacy Tools panel
                             //
-                            result = result + getPanelHeader("Debug Panel") + getPanel(LinkPanel.Text) + getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                            result += getPanelHeader("Debug Panel") + getPanel(LinkPanel.Text) + getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         }
                     }
                     result = "\r<div class=\"ccCon\">" + genericController.htmlIndent(result) + "\r</div>";

@@ -93,8 +93,8 @@ namespace Contensive.Core.Addons.PageManager {
                                     } else {
                                         string SortOrder = (100000 + (pagePtr * 10)).ToString();
                                        pageContentModel childPage = pageContentModel.create(cpCore, childPageId);
-                                        if (childPage.SortOrder != SortOrder) {
-                                            childPage.SortOrder = SortOrder;
+                                        if (childPage.sortOrder != SortOrder) {
+                                            childPage.sortOrder = SortOrder;
                                             childPage.save(cpCore);
                                         }
                                     }

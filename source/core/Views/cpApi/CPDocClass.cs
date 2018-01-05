@@ -171,7 +171,7 @@ namespace Contensive.Core {
             get {
                 if (cpCore.doc != null) {
                     if (cpCore.doc.template != null) {
-                        return cpCore.doc.template.ID;
+                        return cpCore.doc.template.id;
                     }
                 }
                 return 0;

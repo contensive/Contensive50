@@ -69,12 +69,12 @@ namespace Contensive.Core.Controllers {
                 } else {
                     //
                     // -- no section block, continue
-                    LocalTemplateID = cpCore.doc.template.ID;
-                    LocalTemplateBody = cpCore.doc.template.BodyHTML;
+                    LocalTemplateID = cpCore.doc.template.id;
+                    LocalTemplateBody = cpCore.doc.template.bodyHTML;
                     if (string.IsNullOrEmpty(LocalTemplateBody)) {
                         LocalTemplateBody = TemplateDefaultBody;
                     }
-                    LocalTemplateName = cpCore.doc.template.Name;
+                    LocalTemplateName = cpCore.doc.template.name;
                     if (string.IsNullOrEmpty(LocalTemplateName)) {
                         LocalTemplateName = "Template " + LocalTemplateID;
                     }
@@ -82,7 +82,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Encode Template
                     //
                     LocalTemplateBody = contentCmdController.executeContentCommands(cpCore, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.doc.sessionContext.user.id, cpCore.doc.sessionContext.isAuthenticated, ref layoutError);
-                    returnBody = returnBody + activeContentController.convertActiveContentToHtmlForWebRender(cpCore, LocalTemplateBody, "Page Templates", LocalTemplateID, 0, cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
+                    returnBody += activeContentController.convertActiveContentToHtmlForWebRender(cpCore, LocalTemplateBody, "Page Templates", LocalTemplateID, 0, cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
                     //
                     // If Content was not found, add it to the end
                     //
@@ -539,14 +539,14 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // -- ceate new template named Default
                                 cpcore.doc.template = pageTemplateModel.add(cpcore );
-                                cpcore.doc.template.Name = defaultTemplateName;
-                                cpcore.doc.template.BodyHTML = cpcore.appRootFiles.readFile(defaultTemplateHomeFilename);
+                                cpcore.doc.template.name = defaultTemplateName;
+                                cpcore.doc.template.bodyHTML = cpcore.appRootFiles.readFile(defaultTemplateHomeFilename);
                                 cpcore.doc.template.save(cpcore);
                             }
                             //
                             // -- set this new template to all domains without a template
                             foreach (domainModel d in domainModel.createList(cpcore, "((DefaultTemplateId=0)or(DefaultTemplateId is null))")) {
-                                d.DefaultTemplateId = cpcore.doc.template.ID;
+                                d.DefaultTemplateId = cpcore.doc.template.id;
                                 d.save(cpcore);
                             }
                         }
@@ -783,7 +783,7 @@ namespace Contensive.Core.Controllers {
                 List<Models.Entity.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(cpcore, SqlCriteria);
                 bool templateAllowed = false;
                 foreach (TemplateDomainRuleModel rule in allowTemplateRuleList) {
-                    if (rule.templateId == cpcore.doc.template.ID) {
+                    if (rule.templateId == cpcore.doc.template.id) {
                         templateAllowed = true;
                         break;
                     }
@@ -817,7 +817,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- protocol
                 string linkprotocol = "";
-                if (cpcore.doc.page.IsSecure | cpcore.doc.template.IsSecure) {
+                if (cpcore.doc.page.IsSecure | cpcore.doc.template.isSecure) {
                     linkprotocol = "https://";
                 } else {
                     linkprotocol = "http://";
@@ -986,7 +986,7 @@ namespace Contensive.Core.Controllers {
 
                     //
                     // -- execute template Dependencies
-                    List<Models.Entity.addonModel> templateAddonList = addonModel.createList_templateDependencies(cpCore, cpCore.doc.template.ID);
+                    List<Models.Entity.addonModel> templateAddonList = addonModel.createList_templateDependencies(cpCore, cpCore.doc.template.id);
                     foreach (addonModel addon in templateAddonList) {
                         bool AddonStatusOK = true;
                         returnHtml += cpCore.addon.executeDependency(addon, executeContext);
@@ -1440,7 +1440,7 @@ namespace Contensive.Core.Controllers {
                     htmlDocBody = getHtmlBodyTemplate(cpCore);
                     //
                     // -- check secure certificate required
-                    bool SecureLink_Template_Required = cpCore.doc.template.IsSecure;
+                    bool SecureLink_Template_Required = cpCore.doc.template.isSecure;
                     bool SecureLink_Page_Required = false;
                     foreach (Models.Entity.pageContentModel page in cpCore.doc.pageToRootList) {
                         if (cpCore.doc.page.IsSecure) {
@@ -1463,7 +1463,7 @@ namespace Contensive.Core.Controllers {
                         if (SecureLink_Page_Required) {
                             cpCore.doc.redirectReason = "Redirecting because this page [" + cpCore.doc.pageToRootList[0].name + "] requires a secure link.";
                         } else {
-                            cpCore.doc.redirectReason = "Redirecting because this template [" + cpCore.doc.template.Name + "] requires a secure link.";
+                            cpCore.doc.redirectReason = "Redirecting because this template [" + cpCore.doc.template.name + "] requires a secure link.";
                         }
                         return "";
                     }
@@ -1480,7 +1480,7 @@ namespace Contensive.Core.Controllers {
                     } else {
                         bool allowTemplate = false;
                         foreach (TemplateDomainRuleModel rule in allowTemplateRuleList) {
-                            if (rule.templateId == cpCore.doc.template.ID) {
+                            if (rule.templateId == cpCore.doc.template.id) {
                                 allowTemplate = true;
                                 break;
                             }
@@ -1490,7 +1490,7 @@ namespace Contensive.Core.Controllers {
                             // -- must redirect to a domain's landing page
                             RedirectLink = cpCore.webServer.requestProtocol + cpCore.doc.domain.name;
                             cpCore.doc.redirectBecausePageNotFound = false;
-                            cpCore.doc.redirectReason = "Redirecting because this domain has template requiements set, and this template is not configured [" + cpCore.doc.template.Name + "].";
+                            cpCore.doc.redirectReason = "Redirecting because this domain has template requiements set, and this template is not configured [" + cpCore.doc.template.name + "].";
                             return "";
                         }
                     }
@@ -2658,15 +2658,15 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 // ----- Last Modified line
-                if ((cpcore.doc.page.ModifiedDate != DateTime.MinValue) & cpcore.doc.page.AllowLastModifiedFooter) {
-                    result = result + "\r<p>This page was last modified " + cpcore.doc.page.ModifiedDate.ToString("G");
+                if ((cpcore.doc.page.modifiedDate != DateTime.MinValue) & cpcore.doc.page.AllowLastModifiedFooter) {
+                    result = result + "\r<p>This page was last modified " + cpcore.doc.page.modifiedDate.ToString("G");
                     if (cpcore.doc.sessionContext.isAuthenticatedAdmin(cpcore)) {
-                        if (cpcore.doc.page.ModifiedBy == 0) {
+                        if (cpcore.doc.page.modifiedBy == 0) {
                             result = result + " (admin only: modified by unknown)";
                         } else {
-                            string personName = cpcore.db.getRecordName("people", cpcore.doc.page.ModifiedBy);
+                            string personName = cpcore.db.getRecordName("people", cpcore.doc.page.modifiedBy);
                             if (string.IsNullOrEmpty(personName)) {
-                                result = result + " (admin only: modified by person with unnamed or deleted record #" + cpcore.doc.page.ModifiedBy + ")";
+                                result = result + " (admin only: modified by person with unnamed or deleted record #" + cpcore.doc.page.modifiedBy + ")";
                             } else {
                                 result = result + " (admin only: modified by " + personName + ")";
                             }
