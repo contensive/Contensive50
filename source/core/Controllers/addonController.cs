@@ -583,10 +583,10 @@ namespace Contensive.Core.Controllers {
                     cpCore.docProperties.setProperty("instanceId", parentInstanceId);
                     cpCore.doc.addonsCurrentlyRunningIdList.Remove(addon.id);
                     cpCore.doc.addonInstanceCnt = cpCore.doc.addonInstanceCnt + 1;
+                    //
+                    // -- test point message
+                    debugController.testPoint(cpCore, "execute exit (" + (cpCore.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                 }
-                //
-                // -- test point message
-                debugController.testPoint(cpCore, "execute exit (" + (cpCore.doc.appStopWatch.ElapsedMilliseconds- addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             } finally {
