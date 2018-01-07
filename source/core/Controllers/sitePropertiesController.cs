@@ -32,6 +32,14 @@ namespace Contensive.Core.Controllers {
         public sitePropertiesController(coreClass cpCore) : base() {
             this.cpCore = cpCore;
         }
+        public int defaultRouteId {
+            get {
+                return getInteger(spDefaultRouteAddonId);
+            }
+            set {
+                setProperty(spDefaultRouteAddonId, value);
+            }
+        }
         //
         //====================================================================================================
         //

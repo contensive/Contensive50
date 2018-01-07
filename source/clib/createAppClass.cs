@@ -41,7 +41,7 @@ namespace  Contensive.CLI {
                     Console.Write("\n\nCreate application within the server group [" + cp.core.serverConfig.name + "].");
                     serverConfigModel.appConfigModel appConfig = new serverConfigModel.appConfigModel();
                     //
-                    // app name
+                    // -- app name
                     bool appNameOk = false;
                     do
                     {
@@ -57,6 +57,8 @@ namespace  Contensive.CLI {
                     Console.Write("\n\r\t3 Local Mode, cdn as second iis site as cdn." + appName);
                     Console.Write("\n\r\t4 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket");
                     appArchitecture = cliController.promptForReply("Enter 1,2,3, or 4", "1");
+                    //
+                    // -- admin route
                     appConfig.adminRoute = "";
                     bool routeOk = false;
                     do
@@ -74,7 +76,8 @@ namespace  Contensive.CLI {
                             }
                         }
                     } while (!routeOk);
-                    
+                    //
+                    // -- 
                     appConfig.allowSiteMonitor = false;
                     domainName = cliController.promptForReply("Primary Domain Name", "www." + appName + ".com");
                     appConfig.domainList.Add(domainName);

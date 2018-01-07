@@ -521,12 +521,12 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- get template from domain
                         if (domain != null) {
-                            if (domain.DefaultTemplateId > 0) {
-                                cpcore.doc.template = pageTemplateModel.create(cpcore, domain.DefaultTemplateId );
+                            if (domain.defaultTemplateId > 0) {
+                                cpcore.doc.template = pageTemplateModel.create(cpcore, domain.defaultTemplateId );
                                 if (cpcore.doc.template == null) {
                                     //
                                     // -- domain templateId is not valid
-                                    domain.DefaultTemplateId = 0;
+                                    domain.defaultTemplateId = 0;
                                     domain.save(cpcore);
                                 }
                             }
@@ -546,7 +546,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // -- set this new template to all domains without a template
                             foreach (domainModel d in domainModel.createList(cpcore, "((DefaultTemplateId=0)or(DefaultTemplateId is null))")) {
-                                d.DefaultTemplateId = cpcore.doc.template.id;
+                                d.defaultTemplateId = cpcore.doc.template.id;
                                 d.save(cpcore);
                             }
                         }
@@ -559,7 +559,7 @@ namespace Contensive.Core.Controllers {
         public static int getPageNotFoundPageId(coreClass cpcore) {
             int pageId = 0;
             try {
-                pageId = cpcore.domainLegacyCache.domainDetails.pageNotFoundPageId;
+                pageId = cpcore.domain.pageNotFoundPageId;
                 if (pageId == 0) {
                     //
                     // no domain page not found, use site default
@@ -587,10 +587,10 @@ namespace Contensive.Core.Controllers {
                 } else {
                     //
                     // -- attempt domain landing page
-                    if (!domain.RootPageID.Equals(0)) {
-                        landingPage = pageContentModel.create(cpcore, domain.RootPageID);
+                    if (!domain.rootPageId.Equals(0)) {
+                        landingPage = pageContentModel.create(cpcore, domain.rootPageId);
                         if (landingPage == null) {
-                            domain.RootPageID = 0;
+                            domain.rootPageId = 0;
                             domain.save(cpcore);
                         }
                     }
@@ -602,7 +602,7 @@ namespace Contensive.Core.Controllers {
                             landingPage = pageContentModel.create(cpcore, siteLandingPageID);
                             if (landingPage == null) {
                                 cpcore.siteProperties.setProperty("LandingPageID", 0);
-                                domain.RootPageID = 0;
+                                domain.rootPageId = 0;
                                 domain.save(cpcore);
                             }
                         }
@@ -617,7 +617,7 @@ namespace Contensive.Core.Controllers {
                         }
                         //
                         // -- save new page to the domain
-                        domain.RootPageID = landingPage.id;
+                        domain.rootPageId = landingPage.id;
                         domain.save(cpcore);
                     }
                 }
@@ -794,7 +794,7 @@ namespace Contensive.Core.Controllers {
                     // this template has no domain preference, use current domain
                     //
                     linkDomain = cpcore.webServer.requestDomain;
-                } else if (cpcore.domainLegacyCache.domainDetails.id == 0) {
+                } else if (cpcore.domain.id == 0) {
                     //
                     // the current domain is not recognized, or is default - use it
                     //
@@ -2307,7 +2307,7 @@ namespace Contensive.Core.Controllers {
                                     Body = Body + getTableRow("Visit #", encodeText(cpCore.doc.sessionContext.visit.id), true);
                                     Body = Body + getTableRow("Visit IP", cpCore.webServer.requestRemoteIP, false);
                                     Body = Body + getTableRow("Browser ", cpCore.webServer.requestBrowser, true);
-                                    Body = Body + getTableRow("Visitor #", encodeText(cpCore.doc.sessionContext.visitor.ID), false);
+                                    Body = Body + getTableRow("Visitor #", encodeText(cpCore.doc.sessionContext.visitor.id), false);
                                     Body = Body + getTableRow("Visit Authenticated", encodeText(cpCore.doc.sessionContext.visit.VisitAuthenticated), true);
                                     Body = Body + getTableRow("Visit Referrer", cpCore.doc.sessionContext.visit.HTTP_REFERER, false);
                                     Body = Body + kmaEndTable;

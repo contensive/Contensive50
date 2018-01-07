@@ -305,7 +305,7 @@ namespace Contensive.Core {
                 if ( domain == null) {
                     return GetInteger("LandingPageID", 0);
                 } else {
-                    return domain.RootPageID;
+                    return domain.rootPageId;
                 }
             }
         }

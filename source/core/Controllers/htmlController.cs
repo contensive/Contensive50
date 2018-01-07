@@ -1402,13 +1402,13 @@ namespace Contensive.Core.Controllers {
                         if (genericController.vbUCase(field.nameLc) == genericController.vbUCase(FieldName)) {
                             FieldValueVariant = field.defaultValue;
                             fieldTypeId = field.fieldTypeId;
-                            FieldReadOnly = field.ReadOnly;
+                            FieldReadOnly = field.readOnly;
                             FieldCaption = field.caption;
-                            FieldPassword = field.Password;
+                            FieldPassword = field.password;
                             FieldHTMLContent = field.htmlContent;
                             FieldLookupContentID = field.lookupContentID;
                             FieldLookupList = field.lookupList;
-                            FieldMemberSelectGroupID = field.MemberSelectGroupID;
+                            FieldMemberSelectGroupID = field.memberSelectGroupId_get(cpCore);
                             fieldFound = true;
                         }
                     }

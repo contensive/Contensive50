@@ -3175,8 +3175,8 @@ namespace Contensive.Core.Controllers {
                             FieldFoundCount += 1;
                             Models.Complex.cdefFieldModel field = tempVar.CDef.fields[FieldName.ToLower()];
                             SQLSetPair = "";
-                            FieldReadOnly = (field.ReadOnly);
-                            FieldAdminAuthorable = ((!field.ReadOnly) & (!field.NotEditable) & (field.authorable));
+                            FieldReadOnly = (field.readOnly);
+                            FieldAdminAuthorable = ((!field.readOnly) & (!field.notEditable) & (field.authorable));
                             //
                             // ----- Set SQLSetPair to the name=value pair for the SQL statement
                             //
@@ -3248,7 +3248,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                 }
-                                if (field.UniqueName & (genericController.encodeText(writeCacheValue) != "")) {
+                                if (field.uniqueName & (genericController.encodeText(writeCacheValue) != "")) {
                                     //
                                     // ----- set up for unique name check
                                     //
@@ -4719,11 +4719,11 @@ namespace Contensive.Core.Controllers {
                 field.fieldTypeId = cpCore.db.getFieldTypeIdByADOType(ADOFieldType);
                 field.caption = FieldName;
                 field.editSortPriority = 1000;
-                field.ReadOnly = false;
+                field.readOnly = false;
                 field.authorable = true;
                 field.adminOnly = false;
                 field.developerOnly = false;
-                field.TextBuffered = false;
+                field.textBuffered = false;
                 field.htmlContent = false;
                 //
                 switch (genericController.vbUCase(FieldName)) {
@@ -4742,31 +4742,31 @@ namespace Contensive.Core.Controllers {
                         break;
                     case "DATEADDED":
                         field.caption = "Created";
-                        field.ReadOnly = true;
+                        field.readOnly = true;
                         field.editSortPriority = 5020;
                         break;
                     case "CREATEDBY":
                         field.caption = "Created By";
                         field.fieldTypeId = FieldTypeIdLookup;
                         field.set_lookupContentName(cpCore, "Members");
-                        field.ReadOnly = true;
+                        field.readOnly = true;
                         field.editSortPriority = 5030;
                         break;
                     case "MODIFIEDDATE":
                         field.caption = "Modified";
-                        field.ReadOnly = true;
+                        field.readOnly = true;
                         field.editSortPriority = 5040;
                         break;
                     case "MODIFIEDBY":
                         field.caption = "Modified By";
                         field.fieldTypeId = FieldTypeIdLookup;
                         field.set_lookupContentName(cpCore, "Members");
-                        field.ReadOnly = true;
+                        field.readOnly = true;
                         field.editSortPriority = 5050;
                         break;
                     case "ID":
                         field.caption = "Number";
-                        field.ReadOnly = true;
+                        field.readOnly = true;
                         field.editSortPriority = 5060;
                         field.authorable = true;
                         field.adminOnly = false;
@@ -4778,13 +4778,13 @@ namespace Contensive.Core.Controllers {
                         field.set_lookupContentName(cpCore, "Content");
                         field.editSortPriority = 5070;
                         field.authorable = true;
-                        field.ReadOnly = false;
+                        field.readOnly = false;
                         field.adminOnly = true;
                         field.developerOnly = true;
                         break;
                     case "CREATEKEY":
                         field.caption = "CreateKey";
-                        field.ReadOnly = true;
+                        field.readOnly = true;
                         field.editSortPriority = 5080;
                         field.authorable = false;
                         //
@@ -4814,18 +4814,18 @@ namespace Contensive.Core.Controllers {
                         field.set_lookupContentName(cpCore, "Organizations");
                         field.editSortPriority = 2005;
                         field.authorable = true;
-                        field.ReadOnly = false;
+                        field.readOnly = false;
                         break;
                     case "COPYFILENAME":
                         field.caption = "Copy";
                         field.fieldTypeId = FieldTypeIdFileHTML;
-                        field.TextBuffered = true;
+                        field.textBuffered = true;
                         field.editSortPriority = 2010;
                         break;
                     case "BRIEFFILENAME":
                         field.caption = "Overview";
                         field.fieldTypeId = FieldTypeIdFileHTML;
-                        field.TextBuffered = true;
+                        field.textBuffered = true;
                         field.editSortPriority = 2020;
                         field.htmlContent = false;
                         break;
@@ -4843,7 +4843,7 @@ namespace Contensive.Core.Controllers {
                         field.caption = "Content";
                         field.fieldTypeId = FieldTypeIdLookup;
                         field.set_lookupContentName(cpCore, "Content");
-                        field.ReadOnly = false;
+                        field.readOnly = false;
                         field.editSortPriority = 2060;
                         //
                         // --- Record Features
@@ -4853,21 +4853,21 @@ namespace Contensive.Core.Controllers {
                         field.caption = "Parent";
                         field.fieldTypeId = FieldTypeIdLookup;
                         field.set_lookupContentName(cpCore, ContentName);
-                        field.ReadOnly = false;
+                        field.readOnly = false;
                         field.editSortPriority = 3000;
                         break;
                     case "MEMBERID":
                         field.caption = "Member";
                         field.fieldTypeId = FieldTypeIdLookup;
                         field.set_lookupContentName(cpCore, "Members");
-                        field.ReadOnly = false;
+                        field.readOnly = false;
                         field.editSortPriority = 3005;
                         break;
                     case "CONTACTMEMBERID":
                         field.caption = "Contact";
                         field.fieldTypeId = FieldTypeIdLookup;
                         field.set_lookupContentName(cpCore, "Members"); 
-                        field.ReadOnly = false;
+                        field.readOnly = false;
                         field.editSortPriority = 3010;
                         break;
                     case "ALLOWBULKEMAIL":
@@ -4892,13 +4892,13 @@ namespace Contensive.Core.Controllers {
                         break;
                     case "VIEWINGS":
                         field.caption = "Viewings";
-                        field.ReadOnly = true;
+                        field.readOnly = true;
                         field.editSortPriority = 5000;
                         field.defaultValue = "0";
                         break;
                     case "CLICKS":
                         field.caption = "Clicks";
-                        field.ReadOnly = true;
+                        field.readOnly = true;
                         field.editSortPriority = 5010;
                         field.defaultValue = "0";
                         break;

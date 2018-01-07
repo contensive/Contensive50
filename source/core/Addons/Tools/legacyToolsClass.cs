@@ -3230,7 +3230,7 @@ namespace Contensive.Core.Addons.Tools {
                             //
                             // read only
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." + RecordCount, genericController.encodeText(fieldsort.field.ReadOnly), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." + RecordCount, genericController.encodeText(fieldsort.field.readOnly), fieldsort.field.inherited));
                             //
                             // authorable
                             //
@@ -3238,19 +3238,19 @@ namespace Contensive.Core.Addons.Tools {
                             //
                             // required
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." + RecordCount, genericController.encodeText(fieldsort.field.Required), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." + RecordCount, genericController.encodeText(fieldsort.field.required), fieldsort.field.inherited));
                             //
                             // UniqueName
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." + RecordCount, genericController.encodeText(fieldsort.field.UniqueName), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." + RecordCount, genericController.encodeText(fieldsort.field.uniqueName), fieldsort.field.inherited));
                             //
                             // text buffered
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." + RecordCount, genericController.encodeText(fieldsort.field.TextBuffered), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." + RecordCount, genericController.encodeText(fieldsort.field.textBuffered), fieldsort.field.inherited));
                             //
                             // password
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." + RecordCount, genericController.encodeText(fieldsort.field.Password), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." + RecordCount, genericController.encodeText(fieldsort.field.password), fieldsort.field.inherited));
                             //
                             // scramble
                             //

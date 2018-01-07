@@ -91,7 +91,7 @@ namespace Contensive.Core.Models.Context {
                     setProperty(propertyName, PropertyValue, cpCore.doc.sessionContext.visit.id);
                     break;
                 case PropertyTypeVisitor:
-                    setProperty(propertyName, PropertyValue, cpCore.doc.sessionContext.visitor.ID);
+                    setProperty(propertyName, PropertyValue, cpCore.doc.sessionContext.visitor.id);
                     break;
                 case PropertyTypeMember:
                     setProperty(propertyName, PropertyValue, cpCore.doc.sessionContext.user.id);
@@ -201,7 +201,7 @@ namespace Contensive.Core.Models.Context {
                 case PropertyTypeVisit:
                     return getDate(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getDate(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.ID);
+                    return getDate(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.id);
                 case PropertyTypeMember:
                     return getDate(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
             }
@@ -245,7 +245,7 @@ namespace Contensive.Core.Models.Context {
                 case PropertyTypeVisit:
                     return getNumber(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getNumber(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.ID);
+                    return getNumber(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.id);
                 case PropertyTypeMember:
                     return getNumber(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
             }
@@ -289,7 +289,7 @@ namespace Contensive.Core.Models.Context {
                 case PropertyTypeVisit:
                     return getBoolean(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getBoolean(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.ID);
+                    return getBoolean(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.id);
                 case PropertyTypeMember:
                     return getBoolean(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
             }
@@ -333,7 +333,7 @@ namespace Contensive.Core.Models.Context {
                 case PropertyTypeVisit:
                     return getInteger(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getInteger(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.ID);
+                    return getInteger(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.id);
                 case PropertyTypeMember:
                     return getInteger(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
             }
@@ -377,7 +377,7 @@ namespace Contensive.Core.Models.Context {
                 case PropertyTypeVisit:
                     return getText(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getText(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.ID);
+                    return getText(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.id);
                 case PropertyTypeMember:
                     return getText(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
             }

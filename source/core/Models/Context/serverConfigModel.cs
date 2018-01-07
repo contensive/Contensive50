@@ -41,7 +41,7 @@ namespace Contensive.Core.Models.Context {
         //
         // -- If true, use local dotnet memory cache backed by filesystem
         public bool enableLocalMemoryCache = true;
-        public bool enableLocalFileCache = true;
+        public bool enableLocalFileCache = false;
         //
         // -- AWS dotnet elaticcache client wraps enyim, and provides node autodiscovery through the configuration object. this is the srver:port to the config file it uses.
         public bool enableRemoteCache = false;

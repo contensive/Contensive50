@@ -109,7 +109,7 @@ namespace Contensive.Core {
         public override int Id
         {
             get {
-                return cpCore.doc.sessionContext.visitor.ID;
+                return cpCore.doc.sessionContext.visitor.id;
             }
         }
 

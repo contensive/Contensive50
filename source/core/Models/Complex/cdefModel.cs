@@ -363,32 +363,29 @@ namespace Contensive.Core.Models.Complex {
                                     field.manyToManyRuleContentID = genericController.encodeInteger(rowWithinLoop[29]);
                                     field.ManyToManyRulePrimaryField = genericController.encodeText(rowWithinLoop[30]);
                                     field.ManyToManyRuleSecondaryField = genericController.encodeText(rowWithinLoop[31]);
-                                    //.ManyToManyContentName(cpCore) = ""
-                                    //.ManyToManyRuleContentName(cpCore) = ""
-                                    field.MemberSelectGroupID = genericController.encodeInteger(rowWithinLoop[36]);
-                                    //.MemberSelectGroupName(cpCore) = ""
+                                    field.memberSelectGroupId_set( cpcore, genericController.encodeInteger(rowWithinLoop[36]));
                                     field.nameLc = fieldNameLower;
-                                    field.NotEditable = genericController.encodeBoolean(rowWithinLoop[26]);
-                                    field.Password = genericController.encodeBoolean(rowWithinLoop[3]);
-                                    field.ReadOnly = genericController.encodeBoolean(rowWithinLoop[17]);
-                                    field.RedirectContentID = genericController.encodeInteger(rowWithinLoop[19]);
+                                    field.notEditable = genericController.encodeBoolean(rowWithinLoop[26]);
+                                    field.password = genericController.encodeBoolean(rowWithinLoop[3]);
+                                    field.readOnly = genericController.encodeBoolean(rowWithinLoop[17]);
+                                    field.redirectContentID = genericController.encodeInteger(rowWithinLoop[19]);
                                     //.RedirectContentName(cpCore) = ""
-                                    field.RedirectID = genericController.encodeText(rowWithinLoop[21]);
-                                    field.RedirectPath = genericController.encodeText(rowWithinLoop[20]);
-                                    field.Required = genericController.encodeBoolean(rowWithinLoop[14]);
+                                    field.redirectID = genericController.encodeText(rowWithinLoop[21]);
+                                    field.redirectPath = genericController.encodeText(rowWithinLoop[20]);
+                                    field.required = genericController.encodeBoolean(rowWithinLoop[14]);
                                     field.RSSTitleField = genericController.encodeBoolean(rowWithinLoop[32]);
                                     field.RSSDescriptionField = genericController.encodeBoolean(rowWithinLoop[33]);
                                     field.Scramble = genericController.encodeBoolean(rowWithinLoop[35]);
-                                    field.TextBuffered = genericController.encodeBoolean(rowWithinLoop[2]);
-                                    field.UniqueName = genericController.encodeBoolean(rowWithinLoop[1]);
+                                    field.textBuffered = genericController.encodeBoolean(rowWithinLoop[2]);
+                                    field.uniqueName = genericController.encodeBoolean(rowWithinLoop[1]);
                                     //.ValueVariant
                                     //
                                     field.HelpCustom = genericController.encodeText(rowWithinLoop[41]);
                                     field.HelpDefault = genericController.encodeText(rowWithinLoop[40]);
                                     if (string.IsNullOrEmpty(field.HelpCustom)) {
-                                        field.HelpMessage = field.HelpDefault;
+                                        field.helpMessage = field.HelpDefault;
                                     } else {
-                                        field.HelpMessage = field.HelpCustom;
+                                        field.helpMessage = field.HelpCustom;
                                     }
                                     field.HelpChanged = false;
                                     dt.Dispose();
@@ -1362,24 +1359,24 @@ namespace Contensive.Core.Models.Complex {
                     FieldDeveloperOnly = field.developerOnly;
                     FieldActive = field.active;
                     FieldCaption = field.caption;
-                    FieldReadOnly = field.ReadOnly;
+                    FieldReadOnly = field.readOnly;
                     fieldTypeId = field.fieldTypeId;
                     FieldAuthorable = field.authorable;
                     DefaultValue = genericController.encodeText(field.defaultValue);
-                    NotEditable = field.NotEditable;
+                    NotEditable = field.notEditable;
                     LookupContentName = field.get_lookupContentName(cpcore);
                     AdminIndexWidth = field.indexWidth;
                     AdminIndexSort = field.indexSortOrder;
                     RedirectContentName = field.get_RedirectContentName(cpcore);
-                    RedirectIDField = field.RedirectID;
-                    RedirectPath = field.RedirectPath;
+                    RedirectIDField = field.redirectID;
+                    RedirectPath = field.redirectPath;
                     HTMLContent = field.htmlContent;
-                    UniqueName = field.UniqueName;
-                    Password = field.Password;
-                    FieldRequired = field.Required;
+                    UniqueName = field.uniqueName;
+                    Password = field.password;
+                    FieldRequired = field.required;
                     RSSTitle = field.RSSTitleField;
                     RSSDescription = field.RSSDescriptionField;
-                    MemberSelectGroupID = field.MemberSelectGroupID;
+                    MemberSelectGroupID = field.memberSelectGroupId_get( cpcore );
                     installedByCollectionGuid = field.installedByCollectionGuid;
                     EditTab = field.editTabName;
                     Scramble = field.Scramble;
@@ -1719,25 +1716,24 @@ namespace Contensive.Core.Models.Complex {
                                     result = field.caption;
                                     break;
                                 case "REQUIRED":
-                                    result = field.Required.ToString();
+                                    result = field.required.ToString();
                                     break;
                                 case "UNIQUENAME":
-                                    result = field.UniqueName.ToString();
+                                    result = field.uniqueName.ToString();
                                     break;
                                 case "UNIQUE":
                                     //
                                     // fix for the uniquename screwup - it is not unique name, it is unique value
                                     //
-                                    result = field.UniqueName.ToString();
+                                    result = field.uniqueName.ToString();
                                     break;
                                 case "DEFAULT":
                                     result = genericController.encodeText(field.defaultValue);
                                     break;
                                 case "MEMBERSELECTGROUPID":
-                                    result = genericController.encodeText(field.MemberSelectGroupID);
+                                    result = field.memberSelectGroupId_get( cpcore ).ToString() ;
                                     break;
                                 default:
-                                    //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
                                     break;
                             }
                             break;

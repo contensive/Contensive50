@@ -25,14 +25,15 @@ namespace Contensive.Core.Models.Entity {
         //
         //====================================================================================================
         // -- instance properties
-        public int DefaultTemplateId { get; set; }
+        public int defaultTemplateId { get; set; }
         public int forwardDomainId { get; set; }
-        public string ForwardURL { get; set; }
-        public bool NoFollow { get; set; }
-        public int PageNotFoundPageID { get; set; }
-        public int RootPageID { get; set; }
-        public int TypeID { get; set; }
-        public bool Visited { get; set; }
+        public string forwardUrl { get; set; }
+        public bool noFollow { get; set; }
+        public int pageNotFoundPageId { get; set; }
+        public int rootPageId { get; set; }
+        public int typeId { get; set; }
+        public bool visited { get; set; }
+        public int defaultRouteId { get; set; }
         //
         //====================================================================================================
         public static domainModel add(coreClass cpCore) {
@@ -127,6 +128,17 @@ namespace Contensive.Core.Models.Entity {
         //====================================================================================================
         public static domainModel createDefault(coreClass cpcore) {
             return createDefault<domainModel>(cpcore);
+        }
+        //
+        //====================================================================================================
+        public static Dictionary<string,domainModel> createDictionary(coreClass cpcore, string sqlCriteria) {
+            var result = new Dictionary<string, domainModel> { };
+            foreach (var domain in createList(cpcore, sqlCriteria)) {
+                if (!result.ContainsKey(domain.name.ToLower())) {
+                    result.Add(domain.name.ToLower(), domain);
+                }
+            }
+            return result;
         }
         //
         public enum domainTypeEnum {

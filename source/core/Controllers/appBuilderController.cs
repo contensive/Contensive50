@@ -413,12 +413,11 @@ namespace Contensive.Core.Controllers {
                     cpcore.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->");
                     cpcore.siteProperties.getText("TrapEmail", "");
                     cpcore.siteProperties.getText("TrapErrors", "0");
-                    int defaultRouteAddonId = cpcore.siteProperties.getInteger(spDefaultRouteAddonId, 0);
-                    addonModel defaultRouteAddon = addonModel.create(cpcore, defaultRouteAddonId);
+                    addonModel defaultRouteAddon = addonModel.create(cpcore, cpcore.siteProperties.defaultRouteId);
                     if (defaultRouteAddon == null) {
                         defaultRouteAddon = addonModel.create(cpcore, addonGuidPageManager);
                         if (defaultRouteAddon != null) {
-                            cpcore.siteProperties.setProperty(spDefaultRouteAddonId, defaultRouteAddon.id);
+                            cpcore.siteProperties.defaultRouteId = defaultRouteAddon.id;
                         }
                     }
                     //
@@ -461,12 +460,12 @@ namespace Contensive.Core.Controllers {
                             defaultTemplate = pageTemplateModel.add(cpcore);
                             defaultTemplate.name = "Default";
                         }
-                        domain.DefaultTemplateId = defaultTemplate.id;
+                        domain.defaultTemplateId = defaultTemplate.id;
                         domain.name = primaryDomain;
-                        domain.PageNotFoundPageID = landingPage.id;
-                        domain.RootPageID = landingPage.id;
-                        domain.TypeID = (int) domainModel.domainTypeEnum.Normal;
-                        domain.Visited = false;
+                        domain.pageNotFoundPageId = landingPage.id;
+                        domain.rootPageId = landingPage.id;
+                        domain.typeId = (int) domainModel.domainTypeEnum.Normal;
+                        domain.visited = false;
                         domain.save(cpcore);
                         //
                         landingPage.TemplateID = defaultTemplate.id;

@@ -69,7 +69,6 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- test point message
                 long addonStart = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                debugController.testPoint(cpCore, "execute enter [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                 if (addon == null) {
                     //
                     // -- addon not found
@@ -90,6 +89,7 @@ namespace Contensive.Core.Controllers {
                 } else {
                     //
                     // -- ok to execute
+                    debugController.testPoint(cpCore, "execute enter [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                     string parentInstanceId = cpCore.docProperties.getText("instanceId");
                     cpCore.docProperties.setProperty("instanceId", executeContext.instanceGuid);
                     cpCore.doc.addonsCurrentlyRunningIdList.Add(addon.id);
@@ -3763,8 +3763,9 @@ namespace Contensive.Core.Controllers {
                 bool AddonStatusOK = true;
                 try {
                     addonModel addon = addonModel.create(cpCore, addonGuidAddonManager);
-                    result = cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
-                    //addonManager = cpCore.addon.execute_legacy2(0, addonGuidAddonManager, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
+                    if ( addon != null ){
+                        result = cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
+                    }
                 } catch (Exception ex) {
                     cpCore.handleException(new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
                     AddonStatusOK = false;

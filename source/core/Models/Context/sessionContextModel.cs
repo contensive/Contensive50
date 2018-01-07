@@ -282,7 +282,7 @@ namespace Contensive.Core.Models.Context {
                                     }
                                 }
                                 //
-                                if (resultSessionContext.visitor.ID == 0) {
+                                if (resultSessionContext.visitor.id == 0) {
                                     //
                                     // -- visit.visitor not valid, create visitor from cookie
                                     CookieVisitor = genericController.encodeText(cpCore.webServer.getRequestCookie(main_appNameCookiePrefix + main_cookieNameVisitor));
@@ -303,7 +303,7 @@ namespace Contensive.Core.Models.Context {
                                     }
                                 }
                                 //
-                                if (resultSessionContext.visitor.ID == 0) {
+                                if (resultSessionContext.visitor.id == 0) {
                                     //
                                     // -- create new visitor
                                     resultSessionContext.visitor = visitorModel.add(cpCore);
@@ -323,7 +323,7 @@ namespace Contensive.Core.Models.Context {
                                         if (cpCore.siteProperties.AllowAutoLogin & resultSessionContext.user.AutoLogin & resultSessionContext.visit.CookieSupport) {
                                             //
                                             // -- they allow it, now Check if they were logged in on their last visit
-                                            visitModel lastVisit = visitModel.getLastVisitByVisitor(cpCore, resultSessionContext.visit.id, resultSessionContext.visitor.ID);
+                                            visitModel lastVisit = visitModel.getLastVisitByVisitor(cpCore, resultSessionContext.visit.id, resultSessionContext.visitor.id);
                                             if (lastVisit != null) {
                                                 if (lastVisit.VisitAuthenticated && (lastVisit.MemberID == resultSessionContext.visit.id)) {
                                                     if (resultSessionContext.authenticateById(cpCore, resultSessionContext.user.id, resultSessionContext)) {
@@ -447,7 +447,7 @@ namespace Contensive.Core.Models.Context {
                                 //
                                 // -- new visit, update the persistant visitor cookie
                                 if (trackVisits) {
-                                    cpCore.webServer.addResponseCookie(main_appNameCookiePrefix + main_cookieNameVisitor, cpCore.security.encodeToken(resultSessionContext.visitor.ID, resultSessionContext.visit.StartTime), resultSessionContext.visit.StartTime.AddYears(1), "", requestAppRootPath, false);
+                                    cpCore.webServer.addResponseCookie(main_appNameCookiePrefix + main_cookieNameVisitor, cpCore.security.encodeToken(resultSessionContext.visitor.id, resultSessionContext.visit.StartTime), resultSessionContext.visit.StartTime.AddYears(1), "", requestAppRootPath, false);
                                 }
                                 //
                                 // -- OnNewVisit Add-on call
@@ -456,7 +456,7 @@ namespace Contensive.Core.Models.Context {
                             resultSessionContext.visit.LastVisitTime = cpCore.doc.profileStartTime;
                             //
                             // -- verify visitor
-                            if (resultSessionContext.visitor.ID == 0) {
+                            if (resultSessionContext.visitor.id == 0) {
                                 //
                                 // -- create new visitor
                                 resultSessionContext.visitor = visitorModel.add(cpCore);
@@ -544,8 +544,8 @@ namespace Contensive.Core.Models.Context {
                                 resultSessionContext.visit.MemberID = resultSessionContext.user.id;
                                 visit_changes = true;
                             }
-                            if (resultSessionContext.visit.VisitorID != resultSessionContext.visitor.ID) {
-                                resultSessionContext.visit.VisitorID = resultSessionContext.visitor.ID;
+                            if (resultSessionContext.visit.VisitorID != resultSessionContext.visitor.id) {
+                                resultSessionContext.visit.VisitorID = resultSessionContext.visitor.id;
                                 visit_changes = true;
                             }
                             //
@@ -560,7 +560,7 @@ namespace Contensive.Core.Models.Context {
                                 resultSessionContext.visit.save(cpCore);
                             }
                             if (visitor_changes) {
-                                resultSessionContext.visitor.saveObject(cpCore);
+                                resultSessionContext.visitor.save(cpCore);
                             }
                             if (user_changes) {
                                 resultSessionContext.user.save(cpCore);
@@ -725,7 +725,7 @@ namespace Contensive.Core.Models.Context {
                 visit.save(cpCore);
                 //
                 visitor.MemberID = user.id;
-                visitor.saveObject(cpCore);
+                visitor.save(cpCore);
                 //
                 //isAuthenticatedAdmin_cache_isLoaded = False
                 //property_user_isMember_isLoaded = False
@@ -1133,7 +1133,7 @@ namespace Contensive.Core.Models.Context {
         public bool recognizeById(coreClass cpCore, int userId, ref sessionContextModel sessionContext) {
             bool returnResult = false;
             try {
-                if (sessionContext.visitor.ID == 0) {
+                if (sessionContext.visitor.id == 0) {
                     sessionContext.visitor = visitorModel.add(cpCore);
                 }
                 if (sessionContext.visit.id == 0) {
@@ -1143,7 +1143,7 @@ namespace Contensive.Core.Models.Context {
                 sessionContext.visitor.MemberID = sessionContext.user.id;
                 sessionContext.visit.MemberID = sessionContext.user.id;
                 sessionContext.visit.VisitAuthenticated = false;
-                sessionContext.visit.VisitorID = sessionContext.visitor.ID;
+                sessionContext.visit.VisitorID = sessionContext.visitor.id;
                 sessionContext.visit.LoginAttempts = 0;
                 sessionContext.user.Visits = sessionContext.user.Visits + 1;
                 if (sessionContext.user.Visits == 1) {
@@ -1154,7 +1154,7 @@ namespace Contensive.Core.Models.Context {
                 sessionContext.user.LastVisit = cpCore.doc.profileStartTime;
                 sessionContext.visit.ExcludeFromAnalytics = visit.ExcludeFromAnalytics | sessionContext.visit.Bot | sessionContext.user.ExcludeFromAnalytics | sessionContext.user.Admin | sessionContext.user.Developer;
                 sessionContext.visit.save(cpCore);
-                sessionContext.visitor.saveObject(cpCore);
+                sessionContext.visitor.save(cpCore);
                 sessionContext.user.save(cpCore);
                 returnResult = true;
             } catch (Exception ex) {

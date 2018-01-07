@@ -333,20 +333,24 @@ namespace Contensive.Core {
         //
         //===================================================================================================
         /// <summary>
-        /// siteProperties object
+        /// 
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public domainLegacyModel domainLegacyCache {
+        public domainModel domain {
             get {
                 if (_domains == null) {
-                    _domains = new domainLegacyModel(this);
+                    _domains = new domainModel();
                 }
                 return _domains;
             }
-        }
-        private domainLegacyModel _domains = null;
+            set {
+                _domains = value;
+            }
+        } private domainModel _domains = null;
+        //
+        public Dictionary<string, domainModel> domainDictionary;
         //
         //===================================================================================================
         public System.Web.Script.Serialization.JavaScriptSerializer json {
@@ -707,9 +711,9 @@ namespace Contensive.Core {
                             case HardCodedPageExportAscii:
                                 //
                                 return (new Addons.Primitives.processExportAsciiMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            case HardCodedPagePayPalConfirm:
-                                //
-                                return (new Addons.Primitives.processPayPalConformMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                            //case HardCodedPagePayPalConfirm:
+                            //    //
+                            //    return (new Addons.Primitives.processPayPalConformMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                         }
                     }
                     //
@@ -801,8 +805,14 @@ namespace Contensive.Core {
                         return (new Addons.Primitives.robotsTxtClass()).Execute(cp_forAddonExecutionOnly).ToString();
                     }
                     //
-                    // -- default route
-                    int defaultAddonId = siteProperties.getInteger(spDefaultRouteAddonId);
+                    // -- default route 
+                    int defaultAddonId = 0;
+                    if (doc.domain != null) {
+                        defaultAddonId = doc.domain.defaultRouteId;
+                    }
+                    if (defaultAddonId == 0) {
+                        defaultAddonId = siteProperties.defaultRouteId;
+                    }
                     if (defaultAddonId > 0) {
                         //
                         // -- default route is run if no other route is found, which includes the route=defaultPage (default.aspx)
@@ -1228,7 +1238,7 @@ namespace Contensive.Core {
                                     //
                                     // If visit tracking, save the viewing record
                                     //
-                                    string ViewingName = ((string)(doc.sessionContext.visit.id + "." + doc.sessionContext.visit.PageVisits)).Left( 10);
+                                    string ViewingName = ((string)(doc.sessionContext.visit.id + "." + doc.sessionContext.visit.PageVisits)).Left(10);
                                     int PageID = 0;
                                     if (_doc != null) {
                                         if (doc.page != null) {
@@ -1245,7 +1255,7 @@ namespace Contensive.Core {
                                     string SQL = "insert into ccviewings ("
                                         + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID,ExcludeFromAnalytics,pagetitle"
                                         + ")values("
-                                        + " " + db.encodeSQLText(ViewingName) + "," + db.encodeSQLNumber(doc.sessionContext.visit.id) + "," + db.encodeSQLNumber(doc.sessionContext.user.id) + "," + db.encodeSQLText(webServer.requestDomain) + "," + db.encodeSQLText(webServer.requestPath) + "," + db.encodeSQLText(webServer.requestPage) + "," + db.encodeSQLText(webServer.requestQueryString.Left( 255)) + "," + db.encodeSQLText(requestFormSerialized.Left( 255)) + "," + db.encodeSQLText(webServer.requestReferrer.Left( 255)) + "," + db.encodeSQLDate(doc.profileStartTime) + "," + db.encodeSQLBoolean(doc.sessionContext.visit_stateOK) + "," + db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(this, "Viewings")) + "," + db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) + ",1"
+                                        + " " + db.encodeSQLText(ViewingName) + "," + db.encodeSQLNumber(doc.sessionContext.visit.id) + "," + db.encodeSQLNumber(doc.sessionContext.user.id) + "," + db.encodeSQLText(webServer.requestDomain) + "," + db.encodeSQLText(webServer.requestPath) + "," + db.encodeSQLText(webServer.requestPage) + "," + db.encodeSQLText(webServer.requestQueryString.Left(255)) + "," + db.encodeSQLText(requestFormSerialized.Left(255)) + "," + db.encodeSQLText(webServer.requestReferrer.Left(255)) + "," + db.encodeSQLDate(doc.profileStartTime) + "," + db.encodeSQLBoolean(doc.sessionContext.visit_stateOK) + "," + db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(this, "Viewings")) + "," + db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) + ",1"
                                         + "," + db.encodeSQLNumber(0) + "," + db.encodeSQLNumber(PageID);
                                     SQL += "," + db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics);
                                     SQL += "," + db.encodeSQLText(pagetitle);

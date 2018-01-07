@@ -237,7 +237,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         public static void logActivity2(coreClass cpcore, string Message, int SubjectMemberID, int SubjectOrganizationID) {
-            logActivity(cpcore, Message, cpcore.doc.sessionContext.user.id, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.requestUrl, cpcore.doc.sessionContext.visitor.ID, cpcore.doc.sessionContext.visit.id);
+            logActivity(cpcore, Message, cpcore.doc.sessionContext.user.id, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.requestUrl, cpcore.doc.sessionContext.visitor.id, cpcore.doc.sessionContext.visit.id);
         }
         //
         //

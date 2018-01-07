@@ -353,122 +353,89 @@ namespace Contensive.Core.Controllers {
                     //   verify Domain table entry
                     bool updateDomainCache = false;
                     //
-                    cpCore.domainLegacyCache.domainDetails.name = requestDomain;
-                    cpCore.domainLegacyCache.domainDetails.rootPageId = 0;
-                    cpCore.domainLegacyCache.domainDetails.noFollow = false;
-                    cpCore.domainLegacyCache.domainDetails.typeId = 1;
-                    cpCore.domainLegacyCache.domainDetails.visited = false;
-                    cpCore.domainLegacyCache.domainDetails.id = 0;
-                    cpCore.domainLegacyCache.domainDetails.forwardUrl = "";
-                    //
-                    // REFACTOR -- move to cpcore.domains class 
-                    cpCore.domainLegacyCache.domainDetailsList = cpCore.cache.getObject<Dictionary<string, domainLegacyModel.domainDetailsClass>>("domainContentList");
-                    if (cpCore.domainLegacyCache.domainDetailsList == null) {
+                    cpCore.domain.name = requestDomain;
+                    cpCore.domain.rootPageId = 0;
+                    cpCore.domain.noFollow = false;
+                    cpCore.domain.typeId = 1;
+                    cpCore.domain.visited = false;
+                    cpCore.domain.id = 0;
+                    cpCore.domain.forwardUrl = ""; 
+                    cpCore.domainDictionary = cpCore.cache.getObject<Dictionary<string, domainModel>>("domainContentList");
+                    if (cpCore.domainDictionary == null) {
                         //
                         //  no cache found, build domainContentList from database
-                        cpCore.domainLegacyCache.domainDetailsList = new Dictionary<string, domainLegacyModel.domainDetailsClass>();
-                        List<Models.Entity.domainModel> domainList = domainModel.createList(cpCore, "(active<>0)and(name is not null)");
-                        foreach (var domain in domainList) {
-                            domainLegacyModel.domainDetailsClass domainDetailsNew = new domainLegacyModel.domainDetailsClass();
-                            domainDetailsNew.name = domain.name;
-                            domainDetailsNew.rootPageId = domain.RootPageID;
-                            domainDetailsNew.noFollow = domain.NoFollow;
-                            domainDetailsNew.typeId = domain.TypeID;
-                            domainDetailsNew.visited = domain.Visited;
-                            domainDetailsNew.id = domain.id;
-                            domainDetailsNew.forwardUrl = domain.ForwardURL;
-                            domainDetailsNew.defaultTemplateId = domain.DefaultTemplateId;
-                            domainDetailsNew.pageNotFoundPageId = domain.PageNotFoundPageID;
-                            domainDetailsNew.forwardDomainId = domain.forwardDomainId;
-                            if (cpCore.domainLegacyCache.domainDetailsList.ContainsKey(domain.name.ToLower())) {
-                                //
-                                logController.appendLog(cpCore, "Duplicate domain record found when adding domains from table [" + domain.name.ToLower() + "], duplicate skipped.");
-                                //
-                            } else {
-                                cpCore.domainLegacyCache.domainDetailsList.Add(domain.name.ToLower(), domainDetailsNew);
-                            }
-                        }
+                        cpCore.domainDictionary = domainModel.createDictionary(cpCore, "(active<>0)and(name is not null)");
                         updateDomainCache = true;
                     }
                     //
                     // verify app config domainlist is in the domainlist cache
-                    //
                     foreach (string domain in cpCore.serverConfig.appConfig.domainList) {
-                        if (!cpCore.domainLegacyCache.domainDetailsList.ContainsKey(domain.ToLower())) {
-                            domainLegacyModel.domainDetailsClass domainDetailsNew = new domainLegacyModel.domainDetailsClass();
-                            domainDetailsNew.name = domain;
-                            domainDetailsNew.rootPageId = 0;
-                            domainDetailsNew.noFollow = false;
-                            domainDetailsNew.typeId = 1;
-                            domainDetailsNew.visited = false;
-                            domainDetailsNew.id = 0;
-                            domainDetailsNew.forwardUrl = "";
-                            domainDetailsNew.defaultTemplateId = 0;
-                            domainDetailsNew.pageNotFoundPageId = 0;
-                            domainDetailsNew.forwardDomainId = 0;
-                            if (cpCore.domainLegacyCache.domainDetailsList.ContainsKey(domain.ToLower())) {
-                                //
-                                logController.appendLog(cpCore, "Duplicate domain record found when adding appConfig.domainList [" + domain.ToLower() + "], duplicate skipped");
-                                //
-                            } else {
-                                cpCore.domainLegacyCache.domainDetailsList.Add(domain.ToLower(), domainDetailsNew);
-                            }
+                        if (!cpCore.domainDictionary.ContainsKey(domain.ToLower())) {
+                            var newDomain = domainModel.add(cpCore);
+                            newDomain.name = domain;
+                            newDomain.rootPageId = 0;
+                            newDomain.noFollow = false;
+                            newDomain.typeId = 1;
+                            newDomain.visited = false;
+                            newDomain.forwardUrl = "";
+                            newDomain.defaultTemplateId = 0;
+                            newDomain.pageNotFoundPageId = 0;
+                            newDomain.forwardDomainId = 0;
+                            newDomain.defaultRouteId = cpCore.siteProperties.getInteger("");
+                            cpCore.domainDictionary.Add(domain.ToLower(), newDomain);
+                            updateDomainCache = true;
                         }
                     }
-                    if (!cpCore.domainLegacyCache.domainDetailsList.ContainsKey(requestDomain.ToLower())) {
-                        //
-                        // -- domain not found
-                        // -- current host not in domainContent, add it and re-save the cache
-                        domainLegacyModel.domainDetailsClass domainDetailsNew = new domainLegacyModel.domainDetailsClass();
-                        domainDetailsNew.name = requestDomain;
-                        domainDetailsNew.rootPageId = 0;
-                        domainDetailsNew.noFollow = false;
-                        domainDetailsNew.typeId = 1;
-                        domainDetailsNew.visited = false;
-                        domainDetailsNew.id = 0;
-                        domainDetailsNew.forwardUrl = "";
-                        domainDetailsNew.defaultTemplateId = 0;
-                        domainDetailsNew.pageNotFoundPageId = 0;
-                        domainDetailsNew.forwardDomainId = 0;
-                        cpCore.domainLegacyCache.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew);
-                        //
-                        // -- update database
-                        domainModel domain = domainModel.add(cpCore);
-                        cpCore.domainLegacyCache.domainDetails.id = domain.id;
-                        domain.name = requestDomain;
-                        domain.TypeID = 1;
-                        domain.save(cpCore);
-                        //
+                    //
+                    // -- verify request domain
+                    if (!cpCore.domainDictionary.ContainsKey(requestDomain.ToLower())) {
+                        var newDomain = domainModel.add( cpCore );
+                        newDomain.name = requestDomain;
+                        newDomain.rootPageId = 0;
+                        newDomain.noFollow = false;
+                        newDomain.typeId = 1;
+                        newDomain.visited = false;
+                        newDomain.forwardUrl = "";
+                        newDomain.defaultTemplateId = 0;
+                        newDomain.pageNotFoundPageId = 0;
+                        newDomain.forwardDomainId = 0;
+                        newDomain.save(cpCore);
+                        cpCore.domainDictionary.Add(requestDomain.ToLower(), newDomain);
                         updateDomainCache = true;
+                    }
+                    if (updateDomainCache) {
+                        //
+                        // if there was a change, update the cache
+                        //
+                        cpCore.cache.setObject("domainContentList", cpCore.domainDictionary, "domains");
                     }
                     //
                     // domain found
                     //
-                    cpCore.domainLegacyCache.domainDetails = cpCore.domainLegacyCache.domainDetailsList[requestDomain.ToLower()];
-                    if (cpCore.domainLegacyCache.domainDetails.id == 0) {
+                    cpCore.domain = cpCore.domainDictionary[requestDomain.ToLower()];
+                    if (cpCore.domain.id == 0) {
                         //
                         // this is a default domain or a new domain -- add to the domain table
-                        //
-                        domainModel domain = new domainModel() {
+                        var domain = new domainModel() {
                             name = requestDomain,
-                            TypeID = 1,
-                            RootPageID = cpCore.domainLegacyCache.domainDetails.rootPageId,
-                            ForwardURL = cpCore.domainLegacyCache.domainDetails.forwardUrl,
-                            NoFollow = cpCore.domainLegacyCache.domainDetails.noFollow,
-                            Visited = cpCore.domainLegacyCache.domainDetails.visited,
-                            DefaultTemplateId = cpCore.domainLegacyCache.domainDetails.defaultTemplateId,
-                            PageNotFoundPageID = cpCore.domainLegacyCache.domainDetails.pageNotFoundPageId
+                            typeId = 1,
+                            rootPageId = cpCore.domain.rootPageId,
+                            forwardUrl = cpCore.domain.forwardUrl,
+                            noFollow = cpCore.domain.noFollow,
+                            visited = cpCore.domain.visited,
+                            defaultTemplateId = cpCore.domain.defaultTemplateId,
+                            pageNotFoundPageId = cpCore.domain.pageNotFoundPageId
                         };
-                        cpCore.domainLegacyCache.domainDetails.id = domain.id;
+                        cpCore.domain.id = domain.id;
                     }
-                    if (!cpCore.domainLegacyCache.domainDetails.visited) {
+                    if (!cpCore.domain.visited) {
                         //
                         // set visited true
                         //
                         cpCore.db.executeQuery("update ccdomains set visited=1 where name=" + cpCore.db.encodeSQLText(requestDomain));
-                        cpCore.cache.setObject("domainContentList", "", "domains");
+                        cpCore.cache.invalidate("domainContentList");
                     }
-                    if (cpCore.domainLegacyCache.domainDetails.typeId == 1) {
+                    if (cpCore.domain.typeId == 1) {
                         //
                         // normal domain, leave it
                         //
@@ -476,42 +443,34 @@ namespace Contensive.Core.Controllers {
                         //
                         // forwarding does not work in the admin site
                         //
-                    } else if ((cpCore.domainLegacyCache.domainDetails.typeId == 2) && (cpCore.domainLegacyCache.domainDetails.forwardUrl != "")) {
+                    } else if ((cpCore.domain.typeId == 2) && (cpCore.domain.forwardUrl != "")) {
                         //
                         // forward to a URL
                         //
                         //
                         //Call AppendLog("main_init(), 1710 - exit for domain forward")
                         //
-                        if (genericController.vbInstr(1, cpCore.domainLegacyCache.domainDetails.forwardUrl, "://") == 0) {
-                            cpCore.domainLegacyCache.domainDetails.forwardUrl = "http://" + cpCore.domainLegacyCache.domainDetails.forwardUrl;
+                        if (genericController.vbInstr(1, cpCore.domain.forwardUrl, "://") == 0) {
+                            cpCore.domain.forwardUrl = "http://" + cpCore.domain.forwardUrl;
                         }
-                        redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" + cpCore.domainLegacyCache.domainDetails.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this URL", false, false);
+                        redirect(cpCore.domain.forwardUrl, "Forwarding to [" + cpCore.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this URL", false, false);
                         return cpCore.doc.continueProcessing;
-                    } else if ((cpCore.domainLegacyCache.domainDetails.typeId == 3) && (cpCore.domainLegacyCache.domainDetails.forwardDomainId != 0) & (cpCore.domainLegacyCache.domainDetails.forwardDomainId != cpCore.domainLegacyCache.domainDetails.id)) {
+                    } else if ((cpCore.domain.typeId == 3) && (cpCore.domain.forwardDomainId != 0) & (cpCore.domain.forwardDomainId != cpCore.domain.id)) {
                         //
                         // forward to a replacement domain
                         //
-                        string forwardDomain = cpCore.db.getRecordName("domains", cpCore.domainLegacyCache.domainDetails.forwardDomainId);
+                        string forwardDomain = cpCore.db.getRecordName("domains", cpCore.domain.forwardDomainId);
                         if (!string.IsNullOrEmpty(forwardDomain)) {
                             int pos = requestUrlSource.IndexOf( requestDomain ,0,1,StringComparison.CurrentCultureIgnoreCase);
                             if (pos > 0) {
-                                cpCore.domainLegacyCache.domainDetails.forwardUrl = requestUrlSource.ToString().Left( pos - 1) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length) - 1);
-                                redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" + cpCore.domainLegacyCache.domainDetails.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
+                                cpCore.domain.forwardUrl = requestUrlSource.ToString().Left( pos - 1) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length) - 1);
+                                redirect(cpCore.domain.forwardUrl, "Forwarding to [" + cpCore.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
                                 return cpCore.doc.continueProcessing;
                             }
                         }
                     }
-                    if (cpCore.domainLegacyCache.domainDetails.noFollow) {
+                    if (cpCore.domain.noFollow) {
                         response_NoFollow = true;
-                    }
-                    if (updateDomainCache) {
-                        //
-                        // if there was a change, update the cache
-                        //
-                        cpCore.cache.setObject("domainContentList", cpCore.domainLegacyCache.domainDetailsList, "domains");
-                        //domainDetailsListText = cpCore.json.Serialize(cpCore.domains.domainDetailsList)
-                        //Call cpCore.cache.setObject("domainContentList", domainDetailsListText, "domains")
                     }
                     //
                     requestVirtualFilePath = "/" + cpCore.serverConfig.appConfig.name;
@@ -998,7 +957,8 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     if (!found) {
-                        iisManager.Sites.Add(appName, "http", "*:80:" + appName, phyPath);
+                        iisManager.Sites.Add(appName, phyPath, 80);
+                        //iisManager.Sites.Add(appName, "http", "*:80:" + appName, phyPath);
                     }
                     site = iisManager.Sites[appName];
                     //

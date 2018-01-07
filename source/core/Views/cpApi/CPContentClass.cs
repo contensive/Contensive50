@@ -296,18 +296,18 @@ namespace Contensive.Core {
             field.set_ManyToManyRuleContentName(cpCore, "");
             field.ManyToManyRulePrimaryField = "";
             field.ManyToManyRuleSecondaryField = "";
-            field.MemberSelectGroupID = 0;
+            field.memberSelectGroupId_set( cpCore, 0 );
             field.nameLc = FieldName.ToLower();
-            field.Password = false;
-            field.ReadOnly = false;
-            field.RedirectContentID = 0;
+            field.password = false;
+            field.readOnly = false;
+            field.redirectContentID = 0;
             field.set_RedirectContentName(cpCore, "");
-            field.RedirectID = "";
-            field.RedirectPath = "";
-            field.Required = false;
+            field.redirectID = "";
+            field.redirectPath = "";
+            field.required = false;
             field.Scramble = false;
-            field.TextBuffered = false;
-            field.UniqueName = false;
+            field.textBuffered = false;
+            field.uniqueName = false;
             return Models.Complex.cdefModel.verifyCDefField_ReturnID(cpCore, ContentName, field);
         }
         //

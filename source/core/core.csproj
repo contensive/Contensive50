@@ -194,6 +194,7 @@
     <Compile Include="Models\Entity\emailTemplateModel.cs" />
     <Compile Include="Models\Entity\visitModel.cs" />
     <Compile Include="Models\Entity\pageTemplateModel.cs" />
+    <Compile Include="Models\Entity\visitorModel.cs" />
     <Compile Include="Views\coreClass.cs" />
     <Compile Include="Views\cpApi\CPAddonClass.cs" />
     <Compile Include="Views\cpApi\CPBlockClass.cs" />
@@ -259,7 +260,7 @@
     <Compile Include="Models\Entity\tableModel.cs" />
     <Compile Include="Models\Entity\TemplateDomainRuleModel.cs" />
     <Compile Include="Models\Entity\visitModelx.cs" />
-    <Compile Include="Models\Entity\visitorModel.cs" />
+    <Compile Include="Models\Entity\visitorModelx.cs" />
     <Compile Include="Models\Entity\copyContentModel.cs" />
     <Compile Include="Models\Entity\layoutModel.cs" />
     <Compile Include="Models\Entity\_blankModel.cs" />

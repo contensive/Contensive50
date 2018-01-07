@@ -451,7 +451,7 @@ namespace Contensive.Core {
         //Public Const HardCodedPageGetJSLogin As String = "getjslogin"
         public const string HardCodedPageRedirect = "redirect";
         public const string HardCodedPageExportAscii = "exportascii";
-        public const string HardCodedPagePayPalConfirm = "paypalconfirm";
+        //public const string HardCodedPagePayPalConfirm = "paypalconfirm";
         public const string HardCodedPageSendPassword = "sendpassword";
         //
         //-----------------------------------------------------------------------
