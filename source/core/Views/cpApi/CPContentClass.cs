@@ -204,7 +204,7 @@ namespace Contensive.Core {
             try {
                 csController cs = new csController(cpCore);
                 cs.open("layouts", "name=" + cp.Db.EncodeSQLText(layoutName), "id", false, "layout");
-                if (cs.OK()) {
+                if (cs.ok()) {
                     result = cs.getText("layout");
                 }
                 cs.Close();
@@ -221,7 +221,7 @@ namespace Contensive.Core {
             int recordId = 0;
             try {
                 csController cs = new csController(cpCore);
-                if (cs.Insert(ContentName)) {
+                if (cs.insert(ContentName)) {
                     cs.setField("name", recordName);
                     recordId = cs.getInteger("id");
                 }
@@ -243,7 +243,7 @@ namespace Contensive.Core {
             int recordId = 0;
             try {
                 csController cs = new csController(cpCore);
-                if (cs.Insert(ContentName)) {
+                if (cs.insert(ContentName)) {
                     recordId = cs.getInteger("id");
                 }
                 cs.Close();

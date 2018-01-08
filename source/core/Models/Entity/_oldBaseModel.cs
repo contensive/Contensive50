@@ -202,7 +202,7 @@ namespace Contensive.Core.Models.Entity {
         private static oldBaseModel loadRecord(coreClass cpCore, csController cs, ref List<string> callersCacheNameList) {
             oldBaseModel instance = null;
             try {
-                if (cs.OK()) {
+                if (cs.ok()) {
                     instance = new oldBaseModel();
                     foreach (PropertyInfo resultProperty in instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         switch (resultProperty.Name.ToLower()) {
@@ -272,7 +272,7 @@ namespace Contensive.Core.Models.Entity {
                         throw new ApplicationException(message);
                     }
                 } else {
-                    if (!cs.Insert(primaryContentName)) {
+                    if (!cs.insert(primaryContentName)) {
                         cs.Close();
                         id = 0;
                         throw new ApplicationException("Unable to insert record in content [" + primaryContentName + "]");
@@ -421,7 +421,7 @@ namespace Contensive.Core.Models.Entity {
                             result.Add(instance);
                         }
                         cs.goNext();
-                    } while (cs.OK());
+                    } while (cs.ok());
                 }
                 cs.Close();
             } catch (Exception ex) {

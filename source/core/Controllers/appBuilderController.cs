@@ -308,30 +308,29 @@ namespace Contensive.Core.Controllers {
                     logController.appendLogInstall(cpcore, "Verify iis configuration");
                     Controllers.iisController.verifySite(cpcore, cpcore.serverConfig.appConfig.name, primaryDomain, cpcore.serverConfig.appConfig.appRootFilesPath, "default.aspx");
                     //
+                    // -- verify root developer
+                    logController.appendLogInstall(cpcore, "verify developer user");
+                    var rootList = personModel.createList(cpcore, "(Developer<>0)");
+                    if ( rootList.Count==0 ) {
+                        logController.appendLogInstall(cpcore, "verify root user, no developers found, adding root/contensive");
+                        var root = personModel.add(cpcore);
+                        root.name = "root";
+                        root.FirstName = "root";
+                        root.Username = "root";
+                        root.Password = "contensive";
+                        root.Developer = true;
+                        root.save(cpcore);
+                    }
+                    //
                     //---------------------------------------------------------------------
                     // ----- Convert Database fields for new Db
                     //---------------------------------------------------------------------
                     //
                     if (isNewBuild) {
                         //
-                        // -- verify root developer
-                        logController.appendLogInstall(cpcore, "New build, verify root user");
-                        int cid = Models.Complex.cdefModel.getContentId(cpcore, "people");
-                        DataTable dt = cpcore.db.executeQuery("select id from ccmembers where (Developer<>0)");
-                        if (dt.Rows.Count == 0) {
-                            string SQL = ""
-                                + "insert into ccmembers"
-                                + " (active,contentcontrolid,name,firstName,username,password,developer,admin,AllowToolsPanel,AllowBulkEmail,AutoLogin)"
-                                + " values (1," + cid + ",'root','root','root','contensive',1,1,1,1,1)"
-                                + ""
-                                + ""
-                                + "";
-                            cpcore.db.executeQuery(SQL);
-                        }
-                        //
                         // -- Copy default styles into Template Styles
-                        logController.appendLogInstall(cpcore, "New build, verify legacy styles");
-                        cpcore.appRootFiles.copyFile("ccLib\\Config\\Styles.css", "Templates\\Styles.css", cpcore.cdnFiles);
+                        //logController.appendLogInstall(cpcore, "New build, verify legacy styles");
+                        //cpcore.appRootFiles.copyFile("ccLib\\Config\\Styles.css", "Templates\\Styles.css", cpcore.cdnFiles);
                         //
                         // -- set build version so a scratch build will not go through data conversion
                         DataBuildVersion = cpcore.codeVersion();

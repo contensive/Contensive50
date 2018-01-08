@@ -191,6 +191,7 @@
     <Import Include="System.Web.UI.HtmlControls" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ClearScriptV8-32.dll" />
     <Content Include="contensiveBase\arrowUpDown.png" />
     <Content Include="contensiveBase\base.js" />
     <Content Include="contensiveBase\base.css" />
@@ -217,7 +218,6 @@
     <Content Include="ccLib\Config\DefaultValues.txt" />
     <Content Include="ccLib\Config\Filters.txt" />
     <Content Include="ccLib\Config\isoCountryList.txt" />
-    <Content Include="ccLib\Config\styles.css" />
     <Content Include="ccLib\images\2x2.gif" />
     <Content Include="ccLib\images\3ohguy.gif" />
     <Content Include="ccLib\images\808080.gif" />
@@ -684,6 +684,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="quickEditor\styles.css" />
+    <Content Include="v8-base-ia32.dll" />
+    <Content Include="v8-ia32.dll" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -875,13 +877,8 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>$(SolutionDir)scripts\aspnetDefaultAppPostBuild.bat
-
-
-if not exist "$(TargetDir)" md "$(TargetDir)"
-xcopy /s /y "$(SolutionDir)packages\ClearScript.V8.5.5.0\tools\native\x86\*.*" "$(TargetDir)"
-if not exist "$(TargetDir)" md "$(TargetDir)"
-xcopy /s /y "$(SolutionDir)packages\ClearScript.V8.5.5.0\tools\native\amd64\*.*" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\NETStandard.Library.2.0.1\build\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\NETStandard.Library.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

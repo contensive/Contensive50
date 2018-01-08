@@ -253,7 +253,7 @@ namespace Contensive.Core.Models.Entity {
                 do {
                     result.Add(cs.getInteger("id"));
                     cs.goNext();
-                } while (cs.OK());
+                } while (cs.ok());
             }
             cs.Close();
             return result;

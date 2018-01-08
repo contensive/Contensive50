@@ -1924,7 +1924,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="OriginalFilename"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public string csGetFilename(int CSPointer, string FieldName, string OriginalFilename, string ContentName = "", int fieldTypeId = 0) {
+        public string csGetFieldFilename(int CSPointer, string FieldName, string OriginalFilename, string ContentName = "", int fieldTypeId = 0) {
             string returnFilename = "";
             try {
                 string TableName = null;
@@ -2038,40 +2038,83 @@ namespace Contensive.Core.Controllers {
             return returnFilename;
         }
         //
+        //====================================================================================================
         //   csv_cs_getText
         //
         public string csGetText(int CSPointer, string FieldName) {
             return genericController.encodeText(cs_getValue(CSPointer, FieldName));
         }
         //
+        //====================================================================================================
         //   genericController.EncodeInteger( csv_cs_getField )
         //
         public int csGetInteger(int CSPointer, string FieldName) {
             return genericController.encodeInteger(cs_getValue(CSPointer, FieldName));
         }
         //
+        //====================================================================================================
         //   encodeNumber( csv_cs_getField )
         //
         public double csGetNumber(int CSPointer, string FieldName) {
             return genericController.encodeNumber(cs_getValue(CSPointer, FieldName));
         }
         //
+        //====================================================================================================
         //    genericController.EncodeDate( csv_cs_getField )
         //
         public DateTime csGetDate(int CSPointer, string FieldName) {
             return genericController.encodeDate(cs_getValue(CSPointer, FieldName));
         }
         //
+        //====================================================================================================
         //   genericController.EncodeBoolean( csv_cs_getField )
         //
         public bool csGetBoolean(int CSPointer, string FieldName) {
             return genericController.encodeBoolean(cs_getValue(CSPointer, FieldName));
         }
         //
+        //====================================================================================================
         //   genericController.EncodeBoolean( csv_cs_getField )
         //
         public string csGetLookup(int CSPointer, string FieldName) {
             return csGet(CSPointer, FieldName);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// if the field uses an underlying filename, use this method to set that filename. The content for the field will switch to that contained by the new file
+        /// </summary>
+        /// <param name="CSPointer"></param>
+        /// <param name="FieldName"></param>
+        /// <param name="filename"></param>
+        public void csSetFieldFilename( int CSPointer, string FieldName, string filename) {
+            try {
+                if (!csOk(CSPointer)) {
+                    throw new ArgumentException("dataset is not valid");
+                } else if (string.IsNullOrEmpty(FieldName)) {
+                    throw new ArgumentException("fieldName cannot be blank");
+                } else {
+                    var contentSet = contentSetStore[CSPointer];
+                    if (!contentSet.Updateable) {
+                        throw new ApplicationException("Cannot set fields for a dataset based on a query.");
+                    } else if (contentSet.CDef == null) {
+                        throw new ApplicationException("Cannot set fields for a dataset based on a query.");
+                    } else if (contentSet.CDef.fields == null) {
+                        throw new ApplicationException("The dataset contains no fields.");
+                    } else if (!contentSet.CDef.fields.ContainsKey(FieldName.ToLower())) {
+                        throw new ApplicationException("The dataset does not contain the field specified [" + FieldName.ToLower() + "].");
+                    } else { 
+                        if (contentSet.writeCache.ContainsKey(FieldName.ToLower())) {
+                            contentSet.writeCache[FieldName.ToLower()] = filename;
+                        } else {
+                            contentSet.writeCache.Add(FieldName.ToLower(), filename);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
         }
         //
         //====================================================================================
@@ -2098,7 +2141,7 @@ namespace Contensive.Core.Controllers {
                         throw new ApplicationException("Attempting To update an unupdateable data set");
                     } else {
                         string OldFilename = csGetText(CSPointer, FieldName);
-                        string Filename = csGetFilename(CSPointer, FieldName, "", ContentName, constants.FieldTypeIdFileText);
+                        string Filename = csGetFieldFilename(CSPointer, FieldName, "", ContentName, constants.FieldTypeIdFileText);
                         if (OldFilename != Filename) {
                             //
                             // Filename changed, mark record changed
@@ -2517,10 +2560,10 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // ----- cdn file
                                         //
-                                        SourceFilename = csGetFilename(CSSource, FieldName, "", contentSetStore[CSDestination].CDef.Name, sourceFieldTypeId);
+                                        SourceFilename = csGetFieldFilename(CSSource, FieldName, "", contentSetStore[CSDestination].CDef.Name, sourceFieldTypeId);
                                         //SourceFilename = (csv_cs_getText(CSSource, FieldName))
                                         if (!string.IsNullOrEmpty(SourceFilename)) {
-                                            DestFilename = csGetFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId);
+                                            DestFilename = csGetFieldFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId);
                                             //DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
                                             csSet(CSDestination, FieldName, DestFilename);
                                             cpCore.cdnFiles.copyFile(SourceFilename, DestFilename);
@@ -2531,10 +2574,10 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // ----- private file
                                         //
-                                        SourceFilename = csGetFilename(CSSource, FieldName, "", DestContentName, sourceFieldTypeId);
+                                        SourceFilename = csGetFieldFilename(CSSource, FieldName, "", DestContentName, sourceFieldTypeId);
                                         //SourceFilename = (csv_cs_getText(CSSource, FieldName))
                                         if (!string.IsNullOrEmpty(SourceFilename)) {
-                                            DestFilename = csGetFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId);
+                                            DestFilename = csGetFieldFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId);
                                             //DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
                                             csSet(CSDestination, FieldName, DestFilename);
                                             cpCore.cdnFiles.copyFile(SourceFilename, DestFilename);
@@ -2801,7 +2844,7 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// Saves the value to the field, independant of field type, this routine accounts for the destination type, and saves the field as required (file, etc)
+        /// Saves the value for the field. If the field uses a file, the content is saved to the file using the fields filename. To set a file-based field's filename, use setFieldFilename
         /// </summary>
         /// <param name="CSPointer"></param>
         /// <param name="FieldName"></param>
@@ -2879,7 +2922,7 @@ namespace Contensive.Core.Controllers {
                                             }
                                         } else {
                                             if (string.IsNullOrEmpty(fileNameNoExt)) {
-                                                fileNameNoExt = csGetFilename(CSPointer, FieldName, "", ContentName, field.fieldTypeId);
+                                                fileNameNoExt = csGetFieldFilename(CSPointer, FieldName, "", ContentName, field.fieldTypeId);
                                             }
                                             cpCore.cdnFiles.saveFile(fileNameNoExt, FieldValue);
                                             //Call publicFiles.SaveFile(fileNameNoExt, FieldValue)
@@ -2912,7 +2955,7 @@ namespace Contensive.Core.Controllers {
                                             }
                                         } else {
                                             if (string.IsNullOrEmpty(PathFilename)) {
-                                                PathFilename = csGetFilename(CSPointer, FieldNameLc, "", ContentName, field.fieldTypeId);
+                                                PathFilename = csGetFieldFilename(CSPointer, FieldNameLc, "", ContentName, field.fieldTypeId);
                                             }
                                             if (PathFilename.Left( 1) == "/") {
                                                 //
@@ -5255,6 +5298,71 @@ namespace Contensive.Core.Controllers {
                 }
             }
             return result;
+        }
+        //
+        //====================================================================================================
+        //
+        public void cs_setFormInput(coreClass cpcore, int CSPointer, string FieldName, string RequestName = "") {
+            string LocalRequestName = null;
+            string Filename = null;
+            string Path = null;
+            //
+            //If Not (true) Then Exit Sub
+            //
+            if (!cpcore.db.csOk(CSPointer)) {
+                throw new ApplicationException("ContentSetPointer is invalid, empty, or end-of-file");
+            } else if (string.IsNullOrEmpty(FieldName.Trim(' '))) {
+                throw new ApplicationException("FieldName is invalid or blank");
+            } else {
+                LocalRequestName = RequestName;
+                if (string.IsNullOrEmpty(LocalRequestName)) {
+                    LocalRequestName = FieldName;
+                }
+                switch (cpcore.db.cs_getFieldTypeId(CSPointer, FieldName)) {
+                    case FieldTypeIdBoolean:
+                        //
+                        // Boolean
+                        //
+                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getBoolean(LocalRequestName));
+                        break;
+                    case FieldTypeIdCurrency:
+                    case FieldTypeIdFloat:
+                    case FieldTypeIdInteger:
+                    case FieldTypeIdLookup:
+                    case FieldTypeIdManyToMany:
+                        //
+                        // Numbers
+                        //
+                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getNumber(LocalRequestName));
+                        break;
+                    case FieldTypeIdDate:
+                        //
+                        // Date
+                        //
+                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getDate(LocalRequestName));
+                        break;
+                    case FieldTypeIdFile:
+                    case FieldTypeIdFileImage:
+                        //
+                        //
+                        //
+                        Filename = cpcore.docProperties.getText(LocalRequestName);
+                        if (!string.IsNullOrEmpty(Filename)) {
+                            Path = cpcore.db.csGetFieldFilename(CSPointer, FieldName, Filename, "", cpcore.db.cs_getFieldTypeId(CSPointer, FieldName));
+                            cpcore.db.csSet(CSPointer, FieldName, Path);
+                            Path = genericController.vbReplace(Path, "\\", "/");
+                            Path = genericController.vbReplace(Path, "/" + Filename, "");
+                            cpcore.appRootFiles.upload(LocalRequestName, Path, ref Filename);
+                        }
+                        break;
+                    default:
+                        //
+                        // text files
+                        //
+                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getText(LocalRequestName));
+                        break;
+                }
+            }
         }
 
 

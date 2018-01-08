@@ -93,11 +93,11 @@ namespace Contensive.Core.Controllers {
                     throw (new ApplicationException("A group cannot be added with a blank name"));
                 } else {
                     cs.open("Groups", sqlCriteria, "", false, "id");
-                    IsAlreadyThere = cs.OK();
+                    IsAlreadyThere = cs.ok();
                     cs.Close();
                     if (!IsAlreadyThere) {
-                        cs.Insert("Groups");
-                        if (!cs.OK()) {
+                        cs.insert("Groups");
+                        if (!cs.ok()) {
                             throw (new ApplicationException("There was an error inserting a new group record"));
                         } else {
                             returnGroupId = cs.getInteger("id");
@@ -143,11 +143,11 @@ namespace Contensive.Core.Controllers {
                         }
                         using (csController cs = new csController(cpCore)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + groupId.ToString() + ")", "", false);
-                            if (!cs.OK()) {
+                            if (!cs.ok()) {
                                 cs.Close();
-                                cs.Insert("Member Rules");
+                                cs.insert("Member Rules");
                             }
-                            if (!cs.OK()) {
+                            if (!cs.ok()) {
                                 groupName = cpCore.db.getRecordName("groups", groupId);
                                 throw (new ApplicationException("Could not find or create the Member Rule to add this member [" + userid + "] to the Group [" + groupId + ", " + groupName + "]"));
                             } else {
@@ -192,11 +192,11 @@ namespace Contensive.Core.Controllers {
                         }
                         using (csController cs = new csController(cpCore)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + GroupID.ToString() + ")", "", false);
-                            if (!cs.OK()) {
+                            if (!cs.ok()) {
                                 cs.Close();
-                                cs.Insert("Member Rules");
+                                cs.insert("Member Rules");
                             }
-                            if (!cs.OK()) {
+                            if (!cs.ok()) {
                                 throw (new ApplicationException("Could not find or create the Member Rule to add this member [" + userid + "] to the Group [" + GroupID + ", " + groupNameOrGuid + "]"));
                             } else {
                                 cs.setField("active", "1");

@@ -48,25 +48,15 @@ namespace Contensive.Core {
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
                 if (disposing) {
-                    //
-                    // call .dispose for managed objects
-                    //
                     try {
                         if (cs != -1 && true) {
                             cpCore.db.csClose(ref cs);
                         }
-                        //If Not (False) Then
-                        //    Call cmc.asv.csv_CloseCS(CSPointer)
-                        //End If
-                    } catch (Exception ex) {
+                    } catch (Exception) {
                     }
                     cpCore = null;
                     cp = null;
                 }
-                //
-                // Add code here to release the unmanaged resource.
-                //
-                //csv = Nothing
             }
             this.disposed = true;
         }
@@ -75,7 +65,6 @@ namespace Contensive.Core {
         //
         public override bool Insert(string ContentName) {
             bool success = false;
-            //
             try {
                 if (cs != -1) {
                     cpCore.db.csClose(ref cs);
@@ -83,7 +72,7 @@ namespace Contensive.Core {
                 cs = cpCore.db.csInsertRecord(ContentName, OpeningMemberID);
                 success = cpCore.db.csOk(cs);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.insert")
+                cpCore.handleException(ex);
                 throw;
             }
             return success;
@@ -93,7 +82,6 @@ namespace Contensive.Core {
         //
         public override bool OpenRecord(string ContentName, int recordId, string SelectFieldList = "", bool ActiveOnly = true) {
             bool success = false;
-            //
             try {
                 if (cs != -1) {
                     cpCore.db.csClose(ref cs);
@@ -101,7 +89,7 @@ namespace Contensive.Core {
                 cs = cpCore.db.csOpen(ContentName, "id=" + recordId, "", ActiveOnly, 0, false, false, SelectFieldList, 1, 1);
                 success = cpCore.db.csOk(cs);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.OpenRecord")
+                cpCore.handleException(ex);
                 throw;
             }
             return success;
@@ -110,15 +98,12 @@ namespace Contensive.Core {
         //
         //
         public override bool Open(string ContentName, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, string SelectFieldList = "", int pageSize = 10, int PageNumber = 1) {
-            //Public Overrides Function Open(ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal SelectFieldList As String = "", Optional ByVal ignore As Integer = 10, Optional ByVal PageNumber As Integer = 1, Optional pageSize As Integer = 0) As Boolean
             bool success = false;
-            //
             try {
                 if (cs != -1) {
                     cpCore.db.csClose(ref cs);
                 }
                 if ((pageSize == 0) || (pageSize == 10)) {
-
                     // -- (hack) fix for interface issue that has default value 0. later add new method and deprecate
                     // -- pagesize=10, pageNumber=1 -- old code returns all records, new code only returns the first 10 records -- this in effect makes it not compatiblie
                     // -- if I change new cpBase to default pagesize=9999, the change is breaking and old code does not run
@@ -138,7 +123,6 @@ namespace Contensive.Core {
         //
         public override bool OpenGroupUsers(List<string> GroupList, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, int PageSize = 10, int PageNumber = 1) {
             bool success = false;
-            //
             try {
                 if (cs != -1) {
                     cpCore.db.csClose(ref cs);
@@ -156,7 +140,6 @@ namespace Contensive.Core {
         //
         public override bool OpenGroupUsers(string GroupName, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, int PageSize = 10, int PageNumber = 1) {
             bool success = false;
-            //
             try {
                 List<string> groupList = new List<string>();
                 groupList.Add(GroupName);
@@ -166,7 +149,7 @@ namespace Contensive.Core {
                 cs = cpCore.db.csOpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
                 success = OK();
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.OpenGroupUsers")
+                cpCore.handleException(ex);
                 throw;
             }
             return success;
@@ -176,7 +159,6 @@ namespace Contensive.Core {
         //
         public override bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, int PageSize = 10, int PageNumber = 1) {
             List<string> groupList = new List<string>();
-            //
             groupList.AddRange(GroupCommaList.Split(','));
             return OpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
         }
@@ -185,7 +167,6 @@ namespace Contensive.Core {
         //
         public override bool OpenSQL(string sql) {
             bool success = false;
-            //
             try {
                 if (cs != -1) {
                     cpCore.db.csClose(ref cs);
@@ -193,7 +174,7 @@ namespace Contensive.Core {
                 cs = cpCore.db.csOpenSql_rev("default", sql);
                 success = cpCore.db.csOk(cs);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.OpenSQL")
+                cpCore.handleException(ex);
                 throw;
             }
             return success;
@@ -203,23 +184,18 @@ namespace Contensive.Core {
         //
         public override bool OpenSQL(string sql, string DataSourcename, int PageSize = 10, int PageNumber = 1) {
             bool success = false;
-            //Dim swap As String
-            //
             try {
                 if (cs != -1) {
                     cpCore.db.csClose(ref cs);
                 }
                 if (((string.IsNullOrEmpty(sql)) || (sql.ToLower() == "default")) & (!string.IsNullOrEmpty(DataSourcename)) & (DataSourcename.ToLower() != "default")) {
-                    //
-                    // support legacy calls were the arguments were was backwards (datasourcename is sql and vise-versa)
-                    //
                     cs = cpCore.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
                 } else {
                     cs = cpCore.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
                 }
                 success = cpCore.db.csOk(cs);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.OpenSQL")
+                cpCore.handleException(ex);
                 throw;
             }
             return success;
@@ -229,23 +205,18 @@ namespace Contensive.Core {
         //
         public override bool OpenSQL2(string sql, string DataSourcename = "default", int PageSize = 10, int PageNumber = 1) {
             bool success = false;
-            //Dim swap As String
-            //
             try {
                 if (cs != -1) {
                     cpCore.db.csClose(ref cs);
                 }
                 if (((string.IsNullOrEmpty(sql)) || (sql.ToLower() == "default")) & (!string.IsNullOrEmpty(DataSourcename)) & (DataSourcename.ToLower() != "default")) {
-                    //
-                    // support legacy calls were the arguments were was backwards (datasourcename is sql and vise-versa)
-                    //
                     cs = cpCore.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
                 } else {
                     cs = cpCore.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
                 }
                 success = cpCore.db.csOk(cs);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.OpenSQL")
+                cpCore.handleException(ex);
                 throw;
             }
             return success;
@@ -260,7 +231,7 @@ namespace Contensive.Core {
                     cs = -1;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.Close")
+                cpCore.handleException(ex);
                 throw;
             }
         }
@@ -268,11 +239,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override object GetFormInput(string ContentName, string FieldName, string Height = "", string Width = "", string HtmlId = "") {
-            if (true) {
-                return cpCore.html.inputCs(cs, ContentName, FieldName, genericController.encodeInteger(Height), genericController.encodeInteger(Width), HtmlId);
-            } else {
-                return "";
-            }
+            return cpCore.html.inputCs(cs, ContentName, FieldName, genericController.encodeInteger(Height), genericController.encodeInteger(Width), HtmlId);
         }
         //
         //====================================================================================================
@@ -281,7 +248,7 @@ namespace Contensive.Core {
             try {
                 cpCore.db.csDeleteRecord(cs);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.Delete")
+                cpCore.handleException(ex);
                 throw;
             }
         }
@@ -289,15 +256,12 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override bool FieldOK(string FieldName) {
-            bool result = false;
-            //
             try {
-                result = cpCore.db.cs_isFieldSupported(cs, FieldName);
+                return cpCore.db.cs_isFieldSupported(cs, FieldName);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.FieldOK")
+                cpCore.handleException(ex);
                 throw;
             }
-            return result;
         }
         //
         //====================================================================================================
@@ -306,7 +270,7 @@ namespace Contensive.Core {
             try {
                 cpCore.db.cs_goFirst(cs, false);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.Delete")
+                cpCore.handleException(ex);
                 throw;
             }
         }
@@ -314,33 +278,23 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetAddLink(string PresetNameValueList = "", bool AllowPaste = false) {
-            object result = null;
-            //
             try {
-                result = cpCore.html.cs_getRecordAddLink(cs, PresetNameValueList, AllowPaste);
-                if (result == null) {
-                    result = "";
-                }
+                return cpCore.html.cs_getRecordAddLink(cs, PresetNameValueList, AllowPaste);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.GetAddLink")
+                cpCore.handleException(ex);
                 throw;
-                result = "";
             }
-            return encodeText(result);
         }
         //
         //====================================================================================================
         //
         public override bool GetBoolean(string FieldName) {
-            bool result = false;
-            //
             try {
-                result = cpCore.db.csGetBoolean(cs, FieldName);
+                return cpCore.db.csGetBoolean(cs, FieldName);
             } catch (Exception ex) {
                 cpCore.handleException(ex); // "Unexpected error in cs.GetBoolean")
                 throw;
             }
-            return result;
         }
         //
         //====================================================================================================
@@ -352,7 +306,6 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return DateTime.MinValue;
         }
         //
         //====================================================================================================
@@ -364,19 +317,17 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            //return string.Empty;
         }
         //
         //====================================================================================================
         //
         public override string GetFilename(string fieldName, string OriginalFilename = "", string ContentName = "") {
             try {
-                return cpCore.db.csGetFilename(cs, fieldName, OriginalFilename, ContentName);
+                return cpCore.db.csGetFieldFilename(cs, fieldName, OriginalFilename, ContentName);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
             }
-            return string.Empty;
         }
         //
         //====================================================================================================
@@ -388,7 +339,6 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return encodeInteger(string.Empty);
         }
         //
         //====================================================================================================
@@ -400,7 +350,6 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return encodeNumber(string.Empty);
         }
         //
         //====================================================================================================
@@ -412,7 +361,6 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return encodeInteger(string.Empty);
         }
         //
         //====================================================================================================
@@ -424,7 +372,6 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return string.Empty;
         }
         //
         //====================================================================================================
@@ -436,7 +383,6 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return string.Empty;
         }
         //
         //====================================================================================================
@@ -448,7 +394,6 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return string.Empty;
         }
         //
         //====================================================================================================
@@ -461,7 +406,6 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return string.Empty;
         }
         //
         //====================================================================================================
@@ -485,7 +429,6 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return false;
         }
         //
         //====================================================================================================
@@ -497,7 +440,6 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return false;
         }
         //
         //====================================================================================================
@@ -548,7 +490,7 @@ namespace Contensive.Core {
             try {
                 cpCore.db.csSet(cs, FieldName, FieldValue);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.SetField")
+                cpCore.handleException(ex);
                 throw;
             }
         }
@@ -559,7 +501,7 @@ namespace Contensive.Core {
             try {
                 cpCore.db.csSetTextFile(cs, FieldName, Copy, ContentName);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.SetFile")
+                cpCore.handleException(ex);
                 throw;
             }
         }
@@ -567,11 +509,10 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void SetFormInput(string FieldName, string RequestName = "") {
-            bool success = false;
             try {
-                csController.cs_setFormInput(cpCore, cs, FieldName, RequestName);
+                cpCore.db.cs_setFormInput(cpCore, cs, FieldName, RequestName);
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.SetFormInput")
+                cpCore.handleException(ex);
                 throw;
             }
         }

@@ -203,7 +203,7 @@ namespace Contensive.Core.Models.Entity {
         private static oldPageTemplateModel loadRecord(coreClass cpCore, csController cs, ref List<string> callersCacheNameList) {
             oldPageTemplateModel result = null;
             try {
-                if (cs.OK()) {
+                if (cs.ok()) {
                     result = new oldPageTemplateModel();
                     //
                     // -- populate result model
@@ -277,13 +277,13 @@ namespace Contensive.Core.Models.Entity {
                         throw new ApplicationException(message);
                     }
                 } else {
-                    if (!cs.Insert(primaryContentName)) {
+                    if (!cs.insert(primaryContentName)) {
                         cs.Close();
                         ID = 0;
                         throw new ApplicationException("Unable to insert record in content [" + primaryContentName + "]");
                     }
                 }
-                if (cs.OK()) {
+                if (cs.ok()) {
                     ID = cs.getInteger("id");
                     cs.setField("Active", Active.ToString());
                     cs.setField("BodyHTML", BodyHTML);
@@ -420,7 +420,7 @@ namespace Contensive.Core.Models.Entity {
                             result.Add(instance);
                         }
                         cs.goNext();
-                    } while (cs.OK());
+                    } while (cs.ok());
                 }
                 cs.Close();
             } catch (Exception ex) {

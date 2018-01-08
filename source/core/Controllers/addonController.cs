@@ -3822,7 +3822,7 @@ namespace Contensive.Core.Controllers {
                         // create event with Guid and id for name
                         //
                         cs.Close();
-                        cs.Insert("add-on Events");
+                        cs.insert("add-on Events");
                         cs.setField("ccguid", eventNameIdOrGuid);
                         cs.setField("name", "Event " + cs.getInteger("id").ToString());
                     } else if (!string.IsNullOrEmpty(eventNameIdOrGuid)) {
@@ -3830,11 +3830,11 @@ namespace Contensive.Core.Controllers {
                         // create event with name
                         //
                         cs.Close();
-                        cs.Insert("add-on Events");
+                        cs.insert("add-on Events");
                         cs.setField("name", eventNameIdOrGuid);
                     }
                 } else {
-                    while (cs.OK()) {
+                    while (cs.ok()) {
                         addonid = cs.getInteger("addonid");
                         if (addonid != 0) {
                             var addon = addonModel.create(cpCore, addonid);

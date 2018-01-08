@@ -193,7 +193,7 @@
     <Compile Include="Controllers\menuLiveTabController.cs" />
     <Compile Include="Controllers\menuTabController.cs" />
     <Compile Include="Controllers\menuTreeController.cs" />
-    <Compile Include="Controllers\pageContentController.0.cs" />
+    <Compile Include="Controllers\pageContentController.cs" />
     <Compile Include="Controllers\remoteQueryController.cs" />
     <Compile Include="Controllers\securityController.cs" />
     <Compile Include="Controllers\sitePropertiesController.cs" />

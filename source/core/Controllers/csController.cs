@@ -23,14 +23,14 @@ namespace Contensive.Core {
         //
         private Contensive.Core.coreClass cpCore;
         private int csPtr;
-        private int OpeningMemberID;
+        private int openingMemberID;
         protected bool disposed = false;
         //
         // Constructor - Initialize the Main and Csv objects
         //
         public csController(coreClass cpCore) {
             this.cpCore = cpCore;
-            OpeningMemberID = cpCore.doc.sessionContext.user.id;
+            openingMemberID = cpCore.doc.sessionContext.user.id;
         }
         //
         //====================================================================================================
@@ -59,13 +59,13 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool Insert(string ContentName) {
+        public bool insert(string ContentName) {
             bool success = false;
             try {
                 if (csPtr != -1) {
                     cpCore.db.csClose(ref csPtr);
                 }
-                csPtr = cpCore.db.csInsertRecord(ContentName, OpeningMemberID);
+                csPtr = cpCore.db.csInsertRecord(ContentName, openingMemberID);
                 success = cpCore.db.csOk(csPtr);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -75,7 +75,7 @@ namespace Contensive.Core {
         }
         //
         //====================================================================================================
-        public bool OpenRecord(string ContentName, int recordId, string SelectFieldList = "", bool ActiveOnly = true) {
+        public bool openRecord(string ContentName, int recordId, string SelectFieldList = "", bool ActiveOnly = true) {
             bool success = false;
             try {
                 if (csPtr != -1) {
@@ -114,7 +114,7 @@ namespace Contensive.Core {
                     cpCore.db.csClose(ref csPtr);
                 }
                 csPtr = cpCore.db.csOpenGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
-                success = OK();
+                success = ok();
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -132,7 +132,7 @@ namespace Contensive.Core {
                     cpCore.db.csClose(ref csPtr);
                 }
                 csPtr = cpCore.db.csOpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
-                success = OK();
+                success = ok();
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -260,10 +260,18 @@ namespace Contensive.Core {
         }
         //
         //====================================================================================================
-        public string getFilename(string FieldName, string OriginalFilename = "", string ContentName = "", int fieldTypeId = 0) {
+        /// <summary>
+        /// if the field is backed by a filename, use this method to read the filename
+        /// </summary>
+        /// <param name="FieldName"></param>
+        /// <param name="OriginalFilename"></param>
+        /// <param name="ContentName"></param>
+        /// <param name="fieldTypeId"></param>
+        /// <returns></returns>
+        public string getFieldFilename(string FieldName, string OriginalFilename = "", string ContentName = "", int fieldTypeId = 0) {
             string result = "";
             try {
-                result = cpCore.db.csGetFilename(csPtr, FieldName, OriginalFilename, ContentName, fieldTypeId);
+                result = cpCore.db.csGetFieldFilename(csPtr, FieldName, OriginalFilename, ContentName, fieldTypeId);
                 if (result == null) {
                     result = "";
                 }
@@ -369,7 +377,7 @@ namespace Contensive.Core {
         }
         //
         //====================================================================================================
-        public bool OK() {
+        public bool ok() {
             return cpCore.db.csOk(csPtr);
         }
         //
@@ -379,96 +387,61 @@ namespace Contensive.Core {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set the value for the field.
+        /// </summary>
+        /// <param name="FieldName"></param>
+        /// <param name="FieldValue"></param>
         public void setField(string FieldName, DateTime FieldValue) {
             cpCore.db.csSet(csPtr, FieldName, FieldValue);
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set the value for the field.
+        /// </summary>
+        /// <param name="FieldName"></param>
+        /// <param name="FieldValue"></param>
         public void setField(string FieldName, bool FieldValue) {
             cpCore.db.csSet(csPtr, FieldName, FieldValue);
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set the value for the field.
+        /// </summary>
+        /// <param name="FieldName"></param>
+        /// <param name="FieldValue"></param>
         public void setField(string FieldName, string FieldValue) {
             cpCore.db.csSet(csPtr, FieldName, FieldValue);
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set the value for the field.
+        /// </summary>
         public void setField(string FieldName, double FieldValue) {
             cpCore.db.csSet(csPtr, FieldName, FieldValue);
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set the value for the field. If the field is backed by a file, the value will be saved to the file
+        /// </summary>
+        /// <param name="FieldName"></param>
+        /// <param name="FieldValue"></param>
         public void setField(string FieldName, int FieldValue) {
             cpCore.db.csSet(csPtr, FieldName, FieldValue);
         }
         //
         //====================================================================================================
-        public void setFile(string FieldName, string Copy, string ContentName) {
-            cpCore.db.csSetTextFile(csPtr, FieldName, Copy, ContentName);
-        }
-        //
-        //====================================================================================================
-        public void SetFormInput(string FieldName, string RequestName = "") {
-            cs_setFormInput(cpCore, csPtr, FieldName, RequestName);
-        }
-        //
-        //
-        //
-        public static void cs_setFormInput(coreClass cpcore, int CSPointer, string FieldName, string RequestName = "") {
-            string LocalRequestName = null;
-            string Filename = null;
-            string Path = null;
-            //
-            //If Not (true) Then Exit Sub
-            //
-            if (!cpcore.db.csOk(CSPointer)) {
-                throw new ApplicationException("ContentSetPointer is invalid, empty, or end-of-file");
-            } else if (string.IsNullOrEmpty(FieldName.Trim(' '))) {
-                throw new ApplicationException("FieldName is invalid or blank");
-            } else {
-                LocalRequestName = RequestName;
-                if (string.IsNullOrEmpty(LocalRequestName)) {
-                    LocalRequestName = FieldName;
-                }
-                switch (cpcore.db.cs_getFieldTypeId(CSPointer, FieldName)) {
-                    case FieldTypeIdBoolean:
-                        //
-                        // Boolean
-                        //
-                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getBoolean(LocalRequestName));
-                        break;
-                    case FieldTypeIdCurrency:
-                    case FieldTypeIdFloat:
-                    case FieldTypeIdInteger:
-                    case FieldTypeIdLookup:
-                    case FieldTypeIdManyToMany:
-                        //
-                        // Numbers
-                        //
-                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getNumber(LocalRequestName));
-                        break;
-                    case FieldTypeIdDate:
-                        //
-                        // Date
-                        //
-                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getDate(LocalRequestName));
-                        break;
-                    case FieldTypeIdFile:
-                    case FieldTypeIdFileImage:
-                        //
-                        //
-                        //
-                        Filename = cpcore.docProperties.getText(LocalRequestName);
-                        if (!string.IsNullOrEmpty(Filename)) {
-                            Path = cpcore.db.csGetFilename(CSPointer, FieldName, Filename, "", cpcore.db.cs_getFieldTypeId(CSPointer, FieldName));
-                            cpcore.db.csSet(CSPointer, FieldName, Path);
-                            Path = genericController.vbReplace(Path, "\\", "/");
-                            Path = genericController.vbReplace(Path, "/" + Filename, "");
-                            cpcore.appRootFiles.upload(LocalRequestName, Path, ref Filename);
-                        }
-                        break;
-                    default:
-                        //
-                        // text files
-                        //
-                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getText(LocalRequestName));
-                        break;
-                }
-            }
+        /// <summary>
+        /// if the field uses an underlying filename, use this method to set that filename. The content for the field will switch to that contained by the new file
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="filename"></param>
+        public void setFieldFilename( string fieldName, string filename ) {
+            cpCore.db.csSetFieldFilename(csPtr, fieldName, filename);
         }
         //
         //========================================================================

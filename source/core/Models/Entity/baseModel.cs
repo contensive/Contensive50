@@ -431,7 +431,7 @@ namespace Contensive.Core.Models.Entity {
         private static T loadRecord<T>(coreClass cpCore, csController cs, ref List<string> callersCacheNameList) where T : baseModel {
             T modelInstance = default(T);
             try {
-                if (cs.OK()) {
+                if (cs.ok()) {
                     Type instanceType = typeof(T);
                     string contentName = derivedContentName(instanceType);
                     string tableName = derivedContentTableName(instanceType);
@@ -568,7 +568,7 @@ namespace Contensive.Core.Models.Entity {
                             throw new ApplicationException(message);
                         }
                     } else {
-                        if (!cs.Insert(contentName)) {
+                        if (!cs.insert(contentName)) {
                             cs.Close();
                             id = 0;
                             throw new ApplicationException("Unable to insert record in content [" + contentName + "]");
@@ -683,7 +683,8 @@ namespace Contensive.Core.Models.Entity {
                                                 if (string.IsNullOrEmpty(filename)) {
                                                     filename = fileController.getVirtualRecordPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, fieldTypeId);
                                                 }
-                                                cs.setFile(instanceProperty.Name, content, contentName);
+                                                cpCore.cdnFiles.saveFile(filename, content);
+                                                cs.setFieldFilename(instanceProperty.Name, filename);
                                             }
                                         }
                                         //Case "fieldTypeJavascriptFile"
@@ -875,7 +876,7 @@ namespace Contensive.Core.Models.Entity {
                                 result.Add(instance);
                             }
                             cs.goNext();
-                        } while (cs.OK());
+                        } while (cs.ok());
                     }
                     cs.Close();
                 }

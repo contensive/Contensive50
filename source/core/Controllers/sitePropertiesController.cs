@@ -628,7 +628,7 @@ namespace Contensive.Core.Controllers {
                                     }
                                 }
                                 cs.goNext();
-                            } while (cs.OK());
+                            } while (cs.ok());
                         }
                         cs.Close();
                     }

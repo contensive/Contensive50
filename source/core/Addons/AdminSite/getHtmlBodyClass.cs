@@ -5982,7 +5982,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             FieldValueText = genericController.encodeText(fieldValueObject);
                                             if (!string.IsNullOrEmpty(FieldValueText)) {
                                                 string Filename = encodeFilename(FieldValueText);
-                                                string unixPathFilename = cpcore.db.csGetFilename(CSEditRecord, FieldName, Filename, adminContent.Name);
+                                                string unixPathFilename = cpcore.db.csGetFieldFilename(CSEditRecord, FieldName, Filename, adminContent.Name);
                                                 string dosPathFilename = genericController.convertToDosSlash(unixPathFilename);
                                                 string dosPath = genericController.getPath(dosPathFilename);
                                                 cpcore.cdnFiles.upload(FieldName, dosPath, ref Filename);

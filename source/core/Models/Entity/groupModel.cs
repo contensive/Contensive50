@@ -215,13 +215,13 @@ namespace Contensive.Core.Models.Entity {
                         throw new ApplicationException("Unable to open record in content [" + primaryContentName + "], with id [" + ID + "]");
                     }
                 } else {
-                    if (!cs.Insert(primaryContentName)) {
+                    if (!cs.insert(primaryContentName)) {
                         cs.Close();
                         ID = 0;
                         throw new ApplicationException("Unable to insert record in content [" + primaryContentName + "]");
                     }
                 }
-                if (cs.OK()) {
+                if (cs.ok()) {
                     ID = cs.getInteger("id");
                     if (string.IsNullOrEmpty(ccGuid)) {
                         ccGuid = Controllers.genericController.getGUID();
@@ -345,7 +345,7 @@ namespace Contensive.Core.Models.Entity {
                             result.Add(instance);
                         }
                         cs.goNext();
-                    } while (cs.OK());
+                    } while (cs.ok());
                 }
                 cs.Close();
             } catch (Exception ex) {
