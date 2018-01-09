@@ -155,7 +155,6 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
                 throw;
             }
-            return false;
         }
         //
         //=============================================================================================
@@ -167,16 +166,13 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
                 throw;
             }
-            return DateTime.MinValue;
         }
         //
         //====================================================================================================
         //
         public docPropertiesClass getProperty(string RequestName) {
             try {
-                string Key;
-                //
-                Key = encodeDocPropertyKey(RequestName);
+                string Key = encodeDocPropertyKey(RequestName);
                 if (!string.IsNullOrEmpty(Key)) {
                     if (docPropertiesDict.ContainsKey(Key)) {
                         return docPropertiesDict[Key];

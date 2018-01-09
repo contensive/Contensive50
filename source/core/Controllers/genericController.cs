@@ -2875,9 +2875,8 @@ namespace Contensive.Core.Controllers {
                 //
                 // HTTPS
                 //
-                // try this -- a ssl link can not be shortened
+                // an ssl link can not be shortened
                 return WorkingLink;
-                Protocol = WorkingLink.Left( 8);
             }
             if (!string.IsNullOrEmpty(Protocol)) {
                 //
@@ -3598,13 +3597,6 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             }
-            //
-
-            return tempgetSimpleNameValue;
-            //
-            // ----- ErrorTrap
-            //
-            //ErrorTrap:
             return tempgetSimpleNameValue;
         }
         ////==========================================================================================================================

@@ -3329,53 +3329,37 @@ namespace Contensive.Core.Controllers {
                                             returnHtml += "<br>\r\n";
                                         }
                                         RuleCopy = "";
-                                        if (false) {
-                                            Found = false;
-                                            //s = s & "<input type=""checkbox"" name=""" & TagName & "." & CheckBoxCnt & """ "
-                                            if (main_MemberShipCount != 0) {
-                                                for (main_MemberShipPointer = 0; main_MemberShipPointer < main_MemberShipCount; main_MemberShipPointer++) {
-                                                    if (main_MemberShip[main_MemberShipPointer] == (RecordID)) {
-                                                        RuleCopy = main_MemberShipRuleCopy[main_MemberShipPointer];
-                                                        returnHtml += inputHidden(TagName + "." + CheckBoxCnt, true);
-                                                        Found = true;
-                                                        break;
-                                                    }
+                                        Found = false;
+                                        if (main_MemberShipCount != 0) {
+                                            for (main_MemberShipPointer = 0; main_MemberShipPointer < main_MemberShipCount; main_MemberShipPointer++) {
+                                                if (main_MemberShip[main_MemberShipPointer] == (RecordID)) {
+                                                    //s = s & main_GetFormInputHidden(TagName & "." & CheckBoxCnt, True)
+                                                    RuleCopy = main_MemberShipRuleCopy[main_MemberShipPointer];
+                                                    Found = true;
+                                                    break;
                                                 }
                                             }
-                                            returnHtml += genericController.main_GetYesNo(Found) + "&nbsp;-&nbsp;";
-                                        } else {
-                                            Found = false;
-                                            if (main_MemberShipCount != 0) {
-                                                for (main_MemberShipPointer = 0; main_MemberShipPointer < main_MemberShipCount; main_MemberShipPointer++) {
-                                                    if (main_MemberShip[main_MemberShipPointer] == (RecordID)) {
-                                                        //s = s & main_GetFormInputHidden(TagName & "." & CheckBoxCnt, True)
-                                                        RuleCopy = main_MemberShipRuleCopy[main_MemberShipPointer];
-                                                        Found = true;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                            // must leave the first hidden with the value in this form - it is searched in the admin pge
-                                            returnHtml += "\r\n";
-                                            returnHtml += "<table><tr><td style=\"vertical-align:top;margin-top:0;width:20px;\">";
-                                            returnHtml += "<input type=hidden name=\"" + TagName + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
-                                            if (readOnlyfield && !Found) {
-                                                returnHtml += "<input type=checkbox disabled>";
-                                            } else if (readOnlyfield) {
-                                                returnHtml += "<input type=checkbox disabled checked>";
-                                                returnHtml += "<input type=\"hidden\" name=\"" + TagName + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
-                                            } else if (Found) {
-                                                returnHtml += "<input type=checkbox name=\"" + TagName + "." + CheckBoxCnt + "\" checked>";
-                                            } else {
-                                                returnHtml += "<input type=checkbox name=\"" + TagName + "." + CheckBoxCnt + "\">";
-                                            }
-                                            returnHtml += "</td><td style=\"vertical-align:top;padding-top:4px;\">";
-                                            returnHtml += SpanClassAdminNormal + optionCaptionHtmlEncoded;
-                                            if (AllowRuleCopy) {
-                                                returnHtml += ", " + RuleCopyCaption + "&nbsp;" + inputText(TagName + "." + CheckBoxCnt + ".RuleCopy", RuleCopy, 1, 20);
-                                            }
-                                            returnHtml += "</td></tr></table>";
                                         }
+                                        // must leave the first hidden with the value in this form - it is searched in the admin pge
+                                        returnHtml += "\r\n";
+                                        returnHtml += "<table><tr><td style=\"vertical-align:top;margin-top:0;width:20px;\">";
+                                        returnHtml += "<input type=hidden name=\"" + TagName + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
+                                        if (readOnlyfield && !Found) {
+                                            returnHtml += "<input type=checkbox disabled>";
+                                        } else if (readOnlyfield) {
+                                            returnHtml += "<input type=checkbox disabled checked>";
+                                            returnHtml += "<input type=\"hidden\" name=\"" + TagName + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
+                                        } else if (Found) {
+                                            returnHtml += "<input type=checkbox name=\"" + TagName + "." + CheckBoxCnt + "\" checked>";
+                                        } else {
+                                            returnHtml += "<input type=checkbox name=\"" + TagName + "." + CheckBoxCnt + "\">";
+                                        }
+                                        returnHtml += "</td><td style=\"vertical-align:top;padding-top:4px;\">";
+                                        returnHtml += SpanClassAdminNormal + optionCaptionHtmlEncoded;
+                                        if (AllowRuleCopy) {
+                                            returnHtml += ", " + RuleCopyCaption + "&nbsp;" + inputText(TagName + "." + CheckBoxCnt + ".RuleCopy", RuleCopy, 1, 20);
+                                        }
+                                        returnHtml += "</td></tr></table>";
                                         CheckBoxCnt = CheckBoxCnt + 1;
                                         DivCheckBoxCnt = DivCheckBoxCnt + 1;
                                     }

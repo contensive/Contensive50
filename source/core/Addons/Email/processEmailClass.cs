@@ -298,11 +298,7 @@ namespace Contensive.Core.Addons.Email {
                 //   Housekeep logs far > 1 day
                 //
                 if (IsNewDay) {
-                    if (true) {
-                        FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID as EmailID," + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
-                    } else {
-                        FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID as EmailID," + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,0 as BlockSiteStyles,'' as stylesFilename";
-                    }
+                    FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID as EmailID," + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                     if (dataSourceType == DataSourceTypeODBCSQLServer) {
                         sqlDateTest = ""
                             + " AND (CAST(" + SQLTableMemberRules + ".DateAdded as datetime)+ccEmail.ConditionPeriod < " + SQLDateNow + ")"
@@ -359,12 +355,7 @@ namespace Contensive.Core.Addons.Email {
                 // Send Conditional Email - Offset days Before Expiration
                 //
                 if (IsNewDay) {
-
-                    if (true) {
-                        FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, " + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
-                    } else {
-                        FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, " + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,0 as BlockSiteStyles,'' as stylesFilename";
-                    }
+                    FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, " + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                     if (dataSourceType == DataSourceTypeODBCSQLServer) {
                         sqlDateTest = ""
                             + " AND (CAST(" + SQLTableMemberRules + ".DateExpires as datetime)-ccEmail.ConditionPeriod > " + SQLDateNow + ")"
@@ -421,55 +412,49 @@ namespace Contensive.Core.Addons.Email {
                 // Send Conditional Email - Birthday
                 //
                 if (IsNewDay) {
-                    if (true) {
-                        if (true) {
-                            FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, " + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
-                        } else {
-                            FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, " + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,0 as BlockSiteStyles,'' as stylesFilename";
+                    FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, " + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
+                    SQL = "SELECT DISTINCT " + FieldList + " FROM ((((ccEmail"
+                        + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
+                        + " LEFT JOIN " + SQLTableGroups + " ON ccEmailGroups.GroupID = " + SQLTableGroups + ".ID)"
+                        + " LEFT JOIN " + SQLTableMemberRules + " ON " + SQLTableGroups + ".ID = " + SQLTableMemberRules + ".GroupID)"
+                        + " LEFT JOIN " + SQLTablePeople + " ON " + SQLTableMemberRules + ".MemberID = " + SQLTablePeople + ".ID)"
+                        + " Where (ccEmail.id Is Not Null)"
+                        + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
+                        + " AND (ccEmail.ScheduleDate < " + SQLDateNow + " OR ccEmail.ScheduleDate IS NULL)"
+                        + " AND (ccEmail.Submitted <> 0)"
+                        + " AND (ccEmail.ConditionID = 3)"
+                        + " AND (" + SQLTableGroups + ".Active <> 0)"
+                        + " AND (" + SQLTableGroups + ".AllowBulkEmail <> 0)"
+                        + " AND ((" + SQLTableMemberRules + ".DateExpires is null)or(" + SQLTableMemberRules + ".DateExpires > " + SQLDateNow + "))"
+                        + " AND (" + SQLTablePeople + ".ID IS NOT NULL)"
+                        + " AND (" + SQLTablePeople + ".Active <> 0)"
+                        + " AND (" + SQLTablePeople + ".AllowBulkEmail <> 0)"
+                        + " AND (" + SQLTablePeople + ".BirthdayMonth=" + DateTime.Now.Month + ")"
+                        + " AND (" + SQLTablePeople + ".BirthdayDay=" + DateTime.Now.Day + ")"
+                        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" + SQLTablePeople + ".ID and ccEmailLog.DateAdded>=" + cpCore.db.encodeSQLDate(DateTime.Now.Date) + "))";
+                    CSEmailBig = cpCore.db.csOpenSql_rev("Default", SQL);
+                    while (cpCore.db.csOk(CSEmailBig)) {
+                        emailID = cpCore.db.csGetInteger(CSEmailBig, "EmailID");
+                        EmailMemberID = cpCore.db.csGetInteger(CSEmailBig, "MemberID");
+                        EmailDateExpires = cpCore.db.csGetDate(CSEmailBig, "DateExpires");
+                        CSEmail = cpCore.db.cs_openContentRecord("Conditional Email", emailID);
+                        if (cpCore.db.csOk(CSEmail)) {
+                            EmailTemplateID = cpCore.db.csGetInteger(CSEmail, "EmailTemplateID");
+                            EmailTemplate = GetEmailTemplate(cpCore, EmailTemplateID);
+                            FromAddress = cpCore.db.csGetText(CSEmail, "FromAddress");
+                            ConfirmationMemberID = cpCore.db.csGetInteger(CSEmail, "testmemberid");
+                            EmailAddLinkEID = cpCore.db.csGetBoolean(CSEmail, "AddLinkEID");
+                            EmailSubject = cpCore.db.csGet(CSEmail, "Subject");
+                            EmailCopy = cpCore.db.csGet(CSEmail, "CopyFilename");
+                            //emailStyles = emailController.getStyles(emailID)
+                            EmailStatus = SendEmailRecord(cpCore, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.csGet(CSEmail, "Subject"), cpCore.db.csGet(CSEmail, "CopyFilename"), cpCore.db.csGetBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.csGetBoolean(CSEmail, "AddLinkEID"), "");
+                            //EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.csv_cs_get(CSEmail, "Subject"), cpCore.csv_cs_get(CSEmail, "CopyFilename"), cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_cs_getBoolean(CSEmail, "AddLinkEID"), EmailInlineStyles)
+                            SendConfirmationEmail(cpCore, ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
                         }
-                        SQL = "SELECT DISTINCT " + FieldList + " FROM ((((ccEmail"
-                            + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
-                            + " LEFT JOIN " + SQLTableGroups + " ON ccEmailGroups.GroupID = " + SQLTableGroups + ".ID)"
-                            + " LEFT JOIN " + SQLTableMemberRules + " ON " + SQLTableGroups + ".ID = " + SQLTableMemberRules + ".GroupID)"
-                            + " LEFT JOIN " + SQLTablePeople + " ON " + SQLTableMemberRules + ".MemberID = " + SQLTablePeople + ".ID)"
-                            + " Where (ccEmail.id Is Not Null)"
-                            + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
-                            + " AND (ccEmail.ScheduleDate < " + SQLDateNow + " OR ccEmail.ScheduleDate IS NULL)"
-                            + " AND (ccEmail.Submitted <> 0)"
-                            + " AND (ccEmail.ConditionID = 3)"
-                            + " AND (" + SQLTableGroups + ".Active <> 0)"
-                            + " AND (" + SQLTableGroups + ".AllowBulkEmail <> 0)"
-                            + " AND ((" + SQLTableMemberRules + ".DateExpires is null)or(" + SQLTableMemberRules + ".DateExpires > " + SQLDateNow + "))"
-                            + " AND (" + SQLTablePeople + ".ID IS NOT NULL)"
-                            + " AND (" + SQLTablePeople + ".Active <> 0)"
-                            + " AND (" + SQLTablePeople + ".AllowBulkEmail <> 0)"
-                            + " AND (" + SQLTablePeople + ".BirthdayMonth=" + DateTime.Now.Month + ")"
-                            + " AND (" + SQLTablePeople + ".BirthdayDay=" + DateTime.Now.Day + ")"
-                            + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" + SQLTablePeople + ".ID and ccEmailLog.DateAdded>=" + cpCore.db.encodeSQLDate(DateTime.Now.Date) + "))";
-                        CSEmailBig = cpCore.db.csOpenSql_rev("Default", SQL);
-                        while (cpCore.db.csOk(CSEmailBig)) {
-                            emailID = cpCore.db.csGetInteger(CSEmailBig, "EmailID");
-                            EmailMemberID = cpCore.db.csGetInteger(CSEmailBig, "MemberID");
-                            EmailDateExpires = cpCore.db.csGetDate(CSEmailBig, "DateExpires");
-                            CSEmail = cpCore.db.cs_openContentRecord("Conditional Email", emailID);
-                            if (cpCore.db.csOk(CSEmail)) {
-                                EmailTemplateID = cpCore.db.csGetInteger(CSEmail, "EmailTemplateID");
-                                EmailTemplate = GetEmailTemplate(cpCore, EmailTemplateID);
-                                FromAddress = cpCore.db.csGetText(CSEmail, "FromAddress");
-                                ConfirmationMemberID = cpCore.db.csGetInteger(CSEmail, "testmemberid");
-                                EmailAddLinkEID = cpCore.db.csGetBoolean(CSEmail, "AddLinkEID");
-                                EmailSubject = cpCore.db.csGet(CSEmail, "Subject");
-                                EmailCopy = cpCore.db.csGet(CSEmail, "CopyFilename");
-                                //emailStyles = emailController.getStyles(emailID)
-                                EmailStatus = SendEmailRecord(cpCore, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.csGet(CSEmail, "Subject"), cpCore.db.csGet(CSEmail, "CopyFilename"), cpCore.db.csGetBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.csGetBoolean(CSEmail, "AddLinkEID"), "");
-                                //EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.csv_cs_get(CSEmail, "Subject"), cpCore.csv_cs_get(CSEmail, "CopyFilename"), cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_cs_getBoolean(CSEmail, "AddLinkEID"), EmailInlineStyles)
-                                SendConfirmationEmail(cpCore, ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
-                            }
-                            cpCore.db.csClose(ref CSEmail);
-                            cpCore.db.csGoNext(CSEmailBig);
-                        }
-                        cpCore.db.csClose(ref CSEmailBig);
+                        cpCore.db.csClose(ref CSEmail);
+                        cpCore.db.csGoNext(CSEmailBig);
                     }
+                    cpCore.db.csClose(ref CSEmailBig);
                 }
                 //
                 return;
@@ -688,31 +673,22 @@ namespace Contensive.Core.Addons.Email {
         //====================================================================================================
         //
         private string GetEmailTemplate(coreClass cpCore, int EmailTemplateID) {
-            string tempGetEmailTemplate = null;
+            string tempGetEmailTemplate = "";
             try {
-                tempGetEmailTemplate = "";
-                //
-                int CS = 0;
                 //
                 // Get the Template
                 //
                 if (EmailTemplateID != 0) {
-                    CS = cpCore.db.cs_openContentRecord("Email Templates", EmailTemplateID, 0, false, false, "BodyHTML");
+                    int CS = cpCore.db.cs_openContentRecord("Email Templates", EmailTemplateID, 0, false, false, "BodyHTML");
                     if (cpCore.db.csOk(CS)) {
                         tempGetEmailTemplate = cpCore.db.csGet(CS, "BodyHTML");
                     }
                     cpCore.db.csClose(ref CS);
                 }
-                //
-                return tempGetEmailTemplate;
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
+                throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
-                                                                      //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-            //Microsoft.VisualBasic.Information.Err().Clear();
             return tempGetEmailTemplate;
         }
         //

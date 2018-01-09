@@ -160,7 +160,6 @@ namespace Contensive.Core {
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFilename + "]"));
             }
-            return string.Empty;
         }
         //
         //==========================================================================================

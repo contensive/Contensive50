@@ -98,11 +98,7 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         public override string Cookie(string CookieName) {
-            if (true) {
-                return cpCore.webServer.getRequestCookie(CookieName);
-            } else {
-                return "";
-            }
+            return cpCore.webServer.getRequestCookie(CookieName);
         }
         //
         //====================================================================================================

@@ -71,7 +71,7 @@ namespace Contensive.Core.Controllers {
                         fileSystem = cpCore.programDataFiles;
                     }
                     //
-                    if (useMicrosoftTraceLogging) {
+                    if (cpCore.useMicrosoftTraceLogging) {
                         string logName;
                         if (cpCore.serverConfig.appConfig == null) {
                             // -- no app, log to server

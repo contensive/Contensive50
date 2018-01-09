@@ -575,14 +575,6 @@ namespace Contensive.Core.Models.Entity {
                         }
                     }
                     int recordId = cs.getInteger("id");
-                    //todo  NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
-                    //int value = 0;
-                    //todo  NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
-                    //bool value = false;
-                    //todo  NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
-                    DateTime value = default(DateTime);
-                    //todo  NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
-                    //double value = 0;
                     foreach (PropertyInfo instanceProperty in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         switch (instanceProperty.Name.ToLower()) {
                             case "id":

@@ -31,8 +31,6 @@ namespace Contensive.Core.Controllers {
         // -- local constants
         private const int pageSizeDefault = 9999;
         //
-        private const bool useCSReadCacheMultiRow = true;
-        //
         private const bool allowWorkflowErrors = false;
         //
         // set true when configured and tested - else db calls are skipped
@@ -1863,22 +1861,7 @@ namespace Contensive.Core.Controllers {
             string returnResult = "";
             try {
                 if (csOk(CSPointer)) {
-                    if (useCSReadCacheMultiRow) {
-                        returnResult = string.Join(",", contentSetStore[CSPointer].fieldNames);
-                    } else {
-                        returnResult = contentSetStore[CSPointer].SelectTableFieldList;
-                        if (string.IsNullOrEmpty(returnResult)) {
-                            var tempVar = contentSetStore[CSPointer];
-                            if (tempVar.dt != null) {
-                                if (tempVar.dt.Columns.Count > 0) {
-                                    for (var FieldPointer = 0; FieldPointer < tempVar.dt.Columns.Count; FieldPointer++) {
-                                        returnResult = returnResult + "," + tempVar.dt.Columns[FieldPointer].ColumnName;
-                                    }
-                                    returnResult = returnResult.Substring(1);
-                                }
-                            }
-                        }
-                    }
+                   returnResult = string.Join(",", contentSetStore[CSPointer].fieldNames);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);

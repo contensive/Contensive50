@@ -25,16 +25,17 @@ namespace Contensive.Core {
         private Contensive.Core.coreClass cpCore;
         protected bool disposed = false;
         //
+        //====================================================================================================
+        //
         public CPUserErrorClass(Contensive.Core.coreClass cpCoreObj) : base() {
             cpCore = cpCoreObj;
         }
         //
-        // dispose
+        //====================================================================================================
         //
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
-                appendDebugLog(".dispose, dereference main, csv");
-                if (disposing) {
+               if (disposing) {
                     //
                     // call .dispose for managed objects
                     //
@@ -47,41 +48,31 @@ namespace Contensive.Core {
             this.disposed = true;
         }
         //
+        //====================================================================================================
         //
-        //
-        public override void Add(string Message) //Inherits BaseClasses.CPUserErrorBaseClass.Add
-        {
-            if (true) {
-                errorController.addUserError(cpCore, Message);
-            }
-        }
-
-        public override string GetList() //Inherits BaseClasses.CPUserErrorBaseClass.GetList
-        {
-            if (true) {
-                return errorController.getUserError(cpCore);
-            } else {
-                return "";
-            }
-        }
-
-        public override bool OK() //Inherits BaseClasses.CPUserErrorBaseClass.OK
-        {
-            if (true) {
-                return !(cpCore.doc.debug_iUserError != "");
-            } else {
-                return true;
-            }
+        public override void Add(string Message) {
+            errorController.addUserError(cpCore, Message);
         }
         //
+        //====================================================================================================
         //
+        public override string GetList()  {
+            return errorController.getUserError(cpCore);
+        }
+        //
+        //====================================================================================================
+        //
+        public override bool OK() {
+            return !(cpCore.doc.debug_iUserError != "");
+        }
+        //
+        //====================================================================================================
         //
         private void appendDebugLog(string copy) {
-            //My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.userError, " & copy & vbCrLf, True)
-            // 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
+            logController.appendLogDebug(cpCore, copy);
         }
         //
-        // testpoint
+        //====================================================================================================
         //
         private void tp(string msg) {
             //Call appendDebugLog(msg)

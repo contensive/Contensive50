@@ -58,114 +58,86 @@ namespace Contensive.Core {
         //
         public override string ContentType {
             get {
-                if (true) {
-                    return cpCore.webServer.bufferContentType;
-                } else {
-                    return "";
-                }
+                return cpCore.webServer.bufferContentType;
             }
             set {
-                if (true) {
-                    cpCore.webServer.setResponseContentType(value);
-                }
+                cpCore.webServer.setResponseContentType(value);
             }
         }
 
         public override string Cookies {
             get {
-                if (true) {
-                    return cpCore.webServer.bufferCookies;
-                } else {
-                    return "";
-                }
+                return cpCore.webServer.bufferCookies;
             }
         }
 
-        public override string Header //Inherits BaseClasses.CPResponseBaseClass.Header
-        {
+        public override string Header {
             get {
-                if (true) {
-                    return cpCore.webServer.bufferResponseHeader;
-                } else {
-                    return "";
-                }
+                return cpCore.webServer.bufferResponseHeader;
             }
         }
         //
         //
         //
-        public override void Clear() //Inherits BaseClasses.CPResponseBaseClass.Clear
-        {
-            if (true) {
-                cpCore.webServer.clearResponseBuffer();
-            }
+        public override void Clear() {
+            cpCore.webServer.clearResponseBuffer();
         }
         //
         //
         //
-        public override void Close() //Inherits BaseClasses.CPResponseBaseClass.Close
-        {
+        public override void Close()  {
             cpCore.doc.continueProcessing = false;
         }
-
-        public override void AddHeader(string HeaderName, string HeaderValue) //Inherits BaseClasses.CPResponseBaseClass.AddHeader
-        {
-            if (true) {
-                cpCore.webServer.addResponseHeader(HeaderName, HeaderValue);
-            }
+        //
+        public override void AddHeader(string HeaderName, string HeaderValue) {
+            cpCore.webServer.addResponseHeader(HeaderName, HeaderValue);
         }
-
+        //
         public override void Flush() {
-            if (true) {
-                cpCore.webServer.flushStream();
-            }
+            cpCore.webServer.flushStream();
         }
+        //
         public override void Redirect(string Link) {
-            if (true) {
-                cpCore.webServer.redirect(Link, "", false, false);
-            }
+            cpCore.webServer.redirect(Link, "", false, false);
         }
 
         public override void SetBuffer(bool BufferOn) {
-            if (true) {
-                cpCore.html.enableOutputBuffer(BufferOn);
-            }
+            cpCore.html.enableOutputBuffer(BufferOn);
         }
-
-        public override void SetStatus(string status) //Inherits BaseClasses.CPResponseBaseClass.SetStatus
-        {
-            if (true) {
-                cpCore.webServer.setResponseStatus(status);
-            }
+        /// <summary>
+        /// /
+        /// </summary>
+        /// <param name="status"></param>
+        public override void SetStatus(string status) {
+            cpCore.webServer.setResponseStatus(status);
         }
-
+        //
         public override void SetTimeout(string TimeoutSeconds) {
-            if (true) {
-                //Call cmc.main_SetStreamTimeout(TimeoutSeconds)
-            }
         }
-
-        public override void SetType(string ContentType) //Inherits BaseClasses.CPResponseBaseClass.SetType
-        {
+        //
+        public override void SetType(string ContentType) {
             cpCore.webServer.setResponseContentType(ContentType);
         }
-
+        //
         public override void SetCookie(string CookieName, string CookieValue) {
             cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateTime.MinValue, "", "", false);
         }
+        //
         public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires) {
             cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, "", "", false);
         }
         public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain) {
             cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, "", false);
         }
+        //
         public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain, string Path) {
             cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, false);
         }
+        //
         public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain, string Path, bool Secure) {
             cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure);
         }
-
+        //
         [Obsolete("The write buffer is deprecated")]
         public override void Write(string message) {
             //
@@ -175,26 +147,17 @@ namespace Contensive.Core {
         //
         public override bool isOpen {
             get {
-                if (true) {
-                    return cpCore.doc.continueProcessing;
-                } else {
-                    return false;
-                }
+                return cpCore.doc.continueProcessing;
             }
         }
         //
         //
         //
-        private void appendDebugLog(string copy) {
-            //My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.response, " & copy & vbCrLf, True)
-            // 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
-        }
+        private void appendDebugLog(string copy) { }
         //
         // testpoint
         //
-        private void tp(string msg) {
-            //Call appendDebugLog(msg)
-        }
+        private void tp(string msg) { }
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).

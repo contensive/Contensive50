@@ -59,11 +59,7 @@ namespace Contensive.Core {
         public override string Email //Inherits BaseClasses.CPUserBaseClass.Email
         {
             get {
-                if (true) {
-                    return CP.core.doc.sessionContext.user.Email;
-                } else {
-                    return "";
-                }
+                return CP.core.doc.sessionContext.user.Email;
             }
         }
         //

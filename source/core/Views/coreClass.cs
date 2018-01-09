@@ -23,6 +23,9 @@ namespace Contensive.Core {
         // todo move persistent objects to .doc (keeping of document scope persistence)
         public Random random = new Random();
         //
+        // option switch
+        public bool useMicrosoftTraceLogging = false;
+        //
         //===================================================================================================
         /// <summary>
         /// list of DLLs in the addon assembly path that are not adds. As they are discovered, they are added to this list

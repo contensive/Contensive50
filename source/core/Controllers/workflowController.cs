@@ -1063,9 +1063,6 @@ namespace Contensive.Core.Controllers {
                     EditLockDateExpires = DateTime.Now.AddMinutes(EditLockTimeoutMinutes);
                     if (EditLockCount > 0) {
                         for (SourcePointer = 0; SourcePointer < EditLockCount; SourcePointer++) {
-                            if (false) {
-                                break;
-                            }
                             SourceKey = EditLockArray[SourcePointer].Key;
                             SourceDateExpires = EditLockArray[SourcePointer].DateExpires;
                             if (SourceKey == EditLockKey2) {

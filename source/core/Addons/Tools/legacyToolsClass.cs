@@ -2554,16 +2554,7 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add(DateTime.Now + " Opening Table Schema on DataSource [" + datasource.Name + "]<br>");
                     //
                     RSSchema = cpCore.db.getTableSchemaData(TableName);
-                    if (true) {
-                        Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
-                    } else {
-                        //
-                        // ----- error
-                        //
-                        Stream.Add(DateTime.Now + " SQL execution returned the following error<br>");
-                        Stream.Add("Error Number " + ErrorNumber + "<br>");
-                        Stream.Add("Error Descrition " + ErrorDescription + "<br>");
-                    }
+                    Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
                     if (!isDataTableOk(RSSchema)) {
                         //
                         // ----- no result

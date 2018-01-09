@@ -1527,97 +1527,85 @@ namespace Contensive.Core.Controllers {
                         PageNotFoundReason = "The page could not be displayed. The record may have been deleted, marked inactive. The page's parent pages or section may be invalid.";
                     }
                 }
-                if (false) {
+                //if (false) {
+                //    //
+                //    //todo consider if we will keep this. It is not straightforward, and and more straightforward method may exist
+                //    //
+                //    // Determine where to go next
+                //    //   If the current page is not the referring page, redirect to the referring page
+                //    //   Because...
+                //    //   - the page with the form (the referrer) was a link alias page. You can not post to a link alias, so internally we post to the default page, and redirect back.
+                //    //   - This only acts on internal Contensive forms, so developer pages are not effected
+                //    //   - This way, if the form post comes from a main_GetJSPage Remote Method, it posts to the Content Server,
+                //    //       then redirects back to the static site (with the new changed content)
+                //    //
+                //    if (cpCore.webServer.requestReferrer != "") {
+                //        string main_ServerReferrerURL = null;
+                //        string main_ServerReferrerQs = null;
+                //        int Position = 0;
+                //        main_ServerReferrerURL = cpCore.webServer.requestReferrer;
+                //        main_ServerReferrerQs = "";
+                //        Position = genericController.vbInstr(1, main_ServerReferrerURL, "?");
+                //        if (Position != 0) {
+                //            main_ServerReferrerQs = main_ServerReferrerURL.Substring(Position);
+                //            main_ServerReferrerURL = main_ServerReferrerURL.Left( Position - 1);
+                //        }
+                //        if (main_ServerReferrerURL.Substring(main_ServerReferrerURL.Length - 1) == "/") {
+                //            //
+                //            // Referer had no page, figure out what it should have been
+                //            //
+                //            if (cpCore.webServer.requestPage != "") {
+                //                //
+                //                // If the referer had no page, and there is one here now, it must have been from an IIS redirect, use the current page as the default page
+                //                //
+                //                main_ServerReferrerURL = main_ServerReferrerURL + cpCore.webServer.requestPage;
+                //            } else {
+                //                main_ServerReferrerURL = main_ServerReferrerURL + cpCore.siteProperties.serverPageDefault;
+                //            }
+                //        }
+                //        string linkDst = null;
+                //        //main_ServerPage = main_ServerPage
+                //        if (main_ServerReferrerURL != cpCore.webServer.serverFormActionURL) {
+                //            //
+                //            // remove any methods from referrer
+                //            //
+                //            string Copy = "Redirecting because a Contensive Form was detected, source URL [" + main_ServerReferrerURL + "] does not equal the current URL [" + cpCore.webServer.serverFormActionURL + "]. This may be from a Contensive Add-on that now needs to redirect back to the host page.";
+                //            linkDst = cpCore.webServer.requestReferer;
+                //            if (!string.IsNullOrEmpty(main_ServerReferrerQs)) {
+                //                linkDst = main_ServerReferrerURL;
+                //                main_ServerReferrerQs = genericController.ModifyQueryString(main_ServerReferrerQs, "method", "");
+                //                if (!string.IsNullOrEmpty(main_ServerReferrerQs)) {
+                //                    linkDst = linkDst + "?" + main_ServerReferrerQs;
+                //                }
+                //            }
+                //            return cpCore.webServer.redirect(linkDst, Copy);
+                //            cpCore.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
+                //        }
+                //    }
+                //}
+                // - same here, this was in appInit() to prcess the pagenotfounds - maybe here (at the end, maybe in page Manager)
+                //--------------------------------------------------------------------------
+                // ----- Process Early page-not-found
+                //--------------------------------------------------------------------------
+                //
+                if (IsPageNotFound) {
                     //
-                    //todo consider if we will keep this. It is not straightforward, and and more straightforward method may exist
+                    // new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                     //
-                    // Determine where to go next
-                    //   If the current page is not the referring page, redirect to the referring page
-                    //   Because...
-                    //   - the page with the form (the referrer) was a link alias page. You can not post to a link alias, so internally we post to the default page, and redirect back.
-                    //   - This only acts on internal Contensive forms, so developer pages are not effected
-                    //   - This way, if the form post comes from a main_GetJSPage Remote Method, it posts to the Content Server,
-                    //       then redirects back to the static site (with the new changed content)
-                    //
-                    if (cpCore.webServer.requestReferrer != "") {
-                        string main_ServerReferrerURL = null;
-                        string main_ServerReferrerQs = null;
-                        int Position = 0;
-                        main_ServerReferrerURL = cpCore.webServer.requestReferrer;
-                        main_ServerReferrerQs = "";
-                        Position = genericController.vbInstr(1, main_ServerReferrerURL, "?");
-                        if (Position != 0) {
-                            main_ServerReferrerQs = main_ServerReferrerURL.Substring(Position);
-                            main_ServerReferrerURL = main_ServerReferrerURL.Left( Position - 1);
-                        }
-                        if (main_ServerReferrerURL.Substring(main_ServerReferrerURL.Length - 1) == "/") {
-                            //
-                            // Referer had no page, figure out what it should have been
-                            //
-                            if (cpCore.webServer.requestPage != "") {
-                                //
-                                // If the referer had no page, and there is one here now, it must have been from an IIS redirect, use the current page as the default page
-                                //
-                                main_ServerReferrerURL = main_ServerReferrerURL + cpCore.webServer.requestPage;
-                            } else {
-                                main_ServerReferrerURL = main_ServerReferrerURL + cpCore.siteProperties.serverPageDefault;
-                            }
-                        }
-                        string linkDst = null;
-                        //main_ServerPage = main_ServerPage
-                        if (main_ServerReferrerURL != cpCore.webServer.serverFormActionURL) {
-                            //
-                            // remove any methods from referrer
-                            //
-                            string Copy = "Redirecting because a Contensive Form was detected, source URL [" + main_ServerReferrerURL + "] does not equal the current URL [" + cpCore.webServer.serverFormActionURL + "]. This may be from a Contensive Add-on that now needs to redirect back to the host page.";
-                            linkDst = cpCore.webServer.requestReferer;
-                            if (!string.IsNullOrEmpty(main_ServerReferrerQs)) {
-                                linkDst = main_ServerReferrerURL;
-                                main_ServerReferrerQs = genericController.ModifyQueryString(main_ServerReferrerQs, "method", "");
-                                if (!string.IsNullOrEmpty(main_ServerReferrerQs)) {
-                                    linkDst = linkDst + "?" + main_ServerReferrerQs;
-                                }
-                            }
-                            return cpCore.webServer.redirect(linkDst, Copy);
-                            cpCore.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
-                        }
-                    }
-                }
-                if (true) {
-                    // - same here, this was in appInit() to prcess the pagenotfounds - maybe here (at the end, maybe in page Manager)
-                    //--------------------------------------------------------------------------
-                    // ----- Process Early page-not-found
-                    //--------------------------------------------------------------------------
-                    //
-                    if (IsPageNotFound) {
-                        if (true) {
-                            //
-                            // new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
-                            //
-                            logController.appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource);
-                            cpCore.webServer.setResponseStatus("404 Not Found");
-                            cpCore.docProperties.setProperty(rnPageId, getPageNotFoundPageId(cpCore));
-                            //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
-                            if (cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
-                                cpCore.doc.adminWarning = PageNotFoundReason;
-                                cpCore.doc.adminWarningPageID = 0;
-                            }
-                        } else {
-                            //
-                            // old way -- if a (real) 404 page is received, redirect to it to the 404 page with content
-                            //
-                            RedirectReason = PageNotFoundReason;
-                            RedirectLink = pageContentController.main_ProcessPageNotFound_GetLink(cpCore, PageNotFoundReason, "", PageNotFoundSource);
-                        }
+                    logController.appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource);
+                    cpCore.webServer.setResponseStatus("404 Not Found");
+                    cpCore.docProperties.setProperty(rnPageId, getPageNotFoundPageId(cpCore));
+                    //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
+                    if (cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
+                        cpCore.doc.adminWarning = PageNotFoundReason;
+                        cpCore.doc.adminWarningPageID = 0;
                     }
                 }
                 //
                 // add exception list header
-                //
                 returnHtml = errorController.getDocExceptionHtmlList(cpCore) + returnHtml;
-                //
             } catch (Exception ex) {
-                //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetHTMLDoc2")
+                cpCore.handleException(ex);
             }
             return returnHtml;
         }

@@ -1699,9 +1699,6 @@ namespace Contensive.Core.Controllers {
                                                                                                         // image load failed, use raw filename
                                                                                                         //
                                                                                                         throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
-                                                                                                                                                                  //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                                                                                                                                  //Microsoft.VisualBasic.Information.Err().Clear();
-                                                                                                        NewImageFilename = ImageFilename;
                                                                                                     } else {
                                                                                                         //
                                                                                                         //

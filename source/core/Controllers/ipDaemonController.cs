@@ -109,7 +109,7 @@ namespace Contensive.Core.Controllers {
                             queryString = request.Url.Query;
                             Hint += ",cmd=[" + cmd + "],querystring=[" + queryString + "]";
                             if (queryString.Length > 0) {
-                                if (queryString.Left( 1) == "?") {
+                                if (queryString.Left(1) == "?") {
                                     queryString = queryString.Substring(1);
                                 }
                             }
@@ -174,7 +174,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // start on this thread and block
                     //
-                    thread_cmdListener();
+                    //thread_cmdListener();
                 } else {
                     //
                     // start on a new thread and return

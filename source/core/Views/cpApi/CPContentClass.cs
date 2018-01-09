@@ -93,11 +93,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetEditLink(string ContentName, string RecordID, bool AllowCut, string RecordName, bool IsEditing) {
-            if (true) {
-                return cpCore.html.getRecordEditLink2(ContentName, genericController.encodeInteger(RecordID), AllowCut, RecordName, IsEditing);
-            } else {
-                return "";
-            }
+            return cpCore.html.getRecordEditLink2(ContentName, genericController.encodeInteger(RecordID), AllowCut, RecordName, IsEditing);
         }
         //
         //====================================================================================================
