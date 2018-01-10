@@ -97,11 +97,9 @@ namespace Contensive.Core.Controllers {
             int ArrayPointer = -1;
             try {
                 string UcaseTargetKey = null;
-                //Dim ElementKey As String
                 int HighGuess = 0;
                 int LowGuess = 0;
                 int PointerGuess = 0;
-                string test = "";
                 //
                 if (store.ArrayDirty) {
                     Sort();
@@ -144,16 +142,12 @@ namespace Contensive.Core.Controllers {
         public int getPtr(string Key) {
             int returnKey = -1;
             try {
-                string test = null;
                 bool MatchFound = false;
                 string UcaseKey = null;
-                test = "";
                 //
                 UcaseKey = genericController.vbReplace(Key.ToUpper(), "\r\n", "");
-                //UcaseKey = genericController.vbUCase(Key)
                 store.ArrayPointer = GetArrayPointer(Key);
                 if (store.ArrayPointer > -1) {
-                    // Make sure this is the first match
                     MatchFound = true;
                     while (MatchFound) {
                         store.ArrayPointer = store.ArrayPointer - 1;
@@ -279,14 +273,11 @@ namespace Contensive.Core.Controllers {
             try {
                 string TempUcaseKey = null;
                 string tempPtrString = null;
-                //Dim TempPointer as integer
                 bool CleanPass = false;
                 int MaxPointer = 0;
                 int SlowPointer = 0;
                 int FastPointer = 0;
-                string test = null;
                 int PointerDelta = 0;
-                test = "";
                 //
                 if (store.ArrayCount > 1) {
                     PointerDelta = 1;

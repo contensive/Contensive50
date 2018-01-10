@@ -676,9 +676,7 @@ namespace Contensive.Core.Controllers {
                 int TagStart = 0;
                 int TagEnd = 0;
                 int LoopCnt = 0;
-                string WB = null;
                 int Pos = 0;
-                int PosEnd = 0;
                 int CommentPos = 0;
                 int ScriptPos = 0;
                 //

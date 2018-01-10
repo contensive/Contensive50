@@ -1026,7 +1026,6 @@ namespace Contensive.Core.Controllers {
         public string inputTextExpandable(string TagName, string Value = "", int Rows = 0, string styleWidth = "100%", string Id = "", bool PasswordField = false, bool Disabled = false, string HtmlClass = "") {
             string temphtml_GetFormInputTextExpandable2 = null;
             try {
-                string Tn = "cpCoreClass.GetFormInputTextExpandable2";
                 //
                 //If Not (true) Then Exit Function
                 //
@@ -4106,7 +4105,6 @@ namespace Contensive.Core.Controllers {
                 string EditTagID = null;
                 string QuickEditTagID = null;
                 string AdvancedEditTagID = null;
-                string WorkflowTagID = null;
                 string Tag = null;
                 string TagID = null;
                 stringBuilderLegacyController ToolsPanel = null;
@@ -4115,8 +4113,6 @@ namespace Contensive.Core.Controllers {
                 string LoginPanel = "";
                 bool iValueBoolean = false;
                 string WorkingQueryString = null;
-                string BubbleCopy = null;
-                stringBuilderLegacyController AnotherPanel = null;
                 adminUIController Adminui = new adminUIController(cpCore);
                 bool ShowLegacyToolsPanel = false;
                 string QS = null;
@@ -4155,7 +4151,6 @@ namespace Contensive.Core.Controllers {
                         //
                         string helpLink = "";
                         //helpLink = main_GetHelpLink("2", "Contensive Tools Panel", BubbleCopy)
-                        BubbleCopy = "Use the Tools Panel to enable features such as editing and debugging tools. It also includes links to the admin site, the support site and the My Profile page.";
                         result += getPanelHeader("Contensive Tools Panel" + helpLink);
                         //
                         ToolsPanel.Add(cpCore.html.formStart(WorkingQueryString));
@@ -4179,7 +4174,6 @@ namespace Contensive.Core.Controllers {
                             EditTagID = "AllowEditing";
                             QuickEditTagID = "AllowQuickEditor";
                             AdvancedEditTagID = "AllowAdvancedEditor";
-                            WorkflowTagID = "AllowWorkflowRendering";
                             //
                             // Edit
                             //
@@ -4350,7 +4344,6 @@ namespace Contensive.Core.Controllers {
                         //
                         LinkPanel = null;
                         ToolsPanel = null;
-                        AnotherPanel = null;
                     }
                     //
                     // --- Developer Debug Panel

@@ -384,22 +384,7 @@ namespace Contensive.Core.Controllers {
         //
         private void ParseTag(int ElementPointer) {
             try {
-                //Exit Sub
-                //
-                string Copy = null;
-                int CursorPosition = 0;
-                int SpacePosition = 0;
-                //Dim ClosePosition as integer
-                int AttributeDelimiterPosition = 0;
                 string TagString = null;
-                //
-                int QuotePosition = 0;
-                int CloseQuotePosition = 0;
-                int EqualPosition = 0;
-                int TestPosition = 0;
-                string TestValue = null;
-                string Name = null;
-                //
                 string[] AttrSplit = null;
                 int AttrCount = 0;
                 int AttrPointer = 0;
@@ -451,7 +436,7 @@ namespace Contensive.Core.Controllers {
                                             LocalElements[ElementPointer].AttributeSize = LocalElements[ElementPointer].AttributeSize + 5;
                                             Array.Resize(ref LocalElements[ElementPointer].Attributes, (LocalElements[ElementPointer].AttributeSize) + 1);
                                         }
-                                        EqualPosition = genericController.vbInstr(1, AttrName, "=");
+                                        int EqualPosition = genericController.vbInstr(1, AttrName, "=");
                                         if (EqualPosition == 0) {
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Name = AttrName;
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = genericController.vbUCase(AttrName);

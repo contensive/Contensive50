@@ -56,7 +56,7 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override string Email //Inherits BaseClasses.CPUserBaseClass.Email
+        public override string Email
         {
             get {
                 return CP.core.doc.sessionContext.user.Email;
@@ -65,29 +65,21 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override int GetIdByLogin(string Username, string Password) //Inherits BaseClasses.CPUserBaseClass.GetIdByLogin
-        {
-            if (true) {
-                return CP.core.doc.sessionContext.authenticateGetId(cpCore, Username, Password);
-            } else {
-                return 0;
-            }
+        public override int GetIdByLogin(string Username, string Password) {
+            return CP.core.doc.sessionContext.authenticateGetId(cpCore, Username, Password);
         }
         //
         //====================================================================================================
-        //
-        public override int Id //Inherits BaseClasses.CPUserBaseClass.Id
-        {
+        /// <summary>
+        /// Returns the id of the user in the current session context. If 0, this action will create a user.
+        /// This trigger allows sessions with guest detection disabled that will enable if used.
+        /// </summary>
+        public override int Id {
             get {
-                int localId = 0;
-                //
-                if (true) {
-                    localId = CP.core.doc.sessionContext.user.id;
-                    if (localId == 0) {
-                        localId = CP.core.db.insertContentRecordGetID("people", 0);
-
-                        CP.core.doc.sessionContext.recognizeById(cpCore, localId, ref CP.core.doc.sessionContext);
-                    }
+                int localId = CP.core.doc.sessionContext.user.id;
+                if (localId == 0) {
+                    localId = CP.core.db.insertContentRecordGetID("people", 0);
+                    CP.core.doc.sessionContext.recognizeById(cpCore, localId, ref CP.core.doc.sessionContext);
                 }
                 return localId;
             }
@@ -95,117 +87,71 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override bool IsAdmin //Inherits BaseClasses.CPUserBaseClass.admin
-        {
+        public override bool IsAdmin {
             get {
-                if (true) {
-                    return CP.core.doc.sessionContext.isAuthenticatedAdmin(cpCore);
-                } else {
-                    return false;
-                }
+                return CP.core.doc.sessionContext.isAuthenticatedAdmin(cpCore);
             }
         }
         //
         //====================================================================================================
         //
-        public override bool IsAdvancedEditing(string ContentName) //Inherits BaseClasses.CPUserBaseClass.IsAdvancedEditing
-        {
-            if (true) {
-                return CP.core.doc.sessionContext.isAdvancedEditing(cpCore, ContentName);
-            } else {
-                return false;
-            }
+        public override bool IsAdvancedEditing(string ContentName) {
+            return CP.core.doc.sessionContext.isAdvancedEditing(cpCore, ContentName);
         }
         //
         //====================================================================================================
         //
-        public override bool IsAuthenticated //Inherits BaseClasses.CPUserBaseClass.IsAuthenticated
-        {
+        public override bool IsAuthenticated {
             get {
-                if (true) {
-                    return (CP.core.doc.sessionContext.isAuthenticated);
-                } else {
-                    return false;
-                }
+                return (CP.core.doc.sessionContext.isAuthenticated);
             }
         }
         //
         //====================================================================================================
         //
-        public override bool IsAuthoring(string ContentName) //Inherits BaseClasses.CPUserBaseClass.IsAuthoring
-        {
-            if (true) {
-                return CP.core.doc.sessionContext.isEditing(ContentName);
-            } else {
-                return false;
-            }
+        public override bool IsAuthoring(string ContentName) {
+            return CP.core.doc.sessionContext.isEditing(ContentName);
         }
         //
         //====================================================================================================
         //
-        public override bool IsContentManager(string ContentName = "Page Content") //Inherits BaseClasses.CPUserBaseClass.IsContentManager
-        {
-            if (true) {
-                return CP.core.doc.sessionContext.isAuthenticatedContentManager(cpCore, ContentName);
-            } else {
-                return false;
-            }
+        public override bool IsContentManager(string ContentName = "Page Content") {
+            return CP.core.doc.sessionContext.isAuthenticatedContentManager(cpCore, ContentName);
         }
         //
         //====================================================================================================
         //
-        public override bool IsDeveloper //Inherits BaseClasses.CPUserBaseClass.IsDeveloper
-        {
+        public override bool IsDeveloper {
             get {
-                if (true) {
-                    return CP.core.doc.sessionContext.isAuthenticatedDeveloper(cpCore);
-                } else {
-                    return false;
-                }
+                return CP.core.doc.sessionContext.isAuthenticatedDeveloper(cpCore);
             }
         }
         //
         //====================================================================================================
         //
-        public override bool IsEditing(string ContentName) //Inherits BaseClasses.CPUserBaseClass.IsEditing
-        {
-            if (true) {
-                return CP.core.doc.sessionContext.isEditing(ContentName);
-            } else {
-                return false;
-            }
+        public override bool IsEditing(string ContentName) {
+            return CP.core.doc.sessionContext.isEditing(ContentName);
         }
         //
         //====================================================================================================
         //
-        public override bool IsEditingAnything //Inherits BaseClasses.CPUserBaseClass.IsEditingAnything
-        {
+        public override bool IsEditingAnything {
             get {
-                if (true) {
-                    return CP.core.doc.sessionContext.isEditingAnything();
-                } else {
-                    return false;
-                }
+                return CP.core.doc.sessionContext.isEditingAnything();
             }
         }
         //
         //====================================================================================================
         //
-        public override bool IsGuest //Inherits BaseClasses.CPUserBaseClass.IsGuest
-        {
+        public override bool IsGuest {
             get {
-                if (true) {
-                    return CP.core.doc.sessionContext.isGuest(cpCore);
-                } else {
-                    return false;
-                }
+                return CP.core.doc.sessionContext.isGuest(cpCore);
             }
         }
         //
         //====================================================================================================
         //
-        public override bool IsInGroup(string groupName, int userId = 0) //Inherits BaseClasses.CPUserBaseClass.IsInGroup
-        {
+        public override bool IsInGroup(string groupName, int userId = 0) {
             int groupId = 0;
             bool result = false;
             //
@@ -220,7 +166,7 @@ namespace Contensive.Core {
                     result = IsInGroupList(groupId.ToString(), userId);
                 }
             } catch (Exception ex) {
-                CP.core.handleException(ex, "Unexpected error in cs.user.IsInGroup");
+                CP.core.handleException(ex);
                 result = false;
             }
             return result;
@@ -238,7 +184,7 @@ namespace Contensive.Core {
                 }
                 result = CP.core.doc.sessionContext.isMemberOfGroupIdList(cpCore, userId, IsAuthenticated, GroupIDList, false);
             } catch (Exception ex) {
-                CP.core.handleException(ex, "Unexpected error in cs.user.IsInGroupList");
+                CP.core.handleException(ex);
                 result = false;
             }
             return result;
@@ -247,28 +193,21 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override bool IsMember //Inherits BaseClasses.CPUserBaseClass.IsMember
-        {
+        public override bool IsMember {
             get {
-                if (true) {
-                    return CP.core.doc.sessionContext.isAuthenticatedMember(cpCore);
-                } else {
-                    return false;
-                }
+                return CP.core.doc.sessionContext.isAuthenticatedMember(cpCore);
             }
         }
         //
         //====================================================================================================
         //
-        public override bool IsQuickEditing(string ContentName) //Inherits BaseClasses.CPUserBaseClass.IsQuickEditing
-        {
+        public override bool IsQuickEditing(string ContentName) {
             return CP.core.doc.sessionContext.isQuickEditing(cpCore, ContentName);
         }
         //
         //====================================================================================================
         //
-        public override bool IsRecognized //Inherits BaseClasses.CPUserBaseClass.IsRecognized
-        {
+        public override bool IsRecognized {
             get {
                 return CP.core.doc.sessionContext.isRecognized(cpCore);
             }
@@ -276,8 +215,7 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override bool IsWorkflowRendering //Inherits BaseClasses.CPUserBaseClass.IsWorkflowRendering
-        {
+        public override bool IsWorkflowRendering {
             get {
                 return CP.core.doc.sessionContext.isWorkflowRendering();
             }
@@ -285,8 +223,7 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override string Language //Inherits BaseClasses.CPUserBaseClass.Language
-        {
+        public override string Language {
             get {
                 if (CP.core.doc.sessionContext.userLanguage != null) {
                     return CP.core.doc.sessionContext.userLanguage.name;
@@ -297,8 +234,7 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override int LanguageID //Inherits BaseClasses.CPUserBaseClass.LanguageId
-        {
+        public override int LanguageID {
             get {
                 return CP.core.doc.sessionContext.user.LanguageID;
             }
@@ -306,8 +242,7 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override bool Login(string UsernameOrEmail, string Password, bool SetAutoLogin = false) //Inherits BaseClasses.CPUserBaseClass.Login
-        {
+        public override bool Login(string UsernameOrEmail, string Password, bool SetAutoLogin = false) {
             return CP.core.doc.sessionContext.authenticate(cpCore, UsernameOrEmail, Password, SetAutoLogin);
         }
         //
@@ -327,13 +262,12 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override bool LoginByID(int RecordID, bool SetAutoLogin) {
-            return CP.core.doc.sessionContext.authenticateById(cpCore, RecordID, CP.core.doc.sessionContext);
-            if (!CP.core.doc.sessionContext.user.AutoLogin) {
-                CP.core.doc.sessionContext.user.AutoLogin = true;
+            bool result = CP.core.doc.sessionContext.authenticateById(cpCore, RecordID, CP.core.doc.sessionContext);
+            if (result) {
+                CP.core.doc.sessionContext.user.AutoLogin = SetAutoLogin;
                 CP.core.doc.sessionContext.user.save(cpCore);
             }
-            //todo  NOTE: Inserted the following 'return' since all code paths must return a value in C#:
-            return false;
+            return result;
         }
         //
         //====================================================================================================
@@ -382,8 +316,7 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override string Password //Inherits BaseClasses.CPUserBaseClass.Password
-        {
+        public override string Password {
             get {
                 return CP.core.doc.sessionContext.user.Password;
             }
@@ -391,16 +324,14 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override bool Recognize(int UserID) //Inherits BaseClasses.CPUserBaseClass.Recognize
-        {
+        public override bool Recognize(int UserID) {
             sessionContextModel authContext = CP.core.doc.sessionContext;
             return CP.core.doc.sessionContext.recognizeById(cpCore, UserID, ref authContext);
         }
         //
         //====================================================================================================
         //
-        public override string Username //Inherits BaseClasses.CPUserBaseClass.Username
-        {
+        public override string Username {
             get {
                 return CP.core.doc.sessionContext.user.Username;
             }
@@ -427,7 +358,7 @@ namespace Contensive.Core {
         }
         //
         //=======================================================================================================
-        // REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
+        // todo REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
         //=======================================================================================================
         //
         public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
@@ -435,7 +366,7 @@ namespace Contensive.Core {
         }
         //
         //=======================================================================================================
-        // REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
+        //  todo REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
         //=======================================================================================================
         //
         public override DateTime GetDate(string PropertyName, string DefaultValue = "") {
@@ -443,7 +374,7 @@ namespace Contensive.Core {
         }
         //
         //=======================================================================================================
-        // REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
+        // todo  REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
         //=======================================================================================================
         //
         public override int GetInteger(string PropertyName, string DefaultValue = "") {
@@ -451,7 +382,7 @@ namespace Contensive.Core {
         }
         //
         //=======================================================================================================
-        // REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
+        // todo  REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
         //=======================================================================================================
         //
         public override double GetNumber(string PropertyName, string DefaultValue = "") {
@@ -465,20 +396,10 @@ namespace Contensive.Core {
         }
         //
         //====================================================================================================
-        // REFACTOR -- figure out what this does and rewrite
+        // todo  obsolete
         //
         public override void Track() {
-            int localId = 0;
-            if (true) {
-                //
-                // get the id property, which triggers a track() if it returns o
-                //
-                localId = Id;
-                //If Id = 0 Then
-                //    localId = cmc.csv_InsertContentRecordGetID("people", 0)
-                //    Call cmc.main_RecognizeMemberByID(localId)
-                //End If
-            }
+            int localId = Id;
         }
         //
         //====================================================================================================
@@ -489,9 +410,10 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        private void tp(string msg) {
-            //Call appendDebugLog(msg)
-        }
+        private void tp(string msg) {}
+        //
+        //====================================================================================================
+        //
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).

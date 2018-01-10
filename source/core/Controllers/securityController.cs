@@ -310,67 +310,47 @@ namespace Contensive.Core.Controllers {
             /// value is true; otherwise, the function returns false.
             /// </returns>
             public static bool VerifyHash(string plainText, string hashAlgorithm, string hashValue) {
-                bool tempVerifyHash = false;
-
                 // Convert base64-encoded hash value into a byte array.
                 byte[] hashWithSaltBytes = Convert.FromBase64String(hashValue);
-
                 // We must know size of hash (without salt).
                 int hashSizeInBits = 0;
                 int hashSizeInBytes = 0;
-
                 // Make sure that hashing algorithm name is specified.
                 if (hashAlgorithm == null) {
                     hashAlgorithm = "";
                 }
-
                 // Size of hash is based on the specified algorithm.
                 switch (hashAlgorithm.ToUpper()) {
-
                     case "SHA1":
                         hashSizeInBits = 160;
-
                         break;
                     case "SHA256":
                         hashSizeInBits = 256;
-
                         break;
                     case "SHA384":
                         hashSizeInBits = 384;
-
                         break;
                     case "SHA512":
                         hashSizeInBits = 512;
-
                         break;
                     default: // Must be MD5
                         hashSizeInBits = 128;
-
                         break;
                 }
-
                 // Convert size of hash from bits to bytes.
                 hashSizeInBytes = encodeInteger(hashSizeInBits / 8.0);
-
                 // Make sure that the specified hash value is long enough.
                 if (hashWithSaltBytes.Length < hashSizeInBytes) {
-                    tempVerifyHash = false;
                 }
-
                 // Allocate array to hold original salt bytes retrieved from hash.
                 byte[] saltBytes = new byte[hashWithSaltBytes.Length - hashSizeInBytes];
-
                 // Copy salt from the end of the hash to the new array.
                 int I = 0;
                 for (I = 0; I < saltBytes.Length; I++) {
                     saltBytes[I] = hashWithSaltBytes[hashSizeInBytes + I];
                 }
-
                 // Compute a new hash string.
                 string expectedHashString = ComputeHash(plainText, hashAlgorithm, saltBytes);
-
-                // If the computed hash matches the specified hash,
-                // the plain text value must be correct.
                 return (hashValue == expectedHashString);
             }
         }

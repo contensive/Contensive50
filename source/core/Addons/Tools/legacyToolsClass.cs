@@ -2248,7 +2248,6 @@ namespace Contensive.Core.Addons.Tools {
                 long ReadTicks = 0;
                 DataTable RS = null;
                 string TestCopy = null;
-                int Ticks = 0;
                 int PageSize = 0;
                 int PageNumber = 0;
                 int RecordCount = 0;

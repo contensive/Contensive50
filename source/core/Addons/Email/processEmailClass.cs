@@ -264,15 +264,11 @@ namespace Contensive.Core.Addons.Email {
                 string EmailTemplate = null;
                 string FieldList = null;
                 string FromAddress = null;
-                string EmailBody = null;
                 // Dim emailStyles As String
                 int EmailMemberID = 0;
                 DateTime EmailDateExpires = default(DateTime);
-                string siteStyles = null;
                 DateTime rightNow = default(DateTime);
                 DateTime rightNowDate = default(DateTime);
-                DateTime yesterdayDate = default(DateTime);
-                DateTime tomorrowDate = default(DateTime);
                 string SQLDateNow = null;
                 int dataSourceType = 0;
                 string sqlDateTest = null;

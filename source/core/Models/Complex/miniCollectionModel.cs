@@ -16,25 +16,41 @@ using static Contensive.Core.constants;
 //
 namespace Contensive.Core.Models.Complex {
     //
-    //
     //====================================================================================================
     /// <summary>
     /// miniCollection - This is an old collection object used in part to load the cdef part xml files. REFACTOR this into CollectionWantList and werialization into jscon
     /// </summary>
     public class miniCollectionModel : ICloneable {
         //
-        // Content Definitions (some data in CDef, some in the CDef extension)
-        //
+        //====================================================================================================
+        /// <summary>
+        /// Name of miniCollection
+        /// </summary>
         public string name;
         //
-        // true only for the one collection created from the base file. This property does not transfer during addSrcToDst
-        public bool isBaseCollection; 
+        //====================================================================================================
+        /// <summary>
+        /// True only for the one collection created from the base file. This property does not transfer during addSrcToDst
+        /// Assets created from a base collection can only be modifed by the base collection.
+        /// </summary>
+        public bool isBaseCollection;
         //
+        //====================================================================================================
+        /// <summary>
+        /// Name dictionary of content definitions in the collection
+        /// </summary>
+        public Dictionary<string, Models.Complex.cdefModel> cdef = new Dictionary<string, Models.Complex.cdefModel>() { };
         //
-        public Dictionary<string, Models.Complex.cdefModel> CDef = new Dictionary<string, Models.Complex.cdefModel>() { };
+        //====================================================================================================
+        /// <summary>
+        /// Name dictionary of all addons in the miniCollection
+        /// </summary>
+        public Dictionary<string, collectionAddOnModel> addOns = new Dictionary<string, collectionAddOnModel>() { };
         //
-        //
-        public Dictionary<string, collectionAddOnModel> AddOns = new Dictionary<string, collectionAddOnModel>() { };
+        //====================================================================================================
+        /// <summary>
+        /// Model of addons in the minicollection
+        /// </summary>
         public class collectionAddOnModel {
             public string Name;
             public string Link;
@@ -45,8 +61,16 @@ namespace Contensive.Core.Models.Complex {
             public bool dataChanged;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// List of sql indexes for the minicollection
+        /// </summary>
+        public List<collectionSQLIndexModel> sqlIndexes = new List<collectionSQLIndexModel> { };
         //
-        public List<collectionSQLIndexModel> SQLIndexes = new List<collectionSQLIndexModel> { };
+        //====================================================================================================
+        /// <summary>
+        /// Model of sqlIndexes for the collection
+        /// </summary>
         public class collectionSQLIndexModel {
             public string DataSourceName;
             public string TableName;
@@ -55,10 +79,16 @@ namespace Contensive.Core.Models.Complex {
             public bool dataChanged;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// Name dictionary for admin navigator menus in the minicollection
+        /// </summary>
+        public Dictionary<string, collectionMenuModel> menus = new Dictionary<string, collectionMenuModel> { };
         //
-        public Dictionary<string, collectionMenuModel> Menus = new Dictionary<string, collectionMenuModel> { };
-        //
-        //
+        //====================================================================================================
+        /// <summary>
+        /// Model for menu dictionary
+        /// </summary>
         public class collectionMenuModel {
             public string Name;
             public bool IsNavigator;
@@ -79,10 +109,18 @@ namespace Contensive.Core.Models.Complex {
             public string Key;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// Array of styles for the minicollection
+        /// </summary>
+        [Obsolete("Shared styles deprecated")]
+        public StyleType[] styles;
         //
-        public StyleType[] Styles;
-        //
-        //
+        //====================================================================================================
+        /// <summary>
+        /// Model for style array
+        /// </summary>
+        [Obsolete("Shared styles deprecated")]
         public struct StyleType {
             public string Name;
             public bool Overwrite;
@@ -90,26 +128,51 @@ namespace Contensive.Core.Models.Complex {
             public bool dataChanged;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// count of styles
+        /// </summary>
+        [Obsolete("Shared styles deprecated")]
+        public int styleCnt;
         //
-        public int StyleCnt;
-        public string StyleSheet;
+        //====================================================================================================
+        /// <summary>
+        /// Site style sheet
+        /// </summary>
+        [Obsolete("Shared styles deprecated")]
+        public string styleSheet;
         //
-        //
+        //====================================================================================================
+        /// <summary>
+        /// List of collections that must be installed before this collection can be installed
+        /// </summary>
         public List<ImportCollectionType> collectionImports = new List<ImportCollectionType>() { };
         //
-        //
+        //====================================================================================================
+        /// <summary>
+        /// Model for imported collections
+        /// </summary>
         public struct ImportCollectionType {
             public string Name;
             public string Guid;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// count of page templates in collection
+        /// </summary>
+        public int pageTemplateCnt;
         //
-        public int PageTemplateCnt;
+        //====================================================================================================
+        /// <summary>
+        /// Array of page templates
+        /// </summary>
+        public PageTemplateType[] pageTemplates;
         //
-        //
-        public PageTemplateType[] PageTemplates;
-        //
-        // Page Template - started, but CDef2 and LoadDataToCDef are all that is done do far
+        //====================================================================================================
+        /// <summary>
+        /// Model for page templates
+        /// </summary>
         public struct PageTemplateType {
             public string Name;
             public string Copy;
@@ -117,7 +180,11 @@ namespace Contensive.Core.Models.Complex {
             public string Style;
         }
         //
-        //
+        //====================================================================================================
+        /// <summary>
+        /// clone object
+        /// </summary>
+        /// <returns></returns>
         public object Clone() {
             return this.MemberwiseClone();
         }

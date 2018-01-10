@@ -129,33 +129,8 @@ namespace Contensive.WindowsServices {
             try {
                 //
                 httpRequestController kmaHTTP = new httpRequestController();
-                int CookiePointer = 0;
-                bool CookieGood = false;
-                int CookieMatchCount = 0;
-                int CSPointer = 0;
-                string CookieDomain = null;
-                string CookieExpires = null;
-                string CookieName = null;
-                string CookiePath = null;
-                string CookieValue = null;
-                string CookieString = null;
-                DateTime CookieDateAdded = default(DateTime);
-                int CookieID = 0;
-                int VisitID = 0;
-                string SQL = null;
-                string Hint = null;
-                int AnyLanguageID = 0;
-                int CSLanguage = 0;
-                int CSVisit = 0;
-                int CSMember = 0;
-                int VisitMemberID = 0;
                 string URLWorking = null;
-                string ResponseHeader = null;
-                string[] ResponseLines = null;
-                string ResponseStatus = null;
                 Stopwatch stopWatch = new Stopwatch();
-                //
-                PrintDebugMessage("Requesting [" + Link + "]", AppName);
                 //
                 //   Get the document
                 //
@@ -164,71 +139,41 @@ namespace Contensive.WindowsServices {
                 HTTPInProcess = true;
                 HTTPLastError = 0;
                 URLWorking = Contensive.Core.Controllers.genericController.EncodeURL(Link);
-                //todo  TASK: The 'On Error Resume Next' statement is not converted by Instant C#:
-
                 kmaHTTP.timeout = RequestTimeout;
                 tempGetDoc = kmaHTTP.getURL(ref URLWorking);
-                if (true) {
-                    HTTPLastError = 0; // Microsoft.VisualBasic.Information.Err().Number;
-                    HandleMonitorError("MonitorForm", "GetDoc getting URL [" + Link + "]");
-                    switch (HTTPLastError) {
-                        case 20302:
-                            appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - timeout waiting for server]");
-                            return_needsErrorRecovery = true;
-                            break;
-                        case 25061:
-                            appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - timeout waiting for server]");
-                            return_needsErrorRecovery = true;
-                            break;
-                        case 25065:
-                            appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - host is down]");
-                            return_needsErrorRecovery = true;
-                            break;
-                        case 26002:
-                            appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - host not found]");
-                            break;
-                        case 25069:
-                        case 25068:
-                            appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - server too busy]");
-                            return_needsErrorRecovery = true;
-                            break;
-                        case 26005:
-                            appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - invalid domain name]");
-                            break;
-                        default:
-                            appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - error requesting document]");
-                            return_needsErrorRecovery = true;
-                            break;
-                    }
-                } else {
-                    ResponseHeader = kmaHTTP.responseHeader;
-                    ResponseLines = stringSplit(ResponseHeader, Environment.NewLine );
-                    ResponseStatus = "";
-                    if (ResponseLines.GetUpperBound(0) > 0) {
-                        ResponseStatus = ResponseLines[0];
-                    }
-                    if ( genericController.vbInstr(1, ResponseStatus, "200 OK", 1) == 0) {
-                        //
-                        // Not a 200, this is an error
-                        //
-                        appendMonitorLog("GetDoc(" + URLWorking + ") returned Response Status [" + ResponseStatus + "]");
-                        tempGetDoc = "Response Status [" + ResponseStatus + "]";
-                        switch (ResponseStatus.Substring(0, 1)) {
-                            case "5":
-                                //
-                                // Server error, allow IIS resetr
-                                //
-                                return_needsErrorRecovery = true;
-                                break;
-                        }
-                    }
+                HTTPLastError = 0;
+                HandleMonitorError("MonitorForm", "GetDoc getting URL [" + Link + "]");
+                switch (HTTPLastError) {
+                    case 20302:
+                        appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - timeout waiting for server]");
+                        return_needsErrorRecovery = true;
+                        break;
+                    case 25061:
+                        appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - timeout waiting for server]");
+                        return_needsErrorRecovery = true;
+                        break;
+                    case 25065:
+                        appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - host is down]");
+                        return_needsErrorRecovery = true;
+                        break;
+                    case 26002:
+                        appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - host not found]");
+                        break;
+                    case 25069:
+                    case 25068:
+                        appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - server too busy]");
+                        return_needsErrorRecovery = true;
+                        break;
+                    case 26005:
+                        appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - invalid domain name]");
+                        break;
+                    default:
+                        appendMonitorLog("GetDoc(" + URLWorking + ") returned error [" + HTTPLastError + " - error requesting document]");
+                        return_needsErrorRecovery = true;
+                        break;
                 }
                 HTTPInProcess = false;
                 HTTPResponseTime = stopWatch.ElapsedMilliseconds / 1000.0;
-                //
-                //hint = "Done"
-                //
-                PrintDebugMessage("Request complete [" + Link + "]", AppName);
                 //
                 return tempGetDoc;
                 //
@@ -241,29 +186,6 @@ namespace Contensive.WindowsServices {
             //kmaHTTP = null;
             HandleMonitorError("GetDoc", "getting URL [" + Link + "]");
             return tempGetDoc;
-        }
-        //
-        //==========================================================================================
-        //   Update the status form
-        //==========================================================================================
-        //
-        private void PrintDebugMessage(string CurrentActivity, string AppName) {
-            try {
-                //
-                string Copy = null;
-                //
-                // ----- if debugging, print the current status
-                //
-                if (DebugMode && (!string.IsNullOrEmpty(CurrentActivity))) {
-                    SaveToLogFile("PrintDebugMessage", AppName, CurrentActivity);
-                }
-                return;
-                //
-            } catch {
-                goto ErrorTrap;
-            }
-            ErrorTrap:
-            HandleMonitorError("PrintDebugMessage", "TrapError");
         }
         //
         //======================================================================================
@@ -344,7 +266,6 @@ namespace Contensive.WindowsServices {
                 // Log
                 //
                 SaveToLogFile("StartMonitoring", "-", serviceDisplayName + " Started");
-                PrintDebugMessage(serviceDisplayName + " Started", "-");
                 config.Save();
                 //cp.Dispose()
                 return;
@@ -364,25 +285,11 @@ namespace Contensive.WindowsServices {
         //
         public void StopMonitoring() {
             try {
-                //
-                int Timeout = 0;
-                //
                 processTimer.Enabled = false;
-                //
                 SaveToLogFile("StopMonitoring", "-", "Stopping " + serviceDisplayName);
-                PrintDebugMessage("Stopping " + serviceDisplayName, "-");
-                //
-                // set abort and the timeout timer
-                //
                 AbortProcess = true;
-                //
-                return;
-                //
             } catch {
-                goto ErrorTrap;
             }
-            ErrorTrap:
-            HandleMonitorError("StopMonitoring", "TrapError");
         }
         //
         //==========================================================================================
@@ -482,10 +389,8 @@ namespace Contensive.WindowsServices {
                 int AppPtr = 0;
                 string[] AppDetails = null;
                 int AppDetailsCnt = 0;
-                int SiteStatus = 0;
                 string AppName = null;
                 int AppStatus = 0;
-                string Hint = null;
                 string DomainName = null;
                 string[] ListSplit = null;
                 string Response = null;
@@ -495,16 +400,11 @@ namespace Contensive.WindowsServices {
                 string ResponseStatusLine = null;
                 int AppLogPtr = 0;
                 string ErrorMessageResponse = null;
-                //Dim cp As New CPClass
-                //Dim Ctrl As New controlClass
                 //
-                throw new NotImplementedException();
-                //AppList = ctrl.GetApplicationList
                 tempmonitorAllSites_returnEmailBody = "";
                 if (string.IsNullOrEmpty(AppList)) {
                     //
                     // Problem
-                    //
                     tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + " Error, no Contensive Applications were found";
                     appendMonitorLog("GetApplicationList call returned no Contensive Applications were found");
                 } else {

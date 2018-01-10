@@ -3461,7 +3461,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 int Cnt = 0;
                 int fieldEditorFieldId = 0;
                 int fieldEditorAddonId = 0;
-                DataTable dt = null;
                 bool editorOk = false;
                 int CS = 0;
                 string[] QSSplit = null;
@@ -3469,20 +3468,8 @@ namespace Contensive.Core.Addons.AdminSite {
                 string[] NVSplit = null;
                 string NameValue = null;
                 int WCount = 0;
-                string FindTemp = null;
-                int FieldCount = 0;
-                string StringTemp = null;
                 string WhereClauseContent = null;
-                string WherePairTemp = null;
-                int Position = 0;
-                int Position2 = 0;
-                string MethodName = null;
-                string InputText = null;
-                int Id = 0;
-                //dim buildversion As String
                 DataTable dtTest = null;
-                //
-                MethodName = "Admin.Method()";
                 //
                 // Tab Control
                 //
@@ -3749,52 +3736,11 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         private void ProcessActions(cdefModel adminContent, editRecordClass editRecord, bool UseContentWatchLink) {
             try {
-                //
-                //Dim Upload As KMAUpload3.UploadClass
-                //
                 int CS = 0;
-                string Filename = null;
-                int FieldCount = 0;
-                string SQL = null;
-                // converted array to dictionary - Dim FieldPointer As Integer
-                int EMailToMemberID = 0;
-                string EmailFrom = null;
-                string EmailSubject = null;
-                string EmailBody = null;
-                string EmailStatus = null;
-                string EmailStatusMessage = null;
-                string DataSourceName = null;
-                bool ForceReadOnly = false; // set true for special cases that force a record read only
-                string EmailBodySource = null;
-                bool EmailBodyHTML = false;
-                string EmailSubjectSource = null;
-                bool EmailSubjectHTML = false;
-                string ApprovedName = null;
-                int CSRecord = 0;
-                int ContentID = 0;
                 int RecordID = 0;
                 string ContentName = null;
-                string Copy = null;
                 int CSEditRecord = 0;
                 int EmailToConfirmationMemberID = 0;
-                int ImageWidth = 0;
-                int ImageHeight = 0;
-                int Position = 0;
-                byte[] ByteArray = null;
-                string VirtualFilePath = null;
-                bool EmailAddLinkEID = false;
-                string OpenTriggerCode = null;
-                string OpenTriggerCss = null;
-                string ClickFlagQuery = null;
-                string EmailSpamFooterFlag = null;
-                bool ToAll = false;
-                int CSLog = 0;
-                int EmailDropID = 0;
-                string EmailToAddress = null;
-                string EmailToName = null;
-                int ScheduletypeID = 0;
-                int EMailTemplateID = 0;
-                string EmailTemplate = null;
                 int RowCnt = 0;
                 int RowPtr = 0;
                 //
@@ -3820,113 +3766,6 @@ namespace Contensive.Core.Addons.AdminSite {
                                 // Mark the record reviewed without making any changes
                                 //
                                 cpcore.doc.markRecordReviewed(adminContent.Name, editRecord.id);
-                                //Case AdminActionWorkflowPublishSelected
-                                //    '
-                                //    ' Publish everything selected
-                                //    '
-                                //    RowCnt = cpCore.docProperties.getInteger("RowCnt")
-                                //    For RowPtr = 0 To RowCnt - 1
-                                //        If cpCore.docProperties.getBoolean("Row" & RowPtr) Then
-                                //            RecordID = cpCore.docProperties.getInteger("RowID" & RowPtr)
-                                //            ContentName = cpCore.docProperties.getText("RowContentName" & RowPtr)
-                                //            Call cpCore.workflow.publishEdit(ContentName, RecordID)
-                                //            Call cpCore.doc.processAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
-                                //            Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, recordId))
-                                //            Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" &cdefmodel.getContentId(cpcore,ContentName))
-                                //        End If
-                                //    Next
-                                //Case AdminActionWorkflowPublishApproved
-                                //    '
-                                //    ' Publish all approved workflow publishing records
-                                //    '
-                                //    CS = cpCore.db.cs_open("Authoring Controls", "ControlType=3", "ID")
-                                //    Do While cpCore.db.cs_ok(CS)
-                                //        ContentID = cpCore.db.cs_getInteger(CS, "ContentID")
-                                //        RecordID = cpCore.db.cs_getInteger(CS, "RecordID")
-                                //        ContentName = cdefmodel.getContentNameByID(cpcore,ContentID)
-                                //        If ContentName <> "" Then
-                                //            Call cpCore.workflow.publishEdit(ContentName, RecordID)
-                                //            Call cpCore.doc.processAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
-                                //            Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, recordId))
-                                //        End If
-                                //        cpCore.db.cs_goNext(CS)
-                                //    Loop
-                                //    Call cpCore.db.cs_Close(CS)
-                                //    'AdminForm = AdminFormRoot
-                                //Case AdminActionPublishApprove
-                                //    If (editRecord.Read_Only) Then
-                                //        Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is locked.")
-                                //    ElseIf Not adminContent.AllowWorkflowAuthoring Then
-                                //        Call errorController.error_AddUserError(cpCore, "Your request was blocked because content you selected does not support workflow authoring.")
-                                //    Else
-                                //        '
-                                //        Call LoadEditRecord(adminContent, editRecord)
-                                //        Call LoadEditResponse(adminContent, editRecord)
-                                //        Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                //        If Not (cpCore.doc.debug_iUserError <> "") Then
-                                //            'no - if WF, on process on publish
-                                //            'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
-                                //            Call cpCore.workflow.approveEdit(adminContent.Name, editRecord.id)
-                                //        Else
-                                //            AdminForm = AdminSourceForm
-                                //        End If
-                                //    End If
-                                //    AdminAction = AdminActionNop ' convert so action can be used in as a refresh
-                                //Case AdminActionPublishSubmit
-                                //    If (editRecord.Read_Only) Then
-                                //        Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is locked.")
-                                //    ElseIf Not adminContent.AllowWorkflowAuthoring Then
-                                //        Call errorController.error_AddUserError(cpCore, "Your request was blocked because content you selected does not support workflow authoring.")
-                                //    Else
-                                //        '
-                                //        Call LoadEditRecord(adminContent, editRecord)
-                                //        Call LoadEditResponse(adminContent, editRecord)
-                                //        Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                //        If Not (cpCore.doc.debug_iUserError <> "") Then
-                                //            'no - if WF, on process on publish
-                                //            'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
-                                //            Call cpCore.workflow.main_SubmitEdit(adminContent.Name, editRecord.id)
-                                //            Call cpCore.doc.sendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
-                                //        Else
-                                //            AdminForm = AdminSourceForm
-                                //        End If
-                                //    End If
-                                //    AdminAction = AdminActionNop ' convert so action can be used in as a refresh
-                                //Case AdminActionPublish
-                                //    '
-                                //    ' --- Publish edit record to live record - not AuthoringLock blocked
-                                //    '
-                                //    Call LoadEditRecord(adminContent, editRecord)
-                                //    Call LoadEditResponse(adminContent, editRecord)
-                                //    Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                //    If Not (cpCore.doc.debug_iUserError <> "") Then
-                                //        Call cpCore.workflow.publishEdit(adminContent.Name, editRecord.id)
-                                //        CS = cpCore.db.csOpenRecord(adminContent.Name, editRecord.id)
-                                //        Dim IsDeleted As Boolean
-                                //        IsDeleted = Not cpCore.db.cs_ok(CS)
-                                //        Call cpCore.db.cs_Close(CS)
-                                //        Call cpCore.doc.processAfterSave(IsDeleted, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                //        Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, recordId))
-                                //    Else
-                                //        AdminForm = AdminSourceForm
-                                //    End If
-                                //Case AdminActionAbortEdit
-                                //    '
-                                //    ' --- copy live record over edit record
-                                //    '
-                                //    Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.doc.authContext.user.id)
-                                //    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                //    If MenuDepth > 0 Then
-                                //        '
-                                //        ' opened as a child, close the window
-                                //        '
-                                //        AdminForm = AdminFormClose
-                                //    Else
-                                //        '
-                                //        ' opened as a main window, go to the contents index page
-                                //        '
-                                //        AdminForm = AdminFormIndex
-                                //    End If
                                 break;
                             case AdminActionDelete:
                                 if (editRecord.Read_Only) {
@@ -3936,50 +3775,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     cpcore.db.deleteTableRecord(adminContent.ContentTableName, editRecord.id, adminContent.ContentDataSourceName);
                                     cpcore.doc.processAfterSave(true, editRecord.contentControlId_Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink);
                                 }
-                                AdminAction = AdminActionNop; // convert so action can be used in as a refresh
-                                                              //                Case AdminActionSetHTMLEdit
-                                                              //                    '
-                                                              //                    ' Set member property for this field to HTML Edit
-                                                              //                    '
-                                                              //                    Call cpCore.main_SetMemberProperty("HTMLEditor." & AdminContent.Name & "." & InputFieldName, True)
-                                                              //                    Call ProcessActionSave(AdminContent, editRecord,UseContentWatchLink)
-                                                              //                    AdminForm = AdminSourceForm
-                                                              //                Case AdminActionSetTextEdit
-                                                              //                    '
-                                                              //                    ' Set member property for this field to HTML Edit
-                                                              //                    '
-                                                              //                    Call cpCore.main_SetMemberProperty("HTMLEditor." & AdminContent.Name & "." & InputFieldName, False)
-                                                              //                    Call ProcessActionSave(AdminContent, editRecord,UseContentWatchLink)
-                                                              //                    AdminForm = AdminSourceForm
-                                                              //                Case AdminActionSaveField
-                                                              //                    If (editrecord.read_only) Then
-                                                              //                        Call cpCore.htmldoc.main_AddUserError("Your request was blocked because the record you specified is now locked by another authcontext.user.")
-                                                              //                    Else
-                                                              //                        '
-                                                              //                        ' --- preload array with values that may not come back in response
-                                                              //                        '
-                                                              //                        If (InputFieldName = "") Then
-                                                              //                            Call HandleInternalError("ProcessActions", "SaveField action called but InputFieldName is null")
-                                                              //                        Else
-                                                              //                            Call LoadEditRecord
-                                                              //                            Call LoadEditResponseByName(InputFieldName)
-                                                              //                            '
-                                                              //                            ' --- if no error, save values
-                                                              //                            '
-                                                              //                            If Not cpCore.main_IsUserError Then
-                                                              //                                Call SaveEditRecord(adminContent, editRecord,ResponseFormID)
-                                                              //                            End If
-                                                              //                            If cpCore.main_IsUserError Then
-                                                              //                                AdminForm = AdminSourceForm
-                                                              //                            End If
-                                                              //                            'record should be marked modified in cpCore.app.csv_SaveCSRecord
-                                                              //                            'If AdminContent.AllowWorkflowAuthoring Then
-                                                              //                            '    Call cpCore.main_SetAuthoringControl(AdminContent.Name, EditRecord.ID, AuthoringControlsModified)
-                                                              //                            '    End If
-                                                              //                            End If
-                                                              //                        End If
-                                                              //                    AdminAction = AdminActionNop ' convert so action can be used in as a refresh
-                                                              //                    '
+                                AdminAction = AdminActionNop; 
                                 break;
                             case AdminActionSave:
                                 //
@@ -5647,73 +5443,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 cpcore.handleException(ex);
             }
         }
-        //        '
-        //        '========================================================================
-        //        '   Load and Save
-        //        '       From both response and database
-        //        '
-        //        '   This needs to be updated:
-        //        '       - Divide into LoadCalendarEvents / SaveCalendarEvents
-        //        '       - Put LoadCalendarEvents in LoadResponse/LoadDatabase
-        //        '       - Put SaveCalendarEvents with SaveEditRecord
-        //        '       - this is so a usererror will preserve form responses
-        //        '       - Dont delete all and recreate / just update records
-        //        '========================================================================
-        //        '
-        //        Private Sub LoadAndSaveMetaContent()
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadAndSaveMetaContent")
-        //            '
-        //            Dim CS As Integer
-        //            Dim MetaContentID As Integer
-        //            Dim MetaKeywordList As String
-        //            '
-        //            MetaContentID = cpCore.docProperties.getInteger("MetaContent.MetaContentID")
-        //            If (MetaContentID <> 0) Then
-        //                '
-        //                ' ----- Load from Response
-        //                '
-        //                CS = cpCore.db.csOpenRecord("Meta Content", MetaContentID)
-        //                If cpCore.db.cs_ok(CS) Then
-        //                    Call cpCore.db.cs_set(CS, "Name", cpCore.docProperties.getText("MetaContent.PageTitle"))
-        //                    Call cpCore.db.cs_set(CS, "MetaDescription", cpCore.docProperties.getText("MetaContent.MetaDescription"))
-        //                    If True Then ' 3.3.930" Then
-        //                        Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
-        //                        MetaKeywordList = cpCore.docProperties.getText("MetaContent.MetaKeywordList")
-        //                        MetaKeywordList = genericController.vbReplace(MetaKeywordList, ",", vbCrLf)
-        //                        Do While genericController.vbInstr(1, MetaKeywordList, vbCrLf & " ") <> 0
-        //                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, vbCrLf & " ", vbCrLf)
-        //                        Loop
-        //                        Do While genericController.vbInstr(1, MetaKeywordList, " " & vbCrLf) <> 0
-        //                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, " " & vbCrLf, vbCrLf)
-        //                        Loop
-        //                        Do While genericController.vbInstr(1, MetaKeywordList, vbCrLf & vbCrLf) <> 0
-        //                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, vbCrLf & vbCrLf, vbCrLf)
-        //                        Loop
-        //                        Do While (MetaKeywordList <> "") And (Right(MetaKeywordList, 2) = vbCrLf)
-        //                            MetaKeywordList = Left(MetaKeywordList, Len(MetaKeywordList) - 2)
-        //                        Loop
-        //                        Call cpCore.db.cs_set(CS, "MetaKeywordList", MetaKeywordList)
-        //                    ElseIf cpCore.db.cs_isFieldSupported(CS, "OtherHeadTags") Then
-        //                        Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
-        //                    End If
-        //                    Call cpCore.html.main_ProcessCheckList("MetaContent.KeywordList", "Meta Content", genericController.encodeText(MetaContentID), "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID")
-        //                End If
-        //                Call cpCore.db.cs_Close(CS)
-        //                '
-        //                ' Clear any bakes involving this content
-        //                '
-        //                Call cpCore.cache.invalidateContent("Meta Content")
-        //                Call cpCore.cache.invalidateContent("Meta Keyword Rules")
-        //            End If
-        //            '
-        //            Exit Sub
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        ////ErrorTrap:
-        //            Call handleLegacyClassError3("LoadAndSaveMetaContent")
-        //            '
-        //        End Sub
         //
         //========================================================================
         //   Save Link Alias field if it supported, and is non-authoring
@@ -6378,8 +6107,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 string editorAddonListJSON = null;
                 bool Active = false;
                 string Name = null;
-                string WFMessage = "";
-                string IgnoreString = "";
                 string styleList = null;
                 string styleOptionList = "";
                 string fieldEditorList = null;
@@ -7223,262 +6950,6 @@ namespace Contensive.Core.Addons.AdminSite {
             }
             return returnHtml;
         }
-        //
-        //========================================================================
-        // Print the DHTMLEdit form
-        //========================================================================
-        //
-        //Private Function GetForm_EditHTML() As String
-        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_EditHTML")
-        //    '
-        //    Dim WhereCount as integer
-        //    Dim FastString As fastStringClass
-        //    '
-        //    FastString = New FastStringClass
-        //    FastString.Add( cpCore.main_GetFormInputHidden(RequestNameAdminDepth, MenuDepth))
-        //    FastString.Add( cpCore.main_GetFormInputHidden(RequestNameTitleExtension, TitleExtension))
-        //    If WherePairCount > 0 Then
-        //        For WhereCount = 0 To WherePairCount - 1
-        //            FastString.Add( cpCore.main_GetFormInputHidden("wl" & WhereCount, WherePair(0, WhereCount)))
-        //            FastString.Add( cpCore.main_GetFormInputHidden("wr" & WhereCount, WherePair(1, WhereCount)))
-        //            Next
-        //        End If
-        //    GetForm_EditHTML = cpCore.main_GetActiveEditor(AdminContent.Name, EditRecord.ID, InputFieldName, FastString.Text)
-        //    FastString = Nothing
-        //    '
-        //    '''Dim th as integer: Exit Function
-        //    '
-        //    ' ----- Error Trap
-        //    '
-        ////ErrorTrap:
-        //    FastString = Nothing
-        //    Call HandleClassTrapErrorBubble("PrintDHTMLEditForm")
-        //    '
-        //End Function
-        //        '
-        //        '========================================================================
-        //        ' Print the DHTMLEdit form
-        //        '========================================================================
-        //        '
-        //        Private Function GetForm_StaticPublishControl() As String
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "GetForm_StaticPublishControl")
-        //            '
-        //            Dim WhereCount As Integer
-        //            Dim Content As New stringBuilderLegacyController
-        //            Dim EDGPublishNow As Boolean
-        //            Dim Activity As String
-        //            Dim TargetDomain As String
-        //            Dim EDGCreateSnapShot As Boolean
-        //            Dim EDGPublishToProduction As Boolean
-        //            Dim CSPointer As Integer
-        //            Dim Copy As String
-        //            Dim StagingServer As String
-        //            Dim PagesFound As Integer
-        //            Dim PagesComplete As Integer
-        //            Dim SQL As String
-        //            Dim Button As String
-        //            Dim EDGAuthUsername As String
-        //            Dim EDGAuthPassword As String
-        //            Dim QueryString As String
-        //            Dim Adminui As New adminUIController(cpCore)
-        //            Dim Description As String
-        //            Dim ButtonList As String = ""
-        //            '
-        //            Button = cpCore.docProperties.getText(RequestNameButton)
-        //            If Button = ButtonCancel Then
-        //                '
-        //                '
-        //                '
-        //                Return cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "StaticPublishControl, Cancel Button Pressed")
-        //            ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
-        //                '
-        //                '
-        //                '
-        //                ButtonList = ButtonCancel
-        //                Content.Add(Adminui.GetFormBodyAdminOnly())
-        //            Else
-        //                Content.Add(Adminui.EditTableOpen)
-        //                '
-        //                ' Set defaults
-        //                '
-        //                EDGCreateSnapShot = (cpCore.siteProperties.getBoolean("EDGCreateSnapShot", True))
-        //                EDGPublishToProduction = (cpCore.siteProperties.getBoolean("EDGPublishToProduction", True))
-        //                EDGPublishNow = (cpCore.siteProperties.getBoolean("EDGPublishNow"))
-        //                EDGAuthUsername = cpCore.siteProperties.getText("EDGAuthUsername", "")
-        //                EDGAuthPassword = cpCore.siteProperties.getText("EDGAuthPassword", "")
-        //                '
-        //                ' Process Requests
-        //                '
-        //                Select Case Button
-        //                    Case ButtonBegin
-        //                        '
-        //                        ' Save form values
-        //                        '
-        //                        EDGAuthUsername = cpCore.docProperties.getText("EDGAuthUsername")
-        //                        Call cpCore.siteProperties.setProperty("EDGAuthUsername", EDGAuthUsername)
-        //                        '
-        //                        EDGAuthPassword = cpCore.docProperties.getText("EDGAuthPassword")
-        //                        Call cpCore.siteProperties.setProperty("EDGAuthPassword", EDGAuthPassword)
-        //                        '
-        //                        EDGCreateSnapShot = cpCore.docProperties.getBoolean("EDGCreateSnapShot")
-        //                        Call cpCore.siteProperties.setProperty("EDGCreateSnapShot", genericController.encodeText(EDGCreateSnapShot))
-        //                        '
-        //                        EDGPublishToProduction = cpCore.docProperties.getBoolean("EDGPublishToProduction")
-        //                        Call cpCore.siteProperties.setProperty("EDGPublishToProduction", genericController.encodeText(EDGPublishToProduction))
-        //                        '
-        //                        ' Begin Publish
-        //                        '
-        //                        EDGPublishNow = (EDGCreateSnapShot Or EDGPublishToProduction)
-        //                        Call cpCore.siteProperties.setProperty("EDGPublishNow", genericController.encodeText(EDGPublishNow))
-        //                    Case ButtonAbort
-        //                        '
-        //                        ' Abort Publish
-        //                        '
-        //                        EDGPublishNow = False
-        //                        Call cpCore.siteProperties.setProperty("EDGPublishNow", genericController.encodeText(EDGPublishNow))
-        //                    Case ButtonRefresh
-        //                        '
-        //                        ' Refresh (no action)
-        //                        '
-        //                End Select
-        //                '
-        //                ' ----- Status
-        //                '
-        //                If EDGPublishNow Then
-        //                    Copy = "Started"
-        //                Else
-        //                    Copy = "Stopped"
-        //                End If
-        //                Call Content.Add(Adminui.GetEditRow(Copy, "Status", "", False, False, ""))
-        //                '
-        //                ' ----- activity
-        //                '
-        //                Copy = genericController.encodeText(cpCore.siteProperties.getText("EDGPublishStatus", "Waiting"))
-        //                Call Content.Add(Adminui.GetEditRow(Copy, "Activity", "", False, False, ""))
-        //                '
-        //                ' ----- Pages Found
-        //                '
-        //                Copy = "n/a"
-        //                SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs;"
-        //                CSPointer = cpCore.db.csOpenSql_rev("Default", SQL)
-        //                If cpCore.db.csOk(CSPointer) Then
-        //                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
-        //                End If
-        //                Call cpCore.db.csClose(ref CSPointer)
-        //                Call Content.Add(Adminui.GetEditRow(Copy, "Links Found", "", False, False, ""))
-        //                '
-        //                ' ----- Pages Complete
-        //                '
-        //                Copy = "n/a"
-        //                SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1);"
-        //                CSPointer = cpCore.db.csOpenSql_rev("Default", SQL)
-        //                If cpCore.db.csOk(CSPointer) Then
-        //                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
-        //                End If
-        //                Call cpCore.db.csClose(ref CSPointer)
-        //                Call Content.Add(Adminui.GetEditRow(Copy, "Pages Complete", "", False, False, ""))
-        //                '
-        //                ' ----- Bad Links
-        //                '
-        //                Copy = "n/a"
-        //                QueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, RequestNameAdminForm, AdminFormReports, True)
-        //                QueryString = genericController.ModifyQueryString(QueryString, RequestNameReportForm, ReportFormEDGDocErrors, True)
-        //                SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1) And (LinkAlias Is Not null) And ((HTTPResponse Is null) Or ((Not (HTTPResponse Like '% 200 %'))and (not (HTTPResponse like '% 302 %'))));"
-        //                CSPointer = cpCore.db.csOpenSql_rev("Default", SQL)
-        //                If cpCore.db.csOk(CSPointer) Then
-        //                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
-        //                End If
-        //                Call cpCore.db.csClose(ref CSPointer)
-        //                Call Content.Add(Adminui.GetEditRow("<a href=""/" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
-        //                '
-        //                ' ----- Options
-        //                '
-
-        //                'Content.Add( "<tr><td align=""right"">" & SpanClassAdminSmall & "Options</span></td>")
-        //                If EDGPublishNow Then
-        //                    '
-        //                    ' Publishing
-        //                    '
-        //                    Call Content.Add(Adminui.GetEditRow(genericController.main_GetYesNo(EDGCreateSnapShot), "Create Staging Snap-Shot", "", False, False, ""))
-        //                    Call Content.Add(Adminui.GetEditRow(genericController.main_GetYesNo(EDGPublishToProduction), "Publish Snap-Shot to Production", "", False, False, ""))
-        //                Else
-        //                    '
-        //                    ' Ready
-        //                    '
-        //                    Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("EDGCreateSnapShot", EDGCreateSnapShot), "Create Staging Snap-Shot", "", False, False, ""))
-        //                    Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("EDGPublishToProduction", EDGPublishToProduction), "Publish Snap-Shot to Production", "", False, False, ""))
-        //                End If
-        //                '
-        //                ' Username
-        //                '
-        //                Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputText2("EDGAuthUsername", EDGAuthUsername), "Username", "", False, False, ""))
-        //                '
-        //                ' Password
-        //                '
-        //                Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputText2("EDGAuthPassword", EDGAuthPassword), "Password", "", False, False, ""))
-        //                '
-        //                ' Seed Documents
-        //                '
-        //                Copy = ""
-        //                CSPointer = cpCore.db.csOpen("EDG Publish Seeds")
-        //                Do While cpCore.db.csOk(CSPointer)
-        //                    If Copy <> "" Then
-        //                        Copy = Copy & "<br>"
-        //                    End If
-        //                    Copy = Copy & cpCore.db.csGetRecordEditLink(CSPointer) & cpCore.db.csGet(CSPointer, "Name")
-        //                    cpCore.db.csGoNext(CSPointer)
-        //                Loop
-        //                Call cpCore.db.csClose(ref CSPointer)
-        //                Copy = Copy & "<br>" & cpCore.html.main_cs_getRecordAddLink(CSPointer)
-        //                Call Content.Add(Adminui.GetEditRow(Copy, "Seed URLs", "", False, False, ""))
-        //                '
-        //                ' Production Servers
-        //                '
-        //                Copy = ""
-        //                CSPointer = cpCore.db.csOpen("EDG Publish Servers")
-        //                Do While cpCore.db.csOk(CSPointer)
-        //                    If Copy <> "" Then
-        //                        Copy = Copy & "<br>"
-        //                    End If
-        //                    Copy = Copy & cpCore.db.csGetRecordEditLink(CSPointer) & cpCore.db.csGet(CSPointer, "Name")
-        //                    cpCore.db.csGoNext(CSPointer)
-        //                Loop
-        //                Call cpCore.db.csClose(ref CSPointer)
-        //                'If cpCore.visitProperty_AllowEditing Then
-        //                '    If Copy <> "" Then
-        //                '        'Copy = Copy & "<br>"
-        //                '        End If
-        //                Copy = Copy & "<br>" & cpCore.html.main_cs_getRecordAddLink(CSPointer)
-        //                '    End If
-        //                Call Content.Add(Adminui.GetEditRow(Copy, "Production Servers", "", False, False, ""))
-        //                '
-        //                ' Buttons
-        //                '
-        //                If Not EDGPublishNow Then
-        //                    ButtonList = ButtonBegin
-        //                Else
-        //                    ButtonList = ButtonAbort & "," & ButtonRefresh
-        //                End If
-        //                '
-        //                Content.Add(Adminui.EditTableClose)
-        //                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormEDGControl))
-        //            End If
-        //            '
-        //            Description = "Static Publishing lets you create a completely static version of your website on remote servers. Some dynamic features such as personalization will not work on a static site."
-        //            GetForm_StaticPublishControl = Adminui.GetBody("Static Publish Control", ButtonList, "", True, True, Description, "", 0, Content.Text)
-        //            Content = Nothing
-        //            '
-        //            Exit Function
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        ////ErrorTrap:
-        //            Content = Nothing
-        //            Call handleLegacyClassError3("PrintDHTMLEditForm")
-        //            '
-        //        End Function
-        //
-        //
         //
         //========================================================================
         // ----- Print the Normal Content Edit form
@@ -10207,119 +9678,6 @@ namespace Contensive.Core.Addons.AdminSite {
             }
             return tempGetForm_Edit_LinkAliases;
         }
-        //        '
-        //        '========================================================================
-        //        '   Print the Topic Rules section of any edit form
-        //        '========================================================================
-        //        '
-        //        Private Function GetForm_Edit_MetaContent(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_MetaContent")
-        //            '
-        //            Dim s As String
-        //            Dim SQL As String
-        //            Dim FastString As New stringBuilderLegacyController
-        //            Dim Checked As Boolean
-        //            Dim TableID As Integer
-        //            Dim MetaContentID As Integer
-        //            Dim CS As Integer
-        //            Dim PageTitle As String = ""
-        //            Dim MetaDescription As String = ""
-        //            Dim MetaKeywordList As String = ""
-        //            Dim OtherHeadTags As String = ""
-        //            Dim Adminui As New adminUIController(cpCore)
-        //            '
-        //            If adminContent.AllowMetaContent Then
-        //                CS = cpCore.db.cs_open("Meta Content", "(ContentID=" & editRecord.contentControlId & ")and(RecordID=" & editRecord.id & ")")
-        //                If Not cpCore.db.cs_ok(CS) Then
-        //                    CS = cpCore.db.cs_insertRecord("Meta Content")
-        //                    Call cpCore.db.cs_set(CS, "ContentID", editRecord.contentControlId)
-        //                    Call cpCore.db.cs_set(CS, "RecordID", editRecord.id)
-        //                    Call cpCore.db.cs_save2(CS)
-        //                End If
-        //                If cpCore.db.cs_ok(CS) Then
-        //                    MetaContentID = cpCore.db.cs_getInteger(CS, "ID")
-        //                    PageTitle = cpCore.db.cs_get(CS, "Name")
-        //                    MetaDescription = cpCore.db.cs_get(CS, "MetaDescription")
-        //                    If True Then ' 3.3.930" Then
-        //                        MetaKeywordList = cpCore.db.cs_get(CS, "MetaKeywordList")
-        //                        OtherHeadTags = cpCore.db.cs_get(CS, "OtherHeadTags")
-        //                    ElseIf cpCore.db.cs_isFieldSupported(CS, "OtherHeadTags") Then
-        //                        OtherHeadTags = cpCore.db.cs_get(CS, "OtherHeadTags")
-        //                    End If
-        //                End If
-        //                Call cpCore.db.cs_Close(CS)
-        //                '
-        //                'Call FastString.Add(cpCore.main_GetFormInputHidden("MetaContent.MetaContentID", MetaContentID))
-        //                '
-        //                ' Page Title
-        //                '
-        //                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Page Title</td>")
-        //                Call FastString.Add("<td class=""ccAdminEditField"" align=""left"" colspan=""2"">" & SpanClassAdminNormal)
-        //                If readOnlyField Then
-        //                    Call FastString.Add(PageTitle)
-        //                Else
-        //                    Call FastString.Add(cpCore.html.html_GetFormInputText2("MetaContent.PageTitle", PageTitle))
-        //                End If
-        //                Call FastString.Add("</span></td></tr>")
-        //                '
-        //                ' Meta Description
-        //                '
-        //                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Meta Description</td>")
-        //                Call FastString.Add("<td class=""ccAdminEditField"" align=""left"" colspan=""2"">" & SpanClassAdminNormal)
-        //                If readOnlyField Then
-        //                    Call FastString.Add(MetaDescription)
-        //                Else
-        //                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.MetaDescription", MetaDescription, 10))
-        //                End If
-        //                Call FastString.Add("</span></td></tr>")
-        //                '
-        //                ' Meta Keyword List
-        //                '
-        //                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Meta Keyword List</td>")
-        //                Call FastString.Add("<td class=""ccAdminEditField"" align=""left"" colspan=""2"">" & SpanClassAdminNormal)
-        //                If readOnlyField Then
-        //                    Call FastString.Add(MetaKeywordList)
-        //                Else
-        //                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.MetaKeywordList", MetaKeywordList, 10))
-        //                End If
-        //                Call FastString.Add("</span></td></tr>")
-        //                '
-        //                ' Meta Keywords, Shared
-        //                '
-        //                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Shared Meta Keywords</td>")
-        //                Call FastString.Add("<td class=""ccAdminEditField"" colspan=""2"">")
-        //                Call FastString.Add(cpCore.html.getInputCheckList("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField))
-        //                'Call FastString.Add(cpCore.html.getInputCheckListCategories("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField, "Meta Keywords"))
-        //                Call FastString.Add("</td></tr>")
-        //                '
-        //                ' Other Head Tags
-        //                '
-        //                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Other Head Tags</td>")
-        //                Call FastString.Add("<td class=""ccAdminEditField"" colspan=""2"">" & SpanClassAdminNormal)
-        //                If readOnlyField Then
-        //                    Call FastString.Add(OtherHeadTags)
-        //                Else
-        //                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.OtherHeadTags", OtherHeadTags, 10))
-        //                End If
-        //                Call FastString.Add("</span></td></tr>")
-        //                '
-        //                s = "" _
-        //                    & Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose _
-        //                    & cpCore.html.html_GetFormInputHidden("MetaContent.MetaContentID", MetaContentID) _
-        //                    & ""
-        //                '
-        //                GetForm_Edit_MetaContent = Adminui.GetEditPanel((Not allowAdminTabs), "Meta Content", "Meta Tags available for pages using this content", s)
-        //                EditSectionPanelCount = EditSectionPanelCount + 1
-        //                '
-        //                FastString = Nothing
-        //            End If
-        //            '
-        //            Exit Function
-        //            '
-        ////ErrorTrap:
-        //            FastString = Nothing
-        //            Call handleLegacyClassError3("GetForm_Edit_MetaContent")
-        //        End Function
         //
         //========================================================================
         // Print the Email form Group associations
@@ -10982,63 +10340,6 @@ namespace Contensive.Core.Addons.AdminSite {
             }
             return tempGetForm_Edit_ContentGroupRules;
         }
-        //        '
-        //        '========================================================================
-        //        '   Gets the fields pointer if it exists, otherwise -1
-        //        '
-        //        '   Does not report an error
-        //        '========================================================================
-        //        '
-        //        Private Function GetFieldPtrNoError(adminContent As appServices_metaDataClass.CDefClass, editRecord As editRecordClass, ByVal TargetField As String) As Integer
-
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetFieldPtrNoError")
-        //            '
-        //            Dim UcaseTargetField As String
-        //            ''Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
-        //            '
-        //            GetFieldPtrNoError = -1
-        //            UcaseTargetField = genericController.vbUCase(TargetField)
-        //            If adminContent.fields.Count > 0 Then
-        //                arrayOfFields = adminContent.fields
-        //                For GetFieldPtrNoError = 0 To adminContent.fields.Count - 1
-
-        //                    If genericController.vbUCase(arrayOfFields(GetFieldPtrNoError).Name) = UcaseTargetField Then
-        //                        Exit For
-        //                    End If
-        //                Next
-        //                If GetFieldPtrNoError >= adminContent.fields.Count Then
-        //                    GetFieldPtrNoError = -1
-        //                End If
-        //            End If
-        //            Exit Function
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        ////ErrorTrap:
-        //            Call handleLegacyClassError3("GetFieldPtrNoError")
-        //            '
-        //        End Function
-        //        '
-        //        '========================================================================
-        //        ' Get FieldPointer from its FieldName
-        //        '   Returns -1 if not found
-        //        '========================================================================
-        //        '
-        //        Private Function GetFieldPtr(adminContent As appServices_metaDataClass.CDefClass, editRecord As editRecordClass, ByVal TargetField As String) As Integer
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetFieldPtr")
-        //            '
-        //            GetFieldPtr = GetFieldPtrNoError(TargetField)
-        //            If GetFieldPtr = -1 Then
-        //                Call handleLegacyClassError("AdminClass.GetFieldPtr", "Could not find content field [" & adminContent.Name & "].[" & TargetField & "]")
-        //            End If
-        //            Exit Function
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        ////ErrorTrap:
-        //            Call handleLegacyClassError3("GetFieldPtr")
-        //            '
-        //        End Function
         //
         //========================================================================
         // MakeButton
@@ -11100,273 +10401,6 @@ namespace Contensive.Core.Addons.AdminSite {
             }
             return tempMakeButtonFlat;
         }
-        //
-        //========================================================================
-        // GetMenuLeftMode()
-        //   Prints the menu section of the admin page
-        //========================================================================
-        //
-        //Private Function deprecate_menu_getLeftMode() As String
-        //    Dim returnString As String = ""
-        //    Try
-        //        '
-        //        Const MenuEntryContentName = cnNavigatorEntries
-        //        '
-        //        Dim HeaderNameCurrent As String
-        //        Dim MenuName As String
-        //        Dim MenuID As Integer
-        //        Dim MenuPage As String
-        //        Dim MenuContentID As Integer
-        //        Dim MenuNewWindow As Boolean
-        //        Dim MenuItemCount As Integer
-        //        Dim CS As Integer
-        //        Dim Panel As String
-        //        Dim ContentManagementList As New List(Of Integer)
-        //        Dim IsAdminLocal As Boolean
-        //        '
-        //        ' Start the menu panel
-        //        '
-        //        Panel = "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
-        //        Panel = Panel & "<tr><td width=""10""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""10"" height=""1"" ></td><td width=""100%""></td></tr>"
-        //        '
-        //        ' --- Load CCMenu
-        //        '
-        //        CS = GetMenuCSPointer("(ccMenuEntries.ParentID is null)or(ccMenuEntries.ParentID=0)", MenuEntryContentName)
-        //        If cpCore.db.csOk(CS) Then
-        //            IsAdminLocal = cpCore.doc.authContext.user.user_isAdmin
-        //            If Not IsAdminLocal Then
-        //                ContentManagementList.AddRange(cpCore.metaData.getEditableCdefIdList())
-        //            End If
-        //            HeaderNameCurrent = ""
-        //            MenuItemCount = 0
-        //            Do While cpCore.db.csOk(CS)
-        //                MenuName = cpCore.db.cs_get(CS, "Name")
-        //                MenuPage = cpCore.db.cs_get(CS, "LinkPage")
-        //                MenuContentID = cpCore.db.cs_getInteger(CS, "ContentID")
-        //                MenuNewWindow = cpCore.db.cs_getBoolean(CS, "NewWindow")
-        //                MenuID = cpCore.db.cs_getInteger(CS, "ID")
-        //                HeaderNameCurrent = MenuName
-        //                '
-        //                ' --- new header
-        //                '
-        //                If MenuItemCount <> 0 Then
-        //                    Panel = Panel & "<tr><td colspan=""2""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""4"" ></td></tr>"
-        //                    Panel = Panel & "<tr><td colspan=""2"" class=""ccPanelShadow""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td></tr>"
-        //                    Panel = Panel & "<tr><td colspan=""2"" class=""ccPanelHilite""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td></tr>"
-        //                    Panel = Panel & "<tr><td colspan=""2""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""4"" ></td></tr>"
-        //                End If
-        //                Panel = Panel & "<tr><td colspan=""2"">" & SpanClassAdminNormal & "<b>" & MenuName & "</b></span></td></tr>"
-        //                MenuItemCount = MenuItemCount + 1
-        //                Panel = Panel & deprecate_menu_getLeftModeBranch(MenuID, "", ContentManagementList, IsAdminLocal, MenuEntryContentName)
-        //                Call cpCore.db.csGoNext(CS)
-        //            Loop
-        //        End If
-        //        Call cpCore.db.csClose(ref CS)
-        //        '
-        //        ' Close the menu panel
-        //        '
-        //        Panel = Panel & "<tr><td width=""10""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""10"" height=""1"" ></td><td width=""1""></td><td width=""100%""></td><td width=""1""></td></tr>"
-        //        Panel = Panel & "</table>"
-        //        deprecate_menu_getLeftMode = cpcore.htmldoc.main_GetPanel(Panel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "150", 10)
-        //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex) : Throw
-        //    End Try
-        //    Return returnString
-        //End Function
-        //        '
-        //        '========================================================================
-        //        ' GetMenuLeftModeBranch()
-        //        '   Prints the menu section of the admin page
-        //        '========================================================================
-        //        '
-        //        Private Function deprecate_menu_getLeftModeBranch(ByVal ParentID As Integer, ByVal ParentHeaderName As String, ByVal ContentManagementList As List(Of Integer), ByVal IsAdminLocal As Boolean, ByVal MenuEntryContentName As String) As String
-
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetMenuLeftModeBranch")
-        //            '
-        //            Dim HeaderName As String
-        //            Dim HeaderNameCurrent As String
-        //            Dim MenuName As String
-        //            Dim MenuID As Integer
-        //            Dim MenuPage As String
-        //            Dim MenuContentID As Integer
-        //            Dim MenuNewWindow As Boolean
-        //            Dim ButtonObject As String
-        //            Dim MenuItemCount As Integer
-        //            Dim SQL As String
-        //            Dim CS As Integer
-        //            Dim ImageID As Integer
-        //            Dim ButtonGuts As String = ""
-        //            Dim ButtonHref As String
-        //            Dim ParentIDCurrent As Integer
-        //            Dim MenuNameDisplay As String
-        //            '
-        //            ' --- Load CCMenu
-        //            '
-        //            CS = GetMenuCSPointer("(ccMenuEntries.ParentID=" & ParentID & ")", MenuEntryContentName)
-        //            'SQL = GetMenuSQLNew("(ccMenuEntries.ParentID=" & parentid & ")")
-        //            'CS = cpCore.app_openCsSql_Rev_Internal("Default", SQL)
-        //            If cpCore.db.csOk(CS) Then
-        //                HeaderNameCurrent = ""
-        //                MenuItemCount = 0
-        //                Do While cpCore.db.csOk(CS)
-        //                    MenuName = cpCore.db.cs_get(CS, "Name")
-        //                    MenuPage = cpCore.db.cs_get(CS, "LinkPage")
-        //                    MenuContentID = cpCore.db.cs_getInteger(CS, "ContentID")
-        //                    MenuNewWindow = cpCore.db.cs_getBoolean(CS, "NewWindow")
-        //                    MenuID = cpCore.db.cs_getInteger(CS, "ID")
-        //                    If ParentHeaderName = "" Then
-        //                        MenuNameDisplay = MenuName
-        //                    Else
-        //                        MenuNameDisplay = ParentHeaderName & ":" & MenuName
-        //                    End If
-        //                    If (IsAdminLocal) Or ((MenuPage <> "") Or ((MenuContentID > 0) And (ContentManagementList.Contains(MenuContentID)))) Then
-        //                        'If ((MenuPage <> "") Or (MenuContentID > 0)) Then
-        //                        '
-        //                        ' output the button
-        //                        '
-        //                        If MenuName = "" Then
-        //                            MenuName = "[Link]"
-        //                        End If
-        //                        If MenuPage = "" Then
-        //                            MenuPage = cpCore.siteProperties.serverPageDefault
-        //                        End If
-        //                        If MenuContentID > 0 Then
-        //                            MenuPage = modifyLinkQuery(MenuPage, "cid", CStr(MenuContentID), True)
-        //                            'MenuPage = MenuPage & "&cid=" & MenuContentID
-        //                        End If
-        //                        ButtonHref = MenuPage
-        //                        If MenuNewWindow Then
-        //                            ButtonGuts = ButtonGuts & " target=""_blank"""
-        //                        End If
-        //                        ButtonGuts = SpanClassAdminNormal & MenuNameDisplay & "</span>"
-        //                        ' 9-28-02 ButtonGuts = SpanClassAdminNormal & "<nobr>" & MenuNameDisplay & "</nobr></span>"
-        //                        ButtonObject = "Button" & ButtonObjectCount
-        //                        ButtonObjectCount = ButtonObjectCount + 1
-        //                        deprecate_menu_getLeftModeBranch = deprecate_menu_getLeftModeBranch & "<tr><td></td><td>" & MakeButton(ButtonObject, ButtonGuts, ButtonHref, "150", "ccPanel", "ccPanelHilite", "ccPanelShadow", MenuNewWindow) & "</td></tr>"
-        //                    End If
-        //                    MenuItemCount = MenuItemCount + 1
-        //                    deprecate_menu_getLeftModeBranch = deprecate_menu_getLeftModeBranch & deprecate_menu_getLeftModeBranch(MenuID, MenuNameDisplay, ContentManagementList, IsAdminLocal, MenuEntryContentName)
-        //                    Call cpCore.db.csGoNext(CS)
-        //                Loop
-        //            End If
-        //            Call cpCore.db.csClose(ref CS)
-        //            Exit Function
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        ////ErrorTrap:
-        //            Call handleLegacyClassError3("GetMenuLeftModeBranch")
-        //            '
-        //        End Function
-        //        '
-        //        '========================================================================
-        //        ' GetMenuLeftMode()
-        //        '   Prints the menu section of the admin page
-        //        '========================================================================
-        //        '
-        //        Private Function menu_getLeftModeOld(ByVal MenuEntryContentName As String) As String
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetMenuLeftModeOld")
-        //            '
-        //            Dim HeaderName As String
-        //            Dim HeaderNameCurrent As String
-        //            Dim MenuName As String
-        //            Dim MenuID As Integer
-        //            Dim MenuPage As String
-        //            Dim MenuContentID As Integer
-        //            Dim MenuNewWindow As Boolean
-        //            Dim ButtonObject As String
-        //            Dim MenuItemCount As Integer
-        //            Dim SQL As String
-        //            Dim CS As Integer
-        //            Dim ImageID As Integer
-        //            Dim Panel As String
-        //            Dim ButtonGuts As String
-        //            Dim ButtonHref As String
-        //            Dim ParentID As Integer
-        //            Dim ParentIDCurrent As Integer
-        //            '
-        //            ' --- Left Menu Mode
-        //            '
-        //            If AdminMenuModeID = AdminMenuModeLeft Then
-        //                CS = GetMenuCSPointer("", MenuEntryContentName)
-        //                'SQL = GetMenuSQLNew()
-        //                ''
-        //                '' --- Load CCMenu
-        //                ''
-        //                'CS = cpCore.app_openCsSql_Rev_Internal("Default", SQL)
-        //                If cpCore.db.csOk(CS) Then
-        //                    HeaderNameCurrent = ""
-        //                    MenuItemCount = 0
-        //                    Panel = "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
-        //                    Panel = Panel & "<tr><td width=""10""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""10"" height=""1"" ></td><td width=""100%""></td></tr>"
-        //                    Do While cpCore.db.csOk(CS)
-        //                        ParentID = cpCore.db.cs_getInteger(CS, "ParentID")
-        //                        'HeaderName = cpCore.app.cs_get(CS, "HeaderName")
-        //                        MenuName = cpCore.db.cs_get(CS, "Name")
-        //                        MenuPage = cpCore.db.cs_get(CS, "LinkPage")
-        //                        MenuContentID = cpCore.db.cs_getInteger(CS, "ContentID")
-        //                        MenuNewWindow = cpCore.db.cs_getBoolean(CS, "NewWindow")
-        //                        MenuID = cpCore.db.cs_getInteger(CS, "ID")
-        //                        '
-        //                        ' --- draw menu line
-        //                        '
-        //                        If ParentID = 0 Then
-        //                            HeaderNameCurrent = MenuName
-        //                            '
-        //                            ' --- new header
-        //                            '
-        //                            'cpCore.writeAltBufferComment ("Menu new header")
-        //                            If MenuItemCount <> 0 Then
-        //                                Panel = Panel & "<tr><td colspan=""2""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""4"" ></td></tr>"
-        //                                Panel = Panel & "<tr><td colspan=""2"" class=""ccPanelShadow""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td></tr>"
-        //                                Panel = Panel & "<tr><td colspan=""2"" class=""ccPanelHilite""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td></tr>"
-        //                                Panel = Panel & "<tr><td colspan=""2""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""4"" ></td></tr>"
-        //                            End If
-        //                            Panel = Panel & "<tr><td colspan=""2"">" & SpanClassAdminNormal & "<b>" & MenuName & "</b></span></td></tr>"
-        //                        End If
-        //                        If ((MenuPage <> "") Or (MenuContentID > 0)) Then
-        //                            '
-        //                            ' output the button
-        //                            '
-        //                            If MenuName = "" Then
-        //                                MenuName = "[Link]"
-        //                            End If
-        //                            If MenuPage = "" Then
-        //                                MenuPage = cpCore.siteProperties.serverPageDefault
-        //                            End If
-        //                            If genericController.vbInstr(MenuPage, "?") = 0 Then
-        //                                MenuPage = MenuPage & "?s=0"
-        //                                'Else
-        //                                '    MenuPage = MenuPage
-        //                            End If
-        //                            If MenuContentID > 0 Then
-        //                                MenuPage = MenuPage & "&cid=" & MenuContentID
-        //                            End If
-        //                            ButtonHref = MenuPage
-        //                            If MenuNewWindow Then
-        //                                ' ButtonGuts = ButtonGuts & " target=""_blank"""
-        //                            End If
-        //                            ButtonGuts = SpanClassAdminNormal & MenuName & "</span>"
-        //                            ButtonObject = "Button" & ButtonObjectCount
-        //                            ButtonObjectCount = ButtonObjectCount + 1
-        //                            Panel = Panel & "<tr><td></td><td>" & MakeButton(ButtonObject, ButtonGuts, ButtonHref, "150", "ccPanel", "ccPanelHilite", "ccPanelShadow", MenuNewWindow) & "</td></tr>"
-        //                        End If
-        //                        MenuItemCount = MenuItemCount + 1
-        //                        Call cpCore.db.csGoNext(CS)
-        //                    Loop
-        //                    Panel = Panel & "<tr><td width=""10""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""10"" height=""1"" ></td><td width=""1""></td><td width=""100%""></td><td width=""1""></td></tr>"
-        //                    Panel = Panel & "</table>"
-        //                    menu_getLeftModeOld = cpcore.htmldoc.main_GetPanel(Panel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "150", 10)
-        //                End If
-        //            End If
-        //            Exit Function
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        ////ErrorTrap:
-        //            Call handleLegacyClassError3("GetMenuLeftMode")
-        //            '
-        //        End Function
         //
         //========================================================================
         // GetForm_Top
@@ -11475,11 +10509,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 ButtonObjectCount = ButtonObjectCount + 1;
                 //
                 // ----- Output the button image
-                //
                 string Panel = "";
-                //If BGColor <> "" Then
-                //    Panel = Panel & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""" & Width & """ BGColor=""" & BGColor & """ align=""left""><tr><td>"
-                //    End If
                 if (!string.IsNullOrEmpty(HRef)) {
                     Panel = Panel + "<a href=\"" + HRef + "\" ";
                     if (!string.IsNullOrEmpty(OnClick)) {
@@ -11515,48 +10545,6 @@ namespace Contensive.Core.Addons.AdminSite {
             }
             return result;
         }
-        //
-        //========================================================================
-        //   Preload an image, returns object
-        //========================================================================
-        //
-        //Private Function PreloadImage(Image As String) As String
-        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.PreloadImage")
-        //    '
-        //    Dim ImageFound As Boolean
-        //    Dim ImagePreloadPointer as integer
-        //    '
-        //    ImageFound = False
-        //    If ImagePreloadCount > 0 Then
-        //        For ImagePreloadPointer = 0 To ImagePreloadCount
-        //            If ImagePreloads(0, ImagePreloadPointer) = Image Then
-        //                ImageFound = True
-        //                PreloadImage = ImagePreloads(0, ImagePreloadPointer)
-        //                Exit For
-        //                End If
-        //            Next
-        //        End If
-        //    If Not ImageFound Then
-        //        If ImagePreloadCount = 0 Then
-        //            JavaScriptString = JavaScriptString & vbCrLf & "PreloadImages = new Array(); "
-        //            End If
-        //        '
-        //        PreloadImage = "Image" & ImagePreloadCount
-        //        ImagePreloads(0, ImagePreloadCount) = Image
-        //        ImagePreloads(1, ImagePreloadCount) = PreloadImage
-        //        ImagePreloadCount = ImagePreloadCount + 1
-        //        '
-        //        JavaScriptString = JavaScriptString & vbCrLf & "PreloadImages['" & PreloadImage & "'] = new Image(); "
-        //        JavaScriptString = JavaScriptString & vbCrLf & "PreloadImages['" & PreloadImage & "'].src = '/ccLib/images/" & Image & "'; "
-        //        End If
-        //    '''Dim th as integer: Exit Function
-        //    '
-        //    ' ----- Error Trap
-        //    '
-        ////ErrorTrap:
-        //    Call HandleClassTrapErrorBubble("PreloadImage")
-        //    '
-        //End Function
         //
         //========================================================================
         // Get sql for menu
@@ -12465,26 +11453,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string[] ColAlign = null;
                 string[] ColWidth = null;
                 string[,] Cells = null;
-                int GroupID = 0;
-                int GroupToolAction = 0;
-                string ActionPanel = null;
-                int RowCount = 0;
-                string GroupName = null;
-                int MemberID = 0;
-                string QS = null;
-                string VisitsCell = null;
-                int VisitCount = 0;
                 string AdminURL = null;
-                int CCID = 0;
-                string SQLValue = null;
-                string DefaultName = null;
-                string SearchCaption = null;
-                string BlankPanel = null;
-                string RowPageSize = null;
-                string RowGroups = null;
-                string[] GroupIDs = null;
-                int GroupPtr = 0;
-                string GroupDelimiter = null;
                 DateTime DateCompleted = default(DateTime);
                 int RowCnt = 0;
                 int RowPtr = 0;
@@ -12945,124 +11914,6 @@ namespace Contensive.Core.Addons.AdminSite {
             }
             return returnHtml;
         }
-        //        '
-        //        ' Delete this when I can verify the Csvr patch to the instream process works
-        //        '
-        //        Private Sub VerifyDynamicMenuStyleSheet(ByVal MenuID As Integer)
-        //            On Error GoTo ErrorTrap : ''Dim th as integer : th = profileLogAdminMethodEnter("VerifyDynamicMenuStyleSheet")
-        //            '
-        //            Dim StyleSN As String
-        //            Dim EditTabCaption As String
-        //            Dim ACTags() As String
-        //            Dim TagPtr As Integer
-        //            Dim QSPos As Integer
-        //            Dim QSPosEnd As Integer
-        //            Dim QS As String
-        //            Dim MenuName As String
-        //            Dim StylePrefix As String
-        //            Dim CS As Integer
-        //            Dim IsFound As Boolean
-        //            Dim StyleSheet As String
-        //            Dim DefaultStyles As String
-        //            Dim DynamicStyles As String
-        //            Dim AddStyles As String
-        //            Dim StyleSplit() As String
-        //            Dim StylePtr As Integer
-        //            Dim StyleLine As String
-        //            Dim Filename As String
-        //            Dim NewStyleLine As String
-        //            Dim TestSTyles As String
-
-        //            '
-        //            CS = cpCore.main_OpenCSContentRecord("Dynamic Menus", MenuID)
-        //            If cpCore.app.IsCSOK(CS) Then
-        //                StylePrefix = cpCore.db.cs_getText(CS, "StylePrefix")
-        //                If StylePrefix <> "" And genericController.vbUCase(StylePrefix) <> "CCFLYOUT" Then
-        //                    if true then ' 3.3.951" Then
-        //                        TestSTyles = cpCore.app.cs_get(CS, "StylesFilename")
-        //                    Else
-        //                        TestSTyles = cpCore.main_GetStyleSheet
-        //                    End If
-        //                    If genericController.vbInstr(1, TestSTyles, "." & StylePrefix, vbTextCompare) = 0 Then
-        //                        '
-        //                        ' style not found, get the default ccFlyout styles
-        //                        '
-        //                        DefaultStyles = RemoveStyleTags(cpCore.cluster.programDataFiles.ReadFile("ccLib\" & "Styles\" & defaultStyleFilename))
-        //                        'DefaultStyles = genericController.vbReplace(DefaultStyles, vbCrLf, " ")
-        //                        Do While genericController.vbInstr(1, DefaultStyles, "  ") <> 0
-        //                            DefaultStyles = genericController.vbReplace(DefaultStyles, "  ", " ")
-        //                        Loop
-        //                        StyleSplit = Split(DefaultStyles, "}")
-        //                        For StylePtr = 0 To UBound(StyleSplit)
-        //                            StyleLine = StyleSplit(StylePtr)
-        //                            If StyleLine <> "" Then
-        //                                If genericController.vbInstr(1, StyleLine, ".ccflyout", vbTextCompare) <> 0 Then
-        //                                    StyleLine = genericController.vbReplace(StyleLine, vbCrLf, " ")
-        //                                    StyleLine = genericController.vbReplace(StyleLine, ".ccflyout", "." & StylePrefix, vbTextCompare)
-        //                                    Do While Left(StyleLine, 1) = " "
-        //                                        StyleLine = Mid(StyleLine, 2)
-        //                                    Loop
-        //                                    AddStyles = AddStyles & StyleLine & "}" & vbCrLf
-        //                                End If
-        //                            End If
-        //                        Next
-        //                        If AddStyles <> "" Then
-        //                            '
-        //                            '
-        //                            '
-        //                            if true then ' 3.3.951" Then
-        //                                '
-        //                                ' Add new styles to the StylesFilename field
-        //                                '
-        //                                DynamicStyles = "" _
-        //                                    & cpCore.app.cs_get(CS, "StylesFilename") _
-        //                                    & vbCrLf & "" _
-        //                                    & vbCrLf & "/* Menu Styles for Style Prefix [" & StylePrefix & "] created " & nt(cpCore.main_PageStartTime.toshortdateString & " */" _
-        //                                    & vbCrLf & "" _
-        //                                    & vbCrLf & AddStyles _
-        //                                    & ""
-        //                                Call cpCore.app.SetCS(CS, "StylesFilename", DynamicStyles)
-        //                            Else
-        //                                '
-        //                                ' Legacy - add styles to the site stylesheet
-        //                                '
-        //                                Filename = cpCore.app.confxxxig.physicalFilePath & DynamicStylesFilename
-        //                                DynamicStyles = RemoveStyleTags(cpCore.app.publicFiles.ReadFile(Filename)) & vbCrLf & AddStyles
-        //                                Call cpCore.app.publicFiles.SaveFile(Filename, DynamicStyles)
-        //                                '
-        //                                ' Now create admin and public stylesheets from the styles.css styles
-        //                                '
-        //                                StyleSN = (cpCore.app.siteProperty_getInteger("StylesheetSerialNumber", "0"))
-        //                                If StyleSN <> 0 Then
-        //                                    ' mark to rebuild next fetch
-        //                                    Call cpCore.app.siteProperty_set("StylesheetSerialNumber", "-1")
-        //                                    '' Linked Styles
-        //                                    '' Bump the Style Serial Number so next fetch is not cached
-        //                                    ''
-        //                                    'StyleSN = StyleSN + 1
-        //                                    'Call cpCore.app.setSiteProperty("StylesheetSerialNumber", StyleSN)
-        //                                    ''
-        //                                    '' Save new public stylesheet
-        //                                    ''
-        //                                    '' 11/24/2009 - style sheet processing deprecated
-        //                                    'Call cpCore.app.publicFiles.SaveFile("templates\Public" & StyleSN & ".css", cpCore.main_GetStyleSheet)
-        //                                    ''Call cpCore.app.publicFiles.SaveFile("templates\Public" & StyleSN & ".css", cpCore.main_GetStyleSheetProcessed)
-        //                                    'Call cpCore.app.publicFiles.SaveFile("templates\Admin" & StyleSN & ".css", cpCore.main_GetStyleSheetDefault)
-        //                                End If
-        //                            End If
-        //                        End If
-        //                    End If
-        //                End If
-        //            End If
-        //            Call cpCore.app.closeCS(CS)
-        //            '
-        //            Exit Sub
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        ////ErrorTrap:
-        //            Call handleLegacyClassError3("GetForm_Edit_UserFieldTabs")
-        //        End Sub
         //
         //========================================================================
         //
@@ -13072,36 +11923,12 @@ namespace Contensive.Core.Addons.AdminSite {
             string tempGetForm_CustomReports = null;
             try {
                 //
-                string Copy = null;
                 string Button = null;
-                string ButtonPanel = null;
-                bool SaveAction = false;
-                string helpCopy = null;
-                string FieldValue = null;
-                int PaymentProcessMethod = 0;
-                string Argument1 = null;
                 int CS = 0;
-                string ContactGroupCriteria = null;
-                int GroupCount = 0;
-                int GroupPointer = 0;
-                bool GroupChecked = false;
                 string RecordName = null;
-                string ContentName = null;
                 int RecordID = 0;
-                bool RowEven = false;
                 string SQL = null;
                 string RQS = null;
-                int SubTab = 0;
-                bool FormSave = false;
-                bool FormClear = false;
-                int ContactContentID = 0;
-                string Criteria = null;
-                string ContentGorupCriteria = null;
-                string ContactSearchCriteria = null;
-                string[] FieldParms = null;
-                object CriteriaValues = null;
-                int CriteriaCount = 0;
-                int CriteriaPointer = 0;
                 int PageSize = 0;
                 int PageNumber = 0;
                 int TopCount = 0;
@@ -13114,32 +11941,11 @@ namespace Contensive.Core.Addons.AdminSite {
                 string[] ColAlign = null;
                 string[] ColWidth = null;
                 string[,] Cells = null;
-                int GroupID = 0;
-                int GroupToolAction = 0;
-                string ActionPanel = null;
-                int RowCount = 0;
-                string GroupName = null;
-                int MemberID = 0;
-                string QS = null;
-                string VisitsCell = null;
-                int VisitCount = 0;
                 string AdminURL = null;
-                int CCID = 0;
-                string SQLValue = null;
-                string DefaultName = null;
-                string SearchCaption = null;
-                string BlankPanel = null;
-                string RowPageSize = null;
-                string RowGroups = null;
-                string[] GroupIDs = null;
-                int GroupPtr = 0;
-                string GroupDelimiter = null;
-                DateTime DateCompleted = default(DateTime);
                 int RowCnt = 0;
                 int RowPtr = 0;
                 int ContentID = 0;
                 string Format = null;
-                string TableName = null;
                 string Filename = null;
                 string Name = null;
                 string Caption = null;
@@ -14032,37 +12838,13 @@ namespace Contensive.Core.Addons.AdminSite {
             string tempGetForm_HouseKeepingControl = null;
             try {
                 //
-                int WhereCount = 0;
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
-                bool AllowContentSpider = false;
-                string status = null;
-                string TargetDomain = null;
-                bool EDGPublishToProduction = false;
                 int CSServers = 0;
                 string Copy = null;
-                string StagingServer = null;
-                int PagesFound = 0;
-                int PagesComplete = 0;
                 string SQL = null;
                 string Button = null;
-                string SpiderAuthUsername = null;
-                string SpiderAuthPassword = null;
-                string SpiderAppRootPath = null;
-                string SpiderPassword = null;
-                string SpiderUsername = null;
-                string SPIDERQUERYSTRINGEXCLUDELIST = null;
-                string SPIDERQUERYSTRINGIGNORELIST = null;
-                //Dim SPIDERREADTIME as integer
-                //Dim SpiderURLIgnoreList As String
-                string QueryString = null;
-                int Result = 0;
                 int PagesTotal = 0;
-                DateTime LastCheckDate = default(DateTime);
-                DateTime FirstCheckDate = default(DateTime);
                 string Caption = null;
-                string SpiderFontsAllowed = null;
-                string SpiderPDFBodyText = null;
-                string ProgressMessage = null;
                 DateTime DateValue = default(DateTime);
                 string AgeInDays = null;
                 int ArchiveRecordAgeDays = 0;
@@ -14071,7 +12853,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 adminUIController Adminui = new adminUIController(cpcore);
                 string ButtonList = "";
                 string Description = null;
-                //
                 //
                 Button = cpcore.docProperties.getText(RequestNameButton);
                 if (Button == ButtonCancel) {
@@ -14604,74 +13385,25 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 //
                 string Button = null;
-                int Ptr = 0;
                 string Description = null;
-
                 bool NeedToReloadCDef = false;
                 string Title = null;
-                string TitleBar = null;
                 string Content = null;
-                string ButtonBar = null;
                 adminUIController Adminui = new adminUIController(cpcore);
-                string SQL = null;
-                string MenuHeader = null;
                 int ColumnPtr = 0;
                 int ColumnWidth = 0;
-                int FieldPtr = 0;
-                string FieldName = null;
-                int FieldToAdd = 0;
                 string AStart = null;
-                int CS = 0;
-                bool SetSort = false;
-                int MenuEntryID = 0;
-                int MenuHeaderID = 0;
-                int MenuDirection = 0;
-                int SourceID = 0;
-                int PreviousID = 0;
-                int SetID = 0;
-                int NextSetID = 0;
-                bool SwapWithPrevious = false;
-                int HitID = 0;
-                string HitTable = null;
-                int SortPriorityLowest = 0;
-                string TempColumn = null;
-                string Tempfield = null;
-                string TempWidth = null;
-                int TempSortPriority = 0;
-                int TempSortDirection = 0;
                 int CSPointer = 0;
-                int RecordID = 0;
                 int ContentID = 0;
                 cdefModel CDef = null;
-                //Dim AdminColumn As appServices_metaDataClass.CDefAdminColumnType
-                int[] RowFieldID = null;
-                int[] RowFieldWidth = null;
-                string[] RowFieldCaption = null;
-                //Dim RowFieldCount as integer
-                int[] NonRowFieldID = null;
-                string[] NonRowFieldCaption = null;
-                int NonRowFieldCount = 0;
                 string ContentName = null;
-                //
                 DataTable dt = null;
-                int IndexWidth = 0;
-                int CS1 = 0;
-                int CS2 = 0;
-                int FieldPtr1 = 0;
-                int FieldPtr2 = 0;
-                int NewRowFieldWidth = 0;
                 int TargetFieldID = 0;
                 string TargetFieldName = null;
-                //
                 int ColumnWidthTotal = 0;
-                //
                 int ColumnPointer = 0;
-                int CDefFieldCount = 0;
                 int fieldId = 0;
-                int FieldWidth = 0;
                 bool AllowContentAutoLoad = false;
-                int TargetFieldPtr = 0;
-                bool MoveNextColumn = false;
                 string FieldNameToAdd = null;
                 int FieldIDToAdd = 0;
                 int CSSource = 0;
@@ -14681,20 +13413,9 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool NeedToReloadConfig = false;
                 int InheritedFieldCount = 0;
                 string Caption = null;
-                //Dim ContentNameValues() As NameValuePrivateType
-                int ContentCount = 0;
-                int ContentSize = 0;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                string ButtonList = null;
-                string FormPanel = null;
-                int ColumnWidthIncrease = 0;
-                int ColumnWidthBalance = 0;
                 int ToolsAction = 0;
                 indexConfigClass IndexConfig = null;
-                //Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
-                int FieldPointerTemp = 0;
-                string NameTemp = null;
-                int WidthTemp = 0;
                 //
                 const string RequestNameAddField = "addfield";
                 const string RequestNameAddFieldID = "addfieldID";

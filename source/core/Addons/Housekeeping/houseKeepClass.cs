@@ -411,17 +411,8 @@ namespace Contensive.Core.Addons.Housekeeping {
                 DateTime ArchiveEmailDropDate = default(DateTime);
                 string VirtualFileName = null;
                 string VirtualLink = null;
-                string FilenameOriginal = null;
-                int Pos = 0;
-                string FilenameExt = null;
-                string FilenameNoExt = null;
-                string FilenameAltSize = null;
                 FileInfo[] FileList = null;
-                //
                 long FileSize = 0;
-                string PathNameRev = null;
-                string[] FilenameDim = null;
-                //
                 int DaystoRemove = 0;
                 int fieldType = 0;
                 int FieldContentID = 0;
@@ -429,43 +420,22 @@ namespace Contensive.Core.Addons.Housekeeping {
                 string FieldLast = null;
                 string FieldNew = null;
                 int FieldRecordID = 0;
-                int RecordID = 0;
-                int ArchiveParentID = 0;
                 DateTime OldestVisitDate = default(DateTime);
                 DateTime ArchiveDate = default(DateTime);
                 DateTime thirtyDaysAgo = default(DateTime);
                 DateTime SingleDate = default(DateTime);
                 int DataSourceType = 0;
-                //
-                //Dim Controller As controlClass
-                int VisitArchiveDeleteSize = 0;
-                //Dim AppService As appServicesClass
-                //Dim KernelService As KernelServicesClass
-                //    Dim CSConnection As appEnvironmentStruc
                 string SQL = null;
-                string SQLCriteria = null;
                 string PathName = null;
                 string TableName = null;
                 string FieldName = null;
                 int CS = 0;
                 int CSTest = 0;
                 string Filename = null;
-                string[] FileSplit = null;
-                string FolderName = null;
-                string FolderList = null;
-                string[] FolderArray = null;
-                int FolderArrayCount = 0;
-                int FolderArrayPointer = 0;
-                string[] FolderSplit = null;
-                int AdminLicenseCount = 0;
-                string ArchiveDateSQL = null;
                 string appName = null;
                 string SQLTablePeople = null;
                 string SQLTableMemberRules = null;
                 string SQLTableGroups = null;
-                int PeopleCID = 0;
-                //Dim DefaultName As String
-                string Hint = null;
                 bool ArchiveDeleteNoCookie = false;
                 DateTime MidnightTwoDaysAgo = default(DateTime);
                 string SQLDateMidnightTwoDaysAgo = null;
@@ -1409,105 +1379,53 @@ namespace Contensive.Core.Addons.Housekeeping {
             try {
                 //
                 int TimeoutSave = 0;
-                //Dim Controller As controlClass
-                int VisitArchiveAgeDays = 0;
-                int VisitArchiveDeleteSize = 0;
-                //Dim AppService As appServicesClass
-                //Dim KernelService As KernelServicesClass
-                //      Dim CSConnection As appEnvironmentStruc
                 string SQL = null;
-                string SQLCriteria = null;
-                string PathName = null;
-                string TableName = null;
-                string FieldName = null;
-                string FileList = null;
-                string[] FileArray = null;
-                int FileArrayCount = 0;
-                int FileArrayPointer = 0;
-                int CS = 0;
-                int CSTest = 0;
-                string Filename = null;
-                string[] FileSplit = null;
-                string FolderName = null;
-                string FolderList = null;
-                string[] FolderArray = null;
-                int FolderArrayCount = 0;
-                int FolderArrayPointer = 0;
-                string[] FolderSplit = null;
-                int AdminLicenseCount = 0;
                 string DeleteBeforeDateSQL = null;
                 string appName = null;
                 string SQLTablePeople = null;
-                //Dim SQLTableMemberRules As String
-                //Dim SQLTableGroups As String
-                //Dim PeopleCID as integer
-                string DefaultName = null;
                 //
                 // Set long timeout (30 min) needed for heavy work on big tables
-                //
                 TimeoutSave = cpCore.db.sqlCommandTimeout;
                 cpCore.db.sqlCommandTimeout = 1800;
                 //
                 SQLTablePeople = Models.Complex.cdefModel.getContentTablename(cpCore, "People");
-                //SQLTableMemberRules = cpCore.csv_GetContentTablename("Member Rules")
-                //SQLTableGroups = cpCore.csv_GetContentTablename("Groups")
                 //
-                //VisitArchiveAgeDays = genericController.EncodeInteger(cpCore.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
-                if (true) {
-                    appName = cpCore.serverConfig.appConfig.name;
-                    DeleteBeforeDateSQL = cpCore.db.encodeSQLDate(DeleteBeforeDate);
-                    //
-                    // Visits older then archive age
-                    //
-                    AppendClassLog(cpCore, "Deleting visits before [" + DeleteBeforeDateSQL + "]");
-                    cpCore.db.DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" + DeleteBeforeDateSQL + ")", 1000, 10000);
-                    //
-                    // Viewings with visits before the first
-                    //
-                    AppendClassLog(cpCore, "Deleting viewings with visitIDs lower then the lowest ccVisits.ID");
-                    cpCore.db.DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
-                    //
-                    // Visitors with no visits
-                    //
-                    AppendClassLog(cpCore, "Deleting visitors with no visits");
-                    switch (DataSourceType) {
-                        case DataSourceTypeODBCAccess:
-                            SQL = "delete ccVisitors.*"
-                                + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
-                                + " where ccVisits.ID is null";
-                            cpCore.db.executeQuery(SQL);
+                appName = cpCore.serverConfig.appConfig.name;
+                DeleteBeforeDateSQL = cpCore.db.encodeSQLDate(DeleteBeforeDate);
+                //
+                // Visits older then archive age
+                //
+                AppendClassLog(cpCore, "Deleting visits before [" + DeleteBeforeDateSQL + "]");
+                cpCore.db.DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" + DeleteBeforeDateSQL + ")", 1000, 10000);
+                //
+                // Viewings with visits before the first
+                //
+                AppendClassLog(cpCore, "Deleting viewings with visitIDs lower then the lowest ccVisits.ID");
+                cpCore.db.DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
+                //
+                // Visitors with no visits
+                //
+                AppendClassLog(cpCore, "Deleting visitors with no visits");
+                switch (DataSourceType) {
+                    case DataSourceTypeODBCAccess:
+                        SQL = "delete ccVisitors.*"
+                            + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
+                            + " where ccVisits.ID is null";
+                        cpCore.db.executeQuery(SQL);
 
-                            break;
-                        case DataSourceTypeODBCSQLServer:
-                            SQL = "delete From ccVisitors"
-                                + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
-                                + " where ccVisits.ID is null";
-                            cpCore.db.executeQuery(SQL);
-                            break;
-                        default:
-                            SQL = "delete ccVisitors"
-                                + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
-                                + " where ccVisits.ID is null";
-                            cpCore.db.executeQuery(SQL);
-                            break;
-                    }
-                    //        '
-                    //        ' Delete People
-                    //        '   created before DeleteBeforeDate,
-                    //        '   created during a visit (not created by another process),
-                    //        '   with default name (created during a hit)
-                    //        '   with no username (they are not planning on returning)
-                    //        '   with 1 visit (not created with 0 visits, has not returned)
-                    //        '
-                    //        Call AppendClassLog(AppName, "HouseKeep_App_Daily_RemoveVisitRecords(" & AppName & ")", "Deleting members with default name [" & DefaultName & "], LastVisit before DeleteBeforeDate [" & DeleteBeforeDate & "], exactly one total visit, a null username and a null email address.")
-                    //        SQLCriteria = "" _
-                    //            & "(" & SQLTablePeople & ".Name=" & encodeSQLText(DefaultName) & ")" _
-                    //            & " and(LastVisit<" & DeleteBeforeDateSQL & ")" _
-                    //            & " and(createdbyvisit=1)" _
-                    //            & " and(Visits=1)" _
-                    //            & " and(Username is null)" _
-                    //            & " and(email is null)"
-                    //        Call cpCore.csv_DeleteTableRecordChunks("default", "" & SQLTablePeople & "", SQLCriteria, 1000, 10000)
+                        break;
+                    case DataSourceTypeODBCSQLServer:
+                        SQL = "delete From ccVisitors"
+                            + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
+                            + " where ccVisits.ID is null";
+                        cpCore.db.executeQuery(SQL);
+                        break;
+                    default:
+                        SQL = "delete ccVisitors"
+                            + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
+                            + " where ccVisits.ID is null";
+                        cpCore.db.executeQuery(SQL);
+                        break;
                 }
                 //
                 // restore sved timeout
@@ -1526,39 +1444,10 @@ namespace Contensive.Core.Addons.Housekeeping {
             try {
                 //
                 int TimeoutSave = 0;
-                //Dim Controller As controlClass
-                int VisitArchiveAgeDays = 0;
-                int VisitArchiveDeleteSize = 0;
-                //Dim AppService As appServicesClass
-                //Dim KernelService As KernelServicesClass
-                //   Dim CSConnection As appEnvironmentStruc
-                string SQL = null;
                 string SQLCriteria = null;
-                string PathName = null;
-                string TableName = null;
-                string FieldName = null;
-                string FileList = null;
-                string[] FileArray = null;
-                int FileArrayCount = 0;
-                int FileArrayPointer = 0;
-                int CS = 0;
-                int CSTest = 0;
-                string Filename = null;
-                string[] FileSplit = null;
-                string FolderName = null;
-                string FolderList = null;
-                string[] FolderArray = null;
-                int FolderArrayCount = 0;
-                int FolderArrayPointer = 0;
-                string[] FolderSplit = null;
-                int AdminLicenseCount = 0;
                 string DeleteBeforeDateSQL = null;
                 string appName = null;
                 string SQLTablePeople = null;
-                //Dim SQLTableMemberRules As String
-                //Dim SQLTableGroups As String
-                //Dim PeopleCID as integer
-                string DefaultName = null;
                 //
                 // Set long timeout (30 min) needed for heavy work on big tables
                 //
@@ -1566,63 +1455,18 @@ namespace Contensive.Core.Addons.Housekeeping {
                 cpCore.db.sqlCommandTimeout = 1800;
                 //
                 SQLTablePeople = Models.Complex.cdefModel.getContentTablename(cpCore, "People");
-                //SQLTableMemberRules = cpCore.csv_GetContentTablename("Member Rules")
-                //SQLTableGroups = cpCore.csv_GetContentTablename("Groups")
                 //
-                //VisitArchiveAgeDays = genericController.EncodeInteger(cpCore.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
-                if (true) {
-                    appName = cpCore.serverConfig.appConfig.name;
-                    DeleteBeforeDateSQL = cpCore.db.encodeSQLDate(DeleteBeforeDate);
-                    //        '
-                    //        ' Visits older then archive age
-                    //        '
-                    //        Call AppendClassLog(cpCore, cpCore.appEnvironment.name, "HouseKeep_App_Daily_RemoveGuestRecords(" & AppName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
-                    //        Call cpCore.csv_DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" & DeleteBeforeDateSQL & ")", 1000, 10000)
-                    //        '
-                    //        ' Viewings with visits before the first
-                    //        '
-                    //        Call AppendClassLog(AppName, "HouseKeep_App_Daily_RemoveGuestRecords(" & AppName & ")", "Deleting viewings with visitIDs lower then the lowest ccVisits.ID")
-                    //        Call cpCore.csv_DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000)
-                    //        '
-                    //        ' Visitors with no visits
-                    //        '
-                    //        Call AppendClassLog(AppName, "HouseKeep_App_Daily_RemoveGuestRecords(" & AppName & ")", "Deleting visitors with no visits")
-                    //        Select Case DataSourceType
-                    //            Case DataSourceTypeODBCAccess
-                    //                SQL = "delete ccVisitors.*" _
-                    //                    & " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID" _
-                    //                    & " where ccVisits.ID is null"
-                    //                Call cpCore.app.executeSql(sql)
-                    //
-                    //            Case DataSourceTypeODBCSQLServer
-                    //                SQL = "delete From ccVisitors" _
-                    //                    & " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID" _
-                    //                    & " where ccVisits.ID is null"
-                    //                Call cpCore.app.executeSql(sql)
-                    //            Case Else
-                    //                SQL = "delete ccVisitors" _
-                    //                    & " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID" _
-                    //                    & " where ccVisits.ID is null"
-                    //                Call cpCore.app.executeSql(sql)
-                    //        End Select
-                    //
-                    // Delete People
-                    //   created before DeleteBeforeDate,
-                    //   created during a visit (not created by another process),
-                    //   x with default name (created during a hit) - no, spider detect changes name
-                    //   with no username (they are not planning on returning)
-                    //   with 1 visit (not created with 0 visits, has not returned)
-                    //
-                    AppendClassLog(cpCore,   "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");
-                    SQLCriteria = ""
-                        + " (LastVisit<" + DeleteBeforeDateSQL + ")"
-                        + " and(createdbyvisit=1)"
-                        + " and(Visits=1)"
-                        + " and(Username is null)"
-                        + " and(email is null)";
-                    cpCore.db.DeleteTableRecordChunks("default", "" + SQLTablePeople + "", SQLCriteria, 1000, 10000);
-                    //& "(" & SQLTablePeople & ".Name=" & encodeSQLText(DefaultName) & ")"
-                }
+                appName = cpCore.serverConfig.appConfig.name;
+                DeleteBeforeDateSQL = cpCore.db.encodeSQLDate(DeleteBeforeDate);
+                //
+                AppendClassLog(cpCore, "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");
+                SQLCriteria = ""
+                    + " (LastVisit<" + DeleteBeforeDateSQL + ")"
+                    + " and(createdbyvisit=1)"
+                    + " and(Visits=1)"
+                    + " and(Username is null)"
+                    + " and(email is null)";
+                cpCore.db.DeleteTableRecordChunks("default", "" + SQLTablePeople + "", SQLCriteria, 1000, 10000);
                 //
                 // restore sved timeout
                 //
@@ -1671,9 +1515,6 @@ namespace Contensive.Core.Addons.Housekeeping {
         //
         public void HouseKeep_VisitSummary(coreClass cpCore, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
             try {
-                //
-                //
-                //Dim StartDate As Date
                 double StartTimeHoursSinceMidnight = 0;
                 DateTime PeriodStart = default(DateTime);
                 double TotalTimeOnSite = 0;
@@ -1681,14 +1522,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                 int MultiPageHitCnt = 0;
                 double MultiPageTimetoLastHitSum = 0;
                 double TimeOnSite = 0;
-                //Dim PeriodStepInHours As Double
                 DateTime PeriodDatePtr = default(DateTime);
-                DateTime StartOfHour = default(DateTime);
                 int DateNumber = 0;
                 int TimeNumber = 0;
-                double SumStartTime = 0;
-                double SumStopTime = 0;
-                int HoursPerDay = 0;
                 DateTime DateStart = default(DateTime);
                 DateTime DateEnd = default(DateTime);
                 int NewVisitorVisits = 0;
@@ -1700,76 +1536,14 @@ namespace Contensive.Core.Addons.Housekeeping {
                 double AveTimeOnSite = 0;
                 int HitCnt = 0;
                 int VisitCnt = 0;
-                DateTime OldestDateAdded = default(DateTime);
-                object EmptyVariant = null;
-                bool NeedToClearCache = false;
-                int ArchiveParentID = 0;
-                int RecordID = 0;
                 int CS = 0;
-                int LoopPtr = 0;
-                int Ptr = 0;
-                string LocalFile = null;
-                string LocalFilename = null;
-                string[] Folders = null;
-                int FolderCnt = 0;
-                string CollectionGUID = null;
-                string CollectionName = null;
-                int Pos = 0;
-                string LastChangeDate = null;
-                string SubFolderList = null;
-                string[] SubFolders = null;
-                string SubFolder = null;
-                int Cnt = 0;
-                string LocalGUID = null;
-                string LocalLastChangeDateStr = null;
-                DateTime LocalLastChangeDate = default(DateTime);
-                string LibGUID = null;
-                string LibLastChangeDateStr = null;
-                DateTime LibLastChangeDate = default(DateTime);
-                XmlNode LibListNode = null;
-                XmlNode LocalListNode = null;
-                XmlNode CollectionNode = null;
                 XmlDocument LibraryCollections = new XmlDocument();
                 XmlDocument LocalCollections = new XmlDocument();
                 XmlDocument Doc = new XmlDocument();
-                //Dim AppService As appServicesClass
-                //Dim KernelService As KernelServicesClass
-                string SetTimeCheckString = null;
-                double SetTimeCheck = 0;
-                DateTime LogDate = default(DateTime);
-                string FolderName = null;
-                string FileList = null;
-                string[] FileArray = null;
-                int FileArrayCount = 0;
-                int FileArrayPointer = 0;
-                string[] FileSplit = null;
-                string FolderList = null;
-                string[] FolderArray = null;
-                int FolderArrayCount = 0;
-                int FolderArrayPointer = 0;
-                string[] FolderSplit = null;
-                //Dim fs As New fileSystemClass
-                int VisitArchiveAgeDays = 0;
-                bool NewDay = false;
-                bool NewHour = false;
-                //
-                DateTime LastTimeCheck = default(DateTime);
-                //
-                string ConfigFilename = null;
-                string Config = null;
-                string[] ConfigLines = null;
-                //
-                string Line = null;
-                int LineCnt = 0;
-                int LinePtr = 0;
-                string[] NameValue = null;
-                string SQLNow = null;
                 string SQL = null;
                 int AveReadTime = 0;
-                //Dim AddonInstall As New addonInstallClass
                 //
                 if (string.CompareOrdinal(BuildVersion, cpCore.codeVersion()) < 0) {
-                    //throw new ApplicationException("Unexpected exception");
                 } else {
                     PeriodStart = StartTimeDate;
                     if (PeriodStart < OldestVisitSummaryWeCareAbout) {
@@ -1777,7 +1551,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                     }
                     StartTimeHoursSinceMidnight = PeriodStart.TimeOfDay.TotalHours;
                     PeriodStart = PeriodStart.Date.AddHours(StartTimeHoursSinceMidnight);
-                    //PeriodStepInHours = CDbl(HourDuration) / 24.0!
                     PeriodDatePtr = PeriodStart;
                     while (PeriodDatePtr < EndTimeDate) {
                         //
@@ -1788,8 +1561,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                         //
                         VisitCnt = 0;
                         HitCnt = 0;
-                        SumStartTime = 0;
-                        SumStopTime = 0;
                         NewVisitorVisits = 0;
                         SinglePageVisits = 0;
                         MultiPageVisitCnt = 0;
@@ -1809,7 +1580,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + " and (v.dateadded<" + cpCore.db.encodeSQLDate(DateEnd) + ")"
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
-                        //SQL = "select count(id) as NoCookieVisits from ccvisits where (CookieSupport<>1)and(dateadded>=" & encodeSQLDate(DateStart) & ")and(dateadded<" & encodeSQLDate(DateEnd) & ")"
                         CS = cpCore.db.csOpenSql_rev("default", SQL);
                         if (cpCore.db.csOk(CS)) {
                             NoCookieVisits = cpCore.db.csGetInteger(CS, "NoCookieVisits");
@@ -1825,7 +1595,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + " and (v.dateadded<" + cpCore.db.encodeSQLDate(DateEnd) + ")"
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
-                        //SQL = "select count(id) as VisitCnt ,Sum(PageVisits) as HitCnt ,sum(TimetoLastHit) as TimeOnSite from ccvisits where (CookieSupport<>0)and(dateadded>=" & encodeSQLDate(DateStart) & ")and (dateadded<" & encodeSQLDate(DateEnd) & ")"
                         CS = cpCore.db.csOpenSql_rev("default", SQL);
                         if (cpCore.db.csOk(CS)) {
                             VisitCnt = cpCore.db.csGetInteger(CS, "VisitCnt");
@@ -1845,7 +1614,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(v.VisitorNew<>0)"
                                 + "";
-                            //SQL = "select count(id) as NewVisitorVisits from ccvisits where (CookieSupport<>0)and(VisitorNew<>0)and(dateadded>=" & encodeSQLDate(DateStart) & ")and(dateadded<" & encodeSQLDate(DateEnd) & ")"
                             CS = cpCore.db.csOpenSql_rev("default", SQL);
                             if (cpCore.db.csOk(CS)) {
                                 NewVisitorVisits = cpCore.db.csGetInteger(CS, "NewVisitorVisits");
@@ -1862,7 +1630,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(v.PageVisits=1)"
                                 + "";
-                            //SQL = "select count(id) as SinglePageVisits from ccvisits where (CookieSupport<>0)and(PageVisits=1)and(dateadded>=" & encodeSQLDate(DateStart) & ")and(dateadded<" & encodeSQLDate(DateEnd) & ")"
                             CS = cpCore.db.csOpenSql_rev("default", SQL);
                             if (cpCore.db.csOk(CS)) {
                                 SinglePageVisits = cpCore.db.csGetInteger(CS, "SinglePageVisits");
@@ -1879,7 +1646,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(PageVisits>1)"
                                 + "";
-                            //SQL = "select count(id) as VisitCnt ,sum(PageVisits) as HitCnt ,sum(TimetoLastHit) as TimetoLastHitSum from ccvisits where (CookieSupport<>0)and(PageVisits>1)and(dateadded>=" & encodeSQLDate(DateStart) & ")and (dateadded<" & encodeSQLDate(DateEnd) & ")"
                             CS = cpCore.db.csOpenSql_rev("default", SQL);
                             if (cpCore.db.csOk(CS)) {
                                 MultiPageVisitCnt = cpCore.db.csGetInteger(CS, "VisitCnt");
@@ -1898,48 +1664,45 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(VisitAuthenticated<>0)"
                                 + "";
-                            //SQL = "select count(id) as AuthenticatedVisits from ccvisits where (CookieSupport<>0)and(VisitAuthenticated<>0)and(dateadded>=" & encodeSQLDate(DateStart) & ")and(dateadded<" & encodeSQLDate(DateEnd) & ")"
                             CS = cpCore.db.csOpenSql_rev("default", SQL);
                             if (cpCore.db.csOk(CS)) {
                                 AuthenticatedVisits = cpCore.db.csGetInteger(CS, "AuthenticatedVisits");
                             }
                             cpCore.db.csClose(ref CS);
+                            // 
                             //
-                            if (true) {
-                                //
-                                // Mobile Visits
-                                //
-                                SQL = "select count(v.id) as cnt "
-                                    + " from ccvisits v"
-                                    + " where (v.CookieSupport<>0)"
-                                    + " and(v.dateadded>=" + cpCore.db.encodeSQLDate(DateStart) + ")"
-                                    + " and (v.dateadded<" + cpCore.db.encodeSQLDate(DateEnd) + ")"
-                                    + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
-                                    + " and(Mobile<>0)"
-                                    + "";
-                                //SQL = "select count(id) as AuthenticatedVisits from ccvisits where (CookieSupport<>0)and(VisitAuthenticated<>0)and(dateadded>=" & encodeSQLDate(DateStart) & ")and(dateadded<" & encodeSQLDate(DateEnd) & ")"
-                                CS = cpCore.db.csOpenSql_rev("default", SQL);
-                                if (cpCore.db.csOk(CS)) {
-                                    MobileVisits = cpCore.db.csGetInteger(CS, "cnt");
-                                }
-                                cpCore.db.csClose(ref CS);
-                                //
-                                // Bot Visits
-                                //
-                                SQL = "select count(v.id) as cnt "
-                                    + " from ccvisits v"
-                                    + " where (v.CookieSupport<>0)"
-                                    + " and(v.dateadded>=" + cpCore.db.encodeSQLDate(DateStart) + ")"
-                                    + " and (v.dateadded<" + cpCore.db.encodeSQLDate(DateEnd) + ")"
-                                    + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
-                                    + " and(Bot<>0)"
-                                    + "";
-                                CS = cpCore.db.csOpenSql_rev("default", SQL);
-                                if (cpCore.db.csOk(CS)) {
-                                    BotVisits = cpCore.db.csGetInteger(CS, "cnt");
-                                }
-                                cpCore.db.csClose(ref CS);
+                            // Mobile Visits
+                            //
+                            SQL = "select count(v.id) as cnt "
+                                + " from ccvisits v"
+                                + " where (v.CookieSupport<>0)"
+                                + " and(v.dateadded>=" + cpCore.db.encodeSQLDate(DateStart) + ")"
+                                + " and (v.dateadded<" + cpCore.db.encodeSQLDate(DateEnd) + ")"
+                                + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
+                                + " and(Mobile<>0)"
+                                + "";
+                            //SQL = "select count(id) as AuthenticatedVisits from ccvisits where (CookieSupport<>0)and(VisitAuthenticated<>0)and(dateadded>=" & encodeSQLDate(DateStart) & ")and(dateadded<" & encodeSQLDate(DateEnd) & ")"
+                            CS = cpCore.db.csOpenSql_rev("default", SQL);
+                            if (cpCore.db.csOk(CS)) {
+                                MobileVisits = cpCore.db.csGetInteger(CS, "cnt");
                             }
+                            cpCore.db.csClose(ref CS);
+                            //
+                            // Bot Visits
+                            //
+                            SQL = "select count(v.id) as cnt "
+                                + " from ccvisits v"
+                                + " where (v.CookieSupport<>0)"
+                                + " and(v.dateadded>=" + cpCore.db.encodeSQLDate(DateStart) + ")"
+                                + " and (v.dateadded<" + cpCore.db.encodeSQLDate(DateEnd) + ")"
+                                + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
+                                + " and(Bot<>0)"
+                                + "";
+                            CS = cpCore.db.csOpenSql_rev("default", SQL);
+                            if (cpCore.db.csOk(CS)) {
+                                BotVisits = cpCore.db.csGetInteger(CS, "cnt");
+                            }
+                            cpCore.db.csClose(ref CS);
                             //
                             if ((MultiPageHitCnt > MultiPageVisitCnt) && (HitCnt > 0)) {
                                 AveReadTime = encodeInteger(MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt));
@@ -1991,7 +1754,7 @@ namespace Contensive.Core.Addons.Housekeeping {
         //======================================================================================
         //
         public void AppendClassLog(coreClass cpcore, string LogCopy) {
-            logController.appendLog( cpcore, LogCopy, "housekeeping");
+            logController.appendLog(cpcore, LogCopy, "housekeeping");
         }
         //
         //====================================================================================================
@@ -2001,7 +1764,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 FileInfo[] FileList = null;
                 //
-                AppendClassLog(cpCore,  "Deleting files from folder [" + FolderName + "] older than " + LastMonth);
+                AppendClassLog(cpCore, "Deleting files from folder [" + FolderName + "] older than " + LastMonth);
                 FileList = cpCore.privateFiles.getFileList(FolderName);
                 foreach (FileInfo file in FileList) {
                     if (file.CreationTime < LastMonth) {
@@ -2028,7 +1791,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 URL = "http://support.contensive.com/GetUpdates?iv=" + cpCore.codeVersion();
                 loadOK = true;
                 Doc.Load(URL);
-                if ((Doc.DocumentElement.Name.ToLower() == genericController.vbLCase("ContensiveUpdate"))&& (Doc.DocumentElement.ChildNodes.Count != 0)) {
+                if ((Doc.DocumentElement.Name.ToLower() == genericController.vbLCase("ContensiveUpdate")) && (Doc.DocumentElement.ChildNodes.Count != 0)) {
                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                         Copy = CDefSection.InnerText;
                         switch (genericController.vbLCase(CDefSection.Name)) {
@@ -2301,7 +2064,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 return;
             } catch (Exception ex) {
-                cpCore.handleException(ex,"hint [" + hint + "]");
+                cpCore.handleException(ex, "hint [" + hint + "]");
             }
         }
         //

@@ -240,7 +240,6 @@ namespace Contensive.WindowsServices {
 		//
 		public bool isInSchedule()
 		{
-			bool tempisInSchedule = false;
 			bool return_isInSchedule = false;
 			try
 			{
@@ -257,12 +256,10 @@ namespace Contensive.WindowsServices {
 				int timeMinutes = 0;
 				string schedulePeriodStartTime = null;
 				//
-				tempisInSchedule = true;
 				RightNow = DateTime.Now;
 				//TimeNow = New Date(0, 1, 1, RightNow.Hour, RightNow.Minute, 1)
 				if (!string.IsNullOrEmpty(scheduleList))
 				{
-					tempisInSchedule = false;
 					schedulePeriods = scheduleList.Split(',');
 					for (Ptr = 0; Ptr <= schedulePeriods.GetUpperBound(0); Ptr++)
 					{
