@@ -139,9 +139,10 @@ namespace Contensive.Core {
         }
         //
         [Obsolete("The write buffer is deprecated")]
-        public override void Write(string message) {
-            //
-        }
+        //
+        //
+        //
+        public override void Write(string message) {}
         //
         //
         //

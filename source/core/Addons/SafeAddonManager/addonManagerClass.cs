@@ -599,7 +599,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 ColSortable[3] = false;
                                 //
                                 LocalCollections = new XmlDocument();
-                                LocalCollectionXML = collectionController.getCollectionListFile(cpCore);
+                                LocalCollectionXML = collectionController.getLocalCollectionStoreListXml(cpCore);
                                 LocalCollections.LoadXml(LocalCollectionXML);
                                 foreach (XmlNode CDef_Node in LocalCollections.DocumentElement.ChildNodes) {
                                     if (genericController.vbLCase(CDef_Node.Name) == "collection") {

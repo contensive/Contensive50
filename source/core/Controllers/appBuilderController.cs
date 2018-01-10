@@ -563,7 +563,7 @@ namespace Contensive.Core.Controllers {
                             logController.appendLogInstall(cpcore, "...Open collectons.xml");
                             try {
                                 XmlDocument Doc = new XmlDocument();
-                                Doc.LoadXml(collectionController.getCollectionListFile(cpcore));
+                                Doc.LoadXml(collectionController.getLocalCollectionStoreListXml(cpcore));
                                 if (true) {
                                     if (genericController.vbLCase(Doc.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
                                         throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")

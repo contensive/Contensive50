@@ -13,6 +13,7 @@ using System.IO;
 using System.Data;
 using System.Threading;
 using Contensive.Core.Models.Complex;
+using System.Linq;
 //
 //
 namespace Contensive.Core {
@@ -1346,15 +1347,15 @@ namespace Contensive.Core {
             bool returnOk = true;
             try {
                 bool localCollectionUpToDate = false;
-                string[] GuidArray = { };
-                int GuidCnt = 0;
-                int GuidPtr = 0;
-                int RequestPtr = 0;
+                //string[] GuidArray = { };
+                //int GuidCnt = 0;
+                //int GuidPtr = 0;
+                //int RequestPtr = 0;
                 string SupportURL = null;
                 string GuidList = null;
                 DateTime CollectionLastChangeDate = default(DateTime);
                 string workingPath = null;
-                string LocalFile = null;
+                //string collectionServerXml = null;
                 string LocalGuid = null;
                 string LocalLastChangeDateStr = null;
                 DateTime LocalLastChangeDate = default(DateTime);
@@ -1364,306 +1365,167 @@ namespace Contensive.Core {
                 string LibLastChangeDateStr = null;
                 string LibContensiveVersion = "";
                 DateTime LibLastChangeDate = default(DateTime);
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode LibListNode = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode LocalListNode = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode CollectionNode = null;
                 XmlNode LocalLastChangeNode = null;
                 XmlDocument LibraryCollections = new XmlDocument();
-                XmlDocument LocalCollections = new XmlDocument();
-                XmlDocument Doc = new XmlDocument();
+                //XmlDocument LocalCollections = new XmlDocument();
+                //XmlDocument Doc = new XmlDocument();
                 string Copy = null;
-                bool allowLogging;
-                //Dim builder As New coreBuilderClass(cpCore)
                 //
                 //-----------------------------------------------------------------------------------------------
                 //   Load LocalCollections from the Collections.xml file
                 //-----------------------------------------------------------------------------------------------
                 //
-                allowLogging = false;
-                //
-                if (allowLogging) {
-                    logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Enter");
-                }
-                LocalFile = getCollectionListFile(cpCore);
-                if (!string.IsNullOrEmpty(LocalFile)) {
-                    LocalCollections = new XmlDocument();
-                    try {
-                        LocalCollections.LoadXml(LocalFile);
-                    } catch (Exception ex) {
-                        if (allowLogging) {
-                            logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), parse error reading collections.xml");
-                        }
-                        Copy = "Error loading privateFiles\\addons\\Collections.xml";
-                        logController.appendLogInstall(cpCore, Copy);
-                        return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
-                        returnOk = false;
-                    }
-                    if (returnOk) {
-                        if (genericController.vbLCase(LocalCollections.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
-                            if (allowLogging) {
-                                logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), The addons\\Collections.xml file has an invalid root node");
-                            }
-                            Copy = "The addons\\Collections.xml has an invalid root node, [" + LocalCollections.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.";
-                            //Copy = "The LocalCollections file [" & App.Path & "\Addons\Collections.xml] has an invalid root node, [" & LocalCollections.DocumentElement.name & "] was received and [" & CollectionListRootNode & "] was expected."
-                            logController.appendLogInstall(cpCore, Copy);
-                            return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
-                            returnOk = false;
-                        } else {
-                            //
-                            // Get a list of the collection guids on this server
-                            //
-
-                            GuidCnt = 0;
-                            if (genericController.vbLCase(LocalCollections.DocumentElement.Name) == "collectionlist") {
-                                foreach (XmlNode LocalListNode in LocalCollections.DocumentElement.ChildNodes) {
-                                    switch (genericController.vbLCase(LocalListNode.Name)) {
-                                        case "collection":
-                                            foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                                                if (genericController.vbLCase(CollectionNode.Name) == "guid") {
-                                                    Array.Resize(ref GuidArray, GuidCnt + 1);
-                                                    GuidArray[GuidCnt] = CollectionNode.InnerText;
-                                                    GuidCnt = GuidCnt + 1;
-                                                    break;
-                                                }
-                                            }
-                                            break;
-                                    }
-                                }
-                            }
-                            if (allowLogging) {
-                                logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), collection.xml file has " + GuidCnt + " collection nodes.");
-                            }
-                            if (GuidCnt > 0) {
+                var localCollectionStoreList = new List<collectionStoreClass>();
+                if ( getLocalCollectionStoreList(cpCore, ref localCollectionStoreList, ref return_ErrorMessage)) {
+                    if (localCollectionStoreList.Count > 0) {
+                        //
+                        // Request collection updates 10 at a time
+                        //
+                        int packageSize = 0;
+                        int packageNumber = 0;
+                        foreach ( var collectionStore in localCollectionStoreList ) {
+                            GuidList = GuidList + "," + collectionStore.guid;
+                            packageSize += 1;
+                            if (( packageSize>=10 ) | ( collectionStore == localCollectionStoreList.Last())) {
+                                packageNumber += 1;
                                 //
-                                // Request collection updates 10 at a time
-                                //
-                                GuidPtr = 0;
-                                while (GuidPtr < GuidCnt) {
-                                    RequestPtr = 0;
-                                    GuidList = "";
-                                    while ((GuidPtr < GuidCnt) && RequestPtr < 10) {
-                                        GuidList = GuidList + "," + GuidArray[GuidPtr];
-                                        GuidPtr = GuidPtr + 1;
-                                        RequestPtr = RequestPtr + 1;
+                                // -- send package of 10, or the last set
+                                if (!string.IsNullOrEmpty(GuidList)) {
+                                    logController.appendLogInstall(cpCore, "Fetch collection details for collections [" + GuidList + "]");
+                                    GuidList = GuidList.Substring(1);
+                                    //
+                                    //-----------------------------------------------------------------------------------------------
+                                    //   Load LibraryCollections from the Support Site
+                                    //-----------------------------------------------------------------------------------------------
+                                    //
+                                    LibraryCollections = new XmlDocument();
+                                    SupportURL = "http://support.contensive.com/GetCollectionList?iv=" + cpCore.codeVersion() + "&guidlist=" + EncodeRequestVariable(GuidList);
+                                    bool loadOK = true;
+                                    if ( packageNumber>1 ) {
+                                        Thread.Sleep(2000);
                                     }
-                                    //
-                                    // Request these 10 from the support library
-                                    //
-                                    //If genericController.vbInstr(1, GuidList, "58c9", vbTextCompare) <> 0 Then
-                                    //    GuidList = GuidList
-                                    //End If
-                                    if (!string.IsNullOrEmpty(GuidList)) {
-                                        GuidList = GuidList.Substring(1);
-                                        //
-                                        //-----------------------------------------------------------------------------------------------
-                                        //   Load LibraryCollections from the Support Site
-                                        //-----------------------------------------------------------------------------------------------
-                                        //
-                                        if (allowLogging) {
-                                            logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), requesting Library updates for [" + GuidList + "]");
-                                        }
-                                        //hint = "Getting CollectionList"
-                                        LibraryCollections = new XmlDocument();
-                                        SupportURL = "http://support.contensive.com/GetCollectionList?iv=" + cpCore.codeVersion() + "&guidlist=" + EncodeRequestVariable(GuidList);
-                                        bool loadOK = true;
-                                        try {
-                                            LibraryCollections.Load(SupportURL);
-                                        } catch (Exception ex) {
-                                            if (allowLogging) {
-                                                logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Error downloading or loading GetCollectionList from Support.");
-                                            }
-                                            Copy = "Error downloading or loading GetCollectionList from Support.";
-                                            logController.appendLogInstall(cpCore, Copy + ", the request was [" + SupportURL + "]");
-                                            return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
-                                            returnOk = false;
-                                            loadOK = false;
-                                        }
-                                        if (loadOK) {
-                                            if (true) {
-                                                if (genericController.vbLCase(LibraryCollections.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
-                                                    Copy = "The GetCollectionList support site remote method returned an xml file with an invalid root node, [" + LibraryCollections.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.";
-                                                    if (allowLogging) {
-                                                        logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), " + Copy);
-                                                    }
-                                                    logController.appendLogInstall(cpCore, Copy + ", the request was [" + SupportURL + "]");
-                                                    return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
-                                                    returnOk = false;
-                                                } else {
-                                                    if (genericController.vbLCase(LocalCollections.DocumentElement.Name) != "collectionlist") {
-                                                        logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), The Library response did not have a collectioinlist top node, the request was [" + SupportURL + "]");
-                                                    } else {
-                                                        //
-                                                        //-----------------------------------------------------------------------------------------------
-                                                        // Search for Collection Updates Needed
-                                                        //-----------------------------------------------------------------------------------------------
-                                                        //
-                                                        foreach (XmlNode LocalListNode in LocalCollections.DocumentElement.ChildNodes) {
-                                                            localCollectionUpToDate = false;
-                                                            if (allowLogging) {
-                                                                logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Process local collection.xml node [" + LocalListNode.Name + "]");
-                                                            }
-                                                            switch (genericController.vbLCase(LocalListNode.Name)) {
-                                                                case "collection":
-                                                                    LocalGuid = "";
-                                                                    LocalLastChangeDateStr = "";
-                                                                    LocalLastChangeDate = DateTime.MinValue;
-                                                                    LocalLastChangeNode = null;
-                                                                    foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                                                                        switch (genericController.vbLCase(CollectionNode.Name)) {
-                                                                            case "guid":
-                                                                                //
-                                                                                LocalGuid = genericController.vbLCase(CollectionNode.InnerText);
-                                                                                //LocalGUID = genericController.vbReplace(LocalGUID, "{", "")
-                                                                                //LocalGUID = genericController.vbReplace(LocalGUID, "}", "")
-                                                                                //LocalGUID = genericController.vbReplace(LocalGUID, "-", "")
-                                                                                break;
-                                                                            case "lastchangedate":
-                                                                                //
-                                                                                LocalLastChangeDateStr = CollectionNode.InnerText;
-                                                                                LocalLastChangeNode = CollectionNode;
-                                                                                break;
-                                                                        }
-                                                                    }
-                                                                    if (!string.IsNullOrEmpty(LocalGuid)) {
-                                                                        if (!dateController.IsDate(LocalLastChangeDateStr)) {
-                                                                            LocalLastChangeDate = DateTime.MinValue;
-                                                                        } else {
-                                                                            LocalLastChangeDate = genericController.encodeDate(LocalLastChangeDateStr);
-                                                                        }
-                                                                    }
-                                                                    if (allowLogging) {
-                                                                        logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), node is collection, LocalGuid [" + LocalGuid + "], LocalLastChangeDateStr [" + LocalLastChangeDateStr + "]");
-                                                                    }
-                                                                    //
-                                                                    // go through each collection on the Library and find the local collection guid
-                                                                    //
-                                                                    foreach (XmlNode LibListNode in LibraryCollections.DocumentElement.ChildNodes) {
-                                                                        if (localCollectionUpToDate) {
+                                    try {
+                                        LibraryCollections.Load(SupportURL);
+                                    } catch (Exception) {
+                                        Copy = "Error downloading or loading GetCollectionList from Support.";
+                                        logController.appendLogInstall(cpCore, Copy + ", the request was [" + SupportURL + "]");
+                                        return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
+                                        returnOk = false;
+                                        loadOK = false;
+                                    }
+                                    if (loadOK) {
+                                        {
+                                            if (genericController.vbLCase(LibraryCollections.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
+                                                Copy = "The GetCollectionList support site remote method returned an xml file with an invalid root node, [" + LibraryCollections.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.";
+                                                logController.appendLogInstall(cpCore, Copy + ", the request was [" + SupportURL + "]");
+                                                return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
+                                                returnOk = false;
+                                            } else {
+                                                //
+                                                // -- Search for Collection Updates Needed
+                                                foreach (var localTestCollection in localCollectionStoreList) {
+                                                    localCollectionUpToDate = false;
+                                                    LocalGuid = localTestCollection.guid.ToLower();
+                                                    LocalLastChangeDate = localTestCollection.lastChangeDate;
+                                                    //
+                                                    // go through each collection on the Library and find the local collection guid
+                                                    //
+                                                    foreach (XmlNode LibListNode in LibraryCollections.DocumentElement.ChildNodes) {
+                                                        if (localCollectionUpToDate) {
+                                                            break;
+                                                        }
+                                                        switch (genericController.vbLCase(LibListNode.Name)) {
+                                                            case "collection":
+                                                                LibGUID = "";
+                                                                LibLastChangeDateStr = "";
+                                                                LibLastChangeDate = DateTime.MinValue;
+                                                                foreach (XmlNode CollectionNode in LibListNode.ChildNodes) {
+                                                                    switch (genericController.vbLCase(CollectionNode.Name)) {
+                                                                        case "name":
+                                                                            //
+                                                                            LibName = genericController.vbLCase(CollectionNode.InnerText);
                                                                             break;
+                                                                        case "system":
+                                                                            //
+                                                                            LibSystem = genericController.encodeBoolean(CollectionNode.InnerText);
+                                                                            break;
+                                                                        case "guid":
+                                                                            //
+                                                                            LibGUID = genericController.vbLCase(CollectionNode.InnerText);
+                                                                            //LibGUID = genericController.vbReplace(LibGUID, "{", "")
+                                                                            //LibGUID = genericController.vbReplace(LibGUID, "}", "")
+                                                                            //LibGUID = genericController.vbReplace(LibGUID, "-", "")
+                                                                            break;
+                                                                        case "lastchangedate":
+                                                                            //
+                                                                            LibLastChangeDateStr = CollectionNode.InnerText;
+                                                                            //LibLastChangeDateStr = LibLastChangeDateStr;
+                                                                            break;
+                                                                        case "contensiveversion":
+                                                                            //
+                                                                            LibContensiveVersion = CollectionNode.InnerText;
+                                                                            break;
+                                                                    }
+                                                                }
+                                                                if (!string.IsNullOrEmpty(LibGUID)) {
+                                                                    if ((!string.IsNullOrEmpty(LibGUID)) & (LibGUID == LocalGuid) & ((string.IsNullOrEmpty(LibContensiveVersion)) || (string.CompareOrdinal(LibContensiveVersion, cpCore.codeVersion()) <= 0))) {
+                                                                        logController.appendLogInstall(cpCore, "verify collection [" + LibGUID + "]");
+                                                                        //
+                                                                        // LibCollection matches the LocalCollection - process the upgrade
+                                                                        //
+                                                                        if (genericController.vbInstr(1, LibGUID, "58c9", 1) != 0) {
+                                                                            //LibGUID = LibGUID;
                                                                         }
-                                                                        switch (genericController.vbLCase(LibListNode.Name)) {
-                                                                            case "collection":
-                                                                                LibGUID = "";
-                                                                                LibLastChangeDateStr = "";
-                                                                                LibLastChangeDate = DateTime.MinValue;
-                                                                                foreach (XmlNode CollectionNode in LibListNode.ChildNodes) {
-                                                                                    switch (genericController.vbLCase(CollectionNode.Name)) {
-                                                                                        case "name":
-                                                                                            //
-                                                                                            LibName = genericController.vbLCase(CollectionNode.InnerText);
-                                                                                            break;
-                                                                                        case "system":
-                                                                                            //
-                                                                                            LibSystem = genericController.encodeBoolean(CollectionNode.InnerText);
-                                                                                            break;
-                                                                                        case "guid":
-                                                                                            //
-                                                                                            LibGUID = genericController.vbLCase(CollectionNode.InnerText);
-                                                                                            //LibGUID = genericController.vbReplace(LibGUID, "{", "")
-                                                                                            //LibGUID = genericController.vbReplace(LibGUID, "}", "")
-                                                                                            //LibGUID = genericController.vbReplace(LibGUID, "-", "")
-                                                                                            break;
-                                                                                        case "lastchangedate":
-                                                                                            //
-                                                                                            LibLastChangeDateStr = CollectionNode.InnerText;
-                                                                                            //LibLastChangeDateStr = LibLastChangeDateStr;
-                                                                                            break;
-                                                                                        case "contensiveversion":
-                                                                                            //
-                                                                                            LibContensiveVersion = CollectionNode.InnerText;
-                                                                                            break;
-                                                                                    }
-                                                                                }
-                                                                                if (!string.IsNullOrEmpty(LibGUID)) {
-                                                                                    if (genericController.vbInstr(1, LibGUID, "58c9", 1) != 0) {
-                                                                                        //LibGUID = LibGUID;
-                                                                                    }
-                                                                                    if ((!string.IsNullOrEmpty(LibGUID)) & (LibGUID == LocalGuid) & ((string.IsNullOrEmpty(LibContensiveVersion)) || (string.CompareOrdinal(LibContensiveVersion, cpCore.codeVersion()) <= 0))) {
-                                                                                        //
-                                                                                        // LibCollection matches the LocalCollection - process the upgrade
-                                                                                        //
-                                                                                        if (allowLogging) {
-                                                                                            logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Library collection node found that matches");
-                                                                                        }
-                                                                                        if (genericController.vbInstr(1, LibGUID, "58c9", 1) != 0) {
-                                                                                            //LibGUID = LibGUID;
-                                                                                        }
-                                                                                        if (!dateController.IsDate(LibLastChangeDateStr)) {
-                                                                                            LibLastChangeDate = DateTime.MinValue;
-                                                                                        } else {
-                                                                                            LibLastChangeDate = genericController.encodeDate(LibLastChangeDateStr);
-                                                                                        }
-                                                                                        // TestPoint 1.1 - Test each collection for upgrade
-                                                                                        if (LibLastChangeDate > LocalLastChangeDate) {
-                                                                                            //
-                                                                                            // LibLastChangeDate <>0, and it is > local lastchangedate
-                                                                                            //
-                                                                                            workingPath = cpCore.addon.getPrivateFilesAddonPath() + "\\temp_" + genericController.GetRandomInteger(cpCore) + "\\";
-                                                                                            if (allowLogging) {
-                                                                                                logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" + workingPath + "].");
-                                                                                            }
-                                                                                            logController.appendLogInstall(cpCore, "Upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], because LocalChangeDate [" + LocalLastChangeDate + "] < LibraryChangeDate [" + LibLastChangeDate + "]");
-                                                                                            //
-                                                                                            // Upgrade Needed
-                                                                                            //
-                                                                                            cpCore.privateFiles.createPath(workingPath);
-                                                                                            //
-                                                                                            returnOk = downloadCollectionFiles(cpCore, workingPath, LibGUID, ref CollectionLastChangeDate, ref return_ErrorMessage);
-                                                                                            if (allowLogging) {
-                                                                                                logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), DownloadCollectionFiles returned " + returnOk);
-                                                                                            }
-                                                                                            if (returnOk) {
-                                                                                                List<string> listGuidList = new List<string>();
-                                                                                                returnOk = buildLocalCollectionReposFromFolder(cpCore, workingPath, CollectionLastChangeDate, ref listGuidList, ref return_ErrorMessage, allowLogging);
-                                                                                                if (allowLogging) {
-                                                                                                    logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), BuildLocalCollectionFolder returned " + returnOk);
-                                                                                                }
-                                                                                            }
-                                                                                            //
-                                                                                            if (allowLogging) {
-                                                                                                logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), working folder not deleted because debugging. Delete tmp folders when finished.");
-                                                                                            } else {
-                                                                                                cpCore.privateFiles.deleteFolder(workingPath);
-                                                                                            }
-                                                                                            //
-                                                                                            // Upgrade the apps from the collection files, do not install on any apps
-                                                                                            //
-                                                                                            if (returnOk) {
-                                                                                                returnOk = installCollectionFromLocalRepo(cpCore, LibGUID, cpCore.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, ref nonCriticalErrorList);
-                                                                                                if (allowLogging) {
-                                                                                                    logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), UpgradeAllAppsFromLocalCollection returned " + returnOk);
-                                                                                                }
-                                                                                            }
-                                                                                            //
-                                                                                            // make sure this issue is logged and clear the flag to let other local collections install
-                                                                                            //
-                                                                                            if (!returnOk) {
-                                                                                                if (allowLogging) {
-                                                                                                    logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), for this local collection, process returned " + returnOk);
-                                                                                                }
-                                                                                                logController.appendLogInstall(cpCore, "There was a problem upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], error message [" + return_ErrorMessage + "], will clear error and continue with the next collection, the request was [" + SupportURL + "]");
-                                                                                                returnOk = true;
-                                                                                            }
-                                                                                        }
-                                                                                        //
-                                                                                        // this local collection has been resolved, go to the next local collection
-                                                                                        //
-                                                                                        localCollectionUpToDate = true;
-                                                                                        //
-                                                                                        if (!returnOk) {
-                                                                                            logController.appendLogInstall(cpCore, "There was a problem upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], error message [" + return_ErrorMessage + "], will clear error and continue with the next collection");
-                                                                                            returnOk = true;
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                break;
+                                                                        if (!dateController.IsDate(LibLastChangeDateStr)) {
+                                                                            LibLastChangeDate = DateTime.MinValue;
+                                                                        } else {
+                                                                            LibLastChangeDate = genericController.encodeDate(LibLastChangeDateStr);
+                                                                        }
+                                                                        // TestPoint 1.1 - Test each collection for upgrade
+                                                                        if (LibLastChangeDate > LocalLastChangeDate) {
+                                                                            //
+                                                                            // LibLastChangeDate <>0, and it is > local lastchangedate
+                                                                            //
+                                                                            workingPath = cpCore.addon.getPrivateFilesAddonPath() + "\\temp_" + genericController.GetRandomInteger(cpCore) + "\\";
+                                                                            logController.appendLogInstall(cpCore, "Upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], because LocalChangeDate [" + LocalLastChangeDate + "] < LibraryChangeDate [" + LibLastChangeDate + "]");
+                                                                            //
+                                                                            // Upgrade Needed
+                                                                            //
+                                                                            cpCore.privateFiles.createPath(workingPath);
+                                                                            //
+                                                                            returnOk = downloadCollectionFiles(cpCore, workingPath, LibGUID, ref CollectionLastChangeDate, ref return_ErrorMessage);
+                                                                            if (returnOk) {
+                                                                                List<string> listGuidList = new List<string>();
+                                                                                returnOk = buildLocalCollectionReposFromFolder(cpCore, workingPath, CollectionLastChangeDate, ref listGuidList, ref return_ErrorMessage, false);
+                                                                            }
+                                                                            //
+                                                                            cpCore.privateFiles.deleteFolder(workingPath);
+                                                                            //
+                                                                            // Upgrade the apps from the collection files, do not install on any apps
+                                                                            //
+                                                                            if (returnOk) {
+                                                                                returnOk = installCollectionFromLocalRepo(cpCore, LibGUID, cpCore.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, ref nonCriticalErrorList);
+                                                                            }
+                                                                            //
+                                                                            // make sure this issue is logged and clear the flag to let other local collections install
+                                                                            //
+                                                                            if (!returnOk) {
+                                                                                logController.appendLogInstall(cpCore, "There was a problem upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], error message [" + return_ErrorMessage + "], will clear error and continue with the next collection, the request was [" + SupportURL + "]");
+                                                                                returnOk = true;
+                                                                            }
+                                                                        }
+                                                                        //
+                                                                        // this local collection has been resolved, go to the next local collection
+                                                                        //
+                                                                        localCollectionUpToDate = true;
+                                                                        //
+                                                                        if (!returnOk) {
+                                                                            logController.appendLogInstall(cpCore, "There was a problem upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], error message [" + return_ErrorMessage + "], will clear error and continue with the next collection");
+                                                                            returnOk = true;
                                                                         }
                                                                     }
-                                                                    break;
-                                                            }
+                                                                }
+                                                                break;
                                                         }
                                                     }
                                                 }
@@ -1671,10 +1533,57 @@ namespace Contensive.Core {
                                         }
                                     }
                                 }
+                                packageSize = 0;
+                                GuidList = "";
                             }
                         }
                     }
-                }
+                };
+                //collectionServerXml = getLocalCollectionStoreListXml(cpCore);
+                //if (!string.IsNullOrEmpty(collectionServerXml)) {
+                //    LocalCollections = new XmlDocument();
+                //    try {
+                //        LocalCollections.LoadXml(collectionServerXml);
+                //    } catch (Exception) {
+                //        Copy = "Error loading privateFiles\\addons\\Collections.xml";
+                //        logController.appendLogInstall(cpCore, Copy);
+                //        return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
+                //        returnOk = false;
+                //    }
+                //    if (returnOk) {
+                //        if (genericController.vbLCase(LocalCollections.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
+                //            Copy = "The addons\\Collections.xml has an invalid root node, [" + LocalCollections.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.";
+                //            logController.appendLogInstall(cpCore, Copy);
+                //            return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
+                //            returnOk = false;
+                //        } else {
+                //            //
+                //            // Get a list of the collection guids on this server
+                //            //
+
+                //            GuidCnt = 0;
+                //            if (genericController.vbLCase(LocalCollections.DocumentElement.Name) == "collectionlist") {
+                //                foreach (XmlNode LocalListNode in LocalCollections.DocumentElement.ChildNodes) {
+                //                    switch (genericController.vbLCase(LocalListNode.Name)) {
+                //                        case "collection":
+                //                            foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
+                //                                if (genericController.vbLCase(CollectionNode.Name) == "guid") {
+                //                                    Array.Resize(ref GuidArray, GuidCnt + 1);
+                //                                    GuidArray[GuidCnt] = CollectionNode.InnerText;
+                //                                    GuidCnt = GuidCnt + 1;
+                //                                    break;
+                //                                }
+                //                            }
+                //                            break;
+                //                    }
+                //                }
+                //            }
+
+
+
+                //        }
+                //    }
+                //}
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -3017,71 +2926,6 @@ namespace Contensive.Core {
             return result;
         }
         //
-        //====================================================================================================
-        /// <summary>
-        /// Return the collectionList file stored in the root of the addon folder.
-        /// </summary>
-        /// <returns></returns>
-        public static string getCollectionListFile(coreClass cpCore) {
-            string returnXml = "";
-            try {
-                string LastChangeDate = "";
-                DirectoryInfo SubFolder = null;
-                DirectoryInfo[] SubFolderList = null;
-                string FolderName = null;
-                string collectionFilePathFilename = null;
-                string CollectionGuid = null;
-                string Collectionname = null;
-                int Pos = 0;
-                DirectoryInfo[] FolderList = null;
-                //
-                collectionFilePathFilename = cpCore.addon.getPrivateFilesAddonPath() + "Collections.xml";
-                returnXml = cpCore.privateFiles.readFile(collectionFilePathFilename);
-                if (string.IsNullOrEmpty(returnXml)) {
-                    FolderList = cpCore.privateFiles.getFolderList(cpCore.addon.getPrivateFilesAddonPath());
-                    if (FolderList.Length > 0) {
-                        foreach (DirectoryInfo folder in FolderList) {
-                            FolderName = folder.Name;
-                            Pos = genericController.vbInstr(1, FolderName, "\t");
-                            if (Pos > 1) {
-                                //hint = hint & ",800"
-                                FolderName = FolderName.Left( Pos - 1);
-                                if (FolderName.Length > 34) {
-                                    if (genericController.vbLCase(FolderName.Left( 4)) != "temp") {
-                                        CollectionGuid = FolderName.Substring(FolderName.Length - 32);
-                                        Collectionname = FolderName.Left( FolderName.Length - CollectionGuid.Length - 1);
-                                        CollectionGuid = CollectionGuid.Left( 8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
-                                        CollectionGuid = "{" + CollectionGuid + "}";
-                                        SubFolderList = cpCore.privateFiles.getFolderList(cpCore.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
-                                        if (SubFolderList.Length > 0) {
-                                            SubFolder = SubFolderList[SubFolderList.Length - 1];
-                                            FolderName = FolderName + "\\" + SubFolder.Name;
-                                            LastChangeDate = SubFolder.Name.Substring(4, 2) + "/" + SubFolder.Name.Substring(6, 2) + "/" + SubFolder.Name.Left( 4);
-                                            if (!dateController.IsDate(LastChangeDate)) {
-                                                LastChangeDate = "";
-                                            }
-                                        }
-                                        returnXml = returnXml + "\r\n\t<Collection>";
-                                        returnXml = returnXml + "\r\n\t\t<name>" + Collectionname + "</name>";
-                                        returnXml = returnXml + "\r\n\t\t<guid>" + CollectionGuid + "</guid>";
-                                        returnXml = returnXml + "\r\n\t\t<lastchangedate>" + LastChangeDate + "</lastchangedate>";
-                                        returnXml += "\r\n\t\t<path>" + FolderName + "</path>";
-                                        returnXml = returnXml + "\r\n\t</Collection>";
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    returnXml = "<CollectionList>" + returnXml + "\r\n</CollectionList>";
-                    cpCore.privateFiles.saveFile(collectionFilePathFilename, returnXml);
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnXml;
-        }
-        //
         //
         //
         private static void UpdateConfig(coreClass cpCore, string Collectionname, string CollectionGuid, DateTime CollectionUpdatedDate, string CollectionVersionFolderName) {
@@ -3101,7 +2945,7 @@ namespace Contensive.Core {
                 //
                 loadOK = true;
                 try {
-                    Doc.LoadXml(getCollectionListFile(cpCore));
+                    Doc.LoadXml(getLocalCollectionStoreListXml(cpCore));
                 } catch (Exception ex) {
                     logController.appendLogInstall(cpCore, "UpdateConfig, Error loading Collections.xml file.");
                 }
@@ -3230,7 +3074,7 @@ namespace Contensive.Core {
                 return_LastChagnedate = DateTime.MinValue;
                 loadOK = true;
                 try {
-                    Doc.LoadXml(getCollectionListFile(cpCore));
+                    Doc.LoadXml(getLocalCollectionStoreListXml(cpCore));
                 } catch (Exception ex) {
                     //hint = hint & ",parse error"
                     logController.appendLogInstall(cpCore, "GetCollectionConfig, Hint=[" + hint + "], Error loading Collections.xml file.");
@@ -5721,6 +5565,219 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return the collectionList file stored in the root of the addon folder.
+        /// </summary>
+        /// <returns></returns>
+        public static string getLocalCollectionStoreListXml(coreClass cpCore) {
+            string returnXml = "";
+            try {
+                string LastChangeDate = "";
+                DirectoryInfo SubFolder = null;
+                DirectoryInfo[] SubFolderList = null;
+                string FolderName = null;
+                string collectionFilePathFilename = null;
+                string CollectionGuid = null;
+                string Collectionname = null;
+                int Pos = 0;
+                DirectoryInfo[] FolderList = null;
+                //
+                collectionFilePathFilename = cpCore.addon.getPrivateFilesAddonPath() + "Collections.xml";
+                returnXml = cpCore.privateFiles.readFile(collectionFilePathFilename);
+                if (string.IsNullOrEmpty(returnXml)) {
+                    FolderList = cpCore.privateFiles.getFolderList(cpCore.addon.getPrivateFilesAddonPath());
+                    if (FolderList.Length > 0) {
+                        foreach (DirectoryInfo folder in FolderList) {
+                            FolderName = folder.Name;
+                            Pos = genericController.vbInstr(1, FolderName, "\t");
+                            if (Pos > 1) {
+                                //hint = hint & ",800"
+                                FolderName = FolderName.Left(Pos - 1);
+                                if (FolderName.Length > 34) {
+                                    if (genericController.vbLCase(FolderName.Left(4)) != "temp") {
+                                        CollectionGuid = FolderName.Substring(FolderName.Length - 32);
+                                        Collectionname = FolderName.Left(FolderName.Length - CollectionGuid.Length - 1);
+                                        CollectionGuid = CollectionGuid.Left(8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
+                                        CollectionGuid = "{" + CollectionGuid + "}";
+                                        SubFolderList = cpCore.privateFiles.getFolderList(cpCore.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
+                                        if (SubFolderList.Length > 0) {
+                                            SubFolder = SubFolderList[SubFolderList.Length - 1];
+                                            FolderName = FolderName + "\\" + SubFolder.Name;
+                                            LastChangeDate = SubFolder.Name.Substring(4, 2) + "/" + SubFolder.Name.Substring(6, 2) + "/" + SubFolder.Name.Left(4);
+                                            if (!dateController.IsDate(LastChangeDate)) {
+                                                LastChangeDate = "";
+                                            }
+                                        }
+                                        returnXml = returnXml + "\r\n\t<Collection>";
+                                        returnXml = returnXml + "\r\n\t\t<name>" + Collectionname + "</name>";
+                                        returnXml = returnXml + "\r\n\t\t<guid>" + CollectionGuid + "</guid>";
+                                        returnXml = returnXml + "\r\n\t\t<lastchangedate>" + LastChangeDate + "</lastchangedate>";
+                                        returnXml += "\r\n\t\t<path>" + FolderName + "</path>";
+                                        returnXml = returnXml + "\r\n\t</Collection>";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    returnXml = "<CollectionList>" + returnXml + "\r\n</CollectionList>";
+                    cpCore.privateFiles.saveFile(collectionFilePathFilename, returnXml);
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+            return returnXml;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// get a list of collections available on the server
+        /// </summary>
+        public static bool getLocalCollectionStoreList(coreClass cpCore, ref List<collectionStoreClass> localCollectionList, ref string return_ErrorMessage) {
+            bool returnOk = true;
+            try {
+                //
+                //-----------------------------------------------------------------------------------------------
+                //   Load LocalCollections from the Collections.xml file
+                //-----------------------------------------------------------------------------------------------
+                //
+                string localCollectionStoreListXml = getLocalCollectionStoreListXml(cpCore);
+                if (!string.IsNullOrEmpty(localCollectionStoreListXml)) {
+                    XmlDocument LocalCollections = new XmlDocument();
+                    try {
+                        LocalCollections.LoadXml(localCollectionStoreListXml);
+                    } catch (Exception) {
+                        string Copy = "Error loading privateFiles\\addons\\Collections.xml";
+                        logController.appendLogInstall(cpCore, Copy);
+                        return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
+                        returnOk = false;
+                    }
+                    if (returnOk) {
+                        if (genericController.vbLCase(LocalCollections.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
+                            string Copy = "The addons\\Collections.xml has an invalid root node, [" + LocalCollections.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.";
+                            logController.appendLogInstall(cpCore, Copy);
+                            return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
+                            returnOk = false;
+                        } else {
+                            //
+                            // Get a list of the collection guids on this server
+                            //
+                            if (genericController.vbLCase(LocalCollections.DocumentElement.Name) == "collectionlist") {
+                                foreach (XmlNode LocalListNode in LocalCollections.DocumentElement.ChildNodes) {
+                                    switch (genericController.vbLCase(LocalListNode.Name)) {
+                                        case "collection":
+                                            var collection = new collectionStoreClass();
+                                            localCollectionList.Add(collection);
+                                            foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
+                                                if (CollectionNode.Name.ToLower() == "name") {
+                                                    collection.name = CollectionNode.InnerText;
+                                                } else if (CollectionNode.Name.ToLower() == "guid") {
+                                                    collection.guid = CollectionNode.InnerText;
+                                                } else if (CollectionNode.Name.ToLower() == "path") {
+                                                    collection.path = CollectionNode.InnerText;
+                                                } else if (CollectionNode.Name.ToLower() == "lastchangedate") {
+                                                    collection.lastChangeDate = genericController.encodeDate( CollectionNode.InnerText );
+                                                }
+                                            }
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+            return returnOk;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return a list of collections on the 
+        /// </summary>
+        /// <param name="cpCore"></param>
+        /// <param name="remoteCollectionList"></param>
+        /// <returns></returns>
+        //
+        //
+        //
+        public static bool getRemoteCollectionList(coreClass cpCore, ref List<collectionStoreClass> remoteCollectionList) {
+            bool result = false;
+            try {
+                var LibCollections = new XmlDocument();
+                bool parseError = false;
+                try {
+                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + cpCore.codeVersion());
+                } catch (Exception ex) {
+                    string UserError = "There was an error reading the Collection Library. The site may be unavailable.";
+                    logController.appendLogInstall(cpCore, UserError);
+                    errorController.addUserError(cpCore, UserError);
+                    parseError = true;
+                }
+                if (!parseError) {
+                    if (genericController.vbLCase(LibCollections.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
+                        string UserError = "There was an error reading the Collection Library file. The '" + CollectionListRootNode + "' element was not found.";
+                        logController.appendLogInstall(cpCore, UserError);
+                        errorController.addUserError(cpCore, UserError);
+                    } else {
+                        foreach (XmlNode CDef_Node in LibCollections.DocumentElement.ChildNodes) {
+                            var collection = new collectionStoreClass();
+                            remoteCollectionList.Add(collection);
+                            switch (genericController.vbLCase(CDef_Node.Name)) {
+                                case "collection":
+                                    //
+                                    // Read the collection
+                                    //
+                                    foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
+                                        switch (genericController.vbLCase(CollectionNode.Name)) {
+                                            case "name":
+                                                collection.name = CollectionNode.InnerText;
+                                                break;
+                                            case "guid":
+                                                collection.guid = CollectionNode.InnerText;
+                                                break;
+                                            case "version":
+                                                collection.version = CollectionNode.InnerText;
+                                                break;
+                                            case "description":
+                                                collection.description = CollectionNode.InnerText;
+                                                break;
+                                            case "contensiveversion":
+                                                collection.contensiveVersion = CollectionNode.InnerText;
+                                                break;
+                                            case "lastchangedate":
+                                                collection.lastChangeDate = genericController.encodeDate(CollectionNode.InnerText);
+                                                break;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception) {
+                throw;
+            }
+            return result;
+        }
+        //
+        //
+        /// <summary>
+        /// data from local collection repository
+        /// </summary>
+        public class collectionStoreClass {
+            public string name;
+            public string guid;
+            public string path;
+            public DateTime lastChangeDate;
+            public string version;
+            public string description;
+            public string contensiveVersion;
         }
     }
 }

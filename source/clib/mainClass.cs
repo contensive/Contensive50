@@ -9,7 +9,8 @@ namespace Contensive.CLI {
     class mainClass {
         static void Main(string[] args) {
             try {
-                string appName;
+                string appName = "";
+                string collectionName = "";
                 //
                 // create cp for cluster work, with no application
                 //
@@ -31,7 +32,7 @@ namespace Contensive.CLI {
                         if (!EventLog.SourceExists(eventLogSource)) EventLog.CreateEventSource(eventLogSource, eventLogLog);
                         EventLog.WriteEntry(eventLogSource, eventLogEvent, EventLogEntryType.Information);
                         //
-                        // -- set programfiles path if emptry
+                        // -- set programfiles path if empty
                         if (String.IsNullOrEmpty(cp.core.serverConfig.programFilesPath)) {
                             string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
                             if (executePath.ToLower().IndexOf("\\git\\") == 0) {
@@ -45,40 +46,83 @@ namespace Contensive.CLI {
                         }
                         //
                         // -- loop through arguments and execute each command
-                        for (int argPtr = 0; argPtr < args.Length; argPtr++) // Loop through array
-                        {
+                        for (int argPtr = 0; argPtr < args.Length; argPtr++) {
                             string argument = args[argPtr];
                             bool exitArgumentProcessing = false;
                             switch (argument.ToLower()) {
-                                case "--housekeepall":
+                                case "-a":
                                     //
-                                    foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
-                                        String upgradeAppName = kvp.Key;
-                                        using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(upgradeAppName)) {
-                                            cpApp.Doc.SetProperty("force", "1");
-                                            cpApp.executeAddon(Contensive.Core.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
-                                        }
-                                    }
-                                    exitArgumentProcessing = true;
-                                    break;
-                                case "-h":
-                                case "--housekeep":
-                                    //
-                                    // -- upgrade the app in the argument list, or prompt for it
-                                    if (argPtr == (args.Length + 1)) {
-                                        Console.WriteLine("Application name?");
-                                        appName = Console.ReadLine();
-                                    } else {
+                                    // set application name
+                                    if (argPtr < (args.Length + 1)) {
                                         argPtr++;
                                         appName = args[argPtr];
                                     }
-                                    if (string.IsNullOrEmpty(appName)) {
-                                        Console.WriteLine("ERROR: housekeep requires a valid app name.");
-                                        argPtr = args.Length;
+                                    break;
+                                case "-i":
+                                case "--install":
+                                    //
+                                    // -- install collection to one or all applications
+                                    if (argPtr < (args.Length + 1)) {
+                                        argPtr++;
+                                        collectionName = args[argPtr];
+                                    }
+                                    if (string.IsNullOrEmpty(collectionName)) {
+                                        Console.WriteLine("Collection name is required after the --install command");
                                     } else {
+                                        //
+                                        // -- determine guid of collection
+                                        var collectionList = new List<Contensive.Core.collectionController.collectionStoreClass>();
+                                        Contensive.Core.collectionController.getRemoteCollectionList(cp.core, ref collectionList);
+                                        string collectionGuid = "";
+                                        foreach (var collection in collectionList) {
+                                            if (collection.name.ToLower() == collectionName.ToLower()) {
+                                                collectionGuid = collection.guid;
+                                                break;
+                                            }
+                                        }
+                                        if (string.IsNullOrEmpty(collectionGuid)) {
+                                            Console.WriteLine("Collection was not found on the distribution server");
+                                        } else {
+                                            if (string.IsNullOrEmpty(appName)) {
+                                                foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                                    using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(kvp.Key)) {
+                                                        string returnErrorMessage = "";
+                                                        Contensive.Core.collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false);
+                                                        if (!string.IsNullOrEmpty(returnErrorMessage)) {
+                                                            Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
+                                                    string returnErrorMessage = "";
+                                                    Contensive.Core.collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false);
+                                                    if (!string.IsNullOrEmpty(returnErrorMessage)) {
+                                                        Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case "-h":
+                                case "--housekeep":
+                                    if (!string.IsNullOrEmpty(appName)) {
+                                        //
+                                        // -- housekeep app
                                         using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
                                             cpApp.Doc.SetProperty("force", "1");
                                             cpApp.executeAddon(Contensive.Core.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
+                                        }
+                                    } else {
+                                        //
+                                        // -- housekeep all apps
+                                        foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                            String upgradeAppName = kvp.Key;
+                                            using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(upgradeAppName)) {
+                                                cpApp.Doc.SetProperty("force", "1");
+                                                cpApp.executeAddon(Contensive.Core.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
+                                            }
                                         }
                                     }
                                     exitArgumentProcessing = true;
@@ -152,34 +196,19 @@ namespace Contensive.CLI {
                                     break;
                                 case "--upgrade":
                                 case "-u":
-                                    //
-                                    // -- upgrade the app in the argument list, or prompt for it
-                                    if (argPtr == (args.Length + 1)) {
-                                        Console.WriteLine("Application name?");
-                                        appName = Console.ReadLine();
-                                    } else {
-                                        argPtr++;
-                                        appName = args[argPtr];
-                                    }
-                                    if (string.IsNullOrEmpty(appName)) {
-                                        Console.WriteLine("ERROR: upgrade requires a valid app name.");
-                                        argPtr = args.Length;
-                                    } else {
-                                        using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
-                                            Core.Controllers.appBuilderController.upgrade(cpApp.core, false);
-                                        }
-                                        //installFiles = new coreFileSystemClass(cp.core, cp.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
-                                        //installFiles.Dispose();
-                                    }
-                                    exitArgumentProcessing = true;
-                                    break;
-                                case "--upgradeall":
-                                    //
-                                    // upgrade all apps in the server group
-                                    foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
-                                        String upgradeAppName = kvp.Key;
-                                        using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(upgradeAppName)) {
+                                    if (!string.IsNullOrEmpty(appName)) {
+                                        //
+                                        // -- upgrade app
+                                        using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(appName)) {
                                             Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false);
+                                        }
+                                    } else {
+                                        //
+                                        // -- upgrade all apps
+                                        foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                            using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(kvp.Key)) {
+                                                Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false);
+                                            }
                                         }
                                     }
                                     exitArgumentProcessing = true;
@@ -290,6 +319,7 @@ namespace Contensive.CLI {
                 Console.WriteLine("There was an error that forced the program to close. Details follow.\n\n" + ex.ToString());
             }
         }
+        //
         const string helpText = ""
             + "\r\nclib command line"
             + "\r\n"
