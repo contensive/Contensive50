@@ -47,23 +47,15 @@ namespace Contensive.Core.Controllers {
             public bool NewWindow; // True opens link in a new window
         }
         //
-        // ----- Local storage
-        //
-        private string iMenuFilePath;
-        //
         // ----- Menu Entry storage
         //
         private int iEntryCount; // Count of Menus in the object
         private int iEntrySize;
         private MenuEntryType[] iEntry;
-        //
-        private int iTreeCount; // Count of Tree Menus for this instance
-        private string iMenuCloseString; // String returned for closing menus
-                                         //
-        private string UsedEntries; // String of EntryNames that have been used (for unique test)
+        private string iMenuCloseString;
+        private string UsedEntries; 
         private keyPtrController EntryIndexName;
-        //Private EntryIndexID As keyPtrIndex8Class
-        //
+         //
         // ----- RollOverFlyout storage
         //
         private string MenuFlyoutNamePrefix; // Random prefix added to element IDs to avoid namespace collision
@@ -187,10 +179,8 @@ namespace Contensive.Core.Controllers {
         public void AddEntry(string EntryName, string ParentiEntryName = "", string ImageLink = "", string ImageOverLink = "", string Link = "", string Caption = "", string CaptionImageLink = "", bool NewWindow = false) {
             try {
                 //
-                int MenuEntrySize = 0;
                 string iEntryName = null;
                 string UcaseEntryName = null;
-                bool iNewWindow = false;
                 //
                 iEntryName = genericController.vbReplace(encodeEmptyText(EntryName, ""), ",", " ");
                 UcaseEntryName = genericController.vbUCase(iEntryName);
@@ -470,8 +460,6 @@ namespace Contensive.Core.Controllers {
                 //
                 int EntryPointer = 0;
                 string iUsedEntries = null;
-                string SubMenuName = null;
-                int SubMenuCount = 0;
                 string target = null;
                 string SubMenus = "";
                 string PanelChildren = null;

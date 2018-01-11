@@ -24,11 +24,6 @@ namespace Contensive.Core.Controllers {
         //
         private dynamic cmdCallbackObject;
         private int cmdListenPort;
-        private string ServerLicense;
-        private string LocalIPList;
-        //
-        // http listener thread and communication object
-        //
         private Thread cmdListenThread;
         private const bool onThread = true;
         //
@@ -52,8 +47,6 @@ namespace Contensive.Core.Controllers {
             string[] prefixes = null;
             int prefixesCnt = 0;
             IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-            //			IPAddress ipAddressInfo = null;
             IPHostEntry HostEntry = Dns.GetHostEntry(System.Net.Dns.GetHostName());
             int ptr = 0;
             HttpListenerContext context = null;
@@ -184,9 +177,7 @@ namespace Contensive.Core.Controllers {
                     cmdListenThread.IsBackground = true;
                     cmdListenThread.Start();
                 }
-            } catch (Exception ex) {
-                //
-                //
+            } catch (Exception) {
                 //
                 throw new ApplicationException("Error during ipDaemon.startListening");
             }
@@ -211,10 +202,7 @@ namespace Contensive.Core.Controllers {
                     //
                     cmdListenThread.Abort();
                 }
-            } catch (Exception ex) {
-                //
-                //
-                //
+            } catch (Exception) {
                 throw new ApplicationException("Error during ipDaemon.stopListening");
             }
         }

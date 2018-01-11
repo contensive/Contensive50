@@ -96,13 +96,11 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 int RowPtr = 0;
                 stringBuilderLegacyController Body = null;
                 string[,] Cells = null;
-                int PageNumber = 0;
                 int ColumnCnt = 0;
                 string[] ColCaption = null;
                 string[] ColAlign = null;
                 string[] ColWidth = null;
                 bool[] ColSortable = null;
-                string PreTableCopy = null;
                 string PostTableCopy = "";
                 string BodyHTML = null;
                 int CS = 0;
@@ -113,10 +111,6 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 string Description = null;
                 string ButtonList = "";
                 string CollectionFilename = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode CDef_Node = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode CollectionNode = null;
                 string status = "";
                 bool AllowInstallFromFolder = false;
                 string InstallLibCollectionList = "";
@@ -148,7 +142,6 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                         Content.Add(Adminui.GetFormBodyAdminOnly());
                     } else {
                         //
-                        PreTableCopy = "Use this form to upload an add-on collection. If the GUID of the add-on matches one already installed on this server, it will be updated. If the GUID is new, it will be added.";
                         InstallFolder = "temp\\CollectionUpload" + encodeText(genericController.GetRandomInteger(cpCore));
                         privateFilesInstallPath = InstallFolder + "\\";
                         if (Button == constants.ButtonOK) {
@@ -571,7 +564,6 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 // --------------------------------------------------------------------------------
                                 //
                                 ColumnCnt = 4;
-                                PageNumber = 1;
                                 ColCaption = new string[4];
                                 ColAlign = new string[4];
                                 ColWidth = new string[4];
@@ -616,7 +608,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 bool parseError = false;
                                 try {
                                     LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + cpCore.codeVersion());
-                                } catch (Exception ex) {
+                                } catch (Exception) {
                                     UserError = "There was an error reading the Collection Library. The site may be unavailable.";
                                     HandleClassAppendLog("AddonManager", UserError);
                                     status += "<br>" + UserError;
@@ -785,26 +777,15 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 // --------------------------------------------------------------------------------
                                 //
                                 ColumnCnt = 2;
-                                //ColumnCnt = 3
-                                PageNumber = 1;
                                 ColCaption = new string[3];
                                 ColAlign = new string[3];
                                 ColWidth = new string[3];
                                 ColSortable = new bool[3];
-                                //ReDim ColCaption(3)
-                                //ReDim ColAlign(3)
-                                //ReDim ColWidth(3)
-                                //ReDim ColSortable(3)
                                 //
                                 ColCaption[0] = "Del";
                                 ColAlign[0] = "center";
                                 ColWidth[0] = "50";
                                 ColSortable[0] = false;
-                                //
-                                //ColCaption(1) = "Edit"
-                                //ColAlign(1) = "center"
-                                //ColWidth(1) = "50"
-                                //ColSortable(1) = False
                                 //
                                 ColCaption[1] = "Name";
                                 ColAlign[1] = "left";
@@ -824,8 +805,6 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     DisplaySystem = true;
                                     CS = cpCore.db.csOpen("Add-on Collections", "", "Name");
                                 }
-                                //todo  NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
-                                //ORIGINAL LINE: ReDim Preserve Cells(cpCore.db.csGetRowCount(CS), ColumnCnt)
                                 string[,] tempVar3 = new string[cpCore.db.csGetRowCount(CS) + 1, ColumnCnt + 1];
                                 if (Cells != null) {
                                     for (int Dimension0 = 0; Dimension0 < Cells.GetLength(0); Dimension0++) {
@@ -1013,8 +992,6 @@ namespace Contensive.Core.Addons.SafeAddonManager {
         public int GetParentIDFromNameSpace(string ContentName, string menuNameSpace) {
             int tempGetParentIDFromNameSpace = 0;
             try {
-                //
-                string[] NameSplit = null;
                 string ParentNameSpace = null;
                 string ParentName = null;
                 int ParentID = 0;

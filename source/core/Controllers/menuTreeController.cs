@@ -74,7 +74,6 @@ namespace Contensive.Core.Controllers {
         // ----- Local storage
         //
         private coreClass cpCore;
-        private string iMenuFilePath;
         //
         // ----- Menu Entry storage
         //
@@ -82,22 +81,9 @@ namespace Contensive.Core.Controllers {
         private int iEntrySize;
         private MenuEntryType[] iEntry;
         //
-        // Private iDQMCount as integer           ' Count of Default Menus for this instance
-        // Private iDQMCLosed As Boolean       ' true if the menu has been closed
-        //
-        private int iTreeCount; // Count of Tree Menus for this instance
-        private string iMenuCloseString; // String returned for closing menus
-                                         //
         private string UsedEntries; // String of EntryNames that have been used (for unique test)
         private keyPtrController EntryIndexName;
-        // Private EntryIndexID As keyPtrIndex8Class
-        //
-        // ----- RollOverFlyout storage
-        //
-        //Private MenuFlyoutCount as integer           ' Count of Default Menus for this instance
-        private string MenuFlyoutNamePrefix; // Random prefix added to element IDs to avoid namespace collision
-        private string MenuFlyoutIcon_Local; // string used to mark a button that has a non-hover flyout
-                                             // Private RollOverFlyoutClosed As Boolean       ' true if the menu has been closed
+        private string MenuFlyoutNamePrefix;
         private const bool newmode = true;
         //
         //====================================================================================================
@@ -120,10 +106,8 @@ namespace Contensive.Core.Controllers {
         public void AddEntry(string EntryName, string ParentiEntryName = "", string ImageLink = "", string ImageOverLink = "", string Link = "", string Caption = "", string OnClickJavascript = "", string Ignore1 = "", string ImageOpenLink = "", bool NewWindow = false) {
             try {
                 //
-                int MenuEntrySize = 0;
                 string iEntryName = null;
                 string UcaseEntryName = null;
-                bool iNewWindow = false;
                 //
                 iEntryName = genericController.vbReplace(encodeEmptyText(EntryName, ""), ",", " ");
                 UcaseEntryName = genericController.vbUCase(iEntryName);

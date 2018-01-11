@@ -29,10 +29,6 @@ namespace Contensive.Core.Controllers {
         //
         private coreClass cpCore;
         //
-        // ----- objects constructed that must be disposed
-        //
-        private object localObject;
-        //
         // ----- constants
         //
         private const int localConstant = 100;
@@ -74,6 +70,7 @@ namespace Contensive.Core.Controllers {
                 } else {
                     Tabs[TabsCnt].StylePrefix = StylePrefix;
                 }
+                Tabs[TabsCnt].LiveBody = "";
                 TabsCnt = TabsCnt + 1;
             } catch (Exception ex) {
                 cpCore.handleException(ex);

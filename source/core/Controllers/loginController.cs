@@ -309,38 +309,30 @@ namespace Contensive.Core.Controllers {
             bool returnREsult = false;
             try {
                 int LocalMemberID = 0;
-                string loginForm_Username = ""; // Values entered with the login form
-                string loginForm_Password = ""; // =
-                string loginForm_Email = ""; // =
-                bool loginForm_AutoLogin = false; // =
+                string loginForm_Username = ""; 
+                string loginForm_Password = ""; 
+                bool loginForm_AutoLogin = false; 
                 returnREsult = false;
                 //
-                if (true) {
-                    //
-                    // Processing can happen
-                    //   1) early in init() -- legacy
-                    //   2) as well as at the front of main_GetLoginForm - to support addon Login forms
-                    // This flag prevents the default form from processing twice
-                    //
-                    loginForm_Username = cpcore.docProperties.getText("username");
-                    loginForm_Password = cpcore.docProperties.getText("password");
-                    loginForm_AutoLogin = cpcore.docProperties.getBoolean("autologin");
-                    //
-                    if ((cpcore.doc.sessionContext.visit.LoginAttempts < cpcore.siteProperties.maxVisitLoginAttempts) && cpcore.doc.sessionContext.visit.CookieSupport) {
-                        LocalMemberID = cpcore.doc.sessionContext.authenticateGetId(cpcore, loginForm_Username, loginForm_Password);
-                        if (LocalMemberID == 0) {
-                            cpcore.doc.sessionContext.visit.LoginAttempts = cpcore.doc.sessionContext.visit.LoginAttempts + 1;
-                            cpcore.doc.sessionContext.visit.save(cpcore);
+                loginForm_Username = cpcore.docProperties.getText("username");
+                loginForm_Password = cpcore.docProperties.getText("password");
+                loginForm_AutoLogin = cpcore.docProperties.getBoolean("autologin");
+                //
+                if ((cpcore.doc.sessionContext.visit.LoginAttempts < cpcore.siteProperties.maxVisitLoginAttempts) && cpcore.doc.sessionContext.visit.CookieSupport) {
+                    LocalMemberID = cpcore.doc.sessionContext.authenticateGetId(cpcore, loginForm_Username, loginForm_Password);
+                    if (LocalMemberID == 0) {
+                        cpcore.doc.sessionContext.visit.LoginAttempts = cpcore.doc.sessionContext.visit.LoginAttempts + 1;
+                        cpcore.doc.sessionContext.visit.save(cpcore);
+                    } else {
+                        returnREsult = cpcore.doc.sessionContext.authenticateById(cpcore, LocalMemberID, cpcore.doc.sessionContext);
+                        if (returnREsult) {
+                            logController.logActivity2(cpcore, "successful username/password login", cpcore.doc.sessionContext.user.id, cpcore.doc.sessionContext.user.OrganizationID);
                         } else {
-                            returnREsult = cpcore.doc.sessionContext.authenticateById(cpcore, LocalMemberID, cpcore.doc.sessionContext);
-                            if (returnREsult) {
-                                logController.logActivity2(cpcore, "successful username/password login", cpcore.doc.sessionContext.user.id, cpcore.doc.sessionContext.user.OrganizationID);
-                            } else {
-                                logController.logActivity2(cpcore, "bad username/password login", cpcore.doc.sessionContext.user.id, cpcore.doc.sessionContext.user.OrganizationID);
-                            }
+                            logController.logActivity2(cpcore, "bad username/password login", cpcore.doc.sessionContext.user.id, cpcore.doc.sessionContext.user.OrganizationID);
                         }
                     }
                 }
+
             } catch (Exception ex) {
                 cpcore.handleException(ex);
                 throw;
@@ -569,11 +561,8 @@ namespace Contensive.Core.Controllers {
                 string Email = null;
                 int errorCode = 0;
                 //
-                string loginForm_Username = ""; // Values entered with the login form
-                string loginForm_Password = ""; // =
-                string loginForm_Email = ""; // =
-                bool loginForm_AutoLogin = false; // =
-                                                  //
+                string loginForm_Username = ""; 
+                string loginForm_Password = ""; 
                 loginForm_Username = cpcore.docProperties.getText("username");
                 loginForm_Password = cpcore.docProperties.getText("password");
                 //

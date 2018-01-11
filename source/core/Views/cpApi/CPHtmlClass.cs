@@ -133,7 +133,7 @@ namespace Contensive.Core {
                         FormStart = FormStart.Replace(">", " id=\"" + HtmlId + "\">");
                     }
                 }
-            } catch (Exception ex) {
+            } catch (Exception) {
 
             }
             return ""
@@ -223,8 +223,7 @@ namespace Contensive.Core {
         /// process an html file element to cdnFiles to the optional path. If the path is ommitted, the path "upload"
         /// </summary>
         [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")]
-        public override void ProcessInputFile(string HtmlName, string VirtualFilePath = "") //Inherits BaseClasses.CPHtmlBaseClass.ProcessInputFile
-        {
+        public override void ProcessInputFile(string HtmlName, string VirtualFilePath = "") {
             string ignoreFilename = "";
             cpCore.cdnFiles.upload(HtmlName, VirtualFilePath, ref ignoreFilename);
         }

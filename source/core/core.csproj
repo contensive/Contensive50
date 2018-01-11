@@ -201,7 +201,6 @@
     <Compile Include="Controllers\stringBuilderLegacyController.cs" />
     <Compile Include="Controllers\taskRunnerController.cs" />
     <Compile Include="Controllers\taskSchedulerController.cs" />
-    <Compile Include="Controllers\uploadFileController.cs" />
     <Compile Include="Controllers\workflowController.cs" />
     <Compile Include="Controllers\collectionXmlController.cs" />
     <Compile Include="Controllers\_blankStaticController.cs" />

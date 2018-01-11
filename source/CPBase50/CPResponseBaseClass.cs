@@ -35,7 +35,7 @@ namespace Contensive.BaseClasses
         public abstract void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain);
         public abstract void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain, string Path);
         public abstract void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain , string Path , bool Secure );
-        public abstract void Write(string content);
+        [Obsolete("The write buffer is deprecated")] public abstract void Write(string content);
 		/// <summary>
 		/// Is the response object available to write. False during background processes and after the html response has ended. For instance, when a remote method is returned the response is closed meaning no other data should be added to the output.
 		/// </summary>

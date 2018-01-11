@@ -38,10 +38,6 @@ namespace Contensive.WindowsServices {
         //
         private coreClass cpCore;
         private const string serviceDisplayName = "Contensive Monitor";
-        private bool ClassInitialized; // if true, the module has been
-        private bool DebugMode;
-        private bool Testing;
-        //
         private int TimerIntervalSec;
         private bool allowErrorRecovery;
         private bool allowIISReset;
@@ -70,48 +66,17 @@ namespace Contensive.WindowsServices {
         //   Process status flags
         //------------------------------------------------------------------------------------------
         //
-        private bool ServiceRunning;
         private bool ServiceInProcess;
-        private bool HTTPInProcess;
         private bool AbortProcess;
         private int HTTPLastError;
-        //Private needsErrorRecovery As Boolean
-        //
-        // Document constants
-        //
-        private const int DocLengthMax = 500000; // maximum size of a document to be parsed
-                                                 //
-                                                 //------------------------------------------------------------------------------------------
-                                                 //   HTTP Request
-                                                 //------------------------------------------------------------------------------------------
-                                                 //
-        private string HTTPAuthUsername;
-        private string HTTPAuthPassword;
-        private string ContensiveUsername;
-        private string ContensivePassword;
+        private const int DocLengthMax = 500000;
         //
         //------------------------------------------------------------------------------------------
         //   HTTP Response
         //------------------------------------------------------------------------------------------
         //
-        //Private HTTPResponse As String                  ' the entire response
-        private string HTTPResponseHeader; // header part
-        private string HTTPResponseEntity; // entity part
-        private string HTTPResponseFilename; // the server response
-        private string HTTPResponseStatus; // the whole firstline
-        private string HTTPResponseCode; // HTTP response Code (200, etc)
-        private string HTTPResponseContentType; // HTTP response header value
-        private double HTTPResponseTime; // time to fetch this page
+        private double HTTPResponseTime; 
         private const int HTTPResponseHeaderCountMax = 100;
-        private int HTTPResponseContentLength; // length of the body (from header)
-        private string HTTPBodyText; // all the text only body copy
-        private string HTTPSpellCheckText; // all the text only body copy
-                                           //
-        private int ResponseHeaderCount;
-        private int ResponseHeaderSize;
-        //Private ResponseHeaders() As NameValuePairType
-        //
-        //=========================================================================================
         //
         //=========================================================================================
         //
@@ -136,7 +101,6 @@ namespace Contensive.WindowsServices {
                 //
                 return_needsErrorRecovery = false;
                 kmaHTTP.userAgent = "Contensive Monitor";
-                HTTPInProcess = true;
                 HTTPLastError = 0;
                 URLWorking = Contensive.Core.Controllers.genericController.EncodeURL(Link);
                 kmaHTTP.timeout = RequestTimeout;
@@ -172,7 +136,6 @@ namespace Contensive.WindowsServices {
                         return_needsErrorRecovery = true;
                         break;
                 }
-                HTTPInProcess = false;
                 HTTPResponseTime = stopWatch.ElapsedMilliseconds / 1000.0;
                 //
                 return tempGetDoc;
@@ -254,22 +217,10 @@ namespace Contensive.WindowsServices {
                 //
                 ServiceInProcess = false;
                 processTimer.Interval = TimerMsecPerTick;
-                if (DebugMode) {
-                    config.TimerIntervalSec = 10;
-                }
                 processTimer.Enabled = true;
-                //
-                // Setup Debug Panel
-                //
-                ServiceRunning = true;
-                //
-                // Log
-                //
                 SaveToLogFile("StartMonitoring", "-", serviceDisplayName + " Started");
                 config.Save();
-                //cp.Dispose()
                 return;
-                //
             } catch {
                 goto ErrorTrap;
             }
@@ -303,7 +254,6 @@ namespace Contensive.WindowsServices {
                 //Dim Mailer As New SMTP5Class
                 string[] Emails = null;
                 int Ptr = 0;
-                string emailstatus = null;
                 string ToAddress = null;
                 CPClass cp = null;
                 monitorConfigClass config = null;
@@ -723,45 +673,12 @@ namespace Contensive.WindowsServices {
                 procStartInfo.UseShellExecute = false;
                 //Do not create the black window.
                 procStartInfo.CreateNoWindow = true;
-                //Now we create a process, assign its ProcessStartInfo and start it
                 System.Diagnostics.Process proc = new System.Diagnostics.Process();
                 proc.StartInfo = procStartInfo;
                 proc.Start();
-                //Get the output into a string
                 result = proc.StandardOutput.ReadToEnd();
-                //Display the command output.
-            } catch (Exception ex) {
-
-            }
+            } catch (Exception) {}
             return result;
         }
-        //'
-        //'
-        //'
-        //Public Sub executeCommandAsync(ByVal Command As String)
-        //    Try
-        //        '//Asynchronously start the Thread to process the Execute command request.
-        //        Dim objThread As Thread = New Thread(New ParameterizedThreadStart(AddressOf executeCommandSync))
-        //        '//Make the thread as background thread.
-        //        objThread.IsBackground = True
-        //        '//Set the Priority of the thread.
-        //        objThread.Priority = ThreadPriority.AboveNormal
-        //        '//Start the thread.
-        //        objThread.Start(Command)
-        //    Catch ex As ThreadStartException
-        //        '
-        //        '
-        //        '
-        //    Catch ex As ThreadAbortException
-        //        '
-        //        '
-        //        '
-        //    Catch ex As Exception
-        //        '
-        //        '
-        //        '
-        //    End Try
-        //End Sub
     }
-
 }

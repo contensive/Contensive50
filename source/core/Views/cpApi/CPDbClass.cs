@@ -46,9 +46,7 @@ namespace Contensive.Core {
         private void reportClassError(Exception ex, string methodName) {
             try {
                 cp.core.handleException(ex, "Unexpected Trap Error in CP.DB." + methodName);
-            } catch (Exception exInner) {
-                //
-            }
+            } catch (Exception) {}
         }
         //
         //====================================================================================================

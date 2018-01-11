@@ -35,8 +35,6 @@ namespace Contensive.Core.Controllers {
                 bool HelpCustomChanged = false;
                 bool HelpDefaultChanged = false;
                 bool HelpChanged = false;
-                string Copy = null;
-                string n = null;
                 Models.Complex.cdefFieldModel srcCdefField = null;
                 Models.Complex.cdefModel dstCdef = null;
                 Models.Complex.cdefFieldModel dstCdefField = null;
@@ -51,8 +49,6 @@ namespace Contensive.Core.Controllers {
                 string SrcFieldName = null;
                 bool updateDst = false;
                 Models.Complex.cdefModel srcCdef = null;
-                bool DebugSrcFound = false;
-                bool DebugDstFound = false;
                 //
                 // If the Src is the BaseCollection, the Dst must be the Application Collectio
                 //   in this case, reset any BaseContent or BaseField attributes in the application that are not in the base
@@ -98,10 +94,6 @@ namespace Contensive.Core.Controllers {
                 foreach (var srcKeyValuePair in srcCollection.cdef) {
                     srcCdef = srcKeyValuePair.Value;
                     string srcName = srcCdef.Name;
-                    DebugSrcFound = false;
-                    if (srcName.IndexOf(cnNavigatorEntries)>=0 ) {
-                        DebugSrcFound = true;
-                    }
                     //
                     // Search for this cdef in the Dst
                     //
@@ -1167,17 +1159,11 @@ namespace Contensive.Core.Controllers {
             bool returnOk = true;
             try {
                 bool localCollectionUpToDate = false;
-                //string[] GuidArray = { };
-                //int GuidCnt = 0;
-                //int GuidPtr = 0;
-                //int RequestPtr = 0;
                 string SupportURL = null;
                 string GuidList = null;
                 DateTime CollectionLastChangeDate = default(DateTime);
                 string workingPath = null;
-                //string collectionServerXml = null;
                 string LocalGuid = null;
-                string LocalLastChangeDateStr = null;
                 DateTime LocalLastChangeDate = default(DateTime);
                 string LibName = "";
                 bool LibSystem = false;
@@ -1185,10 +1171,7 @@ namespace Contensive.Core.Controllers {
                 string LibLastChangeDateStr = null;
                 string LibContensiveVersion = "";
                 DateTime LibLastChangeDate = default(DateTime);
-                XmlNode LocalLastChangeNode = null;
                 XmlDocument LibraryCollections = new XmlDocument();
-                //XmlDocument LocalCollections = new XmlDocument();
-                //XmlDocument Doc = new XmlDocument();
                 string Copy = null;
                 //
                 //-----------------------------------------------------------------------------------------------
@@ -2206,7 +2189,7 @@ namespace Contensive.Core.Controllers {
                                                         loadOK = true;
                                                         try {
                                                             NavDoc.LoadXml(CollectionWrapper);
-                                                        } catch (Exception ex) {
+                                                        } catch (Exception ) {
                                                             //
                                                             // error - Need a way to reach the user that submitted the file
                                                             //
@@ -2740,7 +2723,7 @@ namespace Contensive.Core.Controllers {
                 loadOK = true;
                 try {
                     Doc.LoadXml(getLocalCollectionStoreListXml(cpCore));
-                } catch (Exception ex) {
+                } catch (Exception) {
                     logController.appendLogInstall(cpCore, "UpdateConfig, Error loading Collections.xml file.");
                 }
                 if (loadOK) {
@@ -2844,29 +2827,20 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         public static void GetCollectionConfig(coreClass cpCore, string CollectionGuid, ref string return_CollectionPath, ref DateTime return_LastChagnedate, ref string return_CollectionName) {
             try {
-                string LocalPath = null;
                 string LocalGuid = "";
                 XmlDocument Doc = new XmlDocument();
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode CollectionNode = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode LocalListNode = null;
-                bool CollectionFound = false;
                 string CollectionPath = "";
                 DateTime LastChangeDate = default(DateTime);
                 string hint = "";
-                bool MatchFound = false;
                 string LocalName = null;
                 bool loadOK = false;
                 //
-                MatchFound = false;
                 return_CollectionPath = "";
                 return_LastChagnedate = DateTime.MinValue;
                 loadOK = true;
                 try {
                     Doc.LoadXml(getLocalCollectionStoreListXml(cpCore));
-                } catch (Exception ex) {
-                    //hint = hint & ",parse error"
+                } catch (Exception) {
                     logController.appendLogInstall(cpCore, "GetCollectionConfig, Hint=[" + hint + "], Error loading Collections.xml file.");
                     loadOK = false;
                 }
@@ -2875,14 +2849,8 @@ namespace Contensive.Core.Controllers {
                         logController.appendLogInstall(cpCore, "Hint=[" + hint + "], The Collections.xml file has an invalid root node");
                     } else {
                         if (true) {
-                            //If genericController.vbLCase(.name) <> "collectionlist" Then
-                            //    Call AppendClassLogFile("Server", "GetCollectionConfig", "Collections.xml file error, root node was not collectionlist, [" & .name & "].")
-                            //Else
-                            CollectionFound = false;
-                            //hint = hint & ",checking nodes [" & .ChildNodes.Count & "]"
                             foreach (XmlNode LocalListNode in Doc.DocumentElement.ChildNodes) {
                                 LocalName = "no name found";
-                                LocalPath = "";
                                 switch (genericController.vbLCase(LocalListNode.Name)) {
                                     case "collection":
                                         LocalGuid = "";
@@ -2907,13 +2875,10 @@ namespace Contensive.Core.Controllers {
                                         }
                                         break;
                                 }
-                                //hint = hint & ",checking node [" & LocalName & "]"
                                 if (genericController.vbLCase(CollectionGuid) == LocalGuid) {
                                     return_CollectionPath = CollectionPath;
                                     return_LastChagnedate = LastChangeDate;
                                     return_CollectionName = LocalName;
-                                    //Call AppendClassLogFile("Server", "GetCollectionConfigArg", "GetCollectionConfig, match found, CollectionName=" & LocalName & ", CollectionPath=" & CollectionPath & ", LastChangeDate=" & LastChangeDate)
-                                    MatchFound = true;
                                     break;
                                 }
                             }
@@ -3142,17 +3107,10 @@ namespace Contensive.Core.Controllers {
                 string menuNameSpace = null;
                 string FieldValue = "";
                 int CS2 = 0;
-                string ScriptingNameorGuid = "";
-                //  Dim ScriptingModuleID As Integer
                 string ScriptingEntryPoint = null;
                 int ScriptingTimeout = 0;
                 string ScriptingLanguage = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode ScriptingNode = null;
                 XmlNode PageInterface = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode TriggerNode = null;
-                bool NavDeveloperOnly = false;
                 string StyleSheet = null;
                 string ArgumentList = null;
                 int CS = 0;
@@ -3229,7 +3187,6 @@ namespace Contensive.Core.Controllers {
                         cpCore.db.csSet(CS, "navTypeId", navTypeId);
                         ArgumentList = "";
                         StyleSheet = "";
-                        NavDeveloperOnly = true;
                         if (AddonNode.ChildNodes.Count > 0) {
                             foreach (XmlNode PageInterfaceWithinLoop in AddonNode.ChildNodes) {
                                 PageInterface = PageInterfaceWithinLoop;
@@ -3507,7 +3464,6 @@ namespace Contensive.Core.Controllers {
                                                 //
                                                 // if template, admin or content - let non-developers have navigator entry
                                                 //
-                                                NavDeveloperOnly = false;
                                             }
                                         }
                                         break;
@@ -3563,7 +3519,6 @@ namespace Contensive.Core.Controllers {
                                         //   this removes the ccsettingpages and settingcollectionrules, etc.
                                         //
                                         if (true) {
-                                            NavDeveloperOnly = false;
                                             cpCore.db.csSet(CS, "formxml", PageInterfaceWithinLoop.InnerXml);
                                         }
                                         break;
@@ -3735,11 +3690,6 @@ namespace Contensive.Core.Controllers {
                 int IncludeAddonID = 0;
                 string UserError = null;
                 int CS2 = 0;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode PageInterface = null;
-                bool NavDeveloperOnly = false;
-                string StyleSheet = null;
-                string ArgumentList = null;
                 int CS = 0;
                 string Criteria = null;
                 bool IsFound = false;
@@ -3782,9 +3732,6 @@ namespace Contensive.Core.Controllers {
                         logController.appendLogInstall(cpCore, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + AOName + "], Guid [" + AOGuid + "]");
                     } else {
                         addonId = cpCore.db.csGetInteger(CS, "ID");
-                        ArgumentList = "";
-                        StyleSheet = "";
-                        NavDeveloperOnly = true;
                         if (AddonNode.ChildNodes.Count > 0) {
                             foreach (XmlNode PageInterface in AddonNode.ChildNodes) {
                                 switch (genericController.vbLCase(PageInterface.Name)) {
@@ -4439,11 +4386,9 @@ namespace Contensive.Core.Controllers {
                 DataTable rs = null;
                 string Copy = null;
                 string ContentName = null;
-                int NodeCount = 0;
                 string TableName = null;
-                bool RequireReload = false;
                 bool Found = false;
-                                                   //
+                //
                 logController.appendLogInstall(cpCore, "Application: " + cpCore.serverConfig.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
                 //
                 //----------------------------------------------------------------------------------------------------------------------
@@ -4482,7 +4427,6 @@ namespace Contensive.Core.Controllers {
                 logController.appendLogInstall(cpCore, "CDef Load, stage 3: Verify all CDef names in ccContent so GetContentID calls will succeed");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                NodeCount = 0;
                 List<string> installedContentList = new List<string>();
                 rs = cpCore.db.executeQuery("SELECT Name from ccContent where (active<>0)");
                 if (isDataTableOk(rs)) {
@@ -4497,7 +4441,6 @@ namespace Contensive.Core.Controllers {
                             SQL = "Insert into ccContent (name,ccguid,active,createkey)values(" + cpCore.db.encodeSQLText(keypairvalue.Value.Name) + "," + cpCore.db.encodeSQLText(keypairvalue.Value.guid) + ",1,0);";
                             cpCore.db.executeQuery(SQL);
                             installedContentList.Add(keypairvalue.Value.Name.ToLower());
-                            RequireReload = true;
                         }
                     }
                 }
@@ -4520,7 +4463,6 @@ namespace Contensive.Core.Controllers {
                 foreach (var keypairvalue in Collection.cdef) {
                     if (keypairvalue.Value.Name.ToLower() == "content") {
                         installCollection_BuildDbFromCollection_AddCDefToDb(cpCore, keypairvalue.Value, BuildVersion);
-                        RequireReload = true;
                         break;
                     }
                 }
@@ -4531,7 +4473,6 @@ namespace Contensive.Core.Controllers {
                 logController.appendLogInstall(cpCore, "CDef Load, stage 6: Verify all definitions and fields");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                RequireReload = false;
                 foreach (var keypairvalue in Collection.cdef) {
                     //
                     // todo tmp fix, changes to field caption in base.xml do not set fieldChange
@@ -4539,7 +4480,6 @@ namespace Contensive.Core.Controllers {
                     {
                         if (keypairvalue.Value.Name.ToLower() != "content") {
                             installCollection_BuildDbFromCollection_AddCDefToDb(cpCore, keypairvalue.Value, BuildVersion);
-                            RequireReload = true;
                         }
                     }
                 }
@@ -4652,7 +4592,6 @@ namespace Contensive.Core.Controllers {
                 logController.appendLogInstall(cpCore, "CDef Load, stage 9: Verify Styles");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                NodeCount = 0;
                 if (Collection.styleCnt > 0) {
                     SiteStyles = cpCore.cdnFiles.readFile("templates/styles.css");
                     if (!string.IsNullOrEmpty(SiteStyles.Trim(' '))) {
@@ -4970,7 +4909,7 @@ namespace Contensive.Core.Controllers {
                 bool parseError = false;
                 try {
                     LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + cpCore.codeVersion());
-                } catch (Exception ex) {
+                } catch (Exception) {
                     string UserError = "There was an error reading the Collection Library. The site may be unavailable.";
                     logController.appendLogInstall(cpCore, UserError);
                     errorController.addUserError(cpCore, UserError);

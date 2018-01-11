@@ -1708,7 +1708,6 @@ namespace Contensive.Core.Controllers {
             string returnValue = "";
             try {
                 bool fieldFound = false;
-                int ColumnPointer = 0;
                 string fieldNameTrimUpper = null;
                 string fieldNameTrim;
                 //
@@ -4619,7 +4618,6 @@ namespace Contensive.Core.Controllers {
                 int ContentID = 0;
                 //Dim DataSourceID As Integer
                 bool ContentFieldFound = false;
-                bool ContentIsNew = false; // true if the content definition is being created
                 int RecordID = 0;
                 //
                 //----------------------------------------------------------------
@@ -4659,7 +4657,6 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- Content definition not found, create it
                         //
-                        ContentIsNew = true;
                         Models.Complex.cdefModel.addContent(cpCore, true, DataSource, TableName, ContentName);
                         //ContentID = csv_GetContentID(ContentName)
                         SQL = "Select ID from ccContent where name=" + cpCore.db.encodeSQLText(ContentName);
@@ -5192,10 +5189,8 @@ namespace Contensive.Core.Controllers {
         //
         //
         public int GetTableID(string TableName) {
-            int tempGetTableID = 0;
             int result = 0;
             int CS = 0;
-            tempGetTableID = -1;
             CS = cpCore.db.csOpenSql("Select ID from ccTables where name=" + cpCore.db.encodeSQLText(TableName),"", 1);
             if (cpCore.db.csOk(CS)) {
                 result = cpCore.db.csGetInteger(CS, "ID");

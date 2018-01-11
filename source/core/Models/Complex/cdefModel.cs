@@ -676,7 +676,6 @@ namespace Contensive.Core.Models.Complex {
         public static void createContentChild(coreClass cpcore, string ChildContentName, string ParentContentName, int MemberID) {
             try {
                 string DataSourceName = "";
-                string MethodName = null;
                 string SQL = null;
                 DataTable rs = null;
                 int ChildContentID = 0;
@@ -689,16 +688,6 @@ namespace Contensive.Core.Models.Complex {
                 DateTime DateNow;
                 //
                 DateNow = DateTime.MinValue;
-                //
-                MethodName = "csv_CreateContentChild";
-                //
-                // ----- Prevent StateOfAllowContentAutoLoad
-                //
-                //StateOfAllowContentAutoLoad = AllowContentAutoLoad
-                //AllowContentAutoLoad = False
-                //
-                // ----- check if child already exists
-                //
                 SQL = "select ID from ccContent where name=" + cpcore.db.encodeSQLText(ChildContentName) + ";";
                 rs = cpcore.db.executeQuery(SQL);
                 if (isDataTableOk(rs)) {
@@ -709,12 +698,6 @@ namespace Contensive.Core.Models.Complex {
                     cpcore.db.executeQuery("update ccContent set CreateKey=0 where ID=" + ChildContentID);
                 }
                 closeDataTable(rs);
-                if (isDataTableOk(rs)) {
-                    if (false) {
-                        //RS.Dispose)
-                    }
-                    //RS = Nothing
-                }
                 if (ChildContentID == 0) {
                     //
                     // Get ContentID of parent
@@ -729,12 +712,6 @@ namespace Contensive.Core.Models.Complex {
                         cpcore.db.executeQuery("update ccContent set CreateKey=0 where ID=" + ParentContentID);
                     }
                     closeDataTable(rs);
-                    if (isDataTableOk(rs)) {
-                        if (false) {
-                            //RS.Close()
-                        }
-                        //RS = Nothing
-                    }
                     //
                     if (ParentContentID == 0) {
                         throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] was not found."));
@@ -1271,7 +1248,6 @@ namespace Contensive.Core.Models.Complex {
                 bool IsBaseField = false;
                 string SQL = null;
                 int ContentID = 0;
-                int Pointer = 0;
                 string[] SQLName = new string[101];
                 string[] SQLValue = new string[101];
                 string MethodName = null;
@@ -1464,7 +1440,6 @@ namespace Contensive.Core.Models.Complex {
                             // create or update the field
                             //
                             sqlFieldListClass sqlList = new sqlFieldListClass();
-                            Pointer = 0;
                             sqlList.add("ACTIVE", cpcore.db.encodeSQLBoolean(field.active)); // Pointer)
                             sqlList.add("MODIFIEDBY", cpcore.db.encodeSQLNumber(SystemMemberID)); // Pointer)
                             sqlList.add("MODIFIEDDATE", cpcore.db.encodeSQLDate(DateTime.Now)); // Pointer)
@@ -1636,7 +1611,6 @@ namespace Contensive.Core.Models.Complex {
         //============================================================================================================
         //
         public static void setContentControlId(coreClass cpcore, int ContentID, int RecordID, int NewContentControlID, string UsedIDString = "") {
-            int result = 0;
             string SQL = null;
             int CS = 0;
             string RecordTableName = null;
@@ -1848,9 +1822,7 @@ namespace Contensive.Core.Models.Complex {
                 } catch (Exception ex) {
                     cpcore.handleException(ex);
                 }
-            } catch (Exception ex) {
-
-            }
+            } catch (Exception) {}
             return result;
         }
         //

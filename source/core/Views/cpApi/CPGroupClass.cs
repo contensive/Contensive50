@@ -119,7 +119,7 @@ namespace Contensive.Core {
                     // -- record guid
                     returnText = cpCore.db.getRecordName("groups", GroupIdOrGuid);
                 }
-            } catch (Exception ex) {
+            } catch (Exception) {
 
             }
             return returnText;

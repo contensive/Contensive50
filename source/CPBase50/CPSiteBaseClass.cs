@@ -63,18 +63,21 @@ namespace Contensive.BaseClasses
         //====================================================================================================
         //
         public abstract bool MultiDomainMode {get;}
-		//
-		//====================================================================================================
-		//
-		public abstract string PhysicalFilePath {get;}
-		//
-		//====================================================================================================
-		//
-		public abstract string PhysicalInstallPath {get;}
-		//
-		//====================================================================================================
-		//
-		public abstract string PhysicalWWWPath {get;}
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        public abstract string PhysicalFilePath {get;}
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        public abstract string PhysicalInstallPath {get;}
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        public abstract string PhysicalWWWPath {get;}
 		//
 		//====================================================================================================
 		//

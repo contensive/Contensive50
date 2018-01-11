@@ -135,7 +135,7 @@ namespace Contensive.Core {
         //
         [Obsolete("Deprecated, template link is not supported", true)]
         public override string GetTemplateLink(int TemplateID) {
-            return ""; // cpCore.doc.getTemplateLink(TemplateID)
+            return "";
         }
         //
         //====================================================================================================

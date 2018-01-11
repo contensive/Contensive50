@@ -113,14 +113,14 @@ namespace Contensive.Core.Models.Complex {
         /// <summary>
         /// Array of styles for the minicollection
         /// </summary>
-        [Obsolete("Shared styles deprecated")]
+       // [Obsolete("Shared styles deprecated")]
         public StyleType[] styles;
         //
         //====================================================================================================
         /// <summary>
         /// Model for style array
         /// </summary>
-        [Obsolete("Shared styles deprecated")]
+    //    [Obsolete("Shared styles deprecated")]
         public struct StyleType {
             public string Name;
             public bool Overwrite;
@@ -132,14 +132,15 @@ namespace Contensive.Core.Models.Complex {
         /// <summary>
         /// count of styles
         /// </summary>
-        [Obsolete("Shared styles deprecated")]
+    //    [Obsolete("Shared styles deprecated")]
         public int styleCnt;
         //
+        // todo
         //====================================================================================================
         /// <summary>
         /// Site style sheet
         /// </summary>
-        [Obsolete("Shared styles deprecated")]
+     //   [Obsolete("Shared styles deprecated")]
         public string styleSheet;
         //
         //====================================================================================================

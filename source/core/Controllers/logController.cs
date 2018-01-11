@@ -194,7 +194,7 @@ namespace Contensive.Core.Controllers {
                     + LogFileCopyPrep(ContensiveAppName) + "\t" + LogFileCopyPrep(processName) + "\t" + LogFileCopyPrep(ClassName) + "\t" + LogFileCopyPrep(MethodName) + "\t" + LogFileCopyPrep(contextDescription) + "\t" + LogFileCopyPrep(ErrorMessage) + "\t" + LogFileCopyPrep(ResumeMessage) + "\t" + LogFileCopyPrep(ErrSource) + "\t" + LogFileCopyPrep(ErrNumber.ToString()) + "\t" + LogFileCopyPrep(ErrDescription) + "\t" + LogFileCopyPrep(URL) + "";
                 //
                 appendLog(cpCore, LogLine, LogFolder, LogNamePrefix);
-            } catch (Exception ex) {
+            } catch (Exception) {
 
             }
         }
@@ -357,11 +357,7 @@ namespace Contensive.Core.Controllers {
                 //
                 return;
                 //
-            } catch (Exception ex) {
-                ;
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception");
+            } catch (Exception) { }
         }
     }
 }

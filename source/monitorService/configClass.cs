@@ -149,7 +149,7 @@ namespace Contensive.WindowsServices {
                         }
                     }
                 }
-            } catch(Exception ex) {
+            } catch(Exception) {
             }
 		}
 		//

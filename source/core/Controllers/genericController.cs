@@ -1528,7 +1528,7 @@ namespace Contensive.Core.Controllers {
                 result = result.Replace(" src=//", " src=" + RootLink);
                 result = result.Replace(" src=/?", " src=" + RootLink + "?");
                 result = result.Replace(" src=/", " src=" + RootLink);
-            } catch (Exception ex) {
+            } catch (Exception) {
                 throw new ApplicationException("Error in ConvertLinksToAbsolute");
             }
             return result;
@@ -1717,7 +1717,7 @@ namespace Contensive.Core.Controllers {
                 if (!tempIsLinkToThisHost) {
                     //Link = Link;
                 }
-            } catch (Exception ex) {
+            } catch (Exception) {
                 throw;
             }
             return result;
@@ -3319,11 +3319,7 @@ namespace Contensive.Core.Controllers {
                     returnFirstLine = Body;
                     Body = "";
                 }
-            } catch (Exception ex) {
-                //
-                //
-                //
-            }
+            } catch (Exception) {}
             return returnFirstLine;
         }
         //

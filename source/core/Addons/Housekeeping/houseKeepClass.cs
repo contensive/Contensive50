@@ -25,8 +25,6 @@ namespace Contensive.Core.Addons.Housekeeping {
     /// </summary>
     public class houseKeepClass : Contensive.BaseClasses.AddonBaseClass {
         //
-        private DateTime LogCheckDateLast;
-        //
         //====================================================================================================
         /// <summary>
         /// addon interface
@@ -532,7 +530,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //        End Select
                     try {
                         cpCore.db.executeQuery(SQL);
-                    } catch (Exception ex) {
+                    } catch (Exception ) {
                     }
 
                     //
@@ -2081,13 +2079,8 @@ namespace Contensive.Core.Addons.Housekeeping {
                 string CollectionRootPath = null;
                 int Pos = 0;
                 DirectoryInfo[] FolderList = null;
-                string LocalPath = null;
                 string LocalGuid = null;
                 XmlDocument Doc = new XmlDocument();
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode CollectionNode = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode LocalListNode = null;
                 int FolderPtr = 0;
                 string CollectionPath = null;
                 DateTime LastChangeDate = default(DateTime);
@@ -2129,7 +2122,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 CollectionPath = "";
                                 LocalGuid = "";
                                 LocalName = "no name found";
-                                LocalPath = "";
                                 switch (genericController.vbLCase(LocalListNode.Name)) {
                                     case "collection":
                                         LocalGuid = "";

@@ -26,7 +26,8 @@ namespace Contensive.BaseClasses
 		public abstract string EncodeSQLDate(DateTime SourceDate);
 		public abstract string EncodeSQLNumber(double SourceNumber);
 		public abstract string EncodeSQLText(string SourceText);
-		public abstract object ExecuteSQL(string SQL, string DataSourcename = "Default", string Retries = "0", string PageSize = "10", string PageNumber = "1");
+        [Obsolete("deprecated. Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
+        public abstract object ExecuteSQL(string SQL, string DataSourcename = "Default", string Retries = "0", string PageSize = "10", string PageNumber = "1");
 		//
 		// need: executeQuery() returns dataTable
 		// need: executeNonQuery() returns recordsAffected
@@ -44,14 +45,19 @@ namespace Contensive.BaseClasses
 		//Public MustOverride Function ExecuteSQL_GetDataTable(ByVal SQL As String, ByVal DataSourcename As String, ByVal MaxRows As Integer, ByVal PageSize As Integer, ByVal PageNumber As Integer) As DataTable
 		public abstract int SQLTimeout {get; set;}
 		public abstract string GetRemoteQueryKey(string sql, string DataSourceName = "Default", int pageSize = 100);
-		//
-		// deprecated
-		//
-		public abstract string DbGetConnectionString(string DataSourcename);
-		public abstract int DbGetDataSourceType(string DataSourcename);
-		public abstract int DbGetTableID(string TableName);
-		public abstract bool DbIsTable(string DataSourcename, string TableName);
-		public abstract bool DbIsTableField(string DataSourcename, string TableName, string FieldName);
+        //
+        // deprecated
+        //
+        [Obsolete("Use GetConnectionString( dataSourceName )")]
+        public abstract string DbGetConnectionString(string DataSourcename);
+        [Obsolete("Use GetDataSourceType( dataSourceName )")]
+        public abstract int DbGetDataSourceType(string DataSourcename);
+        [Obsolete("Use GetTableId instead.", true)]
+        public abstract int DbGetTableID(string TableName);
+        [Obsolete("Use isTable instead", true)]
+        public abstract bool DbIsTable(string DataSourcename, string TableName);
+        [Obsolete("Use isTableField instead", true)]
+        public abstract bool DbIsTableField(string DataSourcename, string TableName, string FieldName);
 	}
 
 }

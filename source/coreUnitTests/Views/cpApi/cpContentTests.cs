@@ -74,7 +74,7 @@ namespace integrationTests {
             string testCopy = "test copy " + cp.Utils.GetRandomInteger().ToString();
             string copyName = "copy record name " + cp.Utils.GetRandomInteger().ToString();
             recordId = cp.Content.AddRecord("copy content");
-            cp.Db.ExecuteSQL("update ccCopyContent set name=" + cp.Db.EncodeSQLText(copyName) + ",copy=" + cp.Db.EncodeSQLText(testCopy) + " where id=" + recordId.ToString());
+            cp.core.db.executeNonQuery("update ccCopyContent set name=" + cp.Db.EncodeSQLText(copyName) + ",copy=" + cp.Db.EncodeSQLText(testCopy) + " where id=" + recordId.ToString());
             // act
             //
             // assert

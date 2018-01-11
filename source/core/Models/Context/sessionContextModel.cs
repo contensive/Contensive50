@@ -1494,16 +1494,10 @@ namespace Contensive.Core.Models.Context {
         //
         public string main_GetAuthoringStatusMessage(coreClass cpcore, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
             string result = "";
-            result = "";
             //
-            string MethodName = null;
             string Copy = null;
             string Delimiter = "";
-            int main_EditLockExpiresMinutes = 0;
-            //
-            MethodName = "result";
-            //
-            main_EditLockExpiresMinutes = encodeInteger((main_EditLockExpires - cpcore.doc.profileStartTime).TotalMinutes);
+            int main_EditLockExpiresMinutes = encodeInteger((main_EditLockExpires - cpcore.doc.profileStartTime).TotalMinutes);
             //
             // ----- site does not support workflow authoring
             //

@@ -48,7 +48,7 @@ namespace Contensive.Core.Controllers {
                 }
                 Tabs[TabsCnt].LiveBody = encodeEmptyText(LiveBody, "");
                 TabsCnt = TabsCnt + 1;
-            } catch (Exception ex) {
+            } catch (Exception) {
                 throw;
             }
         }
@@ -160,7 +160,7 @@ namespace Contensive.Core.Controllers {
                     result = result + "<script type=text/javascript>" + JSClose + "</script>\r\n";
                     TabsCnt = 0;
                 }
-            } catch (Exception ex) {
+            } catch (Exception) {
                 throw;
             }
             return result;
@@ -216,7 +216,7 @@ namespace Contensive.Core.Controllers {
                 + "\r\n<td id=Replace-TabIDR45 class=\"\" ></td>"
                 + "\r\n</tr>"
                 + "\r\n</table>";
-            } catch (Exception ex) {
+            } catch (Exception) {
                 throw;
             }
             return result;

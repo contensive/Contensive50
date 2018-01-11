@@ -16,35 +16,19 @@ using static Contensive.Core.constants;
 //
 namespace Contensive.Core.Controllers {
     public class taskSchedulerController : IDisposable {
-        //
-        //Private cpCore As cpCoreClass
-        //
-        // ----- Log File
-        //
         private const string LogMsg = "For more information, see the Contensive Trace Log.";
         public bool allowVerboseLogging = true;
         public bool allowConsoleWrite = false;
-        //
-        // ----- Task Timer
-        //
         private System.Timers.Timer processTimer;
-        private int ProcessTimerTickCnt;
         private const int ProcessTimerMsecPerTick = 5000;
         private bool ProcessTimerInProcess;
-        private int ProcessTimerProcessCount;
-        //
-        // ----- Debugging
-        //
         public bool StartServiceInProgress;
-        //
         protected bool disposed = false;
         //
         //========================================================================================================
         /// <summary>
         /// dispose
         /// </summary>
-        /// <param name="disposing"></param>
-        /// <remarks></remarks>
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
                 this.disposed = true;

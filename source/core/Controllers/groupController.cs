@@ -227,13 +227,8 @@ namespace Contensive.Core.Controllers {
         public static int group_GetGroupID(coreClass cpcore, string GroupName) {
             int tempgroup_GetGroupID = 0;
             DataTable dt = null;
-            string MethodName = null;
-            string iGroupName;
             //
-            iGroupName = genericController.encodeText(GroupName);
-            //
-            MethodName = "main_GetGroupID";
-            //
+            string iGroupName = genericController.encodeText(GroupName);
             tempgroup_GetGroupID = 0;
             if (!string.IsNullOrEmpty(iGroupName)) {
                 //
@@ -255,12 +250,7 @@ namespace Contensive.Core.Controllers {
             string tempgroup_GetGroupName = null;
             //
             int CS = 0;
-            string MethodName = null;
-            int iGroupID;
-            //
-            iGroupID = genericController.encodeInteger(GroupID);
-            //
-            MethodName = "main_GetGroupByID";
+            int iGroupID = genericController.encodeInteger(GroupID);
             //
             tempgroup_GetGroupName = "";
             if (iGroupID > 0) {
@@ -283,11 +273,8 @@ namespace Contensive.Core.Controllers {
         public static int group_Add(coreClass cpcore, string GroupName, string GroupCaption = "") {
             int tempgroup_Add = 0;
             int CS = 0;
-            string MethodName = null;
             string iGroupName = null;
             string iGroupCaption = null;
-            //
-            MethodName = "main_AddGroup";
             //
             iGroupName = genericController.encodeText(GroupName);
             iGroupCaption = genericController.encodeEmptyText(GroupCaption, iGroupName);
@@ -326,15 +313,11 @@ namespace Contensive.Core.Controllers {
             //
             int CS = 0;
             int GroupID = 0;
-            string MethodName = null;
             string iGroupName = null;
             DateTime iDateExpires = default(DateTime);
             //
-            MethodName = "main_AddGroupMember";
-            //
             iGroupName = genericController.encodeText(GroupName);
-            iDateExpires = DateExpires; //encodeMissingDate(DateExpires, Date.MinValue)
-                                        //
+            iDateExpires = DateExpires;
             if (!string.IsNullOrEmpty(iGroupName)) {
                 GroupID = group_GetGroupID(cpcore, iGroupName);
                 if (GroupID < 1) {
@@ -372,12 +355,9 @@ namespace Contensive.Core.Controllers {
         public static void group_DeleteGroupMember(coreClass cpcore, string GroupName, int NewMemberID = SystemMemberID) {
             //
             int GroupID = 0;
-            string MethodName = null;
             string iGroupName;
             //
             iGroupName = genericController.encodeText(GroupName);
-            //
-            MethodName = "main_DeleteGroupMember";
             //
             if (!string.IsNullOrEmpty(iGroupName)) {
                 GroupID = group_GetGroupID(cpcore, iGroupName);

@@ -68,10 +68,8 @@ namespace Contensive.Core.Addons.Email {
                 int CSDrop = 0;
                 int EmailDropID = 0;
                 int PeopleID = 0;
-                string Confirmation = null;
                 int ConfirmationMemberID = 0;
                 string EmailSubject = null;
-                string EmailBody = null;
                 string EmailStatusList = null;
                 int EmailMemberID = 0;
                 string SQLTablePeople = null;
@@ -81,10 +79,7 @@ namespace Contensive.Core.Addons.Email {
                 string EmailTemplate = null;
                 string PrimaryLink = null;
                 bool EmailAddLinkEID = false;
-                string ClickFlagQuery = null;
-                string FieldList = null;
                 int EmailTemplateID = 0;
-                //Dim emailStyles As String
                 string EmailFrom = null;
                 //
                 SQLDateNow = cpCore.db.encodeSQLDate(DateTime.Now);
@@ -92,7 +87,6 @@ namespace Contensive.Core.Addons.Email {
                 //
                 // Open the email records
                 //
-                FieldList = "TestMemberID,ToAll,ScheduleDate,Sent,ModifiedBy,AddLinkEID,AllowSpamFooter,CopyFilename,Subject,FromAddress,EmailTemplateID,BlockSiteStyles,stylesFilename";
                 Criteria = "(ccemail.active<>0)"
                     + " and (ccemail.Sent=0)"
                     + " and (ccemail.submitted<>0)"
@@ -239,22 +233,11 @@ namespace Contensive.Core.Addons.Email {
                 string EmailSubject = null;
                 string EmailCopy = null;
                 string EmailStatus = null;
-                object SMTPHandler = null;
-                object AppService = null;
-                object KernelService = null;
-                object CSConnection = null;
                 string SQL = null;
                 int CSEmailBig = 0;
                 int CSEmail = 0;
-                int CSPeople = 0;
                 int emailID = 0;
-                string Criteria = null;
-                int CSDrop = 0;
                 int EmailDropID = 0;
-                int CSLog = 0;
-                string DataBuild = null;
-                int PeopleID = 0;
-                string Confirmation = null;
                 int ConfirmationMemberID = 0;
                 string SQLTablePeople = null;
                 string SQLTableMemberRules = null;
@@ -264,7 +247,6 @@ namespace Contensive.Core.Addons.Email {
                 string EmailTemplate = null;
                 string FieldList = null;
                 string FromAddress = null;
-                // Dim emailStyles As String
                 int EmailMemberID = 0;
                 DateTime EmailDateExpires = default(DateTime);
                 DateTime rightNow = default(DateTime);
@@ -282,9 +264,6 @@ namespace Contensive.Core.Addons.Email {
                 //
                 rightNow = DateTime.Now;
                 rightNowDate = rightNow.Date;
-
-
-
                 SQLDateNow = cpCore.db.encodeSQLDate(DateTime.Now);
                 //
                 // Send Conditional Email - Offset days after Joining
@@ -648,10 +627,8 @@ namespace Contensive.Core.Addons.Email {
                     //Call cpCore.app.closeCS(CSPeople)
                 }
                 //Call cpCore.app.closeCS(CSLog)
-            } catch (Exception ex) {
-                throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
-                                                                          //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                //Microsoft.VisualBasic.Information.Err().Clear();
+            } catch (Exception) {
+                throw (new ApplicationException("Unexpected exception")); 
             } finally {
                 cpCore.db.csClose(ref CSPeople);
                 cpCore.db.csClose(ref CSLog);

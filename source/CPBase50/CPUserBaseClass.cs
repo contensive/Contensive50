@@ -43,7 +43,7 @@ namespace Contensive.BaseClasses
 		public abstract bool Recognize(int UserID);
 		//
 		public abstract bool Login(string UsernameOrEmail, string Password, bool SetAutoLogin = false);
-		public abstract bool LoginByID(string RecordID, bool SetAutoLogin = false);
+        [Obsolete("Use LoginById(integer) instead", false)] public abstract bool LoginByID(string RecordID, bool SetAutoLogin = false);
 		public abstract bool LoginByID(int RecordID);
 		public abstract bool LoginByID(int RecordID, bool SetAutoLogin);
 		public abstract bool LoginIsOK(string UsernameOrEmail, string Password);

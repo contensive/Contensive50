@@ -60,7 +60,7 @@ namespace Contensive.Core.Controllers {
                     setHeight = srcImage.Height;
                     loaded = true;
                 }
-            } catch (Exception ex) {
+            } catch (Exception) {
 
             }
             return returnOk;
@@ -83,7 +83,7 @@ namespace Contensive.Core.Controllers {
                     imgOutput.Dispose();
                     returnOk = true;
                 }
-            } catch (Exception ex) {
+            } catch (Exception) {
 
             }
             return returnOk;

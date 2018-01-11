@@ -119,7 +119,7 @@ namespace integrationTests {
                 block.ImportFile(filename);
                 // assert
                 Assert.AreEqual(layoutC, block.GetHtml());
-            } catch (Exception ex) {
+            } catch (Exception) {
                 //
             } finally {
                 cp.core.appRootFiles.deleteFile(filename);

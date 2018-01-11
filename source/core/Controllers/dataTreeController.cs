@@ -20,7 +20,6 @@ namespace Contensive.Core.Controllers {
         // ----- global scope variables
         //
         private coreClass cpCore;
-        private bool ClassInitialized; // if true, the module has been
         private XmlDocument MSxml;
         //
         // ----- Tracking values, should be set before each exit
@@ -54,7 +53,6 @@ namespace Contensive.Core.Controllers {
         /// <remarks></remarks>
         public dataTreeController(coreClass cpCore) : base() {
             this.cpCore = cpCore;
-            ClassInitialized = true;
         }
         //
         //

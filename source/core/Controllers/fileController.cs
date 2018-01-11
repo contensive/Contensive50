@@ -952,15 +952,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Create a filename for the Virtual Directory for a fieldtypeFile or Image (an uploaded file)
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="FieldName"></param>
-        /// <param name="RecordID"></param>
-        /// <param name="OriginalFilename"></param>
-        /// <param name="fieldType"></param>
-        /// <returns></returns>
         public static string getVirtualRecordPathFilename(string TableName, string FieldName, int RecordID, string OriginalFilename) {
-            string result = "";
-            //
             string iOriginalFilename = OriginalFilename.Replace(" ", "_").Replace(".", "_");
             return getVirtualTableFieldIdPath(TableName, FieldName, RecordID) + OriginalFilename;
         }
@@ -969,12 +961,6 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Create a filename for the virtual directory for field types not associated to upload files
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="FieldName"></param>
-        /// <param name="RecordID"></param>
-        /// <param name="OriginalFilename"></param>
-        /// <param name="fieldType"></param>
-        /// <returns></returns>
         public static string getVirtualRecordPathFilename(string TableName, string FieldName, int RecordID, int fieldType) {
             string result = "";
             string IdFilename = RecordID.ToString();

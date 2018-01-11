@@ -1073,14 +1073,13 @@ namespace Contensive.Core {
                 // append to application event log
                 //
                 string sSource = "Contensive";
-                string sLog = "Application";
                 int eventId = 1001;
                 try {
                     //
                     // if command line has been run on this server, this will work. Otherwise skip
                     //
                     EventLog.WriteEntry(sSource, errMsg, EventLogEntryType.Error, eventId);
-                } catch (Exception exEvent) {
+                } catch (Exception) {
                     // ignore error. Can be caused if source has not been created. It is created automatically in command line installation util.
                 }
                 //

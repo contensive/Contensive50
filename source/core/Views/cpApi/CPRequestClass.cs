@@ -62,6 +62,7 @@ namespace Contensive.Core {
         }
         //
         //====================================================================================================
+        [Obsolete]
         public override bool BrowserIsIE {
             get {
                 return cpCore.doc.sessionContext.visit_browserIsIE;
@@ -69,6 +70,7 @@ namespace Contensive.Core {
         }
         //
         //====================================================================================================
+        [Obsolete]
         public override bool BrowserIsMac {
             get {
                 return cpCore.doc.sessionContext.visit_browserIsMac;
@@ -83,6 +85,7 @@ namespace Contensive.Core {
         }
         //
         //====================================================================================================
+        [Obsolete]
         public override bool BrowserIsWindows {
             get {
                 return cpCore.doc.sessionContext.visit_browserIsWindows;
@@ -90,7 +93,7 @@ namespace Contensive.Core {
         }
         //
         //====================================================================================================
-        public override string BrowserVersion {
+        [Obsolete] public override string BrowserVersion {
             get {
                 return cpCore.doc.sessionContext.visit_browserVersion;
             }

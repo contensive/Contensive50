@@ -318,7 +318,6 @@ namespace Contensive.Core.Controllers {
                 bool isAdmin = false;
                 int iAdditionalMemberID = 0;
                 int EmailRecordID = 0;
-                string SQL = null;
                 string EmailFrom = null;
                 string EmailSubjectSource = null;
                 string EmailBodySource = null;
@@ -326,11 +325,8 @@ namespace Contensive.Core.Controllers {
                 bool EmailAllowLinkEID = false;
                 int EmailToConfirmationMemberID = 0;
                 string EmailStatusMessage = "";
-                
                 string BounceAddress = null;
-                int EMailTemplateID = 0;
                 string EmailTemplateSource = "";
-                int CS = 0;
                 //
                 returnString = "";
                 iAdditionalMemberID = AdditionalMemberIDOrZero;
@@ -484,10 +480,7 @@ namespace Contensive.Core.Controllers {
                 string EmailTemplate = null;
                 int EMailTemplateID = 0;
                 int CSTemplate = 0;
-                int CSPeople = 0;
-                string SQL = null;
                 string EmailStatus = null;
-                // Dim emailstyles As String
                 //
                 CS = cpCore.db.csOpenRecord("email", EmailID);
                 if (!cpCore.db.csOk(CS)) {

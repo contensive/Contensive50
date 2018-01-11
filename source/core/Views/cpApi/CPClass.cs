@@ -367,7 +367,7 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override CPFileBaseClass File {
+        [Obsolete()] public override CPFileBaseClass File {
             get {
                 if (_fileObj == null) {
                     _fileObj = new CPFileClass(core);

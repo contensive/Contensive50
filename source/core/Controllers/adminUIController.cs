@@ -437,7 +437,6 @@ namespace Contensive.Core {
                 //
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
                 string Copy = null;
-                string FormInputName = null;
                 //
                 // Left Side
                 //
@@ -487,33 +486,22 @@ namespace Contensive.Core {
                 //
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
                 string Copy = null;
-                string FormInputName = null;
                 //
                 Copy = Caption;
                 if (string.IsNullOrEmpty(Copy)) {
                     Copy = "&nbsp;";
                 }
                 tempGetEditRowWithHelpEdit = "<tr><td class=\"ccAdminEditCaption\"><nobr>" + Copy;
-                if (cpCore.visitProperty.getBoolean("AllowHelpIcon")) {
-                    //If HelpMessage <> "" Then
-                    //GetEditRowWithHelpEdit = GetEditRowWithHelpEdit & "&nbsp;" & cpCore.main_GetHelpLinkEditable(0, Caption, HelpMessage, FormInputName)
-                    //Else
-                    //    GetEditRowWithHelpEdit = GetEditRowWithHelpEdit & "&nbsp;<img alt=""space"" src=""/ccLib/images/spacer.gif"" " & IconWidthHeight & ">"
-                    //End If
-                }
+                if (cpCore.visitProperty.getBoolean("AllowHelpIcon")) {}
                 tempGetEditRowWithHelpEdit = tempGetEditRowWithHelpEdit + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=15 ></nobr></td>";
                 Copy = HTMLFieldString;
                 if (string.IsNullOrEmpty(Copy)) {
                     Copy = "&nbsp;";
                 }
                 return tempGetEditRowWithHelpEdit + "<td class=\"ccAdminEditField\">" + Copy + "</td></tr>";
-                //
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            handleLegacyClassError("GetEditRowWithHelpEdit");
             return tempGetEditRowWithHelpEdit;
         }
         //
@@ -634,7 +622,6 @@ namespace Contensive.Core {
                 string Copy = null;
                 string QS = null;
                 int WidthTest = 0;
-                string LinkTitle = null;
                 //
                 if (string.IsNullOrEmpty(Title)) {
                     Copy = "&nbsp;";

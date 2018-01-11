@@ -19,9 +19,6 @@ namespace Contensive.Core.Controllers {
         //
         // ----- global scope variables
         //
-        private bool iAbort;
-        private int iBusy;
-        private int iTaskCount;
         private const string ApplicationNameLocal = "unknown";
         private coreClass cpCore;
         //
@@ -111,42 +108,24 @@ namespace Contensive.Core.Controllers {
                 string RecordName = null;
                 int AuthoringTableID = 0;
                 string HelpDefault = null;
-                string HelpCustom = null;
                 int HelpCnt = 0;
                 int fieldId = 0;
                 string fieldType = null;
-                int TableID = 0;
                 int ContentTableID = 0;
                 string TableName = null;
-                int DataSourceID = 0;
                 string DataSourceName = null;
-                //Dim RSTable as datatable
                 int DefaultSortMethodID = 0;
                 string DefaultSortMethod = null;
                 int EditorGroupID = 0;
                 string EditorGroupName = null;
                 int ParentID = 0;
                 string ParentName = null;
-                int CSContent = 0;
                 int ContentID = 0;
-                int CSDataSources = 0;
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                Models.Complex.cdefModel CDef = null;
-                int CDefPointer = 0;
-                // converted array to dictionary - Dim FieldPointer As Integer
                 string iContentName = null;
-                int CDefPointerMin = 0;
-                int CDefPointerMax = 0;
-                Models.Complex.cdefModel[] CDefArray = null;
-                int CDefArrayCount = 0;
-                bool AllowContentChildTool = false;
-                int CSField = 0;
                 DataTable dt = null;
-                DataTable RSF = null;
-                DataTable RSH = null;
                 string SQL = null;
                 bool FoundMenuTable = false;
-                //Dim FoundAFTable As Boolean
                 int Ptr = 0;
                 string[,] Tables = null;
                 int TableCnt = 0;
@@ -156,9 +135,6 @@ namespace Contensive.Core.Controllers {
                 int GroupCnt = 0;
                 string[,] Contents = null;
                 int ContentCnt = 0;
-                //Dim ContentSrc as object
-                //Dim ContentSrcCnt as integer
-                //Dim ContentSrcPtr as integer
                 string[,] CFields = null;
                 int CFieldCnt = 0;
                 int CFieldPtr = 0;
@@ -755,10 +731,8 @@ namespace Contensive.Core.Controllers {
             try {
                 int NavIconType = 0;
                 string NavIconTitle = null;
-                int CSPointer = 0;
-                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 DataTable dt = null;
-                int ContentID = 0;
                 string menuNameSpace = null;
                 string RecordName = null;
                 int ParentID = 0;

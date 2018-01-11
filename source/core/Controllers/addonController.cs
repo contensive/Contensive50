@@ -627,7 +627,6 @@ namespace Contensive.Core.Controllers {
                 int ColumnMax = 0;
                 int SQLPageSize = 0;
                 int ErrorNumber = 0;
-                string ErrorDescription = null;
                 object[,] something = { { } };
                 int RecordID = 0;
                 string fieldfilename = null;
@@ -687,7 +686,7 @@ namespace Contensive.Core.Controllers {
                         loadOK = true;
                         try {
                             Doc.LoadXml(FormXML);
-                        } catch (Exception ex) {
+                        } catch (Exception) {
                             ButtonList = ButtonCancel;
                             Content.Add("<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">There was a problem with the Setting Page you requested.</div>");
                             loadOK = false;
@@ -1165,12 +1164,8 @@ namespace Contensive.Core.Controllers {
                                                                 dt = cpCore.db.executeQuery(FieldSQL, FieldDataSource, 0, SQLPageSize);
                                                                 //RS = app.csv_ExecuteSQLCommand(FieldDataSource, FieldSQL, 30, SQLPageSize, 1)
 
-                                                            } catch (Exception ex) {
-
-                                                                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
+                                                            } catch (Exception) {                                                                
                                                                 ErrorNumber = 0;
-                                                                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                                ErrorDescription = "";
                                                                 loadOK = false;
                                                             }
                                                         }
@@ -1450,9 +1445,7 @@ namespace Contensive.Core.Controllers {
             string returnText = "";
             try {
                 var engine = new Microsoft.ClearScript.Windows.VBScriptEngine();
-                //string[] Lines = null;
                 string[] Args = { };
-                string EntryPointArgs = "";
                 string WorkingCode = Code;
                 //
                 if (string.IsNullOrEmpty(EntryPoint)) {
@@ -1530,125 +1523,28 @@ namespace Contensive.Core.Controllers {
                         mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(cpCore);
                         //sc.AddObject("ccLib", mainCsv);
                         engine.AddHostObject("ccLib", mainCsv);
-                    } catch (Exception ex) {
-                        ////
-                        //// Error adding cclib object
-                        ////
-                        //string errorMessage = "Error adding cclib compatibility object to script environment";
-                        //if (sc.Error.Number != 0) {
-                        //    errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                        //    if (sc.Error.Line != 0) {
-                        //        Lines = genericController.customSplit(WorkingCode, "\r\n");
-                        //        if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                        //            errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
-                        //        }
-                        //    }
-                        //} else {
-                        //    errorMessage += ", no scripting error";
-                        //}
-                        //throw new ApplicationException(errorMessage, ex);
+                    } catch (Exception) {
                         throw;
                     }
                     if (true) {
                         try {
                             //sc.AddObject("cp", cpCore.cp_forAddonExecutionOnly);
                             engine.AddHostObject("cp", cpCore.cp_forAddonExecutionOnly);
-                        } catch (Exception ex) {
-                            ////
-                            //// Error adding cp object
-                            ////
-                            //string errorMessage = "Error adding cp object to script environment";
-                            //if (sc.Error.Number != 0) {
-                            //    errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                            //    if (sc.Error.Line != 0) {
-                            //        Lines = genericController.customSplit(WorkingCode, "\r\n");
-                            //        if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                            //            errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
-                            //        }
-                            //    }
-                            //} else {
-                            //    errorMessage += ", no scripting error";
-                            //}
-                            //string addonDescription = getAddonDescription(cpCore, addon);
-                            //errorMessage += ", " + addonDescription;
-                            //throw new ApplicationException(errorMessage, ex);
+                        } catch (Exception) {
                             throw;
                         }
                         if (true) {
-                            //
-                            //if (string.IsNullOrEmpty(EntryPoint)) {
-                            //    if (sc.Procedures.Count > 0) {
-                            //        EntryPoint = sc.Procedures(1).Name;
-                            //    }
-                            //}
                             try {
-                                //if ( !string.IsNullOrEmpty(WorkingEntryPoint)) {
-                                //    //
-                                //    // -- if entry point specified, add it to the end
-                                //    WorkingCode += "\r\ncall " + WorkingEntryPoint;
-                                //};
                                 engine.Execute(WorkingCode);
                                 object returnObj = engine.Evaluate(EntryPoint);
-                                //object returnObj = engine.ExecuteCommand(WorkingCode);
                                 if (returnObj != null) {
                                     if (returnObj.GetType() == typeof(String)) {
                                         returnText = (String)returnObj;
                                     }
                                 }
-                                //if (string.IsNullOrEmpty(EntryPointArgs)) {
-                                //    returnText = genericController.encodeText(sc.Run(EntryPoint));
-
-                                //} else {
-                                //    switch (Args.GetUpperBound(0)) {
-                                //        case 0:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0]));
-                                //            break;
-                                //        case 1:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1]));
-                                //            break;
-                                //        case 2:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2]));
-                                //            break;
-                                //        case 3:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3]));
-                                //            break;
-                                //        case 4:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4]));
-                                //            break;
-                                //        case 5:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5]));
-                                //            break;
-                                //        case 6:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6]));
-                                //            break;
-                                //        case 7:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7]));
-                                //            break;
-                                //        case 8:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8]));
-                                //            break;
-                                //        case 9:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8], Args[9]));
-                                //            break;
-                                //        default:
-                                //            break;
-                                //            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
-                                //    }
-                                //}
                             } catch (Exception ex) {
                                 string addonDescription = getAddonDescription(cpCore, addon);
                                 string errorMessage = "Error executing script [" + ScriptName + "], " + addonDescription;
-                                //if (sc.Error.Number != 0) {
-                                //    errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                                //    if (sc.Error.Line != 0) {
-                                //        Lines = genericController.customSplit(WorkingCode, "\r\n");
-                                //        if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                                //            errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
-                                //        }
-                                //    }
-                                //} else {
-                                //    errorMessage = errorMessage + ", " + GetErrString();
-                                //}
                                 throw new ApplicationException(errorMessage, ex);
                             }
                         }
@@ -1753,7 +1649,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname);
                                 //testAssemblyName = testAssembly.FullName
-                            } catch (Exception ex) {
+                            } catch (Exception) {
                                 cpCore.assemblySkipList.Add(TestFilePathname);
                                 testFileIsValidAddonAssembly = false;
                             }
@@ -1979,7 +1875,6 @@ namespace Contensive.Core.Controllers {
             string tempgetInstanceBubble = null;
             try {
                 //
-                string Dialog = null;
                 string OptionDefault = null;
                 string OptionSuffix = null;
                 int OptionCnt = 0;
@@ -2386,29 +2281,11 @@ namespace Contensive.Core.Controllers {
             string tempgetHTMLViewerBubble = null;
             try {
                 //
-                string DefaultStylesheet = null;
-                string StyleSheet = null;
-                string OptionDefault = null;
-                string OptionSuffix = null;
-                int OptionCnt = 0;
-                string OptionValue_AddonEncoded = null;
-                string OptionValue = null;
-                string OptionCaption = null;
-                string LCaseOptionDefault = null;
-                string[] OptionValues = null;
-                string FormInput = null;
-                int OptionPtr = 0;
-                string QueryString = null;
+               string QueryString = null;
                 string LocalCode = "";
                 string CopyHeader = "";
                 string CopyContent = null;
                 string BubbleJS = null;
-                string[] OptionSplit = null;
-                string OptionName = null;
-                string OptionSelector = null;
-                int Ptr = 0;
-                int Pos = 0;
-                int CS = 0;
                 string AddonName = "";
                 int StyleSN = 0;
                 string HTMLViewerBubbleID = null;
@@ -2539,24 +2416,11 @@ namespace Contensive.Core.Controllers {
                         try {
 
                             Doc.LoadXml(FormXML);
-                        } catch (Exception ex) {
-                            // error
-                            //
+                        } catch (Exception) {
                             ButtonList = ButtonCancel;
                             Content.Add("<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">There was a problem with the Setting Page you requested.</div>");
                             loadOK = false;
                         }
-                        //        CS = cpcore.main_OpenCSContentRecord("Setting Pages", SettingPageID)
-                        //        If Not app.csv_IsCSOK(CS) Then
-                        //            '
-                        //            ' Setting Page was not found
-                        //            '
-                        //            ButtonList = ButtonCancel
-                        //            Content.Add( "<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">The Setting Page you requested could not be found.</div>"
-                        //        Else
-                        //            XMLFile = app.cs_get(CS, "xmlfile")
-                        //            Doc = New XmlDocument
-                        //Doc.loadXML (XMLFile)
                         if (loadOK) {
                         } else {
                             //
@@ -3174,33 +3038,9 @@ namespace Contensive.Core.Controllers {
                 string OptionSuffix = "";
                 string LCaseOptionDefault = null;
                 int Pos = 0;
-                bool Checked = false;
-                int ParentID = 0;
-                int ParentCID = 0;
-                string Criteria = null;
-                int RootCID = 0;
-                string SQL = null;
-                int TableID = 0;
-                int TableName = 0;
-                int ChildCID = 0;
-                string CIDList = null;
-                string TableName2 = null;
-                string RecordContentName = null;
-                bool HasParentID = false;
-                int CS = 0;
-                // converted array to dictionary - Dim FieldPointer As Integer
-                int CSPointer = 0;
-                int RecordID = 0;
                 stringBuilderLegacyController FastString = null;
-                int FieldValueInteger = 0;
-                bool FieldRequired = false;
-                string FieldHelp = null;
-                string AuthoringStatusMessage = null;
-                string Delimiter = null;
                 string Copy = "";
                 adminUIController Adminui = new adminUIController(cpCore);
-                //
-                string FieldName = null;
                 //
                 FastString = new stringBuilderLegacyController();
                 //
@@ -3334,13 +3174,11 @@ namespace Contensive.Core.Controllers {
                 //
                 int SavePtr = 0;
                 string[] ConstructorTypes = null;
-                string ConstructorType = null;
                 string ConstructorValue = null;
                 string ConstructorSelector = null;
                 string ConstructorName = null;
                 int ConstructorPtr = 0;
                 int Pos = 0;
-                int InstanceCnt = 0;
                 string InstanceName = null;
                 string InstanceValue = null;
                 //
@@ -3367,7 +3205,6 @@ namespace Contensive.Core.Controllers {
                         ConstructorName = ConstructorNameValues[ConstructorPtr];
                         ConstructorSelector = "";
                         ConstructorValue = "";
-                        ConstructorType = "text";
                         Pos = genericController.vbInstr(1, ConstructorName, "=");
                         if (Pos > 1) {
                             ConstructorValue = ConstructorName.Substring(Pos);
@@ -3394,9 +3231,6 @@ namespace Contensive.Core.Controllers {
                     }
                     ConstructorCnt = SavePtr;
                 }
-                InstanceCnt = 0;
-                //
-                // Now update the values with Instance - if a name is not found, add it
                 //
                 foreach (var kvp in instanceOptions) {
                     InstanceName = kvp.Key;

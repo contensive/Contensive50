@@ -40,15 +40,16 @@ namespace Contensive.BaseClasses
 		/// <returns></returns>
 		/// <remarks></remarks>
 		public abstract bool AsAjax {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// When true, the system only uses the custom styles field when building the page. This field is not updated with add-on updates.
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract string BlockDefaultStyles {get;}
+        //
+        //====================================================================================================
+        /// <summary>
+        /// When true, the system only uses the custom styles field when building the page. This field is not updated with add-on updates.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [Obsolete("This is no longer supported. Add a overriding style in another stylesheet instead of modifying", true)]
+        public abstract string BlockDefaultStyles {get;}
 		//
 		//====================================================================================================
 		/// <summary>

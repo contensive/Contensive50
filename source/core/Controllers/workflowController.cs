@@ -36,9 +36,7 @@ namespace Contensive.Core.Controllers {
         //   include properties saved in appConfig file, settings not editable online.
         //------------------------------------------------------------------------------------------------------------------------
         //
-        private bool constructed = false; // set true when contructor is finished
         public const bool csv_AllowAutocsv_ClearContentTimeStamp = true;
-        //
         //
         private struct EditLockType {
             public string Key;
@@ -70,7 +68,6 @@ namespace Contensive.Core.Controllers {
             try {
                 //
                 this.cpCore = cpCore;
-                constructed = true;
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -828,10 +825,7 @@ namespace Contensive.Core.Controllers {
         //
         public void setRecordLocking(string ContentName, int RecordID, int AuthoringControl, int MemberID) {
             try {
-                //
-                string MethodName = null;
                 int ContentID = 0;
-                //Dim TableID as integer
                 string AuthoringCriteria = null;
                 int CSNewLock = 0;
                 int CSCurrentLock = 0;
@@ -840,12 +834,9 @@ namespace Contensive.Core.Controllers {
                 double EditLockTimeoutMinutes = 0;
                 Models.Complex.cdefModel CDef = null;
                 //
-                MethodName = "csv_SetAuthoringControl";
-                //
                 CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
                 ContentID = CDef.Id;
                 if (ContentID != 0) {
-                    //TableID = csv_GetContentTableID(ContentName)
                     AuthoringCriteria = getAuthoringControlCriteria(ContentName, RecordID);
                     switch (AuthoringControl) {
                         case AuthoringControlsEditing:
@@ -855,16 +846,13 @@ namespace Contensive.Core.Controllers {
                                 EditLockTimeoutDays = (EditLockTimeoutMinutes / 60 / 24);
                                 //
                                 // Delete expired locks
-                                //
                                 cpCore.db.deleteContentRecords("Authoring Controls", sqlCriteria + "And(DATEEXPIRES<" + cpCore.db.encodeSQLDate(DateTime.Now) + ")");
                                 //
                                 // Select any lock left, only the newest counts
-                                //
                                 CSCurrentLock = cpCore.db.csOpen("Authoring Controls", sqlCriteria, "ID DESC", false, MemberID, false, false);
                                 if (!cpCore.db.csOk(CSCurrentLock)) {
                                     //
                                     // No lock, create one
-                                    //
                                     CSNewLock = cpCore.db.csInsertRecord("Authoring Controls", MemberID);
                                     if (cpCore.db.csOk(CSNewLock)) {
                                         cpCore.db.csSet(CSNewLock, "RecordID", RecordID);
@@ -884,33 +872,6 @@ namespace Contensive.Core.Controllers {
                                 }
                                 cpCore.db.csClose(ref CSCurrentLock);
                             }
-                            //Case AuthoringControlsSubmitted, AuthoringControlsApproved, AuthoringControlsModified
-                            //    If False And cpCore.siteProperties.allowWorkflowAuthoring Then
-                            //        sqlCriteria = AuthoringCriteria & "And(ControlType=" & AuthoringControl & ")"
-                            //        CSCurrentLock = cpCore.db.cs_open("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
-                            //        If Not cpCore.db.cs_ok(CSCurrentLock) Then
-                            //            '
-                            //            ' Create new lock
-                            //            '
-                            //            CSNewLock = cpCore.db.cs_insertRecord("Authoring Controls", MemberID)
-                            //            If cpCore.db.cs_ok(CSNewLock) Then
-                            //                Call cpCore.db.cs_set(CSNewLock, "RecordID", RecordID)
-                            //                Call cpCore.db.cs_set(CSNewLock, "ControlType", AuthoringControl)
-                            //                Call cpCore.db.cs_set(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
-                            //                Call cpCore.db.cs_set(CSNewLock, "ContentID", ContentID)
-                            //            End If
-                            //            Call cpCore.db.cs_Close(CSNewLock)
-                            //        Else
-                            //            '
-                            //            ' Update current lock
-                            //            '
-                            //            'Call csv_SetCSField(CSCurrentLock, "ContentID", ContentID)
-                            //            'Call csv_SetCSField(CSCurrentLock, "RecordID", RecordID)
-                            //            'Call csv_SetCSField(CSCurrentLock, "ControlType", AuthoringControl)
-                            //            'Call csv_SetCSField(CSCurrentLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
-                            //        End If
-                            //        Call cpCore.db.cs_Close(CSCurrentLock)
-                            //    End If
                             break;
                     }
                 }

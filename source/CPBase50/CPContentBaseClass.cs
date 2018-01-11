@@ -41,14 +41,14 @@ namespace Contensive.BaseClasses
 		/// <param name="IsEditing">If false, this call returns nothing. Set it true if IsEdiing( contentname ) is true.</param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string GetAddLink(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing); //Implements BaseClasses.CPContentBaseClass.GetAddLink
+		public abstract string GetAddLink(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing);
 		/// <summary>
 		/// Returns an SQL compatible where-clause which includes all the contentcontentid values allowed for this content name.
 		/// </summary>
 		/// <param name="ContentName"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string GetContentControlCriteria(string ContentName); //Implements BaseClasses.CPContentBaseClass.GetContentControlCriteria
+		public abstract string GetContentControlCriteria(string ContentName); 
 		/// <summary>
 		/// Returns a named field property. Valid values for PropertyName are the field names of the 'Content Fields' content definition, also found as the columns in the ccfields table.
 		/// </summary>
@@ -57,14 +57,14 @@ namespace Contensive.BaseClasses
 		/// <param name="PropertyName"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string GetFieldProperty(string ContentName, string FieldName, string PropertyName); //Implements BaseClasses.CPContentBaseClass.GetFieldProperty
+		public abstract string GetFieldProperty(string ContentName, string FieldName, string PropertyName);
 		/// <summary>
 		/// Returns the content id given its name
 		/// </summary>
 		/// <param name="ContentName"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract int GetID(string ContentName); //Implements BaseClasses.CPContentBaseClass.GetId
+		public abstract int GetID(string ContentName); 
 		/// <summary>
 		/// Returns a named content property. Valid values for PropertyName are the field names of the 'Content' content definition, also found as the columns in the ccfields table.
 		/// </summary>
@@ -72,14 +72,14 @@ namespace Contensive.BaseClasses
 		/// <param name="PropertyName"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string GetProperty(string ContentName, string PropertyName); //Implements BaseClasses.CPContentBaseClass.GetProperty
+		public abstract string GetProperty(string ContentName, string PropertyName); 
 		/// <summary>
 		/// Returns the datasource name of the content given.
 		/// </summary>
 		/// <param name="ContentName"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string GetDataSource(string ContentName); //Implements BaseClasses.CPContentBaseClass.GetDataSource
+		public abstract string GetDataSource(string ContentName); 
 		/// <summary>
 		/// Get an icon linked to the administration site which edits the referenced record. The record is identified by its ID. The recordname is only used for the display caption.
 		/// </summary>
@@ -90,7 +90,7 @@ namespace Contensive.BaseClasses
 		/// <param name="IsEditing">If false, this call returns nothing. Set it true if IsEdiing( contentname ) is true.</param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string GetEditLink(string ContentName, string RecordID, bool AllowCut, string RecordName, bool IsEditing); //Implements BaseClasses.CPContentBaseClass.GetEditLink
+		public abstract string GetEditLink(string ContentName, string RecordID, bool AllowCut, string RecordName, bool IsEditing); 
 		/// <summary>
 		/// Returns the primary link alias for the record id and querystringsuffix. If no link alias exists, it defaultvalue is returned.
 		/// </summary>
@@ -99,7 +99,7 @@ namespace Contensive.BaseClasses
 		/// <param name="DefaultLink">If no link alias is found, this value is returned.</param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string GetLinkAliasByPageID(int PageID, string QueryStringSuffix, string DefaultLink); //Implements BaseClasses.CPContentBaseClass.GetLinkAliasByPageId
+		public abstract string GetLinkAliasByPageID(int PageID, string QueryStringSuffix, string DefaultLink);
 		/// <summary>
 		/// Return the appropriate link for a page.
 		/// </summary>
@@ -108,7 +108,7 @@ namespace Contensive.BaseClasses
 		/// <param name="AllowLinkAlias"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string GetPageLink(int PageID, string QueryStringSuffix = "", bool AllowLinkAlias = true); //Implements BaseClasses.CPContentBaseClass.GetPageLink
+		public abstract string GetPageLink(int PageID, string QueryStringSuffix = "", bool AllowLinkAlias = true); 
 		/// <summary>
 		/// Return a record's ID given it's name. If duplicates exist, the first one ordered by ID is returned.
 		/// </summary>
@@ -116,7 +116,7 @@ namespace Contensive.BaseClasses
 		/// <param name="RecordName"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract int GetRecordID(string ContentName, string RecordName); //Implements BaseClasses.CPContentBaseClass.GetRecordId
+		public abstract int GetRecordID(string ContentName, string RecordName);
 		/// <summary>
 		/// Return a records name given it's ID.
 		/// </summary>
@@ -124,21 +124,22 @@ namespace Contensive.BaseClasses
 		/// <param name="RecordID"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string GetRecordName(string ContentName, int RecordID); //Implements BaseClasses.CPContentBaseClass.GetRecordName
+		public abstract string GetRecordName(string ContentName, int RecordID);
 		/// <summary>
 		/// Get the table used for a content definition.
 		/// </summary>
 		/// <param name="ContentName"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string GetTable(string ContentName); //Implements BaseClasses.CPContentBaseClass.GetTable
-		/// <summary>
-		/// If a template uses a fixed URL, the returns the link associted with a template. Otherwise it returns a blank string.
-		/// </summary>
-		/// <param name="TemplateID"></param>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract string GetTemplateLink(int TemplateID); //Implements BaseClasses.CPContentBaseClass.GetTemplateLink
+		public abstract string GetTable(string ContentName);
+        /// <summary>
+        /// If a template uses a fixed URL, the returns the link associted with a template. Otherwise it returns a blank string.
+        /// </summary>
+        /// <param name="TemplateID"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [Obsolete("Deprecated, template link is not supported", true)]
+        public abstract string GetTemplateLink(int TemplateID);
 		/// <summary>
 		/// Used to test if a field exists in a content definition
 		/// </summary>
@@ -146,7 +147,7 @@ namespace Contensive.BaseClasses
 		/// <param name="FieldName"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract bool IsField(string ContentName, string FieldName); //Implements BaseClasses.CPContentBaseClass.IsField
+		public abstract bool IsField(string ContentName, string FieldName);
 		/// <summary>
 		/// Returns true if the record is currently being edited.
 		/// </summary>
@@ -154,7 +155,7 @@ namespace Contensive.BaseClasses
 		/// <param name="RecordID"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract bool IsLocked(string ContentName, string RecordID); //Implements BaseClasses.CPContentBaseClass.IsLocked
+		public abstract bool IsLocked(string ContentName, string RecordID); 
 		/// <summary>
 		/// Returns true if the childcontentid is a child of the parentcontentid
 		/// </summary>
@@ -162,42 +163,46 @@ namespace Contensive.BaseClasses
 		/// <param name="ParentContentID"></param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract bool IsChildContent(string ChildContentID, string ParentContentID); //Implements BaseClasses.CPContentBaseClass.IsChildContent
-		/// <summary>
-		/// Returns true if the content is currently using workflow editing.
-		/// </summary>
-		/// <param name="ContentName"></param>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract bool IsWorkflow(string ContentName); //Implements BaseClasses.CPContentBaseClass.IsWorkflow
-		/// <summary>
-		/// If Workflow editing, the record is published.
-		/// </summary>
-		/// <param name="ContentName"></param>
-		/// <param name="RecordID"></param>
-		/// <remarks></remarks>
-		public abstract void PublishEdit(string ContentName, int RecordID); //Implements BaseClasses.CPContentBaseClass.PublishEdit
-		/// <summary>
-		/// If workflow editing, the record is submitted for pushlishing
-		/// </summary>
-		/// <param name="ContentName"></param>
-		/// <param name="RecordID"></param>
-		/// <remarks></remarks>
-		public abstract void SubmitEdit(string ContentName, int RecordID); //Implements BaseClasses.CPContentBaseClass.SubmitEdit
-		/// <summary>
-		/// If workflow editing, edits to the record are aborted and the edit record is returned to the condition of hte live record. This condition is used in the Workflow publishing tool.
-		/// </summary>
-		/// <param name="ContentName"></param>
-		/// <param name="RecordId"></param>
-		/// <remarks></remarks>
-		public abstract void AbortEdit(string ContentName, int RecordId); //Implements BaseClasses.CPContentBaseClass.AbortEdit
+		public abstract bool IsChildContent(string ChildContentID, string ParentContentID);
+        /// <summary>
+        /// Returns true if the content is currently using workflow editing.
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [Obsolete("workflow editing is deprecated", false)]
+        public abstract bool IsWorkflow(string ContentName);
+        /// <summary>
+        /// If Workflow editing, the record is published.
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <remarks></remarks>
+        [Obsolete("workflow editing is deprecated", false)]
+        public abstract void PublishEdit(string ContentName, int RecordID); 
+        /// <summary>
+        /// If workflow editing, the record is submitted for pushlishing
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <remarks></remarks>
+        [Obsolete("workflow editing is deprecated", false)]
+         public abstract void SubmitEdit(string ContentName, int RecordID);
+        /// <summary>
+        /// If workflow editing, edits to the record are aborted and the edit record is returned to the condition of hte live record. This condition is used in the Workflow publishing tool.
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordId"></param>
+        /// <remarks></remarks>
+        [Obsolete("workflow editing is deprecated", false)]
+        public abstract void AbortEdit(string ContentName, int RecordId);
 		/// <summary>
 		/// If workflow editing, the record is marked as approved for publishing. This condition is used in the Workflow publishing tool.
 		/// </summary>
 		/// <param name="ContentName"></param>
 		/// <param name="RecordId"></param>
 		/// <remarks></remarks>
-		public abstract void ApproveEdit(string ContentName, int RecordId); //Implements BaseClasses.CPContentBaseClass.ApproveEdit
+		[Obsolete("workflow editing is deprecated", false)] public abstract void ApproveEdit(string ContentName, int RecordId); //Implements BaseClasses.CPContentBaseClass.ApproveEdit
 		/// <summary>
 		/// Returns the html layout field of a layout record
 		/// </summary>

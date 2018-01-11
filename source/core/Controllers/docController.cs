@@ -465,7 +465,6 @@ namespace Contensive.Core.Controllers {
         //todo  NOTE: C# does not support parameterized properties - the following property has been rewritten as a function:
         //ORIGINAL LINE: Public ReadOnly Property main_SiteStructure(cpcore As coreClass) As String
         public string get_main_SiteStructure(coreClass cpcore) {
-            bool returnStatus = false;
             if (!siteStructure_LocalLoaded) {
                 addonModel addon = addonModel.create(cpcore, addonGuidSiteStructureGuid);
                 siteStructure = this.cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextSimple });
@@ -721,9 +720,7 @@ namespace Contensive.Core.Controllers {
             string Copy = null;
             string Button = null;
             int RecordID = 0;
-            bool RecordModified = false;
             string RecordName = "";
-            //
             bool IsEditLocked = false;
             bool IsSubmitted = false;
             bool IsApproved = false;
@@ -739,7 +736,6 @@ namespace Contensive.Core.Controllers {
             bool iIsAdmin = false;
             // Dim main_WorkflowSupport As Boolean
             //
-            RecordModified = false;
             RecordID = (cpCore.docProperties.getInteger("ID"));
             Button = cpCore.docProperties.getText("Button");
             iIsAdmin = cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore);
@@ -1218,19 +1214,12 @@ namespace Contensive.Core.Controllers {
         //
         public void getAuthoringPermissions(string ContentName, int RecordID, ref bool AllowInsert, ref bool AllowCancel, ref bool allowSave, ref bool AllowDelete, ref bool ignore1, ref bool ignore2, ref bool ignore3, ref bool ignore4, ref bool readOnlyField) {
             try {
-                //
-                //If Not (true) Then Exit Sub
-                //
-                string MethodName = null;
-                //
                 bool IsEditing = false;
                 bool IsSubmitted = false;
                 bool IsApproved = false;
                 bool IsInserted = false;
                 bool IsDeleted = false;
                 bool IsModified = false;
-                string EditingName = null;
-                DateTime EditingExpires = default(DateTime);
                 string SubmittedName = "";
                 string ApprovedName = "";
                 string ModifiedName = "";
@@ -1239,15 +1228,9 @@ namespace Contensive.Core.Controllers {
                 DateTime SubmittedDate = default(DateTime);
                 DateTime ApprovedDate = default(DateTime);
                 //
-                MethodName = "main_GetAuthoringButtons";
-                //
-                // main_Get Authoring Workflow Status
-                //
                 if (RecordID != 0) {
                     cpCore.workflow.getAuthoringStatus(ContentName, RecordID, ref IsSubmitted, ref IsApproved, ref SubmittedName, ref ApprovedName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
                 }
-                //
-                // main_Get Content Definition
                 //
                 CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
                 //
@@ -1420,16 +1403,10 @@ namespace Contensive.Core.Controllers {
         //
         public void sendPublishSubmitNotice(string ContentName, int RecordID, string RecordName) {
             try {
-                //
-                //If Not (true) Then Exit Sub
-                //
-                string MethodName = null;
                 Models.Complex.cdefModel CDef = null;
                 string Copy = null;
                 string Link = null;
                 string FromAddress = null;
-                //
-                MethodName = "main_SendPublishSubmitNotice";
                 //
                 FromAddress = cpCore.siteProperties.getText("EmailPublishSubmitFrom", cpCore.siteProperties.emailAdmin);
                 CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);

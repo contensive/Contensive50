@@ -27,14 +27,7 @@ namespace Contensive.Core.Addons.Tools {
         //
         // ----- data fields
         //
-        private int AdminContentMax; // after init, max possible value for AdminContentID
-        private bool FieldProblems;
-        private string[] Findstring = new string[51]; // Value to search for each index column
-                                                      //
-                                                      //=============================================================================
-                                                      // Development Tools values
-                                                      //=============================================================================
-                                                      //
+        private string[] Findstring = new string[51]; 
         private coreClass cpCore;
         private string ToolsTable;
         private string ToolsContentName;
@@ -53,7 +46,6 @@ namespace Contensive.Core.Addons.Tools {
         // ----- Forms
         //
         private int AdminFormTool;
-        private int ToolsSourceForm;
         //
         // ----- Actions
         //
@@ -62,11 +54,6 @@ namespace Contensive.Core.Addons.Tools {
         // ----- Buttons
         //
         private string Button;
-        //
-        private bool ClassInitialized; // if true, the module has been
-                                       //
-                                       // ----- Content Field descriptors (admin and tools)
-                                       //
         private const int fieldType = 0; // The type of data the field holds
         private const int FieldName = 1; // The name of the field
         private const int FieldCaption = 2; // The caption for displaying the field
@@ -341,13 +328,8 @@ namespace Contensive.Core.Addons.Tools {
             string result = "";
             try {
                 //
-                string SQL = null;
-                int CS = 0;
-                string DataSourceName = null;
-                string TableName = null;
                 string ContentName = null;
                 int ContentID = 0;
-                int DataSourceCount = 0;
                 int ItemCount = 0;
                 int CSPointer = 0;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
@@ -1422,53 +1404,33 @@ namespace Contensive.Core.Addons.Tools {
             try {
                 //
                 string SQL = null;
-                int DataSourceID = 0;
                 string DataSourceName = null;
                 string TableName = null;
                 string ContentName = null;
                 int RecordID = 0;
                 int CSContent = 0;
-                int CSDataSources = 0;
-                string StartButton = null;
-                string Name = null;
-                //Dim ConnectionObject As Connection
-                string ConnectionString = null;
                 int CSPointer = 0;
                 int ErrorCount = 0;
                 string FieldName = null;
                 string bitBucket = null;
                 int ContentID = 0;
-                int ParentID = 0;
-                //
                 int CSFields = 0;
                 int CSTestRecord = 0;
                 int TestRecordID = 0;
                 int fieldType = 0;
                 int RedirectContentID = 0;
                 int LookupContentID = 0;
-                string LinkPage = null;
                 string LookupList = null;
-                //
                 string DiagProblem = null;
-                //
                 int iDiagActionCount = 0;
                 int DiagActionPointer = 0;
                 string DiagAction = null;
                 DiagActionType[] DiagActions = null;
-                int fieldId = 0;
                 int CS = 0;
                 int CSTest = 0;
                 string Button = null;
                 bool FieldRequired = false;
                 bool FieldAuthorable = false;
-                //
-                string PathFilename = null;
-                string SampleStyles = null;
-                string SampleLine = null;
-                string Copy = null;
-                int NextWhiteSpace = 0;
-                string SampleName = null;
-                int LinePosition = 0;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = null;
                 //
@@ -2493,21 +2455,9 @@ namespace Contensive.Core.Addons.Tools {
         private string GetForm_DbSchema() {
             string result = "";
             try {
-                //
-                string SQL = null;
-                int ErrorNumber = 0;
-                string ErrorDescription = "";
                 bool StatusOK = false;
                 int FieldCount = 0;
-                string CellString = null;
-                string SQLFilename = null;
-                string SQLArchive = null;
-                string SQLArchiveOld = null;
-                int LineCounter = 0;
-                string SQLLine = null;
                 object Retries = null;
-                int PageSize = 0;
-                int PageNumber = 0;
                 int RowMax = 0;
                 int RowPointer = 0;
                 int ColumnMax = 0;
@@ -2518,8 +2468,6 @@ namespace Contensive.Core.Addons.Tools {
                 string RowEnd = null;
                 string[,] arrayOfSchema = null;
                 string CellData = null;
-                int SelectFieldWidthLimit = 0;
-                string SQLName = null;
                 string TableName = "";
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = null;
@@ -2536,8 +2484,6 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // First pass, initialize
                     //
-                    PageSize = 10;
-                    PageNumber = 1;
                     Retries = 0;
                 } else {
                     //
@@ -2563,7 +2509,6 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         // ----- print results
                         //
-                        PageSize = 9999;
                         Stream.Add(DateTime.Now + " The following results were returned<br>");
                         //
                         // --- Create the Fields for the new table
@@ -2626,7 +2571,6 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         // ----- print results
                         //
-                        PageSize = 999;
                         Stream.Add(DateTime.Now + " The following results were returned<br>");
                         //
                         // --- Create the Fields for the new table
@@ -2689,7 +2633,6 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         // ----- print results
                         //
-                        PageSize = 9999;
                         Stream.Add(DateTime.Now + " The following results were returned<br>");
                         //
                         // --- Create the Fields for the new table
@@ -3335,7 +3278,6 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 int Count = 0;
                 int Pointer = 0;
-                string SQL = null;
                 int TableID = 0;
                 string TableName = "";
                 string FieldName = null;

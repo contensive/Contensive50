@@ -140,15 +140,10 @@ namespace Contensive.Core.Controllers {
             try {
                 bool allowPageWithoutSectionDislay = false;
                 int FieldRows = 0;
-                //Dim templateId As Integer
-                string RootPageContentName = null;
                 int PageID = 0;
                 bool UseContentWatchLink = cpCore.siteProperties.useContentWatchLink;
                 //
-                RootPageContentName = "Page Content";
-                //
                 // -- validate domain
-                //domain = domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String))
                 if (cpCore.doc.domain == null) {
                     //
                     // -- domain not listed, this is now an error
@@ -338,11 +333,7 @@ namespace Contensive.Core.Controllers {
             string tempgetDefaultBlockMessage = null;
             try {
                 tempgetDefaultBlockMessage = "";
-                //
-                int CS = 0;
-                int PageID = 0;
-                //
-                CS = cpcore.db.csOpen("Copy Content", "name=" + cpcore.db.encodeSQLText(ContentBlockCopyName), "ID", false, 0, false, false, "Copy,ID");
+                int CS = cpcore.db.csOpen("Copy Content", "name=" + cpcore.db.encodeSQLText(ContentBlockCopyName), "ID", false, 0, false, false, "Copy,ID");
                 if (cpcore.db.csOk(CS)) {
                     tempgetDefaultBlockMessage = cpcore.db.csGet(CS, "Copy");
                 }
@@ -938,9 +929,7 @@ namespace Contensive.Core.Controllers {
                 int FieldCount = 0;
                 string[] NameValues = null;
                 string RedirectLink = "";
-                string RedirectReason = "";
                 string PageNotFoundReason = "";
-                string PageNotFoundSource = "";
                 bool IsPageNotFound = false;
                 //
                 if (cpCore.doc.continueProcessing) {
@@ -988,17 +977,13 @@ namespace Contensive.Core.Controllers {
                     // -- execute template Dependencies
                     List<Models.Entity.addonModel> templateAddonList = addonModel.createList_templateDependencies(cpCore, cpCore.doc.template.id);
                     foreach (addonModel addon in templateAddonList) {
-                        bool AddonStatusOK = true;
                         returnHtml += cpCore.addon.executeDependency(addon, executeContext);
-                        //returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.doc.authContext.user.id, cpCore.doc.authContext.visit.VisitAuthenticated)
-                    }
+                     }
                     //
                     // -- execute page Dependencies
                     List<Models.Entity.addonModel> pageAddonList = addonModel.createList_pageDependencies(cpCore, cpCore.doc.page.id);
                     foreach (addonModel addon in pageAddonList) {
-                        bool AddonStatusOK = true;
                         returnHtml += cpCore.addon.executeDependency(addon, executeContext);
-                        //returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.doc.authContext.user.id, cpCore.doc.authContext.visit.VisitAuthenticated)
                     }
                     //
                     cpCore.doc.adminWarning = cpCore.docProperties.getText("main_AdminWarningMsg");
@@ -1249,7 +1234,6 @@ namespace Contensive.Core.Controllers {
                     //
                     // link alias and link forward
                     //
-                    string LinkAliasCriteria = "";
                     string linkAliasTest1 = "";
                     string linkAliasTest2 = null;
                     string LinkNoProtocol = "";
@@ -1269,7 +1253,6 @@ namespace Contensive.Core.Controllers {
                     // try link alias
                     //--------------------------------------------------------------------------
                     //
-                    LinkAliasCriteria = "";
                     linkAliasTest1 = cpCore.webServer.requestPathPage;
                     if (linkAliasTest1.Left( 1) == "/") {
                         linkAliasTest1 = linkAliasTest1.Substring(1);
@@ -1354,7 +1337,6 @@ namespace Contensive.Core.Controllers {
                                 }
                                 if (!string.IsNullOrEmpty(tmpLink)) {
                                     RedirectLink = tmpLink;
-                                    RedirectReason = "Redirecting because the URL Is a valid Link Forward entry.";
                                 }
                             }
                         }
@@ -1802,14 +1784,12 @@ namespace Contensive.Core.Controllers {
         internal static main_FormPagetype loadFormPageInstructions(coreClass cpcore, string FormInstructions, string Formhtml) {
             main_FormPagetype result = new main_FormPagetype();
             try {
-                string RepeatBody = null;
                 int PtrFront = 0;
                 int PtrBack = 0;
                 string[] i = null;
                 int IPtr = 0;
                 int IStart = 0;
                 string[] IArgs = null;
-                int CSPeople = 0;
                 //
                 if (true) {
                     PtrFront = genericController.vbInstr(1, Formhtml, "{{REPEATSTART", 1);
@@ -1839,8 +1819,6 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // read in and compose the repeat lines
                                         //
-                                        RepeatBody = "";
-                                        CSPeople = -1;
                                         Array.Resize(ref result.Inst, i.GetUpperBound(0));
                                         for (IPtr = 0; IPtr <= i.GetUpperBound(0) - IStart; IPtr++) {
                                             var tempVar = result.Inst[IPtr];
@@ -1885,24 +1863,13 @@ namespace Contensive.Core.Controllers {
             try {
                 //
                 string RepeatBody = null;
-                int PtrFront = 0;
-                int PtrBack = 0;
-                string[] i = null;
                 int IPtr = 0;
-                int IStart = 0;
-                string[] IArgs = null;
-                int IArgPtr = 0;
                 int CSPeople = 0;
                 string Body = null;
-                string Instruction = null;
                 string Formhtml = "";
                 string FormInstructions = "";
                 int CS = 0;
                 bool HasRequiredFields = false;
-                string ArgCaption = null;
-                int ArgType = 0;
-                bool ArgRequired = false;
-                string GroupName = null;
                 bool GroupValue = false;
                 int GroupRowPtr = 0;
                 int FormPageID = 0;
@@ -1910,8 +1877,6 @@ namespace Contensive.Core.Controllers {
                 bool IsRetry = false;
                 string CaptionSpan = null;
                 string Caption = null;
-                bool IsRequiredByCDef = false;
-                Models.Complex.cdefModel PeopleCDef = null;
                 //
                 IsRetry = (cpcore.docProperties.getInteger("ContensiveFormPageID") != 0);
                 //
@@ -2008,7 +1973,6 @@ namespace Contensive.Core.Controllers {
                 int CS = 0;
                 string SQL = null;
                 bool ContentBlocked = false;
-                bool NewPageCreated = false;
                 int SystemEMailID = 0;
                 int ConditionID = 0;
                 int ConditionGroupID = 0;
@@ -2037,7 +2001,6 @@ namespace Contensive.Core.Controllers {
                 // -- build list of blocked pages
                 string BlockedRecordIDList = "";
                 if ((!string.IsNullOrEmpty(returnHtml)) && (cpCore.doc.redirectLink == "")) {
-                    NewPageCreated = true;
                     foreach (pageContentModel testPage in cpCore.doc.pageToRootList) {
                         if (testPage.BlockContent | testPage.BlockPage) {
                             BlockedRecordIDList = BlockedRecordIDList + "," + testPage.id;
@@ -2607,7 +2570,6 @@ namespace Contensive.Core.Controllers {
                         if (!allowChildListComposite) {
                             Cell = Cell + cpcore.html.getAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
                         }
-                        bool AddonStatusOK = false;
                         addonModel addon = addonModel.create(cpcore, cpcore.siteProperties.childListAddonID);
                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
@@ -2709,15 +2671,12 @@ namespace Contensive.Core.Controllers {
                 int ContentID = 0;
                 int SeeAlsoCount = 0;
                 string Copy = null;
-                string MethodName = null;
                 string iContentName = null;
                 int iRecordID = 0;
                 bool IsEditingLocal = false;
                 //
                 iContentName = genericController.encodeText(ContentName);
                 iRecordID = genericController.encodeInteger(RecordID);
-                //
-                MethodName = "result";
                 //
                 SeeAlsoCount = 0;
                 if (iRecordID > 0) {

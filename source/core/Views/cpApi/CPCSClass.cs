@@ -157,6 +157,7 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
+        [Obsolete()]
         public override bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, int PageSize = 10, int PageNumber = 1) {
             List<string> groupList = new List<string>();
             groupList.AddRange(GroupCommaList.Split(','));

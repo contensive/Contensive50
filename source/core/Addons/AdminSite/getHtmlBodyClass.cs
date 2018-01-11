@@ -160,7 +160,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 cpcore.db.sqlCommandTimeout = 300;
                 ButtonObjectCount = 0;
-                ImagePreloadCount = 0;
                 JavaScriptString = "";
                 ContentWatchLoaded = false;
                 editRecord.Loaded = false;
@@ -974,28 +973,12 @@ namespace Contensive.Core.Addons.AdminSite {
         private string GetForm_MetaKeywordTool() {
             string tempGetForm_MetaKeywordTool = null;
             try {
-                //
-                const int LoginMode_None = 1;
-                const int LoginMode_AutoRecognize = 2;
-                const int LoginMode_AutoLogin = 3;
-                //
-                int LoginMode = 0;
-                string Help = null;
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
                 string Copy = null;
                 string Button = null;
-                string PageNotFoundPageID = null;
                 adminUIController Adminui = new adminUIController(cpcore);
                 string Description = null;
                 string ButtonList = null;
-                bool AllowLinkAlias = false;
-                //Dim AllowExternalLinksInChildList As Boolean
-                bool LinkForwardAutoInsert = false;
-                string SectionLandingLink = null;
-                string ServerPageDefault = null;
-                string LandingPageID = null;
-                string DocTypeDeclaration = null;
-                bool AllowAutoRecognize = false;
                 string KeywordList = null;
                 //
                 Button = cpcore.docProperties.getText(RequestNameButton);
@@ -1193,9 +1176,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string CollectionHelpLink = "";
                 DateTime CollectionDateAdded = default(DateTime);
                 DateTime CollectionLastUpdated = default(DateTime);
-                string SQL = null;
                 string IncludeHelp = "";
-                int addonId = 0;
                 //
                 if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpCollectionID.ToString() + ",") == 0) {
                     CS = cpcore.db.csOpenRecord("Add-on Collections", HelpCollectionID);
@@ -1877,17 +1858,17 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         private struct ContentGroupRuleType {
             public int ContentID;
-            public int GroupID;
+            //public int GroupID;
             public bool AllowAdd;
             public bool AllowDelete;
         }
-        //
-        // ----- generic id/name dictionary
-        //
-        private struct StorageType {
-            public int Id;
-            public string Name;
-        }
+        ////
+        //// ----- generic id/name dictionary
+        ////
+        //private struct StorageType {
+        //    public int Id;
+        //    public string Name;
+        //}
         //
         // ----- Group Rules
         //
@@ -2072,41 +2053,36 @@ namespace Contensive.Core.Addons.AdminSite {
 
         private int MenuDepth; // The number of windows open (below this one)
         private string TitleExtension; // String that adds on to the end of the title
-                                       //Private Findstring(50) As String                ' Value to search for each index column
-                                       //
-                                       // SpellCheck Features
-                                       //
+        //
+        // SpellCheck Features
+        //
         private bool SpellCheckSupported; // if true, spell checking is supported
         private bool SpellCheckRequest; // If true, send the spell check form to the browser
-        private bool SpellCheckResponse; // if true, the user is sending the spell check back to process
-        private string SpellCheckWhiteCharacterList;
-        private string SpellCheckDictionaryFilename; // Full path to user dictionary
-        private string SpellCheckIgnoreList; // List of ignore words (used to verify the file is there)
-                                             //
-                                             //=============================================================================
-                                             // preferences
-                                             //=============================================================================
-                                             //
+        //
+        //=============================================================================
+        // preferences
+        //=============================================================================
+        //
         private int AdminMenuModeID; // Controls the menu mode, set from cpCore.main_MemberAdminMenuModeID
         private bool allowAdminTabs; // true uses tab system
         private string fieldEditorPreference; // this is a hidden on the edit form. The popup editor preferences sets this hidden and submits
-                                              //
-                                              //=============================================================================
-                                              //   Content Tracking Editing
-                                              //
-                                              //   These values are read from Edit form response, and are used to populate then
-                                              //   ContentWatch and ContentWatchListRules records.
-                                              //
-                                              //   They are read in before the current record is processed, then processed and
-                                              //   Saved back to ContentWatch and ContentWatchRules after the current record is
-                                              //   processed, so changes to the record can be reflected in the ContentWatch records.
-                                              //   For instance, if the record is marked inactive, the ContentWatchLink is cleared
-                                              //   and all ContentWatchListRules are deleted.
-                                              //
-                                              //=============================================================================
-                                              //
+        //
+        //=============================================================================
+        //   Content Tracking Editing
+        //
+        //   These values are read from Edit form response, and are used to populate then
+        //   ContentWatch and ContentWatchListRules records.
+        //
+        //   They are read in before the current record is processed, then processed and
+        //   Saved back to ContentWatch and ContentWatchRules after the current record is
+        //   processed, so changes to the record can be reflected in the ContentWatch records.
+        //   For instance, if the record is marked inactive, the ContentWatchLink is cleared
+        //   and all ContentWatchListRules are deleted.
+        //
+        //=============================================================================
+        //
         private bool ContentWatchLoaded; // flag set that shows the rest are valid
-                                         //
+        //
         private int ContentWatchRecordID;
         private string ContentWatchLink;
         private int ContentWatchClicks;
@@ -2115,31 +2091,16 @@ namespace Contensive.Core.Addons.AdminSite {
         private int[] ContentWatchListID; // list of all ContentWatchLists for this Content, read from response, then later saved to Rules
         private int ContentWatchListIDSize; // size of ContentWatchListID() array
         private int ContentWatchListIDCount; // number of valid entries in ContentWatchListID()
-                                             //
-                                             //=============================================================================
-                                             //   Calendar Event Editing
-                                             //=============================================================================
-                                             //
-                                             //Private CalendarEventName As String
-                                             //Private CalendarEventStartDate As Date
-                                             //Private CalendarEventEndDate As Date
-                                             //
-                                             //=============================================================================
-                                             // Other
-                                             //=============================================================================
-                                             //
-        private int ObjectCount; // Convert the following objects to this one
-        private int ButtonObjectCount; // Count of Buttons in use
-        private int ImagePreloadCount; // Number of images preloaded
-        private string[,] ImagePreloads = new string[3, 101]; // names of all gifs already preloaded
-                                                              //                       (0,x) = imagename
-                                                              //                       (1,x) = ImageObject name for the image
+        //
+        //=============================================================================
+        // Other
+        //=============================================================================
+        // Count of Buttons in use
+        private int ButtonObjectCount; 
+        private string[,] ImagePreloads = new string[3, 101]; 
         private string JavaScriptString; // Collected string of Javascript functions to print at end
         private string AdminFormBottom; // the HTML needed to complete the Admin Form after contents
-        private bool UserAllowContentEdit; // set on load - checked within each edit/index page
-        private bool UserAllowContentAdd;
-        private bool UserAllowContentDelete;
-        private int TabStopCount; // used to generate TabStop values
+        private bool UserAllowContentEdit; 
         private int FormInputCount; // used to generate labels for form input
         private int EditSectionPanelCount;
 
@@ -3118,8 +3079,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 string SQL = null;
                 string Caption = null;
                 string Link = null;
-                bool IsAuthoringMode = false;
-                string FirstCaption = "";
                 string RQS = null;
                 string QS = null;
                 int Ptr = 0;
@@ -3134,7 +3093,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 IndexConfig = LoadIndexConfig(adminContent);
                 //
                 ContentName = cdefModel.getContentNameByID(cpcore, adminContent.Id);
-                IsAuthoringMode = true;
                 RQS = "cid=" + adminContent.Id + "&af=1";
                 //
                 //-------------------------------------------------------------------------------------
@@ -3500,8 +3458,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 // determine user rights to this content
                 //
                 UserAllowContentEdit = true;
-                UserAllowContentAdd = true;
-                UserAllowContentDelete = true;
                 if (!cpcore.doc.sessionContext.isAuthenticatedAdmin(cpcore)) {
                     if (adminContent.Id > 0) {
                         UserAllowContentEdit = userHasContentAccess(adminContent.Id);
@@ -3582,8 +3538,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 }
                 //
                 // --- If AdminMenuMode is not given locally, use the Members Preferences
-                //
-                object MenuModeVariant = null;
                 //
                 AdminMenuModeID = cpcore.docProperties.getInteger("mm");
                 if (AdminMenuModeID == 0) {
@@ -3704,9 +3658,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 // --- Spell Check
                 SpellCheckSupported = false;
                 SpellCheckRequest = false;
-                SpellCheckResponse = false;
-                SpellCheckDictionaryFilename = "";
-                SpellCheckIgnoreList = "";
             } catch (Exception ex) {
                 cpcore.handleException(ex);
             }
@@ -4021,8 +3972,6 @@ namespace Contensive.Core.Addons.AdminSite {
         private void LoadAndSaveContentGroupRules(int GroupID) {
             try {
                 //
-                int GroupCount = 0;
-                int GroupPointer = 0;
                 int ContentCount = 0;
                 int ContentPointer = 0;
                 int CSPointer = 0;
@@ -4256,12 +4205,6 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         private void LoadEditRecord(cdefModel adminContent, editRecordClass editRecord, bool CheckUserErrors = false) {
             try {
-                //
-                // converted array to dictionary - Dim FieldPointer As Integer
-                DateTime ApprovedDate = default(DateTime);
-                int CS = 0;
-                //Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
-                //
                 if (string.IsNullOrEmpty(adminContent.Name)) {
                     //
                     // Can not load edit record because bad content definition
@@ -4417,15 +4360,9 @@ namespace Contensive.Core.Addons.AdminSite {
                 string UCaseDefaultValueText = null;
                 string[] lookups = null;
                 int Ptr = 0;
-                // converted array to dictionary - Dim FieldPointer As Integer
-                //Dim FieldCount As Integer
                 string defaultValue = null;
-                string MethodName = null;
                 editRecordFieldClass editRecordField = null;
                 cdefFieldModel field = null;
-                //
-                MethodName = "Admin.Method()";
-                //
                 editrecord.active = true;
                 editrecord.contentControlId = adminContent.Id;
                 editrecord.contentControlId_Name = adminContent.Name;
@@ -4534,14 +4471,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         private void LoadEditRecord_WherePairs(cdefModel Admincontent, editRecordClass editRecord) {
             try {
-                //
-                // converted array to dictionary - Dim FieldPointer As Integer
-                int FieldCount = 0;
                 string DefaultValueText = null;
-                string MethodName;
-                //
-                MethodName = "Admin.LoadEditRecord_WherePairs(adminContent, editRecord)";
-                //
                 foreach (var keyValuePair in Admincontent.fields) {
                     cdefFieldModel field = keyValuePair.Value;
                     DefaultValueText = GetWherePairValue(field.nameLc);
@@ -5332,13 +5262,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int CSPointer = 0;
                 int CSRules = 0;
                 int CSContentWatch = 0;
-                int CSContentWatchList = 0;
                 int ContentWatchID = 0;
-                // converted array to dictionary - Dim FieldPointer As Integer
-                string MethodName;
-                //
-                MethodName = "Admin.SaveContentTracking()";
-                //
                 //
                 if (adminContent.AllowContentTracking & (!editRecord.Read_Only)) {
                     //
@@ -5366,7 +5290,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         cpcore.db.csSet(CSContentWatch, "clicks", 0);
                     }
                     if (!cpcore.db.csOk(CSContentWatch)) {
-                        handleLegacyClassError(MethodName, "SaveContentTracking, can Not create New record");
+                        handleLegacyClassError("", "SaveContentTracking, can Not create New record");
                     } else {
                         ContentWatchID = cpcore.db.csGetInteger(CSContentWatch, "ID");
                         cpcore.db.csSet(CSContentWatch, "LinkLabel", ContentWatchLinkLabel);
@@ -6983,19 +6907,14 @@ namespace Contensive.Core.Addons.AdminSite {
                 string Link = null;
                 int CSAuthoringRecord = 0;
                 string TableName = null;
-                int PageNumber = 0;
-                //
                 bool IsInserted = false;
                 bool IsDeleted = false;
-                //
                 bool IsModified = false;
                 string ModifiedName = "";
                 DateTime ModifiedDate = default(DateTime);
-                //
                 bool IsSubmitted = false;
                 string SubmitName = "";
                 DateTime SubmittedDate = default(DateTime);
-                //
                 bool IsApproved = false;
                 string ApprovedName = "";
                 DateTime ApprovedDate = default(DateTime);
@@ -7310,10 +7229,8 @@ namespace Contensive.Core.Addons.AdminSite {
                 int Pos = 0;
                 int editorAddonID = 0;
                 bool editorReadOnly = false;
-                string addonOptionString = "";
                 bool AllowHelpIcon = false;
                 int fieldId = 0;
-                bool FieldHelpFound = false;
                 string LcaseName = null;
                 bool IsEmptyList = false;
                 string HelpMsgCustom = null;
@@ -7328,7 +7245,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 string EditorStyleModifier = null;
                 string HelpClosedContentID = null;
                 bool AllowHelpRow = false;
-                string EditorRightSideIcon = null;
                 string EditorHelp = null;
                 string HelpEditorID = null;
                 string HelpOpenedReadID = null;
@@ -7338,10 +7254,8 @@ namespace Contensive.Core.Addons.AdminSite {
                 string HelpMsgClosed = null;
                 string HelpMsgOpenedRead = null;
                 string HelpMsgOpenedEdit = null;
-                bool NewWay = false;
                 string RecordName = null;
                 string GroupName = null;
-                string SelectMessage = null;
                 bool IsBaseField = false;
                 bool FieldReadOnly = false;
                 string NonEncodedLink = null;
@@ -7362,11 +7276,9 @@ namespace Contensive.Core.Addons.AdminSite {
                 string LookupContentName = null;
                 stringBuilderLegacyController s = new stringBuilderLegacyController();
                 bool RecordReadOnly = false;
-                string MethodName = null;
                 string FormFieldLCaseName = null;
                 int FieldRows = 0;
                 string EditorString = null;
-                string FieldOptionRow = null;
                 string MTMContent0 = null;
                 string MTMContent1 = null;
                 string MTMRuleContent = null;
@@ -7374,13 +7286,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string MTMRuleField1 = null;
                 string AlphaSort = null;
                 adminUIController Adminui = new adminUIController(cpcore);
-                bool needUniqueEmailMessage;
-                //
-                needUniqueEmailMessage = false;
-                //
-                returnHtml = "";
-                MethodName = "AdminClass.GetFormEdit_UserFields";
-                NewWay = true;
+                bool needUniqueEmailMessage = false;
                 //
                 // ----- Open the panel
                 //
@@ -7419,7 +7325,6 @@ namespace Contensive.Core.Addons.AdminSite {
                         FieldValueObject = editRecord.fieldsLc[field.nameLc].value;
                         FieldValueText = genericController.encodeText(FieldValueObject);
                         FieldRows = 1;
-                        FieldOptionRow = "&nbsp;";
                         FieldPreferenceHTML = field.htmlContent;
                         //
                         Caption = field.caption;
@@ -7735,14 +7640,6 @@ namespace Contensive.Core.Addons.AdminSite {
                                             } else {
                                                 EditorString += (cpcore.html.encodeHTML(RecordName));
                                             }
-                                            SelectMessage = "Select from Administrators";
-                                            //If .MemberSelectGroupID <> 0 Then
-                                            //    GroupName = cpcore.htmldoc.main_GetRecordName("groups", .MemberSelectGroupID)
-                                            //    If GroupName <> "" Then
-                                            //        SelectMessage = SelectMessage & " and members of " & GroupName
-                                            //    End If
-                                            //End If
-                                            //EditorString &=  ("&nbsp;[<a TabIndex=-1 href=""?cid=" & cpCore.main_GetContentID("groups") & """ target=""_blank"">" & SelectMessage & "</a>]")
                                             EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + cdefModel.getContentId(cpcore, "people") + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                                         }
                                         EditorString += WhyReadOnlyMsg;
@@ -7835,7 +7732,6 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //innovaEditor = New innovaEditorAddonClassFPO
                                             //EditorString &=  innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, True, TemplateIDForStyles, emailIdForStyles)
                                             EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
-                                            FieldOptionRow = "&nbsp;";
                                         }
                                         break;
                                     case FieldTypeIdText:
@@ -7909,7 +7805,6 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //innovaEditor = New innovaEditorAddonClassFPO
                                             //EditorString &=  innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, True, TemplateIDForStyles, emailIdForStyles)
                                             EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
-                                            FieldOptionRow = "&nbsp;";
                                         } else {
                                             //
                                             // HTMLContent true, but text editor selected
@@ -8164,7 +8059,6 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //innovaEditor = New innovaEditorAddonClassFPO
                                             //EditorString = innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, False, TemplateIDForStyles, emailIdForStyles)
                                             EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
-                                            FieldOptionRow = "&nbsp;";
                                         }
                                         //
                                         break;
@@ -8256,7 +8150,6 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //innovaEditor = New innovaEditorAddonClassFPO
                                             //EditorString = innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, False, TemplateIDForStyles, emailIdForStyles)
                                             EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
-                                            FieldOptionRow = "&nbsp;";
                                         } else {
                                             //
                                             // HTMLContent true, but text editor selected
@@ -8274,8 +8167,6 @@ namespace Contensive.Core.Addons.AdminSite {
                         // Build Help Line Below editor
                         //
                         includeFancyBox = true;
-                        FieldHelpFound = false;
-                        EditorRightSideIcon = "";
                         HelpMsgDefault = "";
                         HelpMsgCustom = "";
                         EditorHelp = "";
@@ -8498,10 +8389,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 int CSRules = 0;
                 string HTMLFieldString = null;
-                // converted array to dictionary - Dim FieldPointer As Integer
-                int CSPointer = 0;
-                int RecordID = 0;
-                int ContentID = 0;
                 int CSLists = 0;
                 int RecordCount = 0;
                 int ContentWatchListID = 0;
@@ -8633,12 +8520,8 @@ namespace Contensive.Core.Addons.AdminSite {
                 string EID = null;
                 bool IsEmptyList = false;
                 int ParentID = 0;
-                int ParentCID = 0;
-                string Criteria = null;
                 int LimitContentSelectToThisID = 0;
-                string SQL = null;
                 int TableID = 0;
-                int TableName = 0;
                 int ChildCID = 0;
                 string CIDList = "";
                 string TableName2 = null;
@@ -8646,25 +8529,14 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool ContentSupportsParentID = false;
                 int CS = 0;
                 string HTMLFieldString = null;
-                //Dim FieldPtr As Integer
                 int CSPointer = 0;
-                int RecordID = 0;
                 string hiddenInputs = "";
-                stringBuilderLegacyController FastString = null;
+                stringBuilderLegacyController FastString = new stringBuilderLegacyController();
                 int FieldValueInteger = 0;
                 bool FieldRequired = false;
                 string FieldHelp = null;
-                string AuthoringStatusMessage = null;
-                string Delimiter = null;
                 string Copy = null;
                 adminUIController Adminui = new adminUIController(cpcore);
-                ///Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
-                //
-                FastString = new stringBuilderLegacyController();
-                //
-                //arrayOfFields = adminContent.fields
-                //
-                // ----- test admin content before using it
                 //
                 if (string.IsNullOrEmpty(adminContent.Name)) {
                     //
@@ -8866,7 +8738,6 @@ namespace Contensive.Core.Addons.AdminSite {
                         HTMLFieldString = HTMLFieldString + cpcore.html.inputHidden("ContentControlID", FieldValueInteger);
                     } else {
                         RecordContentName = editRecord.contentControlId_Name;
-                        cdefModel RecordCDef = null;
                         TableName2 = cdefModel.getContentTablename(cpcore, RecordContentName);
                         TableID = cpcore.db.getRecordID("Tables", TableName2);
                         //
@@ -9028,7 +8899,6 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 //
                 string ExpandedSelector = "";
-                string ignore = "";
                 string OptionCaption = null;
                 string OptionValue = null;
                 string OptionValue_AddonEncoded = null;
@@ -9038,34 +8908,10 @@ namespace Contensive.Core.Addons.AdminSite {
                 string OptionSuffix = "";
                 string LCaseOptionDefault = null;
                 int Pos = 0;
-                bool Checked = false;
-                int ParentID = 0;
-                int ParentCID = 0;
-                string Criteria = null;
-                int RootCID = 0;
-                string SQL = null;
-                int TableID = 0;
-                int TableName = 0;
-                int ChildCID = 0;
-                string CIDList = null;
-                string TableName2 = null;
-                string RecordContentName = null;
-                bool HasParentID = false;
-                int CS = 0;
                 string HTMLFieldString = null;
-                // converted array to dictionary - Dim FieldPointer As Integer
-                int CSPointer = 0;
-                int RecordID = 0;
                 stringBuilderLegacyController FastString = null;
-                int FieldValueInteger = 0;
-                bool FieldRequired = false;
-                string FieldHelp = null;
-                string AuthoringStatusMessage = null;
-                string Delimiter = null;
                 string Copy = "";
                 adminUIController Adminui = new adminUIController(cpcore);
-                //
-                int FieldPtr = 0;
                 string SitePropertyName = null;
                 string SitePropertyValue = null;
                 string selector = null;
@@ -9606,9 +9452,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string LinkList = "";
                 stringBuilderLegacyController f = new stringBuilderLegacyController();
                 adminUIController Adminui = new adminUIController(cpcore);
-                int Ptr = 0;
                 string linkAlias = null;
-                bool AllowLinkAliasInTab = false;
                 string Link = null;
                 int CS = 0;
                 string tabContent = null;
@@ -9788,13 +9632,11 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 //
                 stringBuilderLegacyController f = new stringBuilderLegacyController();
-                string Copy = null;
                 string SQL = null;
                 int CS = 0;
                 int MembershipCount = 0;
                 int MembershipSize = 0;
                 int MembershipPointer = 0;
-                string SectionName = null;
                 int PeopleContentID = 0;
                 int GroupContentID = 0;
                 bool CanSeeHiddenGroups = false;
@@ -9808,11 +9650,8 @@ namespace Contensive.Core.Addons.AdminSite {
                 DateTime[] DateExpires = { };
                 bool[] Active = { };
                 string Caption = null;
-                string MethodName = null;
                 string ReportLink = null;
                 adminUIController Adminui = new adminUIController(cpcore);
-                //
-                MethodName = "GetForm_Edit_MemberGroups";
                 //
                 // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                 //
@@ -9863,7 +9702,6 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Output all the groups, with the active and dateexpires from those joined
                     //
                     f.Add(Adminui.EditTableOpen);
-                    SectionName = "";
                     GroupCount = 0;
                     CanSeeHiddenGroups = cpcore.doc.sessionContext.isAuthenticatedDeveloper(cpcore);
                     while (cpcore.db.csOk(CS)) {
@@ -10556,8 +10394,6 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 string iParentCriteria = null;
                 string Criteria = null;
-                string SQL = null;
-                string ContentControlCriteria = null;
                 string SelectList = null;
                 List<int> editableCdefIdList = null;
                 //
@@ -10675,9 +10511,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 //th = profileLogAdminMethodEnter("ProcessForms")
                 //
                 //Dim innovaEditor As innovaEditorAddonClassFPO
-                int StyleSN = 0;
-                int ContentID = 0;
-                indexConfigClass IndexConfig = null;
                 int CS = 0;
                 string EditorStyleRulesFilename = null;
                 //
@@ -11405,42 +11238,17 @@ namespace Contensive.Core.Addons.AdminSite {
         private string GetForm_Downloads() {
             string tempGetForm_Downloads = null;
             try {
-                //
-                bool IsEmptyList = false;
                 string ResultMessage = null;
                 string LinkPrefix = null;
                 string LinkSuffix = null;
                 string RemoteKey = null;
-                string Copy = null;
                 string Button = null;
-                string ButtonPanel = null;
-                bool SaveAction = false;
-                string helpCopy = null;
-                string FieldValue = null;
-                int PaymentProcessMethod = 0;
-                string Argument1 = null;
                 int CS = 0;
-                string ContactGroupCriteria = null;
-                int GroupCount = 0;
-                int GroupPointer = 0;
-                bool GroupChecked = false;
-                string RecordName = null;
                 string ContentName = null;
                 int RecordID = 0;
-                bool RowEven = false;
                 string SQL = null;
                 string RQS = null;
-                int SubTab = 0;
-                bool FormSave = false;
-                bool FormClear = false;
-                int ContactContentID = 0;
                 string Criteria = null;
-                string ContentGorupCriteria = null;
-                string ContactSearchCriteria = null;
-                string[] FieldParms = null;
-                object CriteriaValues = null;
-                int CriteriaCount = 0;
-                int CriteriaPointer = 0;
                 int PageSize = 0;
                 int PageNumber = 0;
                 int TopCount = 0;
@@ -12272,14 +12080,10 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool NewWindow = false;
                 string Link = null;
                 string LinkLabel = null;
-                int LinkCID = 0;
-                int MenuPointer = 0;
                 string StyleSheet = "";
                 string StyleSheetHover = "";
                 string ImageLink = null;
                 string ImageOverLink = null;
-                DateTime MenuDate = default(DateTime);
-                DateTime BakeDate = default(DateTime);
                 string BakeName = null;
                 string MenuHeader = null;
                 List<int> editableCdefIdList = null;
@@ -12417,8 +12221,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 int GroupCount = 0;
                 int GroupPointer = 0;
-                int CSPointer = 0;
-                string MethodName = null;
                 int GroupID = 0;
                 bool RuleNeeded = false;
                 int CSRule = 0;
@@ -12427,8 +12229,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool RuleActive = false;
                 DateTime RuleDateExpires = default(DateTime);
                 int MemberRuleID = 0;
-                //
-                MethodName = "SaveMemberRules";
                 //
                 // --- create MemberRule records for all selected
                 //
@@ -12535,30 +12335,17 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 //
                 bool IsEmptyList = false;
-                //Dim cmc As cpCoreClass
-                //Dim GUIDGenerator As guidClass
-                string ccGuid = null;
-                bool SupportAddonID = false;
-                bool SupportGuid = false;
-                string MenuContentName = null;
-                int ParentID = 0;
-                string ParentName = null;
-                int CSEntry = 0;
                 int ParentContentID = 0;
                 string ParentContentName = null;
                 string ChildContentName = "";
                 int ChildContentID = 0;
                 bool AddAdminMenuEntry = false;
                 int CS = 0;
-                string MenuName = null;
-                bool AdminOnly = false;
-                bool DeveloperOnly = false;
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
                 string FieldValue = null;
                 bool NewGroup = false;
                 int GroupID = 0;
                 string NewGroupName = "";
-                string ButtonBar = null;
                 string Button = null;
                 adminUIController Adminui = new adminUIController(cpcore);
                 string Caption = null;
@@ -13397,7 +13184,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 int ContentID = 0;
                 cdefModel CDef = null;
                 string ContentName = null;
-                DataTable dt = null;
                 int TargetFieldID = 0;
                 string TargetFieldName = null;
                 int ColumnWidthTotal = 0;
@@ -13998,9 +13784,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 int CS = 0;
                 string EditorStyleRulesFilename = null;
-                int Pos = 0;
-                int SrcPtr = 0;
-                string[] FeatureDetails = null;
                 bool AllowAdmin = false;
                 bool AllowCM = false;
                 bool AllowPublic = false;
@@ -14016,11 +13799,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string Copy = null;
                 string ButtonList = null;
                 adminUIController Adminui = new adminUIController(cpcore);
-                string Caption = null;
                 string Description = null;
-                int StyleSN = 0;
-                string TBConfig = null;
-                string[] TBArray = null;
                 string[] DefaultFeatures = null;
                 string FeatureName = null;
                 string FeatureList = null;
@@ -14522,18 +14301,6 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 //
                 int TestInteger = 0;
-                int MatchOption = 0;
-                int FindWordPtr = 0;
-                int FormFieldCnt = 0;
-                int FormFieldPtr = 0;
-                indexConfigFindWordClass[] ContentFields = null;
-                string NumericOption = null;
-                int fieldType = 0;
-                string FieldValue = null;
-                string FieldName = null;
-
-                int CS = 0;
-                string Criteria = null;
                 string VarText = null;
                 string FindName = null;
                 string FindValue = null;
@@ -14541,9 +14308,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 int ColumnCnt = 0;
                 int ColumnPtr = 0;
                 string Button = null;
-                //Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
-                //
-                //arrayOfFields = adminContent.fields
                 if (!IndexConfig.Loaded) {
                     IndexConfig = LoadIndexConfig(adminContent);
                 }

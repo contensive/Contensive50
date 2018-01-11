@@ -123,7 +123,6 @@ namespace Contensive.Core.Controllers {
                 bool SelectedFound = false;
                 int RecordID = 0;
                 string Copy = null;
-                string MethodName = null;
                 string DropDownFieldList = null;
                 string[] DropDownFieldName = { };
                 string[] DropDownDelimiter = { };
@@ -152,11 +151,8 @@ namespace Contensive.Core.Controllers {
                 string SelectFields = null;
                 int Ptr = 0;
                 string SelectRaw = "";
-                int CachePtr = 0;
                 string TagID = null;
                 string CurrentValueText = null;
-                //
-                MethodName = "main_GetFormInputSelect2";
                 //
                 LcaseCriteria = genericController.vbLCase(Criteria);
                 return_IsEmptyList = true;
@@ -874,18 +870,14 @@ namespace Contensive.Core.Controllers {
                 //If Not (true) Then Exit Function
                 //
                 int Ptr = 0;
-                string MethodName = null;
                 string ActionQS = null;
                 string iMethod = null;
-                string[] ActionParts = null;
                 string Action = null;
                 string[] QSParts = null;
                 string[] QSNameValues = null;
                 string QSName = null;
                 string QSValue = null;
                 string RefreshHiddens = null;
-                //
-                MethodName = "main_GetFormStart3";
                 //
                 if (ActionQueryString == null) {
                     ActionQS = cpCore.doc.refreshQueryString;
@@ -1099,18 +1091,14 @@ namespace Contensive.Core.Controllers {
         public string inputDate(string TagName, string DefaultValue = "", string Width = "", string Id = "") {
             string result = "";
             try {
-                string HeadJS = null;
                 string DateString = "";
                 DateTime DateValue = default(DateTime);
                 string iDefaultValue = null;
                 int iWidth = 0;
-                string MethodName = null;
                 string iTagName = null;
                 string TagID = null;
                 string CalendarObjName = null;
                 string AnchorName = null;
-                //
-                MethodName = "main_GetFormInputDate";
                 //
                 iTagName = genericController.encodeText(TagName);
                 iDefaultValue = genericController.encodeEmptyText(DefaultValue, "");
@@ -1132,12 +1120,6 @@ namespace Contensive.Core.Controllers {
                 AnchorName = "ACal" + cpCore.doc.inputDateCnt;
 
                 if (cpCore.doc.inputDateCnt == 0) {
-                    HeadJS = ""
-                    + "\r\n<SCRIPT LANGUAGE=\"JavaScript\" SRC=\"/ccLib/mktree/CalendarPopup.js\"></SCRIPT>"
-                    + "\r\n<SCRIPT LANGUAGE=\"JavaScript\">"
-                    + "\r\nvar cal = new CalendarPopup();"
-                    + "\r\ncal.showNavigationDropdowns();"
-                    + "\r\n</SCRIPT>";
                     addScriptLinkSrc("/ccLib/mktree/CalendarPopup.js", "Calendar Popup");
                     addScriptCode("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup");
                 }
@@ -1190,10 +1172,6 @@ namespace Contensive.Core.Controllers {
         public string inputRadio(string TagName, string TagValue, string CurrentValue, string htmlId = "") {
             string temphtml_GetFormInputRadioBox = null;
             try {
-                //
-                //If Not (true) Then Exit Function
-                //
-                string MethodName = null;
                 string iTagName = null;
                 string iTagValue = null;
                 string iCurrentValue = null;
@@ -1207,8 +1185,6 @@ namespace Contensive.Core.Controllers {
                 if (!string.IsNullOrEmpty(ihtmlId)) {
                     TagID = " ID=\"" + ihtmlId + "\"";
                 }
-                //
-                MethodName = "main_GetFormInputRadioBox";
                 //
                 if (iTagValue == iCurrentValue) {
                     temphtml_GetFormInputRadioBox = "<input TYPE=\"Radio\" NAME=\"" + iTagName + "\" VALUE=\"" + iTagValue + "\" checked" + TagID + ">";
@@ -1372,8 +1348,6 @@ namespace Contensive.Core.Controllers {
             string returnResult = "";
             try {
                 bool IsEmptyList = false;
-                string Stream = null;
-                string MethodName = null;
                 string FieldCaption = null;
                 string FieldValueVariant = "";
                 string FieldValueText = null;
@@ -1390,9 +1364,6 @@ namespace Contensive.Core.Controllers {
                 int CSLookup = 0;
                 string FieldLookupList = "";
                 //
-                MethodName = "main_GetFormInputCS";
-                //
-                Stream = "";
                 if (true) {
                     fieldFound = false;
                     Contentdefinition = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
@@ -1680,12 +1651,9 @@ namespace Contensive.Core.Controllers {
                 //If Not (true) Then Exit Function
                 //
                 string Delimiter = null;
-                string MethodName = null;
                 //
                 temphtml_GetWindowOpenJScript = "";
                 WindowName = genericController.encodeEmptyText(WindowName, "_blank");
-                //
-                MethodName = "main_GetWindowOpenJScript()";
                 //
                 // Added addl options from huhcorp.com sample
                 //
@@ -1733,16 +1701,9 @@ namespace Contensive.Core.Controllers {
         public string javascriptOpenModal(string URI, string WindowWidth = "", string WindowHeight = "", bool WindowScrollBars = false, bool WindowResizable = false, string WindowName = "") {
             string temphtml_GetWindowDialogJScript = null;
             try {
-                //
-                //If Not (true) Then Exit Function
-                //
-                string Delimiter = null;
                 string iWindowName = null;
-                string MethodName = null;
                 //
                 iWindowName = genericController.encodeEmptyText(WindowName, "_blank");
-                //
-                MethodName = "main_GetWindowDialogJScript()";
                 //
                 // Added addl options from huhcorp.com sample
                 //
@@ -2737,7 +2698,6 @@ namespace Contensive.Core.Controllers {
             string addonOption_String = "";
             int fieldType = 0;
             string Copy = "";
-            string MethodName = null;
             int RecordID = 0;
             string FieldName = null;
             string ACInstanceID = null;
@@ -2747,8 +2707,6 @@ namespace Contensive.Core.Controllers {
             int PosStart = 0;
             int PosIDStart = 0;
             int PosIDEnd = 0;
-            //
-            MethodName = "main_ProcessAddonSettingsEditor()";
             //
             ContentName = cpCore.docProperties.getText("ContentName");
             RecordID = cpCore.docProperties.getInteger("RecordID");
@@ -3067,14 +3025,11 @@ namespace Contensive.Core.Controllers {
         public void processHelpBubbleEditor() {
             //
             string SQL = null;
-            string MethodName = null;
             string HelpBubbleID = null;
             string[] IDSplit = null;
             int RecordID = 0;
             string HelpCaption = null;
             string HelpMessage = null;
-            //
-            MethodName = "main_ProcessHelpBubbleEditor()";
             //
             HelpBubbleID = cpCore.docProperties.getText("HelpBubbleID");
             IDSplit = HelpBubbleID.Split('-');
@@ -3140,10 +3095,8 @@ namespace Contensive.Core.Controllers {
                 int main_MemberShipID = 0;
                 string javaScriptRequired = "";
                 string DivName = null;
-                int DivCnt = 0;
                 string OldFolderVar = null;
                 string EndDiv = null;
-                int OpenFolderID = 0;
                 string RuleCopyCaption = null;
                 string RuleCopy = null;
                 string SQL = null;
@@ -3151,7 +3104,6 @@ namespace Contensive.Core.Controllers {
                 int main_MemberShipCount = 0;
                 int main_MemberShipSize = 0;
                 int main_MemberShipPointer = 0;
-                string SectionName = null;
                 int CheckBoxCnt = 0;
                 int DivCheckBoxCnt = 0;
                 int[] main_MemberShip = { };
@@ -3297,12 +3249,9 @@ namespace Contensive.Core.Controllers {
                             returnHtml = "(No choices are available.)";
                         } else {
                             if (true) {
-                                OpenFolderID = -1;
                                 EndDiv = "";
-                                SectionName = "";
                                 CheckBoxCnt = 0;
                                 DivCheckBoxCnt = 0;
-                                DivCnt = 0;
                                 CanSeeHiddenFields = cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore);
                                 DivName = TagName + ".All";
                                 while (cpCore.db.csOk(CS)) {
@@ -3394,21 +3343,11 @@ namespace Contensive.Core.Controllers {
         public string getRecordEditLink2(string ContentName, int RecordID, bool AllowCut, string RecordName, bool IsEditing) {
             string tempmain_GetRecordEditLink2 = null;
             try {
-                //
-                //If Not (true) Then Exit Function
-                //
-                int CS = 0;
-                string SQL = null;
                 int ContentID = 0;
-                string Link = null;
-                string MethodName = null;
                 string iContentName = null;
                 int iRecordID = 0;
-                string RootEntryName = null;
-                string ClipBoard = null;
                 string WorkingLink = null;
                 bool iAllowCut = false;
-                string Icon = null;
                 string ContentCaption = null;
                 //
                 iContentName = genericController.encodeText(ContentName);
@@ -3425,8 +3364,6 @@ namespace Contensive.Core.Controllers {
                 if (!string.IsNullOrEmpty(RecordName)) {
                     ContentCaption = ContentCaption + ", named '" + RecordName + "'";
                 }
-                //
-                MethodName = "main_GetRecordEditLink2";
                 //
                 tempmain_GetRecordEditLink2 = "";
                 if (string.IsNullOrEmpty(iContentName)) {
@@ -3511,13 +3448,10 @@ namespace Contensive.Core.Controllers {
                 //
                 string ContentName = null;
                 string iPresetNameValueList = null;
-                string MethodName = null;
                 int iCSPointer;
                 //
                 iCSPointer = genericController.encodeInteger(CSPointer);
                 iPresetNameValueList = genericController.encodeEmptyText(PresetNameValueList, "");
-                //
-                MethodName = "main_cs_getRecordAddLink";
                 //
                 if (iCSPointer < 0) {
                     throw (new ApplicationException("invalid ContentSet pointer [" + iCSPointer + "]")); // handleLegacyError14(MethodName, "main_cs_getRecordAddLink was called with ")
@@ -3592,17 +3526,12 @@ namespace Contensive.Core.Controllers {
         public string getRecordAddLink2(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
             string tempmain_GetRecordAddLink2 = null;
             try {
-                //
-                //If Not (true) Then Exit Function
-                //
                 int ParentID = 0;
                 string BufferString = null;
-                string MethodName = null;
                 string iContentName = null;
                 int iContentID = 0;
                 string iPresetNameValueList = null;
                 string MenuName = null;
-                bool MenuHasBranches = false;
                 string LowestRequiredMenuName = "";
                 string ClipBoard = null;
                 string PasteLink = "";
@@ -3614,8 +3543,6 @@ namespace Contensive.Core.Controllers {
                 bool useFlyout = false;
                 int csChildContent = 0;
                 string Link = null;
-                //
-                MethodName = "main_GetRecordAddLink";
                 //
                 tempmain_GetRecordAddLink2 = "";
                 if (IsEditing) {
@@ -4025,7 +3952,6 @@ namespace Contensive.Core.Controllers {
         public string getPanelTop(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "", string HeightMin = "") {
             string tempmain_GetPanelTop = null;
             string ContentPanelWidth = null;
-            string MethodName = null;
             string MyStylePanel = null;
             string MyStyleHilite = null;
             string MyStyleShadow = null;
@@ -4040,7 +3966,6 @@ namespace Contensive.Core.Controllers {
             MyWidth = genericController.encodeEmptyText(Width, "100%");
             MyPadding = genericController.encodeEmptyText(Padding, "5");
             MyHeightMin = genericController.encodeEmptyText(HeightMin, "1");
-            MethodName = "main_GetPanelTop";
             if (MyWidth.IsNumeric()) {
                 ContentPanelWidth = (int.Parse(MyWidth) - 2).ToString();
             } else {
@@ -5019,15 +4944,12 @@ namespace Contensive.Core.Controllers {
             string dupRuleIdList = null;
             int GroupCnt = 0;
             int GroupPtr = 0;
-            string MethodName = null;
             int SecondaryRecordID = 0;
             bool RuleNeeded = false;
             int CSRule = 0;
             bool RuleContentChanged = false;
             bool SupportRuleCopy = false;
             string RuleCopy = null;
-            //
-            MethodName = "ProcessCheckList";
             //
             // --- create Rule records for all selected
             //

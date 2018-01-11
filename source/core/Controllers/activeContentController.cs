@@ -94,7 +94,6 @@ namespace Contensive.Core.Controllers {
             string result = "";
             try {
                 string ACGuid = null;
-                bool AddonFound = false;
                 string ACNameCaption = null;
                 string GroupIDList = null;
                 string IDControlString = null;
@@ -115,7 +114,6 @@ namespace Contensive.Core.Controllers {
                 string ResultOptionSelector = null;
                 string SrcOptionList = null;
                 int Pos = 0;
-                string REsultOptionValue = null;
                 string SrcOptionValueSelector = null;
                 string InstanceOptionValue = null;
                 string ResultOptionListHTMLEncoded = null;
@@ -124,7 +122,6 @@ namespace Contensive.Core.Controllers {
                 string FieldName = null;
                 int Ptr = 0;
                 int ElementPointer = 0;
-                int ListCount = 0;
                 int CSVisitor = 0;
                 int CSVisit = 0;
                 bool CSVisitorSet = false;
@@ -399,9 +396,7 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // ----- decode all AC tags
                                         //
-                                        ListCount = 0;
                                         ACType = KmaHTML.ElementAttribute(ElementPointer, "TYPE");
-                                        // if ACInstanceID=0, it can not create settings link in edit mode. ACInstanceID is added during edit save.
                                         ACInstanceID = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
                                         ACGuid = KmaHTML.ElementAttribute(ElementPointer, "GUID");
                                         switch (genericController.vbUCase(ACType)) {
@@ -713,9 +708,7 @@ namespace Contensive.Core.Controllers {
                                                             }
                                                             CS = cpCore.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
                                                             if (cpCore.db.csOk(CS)) {
-                                                                AddonFound = true;
-                                                                // ArgumentList comes in already encoded
-                                                                IconFilename = cpCore.db.csGet(CS, "IconFilename");
+                                                                 IconFilename = cpCore.db.csGet(CS, "IconFilename");
                                                                 SrcOptionList = cpCore.db.csGet(CS, "ArgumentList");
                                                                 IconWidth = cpCore.db.csGetInteger(CS, "IconWidth");
                                                                 IconHeight = cpCore.db.csGetInteger(CS, "IconHeight");
@@ -772,7 +765,6 @@ namespace Contensive.Core.Controllers {
                                                                 ResultOptionListHTMLEncoded = "";
                                                             } else {
                                                                 ResultOptionListHTMLEncoded = "";
-                                                                REsultOptionValue = "";
                                                                 SrcOptionList = genericController.vbReplace(SrcOptionList, "\r\n", "\r");
                                                                 SrcOptionList = genericController.vbReplace(SrcOptionList, "\n", "\r");
                                                                 SrcOptions = genericController.stringSplit(SrcOptionList, "\r");
@@ -2477,8 +2469,6 @@ namespace Contensive.Core.Controllers {
                                                                     // There has been a change
                                                                     //
                                                                     string NewRecordFilename = null;
-                                                                    int ImageHeight = 0;
-                                                                    int ImageWidth = 0;
                                                                     NewRecordFilename = RecordVirtualPath + RecordFilenameNoExt + "." + RecordFilenameExt;
                                                                     //
                                                                     // realtime image updates replace without creating new size - that is for the edit interface

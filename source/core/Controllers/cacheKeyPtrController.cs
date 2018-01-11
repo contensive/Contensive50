@@ -197,7 +197,7 @@ namespace Contensive.Core.Controllers {
                     try {
                         needsToReload = true;
                         dataStore = (dataStoreClass)cpCore.cache.getObject<dataStoreClass>(cacheName);
-                    } catch (Exception ex) {
+                    } catch (Exception) {
                         needsToReload = true;
                     }
                     if (dataStore == null) {

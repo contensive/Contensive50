@@ -104,7 +104,6 @@ namespace Contensive.Core.Controllers {
             bool returnOk = false;
             try {
                 string sql = null;
-                int databaseId = 0;
                 DataTable dt = null;
                 //
                 sql = string.Format("SELECT database_id FROM sys.databases WHERE Name = '{0}'", catalog);
