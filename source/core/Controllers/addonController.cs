@@ -5,7 +5,7 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -46,7 +46,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="context"></param>
         /// <returns></returns>
         /// 
-        public string executeDependency(Models.Entity.addonModel addon, CPUtilsBaseClass.addonExecuteContext context) {
+        public string executeDependency(Models.DbModels.addonModel addon, CPUtilsBaseClass.addonExecuteContext context) {
             bool saveContextIsIncludeAddon = context.isIncludeAddon;
             context.isIncludeAddon = true;
             string result = execute(addon, context);
@@ -61,7 +61,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="addon"></param>
         /// <param name="executeContext"></param>
         /// <returns></returns>
-        public string execute(Models.Entity.addonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
+        public string execute(Models.DbModels.addonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
             string result = "";
             bool rootLevelAddon = cpCore.doc.addonsCurrentlyRunningIdList.Count.Equals(0);
             bool save_forceJavascriptToHead = executeContext.forceJavascriptToHead;
@@ -98,9 +98,9 @@ namespace Contensive.Core.Controllers {
                     executeContext.forceJavascriptToHead = executeContext.forceJavascriptToHead || addon.javascriptForceHead;
                     //
                     // -- run included add-ons before their parent
-                    List<Models.Entity.addonIncludeRuleModel> addonIncludeRules = addonIncludeRuleModel.createList(cpCore, "(addonid=" + addon.id + ")");
+                    List<Models.DbModels.addonIncludeRuleModel> addonIncludeRules = addonIncludeRuleModel.createList(cpCore, "(addonid=" + addon.id + ")");
                     if (addonIncludeRules.Count > 0) {
-                        foreach (Models.Entity.addonIncludeRuleModel addonRule in addonIncludeRules) {
+                        foreach (Models.DbModels.addonIncludeRuleModel addonRule in addonIncludeRules) {
                             if (addonRule.IncludedAddonID > 0) {
                                 addonModel dependentAddon = addonModel.create(cpCore, addonRule.IncludedAddonID);
                                 if (dependentAddon == null) {
@@ -1559,7 +1559,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private string execute_assembly(CPUtilsBaseClass.addonExecuteContext executeContext, Models.Entity.addonModel addon, AddonCollectionModel addonCollection) {
+        private string execute_assembly(CPUtilsBaseClass.addonExecuteContext executeContext, Models.DbModels.addonModel addon, AddonCollectionModel addonCollection) {
             string result = "";
             try {
                 bool AddonFound = false;

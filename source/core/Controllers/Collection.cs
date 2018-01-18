@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;

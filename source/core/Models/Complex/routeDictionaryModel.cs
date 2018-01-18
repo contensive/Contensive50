@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -39,8 +39,8 @@ namespace Contensive.Core.Models.Complex {
                     }
                     //
                     // -- remote methods
-                    List<Contensive.Core.Models.Entity.addonModel> remoteMethods = Contensive.Core.Models.Entity.addonModel.createList_RemoteMethods(cpCore, new List<string>());
-                    foreach (Contensive.Core.Models.Entity.addonModel remoteMethod in remoteMethods) {
+                    List<Contensive.Core.Models.DbModels.addonModel> remoteMethods = Contensive.Core.Models.DbModels.addonModel.createList_RemoteMethods(cpCore, new List<string>());
+                    foreach (Contensive.Core.Models.DbModels.addonModel remoteMethod in remoteMethods) {
                         string route = genericController.normalizeRoute(remoteMethod.name);
                         if (!string.IsNullOrWhiteSpace(route)) {
                             if (result.ContainsKey(route)) {
@@ -57,8 +57,8 @@ namespace Contensive.Core.Models.Complex {
                     }
                     //
                     // -- link forwards
-                    List<Models.Entity.linkForwardModel> linkForwards = linkForwardModel.createList(cpCore, "name Is Not null");
-                    foreach (Models.Entity.linkForwardModel linkForward in linkForwards) {
+                    List<Models.DbModels.linkForwardModel> linkForwards = linkForwardModel.createList(cpCore, "name Is Not null");
+                    foreach (Models.DbModels.linkForwardModel linkForward in linkForwards) {
                         string route = genericController.normalizeRoute(linkForward.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.ContainsKey(route)) {
@@ -75,8 +75,8 @@ namespace Contensive.Core.Models.Complex {
                     }
                     //
                     // -- link aliases
-                    List<Models.Entity.linkAliasModel> linkAliasList = linkAliasModel.createList(cpCore, "name Is Not null");
-                    foreach (Models.Entity.linkAliasModel linkAlias in linkAliasList) {
+                    List<Models.DbModels.linkAliasModel> linkAliasList = linkAliasModel.createList(cpCore, "name Is Not null");
+                    foreach (Models.DbModels.linkAliasModel linkAlias in linkAliasList) {
                         string route = genericController.normalizeRoute(linkAlias.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.ContainsKey(route)) {
@@ -102,9 +102,9 @@ namespace Contensive.Core.Models.Complex {
         //====================================================================================================
         public static void setCache(coreClass cpCore, Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> routeDictionary) {
             var dependentKeyList = new List<string>();
-            dependentKeyList.Add(Models.Entity.addonModel.contentTableName);
-            dependentKeyList.Add(Models.Entity.linkAliasModel.contentTableName);
-            dependentKeyList.Add(Models.Entity.linkForwardModel.contentTableName);
+            dependentKeyList.Add(Models.DbModels.addonModel.contentTableName);
+            dependentKeyList.Add(Models.DbModels.linkAliasModel.contentTableName);
+            dependentKeyList.Add(Models.DbModels.linkForwardModel.contentTableName);
             cpCore.cache.setObject(cacheNameRouteDictionary, routeDictionary,dependentKeyList);
         }
         //

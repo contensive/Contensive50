@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 
 namespace  Contensive.CLI {
     class configureClass {

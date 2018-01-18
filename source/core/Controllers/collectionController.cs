@@ -5,7 +5,7 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -2673,7 +2673,7 @@ namespace Contensive.Core.Controllers {
                                                 //
                                                 // -- execute onInstall addon if found
                                                 if (!string.IsNullOrEmpty( onInstallAddonGuid )) {
-                                                    var addon = Models.Entity.addonModel.create(cpCore, onInstallAddonGuid);
+                                                    var addon = Models.DbModels.addonModel.create(cpCore, onInstallAddonGuid);
                                                     if ( addon != null) {
                                                         var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                                             addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple
@@ -4674,7 +4674,7 @@ namespace Contensive.Core.Controllers {
                 bool ContentIsBaseContent = false;
                 int FieldHelpCID = Models.Complex.cdefModel.getContentId(cpCore, "Content Field Help");
                 var tmpList = new List<string> { };
-                Contensive.Core.Models.Entity.dataSourceModel datasource = dataSourceModel.createByName(cpCore, cdef.ContentDataSourceName, ref tmpList);
+                Contensive.Core.Models.DbModels.dataSourceModel datasource = dataSourceModel.createByName(cpCore, cdef.ContentDataSourceName, ref tmpList);
                 {
                     //
                     // -- get contentid and protect content with IsBaseContent true

@@ -12,7 +12,7 @@ using System.Data.SqlClient;
 
 using Contensive.BaseClasses;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -2040,10 +2040,10 @@ namespace Contensive.Core.Controllers {
                                         instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
                                     };
                                     if (!string.IsNullOrEmpty(AddonGuid)) {
-                                        Copy = cpCore.addon.execute(Models.Entity.addonModel.create(cpCore, AddonGuid), executeContext);
+                                        Copy = cpCore.addon.execute(Models.DbModels.addonModel.create(cpCore, AddonGuid), executeContext);
                                         //Copy = cpCore.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                     } else {
-                                        Copy = cpCore.addon.execute(Models.Entity.addonModel.createByName(cpCore, AddonName), executeContext);
+                                        Copy = cpCore.addon.execute(Models.DbModels.addonModel.createByName(cpCore, AddonName), executeContext);
                                         //Copy = cpCore.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                     }
                                 }

@@ -471,8 +471,8 @@ namespace integrationTests {
                     cp.core.db.csClose(ref cs3);
                 }
                 // assert
-                var person_test1 = Contensive.Core.Models.Entity.personModel.create(cp.core, testId_test1);
-                var person_test2 = Contensive.Core.Models.Entity.personModel.create(cp.core, testId_test2);
+                var person_test1 = Contensive.Core.Models.DbModels.personModel.create(cp.core, testId_test1);
+                var person_test2 = Contensive.Core.Models.DbModels.personModel.create(cp.core, testId_test2);
                 //
                 Assert.AreEqual("a", person_test1.Username);
                 Assert.AreEqual("b", person_test1.Password);

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -1216,8 +1216,8 @@ namespace Contensive.Core.Models.Complex {
                             // ----- Load CDef
                             //
                             if (clearMetaCache) {
-                                cpcore.cache.invalidateAllInContent(Models.Entity.contentModel.contentName.ToLower());
-                                cpcore.cache.invalidateAllInContent(Models.Entity.contentFieldModel.contentName.ToLower());
+                                cpcore.cache.invalidateAllInContent(Models.DbModels.contentModel.contentName.ToLower());
+                                cpcore.cache.invalidateAllInContent(Models.DbModels.contentFieldModel.contentName.ToLower());
                                 cpcore.doc.clearMetaData();
                             }
                         }

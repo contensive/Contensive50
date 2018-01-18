@@ -172,12 +172,12 @@ namespace Contensive.Core.Controllers.Tests {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string keyTest = "test" + genericController.GetRandomInteger(cp.core).ToString();
-                string content = Models.Entity.personModel.contentName;
+                string content = Models.DbModels.personModel.contentName;
                 // act
                 cp.core.cache.setObject(keyTest, originalObject, content);
                 cp.Utils.Sleep(1);
                 var valueBefore = cp.core.cache.getObject<cacheTestClass>(keyTest);
-                var person = Models.Entity.personModel.add(cp.core );
+                var person = Models.DbModels.personModel.add(cp.core );
                 cp.Utils.Sleep(1);
                 var valueAfter = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 // assert
@@ -195,12 +195,12 @@ namespace Contensive.Core.Controllers.Tests {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string keyTest = "test" + genericController.GetRandomInteger(cp.core).ToString();
-                string table = Models.Entity.personModel.contentTableName;
+                string table = Models.DbModels.personModel.contentTableName;
                 // act
                 cp.core.cache.setObject(keyTest, originalObject, table);
                 cp.Utils.Sleep(1);
                 var valueBefore = cp.core.cache.getObject<cacheTestClass>(keyTest);
-                var person = Models.Entity.personModel.add(cp.core);
+                var person = Models.DbModels.personModel.add(cp.core);
                 cp.Utils.Sleep(1);
                 var valueAfter = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 // assert

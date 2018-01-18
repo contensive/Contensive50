@@ -5,7 +5,7 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -2343,7 +2343,7 @@ namespace Contensive.Core.Controllers {
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(cpCore, menuNameSpace);
                     int contentId = Models.Complex.cdefModel.getContentId(cpCore, ContentName);
                     string listCriteria = "(name=" + cpCore.db.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
-                    List<Models.Entity.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(cpCore, listCriteria, "id");
+                    List<Models.DbModels.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(cpCore, listCriteria, "id");
                     NavigatorEntryModel entry = null;
                     if (entryList.Count == 0) {
                         entry = NavigatorEntryModel.add(cpCore);

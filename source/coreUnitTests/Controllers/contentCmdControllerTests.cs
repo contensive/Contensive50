@@ -13,7 +13,7 @@ namespace Contensive.Core.Controllers.Tests {
         public void Controllers_ContentCmd_ExecuteCmd_simpleAddonTest() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
                 // arrange
-                Models.Entity.addonModel addon = Models.Entity.addonModel.add(cp.core);
+                Models.DbModels.addonModel addon = Models.DbModels.addonModel.add(cp.core);
                 addon.name = "testaddon" + genericController.GetRandomInteger(cp.core).ToString() ;
                 addon.CopyText = "foo";
                 addon.save(cp.core);
@@ -30,7 +30,7 @@ namespace Contensive.Core.Controllers.Tests {
         public void Controllers_ContentCmd_ExecuteCmd_executeAddonTest() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
                 // arrange
-                Models.Entity.addonModel addon = Models.Entity.addonModel.add(cp.core);
+                Models.DbModels.addonModel addon = Models.DbModels.addonModel.add(cp.core);
                 addon.name = "testaddon" + genericController.GetRandomInteger(cp.core).ToString();
                 addon.CopyText = "foo";
                 addon.save(cp.core);
@@ -47,7 +47,7 @@ namespace Contensive.Core.Controllers.Tests {
         public void Controllers_ContentCmd_ExecuteCmd_executeAddonTest2() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
                 // arrange
-                Models.Entity.addonModel addon = Models.Entity.addonModel.add(cp.core);
+                Models.DbModels.addonModel addon = Models.DbModels.addonModel.add(cp.core);
                 addon.name = "testaddon" + genericController.GetRandomInteger(cp.core).ToString();
                 addon.CopyText = "foo$insert$";
                 addon.save(cp.core);

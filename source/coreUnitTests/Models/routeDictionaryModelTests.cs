@@ -13,9 +13,9 @@ namespace Contensive.Core.Controllers.Tests {
         public void Models_RouteDictionary_NoRoutes() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
                 // arrange
-                cp.core.db.executeNonQuery("delete from " + Models.Entity.addonModel.contentTableName);
-                cp.core.db.executeNonQuery("delete from " + Models.Entity.linkAliasModel.contentTableName);
-                cp.core.db.executeNonQuery("delete from " + Models.Entity.linkForwardModel.contentTableName);
+                cp.core.db.executeNonQuery("delete from " + Models.DbModels.addonModel.contentTableName);
+                cp.core.db.executeNonQuery("delete from " + Models.DbModels.linkAliasModel.contentTableName);
+                cp.core.db.executeNonQuery("delete from " + Models.DbModels.linkForwardModel.contentTableName);
                 // act
                 var routes = Models.Complex.routeDictionaryModel.create(cp.core);
                 // assert only one route, matching the default admin route

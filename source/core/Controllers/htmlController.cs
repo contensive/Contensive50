@@ -12,7 +12,7 @@ using System.Data.SqlClient;
 
 using Contensive.BaseClasses;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -4496,7 +4496,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 // -- css and js
-                // -- go through reverse order, for js, first found in reverse order triggers the in-head mode
+                // -- only select assets with .inHead, which includes those whose depencies are .inHead
                 if (cpCore.doc.htmlAssetList.Count > 0) {
                     List<string> headScriptList = new List<string>();
                     List<string> styleList = new List<string>();

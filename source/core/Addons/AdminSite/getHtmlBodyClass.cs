@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -65,7 +65,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // --- must be authenticated to continue. Force a local login
                     //
-                    returnHtml = cpcore.addon.execute(Contensive.Core.Models.Entity.addonModel.create(cpcore, addonGuidLoginPage), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                    returnHtml = cpcore.addon.execute(Contensive.Core.Models.DbModels.addonModel.create(cpcore, addonGuidLoginPage), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                         errorCaption = "Login Page",
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                     });
@@ -13066,7 +13066,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 switch (ExportType) {
                                     case 1:
-                                        var ExportCSVAddon = Models.Entity.addonModel.create(cpcore, addonGuidExportCSV);
+                                        var ExportCSVAddon = Models.DbModels.addonModel.create(cpcore, addonGuidExportCSV);
                                         if (ExportCSVAddon == null) {
                                             cpcore.handleException(new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
                                         } else {
@@ -13083,7 +13083,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         }
                                         break;
                                     default:
-                                        var ExportXMLAddon = Models.Entity.addonModel.create(cpcore, addonGuidExportXML);
+                                        var ExportXMLAddon = Models.DbModels.addonModel.create(cpcore, addonGuidExportXML);
                                         if (ExportXMLAddon == null) {
                                             cpcore.handleException(new ApplicationException("ExportXML addon not found. Task could not be added to task queue."));
                                         } else {

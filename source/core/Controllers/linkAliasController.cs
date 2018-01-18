@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -36,7 +36,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         public static string getLinkAlias(coreClass cpcore, int PageID, string QueryStringSuffix, string DefaultLink) {
             string linkAlias = DefaultLink;
-            List<Models.Entity.linkAliasModel> linkAliasList = linkAliasModel.createList(cpcore, PageID, QueryStringSuffix);
+            List<Models.DbModels.linkAliasModel> linkAliasList = linkAliasModel.createList(cpcore, PageID, QueryStringSuffix);
             if (linkAliasList.Count > 0) {
                 linkAlias = linkAliasList.First().name;
                 if (linkAlias.Left(1) != "/") {

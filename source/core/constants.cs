@@ -1742,12 +1742,13 @@ namespace Contensive.Core {
         //
         // -- assets to be added to the head section (and end-of-body) of html documents
         public class htmlAssetClass {
-            public htmlAssetTypeEnum assetType; // the type of asset
+            public htmlAssetTypeEnum assetType; // the type of asset, css, js, etc
             public bool inHead; // if true, asset goes in head else it goes at end of body
-            public bool isLink; // asset is a link, else it is content
-            public string content; // either link or content
+            public bool isLink; // if true, the content property is a link to the asset, else use the content as the asset
+            public string content; // either link or content depending on the isLink property
             public string addedByMessage; // message used during debug to show where the asset came from
             public int sourceAddonId; // if this asset was added from an addon, this is the addonId.
+            public bool canBeMerged;
         }
         //
         // -- metaDescription

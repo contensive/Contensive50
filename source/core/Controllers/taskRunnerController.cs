@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -185,7 +185,7 @@ namespace Contensive.Core.Controllers {
                                         //
                                         switch ((command.ToLower())) {
                                             case taskQueueCommandEnumModule.runAddon:
-                                                cpSite.core.addon.execute(Models.Entity.addonModel.create(cpSite.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                                                cpSite.core.addon.execute(Models.DbModels.addonModel.create(cpSite.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                                     backgroundProcess = true,
                                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
                                                     instanceArguments = cmdDetail.docProperties

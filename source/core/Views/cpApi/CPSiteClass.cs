@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -269,7 +269,7 @@ namespace Contensive.Core {
         //
         public override void RequestTask(string Command, string SQL, string ExportName, string Filename) {
             try {
-                var ExportCSVAddon = Models.Entity.addonModel.create(cpCore, addonGuidExportCSV);
+                var ExportCSVAddon = Models.DbModels.addonModel.create(cpCore, addonGuidExportCSV);
                 if (ExportCSVAddon == null) {
                     cpCore.handleException(new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {

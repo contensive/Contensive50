@@ -12,7 +12,7 @@ using System.Data.SqlClient;
 
 using Contensive.BaseClasses;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;

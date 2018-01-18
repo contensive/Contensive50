@@ -4,7 +4,7 @@ using System.Reflection;
 using Contensive.BaseClasses;
 using Contensive.Core.Controllers;
 using Contensive.Core.Models.Context;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using System.Collections.Generic;
 using static Contensive.Core.constants;
 using System.Diagnostics;
@@ -831,7 +831,7 @@ namespace Contensive.Core {
                             personalizationAuthenticated = doc.sessionContext.visit.VisitAuthenticated,
                             personalizationPeopleId = doc.sessionContext.user.id
                         };
-                        return this.addon.execute(Models.Entity.addonModel.create(this, defaultAddonId), executeContext);
+                        return this.addon.execute(Models.DbModels.addonModel.create(this, defaultAddonId), executeContext);
                     }
                     //
                     // -- no route

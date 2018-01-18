@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -153,7 +153,7 @@ namespace Contensive.Core {
                 if (genericController.isGuid(addonNameOrGuid)) {
                     //
                     // -- call by guid
-                    addonModel addon = Models.Entity.addonModel.create(core, addonNameOrGuid);
+                    addonModel addon = Models.DbModels.addonModel.create(core, addonNameOrGuid);
                     if ( addon == null ) {
                         throw new ApplicationException("Addon [" + addonNameOrGuid + "] could not be found.");
                     } else {
@@ -163,7 +163,7 @@ namespace Contensive.Core {
                         });
                     }
                 } else {
-                    addonModel addon = Models.Entity.addonModel.createByName(core, addonNameOrGuid);
+                    addonModel addon = Models.DbModels.addonModel.createByName(core, addonNameOrGuid);
                     if ( addon != null ) {
                         //
                         // -- call by name

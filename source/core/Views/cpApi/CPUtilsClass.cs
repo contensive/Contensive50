@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -151,13 +151,13 @@ namespace Contensive.Core {
         private string ExecuteAddon(string IdGuidOrName, addonExecuteContext executeConext) {
             if (IdGuidOrName.IsNumeric()) {
                 executeConext.errorCaption = "id:" + IdGuidOrName;
-                return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.encodeInteger(IdGuidOrName)), executeConext);
+                return CP.core.addon.execute(Models.DbModels.addonModel.create(CP.core, genericController.encodeInteger(IdGuidOrName)), executeConext);
             } else if (genericController.isGuid(IdGuidOrName)) {
                 executeConext.errorCaption = "guid:" + IdGuidOrName;
-                return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, IdGuidOrName), executeConext);
+                return CP.core.addon.execute(Models.DbModels.addonModel.create(CP.core, IdGuidOrName), executeConext);
             } else {
                 executeConext.errorCaption = IdGuidOrName;
-                return CP.core.addon.execute(Models.Entity.addonModel.createByName(CP.core, IdGuidOrName), executeConext);
+                return CP.core.addon.execute(Models.DbModels.addonModel.createByName(CP.core, IdGuidOrName), executeConext);
             }
         }
         public override string ExecuteAddon(string IdGuidOrName, int WrapperId) => ExecuteAddon(

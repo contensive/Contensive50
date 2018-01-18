@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -48,7 +48,7 @@ namespace Contensive.Core.Controllers {
         public pageContentModel page { get; set; }
         //
         // -- current page to it's root
-        public List<Models.Entity.pageContentModel> pageToRootList { get; set; }
+        public List<Models.DbModels.pageContentModel> pageToRootList { get; set; }
         //
         // -- current template
         public pageTemplateModel template { get; set; }

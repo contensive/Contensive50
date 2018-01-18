@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -461,7 +461,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- build parentpageList (first = current page, last = root)
                     // -- add a 0, then repeat until another 0 is found, or there is a repeat
-                    cpcore.doc.pageToRootList = new List<Models.Entity.pageContentModel>();
+                    cpcore.doc.pageToRootList = new List<Models.DbModels.pageContentModel>();
                     List<int> usedPageIdList = new List<int>();
                     int targetPageId = requestedPage.id;
                     usedPageIdList.Add(0);
@@ -489,7 +489,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- get template from pages
                     cpcore.doc.template = null;
-                    foreach (Models.Entity.pageContentModel page in cpcore.doc.pageToRootList) {
+                    foreach (Models.DbModels.pageContentModel page in cpcore.doc.pageToRootList) {
                         if (page.TemplateID > 0) {
                             cpcore.doc.template = pageTemplateModel.create(cpcore, page.TemplateID );
                             if (cpcore.doc.template == null) {
@@ -771,7 +771,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- domain -- determine if the domain has any template requirements, and if so, is this template allowed
                 string SqlCriteria = "(domainId=" + cpcore.doc.domain.id + ")";
-                List<Models.Entity.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(cpcore, SqlCriteria);
+                List<Models.DbModels.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(cpcore, SqlCriteria);
                 bool templateAllowed = false;
                 foreach (TemplateDomainRuleModel rule in allowTemplateRuleList) {
                     if (rule.templateId == cpcore.doc.template.id) {
@@ -975,13 +975,13 @@ namespace Contensive.Core.Controllers {
 
                     //
                     // -- execute template Dependencies
-                    List<Models.Entity.addonModel> templateAddonList = addonModel.createList_templateDependencies(cpCore, cpCore.doc.template.id);
+                    List<Models.DbModels.addonModel> templateAddonList = addonModel.createList_templateDependencies(cpCore, cpCore.doc.template.id);
                     foreach (addonModel addon in templateAddonList) {
                         returnHtml += cpCore.addon.executeDependency(addon, executeContext);
                      }
                     //
                     // -- execute page Dependencies
-                    List<Models.Entity.addonModel> pageAddonList = addonModel.createList_pageDependencies(cpCore, cpCore.doc.page.id);
+                    List<Models.DbModels.addonModel> pageAddonList = addonModel.createList_pageDependencies(cpCore, cpCore.doc.page.id);
                     foreach (addonModel addon in pageAddonList) {
                         returnHtml += cpCore.addon.executeDependency(addon, executeContext);
                     }
@@ -1348,7 +1348,7 @@ namespace Contensive.Core.Controllers {
                             //
                             if (!string.IsNullOrEmpty(linkAliasTest1 + linkAliasTest2)) {
                                 string sqlLinkAliasCriteria = "(name=" + cpCore.db.encodeSQLText(linkAliasTest1) + ")or(name=" + cpCore.db.encodeSQLText(linkAliasTest2) + ")";
-                                List<Models.Entity.linkAliasModel> linkAliasList = linkAliasModel.createList(cpCore, sqlLinkAliasCriteria, "id desc");
+                                List<Models.DbModels.linkAliasModel> linkAliasList = linkAliasModel.createList(cpCore, sqlLinkAliasCriteria, "id desc");
                                 if (linkAliasList.Count > 0) {
                                     linkAliasModel linkAlias = linkAliasList.First();
                                     string LinkQueryString = rnPageId + "=" + linkAlias.PageID + "&" + linkAlias.QueryStringSuffix;
@@ -1424,7 +1424,7 @@ namespace Contensive.Core.Controllers {
                     // -- check secure certificate required
                     bool SecureLink_Template_Required = cpCore.doc.template.isSecure;
                     bool SecureLink_Page_Required = false;
-                    foreach (Models.Entity.pageContentModel page in cpCore.doc.pageToRootList) {
+                    foreach (Models.DbModels.pageContentModel page in cpCore.doc.pageToRootList) {
                         if (cpCore.doc.page.IsSecure) {
                             SecureLink_Page_Required = true;
                             break;
@@ -1455,7 +1455,7 @@ namespace Contensive.Core.Controllers {
                     // -- if endpoint is domain + route (link alias), the route determines the page, which may determine the cpCore.doc.template. If this template is not allowed for this domain, redirect to the domain's landingcpCore.doc.page.
                     //
                     Sql = "(domainId=" + cpCore.doc.domain.id + ")";
-                    List<Models.Entity.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(cpCore, Sql);
+                    List<Models.DbModels.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(cpCore, Sql);
                     if (allowTemplateRuleList.Count == 0) {
                         //
                         // -- current template has no domain preference, use current
@@ -2377,7 +2377,7 @@ namespace Contensive.Core.Controllers {
                     cpCore.doc.bodyContent = returnHtml;
                     executeContext.addonType = CPUtilsBaseClass.addonContext.ContextOnPageStart;
                     List<addonModel> addonList = addonModel.createList_OnPageStartEvent(cpCore, new List<string>());
-                    foreach (Models.Entity.addonModel addon in addonList) {
+                    foreach (Models.DbModels.addonModel addon in addonList) {
                         cpCore.doc.bodyContent = cpCore.addon.execute(addon, executeContext) + cpCore.doc.bodyContent;
                         //AddonContent = cpCore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                     }
