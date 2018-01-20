@@ -19,6 +19,7 @@ namespace Contensive.Core.Models.DbModels {
         //
         //====================================================================================================
         //-- const
+        // todo contentTablename should just be tableName, contentDatasource should be DataSource
         public const string contentName = "add-ons";
         public const string contentTableName = "ccaggregatefunctions";
         private const string contentDataSource = "default";

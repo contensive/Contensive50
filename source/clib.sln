@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clib", "clib\clib.csproj", "{744280CA-E8A3-4B6A-BA3F-2BF638433F65}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cc", "cc\cc.csproj", "{744280CA-E8A3-4B6A-BA3F-2BF638433F65}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "iisDefaultSite", "iisDefaultSite\iisDefaultSite.vbproj", "{9DB3DACD-45E8-496B-96DA-F939ABE7DB34}"
 EndProject
@@ -22,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core", "core\core.csproj", 
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CPBase41", "CPBase41\CPBase41.vbproj", "{E873F18E-47EF-46A9-AEA1-5A8B0F8BEB01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core.tests", "coreUnitTests\core.tests.csproj", "{36E017D4-C4EB-4C0E-8E2B-1F97150B07D9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core.tests", "coreTests\core.tests.csproj", "{36E017D4-C4EB-4C0E-8E2B-1F97150B07D9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "taskService", "taskService\taskService.csproj", "{219A2CF8-6292-4B39-ACB6-D0D6BCF1FC9C}"
 EndProject
