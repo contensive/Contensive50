@@ -27,7 +27,7 @@ namespace Contensive.Core.Addons.PageManager {
             object tempexecute = null;
             string returnHtml = "";
             try {
-                coreClass cpCore = ((CPClass)cp).core;
+                coreController cpCore = ((CPClass)cp).core;
                 //
                 // decode: "sortlist=childPageList_{parentId}_{listName},page{idOfChild},page{idOfChild},etc"
                 //

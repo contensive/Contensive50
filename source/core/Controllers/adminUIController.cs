@@ -29,7 +29,7 @@ namespace Contensive.Core {
             SortableNotSet = 3
         }
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         //====================================================================================================
         /// <summary>
@@ -37,7 +37,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public adminUIController(coreClass cpCore) : base() {
+        public adminUIController(coreController cpCore) : base() {
             this.cpCore = cpCore;
         }
         //

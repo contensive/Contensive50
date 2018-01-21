@@ -24,7 +24,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static string reflow(coreClass cpCore, string source) {
+        public static string reflow(coreController cpCore, string source) {
             // disabled, this is sample vb - re-introduce later as requirements cleared (pretty vs ugly reflow)
             return source;
             //Dim returnHtml As String = ""

@@ -27,7 +27,7 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreClass cpCore = processor.core;
+                coreController cpCore = processor.core;
                 int emailDropId = cpCore.docProperties.getInteger(rnEmailOpenFlag);
                 if (emailDropId != 0) {
                     //

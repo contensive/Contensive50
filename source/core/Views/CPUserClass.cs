@@ -24,13 +24,13 @@ namespace Contensive.Core {
         public const string EventsId = "DBE2B6CB-6339-4FFB-92D7-BE37AEA841CC";
         #endregion
         //
-        private Contensive.Core.coreClass cpCore;
+        private Contensive.Core.Controllers.coreController cpCore;
         private CPClass CP;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
-        public CPUserClass(Contensive.Core.coreClass cpCoreObj, CPClass CPParent) : base() {
+        public CPUserClass(Contensive.Core.Controllers.coreController cpCoreObj, CPClass CPParent) : base() {
             cpCore = cpCoreObj;
             CP = CPParent;
         }

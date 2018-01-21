@@ -121,14 +121,14 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Iterate through all apps, find addosn that need to run and add them to the task queue
         /// </summary>
-        private void scheduleTasks(coreClass cpcoreServer) {
+        private void scheduleTasks(coreController cpcoreServer) {
             try {
                 //
                 // -- run tasks for each app
                 foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> appKvp in cpcoreServer.serverConfig.apps) {
                     logController.appendLogTasks(cpcoreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
                     using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
-                        coreClass cpcoreApp = cpApp.core;
+                        coreController cpcoreApp = cpApp.core;
                         if (!(cpcoreApp.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
                             //
                             logController.appendLogTasks(cpcoreServer, "scheduleTasks, app status not ok");
@@ -210,7 +210,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="cmdDetail"></param>
         /// <param name="BlockDuplicates"></param>
         /// <returns></returns>
-        static public bool addTaskToQueue(coreClass cpSiteCore, string command, cmdDetailClass cmdDetail, bool BlockDuplicates) {
+        static public bool addTaskToQueue(coreController cpSiteCore, string command, cmdDetailClass cmdDetail, bool BlockDuplicates) {
             bool returnTaskAdded = true;
             try {
                 string cmdDetailJson = cpSiteCore.json.Serialize(cmdDetail);

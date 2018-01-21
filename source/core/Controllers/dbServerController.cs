@@ -24,7 +24,7 @@ namespace Contensive.Core.Controllers {
         //
         // objects passed in that are not disposed
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         // internal storage
         //
@@ -36,7 +36,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public dbServerController(coreClass cpCore) : base() {
+        public dbServerController(coreController cpCore) : base() {
             try {
                 this.cpCore = cpCore;
             } catch (Exception ex) {

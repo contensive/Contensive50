@@ -46,7 +46,7 @@ namespace Contensive.Core.Controllers {
         //
         public httpRequestController() : base() {
             // Me.cpcore = cpcore
-            Type myType = typeof(coreClass);
+            Type myType = typeof(coreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();
             Version myVersion = myAssemblyname.Version;

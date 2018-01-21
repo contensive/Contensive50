@@ -27,7 +27,7 @@ namespace Contensive.Core.Controllers {
         //
         // ----- objects passed in constructor, do not dispose
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         // ----- constants
         //
@@ -39,7 +39,7 @@ namespace Contensive.Core.Controllers {
         // ----- private globals
         //
         //
-        public menuTabController(coreClass cpCore) : base() {
+        public menuTabController(coreController cpCore) : base() {
             this.cpCore = cpCore;
         }
         //

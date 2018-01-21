@@ -73,7 +73,7 @@ namespace Contensive.Core.Controllers {
         //
         // ----- Local storage
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         // ----- Menu Entry storage
         //
@@ -92,7 +92,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <remarks></remarks>
-        public menuTreeController(coreClass cpCore) : base() {
+        public menuTreeController(coreController cpCore) : base() {
             this.cpCore = cpCore;
             EntryIndexName = new keyPtrController();
             Microsoft.VisualBasic.VBMath.Randomize();

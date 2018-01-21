@@ -33,7 +33,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="textToInsert"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string setOuter(coreClass cpCore, string layout, string Key, string textToInsert) {
+        public static string setOuter(coreController cpCore, string layout, string Key, string textToInsert) {
             string returnValue = "";
             try {
                 if (string.IsNullOrEmpty(Key)) {
@@ -59,7 +59,7 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        public static  string setInner(coreClass cpCore, string layout, string Key, string textToInsert) {
+        public static  string setInner(coreController cpCore, string layout, string Key, string textToInsert) {
             string returnValue = "";
             try {
                 int posStart = 0;
@@ -103,7 +103,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="Key"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string getInner(coreClass cpCore, string layout, string Key) {
+        public static string getInner(coreController cpCore, string layout, string Key) {
             string returnValue = "";
             try {
                 int posStart = 0;
@@ -155,7 +155,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="Key"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string getOuter(coreClass cpCore, string layout, string Key) {
+        public static string getOuter(coreController cpCore, string layout, string Key) {
             string returnValue = "";
             try {
                 int posStart = 0;
@@ -189,7 +189,7 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        private static bool tagMatch(coreClass cpCore, string layout, int posStartTag, string searchId, string searchClass) {
+        private static bool tagMatch(coreController cpCore, string layout, int posStartTag, string searchId, string searchClass) {
             bool returnValue = false;
             try {
                 const string attrAllowedChars = "abcdefghijklmnopqrstuvwzyz-_";
@@ -353,7 +353,7 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        public static  int getTagStartPos(coreClass cpCore, string layout, int layoutStartPos, string Key) {
+        public static  int getTagStartPos(coreController cpCore, string layout, int layoutStartPos, string Key) {
             int returnValue = 0;
             try {
                 int returnPos = 0;
@@ -551,7 +551,7 @@ namespace Contensive.Core.Controllers {
         //       returns 0 if the end was not found
         //=================================================================================================
         //
-        public static int getTagEndPos(coreClass cpCore, string Source, int startPos) {
+        public static int getTagEndPos(coreController cpCore, string Source, int startPos) {
             int returnValue = 0;
             try {
                 int Pos = 0;

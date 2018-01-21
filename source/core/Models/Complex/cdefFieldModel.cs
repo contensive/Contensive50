@@ -202,7 +202,7 @@ namespace Contensive.Core.Models.Complex {
         // fields stored differently in xml collection files
         //
         public int redirectContentID { get; set; } // If TYPEREDIRECT, this is new contentID
-        public string get_RedirectContentName(coreClass cpCore) {
+        public string get_RedirectContentName(coreController cpCore) {
             if (_RedirectContentName == null) {
                 if (redirectContentID > 0) {
                     _RedirectContentName = "";
@@ -214,7 +214,7 @@ namespace Contensive.Core.Models.Complex {
             }
             return _RedirectContentName;
         }
-        public void set_RedirectContentName(coreClass cpCore, string value) {
+        public void set_RedirectContentName(coreController cpCore, string value) {
             _RedirectContentName = value;
         }
         private string _RedirectContentName = null;
@@ -222,7 +222,7 @@ namespace Contensive.Core.Models.Complex {
         //====================================================================================================
         //
         public int manyToManyContentID { get; set; } // Content containing Secondary Records
-        public string get_ManyToManyContentName(coreClass cpCore) {
+        public string get_ManyToManyContentName(coreController cpCore) {
             if (_ManyToManyRuleContentName == null) {
                 if (manyToManyContentID > 0) {
                     _ManyToManyRuleContentName = "";
@@ -234,7 +234,7 @@ namespace Contensive.Core.Models.Complex {
             }
             return _ManyToManyContentName;
         }
-        public void set_ManyToManyContentName(coreClass cpCore, string value) {
+        public void set_ManyToManyContentName(coreController cpCore, string value) {
             _ManyToManyContentName = value;
         }
         private string _ManyToManyContentName = null;
@@ -242,7 +242,7 @@ namespace Contensive.Core.Models.Complex {
         //====================================================================================================
         //
         public int manyToManyRuleContentID { get; set; }
-        public string get_ManyToManyRuleContentName(coreClass cpCore) {
+        public string get_ManyToManyRuleContentName(coreController cpCore) {
             if (_ManyToManyRuleContentName == null) {
                 if (manyToManyRuleContentID > 0) {
                     _ManyToManyRuleContentName = "";
@@ -254,7 +254,7 @@ namespace Contensive.Core.Models.Complex {
             }
             return _ManyToManyRuleContentName;
         }
-        public void set_ManyToManyRuleContentName(coreClass cpCore, string value) {
+        public void set_ManyToManyRuleContentName(coreController cpCore, string value) {
             _ManyToManyRuleContentName = value;
         }
         private string _ManyToManyRuleContentName = null;
@@ -262,7 +262,7 @@ namespace Contensive.Core.Models.Complex {
         //====================================================================================================
         //
         public int lookupContentID { get; set; }
-        public string get_lookupContentName(coreClass cpCore) {
+        public string get_lookupContentName(coreController cpCore) {
             if (_lookupContentName == null) {
                 if (lookupContentID > 0) {
                     _lookupContentName = "";
@@ -274,7 +274,7 @@ namespace Contensive.Core.Models.Complex {
             }
             return _lookupContentName;
         }
-        public void set_lookupContentName(coreClass cpCore, string value) {
+        public void set_lookupContentName(coreController cpCore, string value) {
             _lookupContentName = value;
         }
         private string _lookupContentName = null;
@@ -284,13 +284,13 @@ namespace Contensive.Core.Models.Complex {
         // name set by xml file load
         // name get for xml file save
         // id and name get and set in code
-        public void memberSelectGroupName_set(coreClass cpcore, string memberSelectGroupName) {
+        public void memberSelectGroupName_set(coreController cpcore, string memberSelectGroupName) {
             if (_memberSelectGroupName != memberSelectGroupName) {
                 _memberSelectGroupName = memberSelectGroupName;
                 _memberSelectGroupId = null;
             }
         }
-        public string memberSelectGroupName_get(coreClass cpcore) {
+        public string memberSelectGroupName_get(coreController cpcore) {
             if (_memberSelectGroupName == null) {
                 if (_memberSelectGroupId != null) {
                     _memberSelectGroupName = cpcore.db.getRecordName("groups", genericController.encodeInteger(_memberSelectGroupId));
@@ -298,13 +298,13 @@ namespace Contensive.Core.Models.Complex {
             }
             return (_memberSelectGroupName as string);
         }
-        public void memberSelectGroupId_set(coreClass cpcore, int memberSelectGroupId) {
+        public void memberSelectGroupId_set(coreController cpcore, int memberSelectGroupId) {
             if (memberSelectGroupId != _memberSelectGroupId) {
                 _memberSelectGroupId = memberSelectGroupId;
                 _memberSelectGroupName = null;
             }
         }
-        public int memberSelectGroupId_get(coreClass cpcore) {
+        public int memberSelectGroupId_get(coreController cpcore) {
             if (_memberSelectGroupId == null) {
                 if (_memberSelectGroupName != null) {
                     _memberSelectGroupId = cpcore.db.getRecordID("groups", genericController.encodeText(_memberSelectGroupName));

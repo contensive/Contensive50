@@ -23,7 +23,7 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class htmlController {
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         //====================================================================================================
         /// <summary>
@@ -31,7 +31,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <remarks></remarks>
-        public htmlController(coreClass cpCore) {
+        public htmlController(coreController cpCore) {
             this.cpCore = cpCore;
         }
         //
@@ -4383,7 +4383,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="cpCore"></param>
         /// <param name="ButtonList"></param>
         /// <returns></returns>
-        public static string legacy_closeFormTable(coreClass cpCore, string ButtonList) {
+        public static string legacy_closeFormTable(coreController cpCore, string ButtonList) {
             string templegacy_closeFormTable = null;
             if (!string.IsNullOrEmpty(ButtonList)) {
                 templegacy_closeFormTable = "</td></tr></TABLE>" + cpCore.html.getPanelButtons(ButtonList, "Button") + "</form>";
@@ -4400,7 +4400,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="cpCore"></param>
         /// <param name="ButtonList"></param>
         /// <returns></returns>
-        public static string legacy_openFormTable(coreClass cpCore, string ButtonList) {
+        public static string legacy_openFormTable(coreController cpCore, string ButtonList) {
             string result = "";
             try {
                 result = cpCore.html.formStart();

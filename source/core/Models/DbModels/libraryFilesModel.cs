@@ -37,97 +37,97 @@ namespace Contensive.Core.Models.DbModels {
         public int pxWidth { get; set; }
         //
         //====================================================================================================
-        public static libraryFilesModel add(coreClass cpCore) {
+        public static libraryFilesModel add(coreController cpCore) {
             return add<libraryFilesModel>(cpCore);
         }
         //
         //====================================================================================================
-        public static libraryFilesModel add(coreClass cpCore, ref List<string> callersCacheNameList) {
+        public static libraryFilesModel add(coreController cpCore, ref List<string> callersCacheNameList) {
             return add<libraryFilesModel>(cpCore, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static libraryFilesModel create(coreClass cpCore, int recordId) {
+        public static libraryFilesModel create(coreController cpCore, int recordId) {
             return create<libraryFilesModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static libraryFilesModel create(coreClass cpCore, int recordId, ref List<string> callersCacheNameList) {
+        public static libraryFilesModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
             return create<libraryFilesModel>(cpCore, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static libraryFilesModel create(coreClass cpCore, string recordGuid) {
+        public static libraryFilesModel create(coreController cpCore, string recordGuid) {
             return create<libraryFilesModel>(cpCore, recordGuid);
         }
         //
         //====================================================================================================
-        public static libraryFilesModel create(coreClass cpCore, string recordGuid, ref List<string> callersCacheNameList) {
+        public static libraryFilesModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
             return create<libraryFilesModel>(cpCore, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static libraryFilesModel createByName(coreClass cpCore, string recordName) {
+        public static libraryFilesModel createByName(coreController cpCore, string recordName) {
             return createByName<libraryFilesModel>(cpCore, recordName);
         }
         //
         //====================================================================================================
-        public static libraryFilesModel createByName(coreClass cpCore, string recordName, ref List<string> callersCacheNameList) {
+        public static libraryFilesModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
             return createByName<libraryFilesModel>(cpCore, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreClass cpCore) {
+        public new void save(coreController cpCore) {
             base.save(cpCore);
         }
         //
         //====================================================================================================
-        public static void delete(coreClass cpCore, int recordId) {
+        public static void delete(coreController cpCore, int recordId) {
             delete<libraryFilesModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreClass cpCore, string ccGuid) {
+        public static void delete(coreController cpCore, string ccGuid) {
             delete<libraryFilesModel>(cpCore, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<libraryFilesModel> createList(coreClass cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<libraryFilesModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<libraryFilesModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<libraryFilesModel> createList(coreClass cpCore, string sqlCriteria, string sqlOrderBy) {
+        public static List<libraryFilesModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
             return createList<libraryFilesModel>(cpCore, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<libraryFilesModel> createList(coreClass cpCore, string sqlCriteria) {
+        public static List<libraryFilesModel> createList(coreController cpCore, string sqlCriteria) {
             return createList<libraryFilesModel>(cpCore, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreClass cpCore, int recordId) {
+        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
             invalidateCacheSingleRecord<libraryFilesModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreClass cpcore, int recordId) {
+        public static string getRecordName(coreController cpcore, int recordId) {
             return baseModel.getRecordName<libraryFilesModel>(cpcore, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreClass cpcore, string ccGuid) {
+        public static string getRecordName(coreController cpcore, string ccGuid) {
             return baseModel.getRecordName<libraryFilesModel>(cpcore, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreClass cpcore, string ccGuid) {
+        public static int getRecordId(coreController cpcore, string ccGuid) {
             return baseModel.getRecordId<libraryFilesModel>(cpcore, ccGuid);
         }
         //
         //====================================================================================================
-        public static libraryFilesModel createDefault(coreClass cpcore) {
+        public static libraryFilesModel createDefault(coreController cpcore) {
             return createDefault<libraryFilesModel>(cpcore);
         }
     }

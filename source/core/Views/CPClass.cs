@@ -24,7 +24,7 @@ namespace Contensive.Core {
         public const string EventsId = "4FADD1C2-6A89-4A8E-ADD0-9850D3EB6DBC";
         #endregion
         //
-        public Contensive.Core.coreClass core { get; set; }
+        public Contensive.Core.Controllers.coreController core { get; set; }
         private int MyAddonID { get; set; }
         //
         //=========================================================================================================
@@ -33,7 +33,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <remarks></remarks>
         public CPClass() : base() {
-            core = new coreClass(this);
+            core = new coreController(this);
         }
         //
         //=========================================================================================================
@@ -42,7 +42,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <remarks></remarks>
         public CPClass(string appName) : base() {
-            core = new coreClass(this, appName);
+            core = new coreController(this, appName);
         }
         //
         //=========================================================================================================
@@ -51,7 +51,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <remarks></remarks>
         public CPClass(Models.Context.serverConfigModel serverConfig) : base() {
-            core = new coreClass(this, serverConfig);
+            core = new coreController(this, serverConfig);
         }
         //
         //=========================================================================================================
@@ -61,7 +61,7 @@ namespace Contensive.Core {
         /// <param name="httpContext"></param>
         /// <remarks></remarks>
         public CPClass(Models.Context.serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
-            core = new coreClass(this, serverConfig, httpContext);
+            core = new coreController(this, serverConfig, httpContext);
         }
         //
         //=========================================================================================================
@@ -71,7 +71,7 @@ namespace Contensive.Core {
         /// <param name="httpContext"></param>
         /// <remarks></remarks>
         public CPClass(string appName, System.Web.HttpContext httpContext) : base() {
-            core = new coreClass(this, appName, httpContext);
+            core = new coreController(this, appName, httpContext);
         }
         //
         //=========================================================================================================

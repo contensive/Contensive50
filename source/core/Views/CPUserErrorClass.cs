@@ -22,12 +22,12 @@ namespace Contensive.Core {
         public const string EventsId = "B784BFEF-127B-48D5-8C99-B075984227DB";
         #endregion
         //
-        private Contensive.Core.coreClass cpCore;
+        private Contensive.Core.Controllers.coreController cpCore;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
-        public CPUserErrorClass(Contensive.Core.coreClass cpCoreObj) : base() {
+        public CPUserErrorClass(Contensive.Core.Controllers.coreController cpCoreObj) : base() {
             cpCore = cpCoreObj;
         }
         //

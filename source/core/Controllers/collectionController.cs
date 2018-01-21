@@ -28,7 +28,7 @@ namespace Contensive.Core.Controllers {
         /// Overlay a Src CDef on to the current one (Dst). Any Src CDEf entries found in Src are added to Dst.
         /// if SrcIsUserCDef is true, then the Src is overlayed on the Dst if there are any changes -- and .CDefChanged flag set
         /// </summary>
-        private static bool addMiniCollectionSrcToDst(coreClass cpcore, ref miniCollectionModel dstCollection, miniCollectionModel srcCollection) {
+        private static bool addMiniCollectionSrcToDst(coreController cpcore, ref miniCollectionModel dstCollection, miniCollectionModel srcCollection) {
             bool returnOk = true;
             try {
                 string HelpSrc = null;
@@ -584,7 +584,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private static miniCollectionModel installCollection_GetApplicationMiniCollection(coreClass cpCore, bool isNewBuild) {
+        private static miniCollectionModel installCollection_GetApplicationMiniCollection(coreController cpCore, bool isNewBuild) {
             miniCollectionModel returnColl = new miniCollectionModel();
             try {
                 //
@@ -614,7 +614,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         ///  Get an XML nodes attribute based on its name
         /// </summary>
-        public static string GetXMLAttribute(coreClass cpCore, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
+        public static string GetXMLAttribute(coreController cpCore, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
             string returnAttr = "";
             try {
                 //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
@@ -649,19 +649,19 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private static double GetXMLAttributeNumber(coreClass cpCore, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
+        private static double GetXMLAttributeNumber(coreController cpCore, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
             return encodeNumber(GetXMLAttribute(cpCore, Found, Node, Name, DefaultIfNotFound));
         }
         //
         //====================================================================================================
         //
-        private static bool GetXMLAttributeBoolean(coreClass cpCore, bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
+        private static bool GetXMLAttributeBoolean(coreController cpCore, bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
             return genericController.encodeBoolean(GetXMLAttribute(cpCore, Found, Node, Name, encodeText(DefaultIfNotFound)));
         }
         //
         //====================================================================================================
         //
-        private static int GetXMLAttributeInteger(coreClass cpCore, bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
+        private static int GetXMLAttributeInteger(coreController cpCore, bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
             return genericController.encodeInteger(GetXMLAttribute(cpCore, Found, Node, Name, DefaultIfNotFound.ToString()));
         }
         //
@@ -678,7 +678,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private static string GetMenuNameSpace(coreClass cpCore, Dictionary<string,miniCollectionModel.collectionMenuModel> menus, miniCollectionModel.collectionMenuModel menu, string UsedIDList) {
+        private static string GetMenuNameSpace(coreController cpCore, Dictionary<string,miniCollectionModel.collectionMenuModel> menus, miniCollectionModel.collectionMenuModel menu, string UsedIDList) {
             string returnAttr = "";
             try {
                 string ParentName = null;
@@ -717,7 +717,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Create an entry in the Sort Methods Table
         /// </summary>
-        private static void VerifySortMethod(coreClass cpCore, string Name, string OrderByCriteria) {
+        private static void VerifySortMethod(coreController cpCore, string Name, string OrderByCriteria) {
             try {
                 //
                 DataTable dt = null;
@@ -749,7 +749,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static void VerifySortMethods(coreClass cpCore) {
+        public static void VerifySortMethods(coreController cpCore) {
             try {
                 //
                 logController.appendLogInstall(cpCore, "Verify Sort Records");
@@ -769,7 +769,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Get a ContentID from the ContentName using just the tables
         /// </summary>
-        private static void VerifyContentFieldTypes(coreClass cpCore) {
+        private static void VerifyContentFieldTypes(coreController cpCore) {
             try {
                 //
                 int RowsFound = 0;
@@ -864,7 +864,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static void exportApplicationCDefXml(coreClass cpCore, string privateFilesPathFilename, bool IncludeBaseFields) {
+        public static void exportApplicationCDefXml(coreController cpCore, string privateFilesPathFilename, bool IncludeBaseFields) {
             try {
                 collectionXmlController XML = null;
                 string Content = null;
@@ -881,7 +881,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private static bool downloadCollectionFiles(coreClass cpCore, string workingPath, string CollectionGuid, ref DateTime return_CollectionLastChangeDate, ref string return_ErrorMessage) {
+        private static bool downloadCollectionFiles(coreController cpCore, string workingPath, string CollectionGuid, ref DateTime return_CollectionLastChangeDate, ref string return_ErrorMessage) {
             bool tempDownloadCollectionFiles = false;
             tempDownloadCollectionFiles = false;
             try {
@@ -1087,7 +1087,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static bool installCollectionFromRemoteRepo(coreClass cpCore, string collectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionFromRemoteRepo(coreController cpCore, string collectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
             bool UpgradeOK = true;
             try {
                 if (string.IsNullOrWhiteSpace(collectionGuid)) {
@@ -1146,7 +1146,7 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        public static bool installCollectionFromRemoteRepo(coreClass cpCore, string CollectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild){
+        public static bool installCollectionFromRemoteRepo(coreController cpCore, string CollectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild){
             var tmpList = new List<string> { };
             return installCollectionFromRemoteRepo(cpCore, CollectionGuid, ref return_ErrorMessage,ImportFromCollectionsGuidList, IsNewBuild, ref tmpList);
         }
@@ -1155,7 +1155,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Upgrades all collections, registers and resets the server if needed
         /// </summary>
-        public static bool UpgradeLocalCollectionRepoFromRemoteCollectionRepo(coreClass cpCore, ref string return_ErrorMessage, ref string return_RegisterList, ref bool return_IISResetRequired, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
+        public static bool UpgradeLocalCollectionRepoFromRemoteCollectionRepo(coreController cpCore, ref string return_ErrorMessage, ref string return_RegisterList, ref bool return_IISResetRequired, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
             bool returnOk = true;
             try {
                 bool localCollectionUpToDate = false;
@@ -1398,7 +1398,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Upgrade a collection from the files in a working folder
         /// </summary>
-        public static bool buildLocalCollectionReposFromFolder(coreClass cpCore, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> return_CollectionGUIDList, ref string return_ErrorMessage, bool allowLogging) {
+        public static bool buildLocalCollectionReposFromFolder(coreController cpCore, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> return_CollectionGUIDList, ref string return_ErrorMessage, bool allowLogging) {
             bool success = false;
             try {
                 if (cpCore.privateFiles.pathExists(sourcePrivateFolderPath)) {
@@ -1421,7 +1421,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static bool buildLocalCollectionRepoFromFile(coreClass cpCore, string collectionPathFilename, DateTime CollectionLastChangeDate, ref string return_CollectionGUID, ref string return_ErrorMessage, bool allowLogging) {
+        public static bool buildLocalCollectionRepoFromFile(coreController cpCore, string collectionPathFilename, DateTime CollectionLastChangeDate, ref string return_CollectionGUID, ref string return_ErrorMessage, bool allowLogging) {
             bool tempBuildLocalCollectionRepoFromFile = false;
             bool result = true;
             try {
@@ -1816,7 +1816,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Upgrade Application from a local collection
         /// </summary>
-        public static bool installCollectionFromLocalRepo(coreClass cpCore, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionFromLocalRepo(coreController cpCore, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
             bool result = true;
             try {
                 string CollectionVersionFolderName = "";
@@ -2705,7 +2705,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private static void UpdateConfig(coreClass cpCore, string Collectionname, string CollectionGuid, DateTime CollectionUpdatedDate, string CollectionVersionFolderName) {
+        private static void UpdateConfig(coreController cpCore, string Collectionname, string CollectionGuid, DateTime CollectionUpdatedDate, string CollectionVersionFolderName) {
             try {
                 //
                 bool loadOK = true;
@@ -2808,7 +2808,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private static string GetCollectionPath(coreClass cpCore, string CollectionGuid) {
+        private static string GetCollectionPath(coreController cpCore, string CollectionGuid) {
             string result = "";
             try {
                 DateTime LastChangeDate = default(DateTime);
@@ -2825,7 +2825,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Return the collection path, lastChangeDate, and collectionName given the guid
         /// </summary>
-        public static void GetCollectionConfig(coreClass cpCore, string CollectionGuid, ref string return_CollectionPath, ref DateTime return_LastChagnedate, ref string return_CollectionName) {
+        public static void GetCollectionConfig(coreController cpCore, string CollectionGuid, ref string return_CollectionPath, ref DateTime return_LastChagnedate, ref string return_CollectionName) {
             try {
                 string LocalGuid = "";
                 XmlDocument Doc = new XmlDocument();
@@ -2895,7 +2895,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Installs Addons in a source folder
         /// </summary>
-        public static bool InstallCollectionsFromPrivateFolder(coreClass cpCore, string privateFolder, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
+        public static bool InstallCollectionsFromPrivateFolder(coreController cpCore, string privateFolder, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
@@ -2929,7 +2929,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Installs Addons in a source file
         /// </summary>
-        public static bool InstallCollectionsFromPrivateFile(coreClass cpCore, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
+        public static bool InstallCollectionsFromPrivateFile(coreController cpCore, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
@@ -2964,7 +2964,7 @@ namespace Contensive.Core.Controllers {
         //
         //======================================================================================================
         //
-        private static int GetNavIDByGuid(coreClass cpCore, string ccGuid) {
+        private static int GetNavIDByGuid(coreController cpCore, string ccGuid) {
             int navId = 0;
             try {
                 int CS;
@@ -2985,7 +2985,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// copy resources from install folder to www folder
         /// </summary>
-        private static void copyInstallPathToDstPath(coreClass cpCore, string SrcPath, string DstPath, string BlockFileList, string BlockFolderList) {
+        private static void copyInstallPathToDstPath(coreController cpCore, string SrcPath, string DstPath, string BlockFileList, string BlockFolderList) {
             try {
                 FileInfo[] FileInfoArray = null;
                 DirectoryInfo[] FolderInfoArray = null;
@@ -3040,7 +3040,7 @@ namespace Contensive.Core.Controllers {
         //
         //======================================================================================================
         //
-        private static string GetCollectionFileList(coreClass cpCore, string SrcPath, string SubFolder, string ExcludeFileList) {
+        private static string GetCollectionFileList(coreController cpCore, string SrcPath, string SubFolder, string ExcludeFileList) {
             string result = "";
             try {
                 FileInfo[] FileInfoArray = null;
@@ -3089,7 +3089,7 @@ namespace Contensive.Core.Controllers {
         //
         //======================================================================================================
         //
-        private static void InstallCollectionFromLocalRepo_addonNode_Phase1(coreClass cpCore, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool return_UpgradeOK, ref string return_ErrorMessage) {
+        private static void InstallCollectionFromLocalRepo_addonNode_Phase1(coreController cpCore, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool return_UpgradeOK, ref string return_ErrorMessage) {
             try {
                 //
                 int fieldTypeID = 0;
@@ -3681,7 +3681,7 @@ namespace Contensive.Core.Controllers {
         /// this is the second pass, so all add-ons should be added
         /// no errors for missing addones, except the include add-on case
         /// </summary>
-        private static string InstallCollectionFromLocalRepo_addonNode_Phase2(coreClass cpCore, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool ReturnUpgradeOK, ref string ReturnErrorMessage) {
+        private static string InstallCollectionFromLocalRepo_addonNode_Phase2(coreController cpCore, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool ReturnUpgradeOK, ref string ReturnErrorMessage) {
             string result = "";
             try {
                 bool AddRule = false;
@@ -3802,7 +3802,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Import CDef on top of current configuration and the base configuration
         /// </summary>
-        public static void installBaseCollection(coreClass cpCore, bool isNewBuild, ref List<string> nonCriticalErrorList) {
+        public static void installBaseCollection(coreController cpCore, bool isNewBuild, ref List<string> nonCriticalErrorList) {
             try {
                 //
                 // -- new build
@@ -3837,7 +3837,7 @@ namespace Contensive.Core.Controllers {
         //
         //======================================================================================================
         //
-        public static void installCollectionFromLocalRepo_BuildDbFromXmlData(coreClass cpCore, string XMLText, bool isNewBuild, bool isBaseCollection, ref List<string> nonCriticalErrorList) {
+        public static void installCollectionFromLocalRepo_BuildDbFromXmlData(coreController cpCore, string XMLText, bool isNewBuild, bool isBaseCollection, ref List<string> nonCriticalErrorList) {
             try {
                 //
                 logController.appendLogInstall(cpCore, "Application: " + cpCore.serverConfig.appConfig.name);
@@ -3858,7 +3858,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// create a collection class from a collection xml file, cdef are added to the cdefs in the application collection
         /// </summary>
-        private static miniCollectionModel installCollection_LoadXmlToMiniCollection(coreClass cpcore, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, miniCollectionModel defaultCollection) {
+        private static miniCollectionModel installCollection_LoadXmlToMiniCollection(coreController cpcore, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, miniCollectionModel defaultCollection) {
             miniCollectionModel result = null;
             try {
                 Models.Complex.cdefModel DefaultCDef = null;
@@ -4363,7 +4363,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Verify ccContent and ccFields records from the cdef nodes of a a collection file. This is the last step of loading teh cdef nodes of a collection file. ParentId field is set based on ParentName node.
         /// </summary>
-        private static void installCollection_BuildDbFromMiniCollection(coreClass cpCore, miniCollectionModel Collection, string BuildVersion, bool isNewBuild, ref List<string> nonCriticalErrorList) {
+        private static void installCollection_BuildDbFromMiniCollection(coreController cpCore, miniCollectionModel Collection, string BuildVersion, bool isNewBuild, ref List<string> nonCriticalErrorList) {
             try {
                 //
                 int FieldHelpID = 0;
@@ -4665,7 +4665,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Update a table from a collection cdef node
         /// </summary>
-        private static void installCollection_BuildDbFromCollection_AddCDefToDb(coreClass cpCore, Models.Complex.cdefModel cdef, string BuildVersion) {
+        private static void installCollection_BuildDbFromCollection_AddCDefToDb(coreController cpCore, Models.Complex.cdefModel cdef, string BuildVersion) {
             try {
                 //
                 logController.appendLogInstall(cpCore, "Update db cdef [" + cdef.Name + "]");
@@ -4774,7 +4774,7 @@ namespace Contensive.Core.Controllers {
         /// Return the collectionList file stored in the root of the addon folder.
         /// </summary>
         /// <returns></returns>
-        public static string getLocalCollectionStoreListXml(coreClass cpCore) {
+        public static string getLocalCollectionStoreListXml(coreController cpCore) {
             string returnXml = "";
             try {
                 string LastChangeDate = "";
@@ -4838,7 +4838,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// get a list of collections available on the server
         /// </summary>
-        public static bool getLocalCollectionStoreList(coreClass cpCore, ref List<collectionStoreClass> localCollectionStoreList, ref string return_ErrorMessage) {
+        public static bool getLocalCollectionStoreList(coreController cpCore, ref List<collectionStoreClass> localCollectionStoreList, ref string return_ErrorMessage) {
             bool returnOk = true;
             try {
                 //
@@ -4902,7 +4902,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// return a list of collections on the 
         /// </summary>
-        public static bool getRemoteCollectionStoreList(coreClass cpCore, ref List<collectionStoreClass> remoteCollectionStoreList) {
+        public static bool getRemoteCollectionStoreList(coreController cpCore, ref List<collectionStoreClass> remoteCollectionStoreList) {
             bool result = false;
             try {
                 var LibCollections = new XmlDocument();

@@ -23,7 +23,7 @@ namespace Contensive.Core.Controllers {
         // privateKey
         //
         private string _privateKey = "";
-        private Contensive.Core.coreClass cpCore;
+        private coreController cpCore;
         //
         //====================================================================================================
         /// <summary>
@@ -31,7 +31,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <param name="privateKey"></param>
-        public securityController(Contensive.Core.coreClass cpCore, string privateKey) {
+        public securityController(coreController cpCore, string privateKey) {
             this.cpCore = cpCore;
             _privateKey = privateKey;
         }

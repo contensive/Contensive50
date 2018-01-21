@@ -27,7 +27,7 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreClass cpCore = processor.core;
+                coreController cpCore = processor.core;
                 //
                 // -- logout the current member
                 cpCore.doc.sessionContext.logout(cpCore);

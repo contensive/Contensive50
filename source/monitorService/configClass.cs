@@ -18,7 +18,7 @@ namespace Contensive.WindowsServices {
 		//
 		public const int Port_SiteMonitorDefault = 4532;
 		//
-		private coreClass cpCore;
+		private coreController cpCore;
 		//
 		public int TimerIntervalSec;
 		public bool allowErrorRecovery;
@@ -37,7 +37,7 @@ namespace Contensive.WindowsServices {
 		//
 		//
 		//
-		public monitorConfigClass(coreClass cpCore)
+		public monitorConfigClass(coreController cpCore)
 		{
             try {
                 //

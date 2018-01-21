@@ -30,7 +30,7 @@ namespace Contensive.Core.Controllers {
         //   This code is based on the GoMethod site script
         //========================================================================
         //
-        public static string getHtmlBodyTemplate(coreClass cpCore) {
+        public static string getHtmlBodyTemplate(coreController cpCore) {
             string returnBody = "";
             try {
                 string AddonReturn = null;
@@ -135,7 +135,7 @@ namespace Contensive.Core.Controllers {
         //           else - (IsSectionRootPageIDMode) SectionRecord has a RootPageID field
         //=============================================================================
         //
-        public static string getHtmlBodyTemplateContent(coreClass cpCore, bool AllowChildPageList, bool AllowReturnLink, bool AllowEditWrapper, ref bool return_blockSiteWithLogin) {
+        public static string getHtmlBodyTemplateContent(coreController cpCore, bool AllowChildPageList, bool AllowReturnLink, bool AllowEditWrapper, ref bool return_blockSiteWithLogin) {
             string returnHtml = "";
             try {
                 bool allowPageWithoutSectionDislay = false;
@@ -289,7 +289,7 @@ namespace Contensive.Core.Controllers {
         //       is called from main_GetPageRaw, as well as from higher up when blocking is turned on
         //=============================================================================
         //
-        internal static string getContentBoxWrapper(coreClass cpcore, string Content, int ContentPadding) {
+        internal static string getContentBoxWrapper(coreController cpcore, string Content, int ContentPadding) {
             string tempgetContentBoxWrapper = null;
             //dim buildversion As String
             //
@@ -329,7 +329,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        internal static string getDefaultBlockMessage(coreClass cpcore, bool UseContentWatchLink) {
+        internal static string getDefaultBlockMessage(coreController cpcore, bool UseContentWatchLink) {
             string tempgetDefaultBlockMessage = null;
             try {
                 tempgetDefaultBlockMessage = "";
@@ -363,7 +363,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public static string getMoreInfoHtml(coreClass cpCore, int PeopleID) {
+        public static string getMoreInfoHtml(coreController cpCore, int PeopleID) {
             string result = "";
             try {
                 int CS = 0;
@@ -434,7 +434,7 @@ namespace Contensive.Core.Controllers {
             return genericController.GetTableCell("<nobr>" + CopyCaption + "</nobr>", "150", 0, EvenRow, "right") + genericController.GetTableCell(CopyResult, "100%", 0, EvenRow, "left") + kmaEndTableRow;
         }
         //
-        public static void loadPage(coreClass cpcore, int requestedPageId, domainModel domain) {
+        public static void loadPage(coreController cpcore, int requestedPageId, domainModel domain) {
             try {
                 if (domain == null) {
                     //
@@ -547,7 +547,7 @@ namespace Contensive.Core.Controllers {
                 cpcore.handleException(ex);
             }
         }
-        public static int getPageNotFoundPageId(coreClass cpcore) {
+        public static int getPageNotFoundPageId(coreController cpcore) {
             int pageId = 0;
             try {
                 pageId = cpcore.domain.pageNotFoundPageId;
@@ -568,7 +568,7 @@ namespace Contensive.Core.Controllers {
         //
         //---------------------------------------------------------------------------
         //
-        public static pageContentModel getLandingPage(coreClass cpcore, domainModel domain) {
+        public static pageContentModel getLandingPage(coreController cpcore, domainModel domain) {
             pageContentModel landingPage = null;
             try {
                 if (domain == null) {
@@ -621,7 +621,7 @@ namespace Contensive.Core.Controllers {
         //
         // Verify a link from the template link field to be used as a Template Link
         //
-        internal static string verifyTemplateLink(coreClass cpcore, string linkSrc) {
+        internal static string verifyTemplateLink(coreController cpcore, string linkSrc) {
             string tempverifyTemplateLink = null;
             //
             //
@@ -653,7 +653,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        internal static string main_ProcessPageNotFound_GetLink(coreClass cpcore, string adminMessage, string BackupPageNotFoundLink = "", string PageNotFoundLink = "", int EditPageID = 0, int EditSectionID = 0) {
+        internal static string main_ProcessPageNotFound_GetLink(coreController cpcore, string adminMessage, string BackupPageNotFoundLink = "", string PageNotFoundLink = "", int EditPageID = 0, int EditSectionID = 0) {
             string result = "";
             try {
                 int Pos = 0;
@@ -737,7 +737,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static string getPageLink(coreClass cpcore, int PageID, string QueryStringSuffix, bool AllowLinkAliasIfEnabled = true, bool UseContentWatchNotDefaultPage = false) {
+        public static string getPageLink(coreController cpcore, int PageID, string QueryStringSuffix, bool AllowLinkAliasIfEnabled = true, bool UseContentWatchNotDefaultPage = false) {
             string result = "";
             try {
                 string linkPathPage = null;
@@ -827,7 +827,7 @@ namespace Contensive.Core.Controllers {
         //   If you already have all the info, lik the parents templateid, etc, call the ...WithArgs call
         //====================================================================================================
         //
-        public static string main_GetPageLink3(coreClass cpcore, int PageID, string QueryStringSuffix, bool AllowLinkAlias) {
+        public static string main_GetPageLink3(coreController cpcore, int PageID, string QueryStringSuffix, bool AllowLinkAlias) {
             return getPageLink(cpcore, PageID, QueryStringSuffix, AllowLinkAlias, false);
         }
         //
@@ -842,7 +842,7 @@ namespace Contensive.Core.Controllers {
         //   Tests if this record is in the ParentID->ID chain for this content
         //========================================================================
         //
-        public static bool isChildRecord(coreClass cpcore, string ContentName, int ChildRecordID, int ParentRecordID) {
+        public static bool isChildRecord(coreController cpcore, string ContentName, int ChildRecordID, int ParentRecordID) {
             bool tempisChildRecord = false;
             try {
                 //
@@ -874,7 +874,7 @@ namespace Contensive.Core.Controllers {
         //   Tests if this record is in the ParentID->ID chain for this content
         //========================================================================
         //
-        internal static bool main_IsChildRecord_Recurse(coreClass cpcore, string DataSourceName, string TableName, int ChildRecordID, int ParentRecordID, string History) {
+        internal static bool main_IsChildRecord_Recurse(coreController cpcore, string DataSourceName, string TableName, int ChildRecordID, int ParentRecordID, string History) {
             bool result = false;
             try {
                 string SQL = null;
@@ -907,7 +907,7 @@ namespace Contensive.Core.Controllers {
         //   This code is based on the GoMethod site script
         //========================================================================
         //
-        public static string getHtmlBody(coreClass cpCore) {
+        public static string getHtmlBody(coreController cpCore) {
             string returnHtml = "";
             try {
                 int downloadId = 0;
@@ -1594,7 +1594,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        private static void processForm(coreClass cpcore, int FormPageID) {
+        private static void processForm(coreController cpcore, int FormPageID) {
             try {
                 //
                 int CS = 0;
@@ -1781,7 +1781,7 @@ namespace Contensive.Core.Controllers {
         //   {{CAPTION}} tags -- main_Gets the caption for each instruction line
         //   {{FIELD}} tags -- main_Gets the form field for each instruction line
         //
-        internal static main_FormPagetype loadFormPageInstructions(coreClass cpcore, string FormInstructions, string Formhtml) {
+        internal static main_FormPagetype loadFormPageInstructions(coreController cpcore, string FormInstructions, string Formhtml) {
             main_FormPagetype result = new main_FormPagetype();
             try {
                 int PtrFront = 0;
@@ -1858,7 +1858,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        internal static string getFormPage(coreClass cpcore, string FormPageName, int GroupIDToJoinOnSuccess) {
+        internal static string getFormPage(coreController cpcore, string FormPageName, int GroupIDToJoinOnSuccess) {
             string tempgetFormPage = null;
             try {
                 //
@@ -1964,7 +1964,7 @@ namespace Contensive.Core.Controllers {
         //   RootPageID has to be the ID of the root page for PageID
         //=============================================================================
         //
-        public static string getContentBox(coreClass cpCore, string OrderByClause, bool AllowChildPageList, bool AllowReturnLink, bool ArchivePages, int ignoreme, bool UseContentWatchLink, bool allowPageWithoutSectionDisplay) {
+        public static string getContentBox(coreController cpCore, string OrderByClause, bool AllowChildPageList, bool AllowReturnLink, bool ArchivePages, int ignoreme, bool UseContentWatchLink, bool allowPageWithoutSectionDisplay) {
             string returnHtml = "";
             try {
                 DateTime DateModified = default(DateTime);
@@ -2434,7 +2434,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="allowPageWithoutSectionDisplay"></param>
         /// <returns></returns>
         //
-        internal static string getContentBox_content(coreClass cpcore, string OrderByClause, bool AllowChildPageList, bool AllowReturnLink, bool ArchivePages, int ignoreMe, bool UseContentWatchLink, bool allowPageWithoutSectionDisplay) {
+        internal static string getContentBox_content(coreController cpcore, string OrderByClause, bool AllowChildPageList, bool AllowReturnLink, bool ArchivePages, int ignoreMe, bool UseContentWatchLink, bool allowPageWithoutSectionDisplay) {
             string result = "";
             try {
                 bool isEditing = false;
@@ -2478,7 +2478,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="ArchivePage"></param>
         /// <returns></returns>
 
-        internal static string getContentBox_content_Body(coreClass cpcore, string OrderByClause, bool AllowChildList, bool Authoring, int rootPageId, bool AllowReturnLink, string RootPageContentName, bool ArchivePage) {
+        internal static string getContentBox_content_Body(coreController cpcore, string OrderByClause, bool AllowChildList, bool Authoring, int rootPageId, bool AllowReturnLink, string RootPageContentName, bool ArchivePage) {
             string result = "";
             try {
                 bool allowChildListComposite = AllowChildList && cpcore.doc.page.AllowChildListDisplay;
@@ -2663,7 +2663,7 @@ namespace Contensive.Core.Controllers {
         //   RecordID is the parent RecordID
         //=============================================================================
         //
-        public static string getSeeAlso(coreClass cpcore, string ContentName, int RecordID) {
+        public static string getSeeAlso(coreController cpcore, string ContentName, int RecordID) {
             string result = "";
             try {
                 int CS = 0;
@@ -2740,7 +2740,7 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //
-        public string main_GetMoreInfo(coreClass cpcore, int contactMemberID) {
+        public string main_GetMoreInfo(coreController cpcore, int contactMemberID) {
             string tempmain_GetMoreInfo = null;
             string result = "";
             try {
@@ -2760,7 +2760,7 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //
-        public static string main_GetFeedbackForm(coreClass cpCore, string ContentName, int RecordID, int ToMemberID, string headline = "") {
+        public static string main_GetFeedbackForm(coreController cpCore, string ContentName, int RecordID, int ToMemberID, string headline = "") {
             string result = "";
             try {
                 string Panel = null;

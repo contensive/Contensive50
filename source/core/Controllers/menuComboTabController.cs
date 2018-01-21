@@ -55,7 +55,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public string GetTabs(coreClass cpCore ) {
+        public string GetTabs(coreController cpCore ) {
             string result = "";
             try {
                 //

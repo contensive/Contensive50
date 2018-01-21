@@ -20,7 +20,7 @@ namespace Contensive.Core.Controllers {
         // ----- global scope variables
         //
         private const string ApplicationNameLocal = "unknown";
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         private const string ContentSelectList = ""
             + " id,name,active,adminonly,allowadd"
@@ -85,7 +85,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        public collectionXmlController(coreClass cpCore) {
+        public collectionXmlController(coreController cpCore) {
             this.cpCore = cpCore;
         }
         //

@@ -138,7 +138,7 @@ namespace Contensive.Core.Models.DbModels {
             public bool contentUpdated { get; set; } = false;
             //
             // -- set by load(). Used by field to read content from filename when needed
-            public coreClass internalCpCore { get; set; } = null;
+            public coreController internalCpCore { get; set; } = null;
         }
 
         //
@@ -210,7 +210,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <typeparam name="T"></typeparam>
         /// <param name="cpCore"></param>
         /// <returns></returns>
-        protected static T add<T>(coreClass cpCore) where T : baseModel {
+        protected static T add<T>(coreController cpCore) where T : baseModel {
             var tempVar = new List<string>();
             return add<T>(cpCore, ref tempVar);
         }
@@ -223,7 +223,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cpCore"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        protected static T add<T>(coreClass cpCore, ref List<string> callersCacheNameList) where T : baseModel {
+        protected static T add<T>(coreController cpCore, ref List<string> callersCacheNameList) where T : baseModel {
             T result = default(T);
             try {
                 if (cpCore.serverConfig == null) {
@@ -254,7 +254,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cpCore"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        protected static T create<T>(coreClass cpCore, int recordId) where T : baseModel {
+        protected static T create<T>(coreController cpCore, int recordId) where T : baseModel {
             var tempVar = new List<string>();
             return create<T>(cpCore, recordId, ref tempVar);
         }
@@ -266,7 +266,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="recordId">The id of the record to be read into the new object</param>
         /// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        protected static T create<T>(coreClass cpCore, int recordId, ref List<string> callersCacheNameList) where T : baseModel {
+        protected static T create<T>(coreController cpCore, int recordId, ref List<string> callersCacheNameList) where T : baseModel {
             T result = default(T);
             try {
                 if (cpCore.serverConfig == null) {
@@ -334,7 +334,7 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
-        protected static T create<T>(coreClass cpCore, string recordGuid) where T : baseModel {
+        protected static T create<T>(coreController cpCore, string recordGuid) where T : baseModel {
             var tempVar = new List<string>();
             return create<T>(cpCore, recordGuid, ref tempVar);
         }
@@ -345,7 +345,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
-        protected static T create<T>(coreClass cpCore, string recordGuid, ref List<string> callersCacheNameList) where T : baseModel {
+        protected static T create<T>(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) where T : baseModel {
             T result = default(T);
             try {
                 if (cpCore.serverConfig == null) {
@@ -379,7 +379,7 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
-        protected static T createByName<T>(coreClass cpCore, string recordName) where T : baseModel {
+        protected static T createByName<T>(coreController cpCore, string recordName) where T : baseModel {
             var tempVar = new List<string>();
             return createByName<T>(cpCore, recordName, ref tempVar);
         }
@@ -390,7 +390,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordName"></param>
-        protected static T createByName<T>(coreClass cpCore, string recordName, ref List<string> callersCacheNameList) where T : baseModel {
+        protected static T createByName<T>(coreController cpCore, string recordName, ref List<string> callersCacheNameList) where T : baseModel {
             T result = default(T);
             try {
                 if (cpCore.serverConfig == null) {
@@ -428,7 +428,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
-        private static T loadRecord<T>(coreClass cpCore, csController cs, ref List<string> callersCacheNameList) where T : baseModel {
+        private static T loadRecord<T>(coreController cpCore, csController cs, ref List<string> callersCacheNameList) where T : baseModel {
             T modelInstance = default(T);
             try {
                 if (cs.ok()) {
@@ -545,7 +545,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <returns></returns>
-        protected int save(coreClass cpCore) {
+        protected int save(coreController cpCore) {
             try {
                 if (cpCore.serverConfig == null) {
                     //
@@ -766,7 +766,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        protected static void delete<T>(coreClass cpCore, int recordId) where T : baseModel {
+        protected static void delete<T>(coreController cpCore, int recordId) where T : baseModel {
             try {
                 if (cpCore.serverConfig == null) {
                     //
@@ -797,7 +797,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="ccguid"></param>
-        protected static void delete<T>(coreClass cpCore, string ccguid) where T : baseModel {
+        protected static void delete<T>(coreController cpCore, string ccguid) where T : baseModel {
             try {
                 if (cpCore.serverConfig == null) {
                     //
@@ -825,12 +825,12 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
-        protected static List<T> createList<T>(coreClass cpCore, string sqlCriteria) where T : baseModel {
+        protected static List<T> createList<T>(coreController cpCore, string sqlCriteria) where T : baseModel {
             return createList<T>(cpCore, sqlCriteria, "id", new List<string> { });
         }
         //
         //====================================================================================================
-        protected static List<T> createList<T>(coreClass cpCore, string sqlCriteria, string sqlOrderBy) where T : baseModel {
+        protected static List<T> createList<T>(coreController cpCore, string sqlCriteria, string sqlOrderBy) where T : baseModel {
             return createList<T>(cpCore, sqlCriteria, sqlOrderBy, new List<string> { });
         }
         //
@@ -841,7 +841,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        protected static List<T> createList<T>(coreClass cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : baseModel {
+        protected static List<T> createList<T>(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : baseModel {
             List<T> result = new List<T>();
             try {
                 if (cpCore.serverConfig == null) {
@@ -885,7 +885,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <param name="recordId"></param>
-        protected static void invalidateCacheSingleRecord<T>(coreClass cpCore, int recordId) where T : baseModel {
+        protected static void invalidateCacheSingleRecord<T>(coreController cpCore, int recordId) where T : baseModel {
             try {
                 if (cpCore.serverConfig == null) {
                     //
@@ -915,7 +915,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="recordId"></param>record
         /// <returns></returns>
-        protected static string getRecordName<T>(coreClass cpcore, int recordId) where T : baseModel {
+        protected static string getRecordName<T>(coreController cpcore, int recordId) where T : baseModel {
             try {
                 if (cpcore.serverConfig == null) {
                     //
@@ -949,7 +949,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="ccGuid"></param>record
         /// <returns></returns>
-        protected static string getRecordName<T>(coreClass cpcore, string ccGuid) where T : baseModel {
+        protected static string getRecordName<T>(coreController cpcore, string ccGuid) where T : baseModel {
             try {
                 if (cpcore.serverConfig == null) {
                     //
@@ -983,7 +983,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="ccGuid"></param>record
         /// <returns></returns>
-        protected static int getRecordId<T>(coreClass cpcore, string ccGuid) where T : baseModel {
+        protected static int getRecordId<T>(coreController cpcore, string ccGuid) where T : baseModel {
             try {
                 if (cpcore.serverConfig == null) {
                     //
@@ -1012,7 +1012,7 @@ namespace Contensive.Core.Models.DbModels {
         //
         //====================================================================================================
         //
-        protected static T createDefault<T>(coreClass cpcore) where T : baseModel {
+        protected static T createDefault<T>(coreController cpcore) where T : baseModel {
             T instance = default(T);
             try {
                 Type instanceType = typeof(T);
@@ -1067,7 +1067,7 @@ namespace Contensive.Core.Models.DbModels {
             return instance;
         }
         //
-        private static T readModelCache<T>(coreClass cpCore, string fieldName, string fieldValue) where T : baseModel {
+        private static T readModelCache<T>(coreController cpCore, string fieldName, string fieldValue) where T : baseModel {
             Type instanceType = typeof(T);
             string tableName = derivedContentTableName(instanceType);
             string cacheName = Controllers.cacheController.getCacheKey_Entity(tableName, fieldName, fieldValue);

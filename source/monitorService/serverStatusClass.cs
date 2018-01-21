@@ -19,7 +19,7 @@ using static Contensive.WindowsServices.constants;
 namespace Contensive.WindowsServices {
     public class statusServerClass {
         private ipDaemonController cmdListener = new ipDaemonController();
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         public static AppLogType[] AppLog;
         public static int AppLogCnt;
@@ -437,7 +437,7 @@ namespace Contensive.WindowsServices {
             appendMonitorLog("unexepected error in " + methodName + ", " + exToString);
         }
 
-        public statusServerClass(coreClass cpCore) : base() {
+        public statusServerClass(coreController cpCore) : base() {
             this.cpCore = cpCore;
         }
     }

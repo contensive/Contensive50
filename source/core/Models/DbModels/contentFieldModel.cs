@@ -65,97 +65,97 @@ namespace Contensive.Core.Models.DbModels {
         public bool UniqueName { get; set; }
         //
         //====================================================================================================
-        public static contentFieldModel add(coreClass cpCore) {
+        public static contentFieldModel add(coreController cpCore) {
             return add<contentFieldModel>(cpCore);
         }
         //
         //====================================================================================================
-        public static contentFieldModel add(coreClass cpCore, ref List<string> callersCacheNameList) {
+        public static contentFieldModel add(coreController cpCore, ref List<string> callersCacheNameList) {
             return add<contentFieldModel>(cpCore, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static contentFieldModel create(coreClass cpCore, int recordId) {
+        public static contentFieldModel create(coreController cpCore, int recordId) {
             return create<contentFieldModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static contentFieldModel create(coreClass cpCore, int recordId, ref List<string> callersCacheNameList) {
+        public static contentFieldModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
             return create<contentFieldModel>(cpCore, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static contentFieldModel create(coreClass cpCore, string recordGuid) {
+        public static contentFieldModel create(coreController cpCore, string recordGuid) {
             return create<contentFieldModel>(cpCore, recordGuid);
         }
         //
         //====================================================================================================
-        public static contentFieldModel create(coreClass cpCore, string recordGuid, ref List<string> callersCacheNameList) {
+        public static contentFieldModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
             return create<contentFieldModel>(cpCore, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static contentFieldModel createByName(coreClass cpCore, string recordName) {
+        public static contentFieldModel createByName(coreController cpCore, string recordName) {
             return createByName<contentFieldModel>(cpCore, recordName);
         }
         //
         //====================================================================================================
-        public static contentFieldModel createByName(coreClass cpCore, string recordName, ref List<string> callersCacheNameList) {
+        public static contentFieldModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
             return createByName<contentFieldModel>(cpCore, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreClass cpCore) {
+        public new void save(coreController cpCore) {
             base.save(cpCore);
         }
         //
         //====================================================================================================
-        public static void delete(coreClass cpCore, int recordId) {
+        public static void delete(coreController cpCore, int recordId) {
             delete<contentFieldModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreClass cpCore, string ccGuid) {
+        public static void delete(coreController cpCore, string ccGuid) {
             delete<contentFieldModel>(cpCore, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<contentFieldModel> createList(coreClass cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<contentFieldModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<contentFieldModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<contentFieldModel> createList(coreClass cpCore, string sqlCriteria, string sqlOrderBy) {
+        public static List<contentFieldModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
             return createList<contentFieldModel>(cpCore, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<contentFieldModel> createList(coreClass cpCore, string sqlCriteria) {
+        public static List<contentFieldModel> createList(coreController cpCore, string sqlCriteria) {
             return createList<contentFieldModel>(cpCore, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreClass cpCore, int recordId) {
+        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
             invalidateCacheSingleRecord<contentFieldModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreClass cpcore, int recordId) {
+        public static string getRecordName(coreController cpcore, int recordId) {
             return baseModel.getRecordName<contentFieldModel>(cpcore, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreClass cpcore, string ccGuid) {
+        public static string getRecordName(coreController cpcore, string ccGuid) {
             return baseModel.getRecordName<contentFieldModel>(cpcore, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreClass cpcore, string ccGuid) {
+        public static int getRecordId(coreController cpcore, string ccGuid) {
             return baseModel.getRecordId<contentFieldModel>(cpcore, ccGuid);
         }
         //
         //====================================================================================================
-        public static contentFieldModel createDefault(coreClass cpcore) {
+        public static contentFieldModel createDefault(coreController cpcore) {
             return createDefault<contentFieldModel>(cpcore);
         }
     }

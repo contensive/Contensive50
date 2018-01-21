@@ -19,7 +19,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
         //
         // constructor sets cp from argument for use in calls to other objects, then cpCore because cp cannot be uses since that would be a circular depenancy
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         // To interigate Add-on Collections to check for re-use
         //
@@ -49,7 +49,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public addonManagerClass(coreClass cpCore) : base() {
+        public addonManagerClass(coreController cpCore) : base() {
             this.cpCore = cpCore;
         }
         //

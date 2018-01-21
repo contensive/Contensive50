@@ -30,7 +30,7 @@ namespace Contensive.Core.Addons.Email {
             try {
                 //
                 // -- ok to cast cpbase to cp because they build from the same solution
-                coreClass cpCore = ((CPClass)cp).core;
+                coreController cpCore = ((CPClass)cp).core;
                 emailController.procesQueue(cpCore);
                 //
                 // Send Submitted Group Email (submitted, not sent, no conditions)
@@ -53,7 +53,7 @@ namespace Contensive.Core.Addons.Email {
         //====================================================================================================
         //   Process Group Email
         //
-        private void ProcessEmail_GroupEmail(coreClass cpCore) {
+        private void ProcessEmail_GroupEmail(coreController cpCore) {
             try {
                 //
                 //Dim siteStyles As String
@@ -225,7 +225,7 @@ namespace Contensive.Core.Addons.Email {
         //
         //====================================================================================================
         //
-        private void ProcessEmail_ConditionalEmail(coreClass cpCore, bool IsNewHour, bool IsNewDay) {
+        private void ProcessEmail_ConditionalEmail(coreController cpCore, bool IsNewHour, bool IsNewDay) {
             try {
                 //
                 //
@@ -460,7 +460,7 @@ namespace Contensive.Core.Addons.Email {
         /// <param name="EmailAllowLinkEID"></param>
         /// <param name="emailStyles"></param>
         /// <returns>OK if successful, else returns user error.</returns>
-        private string SendEmailRecord(coreClass cpCore, int MemberID, int emailID, DateTime DateBlockExpires, int EmailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
+        private string SendEmailRecord(coreController cpCore, int MemberID, int emailID, DateTime DateBlockExpires, int EmailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
             string returnStatus = "";
             int CSPeople = 0;
             int CSLog = 0;
@@ -639,13 +639,13 @@ namespace Contensive.Core.Addons.Email {
         //
         //====================================================================================================
         //
-        private string GetPrimaryDomainName(coreClass cpCore) {
+        private string GetPrimaryDomainName(coreController cpCore) {
             return cpCore.serverConfig.appConfig.domainList[0];
         }
         //
         //====================================================================================================
         //
-        private string GetEmailTemplate(coreClass cpCore, int EmailTemplateID) {
+        private string GetEmailTemplate(coreController cpCore, int EmailTemplateID) {
             string tempGetEmailTemplate = "";
             try {
                 //
@@ -679,7 +679,7 @@ namespace Contensive.Core.Addons.Email {
         /// <param name="emailStyles"></param>
         /// <param name="EmailFrom"></param>
         /// <param name="EmailStatusList"></param>
-        private void SendConfirmationEmail(coreClass cpCore, int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string PrimaryLink, string EmailSubject, string emailBody, string emailStyles, string EmailFrom, string EmailStatusList) {
+        private void SendConfirmationEmail(coreController cpCore, int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string PrimaryLink, string EmailSubject, string emailBody, string emailStyles, string EmailFrom, string EmailStatusList) {
             try {
                 personModel person = personModel.create(cpCore, ConfirmationMemberID);
                 if ( person != null ) {

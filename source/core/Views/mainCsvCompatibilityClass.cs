@@ -20,8 +20,8 @@ namespace Contensive.Core {
         public const string InterfaceId = "CE342EA5-339F-4C31-9F90-F878F527E17A";
         public const string EventsId = "21D9D0FB-9B5B-43C2-A7A5-3C84ABFAF90A";
         // 
-        private coreClass cpCore;
-        public mainCsvScriptCompatibilityClass(coreClass cpCore) {
+        private coreController cpCore;
+        public mainCsvScriptCompatibilityClass(coreController cpCore) {
             this.cpCore = cpCore;
         }
         //

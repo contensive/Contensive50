@@ -21,14 +21,14 @@ namespace Contensive.Core {
     /// </summary>
     public class csController : IDisposable {
         //
-        private Contensive.Core.coreClass cpCore;
+        private Contensive.Core.Controllers.coreController cpCore;
         private int csPtr;
         private int openingMemberID;
         protected bool disposed = false;
         //
         // Constructor - Initialize the Main and Csv objects
         //
-        public csController(coreClass cpCore) {
+        public csController(coreController cpCore) {
             this.cpCore = cpCore;
             openingMemberID = cpCore.doc.sessionContext.user.id;
         }
@@ -448,7 +448,7 @@ namespace Contensive.Core {
         //   main_cs_get Field, translate all fields to their best text equivalent, and encode for display
         //========================================================================
         //
-        public static string getTextEncoded(coreClass cpcore, int CSPointer, string FieldName) {
+        public static string getTextEncoded(coreController cpcore, int CSPointer, string FieldName) {
             string ContentName = "";
             int RecordID = 0;
             if (cpcore.db.cs_isFieldSupported(CSPointer, "id") & cpcore.db.cs_isFieldSupported(CSPointer, "contentcontrolId")) {

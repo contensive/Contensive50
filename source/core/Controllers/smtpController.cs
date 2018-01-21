@@ -25,7 +25,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Send email by SMTP. return 'ok' if success, else return a user compatible error message
         /// </summary>
-        public static bool sendSmtp( coreClass cpCore, emailController.emailClass email, ref string returnErrorMessage, string AttachmentFilename = "") {
+        public static bool sendSmtp( coreController cpCore, emailController.emailClass email, ref string returnErrorMessage, string AttachmentFilename = "") {
             bool status = false;
             returnErrorMessage = "";
             try {

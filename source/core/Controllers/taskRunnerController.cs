@@ -137,7 +137,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Iterate through all apps, find addosn that need to run and add them to the task queue
         /// </summary>
-        private void runTasks(coreClass cpClusterCore) {
+        private void runTasks(coreController cpClusterCore) {
             try {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();

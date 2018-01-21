@@ -90,7 +90,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         //
-        private static string convertActiveContent_Internal_activeParts(coreClass cpCore, string Source, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool AddLinkEID, bool EncodeCachableTags, bool EncodeImages, bool EncodeEditIcons, bool EncodeNonCachableTags, string AddAnchorQuery, string ProtocolHostLink, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
+        private static string convertActiveContent_Internal_activeParts(coreController cpCore, string Source, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool AddLinkEID, bool EncodeCachableTags, bool EncodeImages, bool EncodeEditIcons, bool EncodeNonCachableTags, string AddAnchorQuery, string ProtocolHostLink, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = "";
             try {
                 string ACGuid = null;
@@ -1117,7 +1117,7 @@ namespace Contensive.Core.Controllers {
         //   ACInstanceID - used to identify an AC tag on a page. Each instance of an AC tag must havea unique ACinstanceID
         //====================================================================================================
         //
-        public static string convertEditorResponseToActiveContent(coreClass cpCore, string SourceCopy) {
+        public static string convertEditorResponseToActiveContent(coreController cpCore, string SourceCopy) {
             string result = "";
             try {
                 string imageNewLink = null;
@@ -1785,7 +1785,7 @@ namespace Contensive.Core.Controllers {
         //===================================================================================================
         // To support the special case when the template calls this to encode itself, and the page content has already been rendered.
         //
-        private static string convertActiveContent_internal(coreClass cpCore, string Source, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool PlainText, bool AddLinkEID, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
+        private static string convertActiveContent_internal(coreController cpCore, string Source, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool PlainText, bool AddLinkEID, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
             string result = Source;
             try {
                 //
@@ -2167,7 +2167,7 @@ namespace Contensive.Core.Controllers {
         //   Upgrade old objects in content, and update changed resource library images
         // ================================================================================================================
         //
-        public static string upgradeActiveContent( coreClass cpCore, string Source) {
+        public static string upgradeActiveContent( coreController cpCore, string Source) {
             string result = Source;
             try {
                 string RecordVirtualPath = "";
@@ -2538,27 +2538,27 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="editorValue"></param>
         /// <returns></returns>
-        public static string convertActiveContentToHtmlForWysiwygEditor(coreClass cpCore, string editorValue) {
+        public static string convertActiveContentToHtmlForWysiwygEditor(coreController cpCore, string editorValue) {
             return convertActiveContent_internal(cpCore, editorValue, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, null, false);
         }
         //
         //====================================================================================================
         //
-        public static string convertActiveContentToJsonForRemoteMethod(coreClass cpCore, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
+        public static string convertActiveContentToJsonForRemoteMethod(coreController cpCore, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
             return convertActiveContent_internal(cpCore, Source, cpCore.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, cpCore.doc.sessionContext.isAuthenticated, null, cpCore.doc.sessionContext.isEditingAnything());
             //False, False, True, True, False, True, ""
         }
         //
         //====================================================================================================
         //
-        public static string convertActiveContentToHtmlForWebRender(coreClass cpCore, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, CPUtilsBaseClass.addonContext addonContext) {
+        public static string convertActiveContentToHtmlForWebRender(coreController cpCore, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, CPUtilsBaseClass.addonContext addonContext) {
             return convertActiveContent_internal(cpCore, Source, cpCore.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, cpCore.doc.sessionContext.isAuthenticated, null, cpCore.doc.sessionContext.isEditingAnything());
             //False, False, True, True, False, True, ""
         }
         //
         //====================================================================================================
         //
-        public static  string convertActiveContentToHtmlForEmailSend(coreClass cpCore, string Source, int personalizationPeopleID, string queryStringForLinkAppend) {
+        public static  string convertActiveContentToHtmlForEmailSend(coreController cpCore, string Source, int personalizationPeopleID, string queryStringForLinkAppend) {
             return convertActiveContent_internal(cpCore, Source, personalizationPeopleID, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
             //False, False, True, True, False, True, ""
         }

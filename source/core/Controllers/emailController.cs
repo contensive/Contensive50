@@ -25,17 +25,17 @@ namespace Contensive.Core.Controllers {
         //
         // ----- private instance storage
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         //====================================================================================================
         //
-        private static void appendEmailLog( coreClass cpCore, string logCopy ) {
+        private static void appendEmailLog( coreController cpCore, string logCopy ) {
             logController.appendLog(cpCore, logCopy, "email");
         }
         //
         //====================================================================================================
         //
-        public static string getBlockList(coreClass cpCore) {
+        public static string getBlockList(coreController cpCore) {
             //
             string privatePathFilename = null;
             //
@@ -50,13 +50,13 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static bool isOnBlockedList(coreClass cpCore, string emailAddress) {
+        public static bool isOnBlockedList(coreController cpCore, string emailAddress) {
             return (getBlockList(cpCore).IndexOf("\r\n" + emailAddress + "\t", StringComparison.CurrentCultureIgnoreCase) >= 0);
         }
         //
         //====================================================================================================
         //
-        public static void addToBlockList( coreClass cpCore, string EmailAddress) {
+        public static void addToBlockList( coreController cpCore, string EmailAddress) {
             var blockList = getBlockList(cpCore);
             if (!verifyEmailAddress(cpCore, EmailAddress)) {
                 //
@@ -78,7 +78,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private static bool verifyEmail(coreClass cpCore, emailClass email, string returnUserWarning) {
+        private static bool verifyEmail(coreController cpCore, emailClass email, string returnUserWarning) {
             bool result = false;
             try {
                 if (!verifyEmailAddress(cpCore, email.toAddress)) {
@@ -101,7 +101,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// email address must have at least one character before the @, and have a valid email domain
         /// </summary>
-        private static bool verifyEmailAddress(coreClass cpCore, string EmailAddress) {
+        private static bool verifyEmailAddress(coreController cpCore, string EmailAddress) {
             bool result = false;
             try {
                 if (!string.IsNullOrWhiteSpace(EmailAddress)) {
@@ -123,7 +123,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Server must have at least 3 digits, and one dot in the middle
         /// </summary>
-        public static bool verifyEmailDomain(coreClass cpCore, string emailDomain) {
+        public static bool verifyEmailDomain(coreController cpCore, string emailDomain) {
             bool result = false;
             try {
                 //
@@ -148,7 +148,7 @@ namespace Contensive.Core.Controllers {
         /// Send Email
         /// </summary>
         /// <returns>false if the email is not sent successfully and the returnUserWarning argument contains a user compatible message. If true, the returnUserWanting may contain a user compatible message about email issues.</returns>
-        public static bool sendAdHoc(coreClass cpCore, string ToAddress, string FromAddress, string SubjectMessage, string BodyMessage, string BounceAddress, string ReplyToAddress, string ResultLogFilename, bool isImmediate, bool isHTML, int emailIdOrZeroForLog, ref string returnSendStatus) {
+        public static bool sendAdHoc(coreController cpCore, string ToAddress, string FromAddress, string SubjectMessage, string BodyMessage, string BounceAddress, string ReplyToAddress, string ResultLogFilename, bool isImmediate, bool isHTML, int emailIdOrZeroForLog, ref string returnSendStatus) {
             bool result = false;
             try {
                 //
@@ -244,7 +244,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="template"></param>
         /// <param name="EmailAllowLinkEID"></param>
         /// <returns> returns ok if send is successful, otherwise returns the principle issue as a user error</returns>
-        public static bool sendPerson(coreClass cpCore, personModel person, string FromAddress, string subject, string Body, bool Immediate, bool HTML, int emailIdOrZeroForLog, string template, bool EmailAllowLinkEID, ref string returnSendStatus, string queryStringForLinkAppend ) {
+        public static bool sendPerson(coreController cpCore, personModel person, string FromAddress, string subject, string Body, bool Immediate, bool HTML, int emailIdOrZeroForLog, string template, bool EmailAllowLinkEID, ref string returnSendStatus, string queryStringForLinkAppend ) {
             bool result = false;
             try {
                 if (person == null) {
@@ -311,7 +311,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="appendedCopy"></param>
         /// <param name="AdditionalMemberIDOrZero"></param>
         /// <returns></returns>
-        public static string sendSystem(coreClass cpCore, string emailName, string appendedCopy = "", int AdditionalMemberIDOrZero = 0) {
+        public static string sendSystem(coreController cpCore, string emailName, string appendedCopy = "", int AdditionalMemberIDOrZero = 0) {
             string returnString = "";
             try {
                 //
@@ -455,7 +455,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="EmailID"></param>
         /// <param name="ConfirmationMemberID"></param>
-        public static void sendConfirmationTest(coreClass cpCore, int EmailID, int ConfirmationMemberID) {
+        public static void sendConfirmationTest(coreController cpCore, int EmailID, int ConfirmationMemberID) {
             try {
                 string ConfirmFooter = "";
                 int TotalCnt = 0;
@@ -619,7 +619,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static void sendForm( coreClass cpCore,string SendTo, string SendFrom, string SendSubject) {
+        public static void sendForm( coreController cpCore,string SendTo, string SendFrom, string SendSubject) {
             try {
                 string Message = "";
                 string iSendTo = null;
@@ -661,7 +661,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static void sendGroup(coreClass cpCore, string groupCommaList, string FromAddress, string subject, string Body, bool Immediate, bool HTML) {
+        public static void sendGroup(coreController cpCore, string groupCommaList, string FromAddress, string subject, string Body, bool Immediate, bool HTML) {
             try {
                 if (!string.IsNullOrWhiteSpace( groupCommaList)) {
                     List<string> groupList = groupCommaList.Split(',').ToList<string>().FindAll(t => !string.IsNullOrWhiteSpace(t));
@@ -683,7 +683,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// add this email to the email queue
         /// </summary>
-        private static void addToQueue(coreClass cpCore, bool immediate, emailClass email) {
+        private static void addToQueue(coreController cpCore, bool immediate, emailClass email) {
             try {
                 var record = emailQueueModel.add(cpCore);
                 record.immediate = immediate;
@@ -701,7 +701,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Send the emails in the current Queue
         /// </summary>
-        public static void procesQueue(coreClass cpCore) {
+        public static void procesQueue(coreController cpCore) {
             try {
                 List<emailQueueModel> queue = emailQueueModel.createList(cpCore, "", "immediate,id desc");
                 foreach (emailQueueModel queueRecord in queue) {
@@ -774,7 +774,7 @@ namespace Contensive.Core.Controllers {
         //
         protected bool disposed = false;
 
-        public emailController(coreClass cpCore) {
+        public emailController(coreController cpCore) {
             this.cpCore = cpCore;
         }
         //

@@ -24,7 +24,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         // -- not sure if this is the best plan, buts lets try this and see if we can get out of it later (to make this an addon) 
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         // -- this documents unique guid (created on the fly)
         public string docGuid { get; set; }
@@ -264,7 +264,7 @@ namespace Contensive.Core.Controllers {
         /// this will eventuall be an addon, but lets do this first to keep the converstion complexity down
         /// </summary>
         /// <param name="cpCore"></param>
-        public docController(coreClass cpCore) {
+        public docController(coreController cpCore) {
             this.cpCore = cpCore;
             //
             domain = new domainModel();
@@ -279,7 +279,7 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //
-        public int main_OpenCSWhatsNew(coreClass cpCore, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
+        public int main_OpenCSWhatsNew(coreController cpCore, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
             int result = -1;
             try {
                 result = main_OpenCSContentWatchList(cpCore, "What's New", SortFieldList, ActiveOnly, PageSize, PageNumber);
@@ -293,7 +293,7 @@ namespace Contensive.Core.Controllers {
         //   Open a content set with the current whats new list
         //========================================================================
         //
-        public int main_OpenCSContentWatchList(coreClass cpcore, string ListName, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
+        public int main_OpenCSContentWatchList(coreController cpcore, string ListName, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
             int result = -1;
             try {
                 string SQL = null;
@@ -372,7 +372,7 @@ namespace Contensive.Core.Controllers {
         //   Prints a linked list of new content
         //========================================================================
         //
-        public string main_GetWhatsNew(coreClass cpcore, string SortFieldList = "") {
+        public string main_GetWhatsNew(coreController cpcore, string SortFieldList = "") {
             string result = "";
             try {
                 int CSPointer = 0;
@@ -411,7 +411,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public string main_GetWatchList(coreClass cpCore, string ListName, string SortField, bool SortReverse) {
+        public string main_GetWatchList(coreController cpCore, string ListName, string SortField, bool SortReverse) {
             string result = "";
             try {
                 int CS = 0;
@@ -464,7 +464,7 @@ namespace Contensive.Core.Controllers {
         //
         //todo  NOTE: C# does not support parameterized properties - the following property has been rewritten as a function:
         //ORIGINAL LINE: Public ReadOnly Property main_SiteStructure(cpcore As coreClass) As String
-        public string get_main_SiteStructure(coreClass cpcore) {
+        public string get_main_SiteStructure(coreController cpcore) {
             if (!siteStructure_LocalLoaded) {
                 addonModel addon = addonModel.create(cpcore, addonGuidSiteStructureGuid);
                 siteStructure = this.cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextSimple });
@@ -1656,7 +1656,7 @@ namespace Contensive.Core.Controllers {
         //
         //=============================================================================
         //
-        public void verifyRegistrationFormPage(coreClass cpcore) {
+        public void verifyRegistrationFormPage(coreController cpcore) {
             try {
                 //
                 int CS = 0;

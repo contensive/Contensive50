@@ -40,7 +40,7 @@ namespace Contensive.Core.Controllers {
         //
         //   Internal Storage
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         private const bool NewWay = true;
         //
@@ -76,7 +76,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public htmlParserController(coreClass cpCore) {
+        public htmlParserController(coreController cpCore) {
             this.cpCore = cpCore;
         }
         //

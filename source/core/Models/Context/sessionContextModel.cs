@@ -27,7 +27,7 @@ namespace Contensive.Core.Models.Context {
         //
         //====================================================================================================
         // -- this class stores state, so it can hold a pointer to the cpCore instance
-        private coreClass cpCore { get; set; }
+        private coreController cpCore { get; set; }
         //
         //====================================================================================================
         // -- the visit is the collection of pages, constructor creates default non-authenticated instance
@@ -122,7 +122,7 @@ namespace Contensive.Core.Models.Context {
         /// <summary>
         /// constructor, no arguments, created default authentication model for use without user, and before user is available
         /// </summary>
-        public sessionContextModel(coreClass cpCore) {
+        public sessionContextModel(coreController cpCore) {
             this.cpCore = cpCore;
             visit = new visitModel();
             visitor = new visitorModel();
@@ -139,7 +139,7 @@ namespace Contensive.Core.Models.Context {
         /// When false, a visit can be configured on the fly by any application that attempts to access the cp.user.id
         /// </param>
         /// <returns></returns>
-        public static sessionContextModel create(coreClass cpCore, bool trackVisits) {
+        public static sessionContextModel create(coreController cpCore, bool trackVisits) {
             sessionContextModel resultSessionContext = null;
             var sw = Stopwatch.StartNew();
             try {
@@ -605,7 +605,7 @@ namespace Contensive.Core.Models.Context {
         //       Member has admin or developer status
         //========================================================================
         //
-        public bool isAuthenticatedAdmin(coreClass cpCore) {
+        public bool isAuthenticatedAdmin(coreController cpCore) {
             bool result = false;
             try {
                 result = visit.VisitAuthenticated & (user.Admin | user.Developer);
@@ -627,7 +627,7 @@ namespace Contensive.Core.Models.Context {
         //   main_IsDeveloper
         //========================================================================
         //
-        public bool isAuthenticatedDeveloper(coreClass cpCore) {
+        public bool isAuthenticatedDeveloper(coreController cpCore) {
             bool result = false;
             try {
                 result = visit.VisitAuthenticated & (user.Admin | user.Developer);
@@ -653,7 +653,7 @@ namespace Contensive.Core.Models.Context {
         //   If ContentName is given, it only tests this content
         //========================================================================
         //
-        public bool isAuthenticatedContentManager(coreClass cpCore, string ContentName = "") {
+        public bool isAuthenticatedContentManager(coreController cpCore, string ContentName = "") {
             bool returnIsContentManager = false;
             try {
                 string SQL = null;
@@ -713,7 +713,7 @@ namespace Contensive.Core.Models.Context {
         //   Create and assign a guest Member identity
         //========================================================================
         //
-        public void logout(coreClass cpCore) {
+        public void logout(coreController cpCore) {
             try {
                 logController.logActivity2(cpCore, "logout", user.id, user.OrganizationID);
                 //
@@ -742,7 +742,7 @@ namespace Contensive.Core.Models.Context {
         //   If the Id can not be found, user errors are added with main_AddUserError and 0 is returned (false)
         //===================================================================================================
         //
-        public int authenticateGetId(coreClass cpCore, string username, string password) {
+        public int authenticateGetId(coreController cpCore, string username, string password) {
             int returnUserId = 0;
             try {
                 const string badLoginUserError = "Your login was not successful. Please try again.";
@@ -874,7 +874,7 @@ namespace Contensive.Core.Models.Context {
         //       returns true if this can be used
         //       returns false, and a User Error response if it can not be used
         //
-        public bool isNewLoginOK(coreClass cpCore, string Username, string Password, ref string returnErrorMessage, ref int returnErrorCode) {
+        public bool isNewLoginOK(coreController cpCore, string Username, string Password, ref string returnErrorMessage, ref int returnErrorCode) {
             bool returnOk = false;
             try {
                 int CSPointer = 0;
@@ -922,7 +922,7 @@ namespace Contensive.Core.Models.Context {
         //====================================================================================================
         // main_GetContentAccessRights( ContentIdOrName, returnAllowEdit, returnAllowAdd, returnAllowDelete )
         //
-        public void getContentAccessRights(coreClass cpCore, string ContentName, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete) {
+        public void getContentAccessRights(coreController cpCore, string ContentName, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete) {
             try {
                 int ContentID = 0;
                 Models.Complex.cdefModel CDef = null;
@@ -979,7 +979,7 @@ namespace Contensive.Core.Models.Context {
         //   Member must be checked for authenticated and main_IsAdmin already
         //========================================================================
         //
-        private void getContentAccessRights_NonAdminByContentId(coreClass cpCore, int ContentID, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete, string usedContentIdList) {
+        private void getContentAccessRights_NonAdminByContentId(coreController cpCore, int ContentID, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete, string usedContentIdList) {
             try {
                 string SQL = null;
                 int CSPointer = 0;
@@ -1074,7 +1074,7 @@ namespace Contensive.Core.Models.Context {
         //   See main_GetLoginMemberID and main_LoginMemberByID
         //========================================================================
         //
-        public bool authenticate(coreClass cpCore, string loginFieldValue, string password, bool AllowAutoLogin = false) {
+        public bool authenticate(coreController cpCore, string loginFieldValue, string password, bool AllowAutoLogin = false) {
             bool returnREsult = false;
             try {
                 int LocalMemberID = 0;
@@ -1103,7 +1103,7 @@ namespace Contensive.Core.Models.Context {
         //
         //========================================================================
         //
-        public bool authenticateById(coreClass cpCore, int userId, sessionContextModel authContext) {
+        public bool authenticateById(coreController cpCore, int userId, sessionContextModel authContext) {
             bool returnResult = false;
             try {
                 returnResult = recognizeById(cpCore, userId, ref authContext);
@@ -1130,7 +1130,7 @@ namespace Contensive.Core.Models.Context {
         //   the current member to be non-authenticated, but recognized
         //========================================================================
         //
-        public bool recognizeById(coreClass cpCore, int userId, ref sessionContextModel sessionContext) {
+        public bool recognizeById(coreController cpCore, int userId, ref sessionContextModel sessionContext) {
             bool returnResult = false;
             try {
                 if (sessionContext.visitor.id == 0) {
@@ -1168,7 +1168,7 @@ namespace Contensive.Core.Models.Context {
         // ----- Returns true if the visitor is an admin, or authenticated and in the group named
         //========================================================================
         //
-        public bool IsMemberOfGroup2(coreClass cpCore, string GroupName, int checkMemberID = 0) {
+        public bool IsMemberOfGroup2(coreController cpCore, string GroupName, int checkMemberID = 0) {
             bool returnREsult = false;
             try {
                 int iMemberID = genericController.encodeInteger(checkMemberID);
@@ -1187,7 +1187,7 @@ namespace Contensive.Core.Models.Context {
         // ----- Returns true if the visitor is a member, and in the group named
         //========================================================================
         //
-        public bool isMemberOfGroup(coreClass cpCore, string GroupName, int checkMemberID = 0, bool adminReturnsTrue = false) {
+        public bool isMemberOfGroup(coreController cpCore, string GroupName, int checkMemberID = 0, bool adminReturnsTrue = false) {
             bool returnREsult = false;
             try {
                 int iMemberID = checkMemberID;
@@ -1207,7 +1207,7 @@ namespace Contensive.Core.Models.Context {
         // ----- Returns true if the visitor is an admin, or authenticated and in the group list
         //========================================================================
         //
-        public bool isMemberOfGroupList(coreClass cpCore, string GroupIDList, int checkMemberID = 0, bool adminReturnsTrue = false) {
+        public bool isMemberOfGroupList(coreController cpCore, string GroupIDList, int checkMemberID = 0, bool adminReturnsTrue = false) {
             bool returnREsult = false;
             try {
                 if (checkMemberID == 0) {
@@ -1226,7 +1226,7 @@ namespace Contensive.Core.Models.Context {
         //   true if the user is authenticated and is a trusted people (member content)
         //========================================================================
         //
-        public bool isAuthenticatedMember(coreClass cpCore) {
+        public bool isAuthenticatedMember(coreController cpCore) {
             bool result = false;
             try {
                 result = visit.VisitAuthenticated & (Models.Complex.cdefModel.isWithinContent(cpCore, user.contentControlID, cdefModel.getContentId(cpCore, "members")));
@@ -1249,7 +1249,7 @@ namespace Contensive.Core.Models.Context {
         //   admins are always returned true
         //===============================================================================================================================
         //
-        public bool isMemberOfGroupIdList(coreClass cpCore, int MemberID, bool isAuthenticated, string GroupIDList) {
+        public bool isMemberOfGroupIdList(coreController cpCore, int MemberID, bool isAuthenticated, string GroupIDList) {
             return isMemberOfGroupIdList(cpCore, MemberID, isAuthenticated, GroupIDList, true);
         }
         //
@@ -1257,7 +1257,7 @@ namespace Contensive.Core.Models.Context {
         //   Is Group Member of a GroupIDList
         //===============================================================================================================================
         //
-        public bool isMemberOfGroupIdList(coreClass cpCore, int MemberID, bool isAuthenticated, string GroupIDList, bool adminReturnsTrue) {
+        public bool isMemberOfGroupIdList(coreController cpCore, int MemberID, bool isAuthenticated, string GroupIDList, bool adminReturnsTrue) {
             bool returnREsult = false;
             try {
                 //
@@ -1354,7 +1354,7 @@ namespace Contensive.Core.Models.Context {
         /// is Guest
         /// </summary>
         /// <returns></returns>
-        public bool isGuest(coreClass cpCore) {
+        public bool isGuest(coreController cpCore) {
             return !isAuthenticatedMember(cpCore);
         }
         //
@@ -1363,7 +1363,7 @@ namespace Contensive.Core.Models.Context {
         /// Is Recognized (not new and not authenticted)
         /// </summary>
         /// <returns></returns>
-        public bool isRecognized(coreClass cpCore) {
+        public bool isRecognized(coreController cpCore) {
             return !visit.MemberNew;
         }
         //
@@ -1433,7 +1433,7 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isQuickEditing(coreClass cpCore, string ContentName) {
+        public bool isQuickEditing(coreController cpCore, string ContentName) {
             bool returnResult = false;
             try {
                 if (true) {
@@ -1455,7 +1455,7 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAdvancedEditing(coreClass cpCore, string ContentName) {
+        public bool isAdvancedEditing(coreController cpCore, string ContentName) {
             bool returnResult = false;
             try {
                 if (true) {
@@ -1480,7 +1480,7 @@ namespace Contensive.Core.Models.Context {
         //
         //   Checks the username and password
         //
-        public bool isLoginOK(coreClass cpcore, string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
+        public bool isLoginOK(coreController cpcore, string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
             bool result = (authenticateGetId(cpcore, Username, Password) != 0);
             if (!result) {
                 ErrorMessage = errorController.getUserError(cpcore);
@@ -1492,7 +1492,7 @@ namespace Contensive.Core.Models.Context {
         //   conversion pass 2
         // ================================================================================================
         //
-        public string main_GetAuthoringStatusMessage(coreClass cpcore, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
+        public string main_GetAuthoringStatusMessage(coreController cpcore, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
             string result = "";
             //
             string Copy = null;

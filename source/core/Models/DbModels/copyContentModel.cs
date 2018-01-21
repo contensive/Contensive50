@@ -28,97 +28,97 @@ namespace Contensive.Core.Models.DbModels {
         public string copy { get; set; }
         //
         //====================================================================================================
-        public static copyContentModel add(coreClass cpCore) {
+        public static copyContentModel add(coreController cpCore) {
             return add<copyContentModel>(cpCore);
         }
         //
         //====================================================================================================
-        public static copyContentModel add(coreClass cpCore, ref List<string> callersCacheNameList) {
+        public static copyContentModel add(coreController cpCore, ref List<string> callersCacheNameList) {
             return add<copyContentModel>(cpCore, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static copyContentModel create(coreClass cpCore, int recordId) {
+        public static copyContentModel create(coreController cpCore, int recordId) {
             return create<copyContentModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static copyContentModel create(coreClass cpCore, int recordId, ref List<string> callersCacheNameList) {
+        public static copyContentModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
             return create<copyContentModel>(cpCore, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static copyContentModel create(coreClass cpCore, string recordGuid) {
+        public static copyContentModel create(coreController cpCore, string recordGuid) {
             return create<copyContentModel>(cpCore, recordGuid);
         }
         //
         //====================================================================================================
-        public static copyContentModel create(coreClass cpCore, string recordGuid, ref List<string> callersCacheNameList) {
+        public static copyContentModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
             return create<copyContentModel>(cpCore, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static copyContentModel createByName(coreClass cpCore, string recordName) {
+        public static copyContentModel createByName(coreController cpCore, string recordName) {
             return createByName<copyContentModel>(cpCore, recordName);
         }
         //
         //====================================================================================================
-        public static copyContentModel createByName(coreClass cpCore, string recordName, ref List<string> callersCacheNameList) {
+        public static copyContentModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
             return createByName<copyContentModel>(cpCore, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreClass cpCore) {
+        public new void save(coreController cpCore) {
             base.save(cpCore);
         }
         //
         //====================================================================================================
-        public static void delete(coreClass cpCore, int recordId) {
+        public static void delete(coreController cpCore, int recordId) {
             delete<copyContentModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreClass cpCore, string ccGuid) {
+        public static void delete(coreController cpCore, string ccGuid) {
             delete<copyContentModel>(cpCore, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<copyContentModel> createList(coreClass cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<copyContentModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<copyContentModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<copyContentModel> createList(coreClass cpCore, string sqlCriteria, string sqlOrderBy) {
+        public static List<copyContentModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
             return createList<copyContentModel>(cpCore, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<copyContentModel> createList(coreClass cpCore, string sqlCriteria) {
+        public static List<copyContentModel> createList(coreController cpCore, string sqlCriteria) {
             return createList<copyContentModel>(cpCore, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreClass cpCore, int recordId) {
+        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
             invalidateCacheSingleRecord<copyContentModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreClass cpcore, int recordId) {
+        public static string getRecordName(coreController cpcore, int recordId) {
             return baseModel.getRecordName<copyContentModel>(cpcore, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreClass cpcore, string ccGuid) {
+        public static string getRecordName(coreController cpcore, string ccGuid) {
             return baseModel.getRecordName<copyContentModel>(cpcore, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreClass cpcore, string ccGuid) {
+        public static int getRecordId(coreController cpcore, string ccGuid) {
             return baseModel.getRecordId<copyContentModel>(cpcore, ccGuid);
         }
         //
         //====================================================================================================
-        public static copyContentModel createDefault(coreClass cpcore) {
+        public static copyContentModel createDefault(coreController cpcore) {
             return createDefault<copyContentModel>(cpcore);
         }
     }

@@ -31,7 +31,7 @@ namespace Contensive.Core.Controllers {
         //   Add on to the common error message
         //==========================================================================
         //
-        public static void addUserError(coreClass cpCore, string Message) {
+        public static void addUserError(coreController cpCore, string Message) {
             if (!string.IsNullOrEmpty(Message)) {
                 if (cpCore.doc.debug_iUserError.IndexOf(Message, System.StringComparison.OrdinalIgnoreCase) == -1) {
                     cpCore.doc.debug_iUserError = cpCore.doc.debug_iUserError + "\r<li class=\"ccError\">" + genericController.encodeText(Message) + "</LI>";
@@ -44,7 +44,7 @@ namespace Contensive.Core.Controllers {
         //       If there are none, return ""
         //==========================================================================
         //
-        public static string getUserError(coreClass cpcore) {
+        public static string getUserError(coreController cpcore) {
             string temperror_GetUserError = null;
             temperror_GetUserError = genericController.encodeText(cpcore.doc.debug_iUserError);
             if (!string.IsNullOrEmpty(temperror_GetUserError)) {
@@ -62,7 +62,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string getDocExceptionHtmlList(coreClass cpcore) {
+        public static string getDocExceptionHtmlList(coreController cpcore) {
             string returnHtmlList = "";
             try {
                 if (cpcore.doc.errList != null) {

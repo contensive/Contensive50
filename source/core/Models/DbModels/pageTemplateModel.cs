@@ -37,97 +37,97 @@ namespace Contensive.Core.Models.DbModels {
         // Public Property OtherHeadTags As String
         //
         //====================================================================================================
-        public static pageTemplateModel add(coreClass cpCore) {
+        public static pageTemplateModel add(coreController cpCore) {
             return add<pageTemplateModel>(cpCore);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel add(coreClass cpCore, ref List<string> callersCacheNameList) {
+        public static pageTemplateModel add(coreController cpCore, ref List<string> callersCacheNameList) {
             return add<pageTemplateModel>(cpCore, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel create(coreClass cpCore, int recordId) {
+        public static pageTemplateModel create(coreController cpCore, int recordId) {
             return create<pageTemplateModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel create(coreClass cpCore, int recordId, ref List<string> callersCacheNameList) {
+        public static pageTemplateModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
             return create<pageTemplateModel>(cpCore, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel create(coreClass cpCore, string recordGuid) {
+        public static pageTemplateModel create(coreController cpCore, string recordGuid) {
             return create<pageTemplateModel>(cpCore, recordGuid);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel create(coreClass cpCore, string recordGuid, ref List<string> callersCacheNameList) {
+        public static pageTemplateModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
             return create<pageTemplateModel>(cpCore, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel createByName(coreClass cpCore, string recordName) {
+        public static pageTemplateModel createByName(coreController cpCore, string recordName) {
             return createByName<pageTemplateModel>(cpCore, recordName);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel createByName(coreClass cpCore, string recordName, ref List<string> callersCacheNameList) {
+        public static pageTemplateModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
             return createByName<pageTemplateModel>(cpCore, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreClass cpCore) {
+        public new void save(coreController cpCore) {
             base.save(cpCore);
         }
         //
         //====================================================================================================
-        public static void delete(coreClass cpCore, int recordId) {
+        public static void delete(coreController cpCore, int recordId) {
             delete<pageTemplateModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreClass cpCore, string ccGuid) {
+        public static void delete(coreController cpCore, string ccGuid) {
             delete<pageTemplateModel>(cpCore, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<pageTemplateModel> createList(coreClass cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<pageTemplateModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<pageTemplateModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<pageTemplateModel> createList(coreClass cpCore, string sqlCriteria, string sqlOrderBy) {
+        public static List<pageTemplateModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
             return createList<pageTemplateModel>(cpCore, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<pageTemplateModel> createList(coreClass cpCore, string sqlCriteria) {
+        public static List<pageTemplateModel> createList(coreController cpCore, string sqlCriteria) {
             return createList<pageTemplateModel>(cpCore, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreClass cpCore, int recordId) {
+        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
             invalidateCacheSingleRecord<pageTemplateModel>(cpCore, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreClass cpcore, int recordId) {
+        public static string getRecordName(coreController cpcore, int recordId) {
             return baseModel.getRecordName<pageTemplateModel>(cpcore, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreClass cpcore, string ccGuid) {
+        public static string getRecordName(coreController cpcore, string ccGuid) {
             return baseModel.getRecordName<pageTemplateModel>(cpcore, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreClass cpcore, string ccGuid) {
+        public static int getRecordId(coreController cpcore, string ccGuid) {
             return baseModel.getRecordId<pageTemplateModel>(cpcore, ccGuid);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel createDefault(coreClass cpcore) {
+        public static pageTemplateModel createDefault(coreController cpcore) {
             return createDefault<pageTemplateModel>(cpcore);
         }
     }

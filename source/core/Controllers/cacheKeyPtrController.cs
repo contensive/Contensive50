@@ -30,7 +30,7 @@ namespace Contensive.Core.Controllers {
         //
         // ----- objects passed in constructor, do not dispose
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         // ----- private globals
         //
@@ -49,7 +49,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public keyPtrIndexController(coreClass cpCore, string cacheName, string sqlLoadKeyValue, string cacheInvalidationTagCommaList) : base() {
+        public keyPtrIndexController(coreController cpCore, string cacheName, string sqlLoadKeyValue, string cacheInvalidationTagCommaList) : base() {
             this.cpCore = cpCore;
             this.cacheName = cacheName;
             this.sqlLoadKeyValue = sqlLoadKeyValue;

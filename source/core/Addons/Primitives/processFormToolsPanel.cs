@@ -27,7 +27,7 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreClass cpCore = processor.core;
+                coreController cpCore = processor.core;
                 //
                 cpCore.html.processFormToolsPanel(cpCore.docProperties.getText("ccformsn"));
             } catch (Exception ex) {

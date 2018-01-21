@@ -23,7 +23,7 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class iisController {
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         // if this instance is a webRole, retain pointer for callbacks
         //
@@ -95,7 +95,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public iisController(coreClass cpCore) : base() {
+        public iisController(coreController cpCore) : base() {
             this.cpCore = cpCore;
             requestCookies = new Dictionary<string, cookieClass>();
         }
@@ -890,7 +890,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="rootPublicFilesPath"></param>
         /// <param name="defaultDocOrBlank"></param>
         /// '
-        public static void verifySite(coreClass cpCore, string appName, string DomainName, string rootPublicFilesPath, string defaultDocOrBlank) {
+        public static void verifySite(coreController cpCore, string appName, string DomainName, string rootPublicFilesPath, string defaultDocOrBlank) {
             try {
                 verifyAppPool(cpCore, appName);
                 verifyWebsite(cpCore, appName, DomainName, rootPublicFilesPath, appName);
@@ -905,7 +905,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <param name="poolName"></param>
-        public static void verifyAppPool(coreClass cpCore, string poolName) {
+        public static void verifyAppPool(coreController cpCore, string poolName) {
             try {
                 using (ServerManager serverManager = new ServerManager()) {
                     bool poolFound = false;
@@ -941,7 +941,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="domainName"></param>
         /// <param name="phyPath"></param>
         /// <param name="appPool"></param>
-        private static void verifyWebsite(coreClass cpCore, string appName, string domainName, string phyPath, string appPool) {
+        private static void verifyWebsite(coreController cpCore, string appName, string domainName, string phyPath, string appPool) {
             try {
 
                 using (ServerManager iisManager = new ServerManager()) {
@@ -994,7 +994,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="site"></param>
         /// <param name="bindingInformation"></param>
         /// <param name="bindingProtocol"></param>
-        private static void verifyWebsite_Binding(coreClass cpCore, Site site, string bindingInformation, string bindingProtocol) {
+        private static void verifyWebsite_Binding(coreController cpCore, Site site, string bindingInformation, string bindingProtocol) {
             try {
                 using (ServerManager iisManager = new ServerManager()) {
                     Binding binding = null;
@@ -1022,7 +1022,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private static void verifyWebsite_VirtualDirectory(coreClass cpCore, Site site, string appName, string virtualFolder, string physicalPath) {
+        private static void verifyWebsite_VirtualDirectory(coreController cpCore, Site site, string appName, string virtualFolder, string physicalPath) {
             try {
                 bool found = false;
                 foreach ( Application iisApp in site.Applications) {
@@ -1069,7 +1069,7 @@ namespace Contensive.Core.Controllers {
         //   returns true if the redirect happened OK
         //========================================================================
         //
-        public static bool main_RedirectByRecord_ReturnStatus(coreClass cpcore, string ContentName, int RecordID, string FieldName = "") {
+        public static bool main_RedirectByRecord_ReturnStatus(coreController cpcore, string ContentName, int RecordID, string FieldName = "") {
             bool tempmain_RedirectByRecord_ReturnStatus = false;
             int CSPointer = 0;
             string MethodName = null;
@@ -1170,7 +1170,7 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //
-        public static string getBrowserAcceptLanguage(coreClass cpCore) {
+        public static string getBrowserAcceptLanguage(coreController cpCore) {
             try {
                 string AcceptLanguageString = genericController.encodeText(cpCore.webServer.requestLanguage) + ",";
                 int CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",");

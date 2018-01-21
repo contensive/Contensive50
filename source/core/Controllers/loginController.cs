@@ -27,7 +27,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="forceDefaultLogin"></param>
         /// <returns></returns>
-        public static string getLoginPage(coreClass cpcore, bool forceDefaultLogin) {
+        public static string getLoginPage(coreController cpcore, bool forceDefaultLogin) {
             string returnREsult = "";
             try {
                 string Body = null;
@@ -74,7 +74,7 @@ namespace Contensive.Core.Controllers {
         //   default login form
         //========================================================================
         //
-        public static string getLoginForm_Default(coreClass cpcore) {
+        public static string getLoginForm_Default(coreController cpcore) {
             string returnHtml = "";
             try {
                 string Panel = null;
@@ -200,7 +200,7 @@ namespace Contensive.Core.Controllers {
         /// A login form that can be added to any page. This is just form with no surrounding border, etc. 
         /// </summary>
         /// <returns></returns>
-        public static string getLoginForm(coreClass cpcore, bool forceDefaultLoginForm = false) {
+        public static string getLoginForm(coreController cpcore, bool forceDefaultLoginForm = false) {
             string returnHtml = "";
             try {
                 int loginAddonID = 0;
@@ -242,7 +242,7 @@ namespace Contensive.Core.Controllers {
         /// a simple email password form
         /// </summary>
         /// <returns></returns>
-        public static string getSendPasswordForm(coreClass cpcore) {
+        public static string getSendPasswordForm(coreController cpcore) {
             string returnResult = "";
             try {
                 string QueryString = null;
@@ -305,7 +305,7 @@ namespace Contensive.Core.Controllers {
         // ----- Process the login form
         //========================================================================
         //
-        public static bool processFormLoginDefault(coreClass cpcore) {
+        public static bool processFormLoginDefault(coreController cpcore) {
             bool returnREsult = false;
             try {
                 int LocalMemberID = 0;
@@ -343,7 +343,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         // ----- Process the send password form
         //
-        public static void processFormSendPassword(coreClass cpCore) {
+        public static void processFormSendPassword(coreController cpCore) {
             try {
                 string returnUserMessage = "";
                 sendPassword(cpCore, cpCore.docProperties.getText("email"), ref returnUserMessage);
@@ -359,7 +359,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="Email"></param>
         /// <returns></returns>
-        public static bool sendPassword(coreClass cpCore, string Email, ref string returnUserMessage) {
+        public static bool sendPassword(coreController cpCore, string Email, ref string returnUserMessage) {
             bool result = false;
             returnUserMessage = "";
             try {
@@ -551,7 +551,7 @@ namespace Contensive.Core.Controllers {
         // ----- Process the send password form
         //========================================================================
         //
-        public static void processFormJoin(coreClass cpcore) {
+        public static void processFormJoin(coreController cpcore) {
             try {
                 string ErrorMessage = "";
                 int CS = 0;

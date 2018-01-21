@@ -63,7 +63,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cpCore"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public static oldPageTemplateModel add(coreClass cpCore, ref List<string> callersCacheNameList) {
+        public static oldPageTemplateModel add(coreController cpCore, ref List<string> callersCacheNameList) {
             oldPageTemplateModel result = null;
             try {
                 result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, cpCore.doc.sessionContext.user.id), ref callersCacheNameList);
@@ -74,7 +74,7 @@ namespace Contensive.Core.Models.DbModels {
             }
             return result;
         }
-        public static oldPageTemplateModel add(coreClass cpCore) { var tmpList = new List<string> { }; return add(cpCore, ref tmpList); }
+        public static oldPageTemplateModel add(coreController cpCore) { var tmpList = new List<string> { }; return add(cpCore, ref tmpList); }
         //
         //====================================================================================================
         /// <summary>
@@ -83,7 +83,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="recordId">The id of the record to be read into the new object</param>
         /// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        public static oldPageTemplateModel create(coreClass cpCore, int recordId, ref List<string> callersCacheNameList) {
+        public static oldPageTemplateModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
             oldPageTemplateModel result = null;
             try {
                 if (recordId > 0) {
@@ -104,7 +104,7 @@ namespace Contensive.Core.Models.DbModels {
             }
             return result;
         }
-        public static oldPageTemplateModel create(coreClass cpCore, int recordId) { var tmpList = new List<string> { }; return create(cpCore, recordId, ref tmpList); }
+        public static oldPageTemplateModel create(coreController cpCore, int recordId) { var tmpList = new List<string> { }; return create(cpCore, recordId, ref tmpList); }
         //
         //====================================================================================================
         /// <summary>
@@ -112,7 +112,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
-        public static oldPageTemplateModel create(coreClass cpCore, string recordGuid, ref List<string> callersCacheNameList) {
+        public static oldPageTemplateModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
             oldPageTemplateModel result = null;
             try {
                 if (!string.IsNullOrEmpty(recordGuid)) {
@@ -140,7 +140,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="foreignKey1Id"></param>
-        public static oldPageTemplateModel create(coreClass cpCore, int foreignKey1Id, int foreignKey2Id, ref List<string> callersCacheNameList) {
+        public static oldPageTemplateModel create(coreController cpCore, int foreignKey1Id, int foreignKey2Id, ref List<string> callersCacheNameList) {
             oldPageTemplateModel result = null;
             try {
                 if ((foreignKey1Id > 0) && (foreignKey2Id > 0)) {
@@ -167,7 +167,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordName"></param>
-        public static oldPageTemplateModel createByName(coreClass cpCore, string recordName, ref List<string> callersCacheNameList) {
+        public static oldPageTemplateModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
             oldPageTemplateModel result = null;
             try {
                 if (!string.IsNullOrEmpty(recordName)) {
@@ -192,7 +192,7 @@ namespace Contensive.Core.Models.DbModels {
             }
             return result;
         }
-        public static oldPageTemplateModel createByName(coreClass cpCore, string recordName) { var tmpList = new List<string> { }; return createByName(cpCore, recordName, ref tmpList); }
+        public static oldPageTemplateModel createByName(coreController cpCore, string recordName) { var tmpList = new List<string> { }; return createByName(cpCore, recordName, ref tmpList); }
         //
         //====================================================================================================
         /// <summary>
@@ -200,7 +200,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
-        private static oldPageTemplateModel loadRecord(coreClass cpCore, csController cs, ref List<string> callersCacheNameList) {
+        private static oldPageTemplateModel loadRecord(coreController cpCore, csController cs, ref List<string> callersCacheNameList) {
             oldPageTemplateModel result = null;
             try {
                 if (cs.ok()) {
@@ -266,7 +266,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <returns></returns>
-        public int save(coreClass cpCore) {
+        public int save(coreController cpCore) {
             try {
                 csController cs = new csController(cpCore);
                 if (ID > 0) {
@@ -340,7 +340,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static void delete(coreClass cpCore, int recordId) {
+        public static void delete(coreController cpCore, int recordId) {
             try {
                 if (recordId > 0) {
                     cpCore.db.deleteContentRecords(primaryContentName, "id=" + recordId.ToString());
@@ -359,7 +359,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="ccguid"></param>
-        public static void delete(coreClass cpCore, string ccguid) {
+        public static void delete(coreController cpCore, string ccguid) {
             try {
                 if (!string.IsNullOrEmpty(ccguid)) {
                     var tempVar = new List<string>();
@@ -383,7 +383,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="foreignKey1Id"></param>
         /// <param name="foreignKey2Id"></param>
-        public static void delete(coreClass cpCore, int foreignKey1Id, int foreignKey2Id) {
+        public static void delete(coreController cpCore, int foreignKey1Id, int foreignKey2Id) {
             try {
                 if ((foreignKey2Id > 0) && (foreignKey1Id > 0)) {
                     var tempVar = new List<string>();
@@ -407,7 +407,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="someCriteria"></param>
         /// <returns></returns>
-        public static List<oldPageTemplateModel> createList_criteria(coreClass cpCore, int someCriteria, List<string> callersCacheNameList) {
+        public static List<oldPageTemplateModel> createList_criteria(coreController cpCore, int someCriteria, List<string> callersCacheNameList) {
             List<oldPageTemplateModel> result = new List<oldPageTemplateModel>();
             try {
                 csController cs = new csController(cpCore);
@@ -436,7 +436,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <param name="recordId"></param>
-        public static void invalidatePrimaryCache(coreClass cpCore, int recordId) {
+        public static void invalidatePrimaryCache(coreController cpCore, int recordId) {
             cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
             //
             // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
@@ -465,7 +465,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="recordId"></param>record
         /// <returns></returns>
-        public static string getRecordName(coreClass cpcore, int recordId) {
+        public static string getRecordName(coreController cpcore, int recordId) {
             var tempVar = new List<string>();
             return oldPageTemplateModel.create(cpcore, recordId, ref tempVar).Name;
         }
@@ -477,7 +477,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="ccGuid"></param>record
         /// <returns></returns>
-        public static string getRecordName(coreClass cpcore, string ccGuid) {
+        public static string getRecordName(coreController cpcore, string ccGuid) {
             var tempVar = new List<string>();
             return oldPageTemplateModel.create(cpcore, ccGuid, ref tempVar).Name;
         }
@@ -489,14 +489,14 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="ccGuid"></param>record
         /// <returns></returns>
-        public static int getRecordId(coreClass cpcore, string ccGuid) {
+        public static int getRecordId(coreController cpcore, string ccGuid) {
             var tempVar = new List<string>();
             return oldPageTemplateModel.create(cpcore, ccGuid, ref tempVar).ID;
         }
         //
         //====================================================================================================
         //
-        public static oldPageTemplateModel createDefault(coreClass cpcore) {
+        public static oldPageTemplateModel createDefault(coreController cpcore) {
             oldPageTemplateModel instance = new oldPageTemplateModel();
             try {
                 Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(cpcore, primaryContentName);

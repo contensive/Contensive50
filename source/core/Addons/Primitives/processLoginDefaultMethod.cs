@@ -29,7 +29,7 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreClass cpCore = processor.core;
+                coreController cpCore = processor.core;
                 //
                 // -- default login page
                 cpCore.doc.continueProcessing = false;

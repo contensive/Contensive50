@@ -28,7 +28,7 @@ namespace Contensive.Core.Addons.Login {
             string returnHtml = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreClass cpCore = processor.core;
+                coreController cpCore = processor.core;
                 returnHtml = loginController.getLoginPage(cpCore, false);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

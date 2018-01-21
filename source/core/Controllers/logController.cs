@@ -50,7 +50,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="LogNamePrefix"></param>
         /// <param name="allowErrorHandling"></param>
         /// <remarks></remarks>
-        public static void appendLog(coreClass cpCore, string LogLine, string LogFolder = "", string LogNamePrefix = "", bool allowErrorHandling = true) {
+        public static void appendLog(coreController cpCore, string LogLine, string LogFolder = "", string LogNamePrefix = "", bool allowErrorHandling = true) {
             try {
                 Console.WriteLine(LogLine);
                 if (string.IsNullOrEmpty(LogFolder) || cpCore.serverConfig.enableLogging) {
@@ -172,7 +172,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="LogFolder"></param>
         /// <param name="LogNamePrefix"></param>
         /// <remarks></remarks>
-        public static void appendLogWithLegacyRow(coreClass cpCore, string ContensiveAppName, string contextDescription, string processName, string ClassName, string MethodName, int ErrNumber, string ErrSource, string ErrDescription, bool ErrorTrap, bool ResumeNextAfterLogging, string URL, string LogFolder, string LogNamePrefix) {
+        public static void appendLogWithLegacyRow(coreController cpCore, string ContensiveAppName, string contextDescription, string processName, string ClassName, string MethodName, int ErrNumber, string ErrSource, string ErrDescription, bool ErrorTrap, bool ResumeNextAfterLogging, string URL, string LogFolder, string LogNamePrefix) {
             try {
                 string ErrorMessage = null;
                 string LogLine = null;
@@ -210,7 +210,7 @@ namespace Contensive.Core.Controllers {
         //
         //=====================================================================================================
         //   Insert into the ActivityLog
-        public static void logActivity(coreClass cpcore, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
+        public static void logActivity(coreController cpcore, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
             try {
                 //
                 int CS;
@@ -236,13 +236,13 @@ namespace Contensive.Core.Controllers {
         }
         //
         //
-        public static void logActivity2(coreClass cpcore, string Message, int SubjectMemberID, int SubjectOrganizationID) {
+        public static void logActivity2(coreController cpcore, string Message, int SubjectMemberID, int SubjectOrganizationID) {
             logActivity(cpcore, Message, cpcore.doc.sessionContext.user.id, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.requestUrl, cpcore.doc.sessionContext.visitor.id, cpcore.doc.sessionContext.visit.id);
         }
         //
         //
         //
-        internal static void appendLogPageNotFound(coreClass cpCore, string PageNotFoundLink) {
+        internal static void appendLogPageNotFound(coreController cpCore, string PageNotFoundLink) {
             appendLog(cpCore, "bad link [" + PageNotFoundLink + "], referrer [" + cpCore.webServer.requestReferrer + "]", "BadLink");
         }
         //
@@ -270,7 +270,7 @@ namespace Contensive.Core.Controllers {
         //           count - the number of times the key was attempted to add. "This error was reported 100 times"
         //================================================================================================
         //
-        public static void reportWarning(coreClass cpcore, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
+        public static void reportWarning(coreController cpcore, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
             string SQL = null;
             int warningId = 0;
             int CS = 0;
@@ -316,31 +316,31 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static void appendLogCache(coreClass cpCore, string message) {
+        public static void appendLogCache(coreController cpCore, string message) {
             appendLog(cpCore, message, "cache");
         }
         //
         //====================================================================================================
         //
-        public static void appendLogDebug(coreClass cpCore, string message) {
+        public static void appendLogDebug(coreController cpCore, string message) {
             appendLog(cpCore, message, "debug");
         }
         //
         //====================================================================================================
         //
-        public static void appendLogInstall(coreClass cpCore, string message) {
+        public static void appendLogInstall(coreController cpCore, string message) {
             appendLog(cpCore, message, "install");
         }
         //
         //====================================================================================================
         //
-        public static void appendLogTasks(coreClass cpCore, string message) {
+        public static void appendLogTasks(coreController cpCore, string message) {
             appendLog(cpCore, message, "tasks");
         }
         //
         //====================================================================================================
         //
-        public static void housekeepLogFolder(coreClass cpCore) {
+        public static void housekeepLogFolder(coreController cpCore) {
             try {
                 //
                 DateTime LogDate = default(DateTime);

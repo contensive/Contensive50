@@ -17,7 +17,7 @@ using static Contensive.Core.constants;
 namespace Contensive.Core.Models.Context {
     public class propertyModelClass {
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         // visit property cache
         //
@@ -34,7 +34,7 @@ namespace Contensive.Core.Models.Context {
         /// <param name="cp"></param>
         /// <param name="propertyTypeId"></param>
         /// <remarks></remarks>
-        public propertyModelClass(coreClass cpCore, int propertyTypeId) {
+        public propertyModelClass(coreController cpCore, int propertyTypeId) {
             this.cpCore = cpCore;
             this.propertyTypeId = propertyTypeId;
         }

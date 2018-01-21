@@ -41,7 +41,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="groupName"></param>
         /// <returns></returns>
-        public static int group_add(coreClass cpCore, string groupName) {
+        public static int group_add(coreController cpCore, string groupName) {
             int returnGroupId = 0;
             try {
                 DataTable dt = null;
@@ -79,7 +79,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="GroupNameOrGuid"></param>
         /// <param name="groupCaption"></param>
         /// <returns></returns>
-        public static int group_add2(coreClass cpCore, string GroupNameOrGuid, string groupCaption = "") {
+        public static int group_add2(coreController cpCore, string GroupNameOrGuid, string groupCaption = "") {
             int returnGroupId = 0;
             try {
                 //
@@ -129,7 +129,7 @@ namespace Contensive.Core.Controllers {
         //
         // Add User
         //
-        public static void group_addUser(coreClass cpCore, int groupId, int userid, DateTime dateExpires) {
+        public static void group_addUser(coreController cpCore, int groupId, int userid, DateTime dateExpires) {
             try {
                 //
                 string groupName = null;
@@ -168,12 +168,12 @@ namespace Contensive.Core.Controllers {
                 throw (ex);
             }
         }
-        public static void group_addUser(coreClass cpCore, int groupId, int userid) { group_addUser(cpCore, groupId, userid, DateTime.MinValue ); }
-        public static void group_addUser(coreClass cpCore, int groupId) { group_addUser(cpCore, groupId, 0, DateTime.MinValue); }
+        public static void group_addUser(coreController cpCore, int groupId, int userid) { group_addUser(cpCore, groupId, userid, DateTime.MinValue ); }
+        public static void group_addUser(coreController cpCore, int groupId) { group_addUser(cpCore, groupId, 0, DateTime.MinValue); }
         //
         //====================================================================================================
         //
-        public static void group_AddUser(coreClass cpCore, string groupNameOrGuid, int userid, DateTime dateExpires) {
+        public static void group_AddUser(coreController cpCore, string groupNameOrGuid, int userid, DateTime dateExpires) {
             try {
                 //
                 int GroupID = 0;
@@ -216,15 +216,15 @@ namespace Contensive.Core.Controllers {
                 throw (ex);
             }
         }
-        public static void group_AddUser(coreClass cpCore, string groupNameOrGuid, int userid = 0) { var tmpDate = DateTime.MinValue; group_AddUser(cpCore, groupNameOrGuid, userid, tmpDate); }
-        public static void group_AddUser(coreClass cpCore, string groupNameOrGuid) { var tmpDate = DateTime.MinValue; group_AddUser(cpCore, groupNameOrGuid, 0, tmpDate); }
+        public static void group_AddUser(coreController cpCore, string groupNameOrGuid, int userid = 0) { var tmpDate = DateTime.MinValue; group_AddUser(cpCore, groupNameOrGuid, userid, tmpDate); }
+        public static void group_AddUser(coreController cpCore, string groupNameOrGuid) { var tmpDate = DateTime.MinValue; group_AddUser(cpCore, groupNameOrGuid, 0, tmpDate); }
 
         //
         //=============================================================================
         // main_Get the GroupID from iGroupName
         //=============================================================================
         //
-        public static int group_GetGroupID(coreClass cpcore, string GroupName) {
+        public static int group_GetGroupID(coreController cpcore, string GroupName) {
             int tempgroup_GetGroupID = 0;
             DataTable dt = null;
             //
@@ -246,7 +246,7 @@ namespace Contensive.Core.Controllers {
         // main_Get the GroupName from iGroupID
         //=============================================================================
         //
-        public static string group_GetGroupName(coreClass cpcore, int GroupID) {
+        public static string group_GetGroupName(coreController cpcore, int GroupID) {
             string tempgroup_GetGroupName = null;
             //
             int CS = 0;
@@ -270,7 +270,7 @@ namespace Contensive.Core.Controllers {
         // Add a new group, return its GroupID
         //=============================================================================
         //
-        public static int group_Add(coreClass cpcore, string GroupName, string GroupCaption = "") {
+        public static int group_Add(coreController cpcore, string GroupName, string GroupCaption = "") {
             int tempgroup_Add = 0;
             int CS = 0;
             string iGroupName = null;
@@ -301,7 +301,7 @@ namespace Contensive.Core.Controllers {
         // Add a new group, return its GroupID
         //=============================================================================
         //
-        public static void group_DeleteGroup(coreClass cpcore, string GroupName) {
+        public static void group_DeleteGroup(coreController cpcore, string GroupName) {
             cpcore.db.deleteContentRecords("Groups", "name=" + cpcore.db.encodeSQLText(GroupName));
         }
         //
@@ -309,7 +309,7 @@ namespace Contensive.Core.Controllers {
         // Add a member to a group
         //=============================================================================
         //
-        public static void group_AddGroupMember(coreClass cpcore, string GroupName, int NewMemberID = SystemMemberID, DateTime DateExpires = default(DateTime)) {
+        public static void group_AddGroupMember(coreController cpcore, string GroupName, int NewMemberID = SystemMemberID, DateTime DateExpires = default(DateTime)) {
             //
             int CS = 0;
             int GroupID = 0;
@@ -352,7 +352,7 @@ namespace Contensive.Core.Controllers {
         // Delete a member from a group
         //=============================================================================
         //
-        public static void group_DeleteGroupMember(coreClass cpcore, string GroupName, int NewMemberID = SystemMemberID) {
+        public static void group_DeleteGroupMember(coreController cpcore, string GroupName, int NewMemberID = SystemMemberID) {
             //
             int GroupID = 0;
             string iGroupName;

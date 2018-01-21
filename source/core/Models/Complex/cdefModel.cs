@@ -70,7 +70,7 @@ namespace Contensive.Core.Models.Complex {
                                                     //
                                                     //====================================================================================================
                                                     //
-        public List<int> get_childIdList(coreClass cpCore) {
+        public List<int> get_childIdList(coreController cpCore) {
             if (_childIdList == null) {
                 string Sql = "select id from cccontent where parentid=" + Id;
                 DataTable dt = cpCore.db.executeQuery(Sql);
@@ -84,7 +84,7 @@ namespace Contensive.Core.Models.Complex {
             }
             return _childIdList;
         }
-        public void set_childIdList(coreClass cpCore, List<int> value) {
+        public void set_childIdList(coreController cpCore, List<int> value) {
             _childIdList = value;
         }
         private List<int> _childIdList = null;
@@ -103,7 +103,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        public static cdefModel create(coreClass cpcore, int contentId, bool loadInvalidFields = false, bool forceDbLoad = false) {
+        public static cdefModel create(coreController cpcore, int contentId, bool loadInvalidFields = false, bool forceDbLoad = false) {
             cdefModel result = null;
             try {
                 List<string> dependantCacheNameList = new List<string>();
@@ -417,7 +417,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        private static void getCdef_SetAdminColumns(coreClass cpcore, Models.Complex.cdefModel cdef) {
+        private static void getCdef_SetAdminColumns(coreController cpcore, Models.Complex.cdefModel cdef) {
             try {
                 bool FieldActive = false;
                 int FieldWidth = 0;
@@ -483,7 +483,7 @@ namespace Contensive.Core.Models.Complex {
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public static int getContentId(coreClass cpcore, string contentName) {
+        public static int getContentId(coreController cpcore, string contentName) {
             int returnId = 0;
             try {
                 if (cpcore.doc.contentNameIdDictionary.ContainsKey(contentName.ToLower())) {
@@ -502,7 +502,7 @@ namespace Contensive.Core.Models.Complex {
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public static Models.Complex.cdefModel getCdef(coreClass cpcore, string contentName) {
+        public static Models.Complex.cdefModel getCdef(coreController cpcore, string contentName) {
             Models.Complex.cdefModel returnCdef = null;
             try {
                 int ContentId = getContentId(cpcore, contentName);
@@ -522,7 +522,7 @@ namespace Contensive.Core.Models.Complex {
         /// </summary>
         /// <param name="contentId"></param>
         /// <returns></returns>
-        public static Models.Complex.cdefModel getCdef(coreClass cpcore, int contentId, bool forceDbLoad = false, bool loadInvalidFields = false) {
+        public static Models.Complex.cdefModel getCdef(coreController cpcore, int contentId, bool forceDbLoad = false, bool loadInvalidFields = false) {
             Models.Complex.cdefModel returnCdef = null;
             try {
                 if (contentId <= 0) {
@@ -565,7 +565,7 @@ namespace Contensive.Core.Models.Complex {
         // will include both the content, and its child contents.
         //========================================================================
         //
-        internal static string getContentControlCriteria(coreClass cpcore, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
+        internal static string getContentControlCriteria(coreController cpcore, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
             string returnCriteria = "";
             try {
                 //
@@ -596,7 +596,7 @@ namespace Contensive.Core.Models.Complex {
         //       Returns true if ChildContentID is in ParentContentID
         //========================================================================
         //
-        public static bool isWithinContent(coreClass cpcore, int ChildContentID, int ParentContentID) {
+        public static bool isWithinContent(coreController cpcore, int ChildContentID, int ParentContentID) {
             bool returnOK = false;
             try {
                 Models.Complex.cdefModel cdef = null;
@@ -630,7 +630,7 @@ namespace Contensive.Core.Models.Complex {
         //       returns a comma delimited list of ContentIDs that the Member can author
         //===========================================================================
         //
-        public static List<int> getEditableCdefIdList(coreClass cpcore) {
+        public static List<int> getEditableCdefIdList(coreController cpcore) {
             List<int> returnList = new List<int>();
             try {
                 string SQL = null;
@@ -673,7 +673,7 @@ namespace Contensive.Core.Models.Complex {
         //   If child already exists, add any missing fields from parent
         //=============================================================================
         //
-        public static void createContentChild(coreClass cpcore, string ChildContentName, string ParentContentName, int MemberID) {
+        public static void createContentChild(coreController cpcore, string ChildContentName, string ParentContentName, int MemberID) {
             try {
                 string DataSourceName = "";
                 string SQL = null;
@@ -787,7 +787,7 @@ namespace Contensive.Core.Models.Complex {
         // Get a Contents Tablename from the ContentPointer
         //========================================================================
         //
-        public static string getContentTablename(coreClass cpcore, string ContentName) {
+        public static string getContentTablename(coreController cpcore, string ContentName) {
             string returnTableName = "";
             try {
                 Models.Complex.cdefModel CDef;
@@ -806,7 +806,7 @@ namespace Contensive.Core.Models.Complex {
         //========================================================================
         // ----- Get a DataSource Name from its ContentName
         //
-        public static string getContentDataSource(coreClass cpcore, string ContentName) {
+        public static string getContentDataSource(coreController cpcore, string ContentName) {
             string returnDataSource = "";
             try {
                 Models.Complex.cdefModel CDef;
@@ -829,7 +829,7 @@ namespace Contensive.Core.Models.Complex {
         //   Bad ContentID returns blank
         //========================================================================
         //
-        public static string getContentNameByID(coreClass cpcore, int ContentID) {
+        public static string getContentNameByID(coreController cpcore, int ContentID) {
             string returnName = "";
             try {
                 Models.Complex.cdefModel cdef;
@@ -850,7 +850,7 @@ namespace Contensive.Core.Models.Complex {
         //       called from upgrade and DeveloperTools
         //========================================================================
         //
-        public static int addContent(coreClass cpcore, bool Active, dataSourceModel datasource, string TableName, string contentName, bool AdminOnly = false, bool DeveloperOnly = false, bool AllowAdd = true, bool AllowDelete = true, string ParentName = "", string DefaultSortMethod = "", string DropDownFieldList = "", bool AllowWorkflowAuthoring = false, bool AllowCalendarEvents = false, bool AllowContentTracking = false, bool AllowTopicRules = false, bool AllowContentChildTool = false, bool ignore1 = false, string IconLink = "", int IconWidth = 0, int IconHeight = 0, int IconSprites = 0, string ccGuid = "", bool IsBaseContent = false, string installedByCollectionGuid = "", bool clearMetaCache = false) {
+        public static int addContent(coreController cpcore, bool Active, dataSourceModel datasource, string TableName, string contentName, bool AdminOnly = false, bool DeveloperOnly = false, bool AllowAdd = true, bool AllowDelete = true, string ParentName = "", string DefaultSortMethod = "", string DropDownFieldList = "", bool AllowWorkflowAuthoring = false, bool AllowCalendarEvents = false, bool AllowContentTracking = false, bool AllowTopicRules = false, bool AllowContentChildTool = false, bool ignore1 = false, string IconLink = "", int IconWidth = 0, int IconHeight = 0, int IconSprites = 0, string ccGuid = "", bool IsBaseContent = false, string installedByCollectionGuid = "", bool clearMetaCache = false) {
             int returnContentId = 0;
             try {
                 //
@@ -1239,7 +1239,7 @@ namespace Contensive.Core.Models.Complex {
         //
         // ====================================================================================================================
         //
-        public static int verifyCDefField_ReturnID(coreClass cpcore, string ContentName, Models.Complex.cdefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
+        public static int verifyCDefField_ReturnID(coreController cpcore, string ContentName, Models.Complex.cdefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
         {
             int returnId = 0;
             try {
@@ -1559,7 +1559,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //=============================================================
         //
-        public static bool isContentFieldSupported(coreClass cpcore, string ContentName, string FieldName) {
+        public static bool isContentFieldSupported(coreController cpcore, string ContentName, string FieldName) {
             bool returnOk = false;
             try {
                 Models.Complex.cdefModel cdef;
@@ -1579,7 +1579,7 @@ namespace Contensive.Core.Models.Complex {
         // Get a tables first ContentID from Tablename
         //========================================================================
         //
-        public static int getContentIDByTablename(coreClass cpcore, string TableName) {
+        public static int getContentIDByTablename(coreController cpcore, string TableName) {
             int tempgetContentIDByTablename = 0;
             //
             string SQL = null;
@@ -1599,7 +1599,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //========================================================================
         //
-        public static string getContentControlCriteria(coreClass cpcore, string ContentName) {
+        public static string getContentControlCriteria(coreController cpcore, string ContentName) {
             return Models.Complex.cdefModel.getCdef(cpcore, ContentName).ContentControlCriteria;
         }
         //
@@ -1610,7 +1610,7 @@ namespace Contensive.Core.Models.Complex {
         //   read it first to main_Get the correct contentid
         //============================================================================================================
         //
-        public static void setContentControlId(coreClass cpcore, int ContentID, int RecordID, int NewContentControlID, string UsedIDString = "") {
+        public static void setContentControlId(coreController cpcore, int ContentID, int RecordID, int NewContentControlID, string UsedIDString = "") {
             string SQL = null;
             int CS = 0;
             string RecordTableName = null;
@@ -1662,7 +1662,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //========================================================================
         //
-        public static string GetContentFieldProperty(coreClass cpcore, string ContentName, string FieldName, string PropertyName) {
+        public static string GetContentFieldProperty(coreController cpcore, string ContentName, string FieldName, string PropertyName) {
             string result = "";
             try {
                 cdefModel Contentdefinition = cdefModel.getCdef(cpcore, ContentName);
@@ -1726,7 +1726,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //========================================================================
         //
-        public static string GetContentProperty(coreClass cpcore, string ContentName, string PropertyName) {
+        public static string GetContentProperty(coreController cpcore, string ContentName, string PropertyName) {
             string result = "";
             Models.Complex.cdefModel Contentdefinition;
             //
@@ -1813,7 +1813,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        public static cdefModel getCache(coreClass cpcore, int contentId) {
+        public static cdefModel getCache(coreController cpcore, int contentId) {
             cdefModel result = null;
             try {
                 try {
@@ -1828,7 +1828,7 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        public static void setCache(coreClass cpcore, int contentId, cdefModel cdef) {
+        public static void setCache(coreController cpcore, int contentId, cdefModel cdef) {
             string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
             //
             // -- make it dependant on cacheNameInvalidateAll. If invalidated, all cdef will invalidate
@@ -1839,14 +1839,14 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        public static void invalidateCache(coreClass cpCore, int contentId) {
+        public static void invalidateCache(coreController cpCore, int contentId) {
             string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
             cpCore.cache.invalidate(cacheName);
         }
         //
         //====================================================================================================
         //
-        public static void invalidateCacheAll(coreClass cpCore) {
+        public static void invalidateCacheAll(coreController cpCore) {
             cpCore.cache.invalidate(cacheNameInvalidateAll);
         }
     }

@@ -22,11 +22,11 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class docPropertyController {
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         private Dictionary<string, docPropertiesClass> docPropertiesDict = new Dictionary<string, docPropertiesClass>();
         //
-        public docPropertyController(coreClass cpCore) : base() {
+        public docPropertyController(coreController cpCore) : base() {
             this.cpCore = cpCore;
         }
         //

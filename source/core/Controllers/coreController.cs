@@ -10,9 +10,9 @@ using static Contensive.Core.constants;
 using System.Diagnostics;
 using System.Linq;
 //
-namespace Contensive.Core {
+namespace Contensive.Core.Controllers {
     // todo - this is not 'cpCore'. It is a 
-    public class coreClass : IDisposable {
+    public class coreController : IDisposable {
         //
         //======================================================================
         // -- provides object dependancy injection
@@ -416,7 +416,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public coreClass(CPClass cp) : base() {
+        public coreController(CPClass cp) : base() {
             cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -434,7 +434,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public coreClass(CPClass cp, Models.Context.serverConfigModel serverConfig) : base() {
+        public coreController(CPClass cp, Models.Context.serverConfigModel serverConfig) : base() {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -453,7 +453,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public coreClass(CPClass cp, Models.Context.serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
+        public coreController(CPClass cp, Models.Context.serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -472,7 +472,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public coreClass(CPClass cp, string applicationName) : base() {
+        public coreController(CPClass cp, string applicationName) : base() {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -493,7 +493,7 @@ namespace Contensive.Core {
         /// <remarks>
         /// All iis httpContext is loaded here and the context should not be used after this method.
         /// </remarks>
-        public coreClass(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
+        public coreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -1163,7 +1163,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <remarks></remarks>
         public string codeVersion() {
-            Type myType = typeof(coreClass);
+            Type myType = typeof(coreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();
             Version myVersion = myAssemblyname.Version;
@@ -1200,7 +1200,7 @@ namespace Contensive.Core {
             GC.SuppressFinalize(this);
         }
         //
-        ~coreClass() {
+        ~coreController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

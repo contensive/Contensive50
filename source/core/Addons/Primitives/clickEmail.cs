@@ -27,7 +27,7 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreClass cpCore = processor.core;
+                coreController cpCore = processor.core;
                 //
                 // -- Email click detected
                 emailDropModel emailDrop = emailDropModel.create(cpCore, cpCore.docProperties.getInteger(rnEmailClickFlag));

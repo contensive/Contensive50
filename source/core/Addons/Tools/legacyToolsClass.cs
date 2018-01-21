@@ -28,7 +28,7 @@ namespace Contensive.Core.Addons.Tools {
         // ----- data fields
         //
         private string[] Findstring = new string[51]; 
-        private coreClass cpCore;
+        private coreController cpCore;
         private string ToolsTable;
         private string ToolsContentName;
         private bool DefaultReadOnly;
@@ -151,7 +151,7 @@ namespace Contensive.Core.Addons.Tools {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public legacyToolsClass(coreClass cpCore) : base() {
+        public legacyToolsClass(coreController cpCore) : base() {
             this.cpCore = cpCore;
         }
         //

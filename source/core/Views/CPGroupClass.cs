@@ -27,7 +27,7 @@ namespace Contensive.Core {
         public const string EventsId = "B9E3C450-CDC4-4590-8BCD-FEDDF7338D4B";
         #endregion
         //
-        private Contensive.Core.coreClass cpCore;
+        private Contensive.Core.Controllers.coreController cpCore;
         private CPClass cp;
         protected bool disposed = false;
         //

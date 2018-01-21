@@ -59,7 +59,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cpCore"></param>
         /// <param name="cacheNameList"></param>
         /// <returns></returns>
-        public static groupModel add(coreClass cpCore, ref List<string> cacheNameList) {
+        public static groupModel add(coreController cpCore, ref List<string> cacheNameList) {
             groupModel result = null;
             try {
                 result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, 0), ref cacheNameList);
@@ -78,7 +78,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="recordId">The id of the record to be read into the new object</param>
         /// <param name="cacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        public static groupModel create(coreClass cpCore, int recordId, ref List<string> cacheNameList) {
+        public static groupModel create(coreController cpCore, int recordId, ref List<string> cacheNameList) {
             groupModel result = null;
             try {
                 if (recordId > 0) {
@@ -102,7 +102,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
-        public static groupModel create(coreClass cpCore, string recordGuid, ref List<string> cacheNameList) {
+        public static groupModel create(coreController cpCore, string recordGuid, ref List<string> cacheNameList) {
             groupModel result = null;
             try {
                 if (!string.IsNullOrEmpty(recordGuid)) {
@@ -126,7 +126,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="foreignKey1Id"></param>
-        public static groupModel create(coreClass cpCore, int foreignKey1Id, int foreignKey2Id, ref List<string> cacheNameList) {
+        public static groupModel create(coreController cpCore, int foreignKey1Id, int foreignKey2Id, ref List<string> cacheNameList) {
             groupModel result = null;
             try {
                 if ((foreignKey1Id > 0) && (foreignKey2Id > 0)) {
@@ -149,7 +149,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
-        private static groupModel loadObject(coreClass cpCore, string sqlCriteria, ref List<string> callersCacheNameList) {
+        private static groupModel loadObject(coreController cpCore, string sqlCriteria, ref List<string> callersCacheNameList) {
             groupModel result = null;
             try {
                 csController cs = new csController(cpCore);
@@ -205,7 +205,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <returns></returns>
-        public int saveObject(coreClass cpCore) {
+        public int saveObject(coreController cpCore) {
             try {
                 csController cs = new csController(cpCore);
                 if (ID > 0) {
@@ -269,7 +269,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static void delete(coreClass cpCore, int recordId) {
+        public static void delete(coreController cpCore, int recordId) {
             try {
                 if (recordId > 0) {
                     cpCore.db.deleteContentRecords(primaryContentName, "id=" + recordId.ToString());
@@ -288,7 +288,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static void delete(coreClass cpCore, string ccguid) {
+        public static void delete(coreController cpCore, string ccguid) {
             try {
                 if (!string.IsNullOrEmpty(ccguid)) {
                     cpCore.db.deleteContentRecords(primaryContentName, "(ccguid=" + cpCore.db.encodeSQLText(ccguid) + ")");
@@ -308,7 +308,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="foreignKey1Id"></param>
         /// <param name="foreignKey2Id"></param>
-        public static void delete(coreClass cpCore, int foreignKey1Id, int foreignKey2Id) {
+        public static void delete(coreController cpCore, int foreignKey1Id, int foreignKey2Id) {
             try {
                 if ((foreignKey2Id > 0) && (foreignKey1Id > 0)) {
                     var tempVar = new List<string>();
@@ -332,7 +332,7 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="someCriteria"></param>
         /// <returns></returns>
-        public static List<groupModel> getObjectList(coreClass cpCore, int someCriteria) {
+        public static List<groupModel> getObjectList(coreController cpCore, int someCriteria) {
             List<groupModel> result = new List<groupModel>();
             try {
                 csController cs = new csController(cpCore);
@@ -361,7 +361,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <param name="recordId"></param>
-        public static void invalidatePrimaryCache(coreClass cpCore, int recordId) {
+        public static void invalidatePrimaryCache(coreController cpCore, int recordId) {
             cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
             //
             // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table

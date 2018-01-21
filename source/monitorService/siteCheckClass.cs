@@ -36,7 +36,7 @@ namespace Contensive.WindowsServices {
         //
         // ----- global scope variables
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         private const string serviceDisplayName = "Contensive Monitor";
         private int TimerIntervalSec;
         private bool allowErrorRecovery;
@@ -650,7 +650,7 @@ namespace Contensive.WindowsServices {
             logController.appendLog(cpCore, message, "Monitor");
         }
 
-        public siteCheckClass(coreClass cpCore) : base() {
+        public siteCheckClass(coreController cpCore) : base() {
             this.cpCore = cpCore;
             version = Assembly.GetEntryAssembly().GetName().Version.ToString();
             processTimer.Elapsed += ProcessTimerTick;

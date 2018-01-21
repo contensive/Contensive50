@@ -24,7 +24,7 @@ namespace Contensive.Core {
         #endregion
         //
         private CPClass cp;
-        private Contensive.Core.coreClass cpCore;
+        private Contensive.Core.Controllers.coreController cpCore;
         protected bool disposed = false;
         //
         //====================================================================================================

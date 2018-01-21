@@ -37,7 +37,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static string exportAscii_GetAsciiExport(coreClass cpCore, string ContentName, int PageSize = 1000, int PageNumber = 1) {
+        public static string exportAscii_GetAsciiExport(coreController cpCore, string ContentName, int PageSize = 1000, int PageNumber = 1) {
             string result = "";
             try {
                 string Delimiter = null;

@@ -28,7 +28,7 @@ namespace Contensive.Core.Addons.AdminSite {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreClass cpCore = processor.core;
+                coreController cpCore = processor.core;
 
                 //
                 // When editing in admin site, if a field has multiple editors (addons as editors), you main_Get an icon

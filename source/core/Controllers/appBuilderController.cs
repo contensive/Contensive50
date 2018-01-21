@@ -275,7 +275,7 @@ namespace Contensive.Core.Controllers {
         // upgrade
         //=========================================================================
         //
-        public static void upgrade(coreClass cpcore, bool isNewBuild) {
+        public static void upgrade(coreController cpcore, bool isNewBuild) {
             try {
                 if (cpcore.doc.upgradeInProgress) {
                     // leftover from 4.1
@@ -1278,7 +1278,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        private static void VerifyAdminMenus(coreClass cpCore, string DataBuildVersion) {
+        private static void VerifyAdminMenus(coreController cpCore, string DataBuildVersion) {
             try {
                 DataTable dt = null;
                 //
@@ -1308,7 +1308,7 @@ namespace Contensive.Core.Controllers {
         //
         // Get the Menu for FormInputHTML
         //
-        private static void VerifyRecord(coreClass cpcore, string ContentName, string Name, string CodeFieldName = "", string Code = "", bool InActive = false) {
+        private static void VerifyRecord(coreController cpcore, string ContentName, string Name, string CodeFieldName = "", string Code = "", bool InActive = false) {
             try {
                 bool Active = false;
                 DataTable dt = null;
@@ -1342,7 +1342,7 @@ namespace Contensive.Core.Controllers {
         // ----- Upgrade Conversion
         //========================================================================
         //
-        private static void Upgrade_Conversion(coreClass cpCore, string DataBuildVersion) {
+        private static void Upgrade_Conversion(coreController cpCore, string DataBuildVersion) {
             try {
                 //
                 // -- Roll the style sheet cache if it is setup
@@ -1361,7 +1361,7 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyTableCoreFields(coreClass cpCore) {
+        public static void VerifyTableCoreFields(coreController cpCore) {
             try {
                 //
                 int IDVariant = 0;
@@ -1406,7 +1406,7 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyScriptingRecords(coreClass cpCore) {
+        public static void VerifyScriptingRecords(coreController cpCore) {
             try {
                 //
                 appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.");
@@ -1423,7 +1423,7 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyLanguageRecords(coreClass cpCore) {
+        public static void VerifyLanguageRecords(coreController cpCore) {
             try {
                 //
                 appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.");
@@ -1440,7 +1440,7 @@ namespace Contensive.Core.Controllers {
         //
         //   Verify Library Folder records
         //
-        private static void VerifyLibraryFolders(coreClass cpCore) {
+        private static void VerifyLibraryFolders(coreController cpCore) {
             try {
                 DataTable dt = null;
                 //
@@ -1602,7 +1602,7 @@ namespace Contensive.Core.Controllers {
         //
         //=============================================================================
         //
-        private static int GetIDBYName(coreClass cpCore, string TableName, string RecordName) {
+        private static int GetIDBYName(coreController cpCore, string TableName, string RecordName) {
             int tempGetIDBYName = 0;
             int returnid = 0;
             try {
@@ -1623,7 +1623,7 @@ namespace Contensive.Core.Controllers {
         //
         //   Verify Library Folder records
         //
-        private static void VerifyLibraryFileTypes(coreClass cpCore) {
+        private static void VerifyLibraryFileTypes(coreController cpCore) {
             try {
                 //
                 // Load basic records -- default images are handled in the REsource Library through the /ccLib/config/DefaultValues.txt GetDefaultValue(key) mechanism
@@ -1709,7 +1709,7 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        private static void VerifyState(coreClass cpcore, string Name, string Abbreviation, double SaleTax, int CountryID, string FIPSState) {
+        private static void VerifyState(coreController cpcore, string Name, string Abbreviation, double SaleTax, int CountryID, string FIPSState) {
             try {
                 //
                 int CS = 0;
@@ -1745,7 +1745,7 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyStates(coreClass cpCore) {
+        public static void VerifyStates(coreController cpCore) {
             try {
                 //
                 appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyStates", "Verify States");
@@ -1818,7 +1818,7 @@ namespace Contensive.Core.Controllers {
         //
         // Get the Menu for FormInputHTML
         //
-        private static void VerifyCountry(coreClass cpCore, string Name, string Abbreviation) {
+        private static void VerifyCountry(coreController cpCore, string Name, string Abbreviation) {
             try {
                 int CS;
                 //
@@ -1848,7 +1848,7 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyCountries(coreClass cpCore) {
+        public static void VerifyCountries(coreController cpCore) {
             try {
                 //
                 appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyCountries", "Verify Countries");
@@ -1873,7 +1873,7 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyDefaultGroups(coreClass cpCore) {
+        public static void VerifyDefaultGroups(coreController cpCore) {
             try {
                 //
                 int GroupID = 0;
@@ -2066,7 +2066,7 @@ namespace Contensive.Core.Controllers {
         //       it will fail if they are not up to date.
         //===================================================================================================================
         //
-        internal static void VerifyBasicTables(coreClass cpCore) {
+        internal static void VerifyBasicTables(coreController cpCore) {
             try {
                 //
                 if (!false) {
@@ -2173,7 +2173,7 @@ namespace Contensive.Core.Controllers {
         //   Error handler
         //===========================================================================
         //
-        private static void handleClassException(coreClass cpCore, Exception ex, string ApplicationName, string MethodName) {
+        private static void handleClassException(coreController cpCore, Exception ex, string ApplicationName, string MethodName) {
             logController.appendLog(cpCore, "exception in builderClass." + MethodName + ", application [" + ApplicationName + "], ex [" + ex.ToString() + "]");
         }
         //
@@ -2181,7 +2181,7 @@ namespace Contensive.Core.Controllers {
         //   Append Log File
         //===========================================================================
         //
-        private static void appendUpgradeLog(coreClass cpCore, string appName, string Method, string Message) {
+        private static void appendUpgradeLog(coreController cpCore, string appName, string Method, string Message) {
             logController.appendLogInstall(cpCore, "app [" + appName + "], Method [" + Method + "], Message [" + Message + "]");
         }
         //
@@ -2189,7 +2189,7 @@ namespace Contensive.Core.Controllers {
         //   Get a ContentID from the ContentName using just the tables
         //=============================================================================
         //
-        private static void appendUpgradeLogAddStep(coreClass cpCore, string appName, string Method, string Message) {
+        private static void appendUpgradeLogAddStep(coreController cpCore, string appName, string Method, string Message) {
             appendUpgradeLog(cpCore, appName, Method, Message);
         }
         //
@@ -2197,7 +2197,7 @@ namespace Contensive.Core.Controllers {
         //   a value in a name/value pair
         //=====================================================================================================
         //
-        public static void SetNameValueArrays(coreClass cpCore, string InputName, string InputValue, ref string[] SQLName, ref string[] SQLValue, ref int Index) {
+        public static void SetNameValueArrays(coreController cpCore, string InputName, string InputValue, ref string[] SQLName, ref string[] SQLValue, ref int Index) {
             // ##### removed to catch err<>0 problem //On Error //Resume Next
             //
             SQLName[Index] = InputName;
@@ -2335,7 +2335,7 @@ namespace Contensive.Core.Controllers {
         //       returns the entry id
         //=============================================================================
         //
-        public static int verifyNavigatorEntry(coreClass cpCore, string ccGuid, string menuNameSpace, string EntryName, string ContentName, string LinkPage, string SortOrder, bool AdminOnly, bool DeveloperOnly, bool NewWindow, bool Active, string AddonName, string NavIconType, string NavIconTitle, int InstalledByCollectionID) {
+        public static int verifyNavigatorEntry(coreController cpCore, string ccGuid, string menuNameSpace, string EntryName, string ContentName, string LinkPage, string SortOrder, bool AdminOnly, bool DeveloperOnly, bool NewWindow, bool Active, string AddonName, string NavIconType, string NavIconTitle, int InstalledByCollectionID) {
             int returnEntry = 0;
             try {
                 if (!string.IsNullOrEmpty(EntryName.Trim())) {
@@ -2593,7 +2593,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public static int verifyNavigatorEntry_getParentIdFromNameSpace(coreClass cpCore, string menuNameSpace) {
+        public static int verifyNavigatorEntry_getParentIdFromNameSpace(coreController cpCore, string menuNameSpace) {
             int parentRecordId = 0;
             try {
                 if (!string.IsNullOrEmpty(menuNameSpace.Trim())) {

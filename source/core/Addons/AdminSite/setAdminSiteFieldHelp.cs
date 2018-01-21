@@ -29,7 +29,7 @@ namespace Contensive.Core.Addons.AdminSite {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreClass cpCore = processor.core;
+                coreController cpCore = processor.core;
                 if (cp.User.IsAdmin) {
                     int fieldId = cp.Doc.GetInteger("fieldId");
                     ContentFieldHelpModel help = ContentFieldHelpModel.createByFieldId(cpCore, fieldId);

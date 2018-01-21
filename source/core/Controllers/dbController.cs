@@ -26,7 +26,7 @@ namespace Contensive.Core.Controllers {
         //
         // non-static class
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         // -- local constants
         private const int pageSizeDefault = 9999;
@@ -102,7 +102,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        public dbController(coreClass cpCore) : base() {
+        public dbController(coreController cpCore) : base() {
             this.cpCore = cpCore;
         }
         //
@@ -3517,7 +3517,7 @@ namespace Contensive.Core.Controllers {
             }
             return returnResult;
         }
-        public string encodeSqlTextLike(coreClass cpcore, string source) {
+        public string encodeSqlTextLike(coreController cpcore, string source) {
             return encodeSQLText("%" + source + "%");
         }
         //
@@ -5280,7 +5280,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public void cs_setFormInput(coreClass cpcore, int CSPointer, string FieldName, string RequestName = "") {
+        public void cs_setFormInput(coreController cpcore, int CSPointer, string FieldName, string RequestName = "") {
             string LocalRequestName = null;
             string Filename = null;
             string Path = null;

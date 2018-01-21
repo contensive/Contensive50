@@ -145,7 +145,7 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static Models.Context.serverConfigModel getObject(coreClass cpCore) {
+        public static Models.Context.serverConfigModel getObject(coreController cpCore) {
             Models.Context.serverConfigModel returnModel = null;
             try {
                 System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -180,7 +180,7 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static Models.Context.serverConfigModel getObject(coreClass cpCore, string appName) {
+        public static Models.Context.serverConfigModel getObject(coreController cpCore, string appName) {
             Models.Context.serverConfigModel returnModel = null;
             try {
                 returnModel = getObject(cpCore);
@@ -210,7 +210,7 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public int saveObject(coreClass cpCore) {
+        public int saveObject(coreController cpCore) {
             try {
                 string jsonTemp = cpCore.json.Serialize(this);
                 cpCore.programDataFiles.saveFile("config.json", jsonTemp);

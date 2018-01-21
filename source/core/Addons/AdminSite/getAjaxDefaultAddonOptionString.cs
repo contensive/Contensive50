@@ -28,7 +28,7 @@ namespace Contensive.Core.Addons.AdminSite {
             string returnHtml = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreClass cpCore = processor.core;
+                coreController cpCore = processor.core;
                 //
                 // return the addons defult AddonOption_String
                 // used in wysiwyg editor - addons in select list have no defaultOption_String

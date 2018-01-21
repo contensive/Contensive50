@@ -23,7 +23,7 @@ namespace Contensive.Core {
         public const string EventsId = "5911548D-7637-4021-BD08-C7676F3E12C6";
         #endregion
         //
-        private Contensive.Core.coreClass cpCore { get; set; }
+        private coreController core { get; set; }
         private CPClass cp { get; set; }
         private string accum { get; set; }
         private Controllers.htmlController htmlDoc { get; set; }
@@ -38,15 +38,15 @@ namespace Contensive.Core {
             try {
                 accum = "";
                 cp = cpParent;
-                cpCore = cp.core;
+                core = cp.core;
                 try {
-                    htmlDoc = new Controllers.htmlController(cpCore);
+                    htmlDoc = new Controllers.htmlController(core);
                 } catch (Exception ex) {
-                    cpCore.handleException(ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.");
+                    core.handleException(ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.");
                     throw;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -57,7 +57,7 @@ namespace Contensive.Core {
             try {
                 accum = htmlString;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -68,7 +68,7 @@ namespace Contensive.Core {
             try {
                 accum += htmlString;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -79,7 +79,7 @@ namespace Contensive.Core {
             try {
                 accum = "";
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -97,10 +97,10 @@ namespace Contensive.Core {
             try {
                 string a = accum;
                 if (!string.IsNullOrEmpty(findSelector)) {
-                    s = htmlParseStaticController.getInner(cpCore, a, findSelector);
+                    s = htmlParseStaticController.getInner(core, a, findSelector);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return s;
@@ -113,10 +113,10 @@ namespace Contensive.Core {
             try {
                 string a = accum;
                 if (!string.IsNullOrEmpty(findSelector)) {
-                    s = htmlParseStaticController.getOuter(cpCore, a, findSelector);
+                    s = htmlParseStaticController.getOuter(core, a, findSelector);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return s;
@@ -133,7 +133,7 @@ namespace Contensive.Core {
                         headTags = htmlParseStaticController.getTagInnerHTML(accum, "head", false);
                         if (!string.IsNullOrEmpty(headTags)) {
                             foreach (string asset in stringSplit( headTags, "\r\n" )) {
-                                cpCore.doc.htmlMetaContent_OtherTags.Add(new htmlMetaClass() {
+                                core.doc.htmlMetaContent_OtherTags.Add(new htmlMetaClass() {
                                     addedByMessage = "block.importFile",
                                     content = asset
                                 });
@@ -143,7 +143,7 @@ namespace Contensive.Core {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -157,21 +157,21 @@ namespace Contensive.Core {
                 if (copyRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
-                    copy = copyContentModel.create(cpCore, genericController.encodeInteger(copyRecordNameOrGuid));
+                    copy = copyContentModel.create(core, genericController.encodeInteger(copyRecordNameOrGuid));
                 } else if (genericController.isGuid(copyRecordNameOrGuid)) {
                     //
                     // -- record guid
-                    copy = copyContentModel.create(cpCore, copyRecordNameOrGuid);
+                    copy = copyContentModel.create(core, copyRecordNameOrGuid);
                 } else {
                     //
                     // -- record name
-                    copy = copyContentModel.createByName(cpCore, copyRecordNameOrGuid);
+                    copy = copyContentModel.createByName(core, copyRecordNameOrGuid);
                 }
                 if (copy != null ) {
                     accum = copy.copy;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -185,7 +185,7 @@ namespace Contensive.Core {
                     accum = cp.wwwFiles.read(wwwFileName);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -199,21 +199,21 @@ namespace Contensive.Core {
                 if (layoutRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
-                    copy = layoutModel.create(cpCore, genericController.encodeInteger(layoutRecordNameOrGuid));
+                    copy = layoutModel.create(core, genericController.encodeInteger(layoutRecordNameOrGuid));
                 } else if (genericController.isGuid(layoutRecordNameOrGuid)) {
                     //
                     // -- record guid
-                    copy = layoutModel.create(cpCore, layoutRecordNameOrGuid);
+                    copy = layoutModel.create(core, layoutRecordNameOrGuid);
                 } else {
                     //
                     // -- record name
-                    copy = layoutModel.createByName(cpCore, layoutRecordNameOrGuid);
+                    copy = layoutModel.createByName(core, layoutRecordNameOrGuid);
                 }
                 if (copy != null) {
                     accum = copy.Layout;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -224,7 +224,7 @@ namespace Contensive.Core {
             try {
                 accum = htmlString + accum;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -233,9 +233,9 @@ namespace Contensive.Core {
         //
         public override void SetInner(string findSelector, string htmlString) {
             try {
-                accum = htmlParseStaticController.setInner(cpCore, accum, findSelector, htmlString);
+                accum = htmlParseStaticController.setInner(core, accum, findSelector, htmlString);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -244,9 +244,9 @@ namespace Contensive.Core {
         //
         public override void SetOuter(string findSelector, string htmlString) {
             try {
-                accum = htmlParseStaticController.setOuter(cpCore, accum, findSelector, htmlString);
+                accum = htmlParseStaticController.setOuter(core, accum, findSelector, htmlString);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -260,7 +260,7 @@ namespace Contensive.Core {
                     //
                     htmlDoc = null;
                     cp = null;
-                    cpCore = null;
+                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.

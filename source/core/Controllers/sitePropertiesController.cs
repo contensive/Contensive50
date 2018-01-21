@@ -22,14 +22,14 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class sitePropertiesController {
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
         //====================================================================================================
         /// <summary>
         /// new
         /// </summary>
         /// <param name="cpCore"></param>
-        public sitePropertiesController(coreClass cpCore) : base() {
+        public sitePropertiesController(coreController cpCore) : base() {
             this.cpCore = cpCore;
         }
         public int defaultRouteId {

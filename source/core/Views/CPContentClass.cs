@@ -26,7 +26,7 @@ namespace Contensive.Core {
         #endregion
         //
         private CPClass cp { get; set; }
-        private Contensive.Core.coreClass cpCore { get; set; }
+        private Contensive.Core.Controllers.coreController cpCore { get; set; }
         protected bool disposed { get; set; } = false;
         //
         //====================================================================================================

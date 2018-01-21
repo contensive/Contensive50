@@ -25,7 +25,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //====================================================================================================
         //
         private CPClass cp; // local cp set in constructor
-        private coreClass cpcore; // cpCore -- short term, this is the migration solution from a built-in tool, to an addon
+        private coreController cpcore; // cpCore -- short term, this is the migration solution from a built-in tool, to an addon
         //
         //====================================================================================================
         /// <summary>

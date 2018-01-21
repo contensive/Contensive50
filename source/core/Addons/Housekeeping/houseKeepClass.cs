@@ -37,7 +37,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // -- ok to cast cpbase to cp because they build from the same solution
                 //this.cp = (CPClass)cp;
-                coreClass cpCore = ((CPClass)cp).core;
+                coreController cpCore = ((CPClass)cp).core;
                 HouseKeep(cpCore, cpCore.docProperties.getBoolean("force"));
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
@@ -46,7 +46,7 @@ namespace Contensive.Core.Addons.Housekeeping {
         }        //
         //
         //
-        public void HouseKeep(coreClass cpCore, bool force) {
+        public void HouseKeep(coreController cpCore, bool force) {
             try {
                 DateTime LastCheckDateTime = cpCore.siteProperties.getDate("housekeep, last check", default(DateTime));
                 int ServerHousekeepHour = cpCore.siteProperties.getInteger("housekeep, run time hour", 2);
@@ -403,7 +403,7 @@ namespace Contensive.Core.Addons.Housekeeping {
         //
         //
         //
-        private void HouseKeep_App_Daily(coreClass cpCore, int VisitArchiveAgeDays, int GuestArchiveAgeDays, int EmailDropArchiveAgeDays, string DefaultMemberName, string BuildVersion) {
+        private void HouseKeep_App_Daily(coreController cpCore, int VisitArchiveAgeDays, int GuestArchiveAgeDays, int EmailDropArchiveAgeDays, string DefaultMemberName, string BuildVersion) {
             try {
                 //
                 DateTime ArchiveEmailDropDate = default(DateTime);
@@ -1373,7 +1373,7 @@ namespace Contensive.Core.Addons.Housekeeping {
         //
         //
         //
-        private void HouseKeep_App_Daily_RemoveVisitRecords(coreClass cpCore, DateTime DeleteBeforeDate, int DataSourceType) {
+        private void HouseKeep_App_Daily_RemoveVisitRecords(coreController cpCore, DateTime DeleteBeforeDate, int DataSourceType) {
             try {
                 //
                 int TimeoutSave = 0;
@@ -1438,7 +1438,7 @@ namespace Contensive.Core.Addons.Housekeeping {
         //
         //
         //
-        private void HouseKeep_App_Daily_RemoveGuestRecords(coreClass cpCore, DateTime DeleteBeforeDate, int DataSourceType) {
+        private void HouseKeep_App_Daily_RemoveGuestRecords(coreController cpCore, DateTime DeleteBeforeDate, int DataSourceType) {
             try {
                 //
                 int TimeoutSave = 0;
@@ -1511,7 +1511,7 @@ namespace Contensive.Core.Addons.Housekeeping {
         //
         //=========================================================================================
         //
-        public void HouseKeep_VisitSummary(coreClass cpCore, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
+        public void HouseKeep_VisitSummary(coreController cpCore, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
             try {
                 double StartTimeHoursSinceMidnight = 0;
                 DateTime PeriodStart = default(DateTime);
@@ -1751,13 +1751,13 @@ namespace Contensive.Core.Addons.Housekeeping {
         //   Log a reported error
         //======================================================================================
         //
-        public void AppendClassLog(coreClass cpcore, string LogCopy) {
+        public void AppendClassLog(coreController cpcore, string LogCopy) {
             logController.appendLog(cpcore, LogCopy, "housekeeping");
         }
         //
         //====================================================================================================
         //
-        private void HouseKeep_App_Daily_LogFolder(coreClass cpCore, string FolderName, DateTime LastMonth) {
+        private void HouseKeep_App_Daily_LogFolder(coreController cpCore, string FolderName, DateTime LastMonth) {
             try {
                 //
                 FileInfo[] FileList = null;
@@ -1778,7 +1778,7 @@ namespace Contensive.Core.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        private bool DownloadUpdates(coreClass cpCore) {
+        private bool DownloadUpdates(coreController cpCore) {
             bool loadOK = true;
             try {
                 XmlDocument Doc = null;
@@ -1830,7 +1830,7 @@ namespace Contensive.Core.Addons.Housekeeping {
         //
         //=========================================================================================
         //
-        public void HouseKeep_PageViewSummary(coreClass cpCore, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
+        public void HouseKeep_PageViewSummary(coreController cpCore, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
             int hint = 0;
             string hinttxt = "";
             try {
@@ -2067,7 +2067,7 @@ namespace Contensive.Core.Addons.Housekeeping {
         }
         //
         //====================================================================================================
-        public void housekeepAddonFolder(coreClass cpCore) {
+        public void housekeepAddonFolder(coreController cpCore) {
             try {
                 string RegisterPathList = null;
                 string RegisterPath = null;

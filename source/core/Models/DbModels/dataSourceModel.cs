@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using Contensive.BaseClasses;
 using Newtonsoft.Json;
+using Contensive.Core.Controllers;
 
 namespace Contensive.Core.Models.DbModels
 {
@@ -66,7 +67,7 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cpCore"></param>
 		/// <param name="callersCacheNameList"></param>
 		/// <returns></returns>
-		public static dataSourceModel add(coreClass cpCore, ref List<string> callersCacheNameList)
+		public static dataSourceModel add(coreController cpCore, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
@@ -89,7 +90,7 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="recordId">The id of the record to be read into the new object</param>
 		/// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-		public static dataSourceModel create(coreClass cpCore, int recordId, ref List<string> callersCacheNameList)
+		public static dataSourceModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
@@ -117,7 +118,7 @@ namespace Contensive.Core.Models.DbModels
 			}
 			return result;
 		}
-        public static dataSourceModel create(coreClass cpCore, int recordId) { var tmpList = new List<string> { }; return create(cpCore, recordId, ref tmpList); }
+        public static dataSourceModel create(coreController cpCore, int recordId) { var tmpList = new List<string> { }; return create(cpCore, recordId, ref tmpList); }
         //
         //====================================================================================================
         /// <summary>
@@ -125,7 +126,7 @@ namespace Contensive.Core.Models.DbModels
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
-        public static dataSourceModel create(coreClass cpCore, string recordGuid, ref List<string> callersCacheNameList)
+        public static dataSourceModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
@@ -159,7 +160,7 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cp"></param>
 		/// <param name="foreignKey1Id"></param>
-		public static dataSourceModel create(coreClass cpCore, int foreignKey1Id, int foreignKey2Id, ref List<string> callersCacheNameList)
+		public static dataSourceModel create(coreController cpCore, int foreignKey1Id, int foreignKey2Id, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
@@ -188,7 +189,7 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cp"></param>
 		/// <param name="sqlCriteria"></param>
-		private static dataSourceModel loadObject(coreClass cpCore, string sqlCriteria, ref List<string> callersCacheNameList)
+		private static dataSourceModel loadObject(coreController cpCore, string sqlCriteria, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
@@ -251,7 +252,7 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cpCore"></param>
 		/// <returns></returns>
-		public int saveObject(coreClass cpCore)
+		public int saveObject(coreController cpCore)
 		{
 			try
 			{
@@ -327,7 +328,7 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cp"></param>
 		/// <param name="recordId"></param>
-		public static void delete(coreClass cpCore, int recordId)
+		public static void delete(coreController cpCore, int recordId)
 		{
 			try
 			{
@@ -351,7 +352,7 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cp"></param>
 		/// <param name="ccguid"></param>
-		public static void delete(coreClass cpCore, string ccguid)
+		public static void delete(coreController cpCore, string ccguid)
 		{
 			try
 			{
@@ -381,7 +382,7 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="foreignKey1Id"></param>
 		/// <param name="foreignKey2Id"></param>
-		public static void delete(coreClass cpCore, int foreignKey1Id, int foreignKey2Id)
+		public static void delete(coreController cpCore, int foreignKey1Id, int foreignKey2Id)
 		{
 			try
 			{
@@ -411,7 +412,7 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="someCriteria"></param>
 		/// <returns></returns>
-		public static List<dataSourceModel> getObjectList(coreClass cpCore, int someCriteria, List<string> callersCacheNameList)
+		public static List<dataSourceModel> getObjectList(coreController cpCore, int someCriteria, List<string> callersCacheNameList)
 		{
 			List<dataSourceModel> result = new List<dataSourceModel>();
 			try
@@ -447,7 +448,7 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cpCore"></param>
 		/// <param name="recordId"></param>
-		public static void invalidatePrimaryCache(coreClass cpCore, int recordId)
+		public static void invalidatePrimaryCache(coreController cpCore, int recordId)
 		{
 			cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
 			//
@@ -477,7 +478,7 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="recordId"></param>record
 		/// <returns></returns>
-		public static string getRecordName(coreClass cpcore, int recordId)
+		public static string getRecordName(coreController cpcore, int recordId)
 		{
 			var  tempVar = new List<string>();
 			return normalizeDataSourceName(dataSourceModel.create(cpcore, recordId, ref tempVar).Name);
@@ -490,7 +491,7 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="ccGuid"></param>record
 		/// <returns></returns>
-		public static string getRecordName(coreClass cpcore, string ccGuid)
+		public static string getRecordName(coreController cpcore, string ccGuid)
 		{
 			var  tempVar = new List<string>();
 			return normalizeDataSourceName(dataSourceModel.create(cpcore, ccGuid, ref tempVar).Name);
@@ -503,7 +504,7 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="ccGuid"></param>record
 		/// <returns></returns>
-		public static int getRecordId(coreClass cpcore, string ccGuid)
+		public static int getRecordId(coreController cpcore, string ccGuid)
 		{
 			var  tempVar = new List<string>();
 			return dataSourceModel.create(cpcore, ccGuid, ref tempVar).ID;
@@ -525,7 +526,7 @@ namespace Contensive.Core.Models.DbModels
 		}
 		//
 		//====================================================================================================
-		public static Dictionary<string, dataSourceModel> getNameDict(coreClass cpcore)
+		public static Dictionary<string, dataSourceModel> getNameDict(coreController cpcore)
 		{
 			Dictionary<string, dataSourceModel> result = new Dictionary<string, dataSourceModel>();
 			try
@@ -563,7 +564,7 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cp"></param>
 		/// <param name="recordGuid"></param>
-		public static dataSourceModel createByName(coreClass cpCore, string recordName, ref List<string> callersCacheNameList)
+		public static dataSourceModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
@@ -596,7 +597,7 @@ namespace Contensive.Core.Models.DbModels
 		/// return the default datasource
 		/// </summary>
 		/// <param name="cp"></param>
-		public static dataSourceModel getDefaultDatasource(coreClass cpCore)
+		public static dataSourceModel getDefaultDatasource(coreController cpCore)
 		{
 			dataSourceModel result = null;
 			try

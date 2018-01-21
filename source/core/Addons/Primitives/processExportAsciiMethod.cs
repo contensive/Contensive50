@@ -27,7 +27,7 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreClass cpCore = processor.core;
+                coreController cpCore = processor.core;
                 //
                 // -- Should be a remote method in commerce
                 if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {

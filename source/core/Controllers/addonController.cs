@@ -32,9 +32,9 @@ namespace Contensive.Core.Controllers {
         //
         // ----- objects passed in constructor, do not dispose
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         //
-        public addonController(coreClass cpCore) : base() {
+        public addonController(coreController cpCore) : base() {
             this.cpCore = cpCore;
         }
         //
@@ -3424,7 +3424,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static string main_GetDefaultAddonOption_String(coreClass cpCore, string ArgumentList, string AddonGuid, bool IsInline) {
+        public static string main_GetDefaultAddonOption_String(coreController cpCore, string ArgumentList, string AddonGuid, bool IsInline) {
             string result = "";
             //
             string NameValuePair = null;
@@ -3573,7 +3573,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private string getAddonDescription(coreClass cpcore, addonModel addon) {
+        private string getAddonDescription(coreController cpcore, addonModel addon) {
             string addonDescription = "[invalid addon]";
             if (addon != null) {
                 string collectionName = "invalid collection or collection not set";
@@ -3591,7 +3591,7 @@ namespace Contensive.Core.Controllers {
         /// Special case addon as it is a required core service. This method attempts the addon call and it if fails, calls the safe-mode version, tested for this build
         /// </summary>
         /// <returns></returns>
-        public static string GetAddonManager(coreClass cpCore) {
+        public static string GetAddonManager(coreController cpCore) {
             string result = "";
             try {
                 bool AddonStatusOK = true;

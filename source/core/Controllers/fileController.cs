@@ -53,7 +53,7 @@ namespace Contensive.Core.Controllers {
             activeSync = 3
         }
         //
-        private coreClass cpCore;
+        private coreController cpCore;
         private bool isLocal { get; set; }
         public string rootLocalPath { get; set; } // path ends in \, folder ends in foldername
         private string clusterFileEndpoint { get; set; }
@@ -68,7 +68,7 @@ namespace Contensive.Core.Controllers {
                                                                                         /// <param name="isLocal">If true, thie object reads/saves to the local filesystem</param>
                                                                                         /// <param name="rootLocalPath"></param>
                                                                                         /// <param name="remoteFileEndpoint">If not isLocal, this endpoint is used for file sync</param>
-        public fileController(coreClass cpCore, bool isLocal, fileSyncModeEnum fileSyncMode, string rootLocalPath, string remoteFileEndpoint = "") {
+        public fileController(coreController cpCore, bool isLocal, fileSyncModeEnum fileSyncMode, string rootLocalPath, string remoteFileEndpoint = "") {
             if (string.IsNullOrEmpty(rootLocalPath)) {
                 cpCore.handleException(new ArgumentException("Blank file system root path not permitted."));
             } else {

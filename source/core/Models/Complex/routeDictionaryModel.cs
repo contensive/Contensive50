@@ -20,7 +20,7 @@ namespace Contensive.Core.Models.Complex {
         private const string cacheNameRouteDictionary = "routeDictionary";
         //
         //===================================================================================================
-        public static Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> create(coreClass cpCore) {
+        public static Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> create(coreController cpCore) {
             Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> result = new Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass>();
             try {
                 result = getCache(cpCore);
@@ -100,7 +100,7 @@ namespace Contensive.Core.Models.Complex {
         }
         //
         //====================================================================================================
-        public static void setCache(coreClass cpCore, Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> routeDictionary) {
+        public static void setCache(coreController cpCore, Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> routeDictionary) {
             var dependentKeyList = new List<string>();
             dependentKeyList.Add(Models.DbModels.addonModel.contentTableName);
             dependentKeyList.Add(Models.DbModels.linkAliasModel.contentTableName);
@@ -109,12 +109,12 @@ namespace Contensive.Core.Models.Complex {
         }
         //
         //====================================================================================================
-        public static Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> getCache(coreClass cpCore) {
+        public static Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> getCache(coreController cpCore) {
             return cpCore.cache.getObject<Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass>>(cacheNameRouteDictionary);
         }
         //
         //====================================================================================================
-        public static void invalidateCache(coreClass cpCore) {
+        public static void invalidateCache(coreController cpCore) {
             cpCore.cache.invalidate(cacheNameRouteDictionary);
         }
     }

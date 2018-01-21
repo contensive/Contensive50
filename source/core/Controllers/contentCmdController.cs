@@ -148,7 +148,7 @@ namespace Contensive.Core.Controllers {
         //           user firstname
         //           site propertyname
         //
-        public static string ExecuteCmd(coreClass cpCore,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        public static string ExecuteCmd(coreController cpCore,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 bool badCmd = false;
@@ -295,7 +295,7 @@ namespace Contensive.Core.Controllers {
         // refactor -- go through all the parsing sections and setup specific exceptions to help users get the syntax correct
         //=================================================================================================================
         //
-        private static string ExecuteAllCmdLists_Execute(coreClass cpCore, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        private static string ExecuteAllCmdLists_Execute(coreController cpCore, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 //
@@ -934,7 +934,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //   encode (execute) all {% -- %} commands
         //
-        public static string executeContentCommands(coreClass cpCore, string Source, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated, ref string Return_ErrorMessage) {
+        public static string executeContentCommands(coreController cpCore, string Source, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated, ref string Return_ErrorMessage) {
             string returnValue = "";
             try {
                 int LoopPtr = 0;

@@ -2176,7 +2176,7 @@ namespace Contensive.Core.Controllers {
         //   Get a Random Long Value
         //=================================================================================
         //
-        public static int GetRandomInteger(coreClass cpCore) {
+        public static int GetRandomInteger(coreController cpCore) {
             int RandomBase = 1; ;
             int RandomLimit = encodeInteger( (Math.Pow(2, 31)) - RandomBase - 1);
             return cpCore.random.Next(RandomBase, RandomLimit);
@@ -3325,7 +3325,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public static string runProcess(coreClass cpCore, string Cmd, string Arguments = "", bool WaitForReturn = false) {
+        public static string runProcess(coreController cpCore, string Cmd, string Arguments = "", bool WaitForReturn = false) {
             string returnResult = "";
             Process p = new Process();
             //
@@ -4153,7 +4153,7 @@ namespace Contensive.Core.Controllers {
         //   If Name = Value, it returns value
         //=============================================================================
         //
-        public static string main_GetNameValue_Internal(coreClass cpcore, string NameValueString, string Name) {
+        public static string main_GetNameValue_Internal(coreController cpcore, string NameValueString, string Name) {
             string result = "";
             //
             string NameValueStringWorking = NameValueString;
@@ -4261,7 +4261,7 @@ namespace Contensive.Core.Controllers {
         //       else (if it start with a file or a path), add the serverFilePath
         //========================================================================
         //
-        public static string getCdnFileLink(coreClass cpcore, string virtualFile) {
+        public static string getCdnFileLink(coreController cpcore, string virtualFile) {
             string returnLink = virtualFile;
             returnLink = genericController.vbReplace(returnLink, "\\", "/");
             if (genericController.vbInstr(1, returnLink, "://") != 0) {
@@ -4394,7 +4394,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="cpCore"></param>
         /// <param name="SrcOptionList"></param>
         /// <returns></returns>
-        public static Dictionary<string, string> convertAddonArgumentstoDocPropertiesList(coreClass cpCore, string SrcOptionList) {
+        public static Dictionary<string, string> convertAddonArgumentstoDocPropertiesList(coreController cpCore, string SrcOptionList) {
             Dictionary<string, string> returnList = new Dictionary<string, string>();
             try {
                 string[] SrcOptions = null;
@@ -4428,7 +4428,7 @@ namespace Contensive.Core.Controllers {
         //   Return just the copy from a content page
         //=============================================================================
         //
-        public static string TextDeScramble(coreClass cpcore, string Copy) {
+        public static string TextDeScramble(coreController cpcore, string Copy) {
             string returnCopy = "";
             try {
                 int CPtr = 0;
@@ -4492,7 +4492,7 @@ namespace Contensive.Core.Controllers {
         //   Return just the copy from a content page
         //=============================================================================
         //
-        public static string TextScramble(coreClass cpcore, string Copy) {
+        public static string TextScramble(coreController cpcore, string Copy) {
             string returnCopy = "";
             try {
                 int CPtr = 0;
