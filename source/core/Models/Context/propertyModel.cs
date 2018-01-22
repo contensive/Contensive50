@@ -17,7 +17,7 @@ using static Contensive.Core.constants;
 namespace Contensive.Core.Models.Context {
     public class propertyModelClass {
         //
-        private coreController cpCore;
+        private coreController core;
         //
         // visit property cache
         //
@@ -34,8 +34,8 @@ namespace Contensive.Core.Models.Context {
         /// <param name="cp"></param>
         /// <param name="propertyTypeId"></param>
         /// <remarks></remarks>
-        public propertyModelClass(coreController cpCore, int propertyTypeId) {
-            this.cpCore = cpCore;
+        public propertyModelClass(coreController core, int propertyTypeId) {
+            this.core = core;
             this.propertyTypeId = propertyTypeId;
         }
         //
@@ -88,13 +88,13 @@ namespace Contensive.Core.Models.Context {
         public void setProperty(string propertyName, string PropertyValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    setProperty(propertyName, PropertyValue, cpCore.doc.sessionContext.visit.id);
+                    setProperty(propertyName, PropertyValue, core.doc.sessionContext.visit.id);
                     break;
                 case PropertyTypeVisitor:
-                    setProperty(propertyName, PropertyValue, cpCore.doc.sessionContext.visitor.id);
+                    setProperty(propertyName, PropertyValue, core.doc.sessionContext.visitor.id);
                     break;
                 case PropertyTypeMember:
-                    setProperty(propertyName, PropertyValue, cpCore.doc.sessionContext.user.id);
+                    setProperty(propertyName, PropertyValue, core.doc.sessionContext.user.id);
                     break;
             }
         }
@@ -113,7 +113,7 @@ namespace Contensive.Core.Models.Context {
                 int RecordID = 0;
                 int CS = 0;
                 string SQLNow = null;
-                dbController db = cpCore.db;
+                dbController db = core.db;
                 //
                 Ptr = -1;
                 if (!propertyCacheLoaded) {
@@ -170,10 +170,10 @@ namespace Contensive.Core.Models.Context {
                 // ----- Error Trap
                 //
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("Unexpected exception"));
+            core.handleException(new Exception("Unexpected exception"));
         }
         //
         //====================================================================================================
@@ -199,11 +199,11 @@ namespace Contensive.Core.Models.Context {
         public DateTime getDate(string propertyName, DateTime defaultValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    return getDate(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
+                    return getDate(propertyName, defaultValue, core.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getDate(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.id);
+                    return getDate(propertyName, defaultValue, core.doc.sessionContext.visitor.id);
                 case PropertyTypeMember:
-                    return getDate(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
+                    return getDate(propertyName, defaultValue, core.doc.sessionContext.user.id);
             }
             return DateTime.MinValue;
         }
@@ -243,11 +243,11 @@ namespace Contensive.Core.Models.Context {
         public double getNumber(string propertyName, double defaultValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    return getNumber(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
+                    return getNumber(propertyName, defaultValue, core.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getNumber(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.id);
+                    return getNumber(propertyName, defaultValue, core.doc.sessionContext.visitor.id);
                 case PropertyTypeMember:
-                    return getNumber(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
+                    return getNumber(propertyName, defaultValue, core.doc.sessionContext.user.id);
             }
             return 0;
         }
@@ -287,11 +287,11 @@ namespace Contensive.Core.Models.Context {
         public bool getBoolean(string propertyName, bool defaultValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    return getBoolean(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
+                    return getBoolean(propertyName, defaultValue, core.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getBoolean(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.id);
+                    return getBoolean(propertyName, defaultValue, core.doc.sessionContext.visitor.id);
                 case PropertyTypeMember:
-                    return getBoolean(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
+                    return getBoolean(propertyName, defaultValue, core.doc.sessionContext.user.id);
             }
             return false;
         }
@@ -331,11 +331,11 @@ namespace Contensive.Core.Models.Context {
         public int getInteger(string propertyName, int defaultValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    return getInteger(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
+                    return getInteger(propertyName, defaultValue, core.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getInteger(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.id);
+                    return getInteger(propertyName, defaultValue, core.doc.sessionContext.visitor.id);
                 case PropertyTypeMember:
-                    return getInteger(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
+                    return getInteger(propertyName, defaultValue, core.doc.sessionContext.user.id);
             }
             return 0;
         }
@@ -375,11 +375,11 @@ namespace Contensive.Core.Models.Context {
         public string getText(string propertyName, string defaultValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    return getText(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
+                    return getText(propertyName, defaultValue, core.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getText(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.id);
+                    return getText(propertyName, defaultValue, core.doc.sessionContext.visitor.id);
                 case PropertyTypeMember:
-                    return getText(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
+                    return getText(propertyName, defaultValue, core.doc.sessionContext.user.id);
             }
             return "";
         }
@@ -416,7 +416,7 @@ namespace Contensive.Core.Models.Context {
                     setProperty(propertyName, defaultValue, keyId);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnString;
@@ -428,7 +428,7 @@ namespace Contensive.Core.Models.Context {
             try {
                 //
                 string Name = null;
-                dbController db = cpCore.db;
+                dbController db = core.db;
                 //
                 propertyCache_nameIndex = new keyPtrController();
                 propertyCacheCnt = 0;
@@ -456,10 +456,10 @@ namespace Contensive.Core.Models.Context {
                 // ----- Error Trap
                 //
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("Unexpected exception"));
+            core.handleException(new Exception("Unexpected exception"));
         }
     }
 }

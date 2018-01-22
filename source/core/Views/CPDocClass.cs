@@ -24,7 +24,7 @@ namespace Contensive.Core {
         #endregion
         //
         private CPClass cp;
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         protected bool disposed = false;
         //
         //====================================================================================================
@@ -34,7 +34,7 @@ namespace Contensive.Core {
         /// <param name="cpParent"></param>
         public CPDocClass(CPClass cpParent) : base() {
             cp = cpParent;
-            cpCore = cp.core;
+            core = cp.core;
         }
         //
         //====================================================================================================
@@ -49,7 +49,7 @@ namespace Contensive.Core {
                     //
                     // call .dispose for managed objects
                     //
-                    cpCore = null;
+                    core = null;
                     cp = null;
                 }
                 //
@@ -66,10 +66,10 @@ namespace Contensive.Core {
         /// <returns></returns>
         public override string Content {
             get {
-                return cpCore.doc.bodyContent;
+                return core.doc.bodyContent;
             }
             set {
-                cpCore.doc.bodyContent = value;
+                core.doc.bodyContent = value;
             }
         }
         //
@@ -92,10 +92,10 @@ namespace Contensive.Core {
         /// <returns></returns>
         public override bool NoFollow {
             get {
-                return cpCore.webServer.response_NoFollow;
+                return core.webServer.response_NoFollow;
             }
             set {
-                cpCore.webServer.response_NoFollow = value;
+                core.webServer.response_NoFollow = value;
             }
         }
         //
@@ -106,10 +106,10 @@ namespace Contensive.Core {
         /// <returns></returns>
         public override int PageId {
             get {
-                if (cpCore.doc.page == null) {
+                if (core.doc.page == null) {
                     return 0;
                 } else {
-                    return cpCore.doc.page.id;
+                    return core.doc.page.id;
                 }
             }
         }
@@ -121,10 +121,10 @@ namespace Contensive.Core {
         /// <returns></returns>
         public override string PageName {
             get {
-                if (cpCore.doc.page == null) {
+                if (core.doc.page == null) {
                     return string.Empty;
                 } else {
-                    return cpCore.doc.page.name;
+                    return core.doc.page.name;
                 }
             }
         }
@@ -136,7 +136,7 @@ namespace Contensive.Core {
         /// <returns></returns>
         public override string RefreshQueryString {
             get {
-                return cpCore.doc.refreshQueryString;
+                return core.doc.refreshQueryString;
             }
         }
         //
@@ -158,7 +158,7 @@ namespace Contensive.Core {
         /// <returns></returns>
         public override DateTime StartTime {
             get {
-                return cpCore.doc.profileStartTime;
+                return core.doc.profileStartTime;
             }
         }
         //
@@ -169,9 +169,9 @@ namespace Contensive.Core {
         /// <returns></returns>
         public override int TemplateId {
             get {
-                if (cpCore.doc != null) {
-                    if (cpCore.doc.template != null) {
-                        return cpCore.doc.template.id;
+                if (core.doc != null) {
+                    if (core.doc.template != null) {
+                        return core.doc.template.id;
                     }
                 }
                 return 0;
@@ -185,7 +185,7 @@ namespace Contensive.Core {
         /// <returns></returns>
         public override string Type {
             get {
-                return cpCore.siteProperties.docTypeDeclaration;
+                return core.siteProperties.docTypeDeclaration;
             }
         }
         //
@@ -195,7 +195,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="NewCode"></param>
         public override void AddHeadJavascript(string NewCode) {
-            cpCore.html.addScriptCode(NewCode, "");
+            core.html.addScriptCode(NewCode, "");
         }
         //
         //====================================================================================================
@@ -204,37 +204,37 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="HeadTag"></param>
         public override void AddHeadTag(string HeadTag) {
-            cpCore.html.addHeadTag(HeadTag);
+            core.html.addHeadTag(HeadTag);
         }
         //
         //====================================================================================================
         //
         public override void AddMetaDescription(string MetaDescription) {
-            cpCore.html.addMetaDescription(MetaDescription);
+            core.html.addMetaDescription(MetaDescription);
         }
         //
         //====================================================================================================
         //
         public override void AddMetaKeywordList(string MetaKeywordList) {
-            cpCore.html.addMetaKeywordList(MetaKeywordList);
+            core.html.addMetaKeywordList(MetaKeywordList);
         }
         //
         //====================================================================================================
         //
         public override void AddOnLoadJavascript(string NewCode) {
-            cpCore.html.addScriptCode_onLoad(NewCode, "");
+            core.html.addScriptCode_onLoad(NewCode, "");
         }
         //
         //====================================================================================================
         //
         public override void AddTitle(string PageTitle) {
-            cpCore.html.addTitle(PageTitle);
+            core.html.addTitle(PageTitle);
         }
         //
         //====================================================================================================
         //
         public override void AddRefreshQueryString(string Name, string Value) {
-            cpCore.doc.addRefreshQueryString(Name, Value);
+            core.doc.addRefreshQueryString(Name, Value);
         }
         //
         //====================================================================================================
@@ -246,23 +246,23 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void AddHeadStyleLink(string StyleSheetLink) {
-            cpCore.html.addStyleLink(StyleSheetLink, "");
+            core.html.addStyleLink(StyleSheetLink, "");
         }
         //
         //====================================================================================================
         //
         public override void AddBodyEnd(string html) {
-            cpCore.doc.htmlForEndOfBody += html;
+            core.doc.htmlForEndOfBody += html;
         }
         //
         //====================================================================================================
         //
         public override string Body {
             get {
-                return cpCore.doc.docBodyFilter;
+                return core.doc.docBodyFilter;
             }
             set {
-                cpCore.doc.docBodyFilter = value;
+                core.doc.docBodyFilter = value;
             }
         }
 
@@ -317,8 +317,8 @@ namespace Contensive.Core {
         //=======================================================================================================
         //
         public override string GetProperty(string PropertyName, string DefaultValue = "") {
-            if (cpCore.docProperties.containsKey(PropertyName)) {
-                return cpCore.docProperties.getText(PropertyName);
+            if (core.docProperties.containsKey(PropertyName)) {
+                return core.docProperties.getText(PropertyName);
             } else {
                 return DefaultValue;
             }
@@ -357,13 +357,13 @@ namespace Contensive.Core {
         //=======================================================================================================
         //
         public override bool IsProperty(string FieldName) {
-            return cpCore.docProperties.containsKey(FieldName);
+            return core.docProperties.containsKey(FieldName);
         }
         //
         //=======================================================================================================
         //
         public override void SetProperty(string FieldName, string FieldValue) {
-            cpCore.docProperties.setProperty(FieldName, FieldValue);
+            core.docProperties.setProperty(FieldName, FieldValue);
         }
         // 20171229 - converted to getter and setter
         //=======================================================================================================
@@ -387,19 +387,19 @@ namespace Contensive.Core {
         //=======================================================================================================
         //
         public override bool get_IsVar(string Index) {
-            return cpCore.docProperties.containsKey(Index);
+            return core.docProperties.containsKey(Index);
         }
         //
         //=======================================================================================================
         //
         public override string get_Var(string Index) {
-            return cpCore.docProperties.getText(Index);
+            return core.docProperties.getText(Index);
         }
         //
         //=======================================================================================================
         //
         public override void set_Var(string Index, string Value) {
-            cpCore.docProperties.setProperty(Index, Value);
+            core.docProperties.setProperty(Index, Value);
         }
         //
         //=======================================================================================================
@@ -416,7 +416,7 @@ namespace Contensive.Core {
                 try {
                     returnIsAdmin = (cp.Request.PathPage.IndexOf(cp.Site.GetText("adminUrl"), System.StringComparison.OrdinalIgnoreCase)  != -1);
                 } catch (Exception ex) {
-                    cpCore.handleException(ex); 
+                    core.handleException(ex); 
                     throw;
                 }
                 return returnIsAdmin;

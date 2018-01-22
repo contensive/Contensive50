@@ -29,98 +29,98 @@ namespace Contensive.Core.Models.DbModels {
         public int pageId { get; set; }
         //
         //====================================================================================================
-        public static addonPageRuleModel add(coreController cpCore) {
-            return add<addonPageRuleModel>(cpCore);
+        public static addonPageRuleModel add(coreController core) {
+            return add<addonPageRuleModel>(core);
         }
         //
         //====================================================================================================
-        public static addonPageRuleModel add(coreController cpCore, ref List<string> callersCacheNameList) {
-            return add<addonPageRuleModel>(cpCore, ref callersCacheNameList);
+        public static addonPageRuleModel add(coreController core, ref List<string> callersCacheNameList) {
+            return add<addonPageRuleModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static addonPageRuleModel create(coreController cpCore, int recordId) {
-            return create<addonPageRuleModel>(cpCore, recordId);
+        public static addonPageRuleModel create(coreController core, int recordId) {
+            return create<addonPageRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static addonPageRuleModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
-            return create<addonPageRuleModel>(cpCore, recordId, ref callersCacheNameList);
+        public static addonPageRuleModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<addonPageRuleModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static addonPageRuleModel create(coreController cpCore, string recordGuid) {
-            return create<addonPageRuleModel>(cpCore, recordGuid);
+        public static addonPageRuleModel create(coreController core, string recordGuid) {
+            return create<addonPageRuleModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static addonPageRuleModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<addonPageRuleModel>(cpCore, recordGuid, ref callersCacheNameList);
+        public static addonPageRuleModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<addonPageRuleModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static addonPageRuleModel createByName(coreController cpCore, string recordName) {
-            return createByName<addonPageRuleModel>(cpCore, recordName);
+        public static addonPageRuleModel createByName(coreController core, string recordName) {
+            return createByName<addonPageRuleModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static addonPageRuleModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<addonPageRuleModel>(cpCore, recordName, ref callersCacheNameList);
+        public static addonPageRuleModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<addonPageRuleModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController cpCore) {
-            base.save(cpCore);
+        public new void save(coreController core) {
+            base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, int recordId) {
-            delete<addonPageRuleModel>(cpCore, recordId);
+        public static void delete(coreController core, int recordId) {
+            delete<addonPageRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, string ccGuid) {
-            delete<addonPageRuleModel>(cpCore, ccGuid);
+        public static void delete(coreController core, string ccGuid) {
+            delete<addonPageRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<addonPageRuleModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<addonPageRuleModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<addonPageRuleModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<addonPageRuleModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<addonPageRuleModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
-            return createList<addonPageRuleModel>(cpCore, sqlCriteria, sqlOrderBy);
+        public static List<addonPageRuleModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<addonPageRuleModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<addonPageRuleModel> createList(coreController cpCore, string sqlCriteria) {
-            return createList<addonPageRuleModel>(cpCore, sqlCriteria);
+        public static List<addonPageRuleModel> createList(coreController core, string sqlCriteria) {
+            return createList<addonPageRuleModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
-            invalidateCacheSingleRecord<addonPageRuleModel>(cpCore, recordId);
+        public void invalidatePrimaryCache(coreController core, int recordId) {
+            invalidateCacheSingleRecord<addonPageRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, int recordId) {
-            return baseModel.getRecordName<addonPageRuleModel>(cpcore, recordId);
+        public static string getRecordName(coreController core, int recordId) {
+            return baseModel.getRecordName<addonPageRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordName<addonPageRuleModel>(cpcore, ccGuid);
+        public static string getRecordName(coreController core, string ccGuid) {
+            return baseModel.getRecordName<addonPageRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordId<addonPageRuleModel>(cpcore, ccGuid);
+        public static int getRecordId(coreController core, string ccGuid) {
+            return baseModel.getRecordId<addonPageRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static addonPageRuleModel createDefault(coreController cpcore) {
-            return createDefault<addonPageRuleModel>(cpcore);
+        public static addonPageRuleModel createDefault(coreController core) {
+            return createDefault<addonPageRuleModel>(core);
         }
     }
 }

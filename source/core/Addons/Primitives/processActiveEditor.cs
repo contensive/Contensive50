@@ -27,10 +27,10 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // ----- Active Editor
-                editorController.processActiveEditor(cpCore);
+                editorController.processActiveEditor(core);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

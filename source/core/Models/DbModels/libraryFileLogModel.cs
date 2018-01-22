@@ -30,98 +30,98 @@ namespace Contensive.Core.Models.DbModels {
         public int VisitID { get; set; }
         //
         //====================================================================================================
-        public static libraryFileLogModel add(coreController cpCore) {
-            return add<libraryFileLogModel>(cpCore);
+        public static libraryFileLogModel add(coreController core) {
+            return add<libraryFileLogModel>(core);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel add(coreController cpCore, ref List<string> callersCacheNameList) {
-            return add<libraryFileLogModel>(cpCore, ref callersCacheNameList);
+        public static libraryFileLogModel add(coreController core, ref List<string> callersCacheNameList) {
+            return add<libraryFileLogModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel create(coreController cpCore, int recordId) {
-            return create<libraryFileLogModel>(cpCore, recordId);
+        public static libraryFileLogModel create(coreController core, int recordId) {
+            return create<libraryFileLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
-            return create<libraryFileLogModel>(cpCore, recordId, ref callersCacheNameList);
+        public static libraryFileLogModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<libraryFileLogModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel create(coreController cpCore, string recordGuid) {
-            return create<libraryFileLogModel>(cpCore, recordGuid);
+        public static libraryFileLogModel create(coreController core, string recordGuid) {
+            return create<libraryFileLogModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<libraryFileLogModel>(cpCore, recordGuid, ref callersCacheNameList);
+        public static libraryFileLogModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<libraryFileLogModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel createByName(coreController cpCore, string recordName) {
-            return createByName<libraryFileLogModel>(cpCore, recordName);
+        public static libraryFileLogModel createByName(coreController core, string recordName) {
+            return createByName<libraryFileLogModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<libraryFileLogModel>(cpCore, recordName, ref callersCacheNameList);
+        public static libraryFileLogModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<libraryFileLogModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController cpCore) {
-            base.save(cpCore);
+        public new void save(coreController core) {
+            base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, int recordId) {
-            delete<libraryFileLogModel>(cpCore, recordId);
+        public static void delete(coreController core, int recordId) {
+            delete<libraryFileLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, string ccGuid) {
-            delete<libraryFileLogModel>(cpCore, ccGuid);
+        public static void delete(coreController core, string ccGuid) {
+            delete<libraryFileLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<libraryFileLogModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<libraryFileLogModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<libraryFileLogModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<libraryFileLogModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<libraryFileLogModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
-            return createList<libraryFileLogModel>(cpCore, sqlCriteria, sqlOrderBy);
+        public static List<libraryFileLogModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<libraryFileLogModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<libraryFileLogModel> createList(coreController cpCore, string sqlCriteria) {
-            return createList<libraryFileLogModel>(cpCore, sqlCriteria);
+        public static List<libraryFileLogModel> createList(coreController core, string sqlCriteria) {
+            return createList<libraryFileLogModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
-            invalidateCacheSingleRecord<libraryFileLogModel>(cpCore, recordId);
+        public void invalidatePrimaryCache(coreController core, int recordId) {
+            invalidateCacheSingleRecord<libraryFileLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, int recordId) {
-            return baseModel.getRecordName<libraryFileLogModel>(cpcore, recordId);
+        public static string getRecordName(coreController core, int recordId) {
+            return baseModel.getRecordName<libraryFileLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordName<libraryFileLogModel>(cpcore, ccGuid);
+        public static string getRecordName(coreController core, string ccGuid) {
+            return baseModel.getRecordName<libraryFileLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordId<libraryFileLogModel>(cpcore, ccGuid);
+        public static int getRecordId(coreController core, string ccGuid) {
+            return baseModel.getRecordId<libraryFileLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel createDefault(coreController cpcore) {
-            return createDefault<libraryFileLogModel>(cpcore);
+        public static libraryFileLogModel createDefault(coreController core) {
+            return createDefault<libraryFileLogModel>(core);
         }
     }
 }

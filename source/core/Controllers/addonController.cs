@@ -32,10 +32,10 @@ namespace Contensive.Core.Controllers {
         //
         // ----- objects passed in constructor, do not dispose
         //
-        private coreController cpCore;
+        private coreController core;
         //
-        public addonController(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public addonController(coreController core) : base() {
+            this.core = core;
         }
         //
         //====================================================================================================
@@ -63,48 +63,48 @@ namespace Contensive.Core.Controllers {
         /// <returns></returns>
         public string execute(Models.DbModels.addonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
             string result = "";
-            bool rootLevelAddon = cpCore.doc.addonsCurrentlyRunningIdList.Count.Equals(0);
+            bool rootLevelAddon = core.doc.addonsCurrentlyRunningIdList.Count.Equals(0);
             bool save_forceJavascriptToHead = executeContext.forceJavascriptToHead;
             try {
                 //
                 // -- test point message
-                long addonStart = cpCore.doc.appStopWatch.ElapsedMilliseconds;
+                long addonStart = core.doc.appStopWatch.ElapsedMilliseconds;
                 if (addon == null) {
                     //
                     // -- addon not found
-                    cpCore.handleException(new ArgumentException("AddonExecute called without valid addon."));
+                    core.handleException(new ArgumentException("AddonExecute called without valid addon."));
                 } else if (executeContext == null) {
                     //
                     // -- context not configured 
-                    cpCore.handleException(new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
+                    core.handleException(new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
                 } else if (!string.IsNullOrEmpty(addon.ObjectProgramID)) {
                     //
                     // -- addons with activeX components are deprecated
-                    string addonDescription = getAddonDescription(cpCore, addon);
+                    string addonDescription = getAddonDescription(core, addon);
                     throw new ApplicationException("Addon is no longer supported because it contains an active-X component, add-on " + addonDescription + ".");
-                } else if (cpCore.doc.addonsCurrentlyRunningIdList.Contains(addon.id)) {
+                } else if (core.doc.addonsCurrentlyRunningIdList.Contains(addon.id)) {
                     //
                     // -- cannot call an addon within an addon
                     throw new ApplicationException("Addon cannot be called by itself [#" + addon.id + ", " + addon.name + "].");
                 } else {
                     //
                     // -- ok to execute
-                    debugController.testPoint(cpCore, "execute enter [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
-                    string parentInstanceId = cpCore.docProperties.getText("instanceId");
-                    cpCore.docProperties.setProperty("instanceId", executeContext.instanceGuid);
-                    cpCore.doc.addonsCurrentlyRunningIdList.Add(addon.id);
+                    debugController.testPoint(core, "execute enter [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
+                    string parentInstanceId = core.docProperties.getText("instanceId");
+                    core.docProperties.setProperty("instanceId", executeContext.instanceGuid);
+                    core.doc.addonsCurrentlyRunningIdList.Add(addon.id);
                     //
                     // -- if the addon's javascript is required in the head, set it in the executeContext now so it will propigate into the dependant addons as well
                     executeContext.forceJavascriptToHead = executeContext.forceJavascriptToHead || addon.javascriptForceHead;
                     //
                     // -- run included add-ons before their parent
-                    List<Models.DbModels.addonIncludeRuleModel> addonIncludeRules = addonIncludeRuleModel.createList(cpCore, "(addonid=" + addon.id + ")");
+                    List<Models.DbModels.addonIncludeRuleModel> addonIncludeRules = addonIncludeRuleModel.createList(core, "(addonid=" + addon.id + ")");
                     if (addonIncludeRules.Count > 0) {
                         foreach (Models.DbModels.addonIncludeRuleModel addonRule in addonIncludeRules) {
                             if (addonRule.IncludedAddonID > 0) {
-                                addonModel dependentAddon = addonModel.create(cpCore, addonRule.IncludedAddonID);
+                                addonModel dependentAddon = addonModel.create(core, addonRule.IncludedAddonID);
                                 if (dependentAddon == null) {
-                                    cpCore.handleException(new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                                    core.handleException(new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                                 } else {
                                     result += executeDependency(dependentAddon, executeContext);
                                 }
@@ -113,7 +113,7 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     // -- properties referenced multiple time 
-                    bool allowAdvanceEditor = cpCore.visitProperty.getBoolean("AllowAdvancedEditor");
+                    bool allowAdvanceEditor = core.visitProperty.getBoolean("AllowAdvancedEditor");
                     //
                     // -- add addon record arguments to doc properties
                     if (!string.IsNullOrWhiteSpace(addon.ArgumentList)) {
@@ -128,7 +128,7 @@ namespace Contensive.Core.Controllers {
                                     if (nvpValue.IndexOf("[") >= 0) {
                                         nvpValue = nvpValue.Left(nvpValue.IndexOf("["));
                                     }
-                                    cpCore.docProperties.setProperty(nvp[0], nvpValue);
+                                    core.docProperties.setProperty(nvp[0], nvpValue);
                                 }
                             }
                         }
@@ -152,7 +152,7 @@ namespace Contensive.Core.Controllers {
                                 ContainerCssClass = kvp.Value;
                                 break;
                         }
-                        cpCore.docProperties.setProperty(kvp.Key, kvp.Value);
+                        core.docProperties.setProperty(kvp.Key, kvp.Value);
                     }
                     //
                     // Preprocess arguments into OptionsForCPVars, and set generic instance values wrapperid and asajax
@@ -160,7 +160,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- inframe execution, deliver iframe with link back to remote method
                         result = "TBD - inframe";
-                        //Link = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
+                        //Link = core.webServer.requestProtocol & core.webServer.requestDomain & requestAppRootPath & core.siteProperties.serverPageDefault
                         //If genericController.vbInstr(1, Link, "?") = 0 Then
                         //    Link = Link & "?"
                         //Else
@@ -173,7 +173,7 @@ namespace Contensive.Core.Controllers {
                         //        & "&remotemethodaddon=" & EncodeURL(addon.id.ToString) _
                         //        & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                         //        & ""
-                        //FrameID = "frame" & GetRandomInteger(cpCore)
+                        //FrameID = "frame" & GetRandomInteger(core)
                         //returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
                         //        & cr & "<script language=javascript type=""text/javascript"">" _
                         //        & cr & "// Safari and Opera need a kick-start." _
@@ -192,18 +192,18 @@ namespace Contensive.Core.Controllers {
                         //-----------------------------------------------------------------
                         //
                         //If True Then
-                        //    AsAjaxID = "asajax" & GetRandomInteger(cpCore)
+                        //    AsAjaxID = "asajax" & GetRandomInteger(core)
                         //    QS = "" _
                         //& RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(addon.id.ToString()) _
                         //& "&HostContentName=" & EncodeRequestVariable(HostContentName) _
                         //& "&HostRecordID=" & HostRecordID _
-                        //& "&HostRQS=" & EncodeRequestVariable(cpCore.doc.refreshQueryString) _
-                        //& "&HostQS=" & EncodeRequestVariable(cpCore.webServer.requestQueryString) _
+                        //& "&HostRQS=" & EncodeRequestVariable(core.doc.refreshQueryString) _
+                        //& "&HostQS=" & EncodeRequestVariable(core.webServer.requestQueryString) _
                         //& "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                         //& ""
                         //    '
                         //    ' -- exception made here. AsAjax is not used often, and this can create a QS too long
-                        //    '& "&HostForm=" & EncodeRequestVariable(cpCore.webServer.requestFormString) _
+                        //    '& "&HostForm=" & EncodeRequestVariable(core.webServer.requestFormString) _
                         //    If IsInline Then
                         //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
                         //    Else
@@ -236,22 +236,22 @@ namespace Contensive.Core.Controllers {
                         //    ' Long Term Fix
                         //    '   Convert js, style, and meta tag system to use .createElement during remote method processing
                         //    '
-                        //    Call cpCore.html.doc_AddPagetitle2(PageTitle, AddedByName)
-                        //    Call cpCore.html.doc_addMetaDescription2(MetaDescription, AddedByName)
-                        //    Call cpCore.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                        //    Call cpCore.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
+                        //    Call core.html.doc_AddPagetitle2(PageTitle, AddedByName)
+                        //    Call core.html.doc_addMetaDescription2(MetaDescription, AddedByName)
+                        //    Call core.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
+                        //    Call core.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
                         //    If Not blockJavascriptAndCss Then
                         //        '
                         //        ' add javascript and styles if it has not run already
                         //        '
-                        //        Call cpCore.html.addOnLoadJavascript(JSOnLoad, AddedByName)
-                        //        Call cpCore.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
-                        //        Call cpCore.html.addJavaScriptLinkHead(JSFilename, AddedByName)
+                        //        Call core.html.addOnLoadJavascript(JSOnLoad, AddedByName)
+                        //        Call core.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
+                        //        Call core.html.addJavaScriptLinkHead(JSFilename, AddedByName)
                         //        If addon.StylesFilename.filename <> "" Then
-                        //            Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.StylesFilename.filename), addon.name & " default")
+                        //            Call core.html.addStyleLink(core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, addon.StylesFilename.filename), addon.name & " default")
                         //        End If
                         //        'If CustomStylesFilename <> "" Then
-                        //        '    Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
+                        //        '    Call core.html.addStyleLink(core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, CustomStylesFilename), AddonName & " custom")
                         //        'End If
                         //    End If
                         //End If
@@ -268,8 +268,8 @@ namespace Contensive.Core.Controllers {
                             result = "TBD - remotemethod inframe";
                             // Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
                             //If True Then
-                            //    Call cpCore.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, addon.id.ToString)
-                            //    Call cpCore.doc.addRefreshQueryString("optionstring", WorkingOptionString)
+                            //    Call core.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, addon.id.ToString)
+                            //    Call core.doc.addRefreshQueryString("optionstring", WorkingOptionString)
                             //End If
                         } else if (addon.AsAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
                             //
@@ -280,29 +280,29 @@ namespace Contensive.Core.Controllers {
                             // restore form values
                             //
                             //If True Then
-                            //    QS = cpCore.docProperties.getText("Hostform")
+                            //    QS = core.docProperties.getText("Hostform")
                             //    If QS <> "" Then
-                            //        Call cpCore.docProperties.addQueryString(QS)
+                            //        Call core.docProperties.addQueryString(QS)
                             //    End If
                             //    '
                             //    ' restore refresh querystring values
                             //    '
-                            //    QS = cpCore.docProperties.getText("HostRQS")
+                            //    QS = core.docProperties.getText("HostRQS")
                             //    QSSplit = Split(QS, "&")
                             //    For Ptr = 0 To UBound(QSSplit)
                             //        NVPair = QSSplit[Ptr]
                             //        If NVPair <> "" Then
                             //            NVSplit = Split(NVPair, "=")
                             //            If UBound(NVSplit) > 0 Then
-                            //                Call cpCore.doc.addRefreshQueryString(NVSplit(0), NVSplit(1))
+                            //                Call core.doc.addRefreshQueryString(NVSplit(0), NVSplit(1))
                             //            End If
                             //        End If
                             //    Next
                             //    '
                             //    ' restore query string
                             //    '
-                            //    QS = cpCore.docProperties.getText("HostQS")
-                            //    Call cpCore.docProperties.addQueryString(QS)
+                            //    QS = core.docProperties.getText("HostQS")
+                            //    Call core.docProperties.addQueryString(QS)
                             //    '
                             //    ' Clear the style,js and meta features that were delivered to the host page
                             //    ' After processing, if these strings are not empty, they must have been added by the DLL
@@ -325,10 +325,10 @@ namespace Contensive.Core.Controllers {
                         //
                         string TestString = addon.Copy + addon.CopyText + addon.PageTitle + addon.MetaDescription + addon.MetaKeywordList + addon.OtherHeadTags + addon.FormXML;
                         if (!string.IsNullOrEmpty(TestString)) {
-                            foreach (var key in cpCore.docProperties.getKeyList()) {
+                            foreach (var key in core.docProperties.getKeyList()) {
                                 string ReplaceSource = "$" + key + "$";
                                 if (TestString.IndexOf(ReplaceSource) >= 0) {
-                                    string ReplaceValue = cpCore.docProperties.getText(key);
+                                    string ReplaceValue = core.docProperties.getText(key);
                                     addon.Copy = addon.Copy.Replace(ReplaceSource, ReplaceValue);
                                     addon.CopyText = addon.CopyText.Replace(ReplaceSource, ReplaceValue);
                                     addon.PageTitle = addon.PageTitle.Replace(ReplaceSource, ReplaceValue);
@@ -349,14 +349,14 @@ namespace Contensive.Core.Controllers {
                             result = addon.CopyText + addon.Copy;
                             if (!string.IsNullOrEmpty(result)) {
                                 string ignoreLayoutErrors = "";
-                                result = contentCmdController.executeContentCommands(cpCore, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
+                                result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
                             }
                             switch (executeContext.addonType) {
                                 case CPUtilsBaseClass.addonContext.ContextEditor:
-                                    result = activeContentController.convertActiveContentToHtmlForWysiwygEditor(cpCore, result);
+                                    result = activeContentController.renderHtmlForWysiwygEditor(core, result);
                                     break;
                                 case CPUtilsBaseClass.addonContext.ContextEmail:
-                                    result = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, result, executeContext.personalizationPeopleId, "");
+                                    result = activeContentController.renderHtmlForEmail(core, result, executeContext.personalizationPeopleId, "");
                                     break;
                                 case CPUtilsBaseClass.addonContext.ContextFilter:
                                 case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
@@ -368,20 +368,20 @@ namespace Contensive.Core.Controllers {
                                 case CPUtilsBaseClass.addonContext.ContextTemplate:
                                 case CPUtilsBaseClass.addonContext.ContextAdmin:
                                 case CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml:
-                                    result = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, result, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                    result = activeContentController.renderHtmlForWeb(core, result, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                     break;
                                 case CPUtilsBaseClass.addonContext.ContextOnContentChange:
                                 case CPUtilsBaseClass.addonContext.ContextSimple:
-                                    result = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                    result = activeContentController.renderHtmlForWeb(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                     break;
                                 case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
-                                    result = activeContentController.convertActiveContentToJsonForRemoteMethod(cpCore, result, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
+                                    result = activeContentController.renderJSONForRemoteMethod(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
                                     break;
                                 default:
-                                    result = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                    result = activeContentController.renderHtmlForWeb(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                     break;
                             }
-                            //result = cpCore.html.convertActiveContent_internal(result, executeContext.personalizationPeopleId, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, 0, False, False, True, True, False, True, "", "", (executeContext.addonType = CPUtilsBaseClass.addonContext.ContextEmail), executeContext.wrapperID, "", executeContext.addonType, executeContext.personalizationAuthenticated, Nothing, False)
+                            //result = core.html.convertActiveContent_internal(result, executeContext.personalizationPeopleId, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, 0, False, False, True, True, False, True, "", "", (executeContext.addonType = CPUtilsBaseClass.addonContext.ContextEmail), executeContext.wrapperID, "", executeContext.addonType, executeContext.personalizationAuthenticated, Nothing, False)
                         }
                         //
                         // -- Scripting code
@@ -390,7 +390,7 @@ namespace Contensive.Core.Controllers {
                             // Get Language
                             string ScriptingLanguage = "";
                             if (addon.ScriptingLanguageID != 0) {
-                                ScriptingLanguage = cpCore.db.getRecordName("Scripting Languages", addon.ScriptingLanguageID);
+                                ScriptingLanguage = core.db.getRecordName("Scripting Languages", addon.ScriptingLanguageID);
                             }
                             if (string.IsNullOrEmpty(ScriptingLanguage)) {
                                 ScriptingLanguage = "VBScript";
@@ -398,14 +398,14 @@ namespace Contensive.Core.Controllers {
                             try {
                                 result += execute_Script(ref addon, ScriptingLanguage, addon.ScriptingCode, addon.ScriptingEntryPoint, encodeInteger(addon.ScriptingTimeout), "Addon [" + addon.name + "]");
                             } catch (Exception ex) {
-                                string addonDescription = getAddonDescription(cpCore, addon);
+                                string addonDescription = getAddonDescription(core, addon);
                                 throw new ApplicationException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
                             }
                         }
                         //
                         // -- DotNet
                         if (addon.DotNetClass != "") {
-                            result += execute_assembly( executeContext, addon, AddonCollectionModel.create(cpCore, addon.CollectionID));
+                            result += execute_assembly( executeContext, addon, AddonCollectionModel.create(core, addon.CollectionID));
                         }
                         //
                         // -- RemoteAssetLink
@@ -415,9 +415,9 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // use request object to build link
                                 if (RemoteAssetLink.Left( 1) == "/") {
-                                    RemoteAssetLink = cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + RemoteAssetLink;
+                                    RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + RemoteAssetLink;
                                 } else {
-                                    RemoteAssetLink = cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + cpCore.webServer.requestVirtualFilePath + RemoteAssetLink;
+                                    RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + core.webServer.requestVirtualFilePath + RemoteAssetLink;
                                 }
                             }
                             int PosStart = 0;
@@ -448,12 +448,12 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- Script Callback
                         if (addon.Link != "") {
-                            string callBackLink = EncodeAppRootPath(addon.Link, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain);
-                            foreach (var key in cpCore.docProperties.getKeyList()) {
-                                callBackLink = modifyLinkQuery(callBackLink, EncodeRequestVariable(key), EncodeRequestVariable(cpCore.docProperties.getText(key)), true);
+                            string callBackLink = EncodeAppRootPath(addon.Link, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                            foreach (var key in core.docProperties.getKeyList()) {
+                                callBackLink = modifyLinkQuery(callBackLink, EncodeRequestVariable(key), EncodeRequestVariable(core.docProperties.getText(key)), true);
                             }
                             foreach (var kvp in executeContext.instanceArguments) {
-                                callBackLink = modifyLinkQuery(callBackLink, EncodeRequestVariable(kvp.Key), EncodeRequestVariable(cpCore.docProperties.getText(kvp.Value)), true);
+                                callBackLink = modifyLinkQuery(callBackLink, EncodeRequestVariable(kvp.Key), EncodeRequestVariable(core.docProperties.getText(kvp.Value)), true);
                             }
                             result += "<SCRIPT LANGUAGE=\"JAVASCRIPT\" SRC=\"" + callBackLink + "\"></SCRIPT>";
                         }
@@ -461,39 +461,39 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- js head links
                         if (addon.JSHeadScriptSrc != "") {
-                            cpCore.html.addScriptLinkSrc(addon.JSHeadScriptSrc, AddedByName + " Javascript Head Src", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
+                            core.html.addScriptLinkSrc(addon.JSHeadScriptSrc, AddedByName + " Javascript Head Src", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
                         }
                         //
                         // -- js head code
                         if (addon.JSFilename.filename != "") {
-                            string scriptFilename = cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, addon.JSFilename.filename);
-                            cpCore.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead),addon.id);
+                            string scriptFilename = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, addon.JSFilename.filename);
+                            core.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead),addon.id);
                         }
                         //
                         // -- non-js html assets (styles,head tags), set flag to block duplicates 
-                        if (!cpCore.doc.addonIdListRunInThisDoc.Contains(addon.id)) {
-                            cpCore.doc.addonIdListRunInThisDoc.Add(addon.id);
-                            cpCore.html.addTitle(addon.PageTitle, AddedByName);
-                            cpCore.html.addMetaDescription(addon.MetaDescription, AddedByName);
-                            cpCore.html.addMetaKeywordList(addon.MetaKeywordList, AddedByName);
-                            cpCore.html.addHeadTag(addon.OtherHeadTags, AddedByName);
+                        if (!core.doc.addonIdListRunInThisDoc.Contains(addon.id)) {
+                            core.doc.addonIdListRunInThisDoc.Add(addon.id);
+                            core.html.addTitle(addon.PageTitle, AddedByName);
+                            core.html.addMetaDescription(addon.MetaDescription, AddedByName);
+                            core.html.addMetaKeywordList(addon.MetaKeywordList, AddedByName);
+                            core.html.addHeadTag(addon.OtherHeadTags, AddedByName);
                             ////
                             //// -- js body links
                             //if (addon.JSBodyScriptSrc != "") {
-                            //    cpCore.html.addScriptLink_Body(addon.JSBodyScriptSrc, AddedByName + " Javascript Body Src");
+                            //    core.html.addScriptLink_Body(addon.JSBodyScriptSrc, AddedByName + " Javascript Body Src");
                             //}
                             ////
                             //// -- js body code
-                            //cpCore.html.addScriptCode_body(addon.JavaScriptBodyEnd, AddedByName + " Javascript Body Code");
+                            //core.html.addScriptCode_body(addon.JavaScriptBodyEnd, AddedByName + " Javascript Body Code");
                             //
                             // -- styles
                             if (addon.StylesFilename.filename != "") {
-                                cpCore.html.addStyleLink(cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, addon.StylesFilename.filename), addon.name + " Stylesheet");
+                                core.html.addStyleLink(core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, addon.StylesFilename.filename), addon.name + " Stylesheet");
                             }
                             //
                             // -- link to stylesheet
                             if (addon.StylesLinkHref != "") {
-                                cpCore.html.addStyleLink(addon.StylesLinkHref, addon.name + " Stylesheet Link");
+                                core.html.addStyleLink(addon.StylesLinkHref, addon.name + " Stylesheet Link");
                             }
                         }
                         //
@@ -511,11 +511,11 @@ namespace Contensive.Core.Controllers {
                     if (addon.InFrame && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
                         //
                         // -- iFrame content, framed in content, during the remote method call, add in the rest of the html page
-                        cpCore.doc.setMetaContent(0, 0);
+                        core.doc.setMetaContent(0, 0);
                         result = ""
-                            + cpCore.siteProperties.docTypeDeclaration + "\r\n<html>"
+                            + core.siteProperties.docTypeDeclaration + "\r\n<html>"
                             + "\r\n<head>"
-                            + cpCore.html.getHtmlHead() 
+                            + core.html.getHtmlHead() 
                             + "\r\n</head>"
                             + "\r\n" + TemplateDefaultBodyTag 
                             + "\r\n</body>"
@@ -537,32 +537,32 @@ namespace Contensive.Core.Controllers {
                         // -- Return all other types, Enable Edit Wrapper for Page Content edit mode
                         bool IncludeEditWrapper = (!addon.BlockEditTools) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) & (!executeContext.isIncludeAddon);
                         if (IncludeEditWrapper) {
-                            IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || cpCore.doc.sessionContext.isEditing(executeContext.hostRecord.contentName)));
+                            IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || core.doc.sessionContext.isEditing(executeContext.hostRecord.contentName)));
                             if (IncludeEditWrapper) {
                                 //
                                 // Edit Icon
-                                string EditWrapperHTMLID = "eWrapper" + cpCore.doc.addonInstanceCnt;
+                                string EditWrapperHTMLID = "eWrapper" + core.doc.addonInstanceCnt;
                                 string DialogList = "";
                                 string HelpIcon = getHelpBubble(addon.id, addon.Help, addon.CollectionID, ref DialogList);
-                                if (cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) {
+                                if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                     string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
                                     string AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
-                                    AddonEditIcon = "<a href=\"/" + cpCore.serverConfig.appConfig.adminRoute + "?cid=" + cdefModel.getContentId(cpCore, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
+                                    AddonEditIcon = "<a href=\"/" + core.serverConfig.appConfig.adminRoute + "?cid=" + cdefModel.getContentId(core, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
                                     string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
-                                    string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + cpCore.doc.editWrapperCnt, ref DialogList);
+                                    string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
                                     string SiteStylesEditIcon = ""; // ?????
                                     string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
                                     ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
-                                    result = cpCore.html.getEditWrapper("<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
-                                } else if (cpCore.visitProperty.getBoolean("AllowEditing")) {
-                                    result = cpCore.html.getEditWrapper("<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
+                                    result = core.html.getEditWrapper("<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
+                                } else if (core.visitProperty.getBoolean("AllowEditing")) {
+                                    result = core.html.getEditWrapper("<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
                                 }
                             }
                         }
                         //
                         // -- Add Comment wrapper, to help debugging except email, remote methods and admin (empty is used to detect no result)
                         if (true && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextAdmin) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple)) {
-                            if (cpCore.visitProperty.getBoolean("AllowDebugging")) {
+                            if (core.visitProperty.getBoolean("AllowDebugging")) {
                                 string AddonCommentName = genericController.vbReplace(addon.name, "-->", "..>");
                                 if (addon.IsInline) {
                                     result = "<!-- Add-on " + AddonCommentName + " -->" + result + "<!-- /Add-on " + AddonCommentName + " -->";
@@ -578,17 +578,17 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     //
-                    // -- this completes the execute of this cpcore.addon. remove it from the 'running' list
+                    // -- this completes the execute of this core.addon. remove it from the 'running' list
                     // -- restore the parent's instanceId
-                    cpCore.docProperties.setProperty("instanceId", parentInstanceId);
-                    cpCore.doc.addonsCurrentlyRunningIdList.Remove(addon.id);
-                    cpCore.doc.addonInstanceCnt = cpCore.doc.addonInstanceCnt + 1;
+                    core.docProperties.setProperty("instanceId", parentInstanceId);
+                    core.doc.addonsCurrentlyRunningIdList.Remove(addon.id);
+                    core.doc.addonInstanceCnt = core.doc.addonInstanceCnt + 1;
                     //
                     // -- test point message
-                    debugController.testPoint(cpCore, "execute exit (" + (cpCore.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
+                    debugController.testPoint(core, "execute exit (" + (core.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             } finally {
                 if (addon != null) {
                     //
@@ -597,8 +597,8 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
                     if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
-                        result = cpCore.html.getHtmlDoc(result, "<body>");
-                        if (!cpCore.doc.visitPropertyAllowDebugging) {
+                        result = core.html.getHtmlDoc(result, "<body>");
+                        if (!core.doc.visitPropertyAllowDebugging) {
                             result = NUglify.Uglify.Html(result).Code;
                         }
                     }
@@ -635,7 +635,7 @@ namespace Contensive.Core.Controllers {
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
                 string Copy = null;
                 string Button = null;
-                adminUIController Adminui = new adminUIController(cpCore);
+                adminUIController Adminui = new adminUIController(core);
                 string ButtonList = "";
                 string Filename = null;
                 string NonEncodedLink = null;
@@ -668,14 +668,14 @@ namespace Contensive.Core.Controllers {
                 string FieldSelector = null;
                 string DefaultFilename = null;
                 //
-                Button = cpCore.docProperties.getText(RequestNameButton);
+                Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonCancel) {
                     //
                     // Cancel just exits with no content
                     //
                     return_ExitAddonBlankWithResponse = true;
                     return string.Empty;
-                } else if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
+                } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //
@@ -714,7 +714,7 @@ namespace Contensive.Core.Controllers {
                                                         case "siteproperty":
                                                             //
                                                             FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                            FieldValue = cpCore.docProperties.getText(FieldName);
+                                                            FieldValue = core.docProperties.getText(FieldName);
                                                             fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
                                                             switch (genericController.vbLCase(fieldType)) {
                                                                 case "integer":
@@ -722,71 +722,71 @@ namespace Contensive.Core.Controllers {
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = genericController.encodeInteger(FieldValue).ToString();
                                                                     }
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "boolean":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = genericController.encodeBoolean(FieldValue).ToString();
                                                                     }
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "float":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = encodeNumber(FieldValue).ToString();
                                                                     }
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "date":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = genericController.encodeDate(FieldValue).ToString();
                                                                     }
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "file":
                                                                 case "imagefile":
                                                                     //
-                                                                    if (cpCore.docProperties.getBoolean(FieldName + ".DeleteFlag")) {
-                                                                        cpCore.siteProperties.setProperty(FieldName, "");
+                                                                    if (core.docProperties.getBoolean(FieldName + ".DeleteFlag")) {
+                                                                        core.siteProperties.setProperty(FieldName, "");
                                                                     }
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         Filename = FieldValue;
                                                                         VirtualFilePath = "Settings/" + FieldName + "/";
-                                                                        cpCore.cdnFiles.upload(FieldName, VirtualFilePath, ref Filename);
-                                                                        cpCore.siteProperties.setProperty(FieldName, VirtualFilePath + Filename);
+                                                                        core.cdnFiles.upload(FieldName, VirtualFilePath, ref Filename);
+                                                                        core.siteProperties.setProperty(FieldName, VirtualFilePath + Filename);
                                                                     }
                                                                     break;
                                                                 case "textfile":
                                                                     //
                                                                     DefaultFilename = "Settings/" + FieldName + ".txt";
-                                                                    Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename);
+                                                                    Filename = core.siteProperties.getText(FieldName, DefaultFilename);
                                                                     if (string.IsNullOrEmpty(Filename)) {
                                                                         Filename = DefaultFilename;
-                                                                        cpCore.siteProperties.setProperty(FieldName, DefaultFilename);
+                                                                        core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                     }
-                                                                    cpCore.appRootFiles.saveFile(Filename, FieldValue);
+                                                                    core.appRootFiles.saveFile(Filename, FieldValue);
                                                                     break;
                                                                 case "cssfile":
                                                                     //
                                                                     DefaultFilename = "Settings/" + FieldName + ".css";
-                                                                    Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename);
+                                                                    Filename = core.siteProperties.getText(FieldName, DefaultFilename);
                                                                     if (string.IsNullOrEmpty(Filename)) {
                                                                         Filename = DefaultFilename;
-                                                                        cpCore.siteProperties.setProperty(FieldName, DefaultFilename);
+                                                                        core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                     }
-                                                                    cpCore.appRootFiles.saveFile(Filename, FieldValue);
+                                                                    core.appRootFiles.saveFile(Filename, FieldValue);
                                                                     break;
                                                                 case "xmlfile":
                                                                     //
                                                                     DefaultFilename = "Settings/" + FieldName + ".xml";
-                                                                    Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename);
+                                                                    Filename = core.siteProperties.getText(FieldName, DefaultFilename);
                                                                     if (string.IsNullOrEmpty(Filename)) {
                                                                         Filename = DefaultFilename;
-                                                                        cpCore.siteProperties.setProperty(FieldName, DefaultFilename);
+                                                                        core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                     }
-                                                                    cpCore.appRootFiles.saveFile(Filename, FieldValue);
+                                                                    core.appRootFiles.saveFile(Filename, FieldValue);
                                                                     break;
                                                                 case "currency":
                                                                     //
@@ -794,13 +794,13 @@ namespace Contensive.Core.Controllers {
                                                                         FieldValue = encodeNumber(FieldValue).ToString();
                                                                         FieldValue = String.Format("C", FieldValue);
                                                                     }
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "link":
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 default:
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                             }
                                                             break;
@@ -816,32 +816,32 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     // treat html as active content for now.
                                                                     //
-                                                                    FieldValue = cpCore.docProperties.getRenderedActiveContent(FieldName);
+                                                                    FieldValue = core.docProperties.getRenderedActiveContent(FieldName);
                                                                 } else {
-                                                                    FieldValue = cpCore.docProperties.getText(FieldName);
+                                                                    FieldValue = core.docProperties.getText(FieldName);
                                                                 }
 
-                                                                CS = cpCore.db.csOpen("Copy Content", "name=" + cpCore.db.encodeSQLText(FieldName), "ID");
-                                                                if (!cpCore.db.csOk(CS)) {
-                                                                    cpCore.db.csClose(ref CS);
-                                                                    CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.sessionContext.user.id);
+                                                                CS = core.db.csOpen("Copy Content", "name=" + core.db.encodeSQLText(FieldName), "ID");
+                                                                if (!core.db.csOk(CS)) {
+                                                                    core.db.csClose(ref CS);
+                                                                    CS = core.db.csInsertRecord("Copy Content", core.doc.sessionContext.user.id);
                                                                 }
-                                                                if (cpCore.db.csOk(CS)) {
-                                                                    cpCore.db.csSet(CS, "name", FieldName);
+                                                                if (core.db.csOk(CS)) {
+                                                                    core.db.csSet(CS, "name", FieldName);
                                                                     //
                                                                     // Set copy
                                                                     //
-                                                                    cpCore.db.csSet(CS, "copy", FieldValue);
+                                                                    core.db.csSet(CS, "copy", FieldValue);
                                                                     //
                                                                     // delete duplicates
                                                                     //
-                                                                    cpCore.db.csGoNext(CS);
-                                                                    while (cpCore.db.csOk(CS)) {
-                                                                        cpCore.db.csDeleteRecord(CS);
-                                                                        cpCore.db.csGoNext(CS);
+                                                                    core.db.csGoNext(CS);
+                                                                    while (core.db.csOk(CS)) {
+                                                                        core.db.csDeleteRecord(CS);
+                                                                        core.db.csGoNext(CS);
                                                                     }
                                                                 }
-                                                                cpCore.db.csClose(ref CS);
+                                                                core.db.csClose(ref CS);
                                                             }
 
                                                             break;
@@ -853,8 +853,8 @@ namespace Contensive.Core.Controllers {
                                                             if (!FieldReadOnly) {
                                                                 FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                                 fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
-                                                                FieldValue = cpCore.docProperties.getText(FieldName);
-                                                                cpCore.appRootFiles.saveFile(fieldfilename, FieldValue);
+                                                                FieldValue = core.docProperties.getText(FieldName);
+                                                                core.appRootFiles.saveFile(fieldfilename, FieldValue);
                                                             }
                                                             break;
                                                         case "dbquery":
@@ -922,17 +922,17 @@ namespace Contensive.Core.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldAddon = xml_GetAttribute(IsFound, TabNode, "EditorAddon", "");
                                                             FieldDefaultValue = TabNode.InnerText;
-                                                            FieldValue = cpCore.siteProperties.getText(FieldName, FieldDefaultValue);
+                                                            FieldValue = core.siteProperties.getText(FieldName, FieldDefaultValue);
                                                             if (!string.IsNullOrEmpty(FieldAddon)) {
                                                                 //
                                                                 // Use Editor Addon
                                                                 //
                                                                 Dictionary<string, string> arguments = new Dictionary<string, string>();
                                                                 arguments.Add("FieldName", FieldName);
-                                                                arguments.Add("FieldValue", cpCore.siteProperties.getText(FieldName, FieldDefaultValue));
-                                                                //OptionString = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(cpCore.siteProperties.getText(FieldName, FieldDefaultValue))
-                                                                addonModel addon = addonModel.createByName(cpCore, FieldAddon);
-                                                                Copy = cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                                                                arguments.Add("FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue));
+                                                                //OptionString = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(core.siteProperties.getText(FieldName, FieldDefaultValue))
+                                                                addonModel addon = addonModel.createByName(core, FieldAddon);
+                                                                Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                                                                     addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                                                                     instanceArguments = arguments
                                                                 });
@@ -950,51 +950,51 @@ namespace Contensive.Core.Controllers {
                                                                     case "integer":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
+                                                                            Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "boolean":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = cpCore.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
+                                                                            Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>");
-                                                                            Copy += cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy += core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
+                                                                            Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                         }
                                                                         break;
                                                                     case "float":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
+                                                                            Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "date":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputDate(FieldName, FieldValue);
+                                                                            Copy = core.html.inputDate(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "file":
                                                                     case "imagefile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (string.IsNullOrEmpty(FieldValue)) {
-                                                                                Copy = cpCore.html.inputFile(FieldName);
+                                                                                Copy = core.html.inputFile(FieldName);
                                                                             } else {
-                                                                                NonEncodedLink = cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, FieldValue);
+                                                                                NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
                                                                                 EncodedLink = EncodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
-                                                                                cpCore.privateFiles.splitPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
+                                                                                core.privateFiles.splitPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
                                                                                 Copy = ""
                                                                                 + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
-                                                                                + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + cpCore.html.inputCheckbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + cpCore.html.inputFile(FieldName);
+                                                                                + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FieldName);
                                                                             }
                                                                         }
                                                                         //Call s.Add("&nbsp;</span></nobr></td>")
@@ -1002,49 +1002,49 @@ namespace Contensive.Core.Controllers {
                                                                     case "currency":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
                                                                                 FieldValue = String.Format("C", FieldValue);
                                                                             }
-                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
+                                                                            Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "textfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            FieldValue = cpCore.cdnFiles.readFile(FieldValue);
+                                                                            FieldValue = core.cdnFiles.readFile(FieldValue);
                                                                             if (FieldHTML) {
-                                                                                Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);
+                                                                                Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
+                                                                                Copy = core.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                             }
                                                                         }
                                                                         break;
                                                                     case "cssfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
+                                                                            Copy = core.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "xmlfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
+                                                                            Copy = core.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "link":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
+                                                                            Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     default:
@@ -1052,13 +1052,13 @@ namespace Contensive.Core.Controllers {
                                                                         // text
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            string tmp = cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            string tmp = core.html.inputHidden(FieldName, FieldValue);
                                                                             Copy = FieldValue + tmp;
                                                                         } else {
                                                                             if (FieldHTML) {
-                                                                                Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);
+                                                                                Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = cpCore.html.inputText(FieldName, FieldValue);
+                                                                                Copy = core.html.inputText(FieldName, FieldValue);
                                                                             }
                                                                         }
                                                                         break;
@@ -1081,20 +1081,20 @@ namespace Contensive.Core.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
-                                                            CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
-                                                            if (!cpCore.db.csOk(CS)) {
-                                                                cpCore.db.csClose(ref CS);
-                                                                CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.sessionContext.user.id);
-                                                                if (cpCore.db.csOk(CS)) {
-                                                                    RecordID = cpCore.db.csGetInteger(CS, "ID");
-                                                                    cpCore.db.csSet(CS, "name", FieldName);
-                                                                    cpCore.db.csSet(CS, "copy", genericController.encodeText(TabNode.InnerText));
-                                                                    cpCore.db.csSave2(CS);
-                                                                    // Call cpCore.workflow.publishEdit("Copy Content", RecordID)
+                                                            CS = core.db.csOpen("Copy Content", "Name=" + core.db.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
+                                                            if (!core.db.csOk(CS)) {
+                                                                core.db.csClose(ref CS);
+                                                                CS = core.db.csInsertRecord("Copy Content", core.doc.sessionContext.user.id);
+                                                                if (core.db.csOk(CS)) {
+                                                                    RecordID = core.db.csGetInteger(CS, "ID");
+                                                                    core.db.csSet(CS, "name", FieldName);
+                                                                    core.db.csSet(CS, "copy", genericController.encodeText(TabNode.InnerText));
+                                                                    core.db.csSave2(CS);
+                                                                    // Call core.workflow.publishEdit("Copy Content", RecordID)
                                                                 }
                                                             }
-                                                            if (cpCore.db.csOk(CS)) {
-                                                                FieldValue = cpCore.db.csGetText(CS, "copy");
+                                                            if (core.db.csOk(CS)) {
+                                                                FieldValue = core.db.csGetText(CS, "copy");
                                                             }
                                                             if (FieldReadOnly) {
                                                                 //
@@ -1105,13 +1105,13 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // HTML
                                                                 //
-                                                                Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);
-                                                                //Copy = cpcore.main_GetFormInputActiveContent( FieldName, FieldValue)
+                                                                Copy = core.html.getFormInputHTML(FieldName, FieldValue);
+                                                                //Copy = core.main_GetFormInputActiveContent( FieldName, FieldValue)
                                                             } else {
                                                                 //
                                                                 // Text edit
                                                                 //
-                                                                Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue);
+                                                                Copy = core.html.inputTextExpandable(FieldName, FieldValue);
                                                             }
                                                             TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
@@ -1128,13 +1128,13 @@ namespace Contensive.Core.Controllers {
                                                         FieldDefaultValue = TabNode.InnerText;
                                                         Copy = "";
                                                         if (!string.IsNullOrEmpty(fieldfilename)) {
-                                                            if (cpCore.appRootFiles.fileExists(fieldfilename)) {
+                                                            if (core.appRootFiles.fileExists(fieldfilename)) {
                                                                 Copy = FieldDefaultValue;
                                                             } else {
-                                                                Copy = cpCore.cdnFiles.readFile(fieldfilename);
+                                                                Copy = core.cdnFiles.readFile(fieldfilename);
                                                             }
                                                             if (!FieldReadOnly) {
-                                                                Copy = cpCore.html.inputTextExpandable(FieldName, Copy, 10);
+                                                                Copy = core.html.inputTextExpandable(FieldName, Copy, 10);
                                                             }
                                                         }
                                                         TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
@@ -1161,7 +1161,7 @@ namespace Contensive.Core.Controllers {
                                                         DataTable dt = null;
                                                         if (!string.IsNullOrEmpty(FieldSQL)) {
                                                             try {
-                                                                dt = cpCore.db.executeQuery(FieldSQL, FieldDataSource, 0, SQLPageSize);
+                                                                dt = core.db.executeQuery(FieldSQL, FieldDataSource, 0, SQLPageSize);
                                                                 //RS = app.csv_ExecuteSQLCommand(FieldDataSource, FieldSQL, 30, SQLPageSize, 1)
 
                                                             } catch (Exception) {                                                                
@@ -1197,7 +1197,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 if (dt.Rows.Count > 0) {
                                                                     if (dt.Rows.Count == 1 && dt.Columns.Count == 1) {
-                                                                        Copy = cpCore.html.inputText("result", genericController.encodeText(something[0, 0]), 0, 0, "", false, true);
+                                                                        Copy = core.html.inputText("result", genericController.encodeText(something[0, 0]), 0, 0, "", false, true);
                                                                     } else {
                                                                         foreach (DataRow dr in dt.Rows) {
                                                                             //
@@ -1260,7 +1260,7 @@ namespace Contensive.Core.Controllers {
                                             }
                                             Copy = Adminui.GetEditPanel(true, TabHeading, TabDescription, Adminui.EditTableOpen + TabCell.Text + Adminui.EditTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
-                                                cpCore.html.addLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
+                                                core.html.addLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
                                             //Content.Add( GetForm_Edit_AddTab(TabName, Copy, True))
                                             TabCell = null;
@@ -1276,12 +1276,12 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // Close Tables
                                 //
-                                //Content.Add( cpcore.main_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormMobileBrowserControl))
+                                //Content.Add( core.main_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormMobileBrowserControl))
                                 //
                                 //
                                 //
                                 if (TabCnt > 0) {
-                                    Content.Add(cpCore.html.getLiveTabs());
+                                    Content.Add(core.html.getLiveTabs());
                                 }
                             }
                         }
@@ -1292,7 +1292,7 @@ namespace Contensive.Core.Controllers {
                 Content = null;
 
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -1416,12 +1416,12 @@ namespace Contensive.Core.Controllers {
                     //
 
                     selector = genericController.decodeNvaArgument(selector);
-                    result = cpCore.html.inputText(SitePropertyName, selector, 1, 20);
+                    result = core.html.inputText(SitePropertyName, selector, 1, 20);
                 }
 
                 FastString = null;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -1466,7 +1466,7 @@ namespace Contensive.Core.Controllers {
                         if (pos > 0) {
                             EntryPoint = EntryPoint.Substring(0, pos);
                         }
-                        logController.appendLog(cpCore, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + EntryPoint + "].");
+                        logController.appendLog(core, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + EntryPoint + "].");
                         //WorkingCode = EntryPoint + "\n" + WorkingCode;
                     }
                 } else {
@@ -1520,7 +1520,7 @@ namespace Contensive.Core.Controllers {
                 //}
                 if (true) {
                     try {
-                        mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(cpCore);
+                        mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(core);
                         //sc.AddObject("ccLib", mainCsv);
                         engine.AddHostObject("ccLib", mainCsv);
                     } catch (Exception) {
@@ -1528,8 +1528,8 @@ namespace Contensive.Core.Controllers {
                     }
                     if (true) {
                         try {
-                            //sc.AddObject("cp", cpCore.cp_forAddonExecutionOnly);
-                            engine.AddHostObject("cp", cpCore.cp_forAddonExecutionOnly);
+                            //sc.AddObject("cp", core.cp_forAddonExecutionOnly);
+                            engine.AddHostObject("cp", core.cp_forAddonExecutionOnly);
                         } catch (Exception) {
                             throw;
                         }
@@ -1543,7 +1543,7 @@ namespace Contensive.Core.Controllers {
                                     }
                                 }
                             } catch (Exception ex) {
-                                string addonDescription = getAddonDescription(cpCore, addon);
+                                string addonDescription = getAddonDescription(core, addon);
                                 string errorMessage = "Error executing script [" + ScriptName + "], " + addonDescription;
                                 throw new ApplicationException(errorMessage, ex);
                             }
@@ -1551,7 +1551,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnText;
@@ -1567,7 +1567,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- development bypass folder (addonAssemblyBypass)
                 // -- purpose is to provide a path that can be hardcoded in visual studio after-build event to make development easier
-                string commonAssemblyPath = cpCore.programDataFiles.rootLocalPath + "AddonAssemblyBypass\\";
+                string commonAssemblyPath = core.programDataFiles.rootLocalPath + "AddonAssemblyBypass\\";
                 if (!Directory.Exists(commonAssemblyPath)) {
                     Directory.CreateDirectory(commonAssemblyPath);
                 } else {
@@ -1581,11 +1581,11 @@ namespace Contensive.Core.Controllers {
                     if ( executeContext.backgroundProcess ) {
                         //
                         // -- background - program files installation folder
-                        appPath = cpCore.programFiles.rootLocalPath;
+                        appPath = core.programFiles.rootLocalPath;
                     } else {
                         //
                         // -- foreground - appRootPath
-                        appPath = cpCore.privateFiles.joinPath(cpCore.appRootFiles.rootLocalPath, "bin\\");
+                        appPath = core.privateFiles.joinPath(core.appRootFiles.rootLocalPath, "bin\\");
                     }
 
 
@@ -1608,12 +1608,12 @@ namespace Contensive.Core.Controllers {
                             string AddonVersionPath = "";
                             var tmpDate = new DateTime();
                             string tmpName = "";
-                            collectionController.GetCollectionConfig(cpCore, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
+                            collectionController.GetCollectionConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
                             if (string.IsNullOrEmpty(AddonVersionPath)) {
                                 throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the path could not be determined for collection [" + addonCollection.name + "].");
                             } else {
-                                string AddonPath = cpCore.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
-                                string appAddonPath = cpCore.privateFiles.joinPath(cpCore.privateFiles.rootLocalPath, AddonPath);
+                                string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
+                                string appAddonPath = core.privateFiles.joinPath(core.privateFiles.rootLocalPath, AddonPath);
                                 result = execute_assembly_byFilePath(addon.id, addon.name, appAddonPath, addon.DotNetClass, false, ref AddonFound);
                                 if (!AddonFound) {
                                     throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");
@@ -1623,7 +1623,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -1640,7 +1640,7 @@ namespace Contensive.Core.Controllers {
                 AddonFound = false;
                 if (Directory.Exists(fullPath)) {
                     foreach (var TestFilePathname in Directory.GetFileSystemEntries(fullPath, "*.dll")) {
-                        if (!cpCore.assemblySkipList.Contains(TestFilePathname)) {
+                        if (!core.assemblySkipList.Contains(TestFilePathname)) {
                             bool testFileIsValidAddonAssembly = true;
                             Assembly testAssembly = null;
                             try {
@@ -1650,7 +1650,7 @@ namespace Contensive.Core.Controllers {
                                 testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname);
                                 //testAssemblyName = testAssembly.FullName
                             } catch (Exception) {
-                                cpCore.assemblySkipList.Add(TestFilePathname);
+                                core.assemblySkipList.Add(TestFilePathname);
                                 testFileIsValidAddonAssembly = false;
                             }
                             try {
@@ -1732,7 +1732,7 @@ namespace Contensive.Core.Controllers {
                                                 try {
                                                     //
                                                     // -- Call Execute
-                                                    object AddonReturnObj = AddonObj.Execute(cpCore.cp_forAddonExecutionOnly);
+                                                    object AddonReturnObj = AddonObj.Execute(core.cp_forAddonExecutionOnly);
                                                     if (AddonReturnObj != null) {
                                                         switch (AddonReturnObj.GetType().ToString()) {
                                                             case "System.Object[,]":
@@ -1761,7 +1761,7 @@ namespace Contensive.Core.Controllers {
                                                     // Error in the addon
                                                     //
                                                     string detailedErrorMessage = "There was an error in the addon [" + AddonDisplayName + "]. It could not be executed because there was an error in the addon assembly [" + TestFilePathname + "], in class [" + addonType.FullName.Trim().ToLower() + "]. The error was [" + Ex.ToString() + "]";
-                                                    cpCore.handleException(Ex, detailedErrorMessage);
+                                                    core.handleException(Ex, detailedErrorMessage);
                                                     //Throw New ApplicationException(detailedErrorMessage)
                                                 }
                                             } catch (Exception Ex) {
@@ -1775,24 +1775,24 @@ namespace Contensive.Core.Controllers {
                                         if (!isAddonAssembly) {
                                             //
                                             // -- not an addon assembly
-                                            //cpCore.assemblySkipList.Add(TestFilePathname);
+                                            //core.assemblySkipList.Add(TestFilePathname);
                                         }
                                     } catch (ReflectionTypeLoadException) {
                                         //
                                         // exceptin thrown out of application bin folder when xunit library included -- ignore
                                         //
-                                        cpCore.assemblySkipList.Add(TestFilePathname);
+                                        core.assemblySkipList.Add(TestFilePathname);
                                     } catch (Exception) {
                                         //
                                         // problem loading types
                                         //
-                                        cpCore.assemblySkipList.Add(TestFilePathname);
+                                        core.assemblySkipList.Add(TestFilePathname);
                                         string detailedErrorMessage = "While locating assembly for addon [" + AddonDisplayName + "], there was an error loading types for assembly [" + TestFilePathname + "]. This assembly was skipped and should be removed from the folder [" + fullPath + "]";
                                         throw new ApplicationException(detailedErrorMessage);
                                     }
                                 }
                             } catch (System.Reflection.ReflectionTypeLoadException ex) {
-                                cpCore.assemblySkipList.Add(TestFilePathname);
+                                core.assemblySkipList.Add(TestFilePathname);
                                 string detailedErrorMessage = "A load exception occured for addon [" + AddonDisplayName + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
                                 foreach (Exception exLoader in ex.LoaderExceptions) {
                                     detailedErrorMessage += "\r\n--LoaderExceptions: " + exLoader.Message;
@@ -1802,9 +1802,9 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // ignore these errors
                                 //
-                                cpCore.assemblySkipList.Add(TestFilePathname);
+                                core.assemblySkipList.Add(TestFilePathname);
                                 string detailedErrorMessage = "A non-load exception occured while loading the addon [" + AddonDisplayName + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "].";
-                                cpCore.handleException(new ApplicationException(detailedErrorMessage));
+                                core.handleException(new ApplicationException(detailedErrorMessage));
                             }
                         }
                     }
@@ -1812,7 +1812,7 @@ namespace Contensive.Core.Controllers {
             } catch (Exception ex) {
                 //
                 // -- this exception should interrupt the caller
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
@@ -1838,38 +1838,38 @@ namespace Contensive.Core.Controllers {
             try {
                 addonModel addon = null;
                 if (encodeInteger(AddonIDGuidOrName) > 0) {
-                    addon = cpCore.addonCache.getAddonById(encodeInteger(AddonIDGuidOrName));
+                    addon = core.addonCache.getAddonById(encodeInteger(AddonIDGuidOrName));
                 } else if (genericController.isGuid(AddonIDGuidOrName)) {
-                    addon = cpCore.addonCache.getAddonByGuid(AddonIDGuidOrName);
+                    addon = core.addonCache.getAddonByGuid(AddonIDGuidOrName);
                 } else {
-                    addon = cpCore.addonCache.getAddonByName(AddonIDGuidOrName);
+                    addon = core.addonCache.getAddonByName(AddonIDGuidOrName);
                 }
                 if (addon != null) {
                     //
                     // -- addon found
-                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
+                    logController.appendLogWithLegacyRow(core, core.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "coreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
                     //
                     string cmdQueryString = ""
-                        + "appname=" + encodeNvaArgument(EncodeRequestVariable(cpCore.serverConfig.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(EncodeRequestVariable(OptionString));
+                        + "appname=" + encodeNvaArgument(EncodeRequestVariable(core.serverConfig.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(EncodeRequestVariable(OptionString));
                     cmdDetailClass cmdDetail = new cmdDetailClass();
                     cmdDetail.addonId = addon.id;
                     cmdDetail.addonName = addon.name;
-                    cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, cmdQueryString);
-                    taskSchedulerController.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString);
+                    taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
-                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
+                    logController.appendLogWithLegacyRow(core, core.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "coreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
         //
         //===============================================================================================================================================
-        //   cpcore.main_Get the editable options bubble
+        //   core.main_Get the editable options bubble
         //       ACInstanceID required
         //       ACInstanceID = -1 means this Add-on does not support instance options (like end-of-page scope, etc)
-        // REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
+        // REFACTOR - unify interface, remove core.main_ and csv_ class references
         //
         public string getInstanceBubble(string AddonName, string Option_String, string ContentName, int RecordID, string FieldName, string ACInstanceID, CPUtilsBaseClass.addonContext Context, ref string return_DialogList) {
             string tempgetInstanceBubble = null;
@@ -1896,13 +1896,13 @@ namespace Contensive.Core.Controllers {
                 int Ptr = 0;
                 int Pos = 0;
                 //
-                if (cpCore.doc.sessionContext.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
-                    if (cpCore.doc.sessionContext.isEditingAnything()) {
+                if (core.doc.sessionContext.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
+                    if (core.doc.sessionContext.isEditingAnything()) {
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
                             + "<td align=left class=\"bbLeft\">Options for this instance of " + AddonName + "</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + cpCore.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
                             + "</tr>"
                             + "</table>"
                             + "</div>";
@@ -1918,7 +1918,7 @@ namespace Contensive.Core.Controllers {
                             //
                             CopyContent = "This addon does not support instance options.";
                             CopyContent = "<div style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + CopyContent + "</div>";
-                            //ElseIf (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (cpCore.siteProperties.allowWorkflowAuthoring And Not cpCore.visitProperty.getBoolean("AllowWorkflowRendering")) Then
+                            //ElseIf (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (core.siteProperties.allowWorkflowAuthoring And Not core.visitProperty.getBoolean("AllowWorkflowRendering")) Then
                             //    '
                             //    ' workflow with no rendering (or within admin site)
                             //    '
@@ -2029,7 +2029,7 @@ namespace Contensive.Core.Controllers {
                                         //                                Return_NewFieldList = Return_NewFieldList & "," & FieldName
                                         //                                FieldValueText = genericController.encodeText(FieldValueVariant)
                                         //                                EditorString = "" _
-                                        //                                    & cpcore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
+                                        //                                    & core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
                                         //                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>" _
                                         //                                    & "&nbsp;<a href=""#"" onClick=""OpenSiteExplorerWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/PageLink1616.gif"" width=16 height=16 border=0 alt=""Link to a page"" title=""Link to a page""></a>"
                                         //                                s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
@@ -2040,9 +2040,9 @@ namespace Contensive.Core.Controllers {
                                         //                                Return_NewFieldList = Return_NewFieldList & "," & FieldName
                                         //                                FieldValueText = genericController.encodeText(FieldValueVariant)
                                         //                                EditorString = "" _
-                                        //                                    & cpcore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
+                                        //                                    & core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
                                         //                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
-                                        //                                'EditorString = cpcore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
+                                        //                                'EditorString = core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
                                         //                                s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
                                         case "resourcelink":
                                             //
@@ -2050,8 +2050,8 @@ namespace Contensive.Core.Controllers {
                                             //
                                             OptionDefault = genericController.decodeNvaArgument(OptionDefault);
                                             FormInput = ""
-                                                + cpCore.html.inputText(OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
-                                            //EditorString = cpcore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
+                                                + core.html.inputText(OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+                                            //EditorString = core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
                                             break;
                                         case "checkbox":
                                             //
@@ -2076,7 +2076,7 @@ namespace Contensive.Core.Controllers {
                                     //
 
                                     OptionSelector = genericController.decodeNvaArgument(OptionSelector);
-                                    FormInput = cpCore.html.inputText(OptionName, OptionSelector, 1, 20);
+                                    FormInput = core.html.inputText(OptionName, OptionSelector, 1, 20);
                                 }
                                 CopyContent = CopyContent + "<tr>"
                                     + "<td class=\"bbLeft\">" + OptionName + "</td>"
@@ -2085,17 +2085,17 @@ namespace Contensive.Core.Controllers {
                             }
                             CopyContent = ""
                                 + CopyContent + "</table>"
-                                + cpCore.html.inputHidden("Type", FormTypeAddonSettingsEditor) + cpCore.html.inputHidden("ContentName", ContentName) + cpCore.html.inputHidden("RecordID", RecordID) + cpCore.html.inputHidden("FieldName", FieldName) + cpCore.html.inputHidden("ACInstanceID", ACInstanceID);
+                                + core.html.inputHidden("Type", FormTypeAddonSettingsEditor) + core.html.inputHidden("ContentName", ContentName) + core.html.inputHidden("RecordID", RecordID) + core.html.inputHidden("FieldName", FieldName) + core.html.inputHidden("ACInstanceID", ACInstanceID);
                         }
                         //
-                        BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodes.Count + "',this);return false;\"";
-                        QueryString = cpCore.doc.refreshQueryString;
+                        BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
+                        QueryString = core.doc.refreshQueryString;
                         QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
-                            + cpCore.html.formStartMultipart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
+                            + core.html.formStartMultipart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                            + "<tr><td class=\"ccButtonCon\">" + cpCore.html.button("Update", "HelpBubbleButton") + "</td></tr>"
+                            + "<tr><td class=\"ccButtonCon\">" + core.html.button("Update", "HelpBubbleButton") + "</td></tr>"
                             + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                             + "</table>"
                             + "</form>"
@@ -2105,28 +2105,28 @@ namespace Contensive.Core.Controllers {
                             + GetIconSprite("", 0, "/ccLib/images/toolsettings.png", 22, 22, "Edit options used just for this instance of the " + AddonName + " Add-on", "Edit options used just for this instance of the " + AddonName + " Add-on", "", true, "") + "</a>"
                             + ""
                             + "";
-                        cpCore.doc.helpCodes.Add( new docController.helpStuff() {
+                        core.doc.helpCodes.Add( new docController.helpStuff() {
                             caption = AddonName,
                             code = LocalCode
                         });
-                        if (cpCore.doc.helpDialogCnt == 0) {
-                            cpCore.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
+                        if (core.doc.helpDialogCnt == 0) {
+                            core.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
                         }
-                        cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1;
+                        core.doc.helpDialogCnt = core.doc.helpDialogCnt + 1;
                     }
                 }
                 //
                 return tempgetInstanceBubble;
             } catch (Exception ex) {
-                cpCore.handleException( ex );
+                core.handleException( ex );
             }
             //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetInstanceBubble")
+            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetInstanceBubble")
             return tempgetInstanceBubble;
         }
         //
         //===============================================================================================================================================
-        //   cpcore.main_Get Addon Styles Bubble Editor
+        //   core.main_Get Addon Styles Bubble Editor
         //
         public string getAddonStylesBubble(int addonId, ref string return_DialogList) {
             string result = "";
@@ -2140,14 +2140,14 @@ namespace Contensive.Core.Controllers {
                 string BubbleJS = null;
                 //Dim AddonName As String = ""
                 //
-                if (cpCore.doc.sessionContext.isAuthenticated && true) {
-                    if (cpCore.doc.sessionContext.isEditingAnything()) {
-                        addonModel addon = addonModel.create(cpCore, addonId);
+                if (core.doc.sessionContext.isAuthenticated && true) {
+                    if (core.doc.sessionContext.isEditingAnything()) {
+                        addonModel addon = addonModel.create(core, addonId);
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
                             + "<td align=left class=\"bbLeft\">Stylesheet for " + addon.name + "</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + cpCore.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
                             + "</tr>"
                             + "</table>"
                             + "</div>";
@@ -2155,27 +2155,27 @@ namespace Contensive.Core.Controllers {
                             + ""
                             + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                             + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccContentCon ccAdminSmall\">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</td></tr>"
-                            + "<tr><td style=\"padding-bottom:5px;\" class=\"ccContentCon ccAdminSmall\"><b>Custom Stylesheet</b>" + cpCore.html.inputTextExpandable("CustomStyles", addon.StylesFilename.content, 10, "400px") + "</td></tr>";
+                            + "<tr><td style=\"padding-bottom:5px;\" class=\"ccContentCon ccAdminSmall\"><b>Custom Stylesheet</b>" + core.html.inputTextExpandable("CustomStyles", addon.StylesFilename.content, 10, "400px") + "</td></tr>";
                         //If DefaultStylesheet = "" Then
                         //    CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>There are no default styles for this add-on.</td></tr>"
                         //Else
-                        //    CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>" & cpCore.html.html_GetFormInputTextExpandable2("DefaultStyles", DefaultStylesheet, 10, "400px", , , True) & "</td></tr>"
+                        //    CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>" & core.html.html_GetFormInputTextExpandable2("DefaultStyles", DefaultStylesheet, 10, "400px", , , True) & "</td></tr>"
                         //End If
                         CopyContent = ""
                         + CopyContent + "</tr>"
                         + "</table>"
-                        + cpCore.html.inputHidden("Type", FormTypeAddonStyleEditor) + cpCore.html.inputHidden("AddonID", addonId) + "";
+                        + core.html.inputHidden("Type", FormTypeAddonStyleEditor) + core.html.inputHidden("AddonID", addonId) + "";
                         //
-                        BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodes.Count + "',this);return false;\"";
-                        QueryString = cpCore.doc.refreshQueryString;
+                        BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
+                        QueryString = core.doc.refreshQueryString;
                         QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         string Dialog = "";
 
                         Dialog = Dialog + "<div class=\"ccCon helpDialogCon\">"
-                            + cpCore.html.formStartMultipart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
+                            + core.html.formStartMultipart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                            + "<tr><td class=\"ccButtonCon\">" + cpCore.html.button("Update", "HelpBubbleButton") + "</td></tr>"
+                            + "<tr><td class=\"ccButtonCon\">" + core.html.button("Update", "HelpBubbleButton") + "</td></tr>"
                             + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                             + "</table>"
                             + "</form>"
@@ -2184,20 +2184,20 @@ namespace Contensive.Core.Controllers {
                         result = ""
                             + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + ">"
                             + GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " + addon.name + " Stylesheets", "Edit " + addon.name + " Stylesheets", "", true, "") + "</a>";
-                        cpCore.doc.helpCodes.Add(new docController.helpStuff {
+                        core.doc.helpCodes.Add(new docController.helpStuff {
                             caption = addon.name,
                             code = LocalCode
                         });
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
         //
         //===============================================================================================================================================
-        //   cpcore.main_Get inner HTML viewer Bubble
+        //   core.main_Get inner HTML viewer Bubble
         //
         public string getHelpBubble(int addonId, string helpCopy, int CollectionID, ref string return_DialogList) {
             string result = "";
@@ -2210,17 +2210,17 @@ namespace Contensive.Core.Controllers {
             string InnerCopy = null;
             string CollectionCopy = "";
             //
-            if (cpCore.doc.sessionContext.isAuthenticated) {
-                if (cpCore.doc.sessionContext.isEditingAnything()) {
-                    StyleSN = genericController.encodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"));
-                    //cpCore.html.html_HelpViewerButtonID = "HelpBubble" & doccontroller.htmlDoc_HelpCodeCount
+            if (core.doc.sessionContext.isAuthenticated) {
+                if (core.doc.sessionContext.isEditingAnything()) {
+                    StyleSN = genericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
+                    //core.html.html_HelpViewerButtonID = "HelpBubble" & doccontroller.htmlDoc_HelpCodeCount
                     InnerCopy = helpCopy;
                     if (string.IsNullOrEmpty(InnerCopy)) {
                         InnerCopy = "<p style=\"text-align:center\">No help is available for this add-on.</p>";
                     }
                     //
                     if (CollectionID != 0) {
-                        CollectionCopy = cpCore.db.getRecordName("Add-on Collections", CollectionID);
+                        CollectionCopy = core.db.getRecordName("Add-on Collections", CollectionID);
                         if (!string.IsNullOrEmpty(CollectionCopy)) {
                             CollectionCopy = "This add-on is a member of the " + CollectionCopy + " collection.";
                         } else {
@@ -2235,7 +2235,7 @@ namespace Contensive.Core.Controllers {
                         + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                         + "<tr>"
                         + "<td align=left class=\"bbLeft\">Help Viewer</td>"
-                        + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + cpCore.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                        + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
                         + "</tr>"
                         + "</table>"
                         + "</div>";
@@ -2247,25 +2247,25 @@ namespace Contensive.Core.Controllers {
                         + "</table>"
                         + "";
                     //
-                    QueryString = cpCore.doc.refreshQueryString;
+                    QueryString = core.doc.refreshQueryString;
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                     //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
-                        + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
+                        + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                         + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
                         + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                         + "</table>"
                         + "</div>";
-                    BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodes.Count + "',this);return false;\"";
-                    cpCore.doc.helpCodes.Add(new docController.helpStuff {
+                    BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
+                    core.doc.helpCodes.Add(new docController.helpStuff {
                         code = LocalCode,
                         caption = AddonName
                     });
                     //
-                    if (cpCore.doc.helpDialogCnt == 0) {
-                        cpCore.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
+                    if (core.doc.helpDialogCnt == 0) {
+                        core.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
                     }
-                    cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1;
+                    core.doc.helpDialogCnt = core.doc.helpDialogCnt + 1;
                     result = ""
                         + "&nbsp;<a href=\"#\" tabindex=-1 tarGet=\"_blank\"" + BubbleJS + " >"
                         + GetIconSprite("", 0, "/ccLib/images/toolhelp.png", 22, 22, "View help resources for this Add-on", "View help resources for this Add-on", "", true, "") + "</a>";
@@ -2275,7 +2275,7 @@ namespace Contensive.Core.Controllers {
         }
         //
         //===============================================================================================================================================
-        //   cpcore.main_Get inner HTML viewer Bubble
+        //   core.main_Get inner HTML viewer Bubble
         //
         public string getHTMLViewerBubble(int addonId, string HTMLSourceID, ref string return_DialogList) {
             string tempgetHTMLViewerBubble = null;
@@ -2290,10 +2290,10 @@ namespace Contensive.Core.Controllers {
                 int StyleSN = 0;
                 string HTMLViewerBubbleID = null;
                 //
-                if (cpCore.doc.sessionContext.isAuthenticated) {
-                    if (cpCore.doc.sessionContext.isEditingAnything()) {
-                        StyleSN = genericController.encodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"));
-                        HTMLViewerBubbleID = "HelpBubble" + cpCore.doc.helpCodes.Count;
+                if (core.doc.sessionContext.isAuthenticated) {
+                    if (core.doc.sessionContext.isEditingAnything()) {
+                        StyleSN = genericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
+                        HTMLViewerBubbleID = "HelpBubble" + core.doc.helpCodes.Count;
                         //
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
@@ -2306,12 +2306,12 @@ namespace Contensive.Core.Controllers {
                         CopyContent = ""
                             + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                             + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">This is the HTML produced by this add-on. Carrage returns and tabs have been added or modified to enhance readability.</td></tr>"
-                            + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + cpCore.html.inputTextExpandable("DefaultStyles", "", 10, "400px", HTMLViewerBubbleID + "_dst",false, false) + "</td></tr>"
+                            + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + core.html.inputTextExpandable("DefaultStyles", "", 10, "400px", HTMLViewerBubbleID + "_dst",false, false) + "</td></tr>"
                             + "</tr>"
                             + "</table>"
                             + "";
                         //
-                        QueryString = cpCore.doc.refreshQueryString;
+                        QueryString = core.doc.refreshQueryString;
                         QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
@@ -2321,15 +2321,15 @@ namespace Contensive.Core.Controllers {
                             + "</table>"
                             + "</div>";
                         BubbleJS = " onClick=\"var d=document.getElementById('" + HTMLViewerBubbleID + "_dst');if(d){var s=document.getElementById('" + HTMLSourceID + "');if(s){d.value=s.innerHTML;HelpBubbleOn( '" + HTMLViewerBubbleID + "',this)}};return false;\" ";
-                        cpCore.doc.helpCodes.Add(new docController.helpStuff {
+                        core.doc.helpCodes.Add(new docController.helpStuff {
                             code = LocalCode,
                             caption = AddonName
                         });
                         //
-                        if (cpCore.doc.helpDialogCnt == 0) {
-                            cpCore.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
+                        if (core.doc.helpDialogCnt == 0) {
+                            core.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
                         }
-                        cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1;
+                        core.doc.helpDialogCnt = core.doc.helpDialogCnt + 1;
                         tempgetHTMLViewerBubble = ""
                             + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + " >"
                             + GetIconSprite("", 0, "/ccLib/images/toolhtml.png", 22, 22, "View the source HTML produced by this Add-on", "View the source HTML produced by this Add-on", "", true, "") + "</A>";
@@ -2338,10 +2338,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempgetHTMLViewerBubble;
             } catch (Exception ex) {
-                cpCore.handleException( ex );
+                core.handleException( ex );
             }
             //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
+            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
             return tempgetHTMLViewerBubble;
         }
         //
@@ -2365,7 +2365,7 @@ namespace Contensive.Core.Controllers {
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
                 string Copy = null;
                 string Button = null;
-                adminUIController Adminui = new adminUIController(cpCore);
+                adminUIController Adminui = new adminUIController(core);
                 string ButtonList = "";
                 string Filename = null;
                 string NonEncodedLink = null;
@@ -2397,14 +2397,14 @@ namespace Contensive.Core.Controllers {
                 string FieldSelector = null;
                 string DefaultFilename = null;
                 //
-                Button = cpCore.docProperties.getText(RequestNameButton);
+                Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonCancel) {
                     //
                     // Cancel just exits with no content
                     //
                     return_ExitRequest = true;
                     return string.Empty;
-                } else if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
+                } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //
@@ -2445,7 +2445,7 @@ namespace Contensive.Core.Controllers {
                                                         case "siteproperty":
                                                             //
                                                             FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                            FieldValue = cpCore.docProperties.getText(FieldName);
+                                                            FieldValue = core.docProperties.getText(FieldName);
                                                             fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
                                                             switch (genericController.vbLCase(fieldType)) {
                                                                 case "integer":
@@ -2453,71 +2453,71 @@ namespace Contensive.Core.Controllers {
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = genericController.encodeInteger(FieldValue).ToString();
                                                                     }
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "boolean":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = genericController.encodeBoolean(FieldValue).ToString();
                                                                     }
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "float":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = encodeNumber(FieldValue).ToString();
                                                                     }
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "date":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = genericController.encodeDate(FieldValue).ToString();
                                                                     }
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "file":
                                                                 case "imagefile":
                                                                     //
-                                                                    if (cpCore.docProperties.getBoolean(FieldName + ".DeleteFlag")) {
-                                                                        cpCore.siteProperties.setProperty(FieldName, "");
+                                                                    if (core.docProperties.getBoolean(FieldName + ".DeleteFlag")) {
+                                                                        core.siteProperties.setProperty(FieldName, "");
                                                                     }
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         Filename = FieldValue;
                                                                         VirtualFilePath = "Settings/" + FieldName + "/";
-                                                                        cpCore.cdnFiles.upload(FieldName, VirtualFilePath, ref Filename);
-                                                                        cpCore.siteProperties.setProperty(FieldName, VirtualFilePath + "/" + Filename);
+                                                                        core.cdnFiles.upload(FieldName, VirtualFilePath, ref Filename);
+                                                                        core.siteProperties.setProperty(FieldName, VirtualFilePath + "/" + Filename);
                                                                     }
                                                                     break;
                                                                 case "textfile":
                                                                     //
                                                                     DefaultFilename = "Settings/" + FieldName + ".txt";
-                                                                    Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename);
+                                                                    Filename = core.siteProperties.getText(FieldName, DefaultFilename);
                                                                     if (string.IsNullOrEmpty(Filename)) {
                                                                         Filename = DefaultFilename;
-                                                                        cpCore.siteProperties.setProperty(FieldName, DefaultFilename);
+                                                                        core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                     }
-                                                                    cpCore.appRootFiles.saveFile(Filename, FieldValue);
+                                                                    core.appRootFiles.saveFile(Filename, FieldValue);
                                                                     break;
                                                                 case "cssfile":
                                                                     //
                                                                     DefaultFilename = "Settings/" + FieldName + ".css";
-                                                                    Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename);
+                                                                    Filename = core.siteProperties.getText(FieldName, DefaultFilename);
                                                                     if (string.IsNullOrEmpty(Filename)) {
                                                                         Filename = DefaultFilename;
-                                                                        cpCore.siteProperties.setProperty(FieldName, DefaultFilename);
+                                                                        core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                     }
-                                                                    cpCore.appRootFiles.saveFile(Filename, FieldValue);
+                                                                    core.appRootFiles.saveFile(Filename, FieldValue);
                                                                     break;
                                                                 case "xmlfile":
                                                                     //
                                                                     DefaultFilename = "Settings/" + FieldName + ".xml";
-                                                                    Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename);
+                                                                    Filename = core.siteProperties.getText(FieldName, DefaultFilename);
                                                                     if (string.IsNullOrEmpty(Filename)) {
                                                                         Filename = DefaultFilename;
-                                                                        cpCore.siteProperties.setProperty(FieldName, DefaultFilename);
+                                                                        core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                     }
-                                                                    cpCore.appRootFiles.saveFile(Filename, FieldValue);
+                                                                    core.appRootFiles.saveFile(Filename, FieldValue);
                                                                     break;
                                                                 case "currency":
                                                                     //
@@ -2525,13 +2525,13 @@ namespace Contensive.Core.Controllers {
                                                                         FieldValue = encodeNumber(FieldValue).ToString();
                                                                         FieldValue = String.Format("C", FieldValue); 
                                                                     }
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "link":
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 default:
-                                                                    cpCore.siteProperties.setProperty(FieldName, FieldValue);
+                                                                    core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                             }
                                                             break;
@@ -2547,32 +2547,32 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     // treat html as active content for now.
                                                                     //
-                                                                    FieldValue = cpCore.docProperties.getRenderedActiveContent(FieldName);
+                                                                    FieldValue = core.docProperties.getRenderedActiveContent(FieldName);
                                                                 } else {
-                                                                    FieldValue = cpCore.docProperties.getText(FieldName);
+                                                                    FieldValue = core.docProperties.getText(FieldName);
                                                                 }
 
-                                                                CS = cpCore.db.csOpen("Copy Content", "name=" + cpCore.db.encodeSQLText(FieldName), "ID");
-                                                                if (!cpCore.db.csOk(CS)) {
-                                                                    cpCore.db.csClose(ref CS);
-                                                                    CS = cpCore.db.csInsertRecord("Copy Content");
+                                                                CS = core.db.csOpen("Copy Content", "name=" + core.db.encodeSQLText(FieldName), "ID");
+                                                                if (!core.db.csOk(CS)) {
+                                                                    core.db.csClose(ref CS);
+                                                                    CS = core.db.csInsertRecord("Copy Content");
                                                                 }
-                                                                if (cpCore.db.csOk(CS)) {
-                                                                    cpCore.db.csSet(CS, "name", FieldName);
+                                                                if (core.db.csOk(CS)) {
+                                                                    core.db.csSet(CS, "name", FieldName);
                                                                     //
                                                                     // Set copy
                                                                     //
-                                                                    cpCore.db.csSet(CS, "copy", FieldValue);
+                                                                    core.db.csSet(CS, "copy", FieldValue);
                                                                     //
                                                                     // delete duplicates
                                                                     //
-                                                                    cpCore.db.csGoNext(CS);
-                                                                    while (cpCore.db.csOk(CS)) {
-                                                                        cpCore.db.csDeleteRecord(CS);
-                                                                        cpCore.db.csGoNext(CS);
+                                                                    core.db.csGoNext(CS);
+                                                                    while (core.db.csOk(CS)) {
+                                                                        core.db.csDeleteRecord(CS);
+                                                                        core.db.csGoNext(CS);
                                                                     }
                                                                 }
-                                                                cpCore.db.csClose(ref CS);
+                                                                core.db.csClose(ref CS);
                                                             }
 
                                                             break;
@@ -2584,8 +2584,8 @@ namespace Contensive.Core.Controllers {
                                                             if (!FieldReadOnly) {
                                                                 FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                                 fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
-                                                                FieldValue = cpCore.docProperties.getText(FieldName);
-                                                                cpCore.appRootFiles.saveFile(fieldfilename, FieldValue);
+                                                                FieldValue = core.docProperties.getText(FieldName);
+                                                                core.appRootFiles.saveFile(fieldfilename, FieldValue);
                                                             }
                                                             break;
                                                         case "dbquery":
@@ -2650,12 +2650,12 @@ namespace Contensive.Core.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldAddon = xml_GetAttribute(IsFound, TabNode, "EditorAddon", "");
                                                             FieldDefaultValue = TabNode.InnerText;
-                                                            FieldValue = cpCore.siteProperties.getText(FieldName, FieldDefaultValue);
+                                                            FieldValue = core.siteProperties.getText(FieldName, FieldDefaultValue);
                                                             //                                                    If FieldReadOnly Then
                                                             //                                                        '
                                                             //                                                        ' Read only = no editor
                                                             //                                                        '
-                                                            //                                                        Copy = FieldValue & cpcore.main_GetFormInputHidden( FieldName, FieldValue)
+                                                            //                                                        Copy = FieldValue & core.main_GetFormInputHidden( FieldName, FieldValue)
                                                             //
                                                             //                                                    ElseIf FieldAddon <> "" Then
                                                             if (!string.IsNullOrEmpty(FieldAddon)) {
@@ -2664,11 +2664,11 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 Dictionary<string, string> arguments = new Dictionary<string, string>();
                                                                 arguments.Add("FieldName", FieldName);
-                                                                arguments.Add("FieldValue", cpCore.siteProperties.getText(FieldName, FieldDefaultValue));
+                                                                arguments.Add("FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue));
                                                                 CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin };
-                                                                addonModel addon = addonModel.createByName(cpCore, FieldAddon);
-                                                                Copy = cpCore.addon.execute(addon, executeContext);
-                                                                //Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(cpCore.siteProperties.getText(FieldName, FieldDefaultValue))
+                                                                addonModel addon = addonModel.createByName(core, FieldAddon);
+                                                                Copy = core.addon.execute(addon, executeContext);
+                                                                //Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(core.siteProperties.getText(FieldName, FieldDefaultValue))
                                                                 //Copy = execute_legacy5(0, FieldAddon, Option_String, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
                                                             } else if (!string.IsNullOrEmpty(FieldSelector)) {
                                                                 //
@@ -2683,51 +2683,51 @@ namespace Contensive.Core.Controllers {
                                                                     case "integer":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
+                                                                            Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "boolean":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = cpCore.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
+                                                                            Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>");
-                                                                            Copy += cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy += core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
+                                                                            Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                         }
                                                                         break;
                                                                     case "float":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
+                                                                            Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "date":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputDate(FieldName, FieldValue);
+                                                                            Copy = core.html.inputDate(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "file":
                                                                     case "imagefile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (string.IsNullOrEmpty(FieldValue)) {
-                                                                                Copy = cpCore.html.inputFile(FieldName);
+                                                                                Copy = core.html.inputFile(FieldName);
                                                                             } else {
-                                                                                NonEncodedLink = cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, FieldValue);
+                                                                                NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
                                                                                 EncodedLink = EncodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
-                                                                                cpCore.privateFiles.splitPathFilename(FieldValue,  ref FieldValuePath, ref FieldValuefilename);
+                                                                                core.privateFiles.splitPathFilename(FieldValue,  ref FieldValuePath, ref FieldValuefilename);
                                                                                 Copy = ""
                                                                                 + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
-                                                                                + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + cpCore.html.inputCheckbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + cpCore.html.inputFile(FieldName);
+                                                                                + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FieldName);
                                                                             }
                                                                         }
                                                                         //Call s.Add("&nbsp;</span></nobr></td>")
@@ -2735,49 +2735,49 @@ namespace Contensive.Core.Controllers {
                                                                     case "currency":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
                                                                                 FieldValue = String.Format("C", FieldValue);
                                                                             }
-                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
+                                                                            Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "textfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            FieldValue = cpCore.cdnFiles.readFile(FieldValue);
+                                                                            FieldValue = core.cdnFiles.readFile(FieldValue);
                                                                             if (FieldHTML) {
-                                                                                Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);
+                                                                                Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
+                                                                                Copy = core.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                             }
                                                                         }
                                                                         break;
                                                                     case "cssfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
+                                                                            Copy = core.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "xmlfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
+                                                                            Copy = core.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "link":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
+                                                                            Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     default:
@@ -2785,12 +2785,12 @@ namespace Contensive.Core.Controllers {
                                                                         // text
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (FieldHTML) {
-                                                                                Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);
+                                                                                Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = cpCore.html.inputText(FieldName, FieldValue);
+                                                                                Copy = core.html.inputText(FieldName, FieldValue);
                                                                             }
                                                                         }
                                                                         break;
@@ -2813,20 +2813,20 @@ namespace Contensive.Core.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
-                                                            CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID",true,0,false,false, "Copy");
-                                                            if (!cpCore.db.csOk(CS)) {
-                                                                cpCore.db.csClose(ref CS);
-                                                                CS = cpCore.db.csInsertRecord("Copy Content");
-                                                                if (cpCore.db.csOk(CS)) {
-                                                                    RecordID = cpCore.db.csGetInteger(CS, "ID");
-                                                                    cpCore.db.csSet(CS, "name", FieldName);
-                                                                    cpCore.db.csSet(CS, "copy", genericController.encodeText(TabNode.InnerText));
-                                                                    cpCore.db.csSave2(CS);
-                                                                    //   Call cpCore.workflow.publishEdit("Copy Content", RecordID)
+                                                            CS = core.db.csOpen("Copy Content", "Name=" + core.db.encodeSQLText(FieldName), "ID",true,0,false,false, "Copy");
+                                                            if (!core.db.csOk(CS)) {
+                                                                core.db.csClose(ref CS);
+                                                                CS = core.db.csInsertRecord("Copy Content");
+                                                                if (core.db.csOk(CS)) {
+                                                                    RecordID = core.db.csGetInteger(CS, "ID");
+                                                                    core.db.csSet(CS, "name", FieldName);
+                                                                    core.db.csSet(CS, "copy", genericController.encodeText(TabNode.InnerText));
+                                                                    core.db.csSave2(CS);
+                                                                    //   Call core.workflow.publishEdit("Copy Content", RecordID)
                                                                 }
                                                             }
-                                                            if (cpCore.db.csOk(CS)) {
-                                                                FieldValue = cpCore.db.csGetText(CS, "copy");
+                                                            if (core.db.csOk(CS)) {
+                                                                FieldValue = core.db.csGetText(CS, "copy");
                                                             }
                                                             if (FieldReadOnly) {
                                                                 //
@@ -2837,13 +2837,13 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // HTML
                                                                 //
-                                                                Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);
-                                                                //Copy = cpcore.main_GetFormInputActiveContent( FieldName, FieldValue)
+                                                                Copy = core.html.getFormInputHTML(FieldName, FieldValue);
+                                                                //Copy = core.main_GetFormInputActiveContent( FieldName, FieldValue)
                                                             } else {
                                                                 //
                                                                 // Text edit
                                                                 //
-                                                                Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue);
+                                                                Copy = core.html.inputTextExpandable(FieldName, FieldValue);
                                                             }
                                                             TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
@@ -2860,13 +2860,13 @@ namespace Contensive.Core.Controllers {
                                                         FieldDefaultValue = TabNode.InnerText;
                                                         Copy = "";
                                                         if (!string.IsNullOrEmpty(fieldfilename)) {
-                                                            if (cpCore.appRootFiles.fileExists(fieldfilename)) {
+                                                            if (core.appRootFiles.fileExists(fieldfilename)) {
                                                                 Copy = FieldDefaultValue;
                                                             } else {
-                                                                Copy = cpCore.cdnFiles.readFile(fieldfilename);
+                                                                Copy = core.cdnFiles.readFile(fieldfilename);
                                                             }
                                                             if (!FieldReadOnly) {
-                                                                Copy = cpCore.html.inputTextExpandable(FieldName, Copy, 10);
+                                                                Copy = core.html.inputTextExpandable(FieldName, Copy, 10);
                                                             }
                                                         }
                                                         TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
@@ -2894,7 +2894,7 @@ namespace Contensive.Core.Controllers {
 
                                                         if (!string.IsNullOrEmpty(FieldSQL)) {
                                                             try {
-                                                                dt = cpCore.db.executeQuery(FieldSQL, FieldDataSource,1, SQLPageSize);
+                                                                dt = core.db.executeQuery(FieldSQL, FieldDataSource,1, SQLPageSize);
                                                             } catch (Exception ex) {
                                                                 ErrorDescription = ex.ToString();
                                                                 loadOK = false;
@@ -2927,7 +2927,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 //
                                                                 //Dim dtOk As Boolean = True
-                                                                dataArray = cpCore.db.convertDataTabletoArray(dt);
+                                                                dataArray = core.db.convertDataTabletoArray(dt);
                                                                 //
                                                                 RowMax = dataArray.GetUpperBound(1);
                                                                 ColumnMax = dataArray.GetUpperBound(0);
@@ -2935,7 +2935,7 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     // Single result, display with no table
                                                                     //
-                                                                    Copy = cpCore.html.inputText("result", genericController.encodeText(dataArray[0, 0]),-1,-1,"",false, true);
+                                                                    Copy = core.html.inputText("result", genericController.encodeText(dataArray[0, 0]),-1,-1,"",false, true);
                                                                 } else {
                                                                     //
                                                                     // Build headers
@@ -2988,9 +2988,9 @@ namespace Contensive.Core.Controllers {
                                             }
                                             Copy = Adminui.GetEditPanel(true, TabHeading, TabDescription, Adminui.EditTableOpen + TabCell.Text + Adminui.EditTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
-                                                cpCore.html.addLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
+                                                core.html.addLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
-                                            //Content.Add( cpcore.main_GetForm_Edit_AddTab(TabName, Copy, True))
+                                            //Content.Add( core.main_GetForm_Edit_AddTab(TabName, Copy, True))
                                             TabCell = null;
                                             break;
                                         default:
@@ -3005,7 +3005,7 @@ namespace Contensive.Core.Controllers {
                                 // Close Tables
                                 //
                                 if (TabCnt > 0) {
-                                    Content.Add(cpCore.html.getLiveTabs());
+                                    Content.Add(core.html.getLiveTabs());
                                 }
                             }
                         }
@@ -3015,7 +3015,7 @@ namespace Contensive.Core.Controllers {
                 tempgetFormContent = Adminui.GetBody(Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -3040,7 +3040,7 @@ namespace Contensive.Core.Controllers {
                 int Pos = 0;
                 stringBuilderLegacyController FastString = null;
                 string Copy = "";
-                adminUIController Adminui = new adminUIController(cpCore);
+                adminUIController Adminui = new adminUIController(core);
                 //
                 FastString = new stringBuilderLegacyController();
                 //
@@ -3126,7 +3126,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // Create Radio 
                             //
-                            //cpCore.htmldoc.main_Addon_execute_GetFormContent_decodeSelector = "<div>" & genericController.vbReplace(cpCore.htmldoc.main_Addon_execute_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
+                            //core.htmldoc.main_Addon_execute_GetFormContent_decodeSelector = "<div>" & genericController.vbReplace(core.htmldoc.main_Addon_execute_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
                             break;
                         default:
                             //
@@ -3141,12 +3141,12 @@ namespace Contensive.Core.Controllers {
                     //
 
                     selector = genericController.decodeNvaArgument(selector);
-                    tempgetFormContent_decodeSelector = cpCore.html.inputText(SitePropertyName, selector, 1, 20);
+                    tempgetFormContent_decodeSelector = core.html.inputText(SitePropertyName, selector, 1, 20);
                 }
 
                 FastString = null;
             } catch (Exception ex) {
-                cpCore.handleException( ex );
+                core.handleException( ex );
             }
             return tempgetFormContent_decodeSelector;
         }
@@ -3276,7 +3276,7 @@ namespace Contensive.Core.Controllers {
                     addonInstanceProperties.Add(ConstructorName, ConstructorValue);
                     //OptionString_ForObjectCall = OptionString_ForObjectCall & csv_DecodeAddonOptionArgument(ConstructorName) & "=" & csv_DecodeAddonOptionArgument(ConstructorValue) & vbCrLf
                     if (IncludeSettingsBubbleOptions) {
-                        addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor + "\r\n" + cpCore.html.getAddonSelector(ConstructorName, ConstructorValue, ConstructorSelector);
+                        addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor + "\r\n" + core.html.getAddonSelector(ConstructorName, ConstructorValue, ConstructorSelector);
                     }
                 }
                 addonInstanceProperties.Add("InstanceID", InstanceID);
@@ -3288,7 +3288,7 @@ namespace Contensive.Core.Controllers {
                     addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor.Substring(2);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
         }
         //
@@ -3339,33 +3339,33 @@ namespace Contensive.Core.Controllers {
                 //
                 s = Content;
                 SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString";
-                CS = cpCore.db.csOpenRecord("Wrappers", WrapperID,false,false, SelectFieldList);
-                if (cpCore.db.csOk(CS)) {
-                    Wrapper = cpCore.db.csGetText(CS, "copytext");
-                    wrapperName = cpCore.db.csGetText(CS, "name");
-                    TargetString = cpCore.db.csGetText(CS, "targetString");
+                CS = core.db.csOpenRecord("Wrappers", WrapperID,false,false, SelectFieldList);
+                if (core.db.csOk(CS)) {
+                    Wrapper = core.db.csGetText(CS, "copytext");
+                    wrapperName = core.db.csGetText(CS, "name");
+                    TargetString = core.db.csGetText(CS, "targetString");
                     //
                     SourceComment = "wrapper " + wrapperName;
                     if (!string.IsNullOrEmpty(WrapperSourceForComment)) {
                         SourceComment = SourceComment + " for " + WrapperSourceForComment;
                     }
-                    cpCore.html.addScriptCode_onLoad(cpCore.db.csGetText(CS, "javascriptonload"), SourceComment);
-                    cpCore.html.addScriptCode(cpCore.db.csGetText(CS, "javascriptbodyend"), SourceComment);
-                    cpCore.html.addHeadTag(cpCore.db.csGetText(CS, "OtherHeadTags"), SourceComment);
+                    core.html.addScriptCode_onLoad(core.db.csGetText(CS, "javascriptonload"), SourceComment);
+                    core.html.addScriptCode(core.db.csGetText(CS, "javascriptbodyend"), SourceComment);
+                    core.html.addHeadTag(core.db.csGetText(CS, "OtherHeadTags"), SourceComment);
                     //
-                    JSFilename = cpCore.db.csGetText(CS, "jsfilename");
+                    JSFilename = core.db.csGetText(CS, "jsfilename");
                     if (!string.IsNullOrEmpty(JSFilename)) {
-                        JSFilename = cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, JSFilename);
-                        cpCore.html.addScriptLinkSrc(JSFilename, SourceComment);
+                        JSFilename = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, JSFilename);
+                        core.html.addScriptLinkSrc(JSFilename, SourceComment);
                     }
-                    Copy = cpCore.db.csGetText(CS, "stylesfilename");
+                    Copy = core.db.csGetText(CS, "stylesfilename");
                     if (!string.IsNullOrEmpty(Copy)) {
                         if (genericController.vbInstr(1, Copy, "://") != 0) {
                         } else if (Copy.Left( 1) == "/") {
                         } else {
-                            Copy = cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, Copy);
+                            Copy = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, Copy);
                         }
-                        cpCore.html.addStyleLink(Copy, SourceComment);
+                        core.html.addStyleLink(Copy, SourceComment);
                     }
                     //
                     if (!string.IsNullOrEmpty(Wrapper)) {
@@ -3379,9 +3379,9 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                cpCore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
             } catch (Exception ex) {
-                cpCore.handleException( ex );
+                core.handleException( ex );
             }
             return s;
         }
@@ -3417,14 +3417,14 @@ namespace Contensive.Core.Controllers {
                     result = DefaultIfNotFound;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
         //
         //====================================================================================================
         //
-        public static string main_GetDefaultAddonOption_String(coreController cpCore, string ArgumentList, string AddonGuid, bool IsInline) {
+        public static string main_GetDefaultAddonOption_String(coreController core, string ArgumentList, string AddonGuid, bool IsInline) {
             string result = "";
             //
             string NameValuePair = null;
@@ -3507,7 +3507,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // rejoin
                         //
-                        NameValuePair = cpCore.html.getAddonSelector(OptionName, OptionValue, OptionSelector);
+                        NameValuePair = core.html.getAddonSelector(OptionName, OptionValue, OptionSelector);
                         NameValuePair = genericController.EncodeJavascript(NameValuePair);
                         result = result + "&" + NameValuePair;
                         if (genericController.vbInstr(1, NameValuePair, "=") == 0) {
@@ -3530,7 +3530,7 @@ namespace Contensive.Core.Controllers {
         //
         //   AddonOptionConstructor is a crlf delimited name=value[selector]descriptor list
         //
-        //   See cpCoreClass.ExecuteAddon for a full description of:
+        //   See coreClass.ExecuteAddon for a full description of:
         //       AddonOptionString
         //       AddonOptionConstructor
         //       AddonOptionNameValueList
@@ -3573,11 +3573,11 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private string getAddonDescription(coreController cpcore, addonModel addon) {
+        private string getAddonDescription(coreController core, addonModel addon) {
             string addonDescription = "[invalid addon]";
             if (addon != null) {
                 string collectionName = "invalid collection or collection not set";
-                AddonCollectionModel collection = AddonCollectionModel.create(cpcore, addon.CollectionID);
+                AddonCollectionModel collection = AddonCollectionModel.create(core, addon.CollectionID);
                 if (collection != null) {
                     collectionName = collection.name;
                 }
@@ -3591,29 +3591,29 @@ namespace Contensive.Core.Controllers {
         /// Special case addon as it is a required core service. This method attempts the addon call and it if fails, calls the safe-mode version, tested for this build
         /// </summary>
         /// <returns></returns>
-        public static string GetAddonManager(coreController cpCore) {
+        public static string GetAddonManager(coreController core) {
             string result = "";
             try {
                 bool AddonStatusOK = true;
                 try {
-                    addonModel addon = addonModel.create(cpCore, addonGuidAddonManager);
+                    addonModel addon = addonModel.create(core, addonGuidAddonManager);
                     if ( addon != null ){
-                        result = cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
+                        result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
                     }
                 } catch (Exception ex) {
-                    cpCore.handleException(new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
+                    core.handleException(new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
                     AddonStatusOK = false;
                 }
                 if (string.IsNullOrEmpty(result)) {
-                    cpCore.handleException(new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
+                    core.handleException(new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
                     AddonStatusOK = false;
                 }
                 if (!AddonStatusOK) {
-                    Addons.SafeAddonManager.addonManagerClass AddonMan = new Addons.SafeAddonManager.addonManagerClass(cpCore);
+                    Addons.SafeAddonManager.addonManagerClass AddonMan = new Addons.SafeAddonManager.addonManagerClass(core);
                     result = AddonMan.GetForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -3629,7 +3629,7 @@ namespace Contensive.Core.Controllers {
             string returnString = "";
             try {
                 string sql = null;
-                var cs = new csController(cpCore);
+                var cs = new csController(core);
                 int addonid = 0;
                 //
                 sql = "select e.id,c.addonId"
@@ -3637,11 +3637,11 @@ namespace Contensive.Core.Controllers {
                     + " left join ccAddonEventCatchers c on c.eventId=e.id)"
                     + " where ";
                 if (eventNameIdOrGuid.IsNumeric()) {
-                    sql += "e.id=" + cpCore.db.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
+                    sql += "e.id=" + core.db.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
                 } else if ( genericController.isGuid(eventNameIdOrGuid)) {
-                    sql += "e.ccGuid=" + cpCore.db.encodeSQLText(eventNameIdOrGuid);
+                    sql += "e.ccGuid=" + core.db.encodeSQLText(eventNameIdOrGuid);
                 } else {
-                    sql += "e.name=" + cpCore.db.encodeSQLText(eventNameIdOrGuid);
+                    sql += "e.name=" + core.db.encodeSQLText(eventNameIdOrGuid);
                 }
                 if (!cs.openSQL(sql)) {
                     //
@@ -3671,8 +3671,8 @@ namespace Contensive.Core.Controllers {
                     while (cs.ok()) {
                         addonid = cs.getInteger("addonid");
                         if (addonid != 0) {
-                            var addon = addonModel.create(cpCore, addonid);
-                            returnString += cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
+                            var addon = addonModel.create(core, addonid);
+                            returnString += core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                                  addonType = CPUtilsBaseClass.addonContext.ContextSimple,
                             });
                         }
@@ -3682,7 +3682,7 @@ namespace Contensive.Core.Controllers {
                 cs.Close();
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex );
+                core.handleException(ex );
             }
             return returnString;
         }

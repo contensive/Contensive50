@@ -64,19 +64,19 @@ namespace Contensive.Core.Models.DbModels
 		/// add a new recod to the db and open it. Starting a new model with this method will use the default
 		/// values in Contensive metadata (active, contentcontrolid, etc)
 		/// </summary>
-		/// <param name="cpCore"></param>
+		/// <param name="core"></param>
 		/// <param name="callersCacheNameList"></param>
 		/// <returns></returns>
-		public static dataSourceModel add(coreController cpCore, ref List<string> callersCacheNameList)
+		public static dataSourceModel add(coreController core, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
 			{
-				result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, cpCore.doc.sessionContext.user.id),ref callersCacheNameList);
+				result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.doc.sessionContext.user.id),ref callersCacheNameList);
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
@@ -90,35 +90,35 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="recordId">The id of the record to be read into the new object</param>
 		/// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-		public static dataSourceModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList)
+		public static dataSourceModel create(coreController core, int recordId, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
 			{
 				if (recordId <= 0)
 				{
-					result = getDefaultDatasource(cpCore);
+					result = getDefaultDatasource(core);
 				}
 				else
 				{
 					string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId);
-					result = cpCore.cache.getObject<dataSourceModel>(cacheName);
+					result = core.cache.getObject<dataSourceModel>(cacheName);
 					if (result == null)
 					{
-						result = loadObject(cpCore, "id=" + recordId.ToString(), ref callersCacheNameList);
+						result = loadObject(core, "id=" + recordId.ToString(), ref callersCacheNameList);
 					}
 				}
 
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
 			return result;
 		}
-        public static dataSourceModel create(coreController cpCore, int recordId) { var tmpList = new List<string> { }; return create(cpCore, recordId, ref tmpList); }
+        public static dataSourceModel create(coreController core, int recordId) { var tmpList = new List<string> { }; return create(core, recordId, ref tmpList); }
         //
         //====================================================================================================
         /// <summary>
@@ -126,28 +126,28 @@ namespace Contensive.Core.Models.DbModels
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
-        public static dataSourceModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList)
+        public static dataSourceModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
 			{
 				if (string.IsNullOrEmpty(recordGuid))
 				{
-					result = getDefaultDatasource(cpCore);
+					result = getDefaultDatasource(core);
 				}
 				else
 				{
 					string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", recordGuid);
-					result = cpCore.cache.getObject<dataSourceModel>(cacheName);
+					result = core.cache.getObject<dataSourceModel>(cacheName);
 					if (result == null)
 					{
-						result = loadObject(cpCore, "ccGuid=" + cpCore.db.encodeSQLText(recordGuid), ref callersCacheNameList);
+						result = loadObject(core, "ccGuid=" + core.db.encodeSQLText(recordGuid), ref callersCacheNameList);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
@@ -160,23 +160,23 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cp"></param>
 		/// <param name="foreignKey1Id"></param>
-		public static dataSourceModel create(coreController cpCore, int foreignKey1Id, int foreignKey2Id, ref List<string> callersCacheNameList)
+		public static dataSourceModel create(coreController core, int foreignKey1Id, int foreignKey2Id, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
 			{
 				if ((foreignKey1Id > 0) && (foreignKey2Id > 0))
 				{
-					result = cpCore.cache.getObject<dataSourceModel>(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "foreignKey1", foreignKey1Id, "foreignKey2", foreignKey2Id));
+					result = core.cache.getObject<dataSourceModel>(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "foreignKey1", foreignKey1Id, "foreignKey2", foreignKey2Id));
 					if (result == null)
 					{
-						result = loadObject(cpCore, "(foreignKey1=" + foreignKey1Id.ToString() + ")and(foreignKey1=" + foreignKey1Id.ToString() + ")", ref callersCacheNameList);
+						result = loadObject(core, "(foreignKey1=" + foreignKey1Id.ToString() + ")and(foreignKey1=" + foreignKey1Id.ToString() + ")", ref callersCacheNameList);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
@@ -189,12 +189,12 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cp"></param>
 		/// <param name="sqlCriteria"></param>
-		private static dataSourceModel loadObject(coreController cpCore, string sqlCriteria, ref List<string> callersCacheNameList)
+		private static dataSourceModel loadObject(coreController core, string sqlCriteria, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
 			{
-				csController cs = new csController(cpCore);
+				csController cs = new csController(core);
 				if (cs.open(primaryContentName, sqlCriteria))
 				{
 					result = new dataSourceModel();
@@ -228,18 +228,18 @@ namespace Contensive.Core.Models.DbModels
 						// -- add all cachenames to the injected cachenamelist
 						string cacheName0 = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", result.ID.ToString());
 						callersCacheNameList.Add(cacheName0);
-						cpCore.cache.setObject(cacheName0, result);
+						core.cache.setObject(cacheName0, result);
 						//
 						string cacheName1 = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", result.ccGuid);
 						callersCacheNameList.Add(cacheName1);
-						cpCore.cache.setAlias(cacheName1, cacheName0);
+						core.cache.setAlias(cacheName1, cacheName0);
 					}
 				}
 				cs.Close();
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
@@ -250,13 +250,13 @@ namespace Contensive.Core.Models.DbModels
 		/// <summary>
 		/// save the instance properties to a record with matching id. If id is not provided, a new record is created.
 		/// </summary>
-		/// <param name="cpCore"></param>
+		/// <param name="core"></param>
 		/// <returns></returns>
-		public int saveObject(coreController cpCore)
+		public int saveObject(coreController core)
 		{
 			try
 			{
-				csController cs = new csController(cpCore);
+				csController cs = new csController(core);
 				if (ID > 0)
 				{
 					if (!cs.open(primaryContentName, "id=" + ID))
@@ -306,16 +306,16 @@ namespace Contensive.Core.Models.DbModels
 				//
 				// -- invalidate objects
 				// -- no, the primary is invalidated by the cs.save()
-				//cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"id", id.ToString))
+				//core.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"id", id.ToString))
 				// -- no, the secondary points to the pirmary, which is invalidated. Dont waste resources invalidating
-				//cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
+				//core.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
 				//
 				// -- object is here, but the cache was invalidated, setting
-				cpCore.cache.setObject(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.ID.ToString()), this);
+				core.cache.setObject(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.ID.ToString()), this);
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
@@ -328,19 +328,19 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cp"></param>
 		/// <param name="recordId"></param>
-		public static void delete(coreController cpCore, int recordId)
+		public static void delete(coreController core, int recordId)
 		{
 			try
 			{
 				if (recordId > 0)
 				{
-					cpCore.db.deleteContentRecords(primaryContentName, "id=" + recordId.ToString());
-					cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
+					core.db.deleteContentRecords(primaryContentName, "id=" + recordId.ToString());
+					core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
 				}
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
@@ -352,24 +352,24 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cp"></param>
 		/// <param name="ccguid"></param>
-		public static void delete(coreController cpCore, string ccguid)
+		public static void delete(coreController core, string ccguid)
 		{
 			try
 			{
 				if (!string.IsNullOrEmpty(ccguid))
 				{
 					var  tempVar = new List<string>();
-					dataSourceModel instance = create(cpCore, ccguid, ref tempVar);
+					dataSourceModel instance = create(core, ccguid, ref tempVar);
 					if (instance != null)
 					{
-						invalidatePrimaryCache(cpCore, instance.ID);
-						cpCore.db.deleteContentRecords(primaryContentName, "(ccguid=" + cpCore.db.encodeSQLText(ccguid) + ")");
+						invalidatePrimaryCache(core, instance.ID);
+						core.db.deleteContentRecords(primaryContentName, "(ccguid=" + core.db.encodeSQLText(ccguid) + ")");
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
@@ -382,24 +382,24 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="foreignKey1Id"></param>
 		/// <param name="foreignKey2Id"></param>
-		public static void delete(coreController cpCore, int foreignKey1Id, int foreignKey2Id)
+		public static void delete(coreController core, int foreignKey1Id, int foreignKey2Id)
 		{
 			try
 			{
 				if ((foreignKey2Id > 0) && (foreignKey1Id > 0))
 				{
 					var  tempVar = new List<string>();
-					dataSourceModel instance = create(cpCore, foreignKey1Id, foreignKey2Id, ref tempVar);
+					dataSourceModel instance = create(core, foreignKey1Id, foreignKey2Id, ref tempVar);
 					if (instance != null)
 					{
-						invalidatePrimaryCache(cpCore, instance.ID);
-						cpCore.db.deleteTableRecord(primaryContentTableName, instance.ID, primaryContentDataSource);
+						invalidatePrimaryCache(core, instance.ID);
+						core.db.deleteTableRecord(primaryContentTableName, instance.ID, primaryContentDataSource);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
@@ -412,19 +412,19 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="someCriteria"></param>
 		/// <returns></returns>
-		public static List<dataSourceModel> getObjectList(coreController cpCore, int someCriteria, List<string> callersCacheNameList)
+		public static List<dataSourceModel> getObjectList(coreController core, int someCriteria, List<string> callersCacheNameList)
 		{
 			List<dataSourceModel> result = new List<dataSourceModel>();
 			try
 			{
-				csController cs = new csController(cpCore);
+				csController cs = new csController(core);
 				List<string> ignoreCacheNames = new List<string>();
 				if (cs.open(primaryContentName, "(someCriteria=" + someCriteria + ")", "name", true, "id"))
 				{
 					dataSourceModel instance = null;
 					do
 					{
-						instance = dataSourceModel.create(cpCore, cs.getInteger("id"), ref callersCacheNameList);
+						instance = dataSourceModel.create(core, cs.getInteger("id"), ref callersCacheNameList);
 						if (instance != null)
 						{
 							result.Add(instance);
@@ -436,7 +436,7 @@ namespace Contensive.Core.Models.DbModels
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 			}
 			return result;
@@ -446,14 +446,14 @@ namespace Contensive.Core.Models.DbModels
 		/// <summary>
 		/// invalidate the primary key (which depends on all secondary keys)
 		/// </summary>
-		/// <param name="cpCore"></param>
+		/// <param name="core"></param>
 		/// <param name="recordId"></param>
-		public static void invalidatePrimaryCache(coreController cpCore, int recordId)
+		public static void invalidatePrimaryCache(coreController core, int recordId)
 		{
-			cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
+			core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
 			//
 			// -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-			cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
+			core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
 		}
 		//
 		//====================================================================================================
@@ -478,10 +478,10 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="recordId"></param>record
 		/// <returns></returns>
-		public static string getRecordName(coreController cpcore, int recordId)
+		public static string getRecordName(coreController core, int recordId)
 		{
 			var  tempVar = new List<string>();
-			return normalizeDataSourceName(dataSourceModel.create(cpcore, recordId, ref tempVar).Name);
+			return normalizeDataSourceName(dataSourceModel.create(core, recordId, ref tempVar).Name);
 		}
 		//
 		//====================================================================================================
@@ -491,10 +491,10 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="ccGuid"></param>record
 		/// <returns></returns>
-		public static string getRecordName(coreController cpcore, string ccGuid)
+		public static string getRecordName(coreController core, string ccGuid)
 		{
 			var  tempVar = new List<string>();
-			return normalizeDataSourceName(dataSourceModel.create(cpcore, ccGuid, ref tempVar).Name);
+			return normalizeDataSourceName(dataSourceModel.create(core, ccGuid, ref tempVar).Name);
 		}
 		//
 		//====================================================================================================
@@ -504,10 +504,10 @@ namespace Contensive.Core.Models.DbModels
 		/// <param name="cp"></param>
 		/// <param name="ccGuid"></param>record
 		/// <returns></returns>
-		public static int getRecordId(coreController cpcore, string ccGuid)
+		public static int getRecordId(coreController core, string ccGuid)
 		{
 			var  tempVar = new List<string>();
-			return dataSourceModel.create(cpcore, ccGuid, ref tempVar).ID;
+			return dataSourceModel.create(core, ccGuid, ref tempVar).ID;
 		}
 		//
 		//====================================================================================================
@@ -526,19 +526,19 @@ namespace Contensive.Core.Models.DbModels
 		}
 		//
 		//====================================================================================================
-		public static Dictionary<string, dataSourceModel> getNameDict(coreController cpcore)
+		public static Dictionary<string, dataSourceModel> getNameDict(coreController core)
 		{
 			Dictionary<string, dataSourceModel> result = new Dictionary<string, dataSourceModel>();
 			try
 			{
-				csController cs = new csController(cpcore);
+				csController cs = new csController(core);
 				List<string> ignoreCacheNames = new List<string>();
 				if (cs.open(primaryContentName, "", "id", true, "id"))
 				{
 					do
 					{
                         var tmpList = new List<string>();
-                        dataSourceModel instance = create(cpcore, cs.getInteger("id"),ref tmpList);
+                        dataSourceModel instance = create(core, cs.getInteger("id"),ref tmpList);
 						if (instance != null)
 						{
 							result.Add(instance.Name.ToLower(), instance);
@@ -547,12 +547,12 @@ namespace Contensive.Core.Models.DbModels
 				}
 				if (!result.ContainsKey("default"))
 				{
-					result.Add("default", getDefaultDatasource(cpcore));
+					result.Add("default", getDefaultDatasource(core));
 				}
 			}
 			catch (Exception ex)
 			{
-				cpcore.handleException(ex);
+				core.handleException(ex);
 				throw;
 			}
 			return result;
@@ -564,28 +564,28 @@ namespace Contensive.Core.Models.DbModels
 		/// </summary>
 		/// <param name="cp"></param>
 		/// <param name="recordGuid"></param>
-		public static dataSourceModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList)
+		public static dataSourceModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
 			{
 				if (string.IsNullOrEmpty(recordName.Trim()) || (recordName.Trim().ToLower() == "default"))
 				{
-					result = getDefaultDatasource(cpCore);
+					result = getDefaultDatasource(core);
 				}
 				else
 				{
 					string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "name", recordName);
-					result = cpCore.cache.getObject<dataSourceModel>(cacheName);
+					result = core.cache.getObject<dataSourceModel>(cacheName);
 					if (result == null)
 					{
-						result = loadObject(cpCore, "name=" + cpCore.db.encodeSQLText(recordName), ref callersCacheNameList);
+						result = loadObject(core, "name=" + core.db.encodeSQLText(recordName), ref callersCacheNameList);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
@@ -597,7 +597,7 @@ namespace Contensive.Core.Models.DbModels
 		/// return the default datasource
 		/// </summary>
 		/// <param name="cp"></param>
-		public static dataSourceModel getDefaultDatasource(coreController cpCore)
+		public static dataSourceModel getDefaultDatasource(coreController core)
 		{
 			dataSourceModel result = null;
 			try
@@ -611,14 +611,14 @@ namespace Contensive.Core.Models.DbModels
 				result.CreateKey = 0;
 				result.DateAdded = DateTime.MinValue;
 				result.type = (int)dataSourceTypeEnum.sqlServerNative;
-				result.endPoint = cpCore.serverConfig.defaultDataSourceAddress;
+				result.endPoint = core.serverConfig.defaultDataSourceAddress;
 				result.Name = "default";
-				result.password = cpCore.serverConfig.password;
-				result.username = cpCore.serverConfig.username;
+				result.password = core.serverConfig.password;
+				result.username = core.serverConfig.username;
 			}
 			catch (Exception ex)
 			{
-				cpCore.handleException(ex);
+				core.handleException(ex);
 				throw;
 				throw;
 			}
@@ -626,12 +626,12 @@ namespace Contensive.Core.Models.DbModels
 		}
 		//
 		//====================================================================================================
-		//Public Shared Function getHtmlInputSelect(cpCore As coreClass, HtmlName As String, selectedId As Integer, callerCacheList As List(Of String)) As String
+		//Public Shared Function getHtmlInputSelect(core As coreClass, HtmlName As String, selectedId As Integer, callerCacheList As List(Of String)) As String
 		//    Dim result As String = ""
 		//    Try
-		//        result = cpCore.htmlDoc.main_GetFormInputSelect2(HtmlName, selectedId, primaryContentName, "", "default", "", Nothing)
+		//        result = core.htmlDoc.main_GetFormInputSelect2(HtmlName, selectedId, primaryContentName, "", "default", "", Nothing)
 		//    Catch ex As Exception
-		//        cpCore.handleExceptionAndContinue(ex)
+		//        core.handleExceptionAndContinue(ex)
 		//    End Try
 		//    Return result
 		//End Function

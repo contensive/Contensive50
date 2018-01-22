@@ -24,14 +24,14 @@ namespace Contensive.Core {
         public const string EventsId = "DBE2B6CB-6339-4FFB-92D7-BE37AEA841CC";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         private CPClass CP;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
-        public CPUserClass(Contensive.Core.Controllers.coreController cpCoreObj, CPClass CPParent) : base() {
-            cpCore = cpCoreObj;
+        public CPUserClass(Contensive.Core.Controllers.coreController coreObj, CPClass CPParent) : base() {
+            core = coreObj;
             CP = CPParent;
         }
         //
@@ -45,7 +45,7 @@ namespace Contensive.Core {
                     // call .dispose for managed objects
                     //
                     CP = null;
-                    cpCore = null;
+                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -66,7 +66,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override int GetIdByLogin(string Username, string Password) {
-            return CP.core.doc.sessionContext.authenticateGetId(cpCore, Username, Password);
+            return CP.core.doc.sessionContext.authenticateGetId(core, Username, Password);
         }
         //
         //====================================================================================================
@@ -79,7 +79,7 @@ namespace Contensive.Core {
                 int localId = CP.core.doc.sessionContext.user.id;
                 if (localId == 0) {
                     localId = CP.core.db.insertContentRecordGetID("people", 0);
-                    CP.core.doc.sessionContext.recognizeById(cpCore, localId, ref CP.core.doc.sessionContext);
+                    CP.core.doc.sessionContext.recognizeById(core, localId, ref CP.core.doc.sessionContext);
                 }
                 return localId;
             }
@@ -89,14 +89,14 @@ namespace Contensive.Core {
         //
         public override bool IsAdmin {
             get {
-                return CP.core.doc.sessionContext.isAuthenticatedAdmin(cpCore);
+                return CP.core.doc.sessionContext.isAuthenticatedAdmin(core);
             }
         }
         //
         //====================================================================================================
         //
         public override bool IsAdvancedEditing(string ContentName) {
-            return CP.core.doc.sessionContext.isAdvancedEditing(cpCore, ContentName);
+            return CP.core.doc.sessionContext.isAdvancedEditing(core, ContentName);
         }
         //
         //====================================================================================================
@@ -116,14 +116,14 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override bool IsContentManager(string ContentName = "Page Content") {
-            return CP.core.doc.sessionContext.isAuthenticatedContentManager(cpCore, ContentName);
+            return CP.core.doc.sessionContext.isAuthenticatedContentManager(core, ContentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsDeveloper {
             get {
-                return CP.core.doc.sessionContext.isAuthenticatedDeveloper(cpCore);
+                return CP.core.doc.sessionContext.isAuthenticatedDeveloper(core);
             }
         }
         //
@@ -145,7 +145,7 @@ namespace Contensive.Core {
         //
         public override bool IsGuest {
             get {
-                return CP.core.doc.sessionContext.isGuest(cpCore);
+                return CP.core.doc.sessionContext.isGuest(core);
             }
         }
         //
@@ -182,7 +182,7 @@ namespace Contensive.Core {
                 if (userId == 0) {
                     userId = Id;
                 }
-                result = CP.core.doc.sessionContext.isMemberOfGroupIdList(cpCore, userId, IsAuthenticated, GroupIDList, false);
+                result = CP.core.doc.sessionContext.isMemberOfGroupIdList(core, userId, IsAuthenticated, GroupIDList, false);
             } catch (Exception ex) {
                 CP.core.handleException(ex);
                 result = false;
@@ -195,21 +195,21 @@ namespace Contensive.Core {
         //
         public override bool IsMember {
             get {
-                return CP.core.doc.sessionContext.isAuthenticatedMember(cpCore);
+                return CP.core.doc.sessionContext.isAuthenticatedMember(core);
             }
         }
         //
         //====================================================================================================
         //
         public override bool IsQuickEditing(string ContentName) {
-            return CP.core.doc.sessionContext.isQuickEditing(cpCore, ContentName);
+            return CP.core.doc.sessionContext.isQuickEditing(core, ContentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsRecognized {
             get {
-                return CP.core.doc.sessionContext.isRecognized(cpCore);
+                return CP.core.doc.sessionContext.isRecognized(core);
             }
         }
         //
@@ -243,29 +243,29 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override bool Login(string UsernameOrEmail, string Password, bool SetAutoLogin = false) {
-            return CP.core.doc.sessionContext.authenticate(cpCore, UsernameOrEmail, Password, SetAutoLogin);
+            return CP.core.doc.sessionContext.authenticate(core, UsernameOrEmail, Password, SetAutoLogin);
         }
         //
         //====================================================================================================
         //
         [Obsolete("Use LoginById(integer) instead", false)]
         public override bool LoginByID(string RecordID, bool SetAutoLogin = false) {
-            return CP.core.doc.sessionContext.authenticateById(cpCore, encodeInteger(RecordID), CP.core.doc.sessionContext);
+            return CP.core.doc.sessionContext.authenticateById(core, encodeInteger(RecordID), CP.core.doc.sessionContext);
         }
         //
         //====================================================================================================
         //
         public override bool LoginByID(int RecordID) {
-            return CP.core.doc.sessionContext.authenticateById(cpCore, RecordID, CP.core.doc.sessionContext);
+            return CP.core.doc.sessionContext.authenticateById(core, RecordID, CP.core.doc.sessionContext);
         }
         //
         //====================================================================================================
         //
         public override bool LoginByID(int RecordID, bool SetAutoLogin) {
-            bool result = CP.core.doc.sessionContext.authenticateById(cpCore, RecordID, CP.core.doc.sessionContext);
+            bool result = CP.core.doc.sessionContext.authenticateById(core, RecordID, CP.core.doc.sessionContext);
             if (result) {
                 CP.core.doc.sessionContext.user.AutoLogin = SetAutoLogin;
-                CP.core.doc.sessionContext.user.save(cpCore);
+                CP.core.doc.sessionContext.user.save(core);
             }
             return result;
         }
@@ -273,13 +273,13 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override bool LoginIsOK(string UsernameOrEmail, string Password) {
-            return CP.core.doc.sessionContext.isLoginOK(cpCore, UsernameOrEmail, Password);
+            return CP.core.doc.sessionContext.isLoginOK(core, UsernameOrEmail, Password);
         }
         //
         //====================================================================================================
         //
         public override void Logout() {
-            CP.core.doc.sessionContext.logout(cpCore);
+            CP.core.doc.sessionContext.logout(core);
         }
         //
         //====================================================================================================
@@ -303,7 +303,7 @@ namespace Contensive.Core {
         public override bool IsNewLoginOK(string Username, string Password) {
             string errorMessage = "";
             int errorCode = 0;
-            return CP.core.doc.sessionContext.isNewLoginOK(cpCore, Username, Password, ref errorMessage, ref errorCode);
+            return CP.core.doc.sessionContext.isNewLoginOK(core, Username, Password, ref errorMessage, ref errorCode);
         }
         //
         //====================================================================================================
@@ -326,7 +326,7 @@ namespace Contensive.Core {
         //
         public override bool Recognize(int UserID) {
             sessionContextModel authContext = CP.core.doc.sessionContext;
-            return CP.core.doc.sessionContext.recognizeById(cpCore, UserID, ref authContext);
+            return CP.core.doc.sessionContext.recognizeById(core, UserID, ref authContext);
         }
         //
         //====================================================================================================

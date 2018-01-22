@@ -21,7 +21,7 @@ namespace Contensive.Core.Controllers {
         // objects passed in that are not disposed
         //------------------------------------------------------------------------------------------------------------------------
         //
-        private coreController cpCore;
+        private coreController core;
         //
         //------------------------------------------------------------------------------------------------------------------------
         // objects created within class to dispose in dispose
@@ -64,12 +64,12 @@ namespace Contensive.Core.Controllers {
         /// <param name="cluster"></param>
         /// <param name="appName"></param>
         /// <remarks></remarks>
-        public workflowController(coreController cpCore) : base() {
+        public workflowController(coreController core) : base() {
             try {
                 //
-                this.cpCore = cpCore;
+                this.core = core;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
                 throw (ex);
             }
@@ -97,14 +97,14 @@ namespace Contensive.Core.Controllers {
                 main_EditLockStatus_Local = false;
                 //
                 main_EditLockStatus_Local = getEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), ref ReturnMemberID, ref ReturnDateExpires);
-                if (main_EditLockStatus_Local && (ReturnMemberID != cpCore.doc.sessionContext.user.id)) {
+                if (main_EditLockStatus_Local && (ReturnMemberID != core.doc.sessionContext.user.id)) {
                     main_EditLockStatus_Local = true;
                     main_EditLockDateExpires_Local = ReturnDateExpires;
                     main_EditLockMemberID_Local = ReturnMemberID;
                     main_EditLockMemberName_Local = "";
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return main_EditLockStatus_Local;
@@ -125,11 +125,11 @@ namespace Contensive.Core.Controllers {
                 if (main_EditLockStatus_Local) {
                     if (string.IsNullOrEmpty(main_EditLockMemberName_Local)) {
                         if (main_EditLockMemberID_Local != 0) {
-                            CS = cpCore.db.cs_open2("people", main_EditLockMemberID_Local);
-                            if (cpCore.db.csOk(CS)) {
-                                main_EditLockMemberName_Local = cpCore.db.csGetText(CS, "name");
+                            CS = core.db.cs_open2("people", main_EditLockMemberID_Local);
+                            if (core.db.csOk(CS)) {
+                                main_EditLockMemberName_Local = core.db.csGetText(CS, "name");
                             }
-                            cpCore.db.csClose(ref CS);
+                            core.db.csClose(ref CS);
                         }
                         if (string.IsNullOrEmpty(main_EditLockMemberName_Local)) {
                             main_EditLockMemberName_Local = "unknown";
@@ -138,7 +138,7 @@ namespace Contensive.Core.Controllers {
                     tempGetEditLockMemberName = main_EditLockMemberName_Local;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return main_EditLockMemberName_Local;
@@ -158,7 +158,7 @@ namespace Contensive.Core.Controllers {
                     returnDate = main_EditLockDateExpires_Local;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnDate;
@@ -169,7 +169,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public void SetEditLock(string ContentName, int RecordID) {
-            setEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), cpCore.doc.sessionContext.user.id);
+            setEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.doc.sessionContext.user.id);
         }
         //
         //========================================================================
@@ -177,7 +177,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public void ClearEditLock(string ContentName, int RecordID) {
-            clearEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), cpCore.doc.sessionContext.user.id);
+            clearEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.doc.sessionContext.user.id);
         }
         //
         //========================================================================
@@ -185,7 +185,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         //Public Sub publishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-        //    Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
+        //    Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), core.doc.authContext.user.id)
         //End Sub
         //
         //========================================================================
@@ -193,7 +193,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         //Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-        //    Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
+        //    Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), core.doc.authContext.user.id)
         //End Sub
         //
         //========================================================================
@@ -201,7 +201,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         //Public Sub main_SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-        //    Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
+        //    Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), core.doc.authContext.user.id)
         //End Sub
         //
         //=========================================================================================
@@ -211,7 +211,7 @@ namespace Contensive.Core.Controllers {
         //=========================================================================================
         //
         //Public Function isWorkflowAuthoringCompatible(ByVal ContentName As String) As Boolean
-        //    isWorkflowAuthoringCompatible = genericController.EncodeBoolean(cpCore.metaData.GetContentProperty(genericController.encodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
+        //    isWorkflowAuthoringCompatible = genericController.EncodeBoolean(core.metaData.GetContentProperty(genericController.encodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
         //End Function
         //
         //==========================================================================================
@@ -269,9 +269,9 @@ namespace Contensive.Core.Controllers {
         //        '
         //        MethodName = "csv_PublishEdit"
         //        '
-        //        CDef = Models.Complex.cdefModel.getcdef(cpcore,ContentName)
+        //        CDef = Models.Complex.cdefModel.getcdef(core,ContentName)
         //        If CDef.Id > 0 Then
-        //            If false And cpCore.siteProperties.allowWorkflowAuthoring Then
+        //            If false And core.siteProperties.allowWorkflowAuthoring Then
         //                With CDef
         //                    FieldList = .SelectCommaList
         //                    LiveDataSourceName = .ContentDataSourceName
@@ -293,35 +293,35 @@ namespace Contensive.Core.Controllers {
         //                '
         //                ' ----- Open the live record
         //                '
-        //                RSLive = cpCore.db.executeSql("SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
-        //                'RSLive = appservices.cpcore.db.executeSql(LiveDataSourceName, "SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & encodeSQLNumber(LiveRecordID) & ";")
+        //                RSLive = core.db.executeSql("SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & core.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
+        //                'RSLive = appservices.core.db.executeSql(LiveDataSourceName, "SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & encodeSQLNumber(LiveRecordID) & ";")
         //                If RSLive.Rows.Count <= 0 Then
         //                    '
         //                    Throw (New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
         //                Else
         //                    If True Then
-        //                        LiveRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows[0], "ID"))
-        //                        LiveRecordBlank = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSLive.Rows[0], "EditBlank"))
+        //                        LiveRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSLive.Rows[0], "ID"))
+        //                        LiveRecordBlank = genericController.EncodeBoolean(core.db.getDataRowColumnName(RSLive.Rows[0], "EditBlank"))
         //                        '
         //                        ' ----- Open the edit record
         //                        '
-        //                        RSEdit = cpCore.db.executeSql("SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
-        //                        'RSEdit = appservices.cpcore.db.executeSql(EditDataSourceName, "SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;")
+        //                        RSEdit = core.db.executeSql("SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & core.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
+        //                        'RSEdit = appservices.core.db.executeSql(EditDataSourceName, "SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;")
         //                        If RSEdit.Rows.Count <= 0 Then
         //                            '
         //                            Throw (New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
         //                        Else
         //                            If True Then
-        //                                EditRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], "ID"))
-        //                                EditRecordCID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], "ContentControlID"))
-        //                                EditRecordBlank = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], "EditBlank"))
+        //                                EditRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSEdit.Rows[0], "ID"))
+        //                                EditRecordCID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSEdit.Rows[0], "ContentControlID"))
+        //                                EditRecordBlank = genericController.EncodeBoolean(core.db.getDataRowColumnName(RSEdit.Rows[0], "EditBlank"))
         //                                PublishingDelete = EditRecordBlank
-        //                                PublishingInactive = Not genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], "active"))
+        //                                PublishingInactive = Not genericController.EncodeBoolean(core.db.getDataRowColumnName(RSEdit.Rows[0], "active"))
         //                                '
         //                                ' ----- Create new Edit record
         //                                '
         //                                If Not PublishingDelete Then
-        //                                    NewEditRecordID = cpCore.db.insertTableRecordGetId(EditDataSourceName, EditTableName, SystemMemberID)
+        //                                    NewEditRecordID = core.db.insertTableRecordGetId(EditDataSourceName, EditTableName, SystemMemberID)
         //                                    If NewEditRecordID < 1 Then
         //                                        '
         //                                        Throw (New ApplicationException("During record publishing, a new edit record could not be create, table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
@@ -360,9 +360,9 @@ namespace Contensive.Core.Controllers {
         //                                                            '
         //                                                            ' ----- Content related field
         //                                                            '
-        //                                                            LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                                            EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
-        //                                                            BlankSQLValue = cpCore.db.EncodeSQL(Nothing, fieldTypeId)
+        //                                                            LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+        //                                                            EditSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
+        //                                                            BlankSQLValue = core.db.EncodeSQL(Nothing, fieldTypeId)
         //                                                            FieldNameArray(FieldPointer) = FieldName
         //                                                            '
         //                                                            ' ----- New Edit Record value
@@ -373,27 +373,27 @@ namespace Contensive.Core.Controllers {
         //                                                                        '
         //                                                                        ' ----- cdn files - create copy of File for neweditrecord
         //                                                                        '
-        //                                                                        EditFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName))
+        //                                                                        EditFilename = genericController.encodeText(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName))
         //                                                                        If EditFilename = "" Then
-        //                                                                            NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(""))
+        //                                                                            NewEditSqlFieldList.add(FieldName, core.db.encodeSQLText(""))
         //                                                                        Else
         //                                                                            NewEditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, NewEditRecordID, fieldTypeId)
         //                                                                            'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
-        //                                                                            Call cpCore.cdnFiles.copyFile(EditFilename, NewEditFilename)
-        //                                                                            NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(NewEditFilename))
+        //                                                                            Call core.cdnFiles.copyFile(EditFilename, NewEditFilename)
+        //                                                                            NewEditSqlFieldList.add(FieldName, core.db.encodeSQLText(NewEditFilename))
         //                                                                        End If
         //                                                                    Case FieldTypeIdFileText, FieldTypeIdFileHTML
         //                                                                        '
         //                                                                        ' ----- private files - create copy of File for neweditrecord
         //                                                                        '
-        //                                                                        EditFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName))
+        //                                                                        EditFilename = genericController.encodeText(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName))
         //                                                                        If EditFilename = "" Then
-        //                                                                            NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(""))
+        //                                                                            NewEditSqlFieldList.add(FieldName, core.db.encodeSQLText(""))
         //                                                                        Else
         //                                                                            NewEditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, NewEditRecordID, fieldTypeId)
         //                                                                            'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
-        //                                                                            Call cpCore.cdnFiles.copyFile(EditFilename, NewEditFilename)
-        //                                                                            NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(NewEditFilename))
+        //                                                                            Call core.cdnFiles.copyFile(EditFilename, NewEditFilename)
+        //                                                                            NewEditSqlFieldList.add(FieldName, core.db.encodeSQLText(NewEditFilename))
         //                                                                        End If
         //                                                                    Case Else
         //                                                                        '
@@ -430,8 +430,8 @@ namespace Contensive.Core.Controllers {
         //                                    FieldName = "MODIFIEDDATE"
         //                                    fieldTypeId = FieldTypeIdDate
         //                                    FieldNameArray(FieldPointer) = FieldName
-        //                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
+        //                                    LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+        //                                    EditSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
         //                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
         //                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
         //                                    PublishFieldNameArray(FieldPointer) = FieldName
@@ -441,8 +441,8 @@ namespace Contensive.Core.Controllers {
         //                                    FieldName = "MODIFIEDBY"
         //                                    fieldTypeId = FieldTypeIdLookup
         //                                    FieldNameArray(FieldPointer) = FieldName
-        //                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
+        //                                    LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+        //                                    EditSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
         //                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
         //                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
         //                                    PublishFieldNameArray(FieldPointer) = FieldName
@@ -452,13 +452,13 @@ namespace Contensive.Core.Controllers {
         //                                    FieldName = "CONTENTCONTROLID"
         //                                    fieldTypeId = FieldTypeIdLookup
         //                                    FieldNameArray(FieldPointer) = FieldName
-        //                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
+        //                                    LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+        //                                    EditSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
         //                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
         //                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
         //                                    PublishFieldNameArray(FieldPointer) = FieldName
         //                                    If PublishingDelete Then
-        //                                        PublishSqlFieldList.add(FieldName, cpCore.db.encodeSQLNumber(0))
+        //                                        PublishSqlFieldList.add(FieldName, core.db.encodeSQLNumber(0))
         //                                    Else
         //                                        PublishSqlFieldList.add(FieldName, EditSQLValue)
         //                                    End If
@@ -467,8 +467,8 @@ namespace Contensive.Core.Controllers {
         //                                    FieldName = "EDITBLANK"
         //                                    fieldTypeId = FieldTypeIdBoolean
         //                                    FieldNameArray(FieldPointer) = FieldName
-        //                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
+        //                                    LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+        //                                    EditSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
         //                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
         //                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
         //                                    PublishFieldNameArray(FieldPointer) = FieldName
@@ -481,13 +481,13 @@ namespace Contensive.Core.Controllers {
         //                                    '
         //                                    ' ----- copy edit record to live record
         //                                    '
-        //                                    Call cpCore.db.updateTableRecord(LiveDataSourceName, LiveTableName, "ID=" & LiveRecordID, PublishSqlFieldList)
+        //                                    Call core.db.updateTableRecord(LiveDataSourceName, LiveTableName, "ID=" & LiveRecordID, PublishSqlFieldList)
         //                                    '
         //                                    ' ----- copy live record to archive record and the edit to the new edit
         //                                    '
-        //                                    Call cpCore.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, ArchiveSqlFieldList)
+        //                                    Call core.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, ArchiveSqlFieldList)
         //                                    If Not PublishingDelete Then
-        //                                        Call cpCore.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & NewEditRecordID, NewEditSqlFieldList)
+        //                                        Call core.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & NewEditRecordID, NewEditSqlFieldList)
         //                                    End If
         //                                    '
         //                                    ' ----- Content Watch effects
@@ -496,22 +496,22 @@ namespace Contensive.Core.Controllers {
         //                                        '
         //                                        ' Record was deleted, delete contentwatch records also
         //                                        '
-        //                                        Call cpCore.db.deleteContentRules(ContentID, RecordID)
+        //                                        Call core.db.deleteContentRules(ContentID, RecordID)
         //                                    End If
         //                                    '
         //                                    ' ----- mark the SpiderDocs record not up-to-date
         //                                    '
         //                                    If (LCase(EditTableName) = "ccpagecontent") And (LiveRecordID <> 0) Then
-        //                                        If cpCore.db.isSQLTableField("default", "ccSpiderDocs", "PageID") Then
+        //                                        If core.db.isSQLTableField("default", "ccSpiderDocs", "PageID") Then
         //                                            SQL = "UPDATE ccspiderdocs SET UpToDate = 0 WHERE PageID=" & LiveRecordID
-        //                                            Call cpCore.db.executeSql(SQL)
+        //                                            Call core.db.executeSql(SQL)
         //                                        End If
         //                                    End If
         //                                    '
         //                                    ' ----- Clear Time Stamp because a record changed
         //                                    '
         //                                    If csv_AllowAutocsv_ClearContentTimeStamp Then
-        //                                        Call cpCore.cache.invalidateObject(ContentName)
+        //                                        Call core.cache.invalidateObject(ContentName)
         //                                    End If
         //                                End If
         //                            End If
@@ -533,12 +533,12 @@ namespace Contensive.Core.Controllers {
         //                '
         //                '
         //                If PublishingDelete Or PublishingInactive Then
-        //                    Call cpCore.db.deleteContentRules(ContentID, LiveRecordID)
+        //                    Call core.db.deleteContentRules(ContentID, LiveRecordID)
         //                End If
         //            End If
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleException(ex); : Throw
+        //        core.handleException(ex); : Throw
         //    End Try
         //End Sub
         //
@@ -569,9 +569,9 @@ namespace Contensive.Core.Controllers {
         //        Dim CDef As Models.Complex.cdefModel
         //        Dim sqlFieldList As New sqlFieldListClass
         //        '
-        //        CDef = Models.Complex.cdefModel.getcdef(cpcore,ContentName)
+        //        CDef = Models.Complex.cdefModel.getcdef(core,ContentName)
         //        If CDef.Id > 0 Then
-        //            If false And cpCore.siteProperties.allowWorkflowAuthoring Then
+        //            If false And core.siteProperties.allowWorkflowAuthoring Then
         //                With CDef
         //                    LiveDataSourceName = .ContentDataSourceName
         //                    LiveTableName = .ContentTableName
@@ -588,7 +588,7 @@ namespace Contensive.Core.Controllers {
         //                '
         //                ' Open the live record
         //                '
-        //                RSLive = cpCore.db.executeSql("SELECT * FROM " & LiveTableName & " WHERE ID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
+        //                RSLive = core.db.executeSql("SELECT * FROM " & LiveTableName & " WHERE ID=" & core.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
         //                If (RSLive Is Nothing) Then
         //                    '
         //                    Throw (New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
@@ -597,11 +597,11 @@ namespace Contensive.Core.Controllers {
         //                        '
         //                        Throw (New ApplicationException("During record publishing, the live record could not be found, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
         //                    Else
-        //                        LiveRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows[0], "ID"))
+        //                        LiveRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSLive.Rows[0], "ID"))
         //                        '
         //                        ' Open the edit record
         //                        '
-        //                        RSEdit = cpCore.db.executeSql("SELECT * FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
+        //                        RSEdit = core.db.executeSql("SELECT * FROM " & EditTableName & " WHERE (EditSourceID=" & core.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
         //                        If (RSEdit Is Nothing) Then
         //                            '
         //                            Throw (New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
@@ -610,7 +610,7 @@ namespace Contensive.Core.Controllers {
         //                                '
         //                                Throw (New ApplicationException("During record publishing, the edit record could not be found, [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
         //                            Else
-        //                                EditRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], "ID"))
+        //                                EditRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSEdit.Rows[0], "ID"))
         //                                '
         //                                ' create update arrays
         //                                '
@@ -619,9 +619,9 @@ namespace Contensive.Core.Controllers {
         //                                    Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
         //                                    With field
         //                                        FieldName = .nameLc
-        //                                        If cpCore.db.isSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
+        //                                        If core.db.isSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
         //                                            fieldTypeId = .fieldTypeId
-        //                                            LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+        //                                            LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
         //                                            Select Case genericController.vbUCase(FieldName)
         //                                                Case "ID"
         //                                                    '
@@ -635,22 +635,22 @@ namespace Contensive.Core.Controllers {
         //                                                        '
         //                                                        '   cdnfiles - create copy of Live TextFile for Edit record
         //                                                        '
-        //                                                        LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName))
+        //                                                        LiveFilename = genericController.encodeText(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName))
         //                                                        If LiveFilename <> "" Then
         //                                                            EditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, fieldTypeId)
-        //                                                            Call cpCore.cdnFiles.copyFile(LiveFilename, EditFilename)
-        //                                                            LiveSQLValue = cpCore.db.encodeSQLText(EditFilename)
+        //                                                            Call core.cdnFiles.copyFile(LiveFilename, EditFilename)
+        //                                                            LiveSQLValue = core.db.encodeSQLText(EditFilename)
         //                                                        End If
         //                                                    End If
         //                                                    If (fieldTypeId = FieldTypeIdFileText) Or (fieldTypeId = FieldTypeIdFileHTML) Then
         //                                                        '
         //                                                        '   pivatefiles - create copy of Live TextFile for Edit record
         //                                                        '
-        //                                                        LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName))
+        //                                                        LiveFilename = genericController.encodeText(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName))
         //                                                        If LiveFilename <> "" Then
         //                                                            EditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, fieldTypeId)
-        //                                                            Call cpCore.cdnFiles.copyFile(LiveFilename, EditFilename)
-        //                                                            LiveSQLValue = cpCore.db.encodeSQLText(EditFilename)
+        //                                                            Call core.cdnFiles.copyFile(LiveFilename, EditFilename)
+        //                                                            LiveSQLValue = core.db.encodeSQLText(EditFilename)
         //                                                        End If
         //                                                    End If
         //                                                    '
@@ -671,7 +671,7 @@ namespace Contensive.Core.Controllers {
         //                '
         //                ' ----- copy live record to editrecord
         //                '
-        //                Call cpCore.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, sqlFieldList)
+        //                Call core.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, sqlFieldList)
         //                '
         //                ' ----- Clear all authoring controls
         //                '
@@ -681,7 +681,7 @@ namespace Contensive.Core.Controllers {
         //            End If
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleException(ex); : Throw
+        //        core.handleException(ex); : Throw
         //    End Try
         //End Sub
         //
@@ -694,14 +694,14 @@ namespace Contensive.Core.Controllers {
         //        '
         //        Dim CDef As Models.Complex.cdefModel
         //        '
-        //        CDef = Models.Complex.cdefModel.getcdef(cpcore,ContentName)
+        //        CDef = Models.Complex.cdefModel.getcdef(core,ContentName)
         //        If CDef.Id > 0 Then
-        //            If false And cpCore.siteProperties.allowWorkflowAuthoring Then
+        //            If false And core.siteProperties.allowWorkflowAuthoring Then
         //                Call setAuthoringControl(ContentName, RecordID, AuthoringControlsApproved, MemberID)
         //            End If
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleException(ex); : Throw
+        //        core.handleException(ex); : Throw
         //    End Try
         //End Sub
         //
@@ -714,14 +714,14 @@ namespace Contensive.Core.Controllers {
         //        '
         //        Dim CDef As Models.Complex.cdefModel
         //        '
-        //        CDef = Models.Complex.cdefModel.getcdef(cpcore,ContentName)
+        //        CDef = Models.Complex.cdefModel.getcdef(core,ContentName)
         //        If CDef.Id > 0 Then
-        //            If false And cpCore.siteProperties.allowWorkflowAuthoring Then
+        //            If false And core.siteProperties.allowWorkflowAuthoring Then
         //                Call setAuthoringControl(ContentName, RecordID, AuthoringControlsSubmitted, MemberID)
         //            End If
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleException(ex); : Throw
+        //        core.handleException(ex); : Throw
         //    End Try
         //End Sub
         //
@@ -735,12 +735,12 @@ namespace Contensive.Core.Controllers {
                 string Criteria = null;
                 int CS = 0;
                 //
-                Criteria = getAuthoringControlCriteria(ContentName, RecordID) + "and(CreatedBy<>" + cpCore.db.encodeSQLNumber(MemberID) + ")";
-                CS = cpCore.db.csOpen("Authoring Controls", Criteria,"", true, MemberID);
-                result = cpCore.db.csOk(CS);
-                cpCore.db.csClose(ref CS);
+                Criteria = getAuthoringControlCriteria(ContentName, RecordID) + "and(CreatedBy<>" + core.db.encodeSQLNumber(MemberID) + ")";
+                CS = core.db.csOpen("Authoring Controls", Criteria,"", true, MemberID);
+                result = core.db.csOk(CS);
+                core.db.csClose(ref CS);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -758,18 +758,18 @@ namespace Contensive.Core.Controllers {
                 string Criteria = "";
                 int TableID;
                 //
-                TableID = cpCore.db.GetContentTableID(ContentName);
+                TableID = core.db.GetContentTableID(ContentName);
                 //
                 // Authoring Control records are referenced by ContentID
                 //
                 ContentCnt = 0;
-                CS = cpCore.db.csOpen("Content", "(contenttableid=" + TableID + ")");
-                while (cpCore.db.csOk(CS)) {
-                    Criteria = Criteria + "," + cpCore.db.csGetInteger(CS, "ID");
+                CS = core.db.csOpen("Content", "(contenttableid=" + TableID + ")");
+                while (core.db.csOk(CS)) {
+                    Criteria = Criteria + "," + core.db.csGetInteger(CS, "ID");
                     ContentCnt = ContentCnt + 1;
-                    cpCore.db.csGoNext(CS);
+                    core.db.csGoNext(CS);
                 }
-                cpCore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
                 if (ContentCnt < 1) {
                     //
                     // No references to this table
@@ -780,15 +780,15 @@ namespace Contensive.Core.Controllers {
                     //
                     // One content record
                     //
-                    result = "(ContentID=" + cpCore.db.encodeSQLNumber(encodeInteger(Criteria.Substring(1))) + ")And(RecordID=" + cpCore.db.encodeSQLNumber(RecordID) + ")And((DateExpires>" + cpCore.db.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
+                    result = "(ContentID=" + core.db.encodeSQLNumber(encodeInteger(Criteria.Substring(1))) + ")And(RecordID=" + core.db.encodeSQLNumber(RecordID) + ")And((DateExpires>" + core.db.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
                 } else {
                     //
                     // Multiple content records
                     //
-                    result = "(ContentID In (" + Criteria.Substring(1) + "))And(RecordID=" + cpCore.db.encodeSQLNumber(RecordID) + ")And((DateExpires>" + cpCore.db.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
+                    result = "(ContentID In (" + Criteria.Substring(1) + "))And(RecordID=" + core.db.encodeSQLNumber(RecordID) + ")And((DateExpires>" + core.db.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -805,16 +805,16 @@ namespace Contensive.Core.Controllers {
                 Criteria = getAuthoringControlCriteria(ContentName, RecordID) + "And(ControlType=" + AuthoringControl + ")";
                 switch (AuthoringControl) {
                     case AuthoringControlsEditing:
-                        cpCore.db.deleteContentRecords("Authoring Controls", Criteria + "And(CreatedBy=" + cpCore.db.encodeSQLNumber(MemberID) + ")", MemberID);
+                        core.db.deleteContentRecords("Authoring Controls", Criteria + "And(CreatedBy=" + core.db.encodeSQLNumber(MemberID) + ")", MemberID);
                         break;
                     case AuthoringControlsSubmitted:
                     case AuthoringControlsApproved:
                     case AuthoringControlsModified:
-                        cpCore.db.deleteContentRecords("Authoring Controls", Criteria, MemberID);
+                        core.db.deleteContentRecords("Authoring Controls", Criteria, MemberID);
                         break;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -834,49 +834,49 @@ namespace Contensive.Core.Controllers {
                 double EditLockTimeoutMinutes = 0;
                 Models.Complex.cdefModel CDef = null;
                 //
-                CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
+                CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                 ContentID = CDef.Id;
                 if (ContentID != 0) {
                     AuthoringCriteria = getAuthoringControlCriteria(ContentName, RecordID);
                     switch (AuthoringControl) {
                         case AuthoringControlsEditing:
-                            EditLockTimeoutMinutes = encodeNumber(cpCore.siteProperties.getText("EditLockTimeout", "5"));
+                            EditLockTimeoutMinutes = encodeNumber(core.siteProperties.getText("EditLockTimeout", "5"));
                             if (EditLockTimeoutMinutes != 0) {
                                 sqlCriteria = AuthoringCriteria + "And(ControlType=" + AuthoringControlsEditing + ")";
                                 EditLockTimeoutDays = (EditLockTimeoutMinutes / 60 / 24);
                                 //
                                 // Delete expired locks
-                                cpCore.db.deleteContentRecords("Authoring Controls", sqlCriteria + "And(DATEEXPIRES<" + cpCore.db.encodeSQLDate(DateTime.Now) + ")");
+                                core.db.deleteContentRecords("Authoring Controls", sqlCriteria + "And(DATEEXPIRES<" + core.db.encodeSQLDate(DateTime.Now) + ")");
                                 //
                                 // Select any lock left, only the newest counts
-                                CSCurrentLock = cpCore.db.csOpen("Authoring Controls", sqlCriteria, "ID DESC", false, MemberID, false, false);
-                                if (!cpCore.db.csOk(CSCurrentLock)) {
+                                CSCurrentLock = core.db.csOpen("Authoring Controls", sqlCriteria, "ID DESC", false, MemberID, false, false);
+                                if (!core.db.csOk(CSCurrentLock)) {
                                     //
                                     // No lock, create one
-                                    CSNewLock = cpCore.db.csInsertRecord("Authoring Controls", MemberID);
-                                    if (cpCore.db.csOk(CSNewLock)) {
-                                        cpCore.db.csSet(CSNewLock, "RecordID", RecordID);
-                                        cpCore.db.csSet(CSNewLock, "DateExpires", (DateTime.Now.AddDays(EditLockTimeoutDays)));
-                                        cpCore.db.csSet(CSNewLock, "ControlType", AuthoringControlsEditing);
-                                        cpCore.db.csSet(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID + "." + RecordID));
-                                        cpCore.db.csSet(CSNewLock, "ContentID", ContentID);
+                                    CSNewLock = core.db.csInsertRecord("Authoring Controls", MemberID);
+                                    if (core.db.csOk(CSNewLock)) {
+                                        core.db.csSet(CSNewLock, "RecordID", RecordID);
+                                        core.db.csSet(CSNewLock, "DateExpires", (DateTime.Now.AddDays(EditLockTimeoutDays)));
+                                        core.db.csSet(CSNewLock, "ControlType", AuthoringControlsEditing);
+                                        core.db.csSet(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID + "." + RecordID));
+                                        core.db.csSet(CSNewLock, "ContentID", ContentID);
                                     }
-                                    cpCore.db.csClose(ref CSNewLock);
+                                    core.db.csClose(ref CSNewLock);
                                 } else {
-                                    if (cpCore.db.csGetInteger(CSCurrentLock, "CreatedBy") == MemberID) {
+                                    if (core.db.csGetInteger(CSCurrentLock, "CreatedBy") == MemberID) {
                                         //
                                         // Record Locked by Member, update DateExpire
                                         //
-                                        cpCore.db.csSet(CSCurrentLock, "DateExpires", (DateTime.Now.AddDays(EditLockTimeoutDays)));
+                                        core.db.csSet(CSCurrentLock, "DateExpires", (DateTime.Now.AddDays(EditLockTimeoutDays)));
                                     }
                                 }
-                                cpCore.db.csClose(ref CSCurrentLock);
+                                core.db.csClose(ref CSCurrentLock);
                             }
                             break;
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -905,41 +905,41 @@ namespace Contensive.Core.Controllers {
                     //
                     // Get Workflow Locks
                     //
-                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
+                    CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                     ContentID = CDef.Id;
                     if (ContentID > 0) {
-                        //If false And cpCore.siteProperties.allowWorkflowAuthoring Then
+                        //If false And core.siteProperties.allowWorkflowAuthoring Then
                         //    '
                         //    ' Check Authoring Controls record for Locks
                         //    '
                         //    'TableID = csv_GetContentTableID(ContentName)
                         //    Criteria = getAuthoringControlCriteria(ContentName, RecordID)
-                        //    CSLocks = cpCore.db.cs_open("Authoring Controls", Criteria, "DateAdded Desc", , , , , "DateAdded,ControlType,CreatedBy,ID,DateExpires")
-                        //    Do While cpCore.db.cs_ok(CSLocks)
-                        //        ControlType = cpCore.db.cs_getInteger(CSLocks, "ControlType")
+                        //    CSLocks = core.db.cs_open("Authoring Controls", Criteria, "DateAdded Desc", , , , , "DateAdded,ControlType,CreatedBy,ID,DateExpires")
+                        //    Do While core.db.cs_ok(CSLocks)
+                        //        ControlType = core.db.cs_getInteger(CSLocks, "ControlType")
                         //        Select Case ControlType
                         //            Case AuthoringControlsModified
                         //                If Not IsModified Then
-                        //                    ModifiedDate = cpCore.db.cs_getDate(CSLocks, "DateAdded")
-                        //                    ModifiedName = cpCore.db.cs_get(CSLocks, "CreatedBy")
+                        //                    ModifiedDate = core.db.cs_getDate(CSLocks, "DateAdded")
+                        //                    ModifiedName = core.db.cs_get(CSLocks, "CreatedBy")
                         //                    IsModified = True
                         //                End If
                         //            Case AuthoringControlsSubmitted
                         //                If Not IsSubmitted Then
-                        //                    SubmittedDate = cpCore.db.cs_getDate(CSLocks, "DateAdded")
-                        //                    SubmittedName = cpCore.db.cs_get(CSLocks, "CreatedBy")
+                        //                    SubmittedDate = core.db.cs_getDate(CSLocks, "DateAdded")
+                        //                    SubmittedName = core.db.cs_get(CSLocks, "CreatedBy")
                         //                    IsSubmitted = True
                         //                End If
                         //            Case AuthoringControlsApproved
                         //                If Not IsApproved Then
-                        //                    ApprovedDate = cpCore.db.cs_getDate(CSLocks, "DateAdded")
-                        //                    ApprovedName = cpCore.db.cs_get(CSLocks, "CreatedBy")
+                        //                    ApprovedDate = core.db.cs_getDate(CSLocks, "DateAdded")
+                        //                    ApprovedName = core.db.cs_get(CSLocks, "CreatedBy")
                         //                    IsApproved = True
                         //                End If
                         //        End Select
-                        //        cpCore.db.cs_goNext(CSLocks)
+                        //        core.db.cs_goNext(CSLocks)
                         //    Loop
-                        //    Call cpCore.db.cs_Close(CSLocks)
+                        //    Call core.db.cs_Close(CSLocks)
                         //    '
                         //    ContentTableName = CDef.ContentTableName
                         //    AuthoringTableName = CDef.AuthoringTableName
@@ -948,10 +948,10 @@ namespace Contensive.Core.Controllers {
                         //    & " FROM " & AuthoringTableName & " As AuthoringTableName RIGHT JOIN " & ContentTableName & " As ContentTableName On AuthoringTableName.EditSourceID = ContentTableName.ID" _
                         //    & " Where (((ContentTableName.ID) = " & RecordID & "))" _
                         //    & " ORDER BY AuthoringTableName.ID DESC;"
-                        //    rs = cpCore.db.executeSql(SQL, DataSourceName)
+                        //    rs = core.db.executeSql(SQL, DataSourceName)
                         //    If isDataTableOk(rs) Then
-                        //        IsInserted = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows[0], "IsInserted"))
-                        //        IsDeleted = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows[0], "IsDeleted"))
+                        //        IsInserted = genericController.EncodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsInserted"))
+                        //        IsDeleted = genericController.EncodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsDeleted"))
                         //        'IsModified = (getDataRowColumnName(RS.rows(0), "LiveRecordModifiedDate") <> getDataRowColumnName(RS.rows(0), "EditRecordModifiedDate"))
                         //    End If
                         //    Call closeDataTable(rs)
@@ -959,7 +959,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -973,7 +973,7 @@ namespace Contensive.Core.Controllers {
             try {
                 setEditLock2(ContentName, RecordID, MemberID, false);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -987,7 +987,7 @@ namespace Contensive.Core.Controllers {
             try {
                 setEditLock2(ContentName, RecordID, MemberID, true);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1019,7 +1019,7 @@ namespace Contensive.Core.Controllers {
                 //
                 if ((!string.IsNullOrEmpty(ContentName)) & (RecordID != 0)) {
                     EditLockKey2 = genericController.vbUCase(ContentName + "," + RecordID.ToString());
-                    StringBuffer = cpCore.siteProperties.getText("EditLockTimeout", "5");
+                    StringBuffer = core.siteProperties.getText("EditLockTimeout", "5");
                     EditLockTimeoutMinutes = encodeNumber(StringBuffer);
                     EditLockDateExpires = DateTime.Now.AddMinutes(EditLockTimeoutMinutes);
                     if (EditLockCount > 0) {
@@ -1083,7 +1083,7 @@ namespace Contensive.Core.Controllers {
                     EditLockCount = DestinationPointer;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1116,7 +1116,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return EditLock2;

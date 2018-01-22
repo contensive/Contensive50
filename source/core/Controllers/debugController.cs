@@ -27,23 +27,23 @@ namespace Contensive.Core.Controllers {
         //       If main_PageTestPointPrinting print a string, value paior
         //========================================================================
         //
-        public static void testPoint(coreController cpcore, string message) {
+        public static void testPoint(coreController core, string message) {
             //
-            if ((cpcore != null) && (cpcore.serverConfig != null) && (cpcore.serverConfig.appConfig != null)) {
-                bool debugging = cpcore.doc.visitPropertyAllowDebugging;
-                bool logging = cpcore.siteProperties.allowTestPointLogging;
+            if ((core != null) && (core.serverConfig != null) && (core.serverConfig.appConfig != null)) {
+                bool debugging = core.doc.visitPropertyAllowDebugging;
+                bool logging = core.siteProperties.allowTestPointLogging;
                 double ElapsedTime = 0;
                 if (logging || debugging) {
-                    ElapsedTime = Convert.ToSingle(cpcore.doc.appStopWatch.ElapsedMilliseconds) / 1000;
+                    ElapsedTime = Convert.ToSingle(core.doc.appStopWatch.ElapsedMilliseconds) / 1000;
                 }
                 if (debugging) {
                     message = (ElapsedTime).ToString("00.000") + " - " + message;
-                    cpcore.doc.testPointMessage = cpcore.doc.testPointMessage + "<nobr>" + message + "</nobr><br>";
+                    core.doc.testPointMessage = core.doc.testPointMessage + "<nobr>" + message + "</nobr><br>";
                 }
                 if (logging) {
                     message = message.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
-                    message = DateTime.Now.ToString("") + "\t" + (ElapsedTime).ToString("00.000") + "\t" + cpcore.doc.sessionContext.visit.id + "\t" + message;
-                    logController.appendLog(cpcore, message, "", "testPoints_" + cpcore.serverConfig.appConfig.name);
+                    message = DateTime.Now.ToString("") + "\t" + (ElapsedTime).ToString("00.000") + "\t" + core.doc.sessionContext.visit.id + "\t" + message;
+                    logController.appendLog(core, message, "", "testPoints_" + core.serverConfig.appConfig.name);
                 }
             }
         }

@@ -26,7 +26,7 @@ namespace Contensive.Core.Controllers {
         //
         // non-static class
         //
-        private coreController cpCore;
+        private coreController core;
         //
         // -- local constants
         private const int pageSizeDefault = 9999;
@@ -102,8 +102,8 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        public dbController(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public dbController(coreController core) : base() {
+            this.core = core;
         }
         //
         //====================================================================================================
@@ -138,18 +138,18 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- default datasource
                         returnConnString = ""
-                        + cpCore.dbServer.getConnectionStringADONET() + "Database=" + catalogName + ";";
+                        + core.dbServer.getConnectionStringADONET() + "Database=" + catalogName + ";";
                     } else {
                         //
                         // -- custom datasource from Db in primary datasource
-                        if (!cpCore.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) {
+                        if (!core.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) {
                             //
                             // -- not found, this is a hard error
                             throw new ApplicationException("Datasource [" + normalizedDataSourceName + "] was not found.");
                         } else {
                             //
                             // -- found in local cache
-                            var tempVar = cpCore.dataSourceDictionary[normalizedDataSourceName];
+                            var tempVar = core.dataSourceDictionary[normalizedDataSourceName];
                             returnConnString = ""
                             + "server=" + tempVar.endPoint + ";"
                             + "User Id=" + tempVar.username + ";"
@@ -160,7 +160,7 @@ namespace Contensive.Core.Controllers {
                     connectionStringDict.Add(key, returnConnString);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnConnString;
@@ -187,7 +187,7 @@ namespace Contensive.Core.Controllers {
             try {
                 string normalizedDataSourceName = dataSourceModel.normalizeDataSourceName(dataSourceName);
                 string defaultConnString = "";
-                string serverUrl = cpCore.serverConfig.defaultDataSourceAddress;
+                string serverUrl = core.serverConfig.defaultDataSourceAddress;
                 if (serverUrl.IndexOf(":") > 0) {
                     serverUrl = serverUrl.Left( serverUrl.IndexOf(":"));
                 }
@@ -195,8 +195,8 @@ namespace Contensive.Core.Controllers {
                     + "Provider=sqloledb;"
                     + "Data Source=" + serverUrl + ";"
                     + "Initial Catalog=" + catalogName + ";"
-                    + "User Id=" + cpCore.serverConfig.defaultDataSourceUsername + ";"
-                    + "Password=" + cpCore.serverConfig.defaultDataSourcePassword + ";"
+                    + "User Id=" + core.serverConfig.defaultDataSourceUsername + ";"
+                    + "Password=" + core.serverConfig.defaultDataSourcePassword + ";"
                     + "";
                 //
                 // -- lookup dataSource
@@ -207,14 +207,14 @@ namespace Contensive.Core.Controllers {
                 } else {
                     //
                     // -- custom datasource from Db in primary datasource
-                    if (!cpCore.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) {
+                    if (!core.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) {
                         //
                         // -- not found, this is a hard error
                         throw new ApplicationException("Datasource [" + normalizedDataSourceName + "] was not found.");
                     } else {
                         //
                         // -- found in local cache
-                        var tempVar = cpCore.dataSourceDictionary[normalizedDataSourceName];
+                        var tempVar = core.dataSourceDictionary[normalizedDataSourceName];
                         returnConnString += ""
                             + "Provider=sqloledb;"
                             + "Data Source=" + tempVar.endPoint + ";"
@@ -224,7 +224,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnConnString;
@@ -261,17 +261,17 @@ namespace Contensive.Core.Controllers {
                 if (!dbEnabled) {
                     //
                     // -- db not available
-                } else if (cpCore.serverConfig == null) {
+                } else if (core.serverConfig == null) {
                     //
                     // -- server config fail
-                    cpCore.handleException(new ApplicationException("Cannot execute Sql in dbController without an application"));
-                } else if (cpCore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot execute Sql in dbController without an application"));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- server config fail
-                    cpCore.handleException(new ApplicationException("Cannot execute Sql in dbController without an application"));
+                    core.handleException(new ApplicationException("Cannot execute Sql in dbController without an application"));
                 } else {
-                    string connString = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName);
-                    //returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
+                    string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, dataSourceName);
+                    //returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(core.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
                     //
                     // REFACTOR
                     // consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
@@ -294,7 +294,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
-                cpCore.handleException(newEx);
+                core.handleException(newEx);
             }
             return returnData;
         }
@@ -318,7 +318,7 @@ namespace Contensive.Core.Controllers {
             //
             //Dim cn As ADODB.Connection = New ADODB.Connection()
             ADODB.Recordset rs = new ADODB.Recordset();
-            string connString = getConnectionStringOLEDB(cpCore.serverConfig.appConfig.name, dataSourceName);
+            string connString = getConnectionStringOLEDB(core.serverConfig.appConfig.name, dataSourceName);
             try {
                 if (dbEnabled) {
                     if (maxRecords > 0) {
@@ -331,7 +331,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
-                cpCore.handleException(newEx);
+                core.handleException(newEx);
                 throw newEx;
             }
             return rs;
@@ -354,7 +354,7 @@ namespace Contensive.Core.Controllers {
         public void executeNonQuery(string sql, string dataSourceName, ref int recordsAffected) {
             try {
                 if (dbEnabled) {
-                    string connString = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName);
+                    string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, dataSourceName);
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
                         using (SqlCommand cmdSQL = new SqlCommand()) {
@@ -367,7 +367,7 @@ namespace Contensive.Core.Controllers {
                     dbVerified = true;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -381,7 +381,7 @@ namespace Contensive.Core.Controllers {
         public void executeNonQueryAsync(string sql, string dataSourceName = "") {
             try {
                 if (dbEnabled) {
-                    string connString = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName);
+                    string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, dataSourceName);
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
                         using (SqlCommand cmdSQL = new SqlCommand()) {
@@ -394,7 +394,7 @@ namespace Contensive.Core.Controllers {
                     dbVerified = true;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -412,7 +412,7 @@ namespace Contensive.Core.Controllers {
                 string SQL = "update " + TableName + " set " + sqlList.getNameValueList() + " where " + Criteria + ";";
                 executeNonQuery(SQL, DataSourceName);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -434,7 +434,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnId;
@@ -455,7 +455,7 @@ namespace Contensive.Core.Controllers {
                 string CreateKeyString = null;
                 string DateAddedString = null;
                 //
-                CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(cpCore));
+                CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
                 DateAddedString = encodeSQLDate(DateTime.Now);
                 //
                 sqlList.add("createkey", CreateKeyString);
@@ -470,7 +470,7 @@ namespace Contensive.Core.Controllers {
                 insertTableRecord(DataSourceName, TableName, sqlList);
                 returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + DateAddedString + ")and(CreateKey=" + CreateKeyString + ")", "ID DESC", "", 1);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnDt;
@@ -491,7 +491,7 @@ namespace Contensive.Core.Controllers {
                     dt.Dispose();
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -527,7 +527,7 @@ namespace Contensive.Core.Controllers {
                 //SQL &= ";"
                 returnDataTable = executeQuery(SQL, DataSourceName, (PageNumber - 1) * PageSize, PageSize);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnDataTable;
@@ -546,13 +546,13 @@ namespace Contensive.Core.Controllers {
                 saveTransactionLog_InProcess = true;
                 //
                 // -- block before appStatus OK because need site properties
-                if ((cpCore.serverConfig.enableLogging) && (cpCore.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
-                    if (cpCore.siteProperties.allowTransactionLog) {
+                if ((core.serverConfig.enableLogging) && (core.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
+                    if (core.siteProperties.allowTransactionLog) {
                         string LogEntry = ("duration [" + ElapsedMilliseconds + "], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
-                        logController.appendLog(cpCore, LogEntry, "DbTransactions");
+                        logController.appendLog(core, LogEntry, "DbTransactions");
                     }
                     if (ElapsedMilliseconds > sqlSlowThreshholdMsec) {
-                        logController.appendLog(cpCore, "query time  " + ElapsedMilliseconds + "ms, sql: " + sql, "SlowSQL");
+                        logController.appendLog(core, "query time  " + ElapsedMilliseconds + "ms, sql: " + sql, "SlowSQL");
                     }
                 }
                 saveTransactionLog_InProcess = false;
@@ -584,7 +584,7 @@ namespace Contensive.Core.Controllers {
         //            End If
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleException(ex); : Throw
+        //        core.handleException(ex); : Throw
         //    End Try
         //    Return returnPos
         //End Function
@@ -600,12 +600,12 @@ namespace Contensive.Core.Controllers {
         public bool isSQLTableField(string DataSourceName, string TableName, string FieldName) {
             bool returnOK = false;
             try {
-                Models.Complex.tableSchemaModel tableSchema = Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName);
+                Models.Complex.tableSchemaModel tableSchema = Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (tableSchema != null) {
                     returnOK = tableSchema.columns.Contains(FieldName.ToLower());
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnOK;
@@ -621,9 +621,9 @@ namespace Contensive.Core.Controllers {
         public bool isSQLTable(string DataSourceName, string TableName) {
             bool ReturnOK = false;
             try {
-                ReturnOK = (!(Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName) == null));
+                ReturnOK = (!(Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null));
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return ReturnOK;
@@ -656,7 +656,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Local table -- create if not in schema
                     //
-                    if (Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName) == null) {
+                    if (Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null) {
                         if (!AllowAutoIncrement) {
                             string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) + ");";
                             executeQuery(SQL, DataSourceName).Dispose();
@@ -694,9 +694,9 @@ namespace Contensive.Core.Controllers {
                     createSQLIndex(DataSourceName, TableName, TableName + "ModifiedDate", "MODIFIEDDATE");
                     createSQLIndex(DataSourceName, TableName, TableName + "ccGuid", "CCGUID");
                 }
-                Models.Complex.tableSchemaModel.tableSchemaListClear(cpCore);
+                Models.Complex.tableSchemaModel.tableSchemaListClear(core);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -754,13 +754,13 @@ namespace Contensive.Core.Controllers {
                         executeQuery(SQL, DataSourceName).Dispose();
                         //
                         if (clearMetaCache) {
-                            cpCore.cache.invalidateAll();
-                            cpCore.doc.clearMetaData();
+                            core.cache.invalidateAll();
+                            core.doc.clearMetaData();
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -774,10 +774,10 @@ namespace Contensive.Core.Controllers {
         public void deleteTable(string DataSourceName, string TableName) {
             try {
                 executeQuery("DROP TABLE " + TableName, DataSourceName).Dispose();
-                cpCore.cache.invalidateAll();
-                cpCore.doc.clearMetaData();
+                core.cache.invalidateAll();
+                core.doc.clearMetaData();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -812,7 +812,7 @@ namespace Contensive.Core.Controllers {
                     executeQuery("ALTER TABLE " + TableName + " DROP COLUMN " + FieldName + ";", DataSourceName);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -830,19 +830,19 @@ namespace Contensive.Core.Controllers {
             try {
                 Models.Complex.tableSchemaModel ts = null;
                 if (!(string.IsNullOrEmpty(TableName) && string.IsNullOrEmpty(IndexName) & string.IsNullOrEmpty(FieldNames))) {
-                    ts = Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName);
+                    ts = Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                     if (ts != null) {
                         if (!ts.indexes.Contains(IndexName.ToLower())) {
                             executeQuery("CREATE INDEX " + IndexName + " ON " + TableName + "( " + FieldNames + " );", DataSourceName);
                             if (clearMetaCache) {
-                                cpCore.cache.invalidateAll();
-                                cpCore.doc.clearMetaData();
+                                core.cache.invalidateAll();
+                                core.doc.clearMetaData();
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -860,7 +860,7 @@ namespace Contensive.Core.Controllers {
                 }
                 csClose(ref CS);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnRecordName;
@@ -873,13 +873,13 @@ namespace Contensive.Core.Controllers {
         public string getRecordName(string contentName, string recordGuid) {
             string returnRecordName = "";
             try {
-                csController cs = new csController(cpCore);
+                csController cs = new csController(core);
                 if ( cs.open(contentName, "(ccguid=" + encodeSQLText(recordGuid) + ")")) {
                     returnRecordName = cs.getText("Name");
                 }
                 cs.Close();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnRecordName;
@@ -903,7 +903,7 @@ namespace Contensive.Core.Controllers {
                     csClose(ref cs);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
@@ -993,7 +993,7 @@ namespace Contensive.Core.Controllers {
                         throw new ApplicationException("Can Not proceed because the field being created has an invalid FieldType [" + fieldType + "]");
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnType;
@@ -1012,7 +1012,7 @@ namespace Contensive.Core.Controllers {
                 int DataSourceType = 0;
                 string sql = null;
                 //
-                ts = Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName);
+                ts = Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (ts != null) {
                     if (ts.indexes.Contains(IndexName.ToLower())) {
                         DataSourceType = getDataSourceType(DataSourceName);
@@ -1027,13 +1027,13 @@ namespace Contensive.Core.Controllers {
                                 break;
                         }
                         executeQuery(sql, DataSourceName);
-                        cpCore.cache.invalidateAll();
-                        cpCore.doc.clearMetaData();
+                        core.cache.invalidateAll();
+                        core.doc.clearMetaData();
                     }
                 }
 
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1053,7 +1053,7 @@ namespace Contensive.Core.Controllers {
                 tempisCdefField = genericController.isDataTableOk(dt);
                 dt.Dispose();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnOk;
@@ -1116,7 +1116,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnType;
@@ -1217,7 +1217,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnTypeId;
@@ -1264,7 +1264,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     throw new ApplicationException("ContentName cannot be blank");
                 } else {
-                    CDef = cdefModel.getCdef(cpCore, ContentName);
+                    CDef = cdefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw (new ApplicationException("No content found For [" + ContentName + "]"));
                     } else if (CDef.Id <= 0) {
@@ -1402,7 +1402,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnCs;
@@ -1460,8 +1460,8 @@ namespace Contensive.Core.Controllers {
                                         //
                                         Filename = csGetText(CSPointer, fieldName);
                                         if (!string.IsNullOrEmpty(Filename)) {
-                                            cpCore.cdnFiles.deleteFile(Filename);
-                                            //Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename))
+                                            core.cdnFiles.deleteFile(Filename);
+                                            //Call core.cdnFiles.deleteFile(core.cdnFiles.joinPath(core.serverConfig.appConfig.cdnFilesNetprefix, Filename))
                                         }
                                         break;
                                     case constants.FieldTypeIdFileText:
@@ -1471,7 +1471,7 @@ namespace Contensive.Core.Controllers {
                                         //
                                         Filename = csGetText(CSPointer, fieldName);
                                         if (!string.IsNullOrEmpty(Filename)) {
-                                            cpCore.cdnFiles.deleteFile(Filename);
+                                            core.cdnFiles.deleteFile(Filename);
                                         }
                                         break;
                                 }
@@ -1483,16 +1483,16 @@ namespace Contensive.Core.Controllers {
                         deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName);
                         //
                         // -- invalidate the special cache name used to detect a change in any record
-                        cpCore.cache.invalidateAllInContent(ContentName);
+                        core.cache.invalidateAllInContent(ContentName);
                         //if (workflowController.csv_AllowAutocsv_ClearContentTimeStamp) {
-                        //    cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(ContentTableName, "id", LiveRecordID.ToString()));
-                        //    //Call cpCore.cache.invalidateObject(ContentName)
+                        //    core.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(ContentTableName, "id", LiveRecordID.ToString()));
+                        //    //Call core.cache.invalidateObject(ContentName)
                         //}
                         deleteContentRules(ContentID, LiveRecordID);
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1524,7 +1524,7 @@ namespace Contensive.Core.Controllers {
         public int csOpenSql(string SQL, string DataSourceName = "", int PageSize = 9999, int PageNumber = 1) {
             int returnCs = -1;
             try {
-                returnCs = cs_init(cpCore.doc.sessionContext.user.id);
+                returnCs = cs_init(core.doc.sessionContext.user.id);
                 {
                     Contensive.Core.Controllers.dbController.ContentSetClass tmp = contentSetStore[returnCs];
                     tmp.Updateable = false;
@@ -1537,7 +1537,7 @@ namespace Contensive.Core.Controllers {
                 }
                 cs_initData(returnCs);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnCs;
@@ -1596,7 +1596,7 @@ namespace Contensive.Core.Controllers {
                     writeCache = null
                 };
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnCs;
@@ -1631,7 +1631,7 @@ namespace Contensive.Core.Controllers {
                     CSPointer = -1;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1667,14 +1667,14 @@ namespace Contensive.Core.Controllers {
                         if (!cs_IsEOF(CSPointer)) {
                             ContentName = contentSetStore[CSPointer].ContentName;
                             RecordID = csGetInteger(CSPointer, "ID");
-                            if (!cpCore.workflow.isRecordLocked(ContentName, RecordID, contentSetStore[CSPointer].OwnerMemberID)) {
-                                cpCore.workflow.setEditLock(ContentName, RecordID, contentSetStore[CSPointer].OwnerMemberID);
+                            if (!core.workflow.isRecordLocked(ContentName, RecordID, contentSetStore[CSPointer].OwnerMemberID)) {
+                                core.workflow.setEditLock(ContentName, RecordID, contentSetStore[CSPointer].OwnerMemberID);
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1692,7 +1692,7 @@ namespace Contensive.Core.Controllers {
                     contentSetStore[CSPointer].readCacheRowPtr = 0;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1746,7 +1746,7 @@ namespace Contensive.Core.Controllers {
                     tempVar.LastUsed = DateTime.Now;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
@@ -1768,7 +1768,7 @@ namespace Contensive.Core.Controllers {
                     returnFieldName = cs_getNextFieldName(CSPointer);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnFieldName;
@@ -1793,7 +1793,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnFieldName;
@@ -1817,7 +1817,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnFieldTypeid;
@@ -1844,7 +1844,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -1863,7 +1863,7 @@ namespace Contensive.Core.Controllers {
                    returnResult = string.Join(",", contentSetStore[CSPointer].fieldNames);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -1888,7 +1888,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = genericController.IsInDelimitedString(CSSelectFieldList, FieldName, ",");
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -1973,7 +1973,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // CS is SQL-based, use the contentname
                             //
-                            TableName = cdefModel.getContentTablename(cpCore, ContentName);
+                            TableName = cdefModel.getContentTablename(core, ContentName);
                         } else {
                             //
                             // no Contentname given
@@ -2014,7 +2014,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnFilename;
@@ -2094,7 +2094,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -2128,22 +2128,22 @@ namespace Contensive.Core.Controllers {
                             //
                             // Filename changed, mark record changed
                             //
-                            cpCore.cdnFiles.saveFile(Filename, Copy);
+                            core.cdnFiles.saveFile(Filename, Copy);
                             csSet(CSPointer, FieldName, Filename);
                         } else {
-                            string OldCopy = cpCore.cdnFiles.readFile(Filename);
+                            string OldCopy = core.cdnFiles.readFile(Filename);
                             if (OldCopy != Copy) {
                                 //
                                 // copy changed, mark record changed
                                 //
-                                cpCore.cdnFiles.saveFile(Filename, Copy);
+                                core.cdnFiles.saveFile(Filename, Copy);
                                 csSet(CSPointer, FieldName, Filename);
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -2164,7 +2164,7 @@ namespace Contensive.Core.Controllers {
                     result = dr[FieldName].ToString();
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -2192,7 +2192,7 @@ namespace Contensive.Core.Controllers {
                 }
                 csClose(ref CS);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -2220,7 +2220,7 @@ namespace Contensive.Core.Controllers {
                     csClose(ref CSPointer);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -2244,7 +2244,7 @@ namespace Contensive.Core.Controllers {
                 } else if (string.IsNullOrEmpty(Criteria.Trim())) {
                     throw new ArgumentException("criteria cannot be blank");
                 } else {
-                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
+                    CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw new ArgumentException("ContentName [" + ContentName + "] was Not found");
                     } else if (CDef.Id == 0) {
@@ -2262,9 +2262,9 @@ namespace Contensive.Core.Controllers {
                             csGoNext(CSPointer);
                         }
                         csClose(ref CSPointer);
-                        cpCore.cache.invalidate(invaldiateObjectList);
+                        core.cache.invalidate(invaldiateObjectList);
 
-                        //    ElseIf cpCore.siteProperties.allowWorkflowAuthoring And (false) Then
+                        //    ElseIf core.siteProperties.allowWorkflowAuthoring And (false) Then
                         //    '
                         //    ' Supports Workflow Authoring, handle it record at a time
                         //    '
@@ -2280,12 +2280,12 @@ namespace Contensive.Core.Controllers {
                         //    '
                         //    Call DeleteTableRecords(CDef.ContentTableName, "(" & Criteria & ") And (" & CDef.ContentControlCriteria & ")", CDef.ContentDataSourceName)
                         //    If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
-                        //        Call cpCore.cache.invalidateObject(CDef.ContentTableName & "-invalidate")
+                        //        Call core.cache.invalidateObject(CDef.ContentTableName & "-invalidate")
                         //    End If
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -2318,14 +2318,14 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(ContentName.Trim())) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
+                    CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw new ApplicationException("content [" + ContentName + "] could Not be found.");
                     } else if (CDef.Id <= 0) {
                         throw new ApplicationException("content [" + ContentName + "] could Not be found.");
                     } else {
                         if (MemberID == -1) {
-                            MemberID = cpCore.doc.sessionContext.user.id;
+                            MemberID = core.doc.sessionContext.user.id;
                         }
                         //
                         // no authoring, create default record in Live table
@@ -2388,7 +2388,7 @@ namespace Contensive.Core.Controllers {
                                                         DefaultValueText = "null";
                                                     } else {
                                                         if (field.lookupContentID != 0) {
-                                                            LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, field.lookupContentID);
+                                                            LookupContentName = Models.Complex.cdefModel.getContentNameByID(core, field.lookupContentID);
                                                             if (!string.IsNullOrEmpty(LookupContentName)) {
                                                                 DefaultValueText = getRecordID(LookupContentName, DefaultValueText).ToString();
                                                             }
@@ -2417,7 +2417,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         //
-                        CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(cpCore));
+                        CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
                         DateAddedString = encodeSQLDate(DateTime.Now);
                         //
                         sqlList.add("CREATEKEY", CreateKeyString); // ArrayPointer)
@@ -2434,14 +2434,14 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- Clear Time Stamp because a record changed
                         // 20171213 added back for integration test (had not noted why it was commented out
-                        cpCore.cache.invalidateAllInContent(ContentName);
+                        core.cache.invalidateAllInContent(ContentName);
                         //If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
-                        //    Call cpCore.cache.invalidateObject(ContentName)
+                        //    Call core.cache.invalidateObject(ContentName)
                         //End If
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnCs;
@@ -2462,7 +2462,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = csOpen(ContentName, "(ID=" + encodeSQLNumber(RecordID) + ")","", false, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -2487,7 +2487,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = contentSetStore[CSPointer].IsOpen & (contentSetStore[CSPointer].readCacheRowPtr >= 0) && (contentSetStore[CSPointer].readCacheRowPtr < contentSetStore[CSPointer].readCacheRowCnt);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -2548,7 +2548,7 @@ namespace Contensive.Core.Controllers {
                                             DestFilename = csGetFieldFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId);
                                             //DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
                                             csSet(CSDestination, FieldName, DestFilename);
-                                            cpCore.cdnFiles.copyFile(SourceFilename, DestFilename);
+                                            core.cdnFiles.copyFile(SourceFilename, DestFilename);
                                         }
                                         break;
                                     case constants.FieldTypeIdFileText:
@@ -2562,7 +2562,7 @@ namespace Contensive.Core.Controllers {
                                             DestFilename = csGetFieldFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId);
                                             //DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
                                             csSet(CSDestination, FieldName, DestFilename);
-                                            cpCore.cdnFiles.copyFile(SourceFilename, DestFilename);
+                                            core.cdnFiles.copyFile(SourceFilename, DestFilename);
                                         }
                                         break;
                                     default:
@@ -2579,7 +2579,7 @@ namespace Contensive.Core.Controllers {
                     csSave2(CSDestination);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -2599,7 +2599,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = contentSetStore[CSPointer].Source;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -2672,8 +2672,8 @@ namespace Contensive.Core.Controllers {
                                 DataTable rs = null;
                                 if (tempVar.CDef.fields.ContainsKey("id")) {
                                     RecordID = genericController.encodeInteger(cs_getValue(CSPointer, "id"));
-                                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, field.manyToManyRuleContentID);
-                                    DbTable = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
+                                    ContentName = Models.Complex.cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
+                                    DbTable = Models.Complex.cdefModel.getContentTablename(core, ContentName);
                                     SQL = "Select " + field.ManyToManyRuleSecondaryField + " from " + DbTable + " where " + field.ManyToManyRulePrimaryField + "=" + RecordID;
                                     rs = executeQuery(SQL);
                                     if (genericController.isDataTableOk(rs)) {
@@ -2723,7 +2723,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             if (FieldValueVariant.IsNumeric()) {
                                                 fieldLookupId = field.lookupContentID;
-                                                LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, fieldLookupId);
+                                                LookupContentName = Models.Complex.cdefModel.getContentNameByID(core, fieldLookupId);
                                                 LookupList = field.lookupList;
                                                 if (!string.IsNullOrEmpty(LookupContentName)) {
                                                     //
@@ -2767,7 +2767,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             //
                                             //
-                                            fieldValue = cpCore.cdnFiles.readFile(genericController.encodeText(FieldValueVariant));
+                                            fieldValue = core.cdnFiles.readFile(genericController.encodeText(FieldValueVariant));
                                             break;
                                         case FieldTypeIdFileCSS:
                                         case FieldTypeIdFileXML:
@@ -2775,7 +2775,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             //
                                             //
-                                            fieldValue = cpCore.cdnFiles.readFile(genericController.encodeText(FieldValueVariant));
+                                            fieldValue = core.cdnFiles.readFile(genericController.encodeText(FieldValueVariant));
                                             //NeedsHTMLEncode = False
                                             break;
                                         case FieldTypeIdText:
@@ -2818,7 +2818,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return fieldValue;
@@ -2898,7 +2898,7 @@ namespace Contensive.Core.Controllers {
                                         //FieldValue = genericController.encodeText(FieldValueVariantLocal)
                                         if (string.IsNullOrEmpty(FieldValue)) {
                                             if (!string.IsNullOrEmpty(fileNameNoExt)) {
-                                                cpCore.cdnFiles.deleteFile(fileNameNoExt);
+                                                core.cdnFiles.deleteFile(fileNameNoExt);
                                                 //Call publicFiles.DeleteFile(fileNameNoExt)
                                                 fileNameNoExt = "";
                                             }
@@ -2906,7 +2906,7 @@ namespace Contensive.Core.Controllers {
                                             if (string.IsNullOrEmpty(fileNameNoExt)) {
                                                 fileNameNoExt = csGetFieldFilename(CSPointer, FieldName, "", ContentName, field.fieldTypeId);
                                             }
-                                            cpCore.cdnFiles.saveFile(fileNameNoExt, FieldValue);
+                                            core.cdnFiles.saveFile(fileNameNoExt, FieldValue);
                                             //Call publicFiles.SaveFile(fileNameNoExt, FieldValue)
                                         }
                                         FieldValue = fileNameNoExt;
@@ -2932,7 +2932,7 @@ namespace Contensive.Core.Controllers {
                                         BlankTest = genericController.vbReplace(BlankTest, "\t", "");
                                         if (string.IsNullOrEmpty(BlankTest)) {
                                             if (!string.IsNullOrEmpty(PathFilename)) {
-                                                cpCore.cdnFiles.deleteFile(PathFilename);
+                                                core.cdnFiles.deleteFile(PathFilename);
                                                 PathFilename = "";
                                             }
                                         } else {
@@ -2977,9 +2977,9 @@ namespace Contensive.Core.Controllers {
                                             }
                                             if ((!string.IsNullOrEmpty(pathFilenameOriginal)) & (pathFilenameOriginal != PathFilename)) {
                                                 pathFilenameOriginal = genericController.convertCdnUrlToCdnPathFilename(pathFilenameOriginal);
-                                                cpCore.cdnFiles.deleteFile(pathFilenameOriginal);
+                                                core.cdnFiles.deleteFile(pathFilenameOriginal);
                                             }
-                                            cpCore.cdnFiles.saveFile(PathFilename, FieldValue);
+                                            core.cdnFiles.saveFile(PathFilename, FieldValue);
                                         }
                                         FieldValue = PathFilename;
                                         SetNeeded = true;
@@ -2998,7 +2998,7 @@ namespace Contensive.Core.Controllers {
                                         if (genericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                             if (FieldValue.Length > 255) {
-                                                cpCore.handleException(new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for Text field is 255. Save will be attempted"));
+                                                core.handleException(new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for Text field is 255. Save will be attempted"));
                                             }
                                         }
                                         break;
@@ -3010,7 +3010,7 @@ namespace Contensive.Core.Controllers {
                                         if (genericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                             if (FieldValue.Length > 65535) {
-                                                cpCore.handleException(new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
+                                                core.handleException(new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
                                             }
                                         }
                                         break;
@@ -3041,7 +3041,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -3071,7 +3071,7 @@ namespace Contensive.Core.Controllers {
                     contentSetStore[CSPointer].writeCache.Clear();
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -3159,7 +3159,7 @@ namespace Contensive.Core.Controllers {
                     //
                     LiveRecordID = csGetInteger(CSPointer, "ID");
                     LiveRecordContentControlID = csGetInteger(CSPointer, "CONTENTCONTROLID");
-                    LiveRecordContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, LiveRecordContentControlID);
+                    LiveRecordContentName = Models.Complex.cdefModel.getContentNameByID(core, LiveRecordContentControlID);
                     LiveRecordInactive = !csGetBoolean(CSPointer, "ACTIVE");
                     //
                     //
@@ -3231,7 +3231,7 @@ namespace Contensive.Core.Controllers {
                                         Copy = Copy.Left( 255);
                                     }
                                     if (field.Scramble) {
-                                        Copy = TextScramble(cpCore, Copy);
+                                        Copy = TextScramble(core, Copy);
                                     }
                                     SQLSetPair = FieldName + "=" + encodeSQLText(Copy);
                                     break;
@@ -3329,7 +3329,7 @@ namespace Contensive.Core.Controllers {
                     //    '
                     //    ' ----- set the csv_ContentSet Modified
                     //    '
-                    //    Call cpCore.workflow.setRecordLocking(ContentName, LiveRecordID, AuthoringControlsModified, .OwnerMemberID)
+                    //    Call core.workflow.setRecordLocking(ContentName, LiveRecordID, AuthoringControlsModified, .OwnerMemberID)
                     //End If
                     //
                     // ----- Do the unique check on the content table, if necessary
@@ -3359,7 +3359,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // ----- reset the ContentTimeStamp to csv_ClearBake
                             //
-                            cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(LiveTableName, "id", LiveRecordID.ToString()));
+                            core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(LiveTableName, "id", LiveRecordID.ToString()));
                             //
                             // ----- mark the record NOT UpToDate for SpiderDocs
                             //
@@ -3374,10 +3374,10 @@ namespace Contensive.Core.Controllers {
                     tempVar.LastUsed = DateTime.Now;
                     //
                     // -- invalidate the special cache name used to detect a change in any record
-                    cpCore.cache.invalidateAllInContent(ContentName);
+                    core.cache.invalidateAllInContent(ContentName);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -3412,7 +3412,7 @@ namespace Contensive.Core.Controllers {
                     csStore.readCacheRowPtr = 0;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -3434,7 +3434,7 @@ namespace Contensive.Core.Controllers {
                     tempcs_IsEOF = (contentSetStore[CSPointer].readCacheRowPtr >= contentSetStore[CSPointer].readCacheRowCnt);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -3486,12 +3486,12 @@ namespace Contensive.Core.Controllers {
                         returnResult = encodeSQLText(genericController.encodeText(expression));
                         break;
                     default:
-                        cpCore.handleException(new ApplicationException("Unknown Field Type [" + fieldType + ""));
+                        core.handleException(new ApplicationException("Unknown Field Type [" + fieldType + ""));
                         returnResult = encodeSQLText(genericController.encodeText(expression));
                         break;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -3517,7 +3517,7 @@ namespace Contensive.Core.Controllers {
             }
             return returnResult;
         }
-        public string encodeSqlTextLike(coreController cpcore, string source) {
+        public string encodeSqlTextLike(coreController core, string source) {
             return encodeSQLText("%" + source + "%");
         }
         //
@@ -3542,7 +3542,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -3574,7 +3574,7 @@ namespace Contensive.Core.Controllers {
             //        returnResult = expression.ToString
             //    End If
             //Catch ex As Exception
-            //    cpCore.handleExceptionAndContinue(ex) : Throw
+            //    core.handleExceptionAndContinue(ex) : Throw
             //End Try
             //Return returnResult
         }
@@ -3597,7 +3597,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = SQLTrue;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -3629,7 +3629,7 @@ namespace Contensive.Core.Controllers {
                 } else if (RecordID <= 0) {
                     throw new ArgumentException("recordid is not valid");
                 } else {
-                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
+                    CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                     if (CDef.Id == 0) {
                         throw new ApplicationException("contentname [" + ContentName + "] is not a valid content");
                     } else {
@@ -3650,7 +3650,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -3719,7 +3719,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = csOpenSql_rev("default", SQL, PageSize, PageNumber);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -3743,7 +3743,7 @@ namespace Contensive.Core.Controllers {
                 }
                 dt.Dispose();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -3767,7 +3767,7 @@ namespace Contensive.Core.Controllers {
                     DeleteTableRecords(TableName, "ID=" + RecordID, DataSourceName);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -3796,12 +3796,12 @@ namespace Contensive.Core.Controllers {
                 } else {
                     ContentRecordKey = ContentID.ToString() + "." + RecordID.ToString();
                     Criteria = "(ContentRecordKey=" + encodeSQLText(ContentRecordKey) + ")";
-                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID);
-                    TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
+                    ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
+                    TableName = Models.Complex.cdefModel.getContentTablename(core, ContentName);
                     //
                     // ----- Delete CalendarEventRules and CalendarEvents
                     //
-                    //If Models.Complex.cdefModel.isContentFieldSupported(cpcore,"calendar events", "ID") Then
+                    //If Models.Complex.cdefModel.isContentFieldSupported(core,"calendar events", "ID") Then
                     //    Call deleteContentRecords("Calendar Events", Criteria)
                     //End If
                     //
@@ -3876,7 +3876,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -3906,7 +3906,7 @@ namespace Contensive.Core.Controllers {
             try {
                 returnResult = contentSetStore[CSPointer].readCache;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -3923,7 +3923,7 @@ namespace Contensive.Core.Controllers {
         //            Try
 
         //            Catch ex As Exception
-        //                cpCore.handleExceptionAndContinue(ex) : Throw
+        //                core.handleExceptionAndContinue(ex) : Throw
         //            End Try
         //            Return returnResult
 
@@ -3972,7 +3972,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = contentSetStore[CSPointer].readCacheRowCnt;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -3994,7 +3994,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = contentSetStore[CSPointer].fieldNames;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -4021,7 +4021,7 @@ namespace Contensive.Core.Controllers {
                     executeQuery(SQL, DataSourceName);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -4042,7 +4042,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = contentSetStore[CSPointer].ContentName;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -4136,7 +4136,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected exception")
+                core.handleException(ex); // "Unexpected exception")
                 throw;
             }
             return returnFieldTypeName;
@@ -4204,7 +4204,7 @@ namespace Contensive.Core.Controllers {
         //                        '
         //                        Call handleLegacyClassError3(MethodName, "The Lookup Content Definition [" & fieldLookupId & "] for this field [" & FieldName & "] is not valid.")
         //                    Else
-        //                        LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpcore,fieldLookupId)
+        //                        LookupContentName = Models.Complex.cdefModel.getContentNameByID(core,fieldLookupId)
         //                        returnResult = cs_open(LookupContentName, "ID=" & encodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
         //                        'CDefLookup = appEnvironment.GetCDefByID(FieldLookupID)
         //                        'csv_OpenCSJoin = csOpen(CDefLookup.Name, "ID=" & encodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
@@ -4214,7 +4214,7 @@ namespace Contensive.Core.Controllers {
         //        End If
         //        'End If
         //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex) : Throw
+        //        core.handleExceptionAndContinue(ex) : Throw
         //    End Try
         //    Return returnResult
         //End Function
@@ -4247,7 +4247,7 @@ namespace Contensive.Core.Controllers {
                     csClose(ref CS);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -4268,7 +4268,7 @@ namespace Contensive.Core.Controllers {
                 csClose(ref CS);
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnRows;
@@ -4322,7 +4322,7 @@ namespace Contensive.Core.Controllers {
                                             csSet(CS, FieldName, "null");
                                             if (!string.IsNullOrEmpty(DefaultValueText)) {
                                                 if (field.lookupContentID != 0) {
-                                                    LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, field.lookupContentID);
+                                                    LookupContentName = Models.Complex.cdefModel.getContentNameByID(core, field.lookupContentID);
                                                     if (!string.IsNullOrEmpty(LookupContentName)) {
                                                         csSet(CS, FieldName, getRecordID(LookupContentName, DefaultValueText));
                                                     }
@@ -4351,7 +4351,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -4394,7 +4394,7 @@ namespace Contensive.Core.Controllers {
         public string getSQLIndexList(string DataSourceName, string TableName) {
             string returnList = "";
             try {
-                Models.Complex.tableSchemaModel ts = Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName);
+                Models.Complex.tableSchemaModel ts = Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (ts != null) {
                     foreach (string entry in ts.indexes) {
                         returnList += "," + entry;
@@ -4404,7 +4404,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnList;
@@ -4419,13 +4419,13 @@ namespace Contensive.Core.Controllers {
         public DataTable getTableSchemaData(string tableName) {
             DataTable returnDt = new DataTable();
             try {
-                string connString = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, "default");
+                string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, "default");
                 using (SqlConnection connSQL = new SqlConnection(connString)) {
                     connSQL.Open();
-                    returnDt = connSQL.GetSchema("Tables", new[] { cpCore.serverConfig.appConfig.name, null, tableName, null });
+                    returnDt = connSQL.GetSchema("Tables", new[] { core.serverConfig.appConfig.name, null, tableName, null });
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnDt;
@@ -4443,14 +4443,14 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(tableName.Trim())) {
                     throw new ArgumentException("tablename cannot be blank");
                 } else {
-                    string connString = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, "default");
+                    string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, "default");
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
-                        returnDt = connSQL.GetSchema("Columns", new[] { cpCore.serverConfig.appConfig.name, null, tableName, null });
+                        returnDt = connSQL.GetSchema("Columns", new[] { core.serverConfig.appConfig.name, null, tableName, null });
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnDt;
@@ -4464,14 +4464,14 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(tableName.Trim())) {
                     throw new ArgumentException("tablename cannot be blank");
                 } else {
-                    string connString = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, "default");
+                    string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, "default");
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
-                        returnDt = connSQL.GetSchema("Indexes", new[] { cpCore.serverConfig.appConfig.name, null, tableName, null });
+                        returnDt = connSQL.GetSchema("Indexes", new[] { core.serverConfig.appConfig.name, null, tableName, null });
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnDt;
@@ -4495,27 +4495,27 @@ namespace Contensive.Core.Controllers {
         //            Dim testDt As DataTable
         //            testDt = executeSql("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='ccContent'")
         //            If testDt.Rows.Count <> 1 Then
-        //                cpcore.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        //                core.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
         //            End If
         //            testDt.Dispose()
         //        Catch ex As Exception
-        //            cpcore.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        //            core.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
         //        End Try
         //        '
         //        '--------------------------------------------------------------------------
         //        '   Perform DB Integregity checks
         //        '--------------------------------------------------------------------------
         //        '
-        //        Dim ts As coreMetaDataClass.tableSchemaClass = cpCore.metaData.getTableSchema("ccContent", "Default")
+        //        Dim ts As coreMetaDataClass.tableSchemaClass = core.metaData.getTableSchema("ccContent", "Default")
         //        If (ts Is Nothing) Then
         //            '
         //            ' Bad Db and no upgrade - exit
         //            '
-        //            cpcore.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
+        //            core.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
         //        Else
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex) : Throw
+        //        core.handleExceptionAndContinue(ex) : Throw
         //    End Try
         //End Function
         //
@@ -4536,7 +4536,7 @@ namespace Contensive.Core.Controllers {
                     sqlCriteria = "name=" + encodeSQLText(nameIdOrGuid);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return sqlCriteria;
@@ -4557,7 +4557,7 @@ namespace Contensive.Core.Controllers {
                 }
                 dt.Dispose();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnContentId;
@@ -4596,7 +4596,7 @@ namespace Contensive.Core.Controllers {
         //            End If
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex) : Throw
+        //        core.handleExceptionAndContinue(ex) : Throw
         //    End Try
         //    Return returndataSourceName
         //End Function
@@ -4624,24 +4624,24 @@ namespace Contensive.Core.Controllers {
                 // ----- lookup datasource ID, if default, ID is -1
                 //----------------------------------------------------------------
                 //
-                //DataSourceID = cpCore.db.GetDataSourceID(DataSourceName)
-                DateAddedString = cpCore.db.encodeSQLDate(DateTime.Now);
-                CreateKeyString = cpCore.db.encodeSQLNumber(genericController.GetRandomInteger(cpCore));
+                //DataSourceID = core.db.GetDataSourceID(DataSourceName)
+                DateAddedString = core.db.encodeSQLDate(DateTime.Now);
+                CreateKeyString = core.db.encodeSQLNumber(genericController.GetRandomInteger(core));
                 //
                 //----------------------------------------------------------------
                 // ----- Read in a record from the table to get fields
                 //----------------------------------------------------------------
                 //
-                DataTable dt = cpCore.db.openTable(DataSource.Name, TableName, "", "","", 1);
+                DataTable dt = core.db.openTable(DataSource.Name, TableName, "", "","", 1);
                 if (dt.Rows.Count == 0) {
                     dt.Dispose();
                     //
                     // --- no records were found, add a blank if we can
                     //
-                    dt = cpCore.db.insertTableRecordGetDataTable(DataSource.Name, TableName, cpCore.doc.sessionContext.user.id);
+                    dt = core.db.insertTableRecordGetDataTable(DataSource.Name, TableName, core.doc.sessionContext.user.id);
                     if (dt.Rows.Count > 0) {
                         RecordID = genericController.encodeInteger(dt.Rows[0]["ID"]);
-                        cpCore.db.executeQuery("Update " + TableName + " Set active=0 where id=" + RecordID + ";", DataSource.Name);
+                        core.db.executeQuery("Update " + TableName + " Set active=0 where id=" + RecordID + ";", DataSource.Name);
                     }
                 }
                 if (dt.Rows.Count == 0) {
@@ -4652,24 +4652,24 @@ namespace Contensive.Core.Controllers {
                     // --- Find/Create the Content Definition
                     //----------------------------------------------------------------
                     //
-                    ContentID = Models.Complex.cdefModel.getContentId(cpCore, ContentName);
+                    ContentID = Models.Complex.cdefModel.getContentId(core, ContentName);
                     if (ContentID <= 0) {
                         //
                         // ----- Content definition not found, create it
                         //
-                        Models.Complex.cdefModel.addContent(cpCore, true, DataSource, TableName, ContentName);
+                        Models.Complex.cdefModel.addContent(core, true, DataSource, TableName, ContentName);
                         //ContentID = csv_GetContentID(ContentName)
-                        SQL = "Select ID from ccContent where name=" + cpCore.db.encodeSQLText(ContentName);
-                        dt = cpCore.db.executeQuery(SQL);
+                        SQL = "Select ID from ccContent where name=" + core.db.encodeSQLText(ContentName);
+                        dt = core.db.executeQuery(SQL);
                         if (dt.Rows.Count == 0) {
                             throw new ApplicationException("Content Definition [" + ContentName + "] could Not be selected by name after it was inserted");
                         } else {
                             ContentID = genericController.encodeInteger(dt.Rows[0]["ID"]);
-                            cpCore.db.executeQuery("update ccContent Set CreateKey=0 where id=" + ContentID);
+                            core.db.executeQuery("update ccContent Set CreateKey=0 where id=" + ContentID);
                         }
                         dt.Dispose();
-                        cpCore.cache.invalidateAll();
-                        cpCore.doc.clearMetaData();
+                        core.cache.invalidateAll();
+                        core.doc.clearMetaData();
                     }
                     //
                     //-----------------------------------------------------------
@@ -4679,7 +4679,7 @@ namespace Contensive.Core.Controllers {
                     // ----- locate the field in the content field table
                     //
                     SQL = "Select name from ccFields where ContentID=" + ContentID + ";";
-                    dtFields = cpCore.db.executeQuery(SQL);
+                    dtFields = core.db.executeQuery(SQL);
                     //
                     // ----- verify all the table fields
                     //
@@ -4704,7 +4704,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // touch field so upgrade does not delete it
                             //
-                            cpCore.db.executeQuery("update ccFields Set CreateKey=0 where (Contentid=" + ContentID + ") And (name = " + cpCore.db.encodeSQLText(UcaseTableColumnName) + ")");
+                            core.db.executeQuery("update ccFields Set CreateKey=0 where (Contentid=" + ContentID + ") And (name = " + core.db.encodeSQLText(UcaseTableColumnName) + ")");
                         }
                     }
                 }
@@ -4712,17 +4712,17 @@ namespace Contensive.Core.Controllers {
                 // Fill ContentControlID fields with new ContentID
                 //
                 SQL = "Update " + TableName + " Set ContentControlID=" + ContentID + " where (ContentControlID Is null);";
-                cpCore.db.executeQuery(SQL, DataSource.Name);
+                core.db.executeQuery(SQL, DataSource.Name);
                 //
                 // ----- Load CDef
                 //       Load only if the previous state of autoload was true
                 //       Leave Autoload false during load so more do not trigger
                 //
-                cpCore.cache.invalidateAll();
-                cpCore.doc.clearMetaData();
+                core.cache.invalidateAll();
+                core.doc.clearMetaData();
                 dt.Dispose();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -4739,7 +4739,7 @@ namespace Contensive.Core.Controllers {
                 //
                 Models.Complex.cdefFieldModel field = new Models.Complex.cdefFieldModel();
                 //
-                field.fieldTypeId = cpCore.db.getFieldTypeIdByADOType(ADOFieldType);
+                field.fieldTypeId = core.db.getFieldTypeIdByADOType(ADOFieldType);
                 field.caption = FieldName;
                 field.editSortPriority = 1000;
                 field.readOnly = false;
@@ -4771,7 +4771,7 @@ namespace Contensive.Core.Controllers {
                     case "CREATEDBY":
                         field.caption = "Created By";
                         field.fieldTypeId = FieldTypeIdLookup;
-                        field.set_lookupContentName(cpCore, "Members");
+                        field.set_lookupContentName(core, "Members");
                         field.readOnly = true;
                         field.editSortPriority = 5030;
                         break;
@@ -4783,7 +4783,7 @@ namespace Contensive.Core.Controllers {
                     case "MODIFIEDBY":
                         field.caption = "Modified By";
                         field.fieldTypeId = FieldTypeIdLookup;
-                        field.set_lookupContentName(cpCore, "Members");
+                        field.set_lookupContentName(core, "Members");
                         field.readOnly = true;
                         field.editSortPriority = 5050;
                         break;
@@ -4798,7 +4798,7 @@ namespace Contensive.Core.Controllers {
                     case "CONTENTCONTROLID":
                         field.caption = "Content Definition";
                         field.fieldTypeId = FieldTypeIdLookup;
-                        field.set_lookupContentName(cpCore, "Content");
+                        field.set_lookupContentName(core, "Content");
                         field.editSortPriority = 5070;
                         field.authorable = true;
                         field.readOnly = false;
@@ -4834,7 +4834,7 @@ namespace Contensive.Core.Controllers {
                     case "ORGANIZATIONID":
                         field.caption = "Organization";
                         field.fieldTypeId = FieldTypeIdLookup;
-                        field.set_lookupContentName(cpCore, "Organizations");
+                        field.set_lookupContentName(core, "Organizations");
                         field.editSortPriority = 2005;
                         field.authorable = true;
                         field.readOnly = false;
@@ -4865,7 +4865,7 @@ namespace Contensive.Core.Controllers {
                     case "CONTENTID":
                         field.caption = "Content";
                         field.fieldTypeId = FieldTypeIdLookup;
-                        field.set_lookupContentName(cpCore, "Content");
+                        field.set_lookupContentName(core, "Content");
                         field.readOnly = false;
                         field.editSortPriority = 2060;
                         //
@@ -4875,21 +4875,21 @@ namespace Contensive.Core.Controllers {
                     case "PARENTID":
                         field.caption = "Parent";
                         field.fieldTypeId = FieldTypeIdLookup;
-                        field.set_lookupContentName(cpCore, ContentName);
+                        field.set_lookupContentName(core, ContentName);
                         field.readOnly = false;
                         field.editSortPriority = 3000;
                         break;
                     case "MEMBERID":
                         field.caption = "Member";
                         field.fieldTypeId = FieldTypeIdLookup;
-                        field.set_lookupContentName(cpCore, "Members");
+                        field.set_lookupContentName(core, "Members");
                         field.readOnly = false;
                         field.editSortPriority = 3005;
                         break;
                     case "CONTACTMEMBERID":
                         field.caption = "Contact";
                         field.fieldTypeId = FieldTypeIdLookup;
-                        field.set_lookupContentName(cpCore, "Members"); 
+                        field.set_lookupContentName(core, "Members"); 
                         field.readOnly = false;
                         field.editSortPriority = 3010;
                         break;
@@ -4926,9 +4926,9 @@ namespace Contensive.Core.Controllers {
                         field.defaultValue = "0";
                         break;
                 }
-                Models.Complex.cdefModel.verifyCDefField_ReturnID(cpCore, ContentName, field);
+                Models.Complex.cdefModel.verifyCDefField_ReturnID(core, ContentName, field);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -4966,7 +4966,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return rows;
@@ -5035,12 +5035,12 @@ namespace Contensive.Core.Controllers {
                     //
                     // records did not delete
                     //
-                    cpCore.handleException(new ApplicationException("Error deleting record chunks. No records were deleted and the process was not complete."));
+                    core.handleException(new ApplicationException("Error deleting record chunks. No records were deleted and the process was not complete."));
                 } else if (LoopCount >= iChunkCount) {
                     //
                     // records did not delete
                     //
-                    cpCore.handleException(new ApplicationException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."));
+                    core.handleException(new ApplicationException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."));
                 }
             }
         }
@@ -5072,9 +5072,9 @@ namespace Contensive.Core.Controllers {
                     //
                     CSPointer = csOpen("Content Watch", "ContentRecordKey=" + encodeSQLText(ContentRecordKey),"",true,0,false,false, "Link,Clicks");
                     if (csOk(CSPointer)) {
-                        result = cpCore.db.csGetText(CSPointer, "Link");
+                        result = core.db.csGetText(CSPointer, "Link");
                     }
-                    cpCore.db.csClose(ref CSPointer);
+                    core.db.csClose(ref CSPointer);
                     //
                     if (string.IsNullOrEmpty(result)) {
                         //
@@ -5084,11 +5084,11 @@ namespace Contensive.Core.Controllers {
                         if (KeySplit.GetUpperBound(0) == 1) {
                             ContentID = genericController.encodeInteger(KeySplit[0]);
                             if (ContentID != 0) {
-                                ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID);
+                                ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
                                 RecordID = genericController.encodeInteger(KeySplit[1]);
                                 if (!string.IsNullOrEmpty(ContentName) & RecordID != 0) {
-                                    if (Models.Complex.cdefModel.getContentTablename(cpCore, ContentName) == "ccPageContent") {
-                                        CSPointer = cpCore.db.csOpenRecord(ContentName, RecordID,false,false, "TemplateID,ParentID");
+                                    if (Models.Complex.cdefModel.getContentTablename(core, ContentName) == "ccPageContent") {
+                                        CSPointer = core.db.csOpenRecord(ContentName, RecordID,false,false, "TemplateID,ParentID");
                                         if (csOk(CSPointer)) {
                                             recordfound = true;
                                             templateId = csGetInteger(CSPointer, "TemplateID");
@@ -5100,19 +5100,19 @@ namespace Contensive.Core.Controllers {
                                             // This content record does not exist - remove any records with this ContentRecordKey pointer
                                             //
                                             deleteContentRecords("Content Watch", "ContentRecordKey=" + encodeSQLText(ContentRecordKey));
-                                            cpCore.db.deleteContentRules(Models.Complex.cdefModel.getContentId(cpCore, ContentName), RecordID);
+                                            core.db.deleteContentRules(Models.Complex.cdefModel.getContentId(core, ContentName), RecordID);
                                         } else {
 
                                             if (templateId != 0) {
-                                                CSPointer = cpCore.db.csOpenRecord("Page Templates", templateId,false,false, "Link");
+                                                CSPointer = core.db.csOpenRecord("Page Templates", templateId,false,false, "Link");
                                                 if (csOk(CSPointer)) {
                                                     result = csGetText(CSPointer, "Link");
                                                 }
                                                 csClose(ref CSPointer);
                                             }
                                             if (string.IsNullOrEmpty(result) && ParentID != 0) {
-                                                TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
-                                                DataSource = Models.Complex.cdefModel.getContentDataSource(cpCore, ContentName);
+                                                TableName = Models.Complex.cdefModel.getContentTablename(core, ContentName);
+                                                DataSource = Models.Complex.cdefModel.getContentDataSource(core, ContentName);
                                                 CSPointer = csOpenSql_rev(DataSource, "Select ContentControlID from " + TableName + " where ID=" + RecordID);
                                                 if (csOk(CSPointer)) {
                                                     ParentContentID = genericController.encodeInteger(csGetText(CSPointer, "ContentControlID"));
@@ -5123,7 +5123,7 @@ namespace Contensive.Core.Controllers {
                                                 }
                                             }
                                             if (string.IsNullOrEmpty(result)) {
-                                                DefaultTemplateLink = cpCore.siteProperties.getText("SectionLandingLink", requestAppRootPath + cpCore.siteProperties.serverPageDefault);
+                                                DefaultTemplateLink = core.siteProperties.getText("SectionLandingLink", requestAppRootPath + core.siteProperties.serverPageDefault);
                                             }
                                         }
                                     }
@@ -5140,9 +5140,9 @@ namespace Contensive.Core.Controllers {
                     result = DefaultLink;
                 }
                 //
-                result = genericController.EncodeAppRootPath(result, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain);
+                result = genericController.EncodeAppRootPath(result, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -5191,11 +5191,11 @@ namespace Contensive.Core.Controllers {
         public int GetTableID(string TableName) {
             int result = 0;
             int CS = 0;
-            CS = cpCore.db.csOpenSql("Select ID from ccTables where name=" + cpCore.db.encodeSQLText(TableName),"", 1);
-            if (cpCore.db.csOk(CS)) {
-                result = cpCore.db.csGetInteger(CS, "ID");
+            CS = core.db.csOpenSql("Select ID from ccTables where name=" + core.db.encodeSQLText(TableName),"", 1);
+            if (core.db.csOk(CS)) {
+                result = core.db.csGetInteger(CS, "ID");
             }
-            cpCore.db.csClose(ref CS);
+            core.db.csClose(ref CS);
             return result;
         }
         //
@@ -5210,13 +5210,13 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public int csOpenRecord(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(genericController.encodeText(ContentName), "(ID=" + cpCore.db.encodeSQLNumber(RecordID) + ")","", false, cpCore.doc.sessionContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(genericController.encodeText(ContentName), "(ID=" + core.db.encodeSQLNumber(RecordID) + ")","", false, core.doc.sessionContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         //========================================================================
         //
         public int cs_open2(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(ContentName, "(ID=" + cpCore.db.encodeSQLNumber(RecordID) + ")","", false, cpCore.doc.sessionContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(ContentName, "(ID=" + core.db.encodeSQLNumber(RecordID) + ")","", false, core.doc.sessionContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         //========================================================================
@@ -5231,7 +5231,7 @@ namespace Contensive.Core.Controllers {
             //  BuildVersion = app.dataBuildVersion
             if (false) //.3.210" Then
             {
-                throw (new Exception("Contensive database was created with version " + cpCore.siteProperties.dataBuildVersion + ". main_SetContentCopy requires an builder."));
+                throw (new Exception("Contensive database was created with version " + core.siteProperties.dataBuildVersion + ". main_SetContentCopy requires an builder."));
             } else {
                 iCopyName = genericController.encodeText(CopyName);
                 iContent = genericController.encodeText(Content);
@@ -5260,18 +5260,18 @@ namespace Contensive.Core.Controllers {
             if (iCSPointer == -1) {
                 throw (new ApplicationException("main_cs_getRecordEditLink called with invalid iCSPointer")); // handleLegacyError14(MethodName, "")
             } else {
-                if (!cpCore.db.csOk(iCSPointer)) {
+                if (!core.db.csOk(iCSPointer)) {
                     throw (new ApplicationException("main_cs_getRecordEditLink called with Not main_CSOK")); // handleLegacyError14(MethodName, "")
                 } else {
                     //
                     // Print an edit link for the records Content (may not be iCSPointer content)
                     //
-                    RecordID = (cpCore.db.csGetInteger(iCSPointer, "ID"));
-                    RecordName = cpCore.db.csGetText(iCSPointer, "Name");
-                    ContentControlID = (cpCore.db.csGetInteger(iCSPointer, "contentcontrolid"));
-                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentControlID);
+                    RecordID = (core.db.csGetInteger(iCSPointer, "ID"));
+                    RecordName = core.db.csGetText(iCSPointer, "Name");
+                    ContentControlID = (core.db.csGetInteger(iCSPointer, "contentcontrolid"));
+                    ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentControlID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        result = cpCore.html.getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, cpCore.doc.sessionContext.isEditing(ContentName));
+                        result = core.html.getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.doc.sessionContext.isEditing(ContentName));
                     }
                 }
             }
@@ -5280,14 +5280,14 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public void cs_setFormInput(coreController cpcore, int CSPointer, string FieldName, string RequestName = "") {
+        public void cs_setFormInput(coreController core, int CSPointer, string FieldName, string RequestName = "") {
             string LocalRequestName = null;
             string Filename = null;
             string Path = null;
             //
             //If Not (true) Then Exit Sub
             //
-            if (!cpcore.db.csOk(CSPointer)) {
+            if (!core.db.csOk(CSPointer)) {
                 throw new ApplicationException("ContentSetPointer is invalid, empty, or end-of-file");
             } else if (string.IsNullOrEmpty(FieldName.Trim(' '))) {
                 throw new ApplicationException("FieldName is invalid or blank");
@@ -5296,12 +5296,12 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(LocalRequestName)) {
                     LocalRequestName = FieldName;
                 }
-                switch (cpcore.db.cs_getFieldTypeId(CSPointer, FieldName)) {
+                switch (core.db.cs_getFieldTypeId(CSPointer, FieldName)) {
                     case FieldTypeIdBoolean:
                         //
                         // Boolean
                         //
-                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getBoolean(LocalRequestName));
+                        core.db.csSet(CSPointer, FieldName, core.docProperties.getBoolean(LocalRequestName));
                         break;
                     case FieldTypeIdCurrency:
                     case FieldTypeIdFloat:
@@ -5311,33 +5311,33 @@ namespace Contensive.Core.Controllers {
                         //
                         // Numbers
                         //
-                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getNumber(LocalRequestName));
+                        core.db.csSet(CSPointer, FieldName, core.docProperties.getNumber(LocalRequestName));
                         break;
                     case FieldTypeIdDate:
                         //
                         // Date
                         //
-                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getDate(LocalRequestName));
+                        core.db.csSet(CSPointer, FieldName, core.docProperties.getDate(LocalRequestName));
                         break;
                     case FieldTypeIdFile:
                     case FieldTypeIdFileImage:
                         //
                         //
                         //
-                        Filename = cpcore.docProperties.getText(LocalRequestName);
+                        Filename = core.docProperties.getText(LocalRequestName);
                         if (!string.IsNullOrEmpty(Filename)) {
-                            Path = cpcore.db.csGetFieldFilename(CSPointer, FieldName, Filename, "", cpcore.db.cs_getFieldTypeId(CSPointer, FieldName));
-                            cpcore.db.csSet(CSPointer, FieldName, Path);
+                            Path = core.db.csGetFieldFilename(CSPointer, FieldName, Filename, "", core.db.cs_getFieldTypeId(CSPointer, FieldName));
+                            core.db.csSet(CSPointer, FieldName, Path);
                             Path = genericController.vbReplace(Path, "\\", "/");
                             Path = genericController.vbReplace(Path, "/" + Filename, "");
-                            cpcore.appRootFiles.upload(LocalRequestName, Path, ref Filename);
+                            core.appRootFiles.upload(LocalRequestName, Path, ref Filename);
                         }
                         break;
                     default:
                         //
                         // text files
                         //
-                        cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getText(LocalRequestName));
+                        core.db.csSet(CSPointer, FieldName, core.docProperties.getText(LocalRequestName));
                         break;
                 }
             }

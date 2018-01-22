@@ -7,13 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Contensive.Core.Controllers;
 using Contensive.Core.Models.DbModels;
+using static Contensive.Core.Tests.testConstants;
 
 namespace Contensive.Core.Tests.UnitTests.Controllers {
     [TestClass()]
     public class contentCmdControllerTests {
         [TestMethod()]
         public void Controllers_ContentCmd_ExecuteCmd_simpleAddonTest() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 addonModel addon = addonModel.add(cp.core);
                 addon.name = "testaddon" + genericController.GetRandomInteger(cp.core).ToString() ;
@@ -30,7 +31,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         }
         [TestMethod()]
         public void Controllers_ContentCmd_ExecuteCmd_executeAddonTest() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 addonModel addon = addonModel.add(cp.core);
                 addon.name = "testaddon" + genericController.GetRandomInteger(cp.core).ToString();
@@ -47,7 +48,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         }
         [TestMethod()]
         public void Controllers_ContentCmd_ExecuteCmd_executeAddonTest2() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 addonModel addon = addonModel.add(cp.core);
                 addon.name = "testaddon" + genericController.GetRandomInteger(cp.core).ToString();

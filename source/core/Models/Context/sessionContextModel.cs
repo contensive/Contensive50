@@ -26,8 +26,8 @@ namespace Contensive.Core.Models.Context {
     public class sessionContextModel {
         //
         //====================================================================================================
-        // -- this class stores state, so it can hold a pointer to the cpCore instance
-        private coreController cpCore { get; set; }
+        // -- this class stores state, so it can hold a pointer to the core instance
+        private coreController core { get; set; }
         //
         //====================================================================================================
         // -- the visit is the collection of pages, constructor creates default non-authenticated instance
@@ -52,14 +52,14 @@ namespace Contensive.Core.Models.Context {
                     if (user.LanguageID > 0) {
                         //
                         // -- get user language
-                        _language = languageModel.create(cpCore, user.LanguageID);
+                        _language = languageModel.create(core, user.LanguageID);
                     }
                     if (_language == null) {
                         //
                         // -- try browser language if available
-                        string HTTP_Accept_Language = Controllers.iisController.getBrowserAcceptLanguage(cpCore);
+                        string HTTP_Accept_Language = Controllers.iisController.getBrowserAcceptLanguage(core);
                         if (!string.IsNullOrEmpty(HTTP_Accept_Language)) {
-                            List<languageModel> languageList = languageModel.createList(cpCore, "(HTTP_Accept_Language='" + HTTP_Accept_Language + "')");
+                            List<languageModel> languageList = languageModel.createList(core, "(HTTP_Accept_Language='" + HTTP_Accept_Language + "')");
                             if (languageList.Count > 0) {
                                 _language = languageList[0];
                             }
@@ -68,23 +68,23 @@ namespace Contensive.Core.Models.Context {
                     if (_language == null) {
                         //
                         // -- try default language
-                        string defaultLanguageName = cpCore.siteProperties.getText("Language", "English");
-                        _language = languageModel.createByName(cpCore, defaultLanguageName);
+                        string defaultLanguageName = core.siteProperties.getText("Language", "English");
+                        _language = languageModel.createByName(core, defaultLanguageName);
                     }
                     if (_language == null) {
                         //
                         // -- try english
-                        _language = languageModel.createByName(cpCore, "English");
+                        _language = languageModel.createByName(core, "English");
                     }
                     if (_language == null) {
                         //
                         // -- add english to the table
-                        _language = languageModel.add(cpCore);
+                        _language = languageModel.add(core);
                         _language.name = "English";
                         _language.HTTP_Accept_Language = "en";
-                        _language.save(cpCore);
+                        _language.save(core);
                         user.LanguageID = _language.id;
-                        user.save(cpCore);
+                        user.save(core);
                     }
                 }
                 return _language;
@@ -122,8 +122,8 @@ namespace Contensive.Core.Models.Context {
         /// <summary>
         /// constructor, no arguments, created default authentication model for use without user, and before user is available
         /// </summary>
-        public sessionContextModel(coreController cpCore) {
-            this.cpCore = cpCore;
+        public sessionContextModel(coreController core) {
+            this.core = core;
             visit = new visitModel();
             visitor = new visitorModel();
             user = new personModel();
@@ -133,30 +133,30 @@ namespace Contensive.Core.Models.Context {
         /// <summary>
         /// create a new session
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="trackVisits">When true, the session is initialized with a visit, visitor, user. Set false for background processing. 
         /// Set true for website processing when allowVisit true.
         /// When false, a visit can be configured on the fly by any application that attempts to access the cp.user.id
         /// </param>
         /// <returns></returns>
-        public static sessionContextModel create(coreController cpCore, bool trackVisits) {
+        public static sessionContextModel create(coreController core, bool trackVisits) {
             sessionContextModel resultSessionContext = null;
             var sw = Stopwatch.StartNew();
             try {
-                if (cpCore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- application error if no server config
-                    cpCore.handleException(new ApplicationException("authorization context cannot be created without a server configuration."));
+                    core.handleException(new ApplicationException("authorization context cannot be created without a server configuration."));
                 } else {
                     //
                     // -- test point message
                     string msg = "SessionContext.create, enter";
-                    debugController.testPoint(cpCore, msg);
-                    logController.appendLogDebug(cpCore, msg);
-                    if (cpCore.serverConfig.appConfig == null) {
+                    debugController.testPoint(core, msg);
+                    logController.appendLogDebug(core, msg);
+                    if (core.serverConfig.appConfig == null) {
                         //
                         // -- no application, this is a server-only call not related to a 
-                        resultSessionContext = new sessionContextModel(cpCore);
+                        resultSessionContext = new sessionContextModel(core);
                     } else {
                         bool TrackGuests = false;
                         string DefaultMemberName = null;
@@ -174,25 +174,25 @@ namespace Contensive.Core.Models.Context {
                         bool visit_changes = false;
                         bool visitor_changes = false;
                         bool user_changes = false;
-                        string main_appNameCookiePrefix = genericController.vbLCase(genericController.main_encodeCookieName(cpCore.serverConfig.appConfig.name));
+                        string main_appNameCookiePrefix = genericController.vbLCase(genericController.main_encodeCookieName(core.serverConfig.appConfig.name));
                         //
-                        resultSessionContext = new sessionContextModel(cpCore);
+                        resultSessionContext = new sessionContextModel(core);
                         visitCookieTimestamp = DateTime.MinValue;
-                        visitCookie = cpCore.webServer.getRequestCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit);
-                        MemberLinkinEID = cpCore.docProperties.getText("eid");
+                        visitCookie = core.webServer.getRequestCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit);
+                        MemberLinkinEID = core.docProperties.getText("eid");
                         MemberLinkLoginID = 0;
                         MemberLinkRecognizeID = 0;
                         if (!string.IsNullOrEmpty(MemberLinkinEID)) {
                             //
                             // -- attempt link authentication
-                            if (cpCore.siteProperties.getBoolean("AllowLinkLogin", true)) {
+                            if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
                                 //
                                 // -- allow Link Login
-                                cpCore.security.decodeToken(MemberLinkinEID, ref MemberLinkLoginID, ref tokenDate);
-                            } else if (cpCore.siteProperties.getBoolean("AllowLinkRecognize", true)) {
+                                core.security.decodeToken(MemberLinkinEID, ref MemberLinkLoginID, ref tokenDate);
+                            } else if (core.siteProperties.getBoolean("AllowLinkRecognize", true)) {
                                 //
                                 // -- allow Link Recognize
-                                cpCore.security.decodeToken(MemberLinkinEID, ref MemberLinkRecognizeID, ref tokenDate);
+                                core.security.decodeToken(MemberLinkinEID, ref MemberLinkRecognizeID, ref tokenDate);
                             } else {
                                 //
                                 // -- block link login
@@ -206,7 +206,7 @@ namespace Contensive.Core.Models.Context {
                             if (!string.IsNullOrEmpty(visitCookie)) {
                                 //
                                 // -- visit cookie found
-                                cpCore.security.decodeToken(visitCookie, ref cookieVisitId, ref visitCookieTimestamp);
+                                core.security.decodeToken(visitCookie, ref cookieVisitId, ref visitCookieTimestamp);
                                 if (cookieVisitId == 0) {
                                     //
                                     // -- Bad Cookie, clear it so a new one will be written
@@ -216,27 +216,27 @@ namespace Contensive.Core.Models.Context {
                             if (cookieVisitId != 0) {
                                 //
                                 // -- Visit is good, setup visit, then secondary visitor/user if possible
-                                resultSessionContext.visit = visitModel.create(cpCore, cookieVisitId);
+                                resultSessionContext.visit = visitModel.create(core, cookieVisitId);
                                 if (resultSessionContext.visit == null) {
                                     //
                                     // -- visit record is missing, create a new visit
-                                    resultSessionContext.visit = visitModel.add(cpCore);
-                                } else if (resultSessionContext.visit.LastVisitTime.AddHours(1) < cpCore.doc.profileStartTime) {
+                                    resultSessionContext.visit = visitModel.add(core);
+                                } else if (resultSessionContext.visit.LastVisitTime.AddHours(1) < core.doc.profileStartTime) {
                                     //
                                     // -- visit has expired, create new visit
-                                    resultSessionContext.visit = visitModel.add(cpCore);
+                                    resultSessionContext.visit = visitModel.add(core);
                                 } else {
                                     //
                                     // -- visit object is valid, share its data with other objects
                                     resultSessionContext.visit.TimeToLastHit = 0;
                                     if (resultSessionContext.visit.StartTime > DateTime.MinValue) {
-                                        resultSessionContext.visit.TimeToLastHit = encodeInteger((cpCore.doc.profileStartTime - resultSessionContext.visit.StartTime).TotalSeconds);
+                                        resultSessionContext.visit.TimeToLastHit = encodeInteger((core.doc.profileStartTime - resultSessionContext.visit.StartTime).TotalSeconds);
                                     }
                                     resultSessionContext.visit.CookieSupport = true;
                                     if (resultSessionContext.visit.VisitorID > 0) {
                                         //
                                         // -- try visit's visitor object
-                                        visitorModel testVisitor = visitorModel.create(cpCore, resultSessionContext.visit.VisitorID);
+                                        visitorModel testVisitor = visitorModel.create(core, resultSessionContext.visit.VisitorID);
                                         if (testVisitor != null) {
                                             resultSessionContext.visitor = testVisitor;
                                         }
@@ -244,7 +244,7 @@ namespace Contensive.Core.Models.Context {
                                     if (resultSessionContext.visit.MemberID > 0) {
                                         //
                                         // -- try visit's person object
-                                        personModel testUser = personModel.create(cpCore, resultSessionContext.visit.MemberID);
+                                        personModel testUser = personModel.create(core, resultSessionContext.visit.MemberID);
                                         if (testUser != null) {
                                             resultSessionContext.user = testUser;
                                         }
@@ -257,17 +257,17 @@ namespace Contensive.Core.Models.Context {
                             if (resultSessionContext.visit.id == 0) {
                                 //
                                 // -- create new visit record
-                                resultSessionContext.visit = visitModel.add(cpCore);
+                                resultSessionContext.visit = visitModel.add(core);
                                 if (string.IsNullOrEmpty(resultSessionContext.visit.name)) {
                                     resultSessionContext.visit.name = "User";
                                 }
                                 resultSessionContext.visit.PageVisits = 0;
-                                resultSessionContext.visit.StartTime = cpCore.doc.profileStartTime;
-                                resultSessionContext.visit.StartDateValue = encodeInteger(cpCore.doc.profileStartTime.ToOADate());
+                                resultSessionContext.visit.StartTime = core.doc.profileStartTime;
+                                resultSessionContext.visit.StartDateValue = encodeInteger(core.doc.profileStartTime.ToOADate());
                                 //
                                 // -- setup referrer
-                                if (!string.IsNullOrEmpty(cpCore.webServer.requestReferrer)) {
-                                    WorkingReferer = cpCore.webServer.requestReferrer;
+                                if (!string.IsNullOrEmpty(core.webServer.requestReferrer)) {
+                                    WorkingReferer = core.webServer.requestReferrer;
                                     SlashPosition = genericController.vbInstr(1, WorkingReferer, "//");
                                     if ((SlashPosition != 0) && (WorkingReferer.Length > (SlashPosition + 2))) {
                                         WorkingReferer = WorkingReferer.Substring(SlashPosition + 1);
@@ -285,16 +285,16 @@ namespace Contensive.Core.Models.Context {
                                 if (resultSessionContext.visitor.id == 0) {
                                     //
                                     // -- visit.visitor not valid, create visitor from cookie
-                                    CookieVisitor = genericController.encodeText(cpCore.webServer.getRequestCookie(main_appNameCookiePrefix + main_cookieNameVisitor));
-                                    if (cpCore.siteProperties.getBoolean("AllowAutoRecognize", true)) {
+                                    CookieVisitor = genericController.encodeText(core.webServer.getRequestCookie(main_appNameCookiePrefix + main_cookieNameVisitor));
+                                    if (core.siteProperties.getBoolean("AllowAutoRecognize", true)) {
                                         //
                                         // -- auto recognize, setup user based on visitor
                                         int cookieVisitorId = 0;
-                                        cpCore.security.decodeToken(CookieVisitor, ref cookieVisitorId, ref tokenDate);
+                                        core.security.decodeToken(CookieVisitor, ref cookieVisitorId, ref tokenDate);
                                         if (cookieVisitorId != 0) {
                                             //
                                             // -- visitor cookie good
-                                            visitorModel testVisitor = visitorModel.create(cpCore, cookieVisitorId);
+                                            visitorModel testVisitor = visitorModel.create(core, cookieVisitorId);
                                             if (testVisitor != null) {
                                                 resultSessionContext.visitor = testVisitor;
                                                 visitor_changes = true;
@@ -306,7 +306,7 @@ namespace Contensive.Core.Models.Context {
                                 if (resultSessionContext.visitor.id == 0) {
                                     //
                                     // -- create new visitor
-                                    resultSessionContext.visitor = visitorModel.add(cpCore);
+                                    resultSessionContext.visitor = visitorModel.add(core);
                                     visitor_changes = false;
                                     //
                                     resultSessionContext.visit.VisitorNew = true;
@@ -317,17 +317,17 @@ namespace Contensive.Core.Models.Context {
                                 if (resultSessionContext.visitor.MemberID > 0) {
                                     //
                                     // -- recognize by the main_VisitorMemberID
-                                    if (resultSessionContext.recognizeById(cpCore, resultSessionContext.visitor.MemberID, ref resultSessionContext)) {
+                                    if (resultSessionContext.recognizeById(core, resultSessionContext.visitor.MemberID, ref resultSessionContext)) {
                                         //
                                         // -- if successful, now test for autologin (authentication)
-                                        if (cpCore.siteProperties.AllowAutoLogin & resultSessionContext.user.AutoLogin & resultSessionContext.visit.CookieSupport) {
+                                        if (core.siteProperties.AllowAutoLogin & resultSessionContext.user.AutoLogin & resultSessionContext.visit.CookieSupport) {
                                             //
                                             // -- they allow it, now Check if they were logged in on their last visit
-                                            visitModel lastVisit = visitModel.getLastVisitByVisitor(cpCore, resultSessionContext.visit.id, resultSessionContext.visitor.id);
+                                            visitModel lastVisit = visitModel.getLastVisitByVisitor(core, resultSessionContext.visit.id, resultSessionContext.visitor.id);
                                             if (lastVisit != null) {
                                                 if (lastVisit.VisitAuthenticated && (lastVisit.MemberID == resultSessionContext.visit.id)) {
-                                                    if (resultSessionContext.authenticateById(cpCore, resultSessionContext.user.id, resultSessionContext)) {
-                                                        logController.logActivity2(cpCore, "autologin", resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                                    if (resultSessionContext.authenticateById(core, resultSessionContext.user.id, resultSessionContext)) {
+                                                        logController.logActivity2(core, "autologin", resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                                         visitor_changes = true;
                                                         user_changes = true;
                                                     }
@@ -336,11 +336,11 @@ namespace Contensive.Core.Models.Context {
                                         } else {
                                             //
                                             // -- Recognized, not auto login
-                                            logController.logActivity2(cpCore, "recognized", resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                            logController.logActivity2(core, "recognized", resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                         }
                                     }
                                 }
-                                if (cpCore.webServer.requestBrowser == "") {
+                                if (core.webServer.requestBrowser == "") {
                                     //
                                     // blank browser, Blank-Browser-Bot
                                     //
@@ -359,17 +359,17 @@ namespace Contensive.Core.Models.Context {
                                             resultSessionContext.visit.Mobile = false;
                                             break;
                                         default:
-                                            resultSessionContext.visit.Mobile = isMobile(cpCore.webServer.requestBrowser);
+                                            resultSessionContext.visit.Mobile = isMobile(core.webServer.requestBrowser);
                                             break;
                                     }
                                     //
                                     // -- bot and badBot detect
                                     resultSessionContext.visit.Bot = false;
                                     resultSessionContext.visit_isBadBot = false;
-                                    string botFileContent = cpCore.cache.getObject<string>("DefaultBotNameList");
+                                    string botFileContent = core.cache.getObject<string>("DefaultBotNameList");
                                     if (string.IsNullOrEmpty(botFileContent)) {
                                         string Filename = "config\\VisitNameList.txt";
-                                        botFileContent = cpCore.privateFiles.readFile(Filename);
+                                        botFileContent = core.privateFiles.readFile(Filename);
                                         if (string.IsNullOrEmpty(botFileContent)) {
                                             botFileContent = ""
                                                 + "\r\n//"
@@ -392,9 +392,9 @@ namespace Contensive.Core.Models.Context {
                                                 + "\r\nUnknown Bot\trobot\t\tr"
                                                 + "\r\nUnknown Bot\tcrawl\t\tr"
                                                 + "";
-                                            cpCore.privateFiles.saveFile(Filename, botFileContent);
+                                            core.privateFiles.saveFile(Filename, botFileContent);
                                         }
-                                        cpCore.cache.setObject("DefaultBotNameList", botFileContent, DateTime.Now.AddHours(1), new List<string>());
+                                        core.cache.setObject("DefaultBotNameList", botFileContent, DateTime.Now.AddHours(1), new List<string>());
                                     }
                                     //
                                     if (!string.IsNullOrEmpty(botFileContent)) {
@@ -415,7 +415,7 @@ namespace Contensive.Core.Models.Context {
                                                     if (Args.GetUpperBound(0) > 0) {
                                                         // -- process argument 1
                                                         if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {
-                                                            if (genericController.vbInstr(1, cpCore.webServer.requestBrowser, Args[1], 1) != 0) {
+                                                            if (genericController.vbInstr(1, core.webServer.requestBrowser, Args[1], 1) != 0) {
                                                                 resultSessionContext.visit.name = Args[0];
                                                                 //visitNameFound = True
                                                                 break;
@@ -424,7 +424,7 @@ namespace Contensive.Core.Models.Context {
                                                         if (Args.GetUpperBound(0) > 1) {
                                                             // -- process argument 2
                                                             if (!string.IsNullOrEmpty(Args[2].Trim(' '))) {
-                                                                if (genericController.vbInstr(1, cpCore.webServer.requestRemoteIP, Args[2], 1) != 0) {
+                                                                if (genericController.vbInstr(1, core.webServer.requestRemoteIP, Args[2], 1) != 0) {
                                                                     resultSessionContext.visit.name = Args[0];
                                                                     //visitNameFound = True
                                                                     break;
@@ -447,19 +447,19 @@ namespace Contensive.Core.Models.Context {
                                 //
                                 // -- new visit, update the persistant visitor cookie
                                 if (trackVisits) {
-                                    cpCore.webServer.addResponseCookie(main_appNameCookiePrefix + main_cookieNameVisitor, cpCore.security.encodeToken(resultSessionContext.visitor.id, resultSessionContext.visit.StartTime), resultSessionContext.visit.StartTime.AddYears(1), "", requestAppRootPath, false);
+                                    core.webServer.addResponseCookie(main_appNameCookiePrefix + main_cookieNameVisitor, core.security.encodeToken(resultSessionContext.visitor.id, resultSessionContext.visit.StartTime), resultSessionContext.visit.StartTime.AddYears(1), "", requestAppRootPath, false);
                                 }
                                 //
                                 // -- OnNewVisit Add-on call
                                 AllowOnNewVisitEvent = true;
                             }
-                            resultSessionContext.visit.LastVisitTime = cpCore.doc.profileStartTime;
+                            resultSessionContext.visit.LastVisitTime = core.doc.profileStartTime;
                             //
                             // -- verify visitor
                             if (resultSessionContext.visitor.id == 0) {
                                 //
                                 // -- create new visitor
-                                resultSessionContext.visitor = visitorModel.add(cpCore);
+                                resultSessionContext.visitor = visitorModel.add(core);
                                 visitor_changes = false;
                                 //
                                 resultSessionContext.visit.VisitorNew = true;
@@ -470,14 +470,14 @@ namespace Contensive.Core.Models.Context {
                             if (MemberLinkLoginID != 0) {
                                 //
                                 // -- Link Login
-                                if (resultSessionContext.authenticateById(cpCore, MemberLinkLoginID, resultSessionContext)) {
-                                    logController.logActivity2(cpCore, "link login with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                if (resultSessionContext.authenticateById(core, MemberLinkLoginID, resultSessionContext)) {
+                                    logController.logActivity2(core, "link login with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                 }
                             } else if (MemberLinkRecognizeID != 0) {
                                 //
                                 // -- Link Recognize
-                                resultSessionContext.recognizeById(cpCore, MemberLinkRecognizeID, ref resultSessionContext);
-                                logController.logActivity2(cpCore, "link recognize with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                resultSessionContext.recognizeById(core, MemberLinkRecognizeID, ref resultSessionContext);
+                                logController.logActivity2(core, "link recognize with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                             }
                             //
                             // -- create guest identity if no identity
@@ -487,12 +487,12 @@ namespace Contensive.Core.Models.Context {
                                 if (resultSessionContext.visit.name.Left(5).ToLower() != "visit") {
                                     DefaultMemberName = resultSessionContext.visit.name;
                                 } else {
-                                    DefaultMemberName = genericController.encodeText(Models.Complex.cdefModel.GetContentFieldProperty(cpCore, "people", "name", "default"));
+                                    DefaultMemberName = genericController.encodeText(Models.Complex.cdefModel.GetContentFieldProperty(core, "people", "name", "default"));
                                 }
                                 //resultAuthContext.isAuthenticatedAdmin_cache_isLoaded = False
                                 //resultAuthContext.property_user_isMember_isLoaded = False
                                 //resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
-                                TrackGuests = cpCore.siteProperties.getBoolean("track guests", false);
+                                TrackGuests = core.siteProperties.getBoolean("track guests", false);
                                 if (!TrackGuests) {
                                     //
                                     // -- do not track guests at all
@@ -509,18 +509,18 @@ namespace Contensive.Core.Models.Context {
                                     if (resultSessionContext.visit.CookieSupport) {
                                         //
                                         // -- cookies supported, not first hit and not spider
-                                        resultSessionContext.user = personModel.add(cpCore);
+                                        resultSessionContext.user = personModel.add(core);
                                         user_changes = true;
                                         resultSessionContext.visitor.MemberID = resultSessionContext.user.id;
                                         visitor_changes = true;
                                         resultSessionContext.visit.VisitAuthenticated = false;
                                         visit_changes = true;
                                     } else {
-                                        if (cpCore.siteProperties.trackGuestsWithoutCookies) {
+                                        if (core.siteProperties.trackGuestsWithoutCookies) {
                                             //
                                             // -- create people for non-cookies too
                                             //
-                                            resultSessionContext.user = personModel.add(cpCore);
+                                            resultSessionContext.user = personModel.add(core);
                                             resultSessionContext.user.name = resultSessionContext.visit.name;
                                             user_changes = true;
                                         } else {
@@ -551,21 +551,21 @@ namespace Contensive.Core.Models.Context {
                             //
                             // -- Save anything that changed
                             resultSessionContext.visit.ExcludeFromAnalytics |= resultSessionContext.visit.Bot | resultSessionContext.user.ExcludeFromAnalytics | resultSessionContext.user.Admin | resultSessionContext.user.Developer;
-                            if (!cpCore.webServer.pageExcludeFromAnalytics) {
+                            if (!core.webServer.pageExcludeFromAnalytics) {
                                 resultSessionContext.visit.PageVisits += 1;
                                 visit_changes = true;
                             }
                             resultSessionContext.visit_initialized = true;
                             if (visit_changes) {
-                                resultSessionContext.visit.save(cpCore);
+                                resultSessionContext.visit.save(core);
                             }
                             if (visitor_changes) {
-                                resultSessionContext.visitor.save(cpCore);
+                                resultSessionContext.visitor.save(core);
                             }
                             if (user_changes) {
-                                resultSessionContext.user.save(cpCore);
+                                resultSessionContext.user.save(core);
                             }
-                            visitCookieNew = cpCore.security.encodeToken(resultSessionContext.visit.id, resultSessionContext.visit.LastVisitTime);
+                            visitCookieNew = core.security.encodeToken(resultSessionContext.visit.id, resultSessionContext.visit.LastVisitTime);
                             if (trackVisits && (visitCookie != visitCookieNew)) {
                                 visitCookie = visitCookieNew;
                             }
@@ -573,26 +573,26 @@ namespace Contensive.Core.Models.Context {
                         resultSessionContext.visit_initialized = true;
                         if ((AllowOnNewVisitEvent) && (true)) {
                             CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextOnNewVisit };
-                            foreach (addonModel addon in addonModel.createList_OnNewVisitEvent(cpCore, new List<string>())) {
+                            foreach (addonModel addon in addonModel.createList_OnNewVisitEvent(core, new List<string>())) {
                                 executeContext.errorCaption = addon.name;
-                                cpCore.addon.execute(addon, executeContext);
+                                core.addon.execute(addon, executeContext);
                             }
                         }
                         //
                         // -- Write Visit Cookie
-                        visitCookie = cpCore.security.encodeToken(resultSessionContext.visit.id, cpCore.doc.profileStartTime);
-                        cpCore.webServer.addResponseCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit, visitCookie, default(DateTime), "", requestAppRootPath, false);
+                        visitCookie = core.security.encodeToken(resultSessionContext.visit.id, core.doc.profileStartTime);
+                        core.webServer.addResponseCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit, visitCookie, default(DateTime), "", requestAppRootPath, false);
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             } finally {
                 //
                 // -- test point message
                 string msg = "SessionContext.create, exit (" + sw.ElapsedMilliseconds.ToString() + "ms)";
-                debugController.testPoint(cpCore, msg);
-                logController.appendLogDebug(cpCore, msg);
+                debugController.testPoint(core, msg);
+                logController.appendLogDebug(core, msg);
             }
             return resultSessionContext;
         }
@@ -605,7 +605,7 @@ namespace Contensive.Core.Models.Context {
         //       Member has admin or developer status
         //========================================================================
         //
-        public bool isAuthenticatedAdmin(coreController cpCore) {
+        public bool isAuthenticatedAdmin(coreController core) {
             bool result = false;
             try {
                 result = visit.VisitAuthenticated & (user.Admin | user.Developer);
@@ -615,7 +615,7 @@ namespace Contensive.Core.Models.Context {
                 //End If
                 //result = isAuthenticatedAdmin_cache
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -627,7 +627,7 @@ namespace Contensive.Core.Models.Context {
         //   main_IsDeveloper
         //========================================================================
         //
-        public bool isAuthenticatedDeveloper(coreController cpCore) {
+        public bool isAuthenticatedDeveloper(coreController core) {
             bool result = false;
             try {
                 result = visit.VisitAuthenticated & (user.Admin | user.Developer);
@@ -637,7 +637,7 @@ namespace Contensive.Core.Models.Context {
                 //End If
                 //result = isAuthenticatedDeveloper_cache
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -653,7 +653,7 @@ namespace Contensive.Core.Models.Context {
         //   If ContentName is given, it only tests this content
         //========================================================================
         //
-        public bool isAuthenticatedContentManager(coreController cpCore, string ContentName = "") {
+        public bool isAuthenticatedContentManager(coreController core, string ContentName = "") {
             bool returnIsContentManager = false;
             try {
                 string SQL = null;
@@ -666,7 +666,7 @@ namespace Contensive.Core.Models.Context {
                 returnIsContentManager = false;
                 if (string.IsNullOrEmpty(ContentName)) {
                     if (isAuthenticated) {
-                        if (isAuthenticatedAdmin(cpCore)) {
+                        if (isAuthenticatedAdmin(core)) {
                             returnIsContentManager = true;
                         } else {
                             //
@@ -676,15 +676,15 @@ namespace Contensive.Core.Models.Context {
                                 SQL = "SELECT ccGroupRules.ContentID"
                                     + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
                                     + " WHERE ("
-                                        + "(ccMemberRules.MemberID=" + cpCore.db.encodeSQLNumber(user.id) + ")"
+                                        + "(ccMemberRules.MemberID=" + core.db.encodeSQLNumber(user.id) + ")"
                                         + " AND(ccMemberRules.active<>0)"
                                         + " AND(ccGroupRules.active<>0)"
                                         + " AND(ccGroupRules.ContentID Is not Null)"
-                                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime) + "))"
+                                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
                                         + ")";
-                                CS = cpCore.db.csOpenSql(SQL);
-                                _isAuthenticatedContentManagerAnything = cpCore.db.csOk(CS);
-                                cpCore.db.csClose(ref CS);
+                                CS = core.db.csOpenSql(SQL);
+                                _isAuthenticatedContentManagerAnything = core.db.csOk(CS);
+                                core.db.csClose(ref CS);
                                 //
                                 _isAuthenticatedContentManagerAnything_userId = user.id;
                                 _isAuthenticatedContentManagerAnything_loaded = true;
@@ -696,10 +696,10 @@ namespace Contensive.Core.Models.Context {
                     //
                     // Specific Content called out
                     //
-                    getContentAccessRights(cpCore, ContentName, ref returnIsContentManager, ref notImplemented_allowAdd, ref notImplemented_allowDelete);
+                    getContentAccessRights(core, ContentName, ref returnIsContentManager, ref notImplemented_allowAdd, ref notImplemented_allowDelete);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnIsContentManager;
@@ -713,25 +713,25 @@ namespace Contensive.Core.Models.Context {
         //   Create and assign a guest Member identity
         //========================================================================
         //
-        public void logout(coreController cpCore) {
+        public void logout(coreController core) {
             try {
-                logController.logActivity2(cpCore, "logout", user.id, user.OrganizationID);
+                logController.logActivity2(core, "logout", user.id, user.OrganizationID);
                 //
                 // Clear MemberID for this page
                 //
-                user = personModel.add(cpCore);
+                user = personModel.add(core);
                 //
                 visit.VisitAuthenticated = false;
-                visit.save(cpCore);
+                visit.save(core);
                 //
                 visitor.MemberID = user.id;
-                visitor.save(cpCore);
+                visitor.save(core);
                 //
                 //isAuthenticatedAdmin_cache_isLoaded = False
                 //property_user_isMember_isLoaded = False
                 //isAuthenticatedDeveloper_cache_isLoaded = False
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -742,7 +742,7 @@ namespace Contensive.Core.Models.Context {
         //   If the Id can not be found, user errors are added with main_AddUserError and 0 is returned (false)
         //===================================================================================================
         //
-        public int authenticateGetId(coreController cpCore, string username, string password) {
+        public int authenticateGetId(coreController core, string username, string password) {
             int returnUserId = 0;
             try {
                 const string badLoginUserError = "Your login was not successful. Please try again.";
@@ -761,58 +761,58 @@ namespace Contensive.Core.Models.Context {
                 iPassword = genericController.encodeText(password);
                 //
                 returnUserId = 0;
-                allowEmailLogin = cpCore.siteProperties.getBoolean("allowEmailLogin");
-                allowNoPasswordLogin = cpCore.siteProperties.getBoolean("allowNoPasswordLogin");
+                allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin");
+                allowNoPasswordLogin = core.siteProperties.getBoolean("allowNoPasswordLogin");
                 if (string.IsNullOrEmpty(iLoginFieldValue)) {
                     //
                     // ----- loginFieldValue blank, stop here
                     //
                     if (allowEmailLogin) {
-                        errorController.addUserError(cpCore, "A valid login requires a non-blank username or email.");
+                        errorController.addUserError(core, "A valid login requires a non-blank username or email.");
                     } else {
-                        errorController.addUserError(cpCore, "A valid login requires a non-blank username.");
+                        errorController.addUserError(core, "A valid login requires a non-blank username.");
                     }
                 } else if ((!allowNoPasswordLogin) && (string.IsNullOrEmpty(iPassword))) {
                     //
                     // ----- password blank, stop here
                     //
-                    errorController.addUserError(cpCore, "A valid login requires a non-blank password.");
-                } else if (visit.LoginAttempts >= cpCore.siteProperties.maxVisitLoginAttempts) {
+                    errorController.addUserError(core, "A valid login requires a non-blank password.");
+                } else if (visit.LoginAttempts >= core.siteProperties.maxVisitLoginAttempts) {
                     //
                     // ----- already tried 5 times
                     //
-                    errorController.addUserError(cpCore, badLoginUserError);
+                    errorController.addUserError(core, badLoginUserError);
                 } else {
                     if (allowEmailLogin) {
                         //
                         // login by username or email
                         //
-                        Criteria = "((username=" + cpCore.db.encodeSQLText(iLoginFieldValue) + ")or(email=" + cpCore.db.encodeSQLText(iLoginFieldValue) + "))";
+                        Criteria = "((username=" + core.db.encodeSQLText(iLoginFieldValue) + ")or(email=" + core.db.encodeSQLText(iLoginFieldValue) + "))";
                     } else {
                         //
                         // login by username only
                         //
-                        Criteria = "(username=" + cpCore.db.encodeSQLText(iLoginFieldValue) + ")";
+                        Criteria = "(username=" + core.db.encodeSQLText(iLoginFieldValue) + ")";
                     }
                     if (true) {
-                        Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + cpCore.db.encodeSQLDate(DateTime.Now) + "))";
+                        Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + core.db.encodeSQLDate(DateTime.Now) + "))";
                     }
-                    CS = cpCore.db.csOpen("People", Criteria, "id", SelectFieldList: "ID ,password,admin,developer", PageSize: 2);
-                    if (!cpCore.db.csOk(CS)) {
+                    CS = core.db.csOpen("People", Criteria, "id", SelectFieldList: "ID ,password,admin,developer", PageSize: 2);
+                    if (!core.db.csOk(CS)) {
                         //
                         // ----- loginFieldValue not found, stop here
                         //
-                        errorController.addUserError(cpCore, badLoginUserError);
-                    } else if ((!genericController.encodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (cpCore.db.csGetRowCount(CS) > 1)) {
+                        errorController.addUserError(core, badLoginUserError);
+                    } else if ((!genericController.encodeBoolean(core.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (core.db.csGetRowCount(CS) > 1)) {
                         //
                         // ----- AllowDuplicates is false, and there are more then one record
                         //
-                        errorController.addUserError(cpCore, "This user account can not be used because the username is not unique on this website. Please contact the site administrator.");
+                        errorController.addUserError(core, "This user account can not be used because the username is not unique on this website. Please contact the site administrator.");
                     } else {
                         //
                         // ----- search all found records for the correct password
                         //
-                        while (cpCore.db.csOk(CS)) {
+                        while (core.db.csOk(CS)) {
                             returnUserId = 0;
                             //
                             // main_Get Id if password good
@@ -821,49 +821,49 @@ namespace Contensive.Core.Models.Context {
                                 //
                                 // no-password-login -- allowNoPassword + no password given + account has no password + account not admin/dev/cm
                                 //
-                                recordIsAdmin = cpCore.db.csGetBoolean(CS, "admin");
-                                recordIsDeveloper = !cpCore.db.csGetBoolean(CS, "admin");
-                                if (allowNoPasswordLogin && (cpCore.db.csGetText(CS, "password") == "") && (!recordIsAdmin) && (recordIsDeveloper)) {
-                                    returnUserId = cpCore.db.csGetInteger(CS, "ID");
+                                recordIsAdmin = core.db.csGetBoolean(CS, "admin");
+                                recordIsDeveloper = !core.db.csGetBoolean(CS, "admin");
+                                if (allowNoPasswordLogin && (core.db.csGetText(CS, "password") == "") && (!recordIsAdmin) && (recordIsDeveloper)) {
+                                    returnUserId = core.db.csGetInteger(CS, "ID");
                                     //
                                     // verify they are in no content manager groups
                                     //
                                     SQL = "SELECT ccGroupRules.ContentID"
                                     + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
                                     + " WHERE ("
-                                        + "(ccMemberRules.MemberID=" + cpCore.db.encodeSQLNumber(returnUserId) + ")"
+                                        + "(ccMemberRules.MemberID=" + core.db.encodeSQLNumber(returnUserId) + ")"
                                         + " AND(ccMemberRules.active<>0)"
                                         + " AND(ccGroupRules.active<>0)"
                                         + " AND(ccGroupRules.ContentID Is not Null)"
-                                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime) + "))"
+                                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
                                         + ");";
-                                    CS = cpCore.db.csOpenSql(SQL);
-                                    if (cpCore.db.csOk(CS)) {
+                                    CS = core.db.csOpenSql(SQL);
+                                    if (core.db.csOk(CS)) {
                                         returnUserId = 0;
                                     }
-                                    cpCore.db.csClose(ref CS);
+                                    core.db.csClose(ref CS);
                                 }
                             } else {
                                 //
                                 // password login
                                 //
-                                if (genericController.vbLCase(cpCore.db.csGetText(CS, "password")) == genericController.vbLCase(iPassword)) {
-                                    returnUserId = cpCore.db.csGetInteger(CS, "ID");
+                                if (genericController.vbLCase(core.db.csGetText(CS, "password")) == genericController.vbLCase(iPassword)) {
+                                    returnUserId = core.db.csGetInteger(CS, "ID");
                                 }
                             }
                             if (returnUserId != 0) {
                                 break;
                             }
-                            cpCore.db.csGoNext(CS);
+                            core.db.csGoNext(CS);
                         }
                         if (returnUserId == 0) {
-                            errorController.addUserError(cpCore, badLoginUserError);
+                            errorController.addUserError(core, badLoginUserError);
                         }
                     }
-                    cpCore.db.csClose(ref CS);
+                    core.db.csClose(ref CS);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnUserId;
@@ -874,7 +874,7 @@ namespace Contensive.Core.Models.Context {
         //       returns true if this can be used
         //       returns false, and a User Error response if it can not be used
         //
-        public bool isNewLoginOK(coreController cpCore, string Username, string Password, ref string returnErrorMessage, ref int returnErrorCode) {
+        public bool isNewLoginOK(coreController core, string Username, string Password, ref string returnErrorMessage, ref int returnErrorCode) {
             bool returnOk = false;
             try {
                 int CSPointer = 0;
@@ -900,8 +900,8 @@ namespace Contensive.Core.Models.Context {
                     //        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
                 } else {
 
-                    CSPointer = cpCore.db.csOpen("People", "username=" + cpCore.db.encodeSQLText(Username), "", false, SelectFieldList: "ID", PageSize: 2);
-                    if (cpCore.db.csOk(CSPointer)) {
+                    CSPointer = core.db.csOpen("People", "username=" + core.db.encodeSQLText(Username), "", false, SelectFieldList: "ID", PageSize: 2);
+                    if (core.db.csOk(CSPointer)) {
                         //
                         // ----- username was found, stop here
                         //
@@ -910,10 +910,10 @@ namespace Contensive.Core.Models.Context {
                     } else {
                         returnOk = true;
                     }
-                    cpCore.db.csClose(ref CSPointer);
+                    core.db.csClose(ref CSPointer);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnOk;
@@ -922,7 +922,7 @@ namespace Contensive.Core.Models.Context {
         //====================================================================================================
         // main_GetContentAccessRights( ContentIdOrName, returnAllowEdit, returnAllowAdd, returnAllowDelete )
         //
-        public void getContentAccessRights(coreController cpCore, string ContentName, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete) {
+        public void getContentAccessRights(coreController core, string ContentName, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete) {
             try {
                 int ContentID = 0;
                 Models.Complex.cdefModel CDef = null;
@@ -939,18 +939,18 @@ namespace Contensive.Core.Models.Context {
                         //
                         // no content given, do not handle the general case -- use authcontext.user.main_IsContentManager2()
                         //
-                    } else if (isAuthenticatedDeveloper(cpCore)) {
+                    } else if (isAuthenticatedDeveloper(core)) {
                         //
                         // developers are always content managers
                         //
                         returnAllowEdit = true;
                         returnAllowAdd = true;
                         returnAllowDelete = true;
-                    } else if (isAuthenticatedAdmin(cpCore)) {
+                    } else if (isAuthenticatedAdmin(core)) {
                         //
                         // admin is content manager if the CDef is not developer only
                         //
-                        CDef = cdefModel.getCdef(cpCore, ContentName);
+                        CDef = cdefModel.getCdef(core, ContentName);
                         if (CDef.Id != 0) {
                             if (!CDef.DeveloperOnly) {
                                 returnAllowEdit = true;
@@ -962,12 +962,12 @@ namespace Contensive.Core.Models.Context {
                         //
                         // Authenticated and not admin or developer
                         //
-                        ContentID = cdefModel.getContentId(cpCore, ContentName);
-                        getContentAccessRights_NonAdminByContentId(cpCore, ContentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, "");
+                        ContentID = cdefModel.getContentId(core, ContentName);
+                        getContentAccessRights_NonAdminByContentId(core, ContentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, "");
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -979,7 +979,7 @@ namespace Contensive.Core.Models.Context {
         //   Member must be checked for authenticated and main_IsAdmin already
         //========================================================================
         //
-        private void getContentAccessRights_NonAdminByContentId(coreController cpCore, int ContentID, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete, string usedContentIdList) {
+        private void getContentAccessRights_NonAdminByContentId(coreController core, int ContentID, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete, string usedContentIdList) {
             try {
                 string SQL = null;
                 int CSPointer = 0;
@@ -1017,30 +1017,30 @@ namespace Contensive.Core.Models.Context {
                     SQL = "SELECT ccGroupRules.ContentID,allowAdd,allowDelete"
                     + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
                     + " WHERE ("
-                        + " (ccMemberRules.MemberID=" + cpCore.db.encodeSQLNumber(user.id) + ")"
+                        + " (ccMemberRules.MemberID=" + core.db.encodeSQLNumber(user.id) + ")"
                         + " AND(ccMemberRules.active<>0)"
                         + " AND(ccGroupRules.active<>0)"
                         + " AND(ccGroupRules.ContentID=" + ContentID + ")"
-                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime) + "))"
+                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
                         + ");";
-                    CSPointer = cpCore.db.csOpenSql(SQL);
-                    if (cpCore.db.csOk(CSPointer)) {
+                    CSPointer = core.db.csOpenSql(SQL);
+                    if (core.db.csOk(CSPointer)) {
                         returnAllowEdit = true;
-                        returnAllowAdd = cpCore.db.csGetBoolean(CSPointer, "allowAdd");
-                        returnAllowDelete = cpCore.db.csGetBoolean(CSPointer, "allowDelete");
+                        returnAllowAdd = core.db.csGetBoolean(CSPointer, "allowAdd");
+                        returnAllowDelete = core.db.csGetBoolean(CSPointer, "allowDelete");
                     }
-                    cpCore.db.csClose(ref CSPointer);
+                    core.db.csClose(ref CSPointer);
                     //
                     if (!returnAllowEdit) {
                         //
                         // ----- Not a content manager for this one, check the parent
                         //
-                        ContentName = cdefModel.getContentNameByID(cpCore, ContentID);
+                        ContentName = cdefModel.getContentNameByID(core, ContentID);
                         if (!string.IsNullOrEmpty(ContentName)) {
-                            CDef = cdefModel.getCdef(cpCore, ContentName);
+                            CDef = cdefModel.getCdef(core, ContentName);
                             ParentID = CDef.parentID;
                             if (ParentID > 0) {
-                                getContentAccessRights_NonAdminByContentId(cpCore, ParentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, usedContentIdList + "," + ContentID.ToString());
+                                getContentAccessRights_NonAdminByContentId(core, ParentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, usedContentIdList + "," + ContentID.ToString());
                             }
                         }
                     }
@@ -1063,7 +1063,7 @@ namespace Contensive.Core.Models.Context {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1074,25 +1074,25 @@ namespace Contensive.Core.Models.Context {
         //   See main_GetLoginMemberID and main_LoginMemberByID
         //========================================================================
         //
-        public bool authenticate(coreController cpCore, string loginFieldValue, string password, bool AllowAutoLogin = false) {
+        public bool authenticate(coreController core, string loginFieldValue, string password, bool AllowAutoLogin = false) {
             bool returnREsult = false;
             try {
                 int LocalMemberID = 0;
                 //
                 returnREsult = false;
-                LocalMemberID = authenticateGetId(cpCore, loginFieldValue, password);
+                LocalMemberID = authenticateGetId(core, loginFieldValue, password);
                 if (LocalMemberID != 0) {
-                    returnREsult = authenticateById(cpCore, LocalMemberID, this);
+                    returnREsult = authenticateById(core, LocalMemberID, this);
                     if (returnREsult) {
-                        logController.logActivity2(cpCore, "successful password login", user.id, user.OrganizationID);
+                        logController.logActivity2(core, "successful password login", user.id, user.OrganizationID);
                         //isAuthenticatedAdmin_cache_isLoaded = False
                         //property_user_isMember_isLoaded = False
                     } else {
-                        logController.logActivity2(cpCore, "unsuccessful login (loginField:" + loginFieldValue + "/password:" + password + ")", user.id, user.OrganizationID);
+                        logController.logActivity2(core, "unsuccessful login (loginField:" + loginFieldValue + "/password:" + password + ")", user.id, user.OrganizationID);
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnREsult;
@@ -1103,22 +1103,22 @@ namespace Contensive.Core.Models.Context {
         //
         //========================================================================
         //
-        public bool authenticateById(coreController cpCore, int userId, sessionContextModel authContext) {
+        public bool authenticateById(coreController core, int userId, sessionContextModel authContext) {
             bool returnResult = false;
             try {
-                returnResult = recognizeById(cpCore, userId, ref authContext);
+                returnResult = recognizeById(core, userId, ref authContext);
                 if (returnResult) {
                     //
                     // Log them in
                     //
                     authContext.visit.VisitAuthenticated = true;
                     if (authContext.visit.StartTime == DateTime.MinValue) {
-                        authContext.visit.StartTime = cpCore.doc.profileStartTime;
+                        authContext.visit.StartTime = core.doc.profileStartTime;
                     }
-                    authContext.visit.save(cpCore);
+                    authContext.visit.save(core);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -1130,16 +1130,16 @@ namespace Contensive.Core.Models.Context {
         //   the current member to be non-authenticated, but recognized
         //========================================================================
         //
-        public bool recognizeById(coreController cpCore, int userId, ref sessionContextModel sessionContext) {
+        public bool recognizeById(coreController core, int userId, ref sessionContextModel sessionContext) {
             bool returnResult = false;
             try {
                 if (sessionContext.visitor.id == 0) {
-                    sessionContext.visitor = visitorModel.add(cpCore);
+                    sessionContext.visitor = visitorModel.add(core);
                 }
                 if (sessionContext.visit.id == 0) {
-                    sessionContext.visit = visitModel.add(cpCore);
+                    sessionContext.visit = visitModel.add(core);
                 }
-                sessionContext.user = personModel.create(cpCore, userId);
+                sessionContext.user = personModel.create(core, userId);
                 sessionContext.visitor.MemberID = sessionContext.user.id;
                 sessionContext.visit.MemberID = sessionContext.user.id;
                 sessionContext.visit.VisitAuthenticated = false;
@@ -1151,14 +1151,14 @@ namespace Contensive.Core.Models.Context {
                 } else {
                     sessionContext.visit.MemberNew = false;
                 }
-                sessionContext.user.LastVisit = cpCore.doc.profileStartTime;
+                sessionContext.user.LastVisit = core.doc.profileStartTime;
                 sessionContext.visit.ExcludeFromAnalytics = visit.ExcludeFromAnalytics | sessionContext.visit.Bot | sessionContext.user.ExcludeFromAnalytics | sessionContext.user.Admin | sessionContext.user.Developer;
-                sessionContext.visit.save(cpCore);
-                sessionContext.visitor.save(cpCore);
-                sessionContext.user.save(cpCore);
+                sessionContext.visit.save(core);
+                sessionContext.visitor.save(core);
+                sessionContext.user.save(core);
                 returnResult = true;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -1168,16 +1168,16 @@ namespace Contensive.Core.Models.Context {
         // ----- Returns true if the visitor is an admin, or authenticated and in the group named
         //========================================================================
         //
-        public bool IsMemberOfGroup2(coreController cpCore, string GroupName, int checkMemberID = 0) {
+        public bool IsMemberOfGroup2(coreController core, string GroupName, int checkMemberID = 0) {
             bool returnREsult = false;
             try {
                 int iMemberID = genericController.encodeInteger(checkMemberID);
                 if (iMemberID == 0) {
                     iMemberID = user.id;
                 }
-                returnREsult = isMemberOfGroupList(cpCore, "," + groupController.group_GetGroupID(cpCore, genericController.encodeText(GroupName)), iMemberID, true);
+                returnREsult = isMemberOfGroupList(core, "," + groupController.group_GetGroupID(core, genericController.encodeText(GroupName)), iMemberID, true);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnREsult;
@@ -1187,16 +1187,16 @@ namespace Contensive.Core.Models.Context {
         // ----- Returns true if the visitor is a member, and in the group named
         //========================================================================
         //
-        public bool isMemberOfGroup(coreController cpCore, string GroupName, int checkMemberID = 0, bool adminReturnsTrue = false) {
+        public bool isMemberOfGroup(coreController core, string GroupName, int checkMemberID = 0, bool adminReturnsTrue = false) {
             bool returnREsult = false;
             try {
                 int iMemberID = checkMemberID;
                 if (iMemberID == 0) {
                     iMemberID = user.id;
                 }
-                returnREsult = isMemberOfGroupList(cpCore, "," + groupController.group_GetGroupID(cpCore, genericController.encodeText(GroupName)), iMemberID, adminReturnsTrue);
+                returnREsult = isMemberOfGroupList(core, "," + groupController.group_GetGroupID(core, genericController.encodeText(GroupName)), iMemberID, adminReturnsTrue);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnREsult;
@@ -1207,15 +1207,15 @@ namespace Contensive.Core.Models.Context {
         // ----- Returns true if the visitor is an admin, or authenticated and in the group list
         //========================================================================
         //
-        public bool isMemberOfGroupList(coreController cpCore, string GroupIDList, int checkMemberID = 0, bool adminReturnsTrue = false) {
+        public bool isMemberOfGroupList(coreController core, string GroupIDList, int checkMemberID = 0, bool adminReturnsTrue = false) {
             bool returnREsult = false;
             try {
                 if (checkMemberID == 0) {
                     checkMemberID = user.id;
                 }
-                returnREsult = isMemberOfGroupIdList(cpCore, checkMemberID, isAuthenticated, GroupIDList, adminReturnsTrue);
+                returnREsult = isMemberOfGroupIdList(core, checkMemberID, isAuthenticated, GroupIDList, adminReturnsTrue);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnREsult;
@@ -1226,17 +1226,17 @@ namespace Contensive.Core.Models.Context {
         //   true if the user is authenticated and is a trusted people (member content)
         //========================================================================
         //
-        public bool isAuthenticatedMember(coreController cpCore) {
+        public bool isAuthenticatedMember(coreController core) {
             bool result = false;
             try {
-                result = visit.VisitAuthenticated & (Models.Complex.cdefModel.isWithinContent(cpCore, user.contentControlID, cdefModel.getContentId(cpCore, "members")));
+                result = visit.VisitAuthenticated & (Models.Complex.cdefModel.isWithinContent(core, user.contentControlID, cdefModel.getContentId(core, "members")));
                 //If (Not property_user_isMember_isLoaded) And (visit_initialized) Then
-                //    property_user_isMember = isAuthenticated() And cpCore.IsWithinContent(user.ContentControlID, cpCore.main_GetContentID("members"))
+                //    property_user_isMember = isAuthenticated() And core.IsWithinContent(user.ContentControlID, core.main_GetContentID("members"))
                 //    property_user_isMember_isLoaded = True
                 //End If
                 //result = property_user_isMember
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -1249,15 +1249,15 @@ namespace Contensive.Core.Models.Context {
         //   admins are always returned true
         //===============================================================================================================================
         //
-        public bool isMemberOfGroupIdList(coreController cpCore, int MemberID, bool isAuthenticated, string GroupIDList) {
-            return isMemberOfGroupIdList(cpCore, MemberID, isAuthenticated, GroupIDList, true);
+        public bool isMemberOfGroupIdList(coreController core, int MemberID, bool isAuthenticated, string GroupIDList) {
+            return isMemberOfGroupIdList(core, MemberID, isAuthenticated, GroupIDList, true);
         }
         //
         //===============================================================================================================================
         //   Is Group Member of a GroupIDList
         //===============================================================================================================================
         //
-        public bool isMemberOfGroupIdList(coreController cpCore, int MemberID, bool isAuthenticated, string GroupIDList, bool adminReturnsTrue) {
+        public bool isMemberOfGroupIdList(coreController core, int MemberID, bool isAuthenticated, string GroupIDList, bool adminReturnsTrue) {
             bool returnREsult = false;
             try {
                 //
@@ -1306,9 +1306,9 @@ namespace Contensive.Core.Models.Context {
                                 + " or(m.developer<>0)"
                                 + " )"
                                 + " ";
-                            CS = cpCore.db.csOpenSql_rev("default", SQL);
-                            returnREsult = cpCore.db.csOk(CS);
-                            cpCore.db.csClose(ref CS);
+                            CS = core.db.csOpenSql_rev("default", SQL);
+                            returnREsult = core.db.csOk(CS);
+                            core.db.csClose(ref CS);
                         }
                     } else {
                         //
@@ -1322,7 +1322,7 @@ namespace Contensive.Core.Models.Context {
                         Criteria = ""
                             + "(" + Criteria + ")"
                             + " and(r.id is not null)"
-                            + " and((r.DateExpires is null)or(r.DateExpires>" + cpCore.db.encodeSQLDate(DateTime.Now) + "))"
+                            + " and((r.DateExpires is null)or(r.DateExpires>" + core.db.encodeSQLDate(DateTime.Now) + "))"
                             + " ";
                         if (adminReturnsTrue) {
                             Criteria = "(" + Criteria + ")or(m.admin<>0)or(m.developer<>0)";
@@ -1336,14 +1336,14 @@ namespace Contensive.Core.Models.Context {
                             + " from ccmembers m"
                             + " left join ccMemberRules r on r.Memberid=m.id"
                             + " where" + Criteria;
-                        CS = cpCore.db.csOpenSql_rev("default", SQL);
-                        returnREsult = cpCore.db.csOk(CS);
-                        cpCore.db.csClose(ref CS);
+                        CS = core.db.csOpenSql_rev("default", SQL);
+                        returnREsult = core.db.csOk(CS);
+                        core.db.csClose(ref CS);
                     }
                 }
 
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnREsult;
@@ -1354,8 +1354,8 @@ namespace Contensive.Core.Models.Context {
         /// is Guest
         /// </summary>
         /// <returns></returns>
-        public bool isGuest(coreController cpCore) {
-            return !isAuthenticatedMember(cpCore);
+        public bool isGuest(coreController core) {
+            return !isAuthenticatedMember(core);
         }
         //
         //========================================================================
@@ -1363,7 +1363,7 @@ namespace Contensive.Core.Models.Context {
         /// Is Recognized (not new and not authenticted)
         /// </summary>
         /// <returns></returns>
-        public bool isRecognized(coreController cpCore) {
+        public bool isRecognized(coreController core) {
             return !visit.MemberNew;
         }
         //
@@ -1400,17 +1400,17 @@ namespace Contensive.Core.Models.Context {
                 } else if (genericController.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",")) {
                     //
                     // -- 
-                    //Call debugController.debug_testPoint(cpCore, "...is in main_IsNotEditingContentList")
+                    //Call debugController.debug_testPoint(core, "...is in main_IsNotEditingContentList")
                 } else {
                     if (isAuthenticated) {
                         if (true) {
-                            if (cpCore.visitProperty.getBoolean("AllowEditing") | cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) {
+                            if (core.visitProperty.getBoolean("AllowEditing") | core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                 if (!string.IsNullOrEmpty(localContentNameOrId)) {
                                     if (localContentNameOrId.IsNumeric()) {
-                                        localContentNameOrId = cdefModel.getContentNameByID(cpCore, encodeInteger(localContentNameOrId));
+                                        localContentNameOrId = cdefModel.getContentNameByID(core, encodeInteger(localContentNameOrId));
                                     }
                                 }
-                                returnResult = isAuthenticatedContentManager(cpCore, localContentNameOrId);
+                                returnResult = isAuthenticatedContentManager(core, localContentNameOrId);
                             }
                         }
                     }
@@ -1421,7 +1421,7 @@ namespace Contensive.Core.Models.Context {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -1433,16 +1433,16 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isQuickEditing(coreController cpCore, string ContentName) {
+        public bool isQuickEditing(coreController core, string ContentName) {
             bool returnResult = false;
             try {
                 if (true) {
-                    if (isAuthenticatedContentManager(cpCore, ContentName)) {
-                        returnResult = cpCore.visitProperty.getBoolean("AllowQuickEditor");
+                    if (isAuthenticatedContentManager(core, ContentName)) {
+                        returnResult = core.visitProperty.getBoolean("AllowQuickEditor");
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -1455,16 +1455,16 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAdvancedEditing(coreController cpCore, string ContentName) {
+        public bool isAdvancedEditing(coreController core, string ContentName) {
             bool returnResult = false;
             try {
                 if (true) {
-                    if (isAuthenticatedContentManager(cpCore, ContentName)) {
-                        returnResult = cpCore.visitProperty.getBoolean("AllowAdvancedEditor");
+                    if (isAuthenticatedContentManager(core, ContentName)) {
+                        returnResult = core.visitProperty.getBoolean("AllowAdvancedEditor");
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -1480,10 +1480,10 @@ namespace Contensive.Core.Models.Context {
         //
         //   Checks the username and password
         //
-        public bool isLoginOK(coreController cpcore, string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
-            bool result = (authenticateGetId(cpcore, Username, Password) != 0);
+        public bool isLoginOK(coreController core, string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
+            bool result = (authenticateGetId(core, Username, Password) != 0);
             if (!result) {
-                ErrorMessage = errorController.getUserError(cpcore);
+                ErrorMessage = errorController.getUserError(core);
             }
             return result;
         }
@@ -1492,12 +1492,12 @@ namespace Contensive.Core.Models.Context {
         //   conversion pass 2
         // ================================================================================================
         //
-        public string main_GetAuthoringStatusMessage(coreController cpcore, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
+        public string main_GetAuthoringStatusMessage(coreController core, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
             string result = "";
             //
             string Copy = null;
             string Delimiter = "";
-            int main_EditLockExpiresMinutes = encodeInteger((main_EditLockExpires - cpcore.doc.profileStartTime).TotalMinutes);
+            int main_EditLockExpiresMinutes = encodeInteger((main_EditLockExpires - core.doc.profileStartTime).TotalMinutes);
             //
             // ----- site does not support workflow authoring
             //
@@ -1522,11 +1522,11 @@ namespace Contensive.Core.Models.Context {
             bool tempisWorkflowRendering = false;
             bool result = false;
             try {
-                if (isAuthenticatedContentManager(cpCore)) {
-                    tempisWorkflowRendering = cpCore.visitProperty.getBoolean("AllowWorkflowRendering");
+                if (isAuthenticatedContentManager(core)) {
+                    tempisWorkflowRendering = core.visitProperty.getBoolean("AllowWorkflowRendering");
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;

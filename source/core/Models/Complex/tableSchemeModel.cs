@@ -30,7 +30,7 @@ namespace Contensive.Core.Models.Complex {
         //   returns -1 if the table is not found
         //=================================================================================
         //
-        public static Models.Complex.tableSchemaModel getTableSchema(coreController cpcore, string TableName, string DataSourceName) {
+        public static Models.Complex.tableSchemaModel getTableSchema(coreController core, string TableName, string DataSourceName) {
             Models.Complex.tableSchemaModel tableSchema = null;
             try {
                 DataTable dt = null;
@@ -45,10 +45,10 @@ namespace Contensive.Core.Models.Complex {
                 } else {
                     if (!string.IsNullOrEmpty(TableName)) {
                         lowerTablename = TableName.ToLower();
-                        if ((cpcore.doc.tableSchemaDictionary) == null) {
-                            cpcore.doc.tableSchemaDictionary = new Dictionary<string, Models.Complex.tableSchemaModel>();
+                        if ((core.doc.tableSchemaDictionary) == null) {
+                            core.doc.tableSchemaDictionary = new Dictionary<string, Models.Complex.tableSchemaModel>();
                         } else {
-                            isInCache = cpcore.doc.tableSchemaDictionary.TryGetValue(lowerTablename, out tableSchema);
+                            isInCache = core.doc.tableSchemaDictionary.TryGetValue(lowerTablename, out tableSchema);
                         }
                         buildCache = !isInCache;
                         if (isInCache) {
@@ -58,7 +58,7 @@ namespace Contensive.Core.Models.Complex {
                             //
                             // cache needs to be built
                             //
-                            dt = cpcore.db.getTableSchemaData(TableName);
+                            dt = core.db.getTableSchemaData(TableName);
                             if (dt.Rows.Count <= 0) {
                                 tableSchema = null;
                             } else {
@@ -70,7 +70,7 @@ namespace Contensive.Core.Models.Complex {
                                 //
                                 // load columns
                                 //
-                                dt = cpcore.db.getColumnSchemaData(TableName);
+                                dt = core.db.getColumnSchemaData(TableName);
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
                                         tableSchema.columns.Add(genericController.encodeText(row["COLUMN_NAME"]).ToLower());
@@ -79,7 +79,7 @@ namespace Contensive.Core.Models.Complex {
                                 //
                                 // Load the index schema
                                 //
-                                dt = cpcore.db.getIndexSchemaData(TableName);
+                                dt = core.db.getIndexSchemaData(TableName);
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
                                         tableSchema.indexes.Add(genericController.encodeText(row["INDEX_NAME"]).ToLower());
@@ -87,25 +87,25 @@ namespace Contensive.Core.Models.Complex {
                                 }
                             }
                             if (!isInDb && isInCache) {
-                                cpcore.doc.tableSchemaDictionary.Remove(lowerTablename);
+                                core.doc.tableSchemaDictionary.Remove(lowerTablename);
                             } else if (isInDb && (!isInCache)) {
-                                cpcore.doc.tableSchemaDictionary.Add(lowerTablename, tableSchema);
+                                core.doc.tableSchemaDictionary.Add(lowerTablename, tableSchema);
                             } else if (isInDb && isInCache) {
-                                cpcore.doc.tableSchemaDictionary[lowerTablename] = tableSchema;
+                                core.doc.tableSchemaDictionary[lowerTablename] = tableSchema;
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return tableSchema;
         }
         //
         //====================================================================================================
-        public static void tableSchemaListClear(coreController cpcore) {
-            cpcore.doc.tableSchemaDictionary.Clear();
+        public static void tableSchemaListClear(coreController core) {
+            core.doc.tableSchemaDictionary.Clear();
         }
     }
 

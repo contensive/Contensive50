@@ -36,7 +36,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // call .dispose for managed objects
                     //
-                    //cpCore.dispose()
+                    //core.dispose()
                 }
                 //
                 // cp  creates and destroys cmc
@@ -121,26 +121,26 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Iterate through all apps, find addosn that need to run and add them to the task queue
         /// </summary>
-        private void scheduleTasks(coreController cpcoreServer) {
+        private void scheduleTasks(coreController coreServer) {
             try {
                 //
                 // -- run tasks for each app
-                foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> appKvp in cpcoreServer.serverConfig.apps) {
-                    logController.appendLogTasks(cpcoreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
+                foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> appKvp in coreServer.serverConfig.apps) {
+                    logController.appendLogTasks(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
                     using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
-                        coreController cpcoreApp = cpApp.core;
-                        if (!(cpcoreApp.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
+                        coreController coreApp = cpApp.core;
+                        if (!(coreApp.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
                             //
-                            logController.appendLogTasks(cpcoreServer, "scheduleTasks, app status not ok");
-                        } else if (!(cpcoreApp.serverConfig.appConfig.appMode == Models.Context.serverConfigModel.appModeEnum.normal)) {
+                            logController.appendLogTasks(coreServer, "scheduleTasks, app status not ok");
+                        } else if (!(coreApp.serverConfig.appConfig.appMode == Models.Context.serverConfigModel.appModeEnum.normal)) {
                             //
-                            logController.appendLogTasks(cpcoreServer, "scheduleTasks, app mode not normal");
+                            logController.appendLogTasks(coreServer, "scheduleTasks, app mode not normal");
                         } else {
                             //
                             // Execute Processes
                             try {
                                 DateTime RightNow = DateTime.Now;
-                                string SQLNow = cpcoreApp.db.encodeSQLDate(RightNow);
+                                string SQLNow = coreApp.db.encodeSQLDate(RightNow);
                                 string sqlAddonsCriteria = ""
                                     + "(Active<>0)"
                                     + " and(name<>'')"
@@ -149,55 +149,55 @@ namespace Contensive.Core.Controllers {
                                     + "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))"
                                     + "  or(ProcessNextRun<" + SQLNow + ")"
                                     + " )";
-                                int CS = cpcoreApp.db.csOpen(cnAddons, sqlAddonsCriteria);
-                                while (cpcoreApp.db.csOk(CS)) {
-                                    int addonProcessInterval = cpcoreApp.db.csGetInteger(CS, "ProcessInterval");
-                                    string addonName = cpcoreApp.db.csGetText(CS, "name");
-                                    bool addonProcessRunOnce = cpcoreApp.db.csGetBoolean(CS, "ProcessRunOnce");
-                                    DateTime addonProcessNextRun = cpcoreApp.db.csGetDate(CS, "ProcessNextRun");
+                                int CS = coreApp.db.csOpen(cnAddons, sqlAddonsCriteria);
+                                while (coreApp.db.csOk(CS)) {
+                                    int addonProcessInterval = coreApp.db.csGetInteger(CS, "ProcessInterval");
+                                    string addonName = coreApp.db.csGetText(CS, "name");
+                                    bool addonProcessRunOnce = coreApp.db.csGetBoolean(CS, "ProcessRunOnce");
+                                    DateTime addonProcessNextRun = coreApp.db.csGetDate(CS, "ProcessNextRun");
                                     DateTime nextRun = DateTime.MinValue;
                                     if (addonProcessInterval > 0) {
                                         nextRun = RightNow.AddMinutes(addonProcessInterval);
                                     }
                                     if ((addonProcessNextRun < RightNow) || (addonProcessRunOnce)) {
                                         //
-                                        logController.appendLogTasks(cpcoreServer, "scheduleTasks, addon [" + addonName + "], add task, addonProcessRunOnce [" + addonProcessRunOnce + "], addonProcessNextRun [" + addonProcessNextRun + "]");
+                                        logController.appendLogTasks(coreServer, "scheduleTasks, addon [" + addonName + "], add task, addonProcessRunOnce [" + addonProcessRunOnce + "], addonProcessNextRun [" + addonProcessNextRun + "]");
                                         //
                                         // -- resolve triggering state
-                                        cpcoreApp.db.csSet(CS, "ProcessRunOnce", false);
+                                        coreApp.db.csSet(CS, "ProcessRunOnce", false);
                                         if (addonProcessNextRun < RightNow) {
-                                            cpcoreApp.db.csSet(CS, "ProcessNextRun", nextRun);
+                                            coreApp.db.csSet(CS, "ProcessNextRun", nextRun);
                                         }
-                                        cpcoreApp.db.csSave2(CS);
+                                        coreApp.db.csSave2(CS);
                                         //
                                         // -- add task to queue for runner
                                         cmdDetailClass cmdDetail = new cmdDetailClass();
-                                        cmdDetail.addonId = cpcoreApp.db.csGetInteger(CS, "ID");
+                                        cmdDetail.addonId = coreApp.db.csGetInteger(CS, "ID");
                                         cmdDetail.addonName = addonName;
-                                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpcoreApp, cpcoreApp.db.csGetText(CS, "argumentlist"));
-                                        addTaskToQueue(cpcoreApp, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
-                                    } else if (cpcoreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
+                                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
+                                        addTaskToQueue(coreApp, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                                    } else if (coreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
                                         //
-                                        logController.appendLogTasks(cpcoreServer, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
+                                        logController.appendLogTasks(coreServer, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
                                         //
                                         // -- Interval is OK but NextRun is 0, just set next run
-                                        cpcoreApp.db.csSet(CS, "ProcessNextRun", nextRun);
-                                        cpcoreApp.db.csSave2(CS);
+                                        coreApp.db.csSet(CS, "ProcessNextRun", nextRun);
+                                        coreApp.db.csSave2(CS);
                                     }
-                                    cpcoreApp.db.csGoNext(CS);
+                                    coreApp.db.csGoNext(CS);
                                 }
-                                cpcoreApp.db.csClose(ref CS);
+                                coreApp.db.csClose(ref CS);
                             } catch (Exception ex) {
                                 //
-                                logController.appendLogTasks(cpcoreServer, "scheduleTasks, exception [" + ex.ToString() + "]");
-                                cpcoreServer.handleException(ex);
+                                logController.appendLogTasks(coreServer, "scheduleTasks, exception [" + ex.ToString() + "]");
+                                coreServer.handleException(ex);
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                logController.appendLogTasks(cpcoreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
-                cpcoreServer.handleException(ex);
+                logController.appendLogTasks(coreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
+                coreServer.handleException(ex);
             }
         }
         //

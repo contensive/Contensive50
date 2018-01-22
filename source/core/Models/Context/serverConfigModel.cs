@@ -145,7 +145,7 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static Models.Context.serverConfigModel getObject(coreController cpCore) {
+        public static Models.Context.serverConfigModel getObject(coreController core) {
             Models.Context.serverConfigModel returnModel = null;
             try {
                 System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -153,7 +153,7 @@ namespace Contensive.Core.Models.Context {
                 //
                 // ----- read/create serverConfig
                 //
-                JSONTemp = cpCore.programDataFiles.readFile("config.json");
+                JSONTemp = core.programDataFiles.readFile("config.json");
                 if (string.IsNullOrEmpty(JSONTemp)) {
                     //
                     // for now it fails, maybe later let it autobuild a local cluster
@@ -161,7 +161,7 @@ namespace Contensive.Core.Models.Context {
                     returnModel = new Models.Context.serverConfigModel();
                     returnModel.allowTaskRunnerService = false;
                     returnModel.allowTaskSchedulerService = false;
-                    cpCore.programDataFiles.saveFile("config.json", json_serializer.Serialize(returnModel));
+                    core.programDataFiles.saveFile("config.json", json_serializer.Serialize(returnModel));
                 } else {
                     returnModel = json_serializer.Deserialize<serverConfigModel>(JSONTemp);
                 }
@@ -169,7 +169,7 @@ namespace Contensive.Core.Models.Context {
                 // -- block the configured app that last saved the server model
                 returnModel.appConfig = null;
             } catch (Exception ex) {
-                cpCore.handleException(ex, "exception in serverConfigModel.getObject");
+                core.handleException(ex, "exception in serverConfigModel.getObject");
             }
             return returnModel;
         }
@@ -180,10 +180,10 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static Models.Context.serverConfigModel getObject(coreController cpCore, string appName) {
+        public static Models.Context.serverConfigModel getObject(coreController core, string appName) {
             Models.Context.serverConfigModel returnModel = null;
             try {
-                returnModel = getObject(cpCore);
+                returnModel = getObject(core);
                 if (!string.IsNullOrEmpty(appName)) {
                     if (!returnModel.apps.ContainsKey(appName.ToLower())) {
                         //
@@ -199,7 +199,7 @@ namespace Contensive.Core.Models.Context {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex, "exception in serverConfigModel.getObject");
+                core.handleException(ex, "exception in serverConfigModel.getObject");
             }
             return returnModel;
         }
@@ -210,12 +210,12 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public int saveObject(coreController cpCore) {
+        public int saveObject(coreController core) {
             try {
-                string jsonTemp = cpCore.json.Serialize(this);
-                cpCore.programDataFiles.saveFile("config.json", jsonTemp);
+                string jsonTemp = core.json.Serialize(this);
+                core.programDataFiles.saveFile("config.json", jsonTemp);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return 0;
         }

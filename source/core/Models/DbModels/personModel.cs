@@ -83,109 +83,109 @@ namespace Contensive.Core.Models.DbModels {
         public string Zip { get; set; }
         //
         //====================================================================================================
-        public static personModel add(coreController cpCore) {
-            return add<personModel>(cpCore);
+        public static personModel add(coreController core) {
+            return add<personModel>(core);
         }
         //
         //====================================================================================================
-        public static personModel add(coreController cpCore, ref List<string> callersCacheNameList) {
-            return add<personModel>(cpCore, ref callersCacheNameList);
+        public static personModel add(coreController core, ref List<string> callersCacheNameList) {
+            return add<personModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static personModel create(coreController cpCore, int recordId) {
-            return create<personModel>(cpCore, recordId);
+        public static personModel create(coreController core, int recordId) {
+            return create<personModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static personModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
-            return create<personModel>(cpCore, recordId, ref callersCacheNameList);
+        public static personModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<personModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static personModel create(coreController cpCore, string recordGuid) {
-            return create<personModel>(cpCore, recordGuid);
+        public static personModel create(coreController core, string recordGuid) {
+            return create<personModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static personModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<personModel>(cpCore, recordGuid, ref callersCacheNameList);
+        public static personModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<personModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static personModel createByName(coreController cpCore, string recordName) {
-            return createByName<personModel>(cpCore, recordName);
+        public static personModel createByName(coreController core, string recordName) {
+            return createByName<personModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static personModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<personModel>(cpCore, recordName, ref callersCacheNameList);
+        public static personModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<personModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController cpCore) {
-            base.save(cpCore);
+        public new void save(coreController core) {
+            base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, int recordId) {
-            delete<personModel>(cpCore, recordId);
+        public static void delete(coreController core, int recordId) {
+            delete<personModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, string ccGuid) {
-            delete<personModel>(cpCore, ccGuid);
+        public static void delete(coreController core, string ccGuid) {
+            delete<personModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<personModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<personModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<personModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<personModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<personModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
-            return createList<personModel>(cpCore, sqlCriteria, sqlOrderBy);
+        public static List<personModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<personModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<personModel> createList(coreController cpCore, string sqlCriteria) {
-            return createList<personModel>(cpCore, sqlCriteria);
+        public static List<personModel> createList(coreController core, string sqlCriteria) {
+            return createList<personModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
-            invalidateCacheSingleRecord<personModel>(cpCore, recordId);
+        public void invalidatePrimaryCache(coreController core, int recordId) {
+            invalidateCacheSingleRecord<personModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, int recordId) {
-            return baseModel.getRecordName<personModel>(cpcore, recordId);
+        public static string getRecordName(coreController core, int recordId) {
+            return baseModel.getRecordName<personModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordName<personModel>(cpcore, ccGuid);
+        public static string getRecordName(coreController core, string ccGuid) {
+            return baseModel.getRecordName<personModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordId<personModel>(cpcore, ccGuid);
+        public static int getRecordId(coreController core, string ccGuid) {
+            return baseModel.getRecordId<personModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static personModel createDefault(coreController cpcore) {
-            return createDefault<personModel>(cpcore);
+        public static personModel createDefault(coreController core) {
+            return createDefault<personModel>(core);
         }
         //
         //====================================================================================================
         /// <summary>
         /// return a list of people in a any one of a list of groups. If requireBuldEmail true, the list only includes those with allowBulkEmail.
         /// </summary>
-        /// <param name="cpcore"></param>
+        /// <param name="core"></param>
         /// <param name="groupList"></param>
         /// <param name="requireBulkEmail"></param>
         /// <returns></returns>
-        public static List<personModel> createListFromGroupList( coreController cpcore, List<string> groupList, bool requireBulkEmail ) {
+        public static List<personModel> createListFromGroupList( coreController core, List<string> groupList, bool requireBulkEmail ) {
             var personList = new List<personModel> { };
             try {
                 string sqlGroups = "";
@@ -194,7 +194,7 @@ namespace Contensive.Core.Models.DbModels {
                         if (!group.Equals(groupList.First<string>())) {
                             sqlGroups += "or";
                         }
-                        sqlGroups += "(ccgroups.Name=" + cpcore.db.encodeSQLText(group) + ")";
+                        sqlGroups += "(ccgroups.Name=" + core.db.encodeSQLText(group) + ")";
                     }
                 }
                 string sqlCriteria = ""
@@ -205,21 +205,21 @@ namespace Contensive.Core.Models.DbModels {
                     + " WHERE (ccMembers.Active>0)"
                     + " and(ccMemberRules.Active>0)"
                     + " and(ccgroups.Active>0)"
-                    + " and((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + cpcore.db.encodeSQLDate(cpcore.doc.profileStartTime) + "))";
+                    + " and((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))";
                 if (requireBulkEmail) {
                     sqlCriteria += "and(ccMembers.AllowBulkEmail>0)and(ccgroups.AllowBulkEmail>0)";
                 }
                 if (!string.IsNullOrEmpty(sqlGroups)) {
                     sqlCriteria += "and(" + sqlGroups + ")";
                 }
-                personList = createList(cpcore, sqlCriteria);
+                personList = createList(core, sqlCriteria);
             } catch (Exception) {
                 throw;
             }
             return personList;
         }
         //
-        public static List<int> createidListForEmail(coreController cpcore, int emailId) {
+        public static List<int> createidListForEmail(coreController core, int emailId) {
             var result = new List<int> { };
             string sqlCriteria = ""
                     + " select"
@@ -239,7 +239,7 @@ namespace Contensive.Core.Models.DbModels {
                     + " and(mr.Active<>0)"
                     + " and(u.Active<>0)"
                     + " and(u.AllowBulkEmail<>0)"
-                    + " and((mr.DateExpires is null)OR(mr.DateExpires>" + cpcore.db.encodeSQLDate(DateTime.Now)  + ")) "
+                    + " and((mr.DateExpires is null)OR(mr.DateExpires>" + core.db.encodeSQLDate(DateTime.Now)  + ")) "
                     + " "
                     + " group by "
                     + " u.ID, u.Name, u.Email "
@@ -248,7 +248,7 @@ namespace Contensive.Core.Models.DbModels {
                     + " "
                     + " order by u.Email,u.ID"
                     + " ";
-            var cs = new csController(cpcore);
+            var cs = new csController(core);
             if (cs.openSQL(sqlCriteria)) {
                 do {
                     result.Add(cs.getInteger("id"));

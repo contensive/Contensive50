@@ -27,8 +27,8 @@ namespace Contensive.Core.Addons.AdminSite {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
-                cpCore.visitProperty.setProperty("AdminNavOpen", "1");
+                coreController core = processor.core;
+                core.visitProperty.setProperty("AdminNavOpen", "1");
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

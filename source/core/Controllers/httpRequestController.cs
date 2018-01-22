@@ -45,7 +45,7 @@ namespace Contensive.Core.Controllers {
         //======================================================================================
         //
         public httpRequestController() : base() {
-            // Me.cpcore = cpcore
+            // Me.core = core
             Type myType = typeof(coreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();
@@ -88,7 +88,7 @@ namespace Contensive.Core.Controllers {
                 string path = null;
                 int ptr = 0;
                 //
-                //cpCore.AppendLog( "http4Class.getUrlToFile, url=[" & URL & "], filename=[" & Filename & "]")
+                //core.AppendLog( "http4Class.getUrlToFile, url=[" & URL & "], filename=[" & Filename & "]")
                 //
                 privateResponseFilename = Filename;
                 path = Filename.Replace("/", "\\");
@@ -176,7 +176,7 @@ namespace Contensive.Core.Controllers {
                 int CookiePointer = 0;
                 string[] CookiePart = null;
                 //
-                //cpCore.AppendLog( "http4Class.getURL, url=[" & URL & "]")
+                //core.AppendLog( "http4Class.getURL, url=[" & URL & "]")
                 //
                 //Dim TimeoutTime As Date
                 //
@@ -234,7 +234,7 @@ namespace Contensive.Core.Controllers {
                 throw;
             }
             //
-            //cpCore.AppendLog( "http4Class.getURL exit, return=[" & returnString & "]")
+            //core.AppendLog( "http4Class.getURL exit, return=[" & returnString & "]")
             //
             return returnString;
         }

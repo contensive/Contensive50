@@ -86,7 +86,7 @@ namespace Contensive.Core {
         }
 
         public override string EncodeContentForWeb(string Source, string ContextContentName = "", int ContextRecordID = 0, int WrapperID = 0) {
-            return activeContentController.convertActiveContentToHtmlForWebRender( CP.core, Source, ContextContentName, ContextRecordID, 0, "", WrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+            return activeContentController.renderHtmlForWeb( CP.core, Source, ContextContentName, ContextRecordID, 0, "", WrapperID, CPUtilsBaseClass.addonContext.ContextPage);
         }
 
         public override string DecodeHTML(string Source) {
@@ -374,7 +374,7 @@ namespace Contensive.Core {
         /// <param name="Source"></param>
         /// <returns></returns>
         public override string EncodeHtmlForWysiwygEditor(string Source) {
-            return activeContentController.convertActiveContentToHtmlForWysiwygEditor(CP.core, Source);
+            return activeContentController.renderHtmlForWysiwygEditor(CP.core, Source);
         }
         //
         //====================================================================================================
@@ -384,7 +384,7 @@ namespace Contensive.Core {
         /// <param name="Source"></param>
         /// <returns></returns>
         public override string DecodeHtmlFromWysiwygEditor(string Source) {
-            return activeContentController.convertEditorResponseToActiveContent(CP.core, Source);
+            return activeContentController.processWysiwygResponseForSave(CP.core, Source);
         }
         //
         //

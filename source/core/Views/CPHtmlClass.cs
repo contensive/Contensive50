@@ -24,14 +24,14 @@ namespace Contensive.Core {
         #endregion
         //
         private CPClass cp;
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         protected bool disposed = false;
         //
         // Constructor
         //
         public CPHtmlClass(CPClass cpParent) : base() {
             cp = cpParent;
-            cpCore = cp.core;
+            core = cp.core;
         }
         //
         // dispose
@@ -91,14 +91,14 @@ namespace Contensive.Core {
         //
         public override string CheckBox(string HtmlName, bool HtmlValue = false, string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.CheckBox
         {
-            return cpCore.html.inputCheckbox(HtmlName, HtmlValue, HtmlId, false, HtmlClass);
+            return core.html.inputCheckbox(HtmlName, HtmlValue, HtmlId, false, HtmlClass);
         }
         //
         //
         //
         public override string CheckList(string HtmlName, string PrimaryContentName, int PrimaryRecordId, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectSQLCriteria = "", string CaptionFieldName = "", bool IsReadOnly = false, string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.CheckList
         {
-            return cpCore.html.getCheckList2(HtmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly);
+            return core.html.getCheckList2(HtmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly);
         }
         //
         //
@@ -109,19 +109,19 @@ namespace Contensive.Core {
             try {
                 if (Method.ToLower() == "get") {
                     if (InnerHtml.IndexOf("type=\"file", 0, 1, StringComparison.OrdinalIgnoreCase) >= 0) {
-                        cpCore.handleException(new ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"));
+                        core.handleException(new ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"));
                     }
                     if (string.IsNullOrEmpty(ActionQueryString)) {
-                        FormStart = cpCore.html.formStart("", HtmlName, HtmlId, Method);
+                        FormStart = core.html.formStart("", HtmlName, HtmlId, Method);
                     } else {
-                        FormStart = cpCore.html.formStart(ActionQueryString, HtmlName, HtmlId, Method);
+                        FormStart = core.html.formStart(ActionQueryString, HtmlName, HtmlId, Method);
                     }
 
                 } else {
                     if (string.IsNullOrEmpty(ActionQueryString)) {
-                        FormStart = cpCore.html.formStartMultipart();
+                        FormStart = core.html.formStartMultipart();
                     } else {
-                        FormStart = cpCore.html.formStartMultipart(ActionQueryString);
+                        FormStart = core.html.formStartMultipart(ActionQueryString);
                     }
                     if (!string.IsNullOrEmpty(HtmlName)) {
                         FormStart = FormStart.Replace(">", " name=\"" + HtmlName + "\">");
@@ -184,7 +184,7 @@ namespace Contensive.Core {
 
         public override string RadioBox(string HtmlName, string HtmlValue, string CurrentValue, string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.RadioBox
         {
-            return cpCore.html.inputRadio(HtmlName, HtmlValue, CurrentValue, HtmlId);
+            return core.html.inputRadio(HtmlName, HtmlValue, CurrentValue, HtmlId);
         }
         //
         //
@@ -192,7 +192,7 @@ namespace Contensive.Core {
         public override string SelectContent(string HtmlName, string HtmlValue, string ContentName, string SQLCriteria = "", string NoneCaption = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.SelectContent
         {
             string tempSelectContent = null;
-            tempSelectContent = cpCore.html.selectFromContent(HtmlName, genericController.encodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption);
+            tempSelectContent = core.html.selectFromContent(HtmlName, genericController.encodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption);
             if (!string.IsNullOrEmpty(HtmlClass)) {
                 tempSelectContent = tempSelectContent.Replace("<select ", "<select class=\"" + HtmlClass + "\" ");
             }
@@ -205,7 +205,7 @@ namespace Contensive.Core {
         public override string SelectList(string HtmlName, string HtmlValue, string OptionList, string NoneCaption = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.SelectList
         {
             string tempSelectList = null;
-            tempSelectList = cpCore.html.selectFromList(HtmlName, HtmlValue, OptionList, NoneCaption, HtmlId);
+            tempSelectList = core.html.selectFromList(HtmlName, HtmlValue, OptionList, NoneCaption, HtmlId);
             if (!string.IsNullOrEmpty(HtmlClass)) {
                 tempSelectList = tempSelectList.Replace("<select ", "<select class=\"" + HtmlClass + "\" ");
             }
@@ -215,7 +215,7 @@ namespace Contensive.Core {
         //
         //
         public override void ProcessCheckList(string HtmlName, string PrimaryContentName, string PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName) {
-            cpCore.html.processCheckList(HtmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName);
+            core.html.processCheckList(HtmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName);
         }
         //
         //====================================================================================================
@@ -225,13 +225,13 @@ namespace Contensive.Core {
         [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")]
         public override void ProcessInputFile(string HtmlName, string VirtualFilePath = "") {
             string ignoreFilename = "";
-            cpCore.cdnFiles.upload(HtmlName, VirtualFilePath, ref ignoreFilename);
+            core.cdnFiles.upload(HtmlName, VirtualFilePath, ref ignoreFilename);
         }
         //
         //
         //
         public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass = "", string HtmlId = "") {
-            return cpCore.html.inputHidden(HtmlName, HtmlValue, HtmlId);
+            return core.html.inputHidden(HtmlName, HtmlValue, HtmlId);
         }
         //
         //
@@ -239,7 +239,7 @@ namespace Contensive.Core {
         public override string InputDate(string HtmlName, string HtmlValue = "", string Width = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.InputDate
         {
             string returnValue = "";
-            returnValue = cpCore.html.inputDate(HtmlName, HtmlValue, Width, HtmlId);
+            returnValue = core.html.inputDate(HtmlName, HtmlValue, Width, HtmlId);
             if (!string.IsNullOrEmpty(HtmlClass)) {
                 returnValue = returnValue.Replace(">", " class=\"" + HtmlClass + "\">");
             }
@@ -249,26 +249,26 @@ namespace Contensive.Core {
         //
         //
         public override string InputFile(string HtmlName, string HtmlClass = "", string HtmlId = "") {
-            return cpCore.html.inputFile(HtmlName, HtmlId, HtmlClass);
+            return core.html.inputFile(HtmlName, HtmlId, HtmlClass);
         }
         //
         //
         //
         public override string InputText(string HtmlName, string HtmlValue = "", string Height = "", string Width = "", bool IsPassword = false, string HtmlClass = "", string HtmlId = "") {
-            string returnValue = cpCore.html.inputText(HtmlName, HtmlValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), HtmlId, IsPassword, false, HtmlClass);
+            string returnValue = core.html.inputText(HtmlName, HtmlValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), HtmlId, IsPassword, false, HtmlClass);
             returnValue = returnValue.Replace(" SIZE=\"60\"", "");
             return returnValue;
         }
         //
         //
         public override string InputTextExpandable(string HtmlName, string HtmlValue = "", int Rows = 0, string StyleWidth = "", bool IsPassword = false, string HtmlClass = "", string HtmlId = "") {
-            return cpCore.html.inputTextExpandable(HtmlName, HtmlValue, Rows, StyleWidth, HtmlId, IsPassword);
+            return core.html.inputTextExpandable(HtmlName, HtmlValue, Rows, StyleWidth, HtmlId, IsPassword);
         }
         //
         //
         //
         public override string SelectUser(string HtmlName, int HtmlValue, int GroupId, string NoneCaption = "", string HtmlClass = "", string HtmlId = "") {
-            return cpCore.html.selectUserFromGroup(HtmlName, HtmlValue, GroupId, NoneCaption, HtmlId);
+            return core.html.selectUserFromGroup(HtmlName, HtmlValue, GroupId, NoneCaption, HtmlId);
         }
         //
         //
@@ -340,19 +340,19 @@ namespace Contensive.Core {
         }
 
         public override string InputWysiwyg(string HtmlName, string HtmlValue = "", BaseClasses.CPHtmlBaseClass.EditorUserScope UserScope = BaseClasses.CPHtmlBaseClass.EditorUserScope.CurrentUser, BaseClasses.CPHtmlBaseClass.EditorContentScope ContentScope = BaseClasses.CPHtmlBaseClass.EditorContentScope.Page, string Height = "", string Width = "", string HtmlClass = "", string HtmlId = "") {
-            return cpCore.html.getFormInputHTML(HtmlName, HtmlValue, Height, Width);
+            return core.html.getFormInputHTML(HtmlName, HtmlValue, Height, Width);
         }
         //
         //
         //
         public override void AddEvent(string HtmlId, string DOMEvent, string JavaScript) {
-            cpCore.html.javascriptAddEvent(HtmlId, DOMEvent, JavaScript);
+            core.html.javascriptAddEvent(HtmlId, DOMEvent, JavaScript);
         }
         //
         //
         //
         public override string Button(string HtmlName, string HtmlValue = "", string HtmlClass = "", string HtmlId = "") {
-            string tempButton = cpCore.html.button(HtmlValue, HtmlName, HtmlId, "");
+            string tempButton = core.html.button(HtmlValue, HtmlName, HtmlId, "");
             if (!string.IsNullOrEmpty(HtmlClass)) {
                 tempButton = tempButton.Replace(">", " class=\"" + HtmlClass + "\">");
             }
@@ -364,7 +364,7 @@ namespace Contensive.Core {
         public override string adminHint(string innerHtml) {
             string returnString = innerHtml;
             try {
-                if (cpCore.doc.sessionContext.isEditingAnything() | cpCore.doc.sessionContext.user.Admin) {
+                if (core.doc.sessionContext.isEditingAnything() | core.doc.sessionContext.user.Admin) {
                     returnString = ""
                         + "<div class=\"ccHintWrapper\">"
                             + "<div  class=\"ccHintWrapperContent\">"
@@ -374,7 +374,7 @@ namespace Contensive.Core {
                         + "</div>";
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex, "Unexpected error in cp.html.adminHint()");
+                core.handleException(ex, "Unexpected error in cp.html.adminHint()");
             }
             return returnString;
         }

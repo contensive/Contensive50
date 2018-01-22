@@ -27,11 +27,11 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // ----- Page Authoring Tools Panel
                 //
-                cpCore.doc.processFormQuickEditing();
+                core.doc.processFormQuickEditing();
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

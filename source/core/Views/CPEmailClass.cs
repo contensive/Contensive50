@@ -23,13 +23,13 @@ namespace Contensive.Core {
         public const string EventsId = "32E893C5-165B-4088-8D9E-CE82524A5000";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         protected bool disposed = false;
         //
         //==========================================================================================
         //
-        public CPEmailClass(Contensive.Core.Controllers.coreController cpCoreObj) : base() {
-            cpCore = cpCoreObj;
+        public CPEmailClass(Contensive.Core.Controllers.coreController coreObj) : base() {
+            core = coreObj;
         }
         //
         //==========================================================================================
@@ -40,7 +40,7 @@ namespace Contensive.Core {
                     //
                     // call .dispose for managed objects
                     //
-                    cpCore = null;
+                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -53,7 +53,7 @@ namespace Contensive.Core {
         //
         public override string fromAddressDefault {
             get {
-                return cpCore.siteProperties.getText("EMAILFROMADDRESS");
+                return core.siteProperties.getText("EMAILFROMADDRESS");
             }
         }
         //
@@ -70,9 +70,9 @@ namespace Contensive.Core {
         public override void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) {
             try {
                 string sendStatus = "";
-                emailController.sendAdHoc(cpCore, ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0, ref sendStatus);
+                emailController.sendAdHoc(core, ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0, ref sendStatus);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -86,9 +86,9 @@ namespace Contensive.Core {
         /// <param name="Subject"></param>
         public override void sendForm(string ToAddress, string FromAddress, string Subject) {
             try {
-                emailController.sendForm(cpCore, ToAddress, FromAddress, Subject);
+                emailController.sendForm(core, ToAddress, FromAddress, Subject);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -105,9 +105,9 @@ namespace Contensive.Core {
         /// <param name="BodyIsHTML"></param>
         public override void sendGroup(string GroupList, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) {
             try {
-                emailController.sendGroup(cpCore, GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML);
+                emailController.sendGroup(core, GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -116,13 +116,13 @@ namespace Contensive.Core {
         //
         public override void sendPassword(string UserEmailAddress) {
             string sendStatus = "";
-            loginController.sendPassword(cpCore, UserEmailAddress, ref sendStatus);
+            loginController.sendPassword(core, UserEmailAddress, ref sendStatus);
         }
         //
         //====================================================================================================
         //
         public override void sendSystem(string EmailName, string AdditionalCopy = "", int AdditionalUserID = 0) {
-            emailController.sendSystem(cpCore, EmailName, AdditionalCopy, AdditionalUserID);
+            emailController.sendSystem(core, EmailName, AdditionalCopy, AdditionalUserID);
         }
         //
         //====================================================================================================
@@ -131,11 +131,11 @@ namespace Contensive.Core {
             int userId = 0;
             if (toUserId.IsNumeric()) {
                 userId = int.Parse(toUserId);
-                personModel person = personModel.create(cpCore, userId);
+                personModel person = personModel.create(core, userId);
                 if ( person != null ) {
                     string sendStatus = "";
                     string queryStringForLinkAppend = "";
-                    emailController.sendPerson(cpCore, person, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", false, ref sendStatus, queryStringForLinkAppend);
+                    emailController.sendPerson(core, person, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", false, ref sendStatus, queryStringForLinkAppend);
                 }
             }
         }

@@ -8,13 +8,14 @@ using Contensive.Core.Controllers;
 using Contensive.Core.Models;
 using Contensive.Core.Models.Complex;
 using Contensive.Core.Models.DbModels;
+using static Contensive.Core.Tests.testConstants;
 
 namespace Contensive.Core.Tests.UnitTests.Models {
     [TestClass()]
     public class routeDictionaryModelTests {
         [TestMethod()]
         public void Models_RouteDictionary_NoRoutes() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 cp.core.db.executeNonQuery("delete from " + addonModel.contentTableName);
                 cp.core.db.executeNonQuery("delete from " + linkAliasModel.contentTableName);

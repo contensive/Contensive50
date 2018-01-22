@@ -27,9 +27,9 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
-                cpCore.html.processHelpBubbleEditor();
+                core.html.processHelpBubbleEditor();
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

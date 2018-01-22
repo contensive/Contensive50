@@ -29,98 +29,98 @@ namespace Contensive.Core.Models.DbModels {
         public int templateId { get; set; }
         //
         //====================================================================================================
-        public static addonTemplateRuleModel add(coreController cpCore) {
-            return add<addonTemplateRuleModel>(cpCore);
+        public static addonTemplateRuleModel add(coreController core) {
+            return add<addonTemplateRuleModel>(core);
         }
         //
         //====================================================================================================
-        public static addonTemplateRuleModel add(coreController cpCore, ref List<string> callersCacheNameList) {
-            return add<addonTemplateRuleModel>(cpCore, ref callersCacheNameList);
+        public static addonTemplateRuleModel add(coreController core, ref List<string> callersCacheNameList) {
+            return add<addonTemplateRuleModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static addonTemplateRuleModel create(coreController cpCore, int recordId) {
-            return create<addonTemplateRuleModel>(cpCore, recordId);
+        public static addonTemplateRuleModel create(coreController core, int recordId) {
+            return create<addonTemplateRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static addonTemplateRuleModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
-            return create<addonTemplateRuleModel>(cpCore, recordId, ref callersCacheNameList);
+        public static addonTemplateRuleModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<addonTemplateRuleModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static addonTemplateRuleModel create(coreController cpCore, string recordGuid) {
-            return create<addonTemplateRuleModel>(cpCore, recordGuid);
+        public static addonTemplateRuleModel create(coreController core, string recordGuid) {
+            return create<addonTemplateRuleModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static addonTemplateRuleModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<addonTemplateRuleModel>(cpCore, recordGuid, ref callersCacheNameList);
+        public static addonTemplateRuleModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<addonTemplateRuleModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static addonTemplateRuleModel createByName(coreController cpCore, string recordName) {
-            return createByName<addonTemplateRuleModel>(cpCore, recordName);
+        public static addonTemplateRuleModel createByName(coreController core, string recordName) {
+            return createByName<addonTemplateRuleModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static addonTemplateRuleModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<addonTemplateRuleModel>(cpCore, recordName, ref callersCacheNameList);
+        public static addonTemplateRuleModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<addonTemplateRuleModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController cpCore) {
-            base.save(cpCore);
+        public new void save(coreController core) {
+            base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, int recordId) {
-            delete<addonTemplateRuleModel>(cpCore, recordId);
+        public static void delete(coreController core, int recordId) {
+            delete<addonTemplateRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, string ccGuid) {
-            delete<addonTemplateRuleModel>(cpCore, ccGuid);
+        public static void delete(coreController core, string ccGuid) {
+            delete<addonTemplateRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<addonTemplateRuleModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<addonTemplateRuleModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<addonTemplateRuleModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<addonTemplateRuleModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<addonTemplateRuleModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
-            return createList<addonTemplateRuleModel>(cpCore, sqlCriteria, sqlOrderBy);
+        public static List<addonTemplateRuleModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<addonTemplateRuleModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<addonTemplateRuleModel> createList(coreController cpCore, string sqlCriteria) {
-            return createList<addonTemplateRuleModel>(cpCore, sqlCriteria);
+        public static List<addonTemplateRuleModel> createList(coreController core, string sqlCriteria) {
+            return createList<addonTemplateRuleModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
-            invalidateCacheSingleRecord<addonTemplateRuleModel>(cpCore, recordId);
+        public void invalidatePrimaryCache(coreController core, int recordId) {
+            invalidateCacheSingleRecord<addonTemplateRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, int recordId) {
-            return baseModel.getRecordName<addonTemplateRuleModel>(cpcore, recordId);
+        public static string getRecordName(coreController core, int recordId) {
+            return baseModel.getRecordName<addonTemplateRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordName<addonTemplateRuleModel>(cpcore, ccGuid);
+        public static string getRecordName(coreController core, string ccGuid) {
+            return baseModel.getRecordName<addonTemplateRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordId<addonTemplateRuleModel>(cpcore, ccGuid);
+        public static int getRecordId(coreController core, string ccGuid) {
+            return baseModel.getRecordId<addonTemplateRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static addonTemplateRuleModel createDefault(coreController cpcore) {
-            return createDefault<addonTemplateRuleModel>(cpcore);
+        public static addonTemplateRuleModel createDefault(coreController core) {
+            return createDefault<addonTemplateRuleModel>(core);
         }
     }
 }

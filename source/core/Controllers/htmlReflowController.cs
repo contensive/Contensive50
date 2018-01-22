@@ -24,13 +24,13 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static string reflow(coreController cpCore, string source) {
+        public static string reflow(coreController core, string source) {
             // disabled, this is sample vb - re-introduce later as requirements cleared (pretty vs ugly reflow)
             return source;
             //Dim returnHtml As String = ""
-            //If cpCore.siteProperties.getBoolean("AutoHTMLFormatting") Then
+            //If core.siteProperties.getBoolean("AutoHTMLFormatting") Then
             //    Dim indentCnt As Integer = 0
-            //    Dim Parse As htmlParserController = New htmlParserController(cpCore)
+            //    Dim Parse As htmlParserController = New htmlParserController(core)
             //    Call Parse.Load(source)
             //    If Parse.ElementCount > 0 Then
             //        For Ptr = 0 To Parse.ElementCount - 1
@@ -126,7 +126,7 @@ namespace Contensive.Core.Controllers {
             //            '
             //            ' Add to 'Asset Errors' Table - a merge with Spider Doc Errors
             //            '
-            //            'Call main_AppendClassErrorLog("cpCoreClass(" & appEnvironment.name & ").GetHTMLBody AutoIndent error. At the end of the document, the last tag was still indented (more start tags than end tags). Link=[" & genericController.decodeHtml(main_ServerLink) & "], ")
+            //            'Call main_AppendClassErrorLog("coreClass(" & appEnvironment.name & ").GetHTMLBody AutoIndent error. At the end of the document, the last tag was still indented (more start tags than end tags). Link=[" & genericController.decodeHtml(main_ServerLink) & "], ")
             //        End If
             //        returnBody = Result.Text
             //    End If

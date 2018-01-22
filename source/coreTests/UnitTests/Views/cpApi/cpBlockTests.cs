@@ -15,6 +15,7 @@ using static Contensive.Core.constants;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using Contensive.BaseClasses;
+using static Contensive.Core.Tests.testConstants;
 
 namespace Contensive.Core.Tests.UnitTests.Views {
 
@@ -34,7 +35,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpBlock_InnerOuterTest() {
             // arrange
-            CPClass cpApp = new CPClass("testapp");
+            CPClass cpApp = new CPClass(testAppName);
             CPBlockBaseClass block = cpApp.BlockNew();
             int layoutInnerLength = layoutA.Length;
             // act
@@ -94,7 +95,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         /// </summary>
         [TestMethod()]
         public void Views_cpBlock_ClearTest() {
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPBlockBaseClass block = cp.BlockNew();
             // act
             block.Load(layoutC);
@@ -110,7 +111,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         /// </summary>
         [TestMethod()]
         public void Views_cpBlock_ImportFileTest() {
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
             try {
                 CPBlockBaseClass block = cp.BlockNew();
@@ -132,7 +133,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         /// </summary>
         [TestMethod()]
         public void Views_cpBlock_OpenCopyTest() {
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             string recordName = "cpBlockTest" + GetRandomInteger(cp.core).ToString();
             int recordId = 0;
             try {
@@ -160,7 +161,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         /// </summary>
         [TestMethod()]
         public void Views_cpBlock_OpenFileTest() {
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
             try {
                 CPBlockBaseClass block = cp.BlockNew();
@@ -180,7 +181,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         /// </summary>
         [TestMethod()]
         public void Views_cpBlock_OpenLayoutTest() {
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             string recordName = "cpBlockTest" + GetRandomInteger(cp.core).ToString();
             int recordId = 0;
             try {
@@ -208,7 +209,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpBlock_AppendPrependTest() {
             // arrange
-            CPClass cpApp = new CPClass("testapp");
+            CPClass cpApp = new CPClass(testAppName);
             CPBlockBaseClass block = cpApp.BlockNew();
             int layoutInnerLength = layoutA.Length;
             // act
@@ -363,7 +364,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         public void Views_cpBlock_AddVar_unit() {
             // arrange
             CPClass cp = new CPClass();
-            CPClass cpApp = new CPClass("testapp");
+            CPClass cpApp = new CPClass(testAppName);
             // act
             cp.AddVar("a", "1");
             cp.AddVar("b", "2");
@@ -393,7 +394,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         public void Views_cpBlock_AppOk_unit() {
             // arrange
             CPClass cp = new CPClass();
-            CPClass cpApp = new CPClass("testapp");
+            CPClass cpApp = new CPClass(testAppName);
             // act
             // assert
             Assert.AreEqual(cp.appOk, false);
@@ -443,7 +444,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         }
         [TestMethod()]
         public void Controllers_db_csSetGetTest() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
                 //

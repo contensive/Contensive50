@@ -27,24 +27,24 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // -- Robots.txt
                 string Filename = "config/RobotsTxtBase.txt";
                 // 
                 // set this way because the preferences page needs a filename in a site property (enhance later)
-                cpCore.siteProperties.setProperty("RobotsTxtFilename", Filename);
-                result = cpCore.cdnFiles.readFile(Filename);
+                core.siteProperties.setProperty("RobotsTxtFilename", Filename);
+                result = core.cdnFiles.readFile(Filename);
                 if (string.IsNullOrEmpty(result)) {
                     //
                     // save default robots.txt
                     //
                     result = "User-agent: *\r\nDisallow: /admin/\r\nDisallow: /images/";
-                    cpCore.appRootFiles.saveFile(Filename, result);
+                    core.appRootFiles.saveFile(Filename, result);
                 }
-                result = result + cpCore.addonCache.robotsTxt;
-                cpCore.webServer.setResponseContentType("text/plain");
-                cpCore.doc.continueProcessing = false;
+                result = result + core.addonCache.robotsTxt;
+                core.webServer.setResponseContentType("text/plain");
+                core.doc.continueProcessing = false;
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

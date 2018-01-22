@@ -44,50 +44,50 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// add the log line to a log file with the folder and prefix
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="LogLine"></param>
         /// <param name="LogFolder"></param>
         /// <param name="LogNamePrefix"></param>
         /// <param name="allowErrorHandling"></param>
         /// <remarks></remarks>
-        public static void appendLog(coreController cpCore, string LogLine, string LogFolder = "", string LogNamePrefix = "", bool allowErrorHandling = true) {
+        public static void appendLog(coreController core, string LogLine, string LogFolder = "", string LogNamePrefix = "", bool allowErrorHandling = true) {
             try {
                 Console.WriteLine(LogLine);
-                if (string.IsNullOrEmpty(LogFolder) || cpCore.serverConfig.enableLogging) {
+                if (string.IsNullOrEmpty(LogFolder) || core.serverConfig.enableLogging) {
                     int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
                     string threadName = threadId.ToString("00000000");
                     string absContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine;
                     fileController fileSystem = null;
-                    if (cpCore.serverConfig != null) {
-                        if (cpCore.serverConfig.appConfig != null) {
+                    if (core.serverConfig != null) {
+                        if (core.serverConfig.appConfig != null) {
                             //
                             // -- use app log space
-                            fileSystem = cpCore.privateFiles;
+                            fileSystem = core.privateFiles;
                         }
                     }
                     if (fileSystem == null) {
                         //
                         // -- no app or no server, use program data files
-                        fileSystem = cpCore.programDataFiles;
+                        fileSystem = core.programDataFiles;
                     }
                     //
-                    if (cpCore.useMicrosoftTraceLogging) {
+                    if (core.useMicrosoftTraceLogging) {
                         string logName;
-                        if (cpCore.serverConfig.appConfig == null) {
+                        if (core.serverConfig.appConfig == null) {
                             // -- no app, log to server
                             logName = ("server/log/" + LogFolder).ToLower();
                         } else {
                             // -- use app log
-                            logName = (cpCore.serverConfig.appConfig.name + "/log/" + LogFolder).ToLower();
+                            logName = (core.serverConfig.appConfig.name + "/log/" + LogFolder).ToLower();
                         }
-                        if (!cpCore.doc.logList.ContainsKey(logName)) {
+                        if (!core.doc.logList.ContainsKey(logName)) {
                             string logPathFile = fileSystem.rootLocalPath + "logs\\" + LogFolder.ToLower() + "\\" + getDateString(DateTime.Now) + ".log";
                             if (!fileSystem.fileExists(logPathFile)) {
                                 fileSystem.appendFile(logPathFile, "");
                             }
-                            cpCore.doc.logList.Add(logName, new TextWriterTraceListener(logPathFile, logName));
+                            core.doc.logList.Add(logName, new TextWriterTraceListener(logPathFile, logName));
                         }
-                        cpCore.doc.logList[logName].WriteLine(absContent);
+                        core.doc.logList[logName].WriteLine(absContent);
                     } else {
                         //
                         // -- until trace works
@@ -157,7 +157,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Append log, use the legacy row with tab delimited context
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="ContensiveAppName"></param>
         /// <param name="contextDescription"></param>
         /// <param name="processName"></param>
@@ -172,7 +172,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="LogFolder"></param>
         /// <param name="LogNamePrefix"></param>
         /// <remarks></remarks>
-        public static void appendLogWithLegacyRow(coreController cpCore, string ContensiveAppName, string contextDescription, string processName, string ClassName, string MethodName, int ErrNumber, string ErrSource, string ErrDescription, bool ErrorTrap, bool ResumeNextAfterLogging, string URL, string LogFolder, string LogNamePrefix) {
+        public static void appendLogWithLegacyRow(coreController core, string ContensiveAppName, string contextDescription, string processName, string ClassName, string MethodName, int ErrNumber, string ErrSource, string ErrDescription, bool ErrorTrap, bool ResumeNextAfterLogging, string URL, string LogFolder, string LogNamePrefix) {
             try {
                 string ErrorMessage = null;
                 string LogLine = null;
@@ -193,7 +193,7 @@ namespace Contensive.Core.Controllers {
                 LogLine = ""
                     + LogFileCopyPrep(ContensiveAppName) + "\t" + LogFileCopyPrep(processName) + "\t" + LogFileCopyPrep(ClassName) + "\t" + LogFileCopyPrep(MethodName) + "\t" + LogFileCopyPrep(contextDescription) + "\t" + LogFileCopyPrep(ErrorMessage) + "\t" + LogFileCopyPrep(ResumeMessage) + "\t" + LogFileCopyPrep(ErrSource) + "\t" + LogFileCopyPrep(ErrNumber.ToString()) + "\t" + LogFileCopyPrep(ErrDescription) + "\t" + LogFileCopyPrep(URL) + "";
                 //
-                appendLog(cpCore, LogLine, LogFolder, LogNamePrefix);
+                appendLog(core, LogLine, LogFolder, LogNamePrefix);
             } catch (Exception) {
 
             }
@@ -210,40 +210,40 @@ namespace Contensive.Core.Controllers {
         //
         //=====================================================================================================
         //   Insert into the ActivityLog
-        public static void logActivity(coreController cpcore, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
+        public static void logActivity(coreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
             try {
                 //
                 int CS;
                 //
-                CS = cpcore.db.csInsertRecord("Activity Log", ByMemberID);
-                if (cpcore.db.csOk(CS)) {
-                    cpcore.db.csSet(CS, "MemberID", SubjectMemberID);
-                    cpcore.db.csSet(CS, "OrganizationID", SubjectOrganizationID);
-                    cpcore.db.csSet(CS, "Message", Message);
-                    cpcore.db.csSet(CS, "Link", Link);
-                    cpcore.db.csSet(CS, "VisitorID", VisitorID);
-                    cpcore.db.csSet(CS, "VisitID", VisitID);
+                CS = core.db.csInsertRecord("Activity Log", ByMemberID);
+                if (core.db.csOk(CS)) {
+                    core.db.csSet(CS, "MemberID", SubjectMemberID);
+                    core.db.csSet(CS, "OrganizationID", SubjectOrganizationID);
+                    core.db.csSet(CS, "Message", Message);
+                    core.db.csSet(CS, "Link", Link);
+                    core.db.csSet(CS, "VisitorID", VisitorID);
+                    core.db.csSet(CS, "VisitID", VisitID);
                 }
-                cpcore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
                 //
                 return;
                 //
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception"));
         }
         //
         //
-        public static void logActivity2(coreController cpcore, string Message, int SubjectMemberID, int SubjectOrganizationID) {
-            logActivity(cpcore, Message, cpcore.doc.sessionContext.user.id, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.requestUrl, cpcore.doc.sessionContext.visitor.id, cpcore.doc.sessionContext.visit.id);
+        public static void logActivity2(coreController core, string Message, int SubjectMemberID, int SubjectOrganizationID) {
+            logActivity(core, Message, core.doc.sessionContext.user.id, SubjectMemberID, SubjectOrganizationID, core.webServer.requestUrl, core.doc.sessionContext.visitor.id, core.doc.sessionContext.visit.id);
         }
         //
         //
         //
-        internal static void appendLogPageNotFound(coreController cpCore, string PageNotFoundLink) {
-            appendLog(cpCore, "bad link [" + PageNotFoundLink + "], referrer [" + cpCore.webServer.requestReferrer + "]", "BadLink");
+        internal static void appendLogPageNotFound(coreController core, string PageNotFoundLink) {
+            appendLog(core, "bad link [" + PageNotFoundLink + "], referrer [" + core.webServer.requestReferrer + "]", "BadLink");
         }
         //
         //================================================================================================
@@ -270,17 +270,17 @@ namespace Contensive.Core.Controllers {
         //           count - the number of times the key was attempted to add. "This error was reported 100 times"
         //================================================================================================
         //
-        public static void reportWarning(coreController cpcore, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
+        public static void reportWarning(coreController core, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
             string SQL = null;
             int warningId = 0;
             int CS = 0;
             //
             warningId = 0;
             SQL = "select top 1 ID from ccSiteWarnings"
-                + " where (generalKey=" + cpcore.db.encodeSQLText(generalKey) + ")"
-                + " and(specificKey=" + cpcore.db.encodeSQLText(specificKey) + ")"
+                + " where (generalKey=" + core.db.encodeSQLText(generalKey) + ")"
+                + " and(specificKey=" + core.db.encodeSQLText(specificKey) + ")"
                 + "";
-            DataTable dt = cpcore.db.executeQuery(SQL);
+            DataTable dt = core.db.executeQuery(SQL);
             if (dt.Rows.Count > 0) {
                 warningId = genericController.encodeInteger(dt.Rows[0]["id"]);
             }
@@ -289,58 +289,58 @@ namespace Contensive.Core.Controllers {
                 //
                 // increment count for matching warning
                 //
-                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" + cpcore.db.encodeSQLDate(DateTime.Now) + " where id=" + warningId;
-                cpcore.db.executeQuery(SQL);
+                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" + core.db.encodeSQLDate(DateTime.Now) + " where id=" + warningId;
+                core.db.executeQuery(SQL);
             } else {
                 //
                 // insert new record
                 //
-                CS = cpcore.db.csInsertRecord("Site Warnings", 0);
-                if (cpcore.db.csOk(CS)) {
-                    cpcore.db.csSet(CS, "name", Name);
-                    cpcore.db.csSet(CS, "description", Description);
-                    cpcore.db.csSet(CS, "generalKey", generalKey);
-                    cpcore.db.csSet(CS, "specificKey", specificKey);
-                    cpcore.db.csSet(CS, "count", 1);
-                    cpcore.db.csSet(CS, "DateLastReported", DateTime.Now);
+                CS = core.db.csInsertRecord("Site Warnings", 0);
+                if (core.db.csOk(CS)) {
+                    core.db.csSet(CS, "name", Name);
+                    core.db.csSet(CS, "description", Description);
+                    core.db.csSet(CS, "generalKey", generalKey);
+                    core.db.csSet(CS, "specificKey", specificKey);
+                    core.db.csSet(CS, "count", 1);
+                    core.db.csSet(CS, "DateLastReported", DateTime.Now);
                     if (true) {
-                        cpcore.db.csSet(CS, "shortDescription", shortDescription);
-                        cpcore.db.csSet(CS, "location", location);
-                        cpcore.db.csSet(CS, "pageId", PageID);
+                        core.db.csSet(CS, "shortDescription", shortDescription);
+                        core.db.csSet(CS, "location", location);
+                        core.db.csSet(CS, "pageId", PageID);
                     }
                 }
-                cpcore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
             }
             //
         }
         //
         //====================================================================================================
         //
-        public static void appendLogCache(coreController cpCore, string message) {
-            appendLog(cpCore, message, "cache");
+        public static void appendLogCache(coreController core, string message) {
+            appendLog(core, message, "cache");
         }
         //
         //====================================================================================================
         //
-        public static void appendLogDebug(coreController cpCore, string message) {
-            appendLog(cpCore, message, "debug");
+        public static void appendLogDebug(coreController core, string message) {
+            appendLog(core, message, "debug");
         }
         //
         //====================================================================================================
         //
-        public static void appendLogInstall(coreController cpCore, string message) {
-            appendLog(cpCore, message, "install");
+        public static void appendLogInstall(coreController core, string message) {
+            appendLog(core, message, "install");
         }
         //
         //====================================================================================================
         //
-        public static void appendLogTasks(coreController cpCore, string message) {
-            appendLog(cpCore, message, "tasks");
+        public static void appendLogTasks(coreController core, string message) {
+            appendLog(core, message, "tasks");
         }
         //
         //====================================================================================================
         //
-        public static void housekeepLogFolder(coreController cpCore) {
+        public static void housekeepLogFolder(coreController core) {
             try {
                 //
                 DateTime LogDate = default(DateTime);
@@ -348,10 +348,10 @@ namespace Contensive.Core.Controllers {
                 FileInfo[] FileList = null;
                 //
                 LogDate = DateTime.Now.AddDays(-30);
-                FileList = cpCore.privateFiles.getFileList("logs\\");
+                FileList = core.privateFiles.getFileList("logs\\");
                 foreach (FileInfo file in FileList) {
                     if (file.CreationTime < LogDate) {
-                        cpCore.privateFiles.deleteFile("logs\\" + file.Name);
+                        core.privateFiles.deleteFile("logs\\" + file.Name);
                     }
                 }
                 //

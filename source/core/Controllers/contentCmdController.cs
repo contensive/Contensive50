@@ -17,16 +17,16 @@ using Contensive.BaseClasses;
 namespace Contensive.Core.Controllers {
     public class contentCmdController {
         //
-        //private coreClass cpCore;
+        //private coreClass core;
         //
         //====================================================================================================
         /// <summary>
         /// constructor
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <remarks></remarks>
-        //public contentCmdController(coreClass cpCore) {
-        //    this.cpCore = cpCore;
+        //public contentCmdController(coreClass core) {
+        //    this.core = core;
         //}
         //
         //=================================================================================
@@ -56,7 +56,7 @@ namespace Contensive.Core.Controllers {
         //            execute = ExecuteCmd(src, Context, personalizationPeopleId, personalizationIsAuthenticated)
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleException(ex);
+        //        core.handleException(ex);
         //    End Try
         //    Return returnValue
         //End Function
@@ -148,7 +148,7 @@ namespace Contensive.Core.Controllers {
         //           user firstname
         //           site propertyname
         //
-        public static string ExecuteCmd(coreController cpCore,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        public static string ExecuteCmd(coreController core,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 bool badCmd = false;
@@ -269,7 +269,7 @@ namespace Contensive.Core.Controllers {
                         // cmd found, process it and add the results to the dst
                         //
                         Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
-                        cmdResult = ExecuteAllCmdLists_Execute( cpCore,  Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                        cmdResult = ExecuteAllCmdLists_Execute( core,  Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
                         if (badCmd) {
                             //
                             // the command was bad, put it back in place (?) in case it was not a command
@@ -284,7 +284,7 @@ namespace Contensive.Core.Controllers {
                 //
                 returnValue = dst;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
@@ -295,7 +295,7 @@ namespace Contensive.Core.Controllers {
         // refactor -- go through all the parsing sections and setup specific exceptions to help users get the syntax correct
         //=================================================================================================================
         //
-        private static string ExecuteAllCmdLists_Execute(coreController cpCore, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        private static string ExecuteAllCmdLists_Execute(coreController core, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 //
@@ -304,7 +304,7 @@ namespace Contensive.Core.Controllers {
                 Dictionary<string, object> cmdDef = null;
                 Dictionary<string, object> cmdArgDef = new Dictionary<string, object>();
                 //
-                //htmlDoc = new Controllers.htmlController(cpCore);
+                //htmlDoc = new Controllers.htmlController(core);
                 cmdSrc = cmdSrc.Trim(' ');
                 string whiteChrs = "\r\n\t ";
                 bool trimming;
@@ -354,9 +354,9 @@ namespace Contensive.Core.Controllers {
                         //
                         Dictionary<string, object> cmdDictionary = new Dictionary<string, object>();
                         try {
-                            cmdDictionary = cpCore.json.Deserialize<Dictionary<string, object>>(cmdSrc);
+                            cmdDictionary = core.json.Deserialize<Dictionary<string, object>>(cmdSrc);
                         } catch (Exception ex) {
-                            cpCore.handleException(ex);
+                            core.handleException(ex);
                             throw;
                         }
                         //
@@ -380,7 +380,7 @@ namespace Contensive.Core.Controllers {
                         // JSON is a command list in the form of an array, like:
                         //   [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
                         //
-                        cmdCollection = cpCore.json.Deserialize<Collection<object>>(cmdSrc);
+                        cmdCollection = core.json.Deserialize<Collection<object>>(cmdSrc);
                         //If True Then
                         //End If
                         //If (LCase(TypeName(cmdDictionaryOrCollection)) <> "collection") Then
@@ -459,7 +459,7 @@ namespace Contensive.Core.Controllers {
                             // argument is in the form of an object, like:
                             //   { "text name": "my text" }
                             //
-                            object cmdDictionaryOrCollection = cpCore.json.Deserialize<object>(cmdArg);
+                            object cmdDictionaryOrCollection = core.json.Deserialize<object>(cmdArg);
                             string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLower();
                             if (cmdDictionaryOrCollectionTypeName.Left(37) != "system.collections.generic.dictionary") {
                                 throw new ApplicationException("Error parsing JSON command argument list, expected a single command, command list [" + cmdSrc + "]");
@@ -568,7 +568,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = cpCore.html.getContentCopy(ArgName, "copy content", cpCore.doc.sessionContext.user.id, true, cpCore.doc.sessionContext.isAuthenticated);
+                                        CmdAccumulator = core.html.getContentCopy(ArgName, "copy content", core.doc.sessionContext.user.id, true, core.doc.sessionContext.isAuthenticated);
                                     }
                                     break;
                                 }
@@ -592,7 +592,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = cpCore.html.getContentCopy(ArgName, "copy content", cpCore.doc.sessionContext.user.id, true, cpCore.doc.sessionContext.isAuthenticated);
+                                        CmdAccumulator = core.html.getContentCopy(ArgName, "copy content", core.doc.sessionContext.user.id, true, core.doc.sessionContext.isAuthenticated);
                                     }
                                     break;
                                 }
@@ -616,8 +616,8 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        //CmdAccumulator = cpCore.main_GetContentCopy(ArgName, "copy content")
-                                        DataTable dt = cpCore.db.executeQuery("select layout from ccLayouts where name=" + cpCore.db.encodeSQLText(ArgName));
+                                        //CmdAccumulator = core.main_GetContentCopy(ArgName, "copy content")
+                                        DataTable dt = core.db.executeQuery("select layout from ccLayouts where name=" + core.db.encodeSQLText(ArgName));
                                         if (dt != null) {
                                             CmdAccumulator = genericController.encodeText(dt.Rows[0]["layout"]);
                                         }
@@ -645,7 +645,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = cpCore.appRootFiles.readFile(ArgName);
+                                        CmdAccumulator = core.appRootFiles.readFile(ArgName);
                                     }
                                     break;
                                 }
@@ -674,7 +674,7 @@ namespace Contensive.Core.Controllers {
                                     //    End Select
                                     //Next
                                     //If ArgName <> "" Then
-                                    //    CmdAccumulator = cpCore.app.siteProperty_getText(ArgName, "")
+                                    //    CmdAccumulator = core.app.siteProperty_getText(ArgName, "")
                                     //End If
                                 }
                             case "set": {
@@ -835,11 +835,11 @@ namespace Contensive.Core.Controllers {
                                         personalizationPeopleId = personalizationPeopleId,
                                         instanceArguments = addonArgDict
                                     };
-                                    addonModel addon = addonModel.createByName(cpCore, addonName);
+                                    addonModel addon = addonModel.createByName(core, addonName);
                                     if (addon == null) {
-                                        cpCore.handleException(new ApplicationException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
+                                        core.handleException(new ApplicationException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
                                     } else {
-                                        CmdAccumulator = cpCore.addon.execute(addon, executeContext);
+                                        CmdAccumulator = core.addon.execute(addon, executeContext);
                                     }
 
                                     break;
@@ -878,8 +878,8 @@ namespace Contensive.Core.Controllers {
                                         personalizationPeopleId = personalizationPeopleId,
                                         instanceArguments = addonArgDict
                                     };
-                                    addonModel addon = addonModel.createByName(cpCore, addonName);
-                                    CmdAccumulator = cpCore.addon.execute(addon, executeContext);
+                                    addonModel addon = addonModel.createByName(core, addonName);
+                                    CmdAccumulator = core.addon.execute(addon, executeContext);
 
 
                                     //
@@ -911,11 +911,11 @@ namespace Contensive.Core.Controllers {
                                     //    },
                                     //    .personalizationAuthenticated = personalizationIsAuthenticated,
                                     //    .personalizationPeopleId = personalizationPeopleId,
-                                    //    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, ArgOptionString)
+                                    //    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, ArgOptionString)
                                     //}
-                                    //Dim addon As addonModel = addonModel.createByName(cpCore, addonName)
-                                    //CmdAccumulator = cpCore.addon.execute(addon, executeContext)
-                                    //CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                    //Dim addon As addonModel = addonModel.createByName(core, addonName)
+                                    //CmdAccumulator = core.addon.execute(addon, executeContext)
+                                    //CmdAccumulator = core.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                     //CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)
                                     break;
                                 }
@@ -925,7 +925,7 @@ namespace Contensive.Core.Controllers {
                 //
                 returnValue = CmdAccumulator;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
@@ -934,20 +934,20 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //   encode (execute) all {% -- %} commands
         //
-        public static string executeContentCommands(coreController cpCore, string Source, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated, ref string Return_ErrorMessage) {
+        public static string executeContentCommands(coreController core, string Source, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated, ref string Return_ErrorMessage) {
             string returnValue = "";
             try {
                 int LoopPtr = 0;
-                //contentCmdController contentCmd = new contentCmdController(cpCore);
+                //contentCmdController contentCmd = new contentCmdController(core);
                 //
                 returnValue = Source;
                 LoopPtr = 0;
                 while ((LoopPtr < 10) && ((returnValue.IndexOf(contentReplaceEscapeStart) != -1))) {
-                    returnValue = contentCmdController.ExecuteCmd(cpCore, returnValue, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                    returnValue = contentCmdController.ExecuteCmd(core, returnValue, Context, personalizationPeopleId, personalizationIsAuthenticated);
                     LoopPtr = LoopPtr + 1;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;

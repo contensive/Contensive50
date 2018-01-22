@@ -21,7 +21,7 @@
 //        /// <summary>
 //        /// constructor
 //        /// </summary>
-//        /// <param name="cpCore"></param>
+//        /// <param name="core"></param>
 //        /// <remarks></remarks>
 //        public htmlToTextControllers() {
 //        }
@@ -30,7 +30,7 @@
 //        // Decode an HTML document back into plain text
 //        //========================================================================
 //        //
-//        static public string convert(coreClass cpCore, string Body) {
+//        static public string convert(coreClass core, string Body) {
 //            //return NUglify.Uglify.HtmlToText(Body).Code;
 //            string result = Body;
 //            try {
@@ -66,7 +66,7 @@
 //                    //
 //                    // ----- Remove HTML tags
 //                    //
-//                    Parse = new htmlParserController(cpCore);
+//                    Parse = new htmlParserController(core);
 //                    if (Parse != null) {
 //                        Parse.Load(iBody);
 //                        ElementCount = Parse.ElementCount;
@@ -387,7 +387,7 @@
 //        // Remove all but a..z, A..Z
 //        //=============================================================================
 //        //
-//        private string DecodeHTML_RemoveWhiteSpace(coreClass cpCore, string DirtyText) {
+//        private string DecodeHTML_RemoveWhiteSpace(coreClass core, string DirtyText) {
 //            string tempDecodeHTML_RemoveWhiteSpace = null;
 //            try {
 //                int Pointer = 0;
@@ -428,7 +428,7 @@
 //                    }
 //                }
 //            } catch (Exception ex) {
-//                cpCore.handleException(ex);
+//                core.handleException(ex);
 //            }
 //            return tempDecodeHTML_RemoveWhiteSpace;
 //        }

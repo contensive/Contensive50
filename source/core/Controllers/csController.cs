@@ -21,16 +21,16 @@ namespace Contensive.Core {
     /// </summary>
     public class csController : IDisposable {
         //
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         private int csPtr;
         private int openingMemberID;
         protected bool disposed = false;
         //
         // Constructor - Initialize the Main and Csv objects
         //
-        public csController(coreController cpCore) {
-            this.cpCore = cpCore;
-            openingMemberID = cpCore.doc.sessionContext.user.id;
+        public csController(coreController core) {
+            this.core = core;
+            openingMemberID = core.doc.sessionContext.user.id;
         }
         //
         //====================================================================================================
@@ -44,7 +44,7 @@ namespace Contensive.Core {
                     //
                     // -- call .dispose for managed objects
                     if (csPtr > -1) {
-                        cpCore.db.csClose(ref csPtr);
+                        core.db.csClose(ref csPtr);
                     }
                 }
                 //
@@ -63,12 +63,12 @@ namespace Contensive.Core {
             bool success = false;
             try {
                 if (csPtr != -1) {
-                    cpCore.db.csClose(ref csPtr);
+                    core.db.csClose(ref csPtr);
                 }
-                csPtr = cpCore.db.csInsertRecord(ContentName, openingMemberID);
-                success = cpCore.db.csOk(csPtr);
+                csPtr = core.db.csInsertRecord(ContentName, openingMemberID);
+                success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return success;
@@ -79,12 +79,12 @@ namespace Contensive.Core {
             bool success = false;
             try {
                 if (csPtr != -1) {
-                    cpCore.db.csClose(ref csPtr);
+                    core.db.csClose(ref csPtr);
                 }
-                csPtr = cpCore.db.csOpen(ContentName, "id=" + recordId, "", ActiveOnly, 0, false, false, SelectFieldList, 1, 1);
-                success = cpCore.db.csOk(csPtr);
+                csPtr = core.db.csOpen(ContentName, "id=" + recordId, "", ActiveOnly, 0, false, false, SelectFieldList, 1, 1);
+                success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return success;
@@ -95,12 +95,12 @@ namespace Contensive.Core {
             bool success = false;
             try {
                 if (csPtr != -1) {
-                    cpCore.db.csClose(ref csPtr);
+                    core.db.csClose(ref csPtr);
                 }
-                csPtr = cpCore.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly,0,false,false,SelectFieldList, pageSize, PageNumber);
-                success = cpCore.db.csOk(csPtr);
+                csPtr = core.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly,0,false,false,SelectFieldList, pageSize, PageNumber);
+                success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return success;
@@ -111,12 +111,12 @@ namespace Contensive.Core {
             bool success = false;
             try {
                 if (csPtr != -1) {
-                    cpCore.db.csClose(ref csPtr);
+                    core.db.csClose(ref csPtr);
                 }
-                csPtr = cpCore.db.csOpenGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
+                csPtr = core.db.csOpenGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
                 success = ok();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return success;
@@ -129,12 +129,12 @@ namespace Contensive.Core {
                 List<string> groupList = new List<string>();
                 groupList.Add(GroupName);
                 if (csPtr != -1) {
-                    cpCore.db.csClose(ref csPtr);
+                    core.db.csClose(ref csPtr);
                 }
-                csPtr = cpCore.db.csOpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
+                csPtr = core.db.csOpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
                 success = ok();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return success;
@@ -148,7 +148,7 @@ namespace Contensive.Core {
                 groupList.AddRange(GroupCommaList.Split(','));
                 result = openGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -159,12 +159,12 @@ namespace Contensive.Core {
             bool success = false;
             try {
                 if (csPtr != -1) {
-                    cpCore.db.csClose(ref csPtr);
+                    core.db.csClose(ref csPtr);
                 }
-                csPtr = cpCore.db.csOpenSql_rev("default", sql);
-                success = cpCore.db.csOk(csPtr);
+                csPtr = core.db.csOpenSql_rev("default", sql);
+                success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return success;
@@ -175,12 +175,12 @@ namespace Contensive.Core {
             bool success = false;
             try {
                 if (csPtr != -1) {
-                    cpCore.db.csClose(ref csPtr);
+                    core.db.csClose(ref csPtr);
                 }
-                csPtr = cpCore.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
-                success = cpCore.db.csOk(csPtr);
+                csPtr = core.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
+                success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return success;
@@ -190,45 +190,45 @@ namespace Contensive.Core {
         public void Close() {
             try {
                 if (csPtr != -1) {
-                    cpCore.db.csClose(ref csPtr);
+                    core.db.csClose(ref csPtr);
                     csPtr = -1;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
         //
         //====================================================================================================
         public string getFormInput(string ContentName, string FieldName, int HeightLines = 1, int WidthRows = 40, string HtmlId = "") {
-            return cpCore.html.inputCs(csPtr, ContentName, FieldName, HeightLines, WidthRows, HtmlId);
+            return core.html.inputCs(csPtr, ContentName, FieldName, HeightLines, WidthRows, HtmlId);
         }
         //
         //====================================================================================================
         public void delete() {
-            cpCore.db.csDeleteRecord(csPtr);
+            core.db.csDeleteRecord(csPtr);
         }
         //
         //====================================================================================================
         public bool fieldOK(string FieldName) {
-            return cpCore.db.cs_isFieldSupported(csPtr, FieldName);
+            return core.db.cs_isFieldSupported(csPtr, FieldName);
         }
         //
         //====================================================================================================
         public void goFirst() {
-            cpCore.db.cs_goFirst(csPtr, false);
+            core.db.cs_goFirst(csPtr, false);
         }
         //
         //====================================================================================================
         public string getAddLink(string PresetNameValueList = "", bool AllowPaste = false) {
             string result = "";
             try {
-                result = cpCore.html.cs_getRecordAddLink(csPtr, PresetNameValueList, AllowPaste);
+                result = core.html.cs_getRecordAddLink(csPtr, PresetNameValueList, AllowPaste);
                 if (result == null) {
                     result = "";
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -236,24 +236,24 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         public bool getBoolean(string FieldName) {
-            return cpCore.db.csGetBoolean(csPtr, FieldName);
+            return core.db.csGetBoolean(csPtr, FieldName);
         }
         //
         //====================================================================================================
         public DateTime getDate(string FieldName) {
-            return cpCore.db.csGetDate(csPtr, FieldName);
+            return core.db.csGetDate(csPtr, FieldName);
         }
         //
         //====================================================================================================
         public string getEditLink(bool AllowCut = false) {
             string result = "";
             try {
-                result = cpCore.db.csGetRecordEditLink(csPtr, AllowCut);
+                result = core.db.csGetRecordEditLink(csPtr, AllowCut);
                 if (result == null) {
                     result = "";
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -271,12 +271,12 @@ namespace Contensive.Core {
         public string getFieldFilename(string FieldName, string OriginalFilename = "", string ContentName = "", int fieldTypeId = 0) {
             string result = "";
             try {
-                result = cpCore.db.csGetFieldFilename(csPtr, FieldName, OriginalFilename, ContentName, fieldTypeId);
+                result = core.db.csGetFieldFilename(csPtr, FieldName, OriginalFilename, ContentName, fieldTypeId);
                 if (result == null) {
                     result = "";
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -284,29 +284,29 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         public int getInteger(string FieldName) {
-            return cpCore.db.csGetInteger(csPtr, FieldName);
+            return core.db.csGetInteger(csPtr, FieldName);
         }
         //
         //====================================================================================================
         public double getNumber(string FieldName) {
-            return cpCore.db.csGetNumber(csPtr, FieldName);
+            return core.db.csGetNumber(csPtr, FieldName);
         }
         //
         //====================================================================================================
         public int getRowCount() {
-            return cpCore.db.csGetRowCount(csPtr);
+            return core.db.csGetRowCount(csPtr);
         }
         //
         //====================================================================================================
         public string getSql() {
             string result = "";
             try {
-                result = cpCore.db.csGetSource(csPtr);
+                result = core.db.csGetSource(csPtr);
                 if (result == null) {
                     result = "";
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -322,12 +322,12 @@ namespace Contensive.Core {
         public string getText(string FieldName) {
             string result = "";
             try {
-                result = cpCore.db.csGet(csPtr, FieldName);
+                result = core.db.csGet(csPtr, FieldName);
                 if (result == null) {
                     result = "";
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -348,29 +348,29 @@ namespace Contensive.Core {
         //Public Function getTextFile(ByVal FieldName As String) As String
         //    Dim result As String = ""
         //    Try
-        //        result = cpCore.db.cs_getTextFile(csPtr, FieldName)
+        //        result = core.db.cs_getTextFile(csPtr, FieldName)
         //        If result Is Nothing Then
         //            result = ""
         //        End If
         //    Catch ex As Exception
-        //        Call cpCore.handleException(ex); : Throw
+        //        Call core.handleException(ex); : Throw
         //    End Try
         //    Return result
         //End Function
         //
         //====================================================================================================
         public void goNext() {
-            cpCore.db.csGoNext(csPtr);
+            core.db.csGoNext(csPtr);
         }
         //
         //====================================================================================================
         public bool nextOK() {
             bool result = false;
             try {
-                cpCore.db.csGoNext(csPtr);
-                result = cpCore.db.csOk(csPtr);
+                core.db.csGoNext(csPtr);
+                result = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -378,12 +378,12 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         public bool ok() {
-            return cpCore.db.csOk(csPtr);
+            return core.db.csOk(csPtr);
         }
         //
         //====================================================================================================
         public void save() {
-            cpCore.db.csSave2(csPtr);
+            core.db.csSave2(csPtr);
         }
         //
         //====================================================================================================
@@ -393,7 +393,7 @@ namespace Contensive.Core {
         /// <param name="FieldName"></param>
         /// <param name="FieldValue"></param>
         public void setField(string FieldName, DateTime FieldValue) {
-            cpCore.db.csSet(csPtr, FieldName, FieldValue);
+            core.db.csSet(csPtr, FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -403,7 +403,7 @@ namespace Contensive.Core {
         /// <param name="FieldName"></param>
         /// <param name="FieldValue"></param>
         public void setField(string FieldName, bool FieldValue) {
-            cpCore.db.csSet(csPtr, FieldName, FieldValue);
+            core.db.csSet(csPtr, FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -413,7 +413,7 @@ namespace Contensive.Core {
         /// <param name="FieldName"></param>
         /// <param name="FieldValue"></param>
         public void setField(string FieldName, string FieldValue) {
-            cpCore.db.csSet(csPtr, FieldName, FieldValue);
+            core.db.csSet(csPtr, FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -421,7 +421,7 @@ namespace Contensive.Core {
         /// set the value for the field.
         /// </summary>
         public void setField(string FieldName, double FieldValue) {
-            cpCore.db.csSet(csPtr, FieldName, FieldValue);
+            core.db.csSet(csPtr, FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -431,7 +431,7 @@ namespace Contensive.Core {
         /// <param name="FieldName"></param>
         /// <param name="FieldValue"></param>
         public void setField(string FieldName, int FieldValue) {
-            cpCore.db.csSet(csPtr, FieldName, FieldValue);
+            core.db.csSet(csPtr, FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -441,22 +441,22 @@ namespace Contensive.Core {
         /// <param name="fieldName"></param>
         /// <param name="filename"></param>
         public void setFieldFilename( string fieldName, string filename ) {
-            cpCore.db.csSetFieldFilename(csPtr, fieldName, filename);
+            core.db.csSetFieldFilename(csPtr, fieldName, filename);
         }
         //
         //========================================================================
         //   main_cs_get Field, translate all fields to their best text equivalent, and encode for display
         //========================================================================
         //
-        public static string getTextEncoded(coreController cpcore, int CSPointer, string FieldName) {
+        public static string getTextEncoded(coreController core, int CSPointer, string FieldName) {
             string ContentName = "";
             int RecordID = 0;
-            if (cpcore.db.cs_isFieldSupported(CSPointer, "id") & cpcore.db.cs_isFieldSupported(CSPointer, "contentcontrolId")) {
-                RecordID = cpcore.db.csGetInteger(CSPointer, "id");
-                ContentName = Models.Complex.cdefModel.getContentNameByID(cpcore, cpcore.db.csGetInteger(CSPointer, "contentcontrolId"));
+            if (core.db.cs_isFieldSupported(CSPointer, "id") & core.db.cs_isFieldSupported(CSPointer, "contentcontrolId")) {
+                RecordID = core.db.csGetInteger(CSPointer, "id");
+                ContentName = Models.Complex.cdefModel.getContentNameByID(core, core.db.csGetInteger(CSPointer, "contentcontrolId"));
             }
-            string source = cpcore.db.csGet(CSPointer, FieldName);
-            return activeContentController.convertActiveContentToHtmlForWebRender(cpcore, source, ContentName, RecordID, cpcore.doc.sessionContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
+            string source = core.db.csGet(CSPointer, FieldName);
+            return activeContentController.renderHtmlForWeb(core, source, ContentName, RecordID, core.doc.sessionContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
         }
         //
         //========================================================================
@@ -464,12 +464,12 @@ namespace Contensive.Core {
         public string getValue(string FieldName) {
             string result = "";
             try {
-                result = cpCore.db.cs_getValue(csPtr, FieldName);
+                result = core.db.cs_getValue(csPtr, FieldName);
                 if (result == null) {
                     result = "";
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;

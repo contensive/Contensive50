@@ -26,56 +26,56 @@ namespace Contensive.Core {
         #endregion
         //
         private CPClass cp { get; set; }
-        private Contensive.Core.Controllers.coreController cpCore { get; set; }
+        private Contensive.Core.Controllers.coreController core { get; set; }
         protected bool disposed { get; set; } = false;
         //
         //====================================================================================================
         //
         public CPContentClass(CPClass cpParent) : base() {
             cp = cpParent;
-            cpCore = cp.core;
+            core = cp.core;
         }
         //
         //====================================================================================================
         //
         public override string GetCopy(string CopyName, string DefaultContent = "") {
-            return cpCore.html.getContentCopy(CopyName, DefaultContent, cpCore.doc.sessionContext.user.id, true, cpCore.doc.sessionContext.isAuthenticated);
+            return core.html.getContentCopy(CopyName, DefaultContent, core.doc.sessionContext.user.id, true, core.doc.sessionContext.isAuthenticated);
         }
         //
         //====================================================================================================
         //
         public override string GetCopy(string CopyName, string DefaultContent, int personalizationPeopleId) {
-            return cpCore.html.getContentCopy(CopyName, DefaultContent, personalizationPeopleId, true, cpCore.doc.sessionContext.isAuthenticated);
+            return core.html.getContentCopy(CopyName, DefaultContent, personalizationPeopleId, true, core.doc.sessionContext.isAuthenticated);
         }
         //
         //====================================================================================================
         //
         public override void SetCopy(string CopyName, string Content) {
-            cpCore.db.SetContentCopy(CopyName, Content);
+            core.db.SetContentCopy(CopyName, Content);
         }
         //
         //====================================================================================================
         //
         public override string GetAddLink(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
-            return cpCore.html.getRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing);
+            return core.html.getRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing);
         }
         //
         //====================================================================================================
         //
         public override string GetContentControlCriteria(string ContentName) {
-            return Models.Complex.cdefModel.getContentControlCriteria(cpCore, ContentName);
+            return Models.Complex.cdefModel.getContentControlCriteria(core, ContentName);
         }
         //
         //====================================================================================================
         //
         public override string GetFieldProperty(string ContentName, string FieldName, string PropertyName) {
-            return Models.Complex.cdefModel.GetContentFieldProperty(cpCore, ContentName, FieldName, PropertyName);
+            return Models.Complex.cdefModel.GetContentFieldProperty(core, ContentName, FieldName, PropertyName);
         }
         //
         //====================================================================================================
         //
         public override int GetID(string ContentName) {
-            return Models.Complex.cdefModel.getContentId(cpCore, ContentName);
+            return Models.Complex.cdefModel.getContentId(core, ContentName);
         }
         //
         //====================================================================================================
@@ -87,31 +87,31 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetDataSource(string ContentName) {
-            return Models.Complex.cdefModel.getContentDataSource(cpCore, ContentName);
+            return Models.Complex.cdefModel.getContentDataSource(core, ContentName);
         }
         //
         //====================================================================================================
         //
         public override string GetEditLink(string ContentName, string RecordID, bool AllowCut, string RecordName, bool IsEditing) {
-            return cpCore.html.getRecordEditLink2(ContentName, genericController.encodeInteger(RecordID), AllowCut, RecordName, IsEditing);
+            return core.html.getRecordEditLink2(ContentName, genericController.encodeInteger(RecordID), AllowCut, RecordName, IsEditing);
         }
         //
         //====================================================================================================
         //
         public override string GetLinkAliasByPageID(int PageID, string QueryStringSuffix, string DefaultLink) {
-            return linkAliasController.getLinkAlias(cpCore, PageID, QueryStringSuffix, DefaultLink);
+            return linkAliasController.getLinkAlias(core, PageID, QueryStringSuffix, DefaultLink);
         }
         //
         //====================================================================================================
         //
         public override string GetPageLink(int PageID, string QueryStringSuffix = "", bool AllowLinkAlias = true) {
-            return pageContentController.getPageLink(cpCore, PageID, QueryStringSuffix, AllowLinkAlias, false);
+            return pageContentController.getPageLink(core, PageID, QueryStringSuffix, AllowLinkAlias, false);
         }
         //
         //====================================================================================================
         //
         public override int GetRecordID(string ContentName, string RecordName) {
-            return cpCore.db.getRecordID(ContentName, RecordName);
+            return core.db.getRecordID(ContentName, RecordName);
         }
         //
         //====================================================================================================
@@ -122,13 +122,13 @@ namespace Contensive.Core {
         /// <param name="RecordID"></param>
         /// <returns></returns>
         public override string GetRecordName(string ContentName, int RecordID) {
-            return cpCore.db.getRecordName(ContentName, RecordID);
+            return core.db.getRecordName(ContentName, RecordID);
         }
         //
         //====================================================================================================
         //
         public override string GetTable(string ContentName) {
-            return Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
+            return Models.Complex.cdefModel.getContentTablename(core, ContentName);
         }
         //
         //====================================================================================================
@@ -141,13 +141,13 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override bool IsField(string ContentName, string FieldName) {
-            return Models.Complex.cdefModel.isContentFieldSupported(cpCore, ContentName, FieldName);
+            return Models.Complex.cdefModel.isContentFieldSupported(core, ContentName, FieldName);
         }
         //
         //====================================================================================================
         //
         public override bool IsLocked(string ContentName, string RecordID) {
-            return cpCore.workflow.isRecordLocked(ContentName, genericController.encodeInteger(RecordID), 0);
+            return core.workflow.isRecordLocked(ContentName, genericController.encodeInteger(RecordID), 0);
         }
         //
         //====================================================================================================
@@ -169,28 +169,28 @@ namespace Contensive.Core {
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void PublishEdit(string ContentName, int RecordID) {
-            // Call cpCore.workflow.publishEdit(ContentName, RecordID, 0)
+            // Call core.workflow.publishEdit(ContentName, RecordID, 0)
         }
         //
         //====================================================================================================
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void SubmitEdit(string ContentName, int RecordID) {
-            //Call cpCore.workflow.submitEdit2(ContentName, RecordID, 0)
+            //Call core.workflow.submitEdit2(ContentName, RecordID, 0)
         }
         //
         //====================================================================================================
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void AbortEdit(string ContentName, int RecordId) {
-            // Call cpCore.workflow.abortEdit2(ContentName, RecordId, 0)
+            // Call core.workflow.abortEdit2(ContentName, RecordId, 0)
         }
         //
         //====================================================================================================
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void ApproveEdit(string ContentName, int RecordId) {
-            //Call cpCore.workflow.approveEdit(ContentName, RecordId, 0)
+            //Call core.workflow.approveEdit(ContentName, RecordId, 0)
         }
         //
         //====================================================================================================
@@ -198,14 +198,14 @@ namespace Contensive.Core {
         public override string getLayout(string layoutName) {
             string result = "";
             try {
-                csController cs = new csController(cpCore);
+                csController cs = new csController(core);
                 cs.open("layouts", "name=" + cp.Db.EncodeSQLText(layoutName), "id", false, "layout");
                 if (cs.ok()) {
                     result = cs.getText("layout");
                 }
                 cs.Close();
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in getLayout")
+                core.handleException(ex); // "Unexpected error in getLayout")
                 throw;
             }
             return result;
@@ -216,14 +216,14 @@ namespace Contensive.Core {
         public override int AddRecord(string ContentName, string recordName) {
             int recordId = 0;
             try {
-                csController cs = new csController(cpCore);
+                csController cs = new csController(core);
                 if (cs.insert(ContentName)) {
                     cs.setField("name", recordName);
                     recordId = cs.getInteger("id");
                 }
                 cs.Close();
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in AddRecord")
+                core.handleException(ex); // "Unexpected error in AddRecord")
                 throw;
             }
             return recordId;
@@ -238,13 +238,13 @@ namespace Contensive.Core {
         public override int AddRecord(string ContentName) {
             int recordId = 0;
             try {
-                csController cs = new csController(cpCore);
+                csController cs = new csController(core);
                 if (cs.insert(ContentName)) {
                     recordId = cs.getInteger("id");
                 }
                 cs.Close();
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in AddRecord")
+                core.handleException(ex); // "Unexpected error in AddRecord")
                 throw;
             }
             return recordId;
@@ -253,13 +253,13 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void Delete(string ContentName, string SQLCriteria) {
-            cpCore.db.deleteContentRecords(ContentName, SQLCriteria);
+            core.db.deleteContentRecords(ContentName, SQLCriteria);
         }
         //
         //====================================================================================================
         //
         public override void DeleteContent(string ContentName) {
-            contentModel.delete(cpCore, Models.Complex.cdefModel.getContentId(cpCore, ContentName));
+            contentModel.delete(core, Models.Complex.cdefModel.getContentId(core, ContentName));
         }
         //
         //====================================================================================================
@@ -271,7 +271,7 @@ namespace Contensive.Core {
             field.authorable = true;
             field.blockAccess = false;
             field.caption = FieldName;
-            field.contentId = Models.Complex.cdefModel.getContentId(cpCore, ContentName);
+            field.contentId = Models.Complex.cdefModel.getContentId(core, ContentName);
             field.developerOnly = false;
             field.editSortPriority = 9999;
             field.editTabName = "";
@@ -287,24 +287,24 @@ namespace Contensive.Core {
             //field.lookupContentName = ""
             field.lookupList = "";
             field.manyToManyContentID = 0;
-            field.set_ManyToManyContentName(cpCore, "");
+            field.set_ManyToManyContentName(core, "");
             field.manyToManyRuleContentID = 0;
-            field.set_ManyToManyRuleContentName(cpCore, "");
+            field.set_ManyToManyRuleContentName(core, "");
             field.ManyToManyRulePrimaryField = "";
             field.ManyToManyRuleSecondaryField = "";
-            field.memberSelectGroupId_set( cpCore, 0 );
+            field.memberSelectGroupId_set( core, 0 );
             field.nameLc = FieldName.ToLower();
             field.password = false;
             field.readOnly = false;
             field.redirectContentID = 0;
-            field.set_RedirectContentName(cpCore, "");
+            field.set_RedirectContentName(core, "");
             field.redirectID = "";
             field.redirectPath = "";
             field.required = false;
             field.Scramble = false;
             field.textBuffered = false;
             field.uniqueName = false;
-            return Models.Complex.cdefModel.verifyCDefField_ReturnID(cpCore, ContentName, field);
+            return Models.Complex.cdefModel.verifyCDefField_ReturnID(core, ContentName, field);
         }
         //
         //====================================================================================================
@@ -323,8 +323,8 @@ namespace Contensive.Core {
         //
         public override int AddContent(string ContentName, string sqlTableName, string dataSourceName) {
             var tmpList = new List<string> { };
-            dataSourceModel dataSource = dataSourceModel.createByName(cpCore, dataSourceName, ref tmpList);
-            return Models.Complex.cdefModel.addContent(cpCore, true, dataSource, sqlTableName, ContentName, false, false, true, false, "", "sort order", "name", false, false, false, false, false, false, "", 0, 0, 0, "", false, "", true);
+            dataSourceModel dataSource = dataSourceModel.createByName(core, dataSourceName, ref tmpList);
+            return Models.Complex.cdefModel.addContent(core, true, dataSource, sqlTableName, ContentName, false, false, true, false, "", "sort order", "name", false, false, false, false, false, false, "", 0, 0, 0, "", false, "", true);
         }
         //
         //====================================================================================================
@@ -347,7 +347,7 @@ namespace Contensive.Core {
                     + " align=\"absmiddle\""
                     + "></a>";
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in GetListLink")
+                core.handleException(ex); // "Unexpected error in GetListLink")
                 throw;
             }
             return returnHtml;
@@ -361,7 +361,7 @@ namespace Contensive.Core {
                     //
                     // call .dispose for managed objects
                     //
-                    cpCore = null;
+                    core = null;
                     cp = null;
                 }
                 //

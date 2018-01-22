@@ -27,9 +27,9 @@ namespace Contensive.Core.Addons.AdminSite {
             string returnHtml = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
-                cpCore.visitProperty.setProperty("IndexFilterOpen", "1");
+                core.visitProperty.setProperty("IndexFilterOpen", "1");
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

@@ -55,7 +55,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public string GetTabs(coreController cpCore ) {
+        public string GetTabs(coreController core ) {
             string result = "";
             try {
                 //
@@ -88,7 +88,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Create TabBar
                     //
-                    TabWrapperID = "TabWrapper" + genericController.GetRandomInteger(cpCore);
+                    TabWrapperID = "TabWrapper" + genericController.GetRandomInteger(core);
                     TabBlank = GetTabBlank();
                     result = result + "<script language=\"JavaScript\" src=\"/ccLib/clientside/ccDynamicTab.js\" type=\"text/javascript\"></script>\r\n";
                     result = result + "<table border=0 cellspacing=0 cellpadding=0 width=\"100%\"><tr>";
@@ -105,7 +105,7 @@ namespace Contensive.Core.Controllers {
                         TabBodyWrapShowStyle = TabStyle + "BodyWrapShow";
                         TabBodyWrapHideStyle = TabStyle + "BodyWrapHide";
                         TabBodyCollectionWrapStyle = TabStyle + "BodyCollectionWrap";
-                        IDNumber = genericController.GetRandomInteger(cpCore);
+                        IDNumber = genericController.GetRandomInteger(core);
                         LiveBodyID = "TabContent" + IDNumber;
                         TabID = "Tab" + IDNumber;
                         //

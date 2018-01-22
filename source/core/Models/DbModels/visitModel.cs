@@ -52,110 +52,110 @@ namespace Contensive.Core.Models.DbModels {
         public bool VisitorNew { get; set; }
         //
         //====================================================================================================
-        public static visitModel add(coreController cpCore) {
-            return add<visitModel>(cpCore);
+        public static visitModel add(coreController core) {
+            return add<visitModel>(core);
         }
         //
         //====================================================================================================
-        public static visitModel add(coreController cpCore, ref List<string> callersCacheNameList) {
-            return add<visitModel>(cpCore, ref callersCacheNameList);
+        public static visitModel add(coreController core, ref List<string> callersCacheNameList) {
+            return add<visitModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static visitModel create(coreController cpCore, int recordId) {
-            return create<visitModel>(cpCore, recordId);
+        public static visitModel create(coreController core, int recordId) {
+            return create<visitModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static visitModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
-            return create<visitModel>(cpCore, recordId, ref callersCacheNameList);
+        public static visitModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<visitModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static visitModel create(coreController cpCore, string recordGuid) {
-            return create<visitModel>(cpCore, recordGuid);
+        public static visitModel create(coreController core, string recordGuid) {
+            return create<visitModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static visitModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<visitModel>(cpCore, recordGuid, ref callersCacheNameList);
+        public static visitModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<visitModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static visitModel createByName(coreController cpCore, string recordName) {
-            return createByName<visitModel>(cpCore, recordName);
+        public static visitModel createByName(coreController core, string recordName) {
+            return createByName<visitModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static visitModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<visitModel>(cpCore, recordName, ref callersCacheNameList);
+        public static visitModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<visitModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController cpCore) {
-            base.save(cpCore);
+        public new void save(coreController core) {
+            base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, int recordId) {
-            delete<visitModel>(cpCore, recordId);
+        public static void delete(coreController core, int recordId) {
+            delete<visitModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, string ccGuid) {
-            delete<visitModel>(cpCore, ccGuid);
+        public static void delete(coreController core, string ccGuid) {
+            delete<visitModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<visitModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<visitModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<visitModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<visitModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<visitModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
-            return createList<visitModel>(cpCore, sqlCriteria, sqlOrderBy);
+        public static List<visitModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<visitModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<visitModel> createList(coreController cpCore, string sqlCriteria) {
-            return createList<visitModel>(cpCore, sqlCriteria);
+        public static List<visitModel> createList(coreController core, string sqlCriteria) {
+            return createList<visitModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
-            invalidateCacheSingleRecord<visitModel>(cpCore, recordId);
+        public void invalidatePrimaryCache(coreController core, int recordId) {
+            invalidateCacheSingleRecord<visitModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, int recordId) {
-            return baseModel.getRecordName<visitModel>(cpcore, recordId);
+        public static string getRecordName(coreController core, int recordId) {
+            return baseModel.getRecordName<visitModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordName<visitModel>(cpcore, ccGuid);
+        public static string getRecordName(coreController core, string ccGuid) {
+            return baseModel.getRecordName<visitModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordId<visitModel>(cpcore, ccGuid);
+        public static int getRecordId(coreController core, string ccGuid) {
+            return baseModel.getRecordId<visitModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static visitModel createDefault(coreController cpcore) {
-            return createDefault<visitModel>(cpcore);
+        public static visitModel createDefault(coreController core) {
+            return createDefault<visitModel>(core);
         }
         //
         //====================================================================================================
         /// <summary>
         /// return a visit object for the visitor's last visit before the provided id
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="visitId"></param>
         /// <param name="visitorId"></param>
         /// <returns></returns>
-        public static visitModel getLastVisitByVisitor(coreController cpCore, int visitId, int visitorId) {
-            var visitList = createList(cpCore, "(id<>" + visitId + ")and(VisitorID=" + visitorId + ")", "id desc");
+        public static visitModel getLastVisitByVisitor(coreController core, int visitId, int visitorId) {
+            var visitList = createList(core, "(id<>" + visitId + ")and(VisitorID=" + visitorId + ")", "id desc");
             if ( visitList.Count>0) {
                 return visitList.First();
             }

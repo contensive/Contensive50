@@ -33,16 +33,16 @@ namespace Contensive.Core.Controllers {
         /// <param name="textToInsert"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string setOuter(coreController cpCore, string layout, string Key, string textToInsert) {
+        public static string setOuter(coreController core, string layout, string Key, string textToInsert) {
             string returnValue = "";
             try {
                 if (string.IsNullOrEmpty(Key)) {
                     returnValue = textToInsert;
                 } else {
                     returnValue = layout;
-                    int posStart = getTagStartPos(cpCore, layout, 1, Key);
+                    int posStart = getTagStartPos(core, layout, 1, Key);
                     if (posStart != 0) {
-                        int posEnd = getTagEndPos(cpCore, layout, posStart);
+                        int posEnd = getTagEndPos(core, layout, posStart);
                         if (posEnd > 0) {
                             //
                             // seems like these are the correct positions here.
@@ -52,14 +52,14 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
         }
         //
         //====================================================================================================
-        public static  string setInner(coreController cpCore, string layout, string Key, string textToInsert) {
+        public static  string setInner(coreController core, string layout, string Key, string textToInsert) {
             string returnValue = "";
             try {
                 int posStart = 0;
@@ -71,10 +71,10 @@ namespace Contensive.Core.Controllers {
                     returnValue = textToInsert;
                 } else {
                     returnValue = layout;
-                    posStart = getTagStartPos( cpCore, layout, 1, Key);
+                    posStart = getTagStartPos( core, layout, 1, Key);
                     //outerHTML = getOuterHTML(ignore, layout, Key, PosStart)
                     if (posStart != 0) {
-                        posEnd = getTagEndPos( cpCore, layout, posStart);
+                        posEnd = getTagEndPos( core, layout, posStart);
                         if (posEnd > 0) {
                             posStart = genericController.vbInstr(posStart + 1, layout, ">");
                             if (posStart != 0) {
@@ -88,7 +88,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
@@ -103,7 +103,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="Key"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string getInner(coreController cpCore, string layout, string Key) {
+        public static string getInner(coreController core, string layout, string Key) {
             string returnValue = "";
             try {
                 int posStart = 0;
@@ -117,9 +117,9 @@ namespace Contensive.Core.Controllers {
                     //
                 } else {
                     returnValue = layout;
-                    posStart = getTagStartPos(cpCore, layout, 1, Key);
+                    posStart = getTagStartPos(core, layout, 1, Key);
                     if (posStart != 0) {
-                        posEnd = getTagEndPos(cpCore, layout, posStart);
+                        posEnd = getTagEndPos(core, layout, posStart);
                         if (posEnd > 0) {
                             posStart = genericController.vbInstr(posStart + 1, layout, ">");
                             if (posStart != 0) {
@@ -140,7 +140,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
@@ -155,7 +155,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="Key"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string getOuter(coreController cpCore, string layout, string Key) {
+        public static string getOuter(coreController core, string layout, string Key) {
             string returnValue = "";
             try {
                 int posStart = 0;
@@ -164,7 +164,7 @@ namespace Contensive.Core.Controllers {
                 //
                 s = layout;
                 if (!string.IsNullOrEmpty(s)) {
-                    posStart = getTagStartPos(cpCore, s, 1, Key);
+                    posStart = getTagStartPos(core, s, 1, Key);
                     if (posStart > 0) {
                         //
                         // now backtrack to include the leading whitespace
@@ -174,7 +174,7 @@ namespace Contensive.Core.Controllers {
                         }
                         //posStart = posStart + 1
                         s = s.Substring(posStart - 1);
-                        posEnd = getTagEndPos(cpCore, s, 1);
+                        posEnd = getTagEndPos(core, s, 1);
                         if (posEnd > 0) {
                             s = s.Left( posEnd - 1);
                             returnValue = s;
@@ -182,14 +182,14 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
         }
         //
         //====================================================================================================
-        private static bool tagMatch(coreController cpCore, string layout, int posStartTag, string searchId, string searchClass) {
+        private static bool tagMatch(coreController core, string layout, int posStartTag, string searchId, string searchClass) {
             bool returnValue = false;
             try {
                 const string attrAllowedChars = "abcdefghijklmnopqrstuvwzyz-_";
@@ -346,14 +346,14 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
         }
         //
         //====================================================================================================
-        public static  int getTagStartPos(coreController cpCore, string layout, int layoutStartPos, string Key) {
+        public static  int getTagStartPos(coreController core, string layout, int layoutStartPos, string Key) {
             int returnValue = 0;
             try {
                 int returnPos = 0;
@@ -511,7 +511,7 @@ namespace Contensive.Core.Controllers {
                                 // this is an end tag, skip it
                                 //
                                 Pos = Pos + 1;
-                            } else if (tagMatch( cpCore, layout, posStartTag, searchId, searchClass)) {
+                            } else if (tagMatch( core, layout, posStartTag, searchId, searchClass)) {
                                 //
                                 // match, return with this position
                                 //
@@ -530,13 +530,13 @@ namespace Contensive.Core.Controllers {
                     //
                     //
                     if (LoopPtr >= 10000) {
-                        cpCore.handleException(new ApplicationException("Tag limit of 10000 tags per block reached."));
+                        core.handleException(new ApplicationException("Tag limit of 10000 tags per block reached."));
                     }
                 }
                 //
                 returnValue = returnPos;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
@@ -551,7 +551,7 @@ namespace Contensive.Core.Controllers {
         //       returns 0 if the end was not found
         //=================================================================================================
         //
-        public static int getTagEndPos(coreController cpCore, string Source, int startPos) {
+        public static int getTagEndPos(coreController core, string Source, int startPos) {
             int returnValue = 0;
             try {
                 int Pos = 0;
@@ -610,7 +610,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // ----- the tag is nested, find the end of the nest
                                     //
-                                    Pos = getTagEndPos(cpCore, Source, posNest);
+                                    Pos = getTagEndPos(core, Source, posNest);
                                     // 8/28/2012, if there is a nested tag right before the correct end tag, it skips the end:
                                     // <div class=a>a<div class=b>b</div></div>
                                     // the second /div is missed because returnValue returns one past the >, then the
@@ -654,7 +654,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;

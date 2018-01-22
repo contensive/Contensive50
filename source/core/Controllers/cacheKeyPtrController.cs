@@ -30,7 +30,7 @@ namespace Contensive.Core.Controllers {
         //
         // ----- objects passed in constructor, do not dispose
         //
-        private coreController cpCore;
+        private coreController core;
         //
         // ----- private globals
         //
@@ -49,8 +49,8 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public keyPtrIndexController(coreController cpCore, string cacheName, string sqlLoadKeyValue, string cacheInvalidationTagCommaList) : base() {
-            this.cpCore = cpCore;
+        public keyPtrIndexController(coreController core, string cacheName, string sqlLoadKeyValue, string cacheInvalidationTagCommaList) : base() {
+            this.core = core;
             this.cacheName = cacheName;
             this.sqlLoadKeyValue = sqlLoadKeyValue;
             this.cacheInvalidationTagCommaList = cacheInvalidationTagCommaList;
@@ -69,9 +69,9 @@ namespace Contensive.Core.Controllers {
                 dataStore.loaded = false;
                 dataStore.dataList.Clear();
                 dataStore.keyPtrIndex = new keyPtrController();
-                cpCore.cache.setObject(cacheName + "-dataList", dataStore.dataList);
+                core.cache.setObject(cacheName + "-dataList", dataStore.dataList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -98,7 +98,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex, "key[" + key + "]");
+                core.handleException(ex, "key[" + key + "]");
             }
             return returnPtr;
         }
@@ -120,7 +120,7 @@ namespace Contensive.Core.Controllers {
                     returnPtr = dataStore.keyPtrIndex.getNextPtr();
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnPtr;
@@ -148,7 +148,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex, "key[" + key + "]");
+                core.handleException(ex, "key[" + key + "]");
             }
             return returnPtr;
         }
@@ -175,7 +175,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex, "ptr[" + ptr.ToString() + "]");
+                core.handleException(ex, "ptr[" + ptr.ToString() + "]");
             }
             return returnValue;
         }
@@ -196,7 +196,7 @@ namespace Contensive.Core.Controllers {
                 if (!dataStore.loaded) {
                     try {
                         needsToReload = true;
-                        dataStore = (dataStoreClass)cpCore.cache.getObject<dataStoreClass>(cacheName);
+                        dataStore = (dataStoreClass)core.cache.getObject<dataStoreClass>(cacheName);
                     } catch (Exception) {
                         needsToReload = true;
                     }
@@ -212,7 +212,7 @@ namespace Contensive.Core.Controllers {
                         dataStore = new dataStoreClass();
                         dataStore.dataList = new List<string>();
                         dataStore.keyPtrIndex = new keyPtrController();
-                        using (DataTable dt = cpCore.db.executeQuery(sqlLoadKeyValue)) {
+                        using (DataTable dt = core.db.executeQuery(sqlLoadKeyValue)) {
                             Ptr = 0;
                             foreach (DataRow dr in dt.Rows) {
                                 dataStore.keyPtrIndex.setPtr(dr[0].ToString(), Ptr);
@@ -246,7 +246,7 @@ namespace Contensive.Core.Controllers {
             try {
                 if (dataStore.loaded) {
                     dataStore.keyPtrIndex.getPtr("test");
-                    cpCore.cache.setObject(cacheName, dataStore, cacheInvalidationTagCommaList);
+                    core.cache.setObject(cacheName, dataStore, cacheInvalidationTagCommaList);
                 }
             } catch (Exception ex) {
                 throw new ApplicationException("Exception in cacheKeyPtrClass.save", ex);

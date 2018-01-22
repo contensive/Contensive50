@@ -22,12 +22,12 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class docPropertyController {
         //
-        private coreController cpCore;
+        private coreController core;
         //
         private Dictionary<string, docPropertiesClass> docPropertiesDict = new Dictionary<string, docPropertiesClass>();
         //
-        public docPropertyController(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public docPropertyController(coreController core) : base() {
+            this.core = core;
         }
         //
         //====================================================================================================
@@ -69,7 +69,7 @@ namespace Contensive.Core.Controllers {
                 prop.Value = value;
                 setProperty(key, prop);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -108,7 +108,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return genericController.encodeNumber(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -119,7 +119,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return genericController.encodeInteger(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -130,7 +130,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return genericController.encodeText(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -139,9 +139,9 @@ namespace Contensive.Core.Controllers {
         //
         public string getRenderedActiveContent(string RequestName) {
             try {
-                return activeContentController.convertEditorResponseToActiveContent(cpCore, genericController.encodeText(getProperty(RequestName).Value));
+                return activeContentController.processWysiwygResponseForSave(core, genericController.encodeText(getProperty(RequestName).Value));
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -152,7 +152,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return genericController.encodeBoolean(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -163,7 +163,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return genericController.encodeDate(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -179,7 +179,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return new docPropertiesClass();
@@ -192,15 +192,15 @@ namespace Contensive.Core.Controllers {
             try {
                 if (!string.IsNullOrEmpty(sourceKey)) {
                     returnResult = sourceKey.ToLower();
-                    if (cpCore.webServer.requestSpaceAsUnderscore) {
+                    if (core.webServer.requestSpaceAsUnderscore) {
                         returnResult = genericController.vbReplace(returnResult, " ", "_");
                     }
-                    if (cpCore.webServer.requestDotAsUnderscore) {
+                    if (core.webServer.requestDotAsUnderscore) {
                         returnResult = genericController.vbReplace(returnResult, ".", "_");
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnResult;
@@ -238,14 +238,14 @@ namespace Contensive.Core.Controllers {
                                 }
                                 docProperty.IsForm = false;
                                 docProperty.IsFile = false;
-                                //cpCore.webServer.readStreamJSForm = cpCore.webServer.readStreamJSForm Or (UCase(.Name) = genericController.vbUCase(RequestNameJSForm))
-                                cpCore.docProperties.setProperty(key, docProperty);
+                                //core.webServer.readStreamJSForm = core.webServer.readStreamJSForm Or (UCase(.Name) = genericController.vbUCase(RequestNameJSForm))
+                                core.docProperties.setProperty(key, docProperty);
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }

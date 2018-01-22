@@ -7,15 +7,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Contensive.Core.Controllers;
 using Contensive.Core.Models.DbModels;
-
+using static Contensive.Core.Tests.testConstants;
 
 namespace Contensive.Core.Tests.UnitTests.Controllers {
+    //
+    //====================================================================================================
+    /// <summary>
+    /// cache controller unit tests
+    /// </summary>
     [TestClass()]
     public class cacheControllerTests {
         //
+        //====================================================================================================
+        //
         [TestMethod()]
         public void Controllers_cache_blank() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 // act
                 // assert
@@ -23,9 +30,11 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
             }
         }
         //
+        //====================================================================================================
+        //
         [TestMethod()]
         public void Controllers_cache_SetGetString() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 string key = "test" + genericController.GetRandomInteger(cp.core).ToString();
                 string value = "value" + genericController.GetRandomInteger(cp.core).ToString();
@@ -45,9 +54,11 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
             public bool prop5 = false;
         }
         //
+        //====================================================================================================
+        //
         [TestMethod()]
         public void Controllers_cache_SetGetObjectDefault() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var srcTest = new cacheTestClass();
                 string key = "test" + genericController.GetRandomInteger(cp.core).ToString();
@@ -61,7 +72,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod()]
         public void Controllers_cache_SetGetObjectNonDefault() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var srcTest = new cacheTestClass() {
                     prop1 = "b",
@@ -81,7 +92,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod()]
         public void Controllers_cache_SetGetObjectWithDependency() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string keyTest = "test" + genericController.GetRandomInteger(cp.core).ToString();
@@ -103,7 +114,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod()]
         public void Controllers_cache_SetGetObjectWithDependencyList() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string keyTest = "test" + genericController.GetRandomInteger(cp.core).ToString();
@@ -128,7 +139,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod()]
         public void Controllers_cache_SetGetObjectWithInvalidationDate() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string keyTestWithDate = "testWithDate" + genericController.GetRandomInteger(cp.core).ToString();
@@ -148,7 +159,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod()]
         public void Controllers_cache_SetGetObjectWithInvalidate() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string keyTest = "test" + genericController.GetRandomInteger(cp.core).ToString();
@@ -170,7 +181,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod()]
         public void Controllers_cache_SetGetObjectWithInvalidateContent() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string keyTest = "test" + genericController.GetRandomInteger(cp.core).ToString();
@@ -193,7 +204,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod()]
         public void Controllers_cache_SetGetObjectWithInvalidateTable() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string keyTest = "test" + genericController.GetRandomInteger(cp.core).ToString();
@@ -216,7 +227,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod()]
         public void Controllers_cache_SetGetAlias() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string testKey = "test" + genericController.GetRandomInteger(cp.core).ToString();
@@ -235,7 +246,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod()]
         public void Controllers_cache_SetGetAliasInvalidateKey() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string testKey = "test" + genericController.GetRandomInteger(cp.core).ToString();
@@ -257,7 +268,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod()]
         public void Controllers_cache_SetGetAliasInvalidateAlias() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
                 string testKey = "test" + genericController.GetRandomInteger(cp.core).ToString();

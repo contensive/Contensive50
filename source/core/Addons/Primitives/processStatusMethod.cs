@@ -27,38 +27,38 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // test default data connection
                 //
                 bool InsertTestOK = false;
                 int TrapID = 0;
-                int CS = cpCore.db.csInsertRecord("Trap Log");
-                if (!cpCore.db.csOk(CS)) {
+                int CS = core.db.csInsertRecord("Trap Log");
+                if (!core.db.csOk(CS)) {
                     //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
                 } else {
                     InsertTestOK = true;
-                    TrapID = cpCore.db.csGetInteger(CS, "ID");
+                    TrapID = core.db.csGetInteger(CS, "ID");
                 }
-                cpCore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
                 if (InsertTestOK) {
                     if (TrapID == 0) {
                         //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
                     } else {
-                        cpCore.db.deleteContentRecord("Trap Log", TrapID);
+                        core.db.deleteContentRecord("Trap Log", TrapID);
                     }
                 }
                 //
                 // Close page
                 //
-                cpCore.webServer.clearResponseBuffer();
-                if (cpCore.doc.errorCount == 0) {
+                core.webServer.clearResponseBuffer();
+                if (core.doc.errorCount == 0) {
                     result = "Contensive OK";
                 } else {
-                    result = "Contensive Error Count = " + cpCore.doc.errorCount;
+                    result = "Contensive Error Count = " + core.doc.errorCount;
                 }
-                result = cpCore.html.getHtmlBodyEnd(false, false);
-                cpCore.doc.continueProcessing = false;
+                result = core.html.getHtmlBodyEnd(false, false);
+                core.doc.continueProcessing = false;
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

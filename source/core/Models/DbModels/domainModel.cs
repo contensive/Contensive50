@@ -36,104 +36,104 @@ namespace Contensive.Core.Models.DbModels {
         public int defaultRouteId { get; set; }
         //
         //====================================================================================================
-        public static domainModel add(coreController cpCore) {
-            return add<domainModel>(cpCore);
+        public static domainModel add(coreController core) {
+            return add<domainModel>(core);
         }
         //
         //====================================================================================================
-        public static domainModel add(coreController cpCore, ref List<string> callersCacheNameList) {
-            return add<domainModel>(cpCore, ref callersCacheNameList);
+        public static domainModel add(coreController core, ref List<string> callersCacheNameList) {
+            return add<domainModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static domainModel create(coreController cpCore, int recordId) {
-            return create<domainModel>(cpCore, recordId);
+        public static domainModel create(coreController core, int recordId) {
+            return create<domainModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static domainModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
-            return create<domainModel>(cpCore, recordId, ref callersCacheNameList);
+        public static domainModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<domainModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static domainModel create(coreController cpCore, string recordGuid) {
-            return create<domainModel>(cpCore, recordGuid);
+        public static domainModel create(coreController core, string recordGuid) {
+            return create<domainModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static domainModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<domainModel>(cpCore, recordGuid, ref callersCacheNameList);
+        public static domainModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<domainModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static domainModel createByName(coreController cpCore, string recordName) {
-            return createByName<domainModel>(cpCore, recordName);
+        public static domainModel createByName(coreController core, string recordName) {
+            return createByName<domainModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static domainModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<domainModel>(cpCore, recordName, ref callersCacheNameList);
+        public static domainModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<domainModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController cpCore) {
-            base.save(cpCore);
+        public new void save(coreController core) {
+            base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, int recordId) {
-            delete<domainModel>(cpCore, recordId);
+        public static void delete(coreController core, int recordId) {
+            delete<domainModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, string ccGuid) {
-            delete<domainModel>(cpCore, ccGuid);
+        public static void delete(coreController core, string ccGuid) {
+            delete<domainModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<domainModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<domainModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<domainModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<domainModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<domainModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
-            return createList<domainModel>(cpCore, sqlCriteria, sqlOrderBy);
+        public static List<domainModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<domainModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<domainModel> createList(coreController cpCore, string sqlCriteria) {
-            return createList<domainModel>(cpCore, sqlCriteria);
+        public static List<domainModel> createList(coreController core, string sqlCriteria) {
+            return createList<domainModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
-            invalidateCacheSingleRecord<domainModel>(cpCore, recordId);
+        public void invalidatePrimaryCache(coreController core, int recordId) {
+            invalidateCacheSingleRecord<domainModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, int recordId) {
-            return baseModel.getRecordName<domainModel>(cpcore, recordId);
+        public static string getRecordName(coreController core, int recordId) {
+            return baseModel.getRecordName<domainModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordName<domainModel>(cpcore, ccGuid);
+        public static string getRecordName(coreController core, string ccGuid) {
+            return baseModel.getRecordName<domainModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordId<domainModel>(cpcore, ccGuid);
+        public static int getRecordId(coreController core, string ccGuid) {
+            return baseModel.getRecordId<domainModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static domainModel createDefault(coreController cpcore) {
-            return createDefault<domainModel>(cpcore);
+        public static domainModel createDefault(coreController core) {
+            return createDefault<domainModel>(core);
         }
         //
         //====================================================================================================
-        public static Dictionary<string,domainModel> createDictionary(coreController cpcore, string sqlCriteria) {
+        public static Dictionary<string,domainModel> createDictionary(coreController core, string sqlCriteria) {
             var result = new Dictionary<string, domainModel> { };
-            foreach (var domain in createList(cpcore, sqlCriteria)) {
+            foreach (var domain in createList(core, sqlCriteria)) {
                 if (!result.ContainsKey(domain.name.ToLower())) {
                     result.Add(domain.name.ToLower(), domain);
                 }

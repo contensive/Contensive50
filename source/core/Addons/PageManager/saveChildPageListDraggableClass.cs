@@ -27,7 +27,7 @@ namespace Contensive.Core.Addons.PageManager {
             object tempexecute = null;
             string returnHtml = "";
             try {
-                coreController cpCore = ((CPClass)cp).core;
+                coreController core = ((CPClass)cp).core;
                 //
                 // decode: "sortlist=childPageList_{parentId}_{listName},page{idOfChild},page{idOfChild},etc"
                 //
@@ -58,7 +58,7 @@ namespace Contensive.Core.Addons.PageManager {
                                 }
                             }
                             //
-                           pageContentModel parentPage = pageContentModel.create(cpCore, parentPageId );
+                           pageContentModel parentPage = pageContentModel.create(core, parentPageId );
                             if (parentPage == null) {
                                 //
                                 // -- parent page is not valid
@@ -66,23 +66,23 @@ namespace Contensive.Core.Addons.PageManager {
                             } else {
                                 //
                                 // -- verify page set to required sort method Id
-                                sortMethodModel sortMethod = sortMethodModel.createByName(cpCore, "By Alpha Sort Order Field");
+                                sortMethodModel sortMethod = sortMethodModel.createByName(core, "By Alpha Sort Order Field");
                                 if (sortMethod == null) {
-                                    sortMethod = sortMethodModel.createByName(cpCore, "Alpha Sort Order Field");
+                                    sortMethod = sortMethodModel.createByName(core, "Alpha Sort Order Field");
                                 }
                                 if (sortMethod == null) {
                                     //
                                     // -- create the required sortMethod
-                                    sortMethod = sortMethodModel.add(cpCore);
+                                    sortMethod = sortMethodModel.add(core);
                                     sortMethod.name = "By Alpha Sort Order Field";
                                     sortMethod.OrderByClause = "sortOrder";
-                                    sortMethod.save(cpCore);
+                                    sortMethod.save(core);
                                 }
                                 if (parentPage.ChildListSortMethodID != sortMethod.id) {
                                     //
                                     // -- update page if not set correctly
                                     parentPage.ChildListSortMethodID = sortMethod.id;
-                                    parentPage.save(cpCore);
+                                    parentPage.save(core);
                                 }
                                 int pagePtr = 0;
                                 foreach (var childPageId in childPageIdList) {
@@ -92,10 +92,10 @@ namespace Contensive.Core.Addons.PageManager {
                                         cp.Site.ErrorReport(new ApplicationException("child page id is invalid from remote request [" + pageCommaList + "]"));
                                     } else {
                                         string SortOrder = (100000 + (pagePtr * 10)).ToString();
-                                       pageContentModel childPage = pageContentModel.create(cpCore, childPageId);
+                                       pageContentModel childPage = pageContentModel.create(core, childPageId);
                                         if (childPage.sortOrder != SortOrder) {
                                             childPage.sortOrder = SortOrder;
-                                            childPage.save(cpCore);
+                                            childPage.save(core);
                                         }
                                     }
                                     pagePtr += 1;

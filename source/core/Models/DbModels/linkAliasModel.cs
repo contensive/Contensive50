@@ -30,107 +30,107 @@ namespace Contensive.Core.Models.DbModels {
         public string QueryStringSuffix { get; set; }
         //
         //====================================================================================================
-        public static linkAliasModel add(coreController cpCore) {
-            return add<linkAliasModel>(cpCore);
+        public static linkAliasModel add(coreController core) {
+            return add<linkAliasModel>(core);
         }
         //
         //====================================================================================================
-        public static linkAliasModel add(coreController cpCore, ref List<string> callersCacheNameList) {
-            return add<linkAliasModel>(cpCore, ref callersCacheNameList);
+        public static linkAliasModel add(coreController core, ref List<string> callersCacheNameList) {
+            return add<linkAliasModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static linkAliasModel create(coreController cpCore, int recordId) {
-            return create<linkAliasModel>(cpCore, recordId);
+        public static linkAliasModel create(coreController core, int recordId) {
+            return create<linkAliasModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static linkAliasModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
-            return create<linkAliasModel>(cpCore, recordId, ref callersCacheNameList);
+        public static linkAliasModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<linkAliasModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static linkAliasModel create(coreController cpCore, string recordGuid) {
-            return create<linkAliasModel>(cpCore, recordGuid);
+        public static linkAliasModel create(coreController core, string recordGuid) {
+            return create<linkAliasModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static linkAliasModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<linkAliasModel>(cpCore, recordGuid, ref callersCacheNameList);
+        public static linkAliasModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<linkAliasModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static linkAliasModel createByName(coreController cpCore, string recordName) {
-            return createByName<linkAliasModel>(cpCore, recordName);
+        public static linkAliasModel createByName(coreController core, string recordName) {
+            return createByName<linkAliasModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static linkAliasModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<linkAliasModel>(cpCore, recordName, ref callersCacheNameList);
+        public static linkAliasModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<linkAliasModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController cpCore) {
-            base.save(cpCore);
+        public new void save(coreController core) {
+            base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, int recordId) {
-            delete<linkAliasModel>(cpCore, recordId);
+        public static void delete(coreController core, int recordId) {
+            delete<linkAliasModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, string ccGuid) {
-            delete<linkAliasModel>(cpCore, ccGuid);
+        public static void delete(coreController core, string ccGuid) {
+            delete<linkAliasModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<linkAliasModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<linkAliasModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<linkAliasModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<linkAliasModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<linkAliasModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
-            return createList<linkAliasModel>(cpCore, sqlCriteria, sqlOrderBy);
+        public static List<linkAliasModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<linkAliasModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<linkAliasModel> createList(coreController cpCore, string sqlCriteria) {
-            return createList<linkAliasModel>(cpCore, sqlCriteria);
+        public static List<linkAliasModel> createList(coreController core, string sqlCriteria) {
+            return createList<linkAliasModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public static void invalidateCache(coreController cpCore, int recordId) {
-            invalidateCacheSingleRecord<linkAliasModel>(cpCore, recordId);
-            Models.Complex.routeDictionaryModel.invalidateCache(cpCore);
+        public static void invalidateCache(coreController core, int recordId) {
+            invalidateCacheSingleRecord<linkAliasModel>(core, recordId);
+            Models.Complex.routeDictionaryModel.invalidateCache(core);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, int recordId) {
-            return baseModel.getRecordName<linkAliasModel>(cpcore, recordId);
+        public static string getRecordName(coreController core, int recordId) {
+            return baseModel.getRecordName<linkAliasModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordName<linkAliasModel>(cpcore, ccGuid);
+        public static string getRecordName(coreController core, string ccGuid) {
+            return baseModel.getRecordName<linkAliasModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordId<linkAliasModel>(cpcore, ccGuid);
+        public static int getRecordId(coreController core, string ccGuid) {
+            return baseModel.getRecordId<linkAliasModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static linkAliasModel createDefault(coreController cpcore) {
-            return createDefault<linkAliasModel>(cpcore);
+        public static linkAliasModel createDefault(coreController core) {
+            return createDefault<linkAliasModel>(core);
         }
         //
         //====================================================================================================
-        public static List<linkAliasModel> createList(coreController cpCore, int pageId, string queryStringSuffix) {
+        public static List<linkAliasModel> createList(coreController core, int pageId, string queryStringSuffix) {
             if (string.IsNullOrEmpty(queryStringSuffix)) {
-                return createList<linkAliasModel>(cpCore, "(pageId=" + pageId + ")", "id desc");
+                return createList<linkAliasModel>(core, "(pageId=" + pageId + ")", "id desc");
             } else {
-                return createList<linkAliasModel>(cpCore, "(pageId=" + pageId + ")and(QueryStringSuffix=" + cpCore.db.encodeSQLText(queryStringSuffix) + ")", "id desc");
+                return createList<linkAliasModel>(core, "(pageId=" + pageId + ")and(QueryStringSuffix=" + core.db.encodeSQLText(queryStringSuffix) + ")", "id desc");
             }
         }
     }

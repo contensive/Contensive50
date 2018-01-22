@@ -25,11 +25,11 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Send email by SMTP. return 'ok' if success, else return a user compatible error message
         /// </summary>
-        public static bool sendSmtp( coreController cpCore, emailController.emailClass email, ref string returnErrorMessage, string AttachmentFilename = "") {
+        public static bool sendSmtp( coreController core, emailController.emailClass email, ref string returnErrorMessage, string AttachmentFilename = "") {
             bool status = false;
             returnErrorMessage = "";
             try {
-                string smtpServer = cpCore.siteProperties.getText("SMTPServer", "127.0.0.1");
+                string smtpServer = core.siteProperties.getText("SMTPServer", "127.0.0.1");
                 SmtpClient client = new SmtpClient(smtpServer);
                 MailMessage mailMessage = new MailMessage();
                 MailAddress fromAddresses = new MailAddress(email.fromAddress.Trim());

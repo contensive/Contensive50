@@ -28,26 +28,26 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
-                cpCore.doc.addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer);
-                string LinkObjectName = cpCore.docProperties.getText("LinkObjectName");
+                core.doc.addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer);
+                string LinkObjectName = core.docProperties.getText("LinkObjectName");
                 if (!string.IsNullOrEmpty(LinkObjectName)) {
                     //
                     // Open a page compatible with a dialog
                     //
-                    cpCore.doc.addRefreshQueryString("LinkObjectName", LinkObjectName);
-                    cpCore.html.addTitle("Site Explorer");
-                    cpCore.doc.setMetaContent(0, 0);
-                    string copy = cpCore.addon.execute(addonModel.createByName(cpCore, "Site Explorer"), new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextPage });
-                    cpCore.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Site Explorer");
+                    core.doc.addRefreshQueryString("LinkObjectName", LinkObjectName);
+                    core.html.addTitle("Site Explorer");
+                    core.doc.setMetaContent(0, 0);
+                    string copy = core.addon.execute(addonModel.createByName(core, "Site Explorer"), new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextPage });
+                    core.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Site Explorer");
                     string htmlBodyTag = "<body class=\"ccBodyAdmin ccCon\" style=\"overflow:scroll\">";
                     string htmlBody = ""
-                        + genericController.htmlIndent(cpCore.html.getPanelHeader("Contensive Site Explorer")) + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>"
+                        + genericController.htmlIndent(core.html.getPanelHeader("Contensive Site Explorer")) + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>"
                         + genericController.htmlIndent(copy) + "\r</td></tr></table>"
                         + "";
-                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, false, false);
-                    cpCore.doc.continueProcessing = false;
+                    result = core.html.getHtmlDoc(htmlBody, htmlBodyTag, false, false);
+                    core.doc.continueProcessing = false;
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

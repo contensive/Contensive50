@@ -37,7 +37,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static string exportAscii_GetAsciiExport(coreController cpCore, string ContentName, int PageSize = 1000, int PageNumber = 1) {
+        public static string exportAscii_GetAsciiExport(coreController core, string ContentName, int PageSize = 1000, int PageNumber = 1) {
             string result = "";
             try {
                 string Delimiter = null;
@@ -51,7 +51,7 @@ namespace Contensive.Core.Controllers {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string TestFilename;
                 //
-                TestFilename = "AsciiExport" + genericController.GetRandomInteger(cpCore) + ".txt";
+                TestFilename = "AsciiExport" + genericController.GetRandomInteger(core) + ".txt";
                 //
                 iContentName = genericController.encodeText(ContentName);
                 if (PageSize == 0) {
@@ -63,32 +63,32 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Check for special case iContentNames
                 //
-                cpCore.webServer.setResponseContentType("text/plain");
-                cpCore.html.enableOutputBuffer(false);
-                TableName = genericController.GetDbObjectTableName(Models.Complex.cdefModel.getContentTablename(cpCore, iContentName));
+                core.webServer.setResponseContentType("text/plain");
+                core.html.enableOutputBuffer(false);
+                TableName = genericController.GetDbObjectTableName(Models.Complex.cdefModel.getContentTablename(core, iContentName));
                 switch (genericController.vbUCase(TableName)) {
                     case "CCMEMBERS":
                         //
                         // ----- People and member content export
                         //
-                        if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
+                        if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                             sb.Append("Warning: You must be a site administrator to export this information.");
                         } else {
-                            CSPointer = cpCore.db.csOpen(iContentName, "", "ID", false, 0, false, false, "", PageSize, PageNumber);
+                            CSPointer = core.db.csOpen(iContentName, "", "ID", false, 0, false, false, "", PageSize, PageNumber);
                             //
                             // ----- print out the field names
                             //
-                            if (cpCore.db.csOk(CSPointer)) {
+                            if (core.db.csOk(CSPointer)) {
                                 sb.Append("\"EID\"");
                                 Delimiter = ",";
-                                FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer);
+                                FieldNameVariant = core.db.cs_getFirstFieldName(CSPointer);
                                 while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                     FieldName = genericController.encodeText(FieldNameVariant);
                                     UcaseFieldName = genericController.vbUCase(FieldName);
                                     if ((UcaseFieldName != "USERNAME") & (UcaseFieldName != "PASSWORD")) {
                                         sb.Append(Delimiter + "\"" + FieldName + "\"");
                                     }
-                                    FieldNameVariant = cpCore.db.cs_getNextFieldName(CSPointer);
+                                    FieldNameVariant = core.db.cs_getNextFieldName(CSPointer);
                                     ///DoEvents
                                 }
                                 sb.Append("\r\n");
@@ -96,17 +96,17 @@ namespace Contensive.Core.Controllers {
                             //
                             // ----- print out the values
                             //
-                            while (cpCore.db.csOk(CSPointer)) {
-                                if (!(cpCore.db.csGetBoolean(CSPointer, "Developer"))) {
-                                    Copy = cpCore.security.encodeToken((cpCore.db.csGetInteger(CSPointer, "ID")), cpCore.doc.profileStartTime);
+                            while (core.db.csOk(CSPointer)) {
+                                if (!(core.db.csGetBoolean(CSPointer, "Developer"))) {
+                                    Copy = core.security.encodeToken((core.db.csGetInteger(CSPointer, "ID")), core.doc.profileStartTime);
                                     sb.Append("\"" + Copy + "\"");
                                     Delimiter = ",";
-                                    FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer);
+                                    FieldNameVariant = core.db.cs_getFirstFieldName(CSPointer);
                                     while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                         FieldName = genericController.encodeText(FieldNameVariant);
                                         UcaseFieldName = genericController.vbUCase(FieldName);
                                         if ((UcaseFieldName != "USERNAME") & (UcaseFieldName != "PASSWORD")) {
-                                            Copy = cpCore.db.csGet(CSPointer, FieldName);
+                                            Copy = core.db.csGet(CSPointer, FieldName);
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 Copy = genericController.vbReplace(Copy, "\"", "'");
                                                 Copy = genericController.vbReplace(Copy, "\r\n", " ");
@@ -115,12 +115,12 @@ namespace Contensive.Core.Controllers {
                                             }
                                             sb.Append(Delimiter + "\"" + Copy + "\"");
                                         }
-                                        FieldNameVariant = cpCore.db.cs_getNextFieldName(CSPointer);
+                                        FieldNameVariant = core.db.cs_getNextFieldName(CSPointer);
                                         ///DoEvents
                                     }
                                     sb.Append("\r\n");
                                 }
-                                cpCore.db.csGoNext(CSPointer);
+                                core.db.csGoNext(CSPointer);
                                 ///DoEvents
                             }
                         }
@@ -130,47 +130,47 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- All other content
                         //
-                        if (!cpCore.doc.sessionContext.isAuthenticatedContentManager(cpCore, iContentName)) {
+                        if (!core.doc.sessionContext.isAuthenticatedContentManager(core, iContentName)) {
                             sb.Append("Error: You must be a content manager to export this data.");
                         } else {
-                            CSPointer = cpCore.db.csOpen(iContentName, "", "ID", false, 0, false, false, "", PageSize, PageNumber);
+                            CSPointer = core.db.csOpen(iContentName, "", "ID", false, 0, false, false, "", PageSize, PageNumber);
                             //
                             // ----- print out the field names
                             //
-                            if (cpCore.db.csOk(CSPointer)) {
+                            if (core.db.csOk(CSPointer)) {
                                 Delimiter = "";
-                                FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer);
+                                FieldNameVariant = core.db.cs_getFirstFieldName(CSPointer);
                                 while (!string.IsNullOrEmpty(FieldNameVariant)) {
-                                    cpCore.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + FieldNameVariant + "\"");
+                                    core.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + FieldNameVariant + "\"");
                                     Delimiter = ",";
-                                    FieldNameVariant = cpCore.db.cs_getNextFieldName(CSPointer);
+                                    FieldNameVariant = core.db.cs_getNextFieldName(CSPointer);
                                     ///DoEvents
                                 }
-                                cpCore.appRootFiles.appendFile(TestFilename, "\r\n");
+                                core.appRootFiles.appendFile(TestFilename, "\r\n");
                             }
                             //
                             // ----- print out the values
                             //
-                            while (cpCore.db.csOk(CSPointer)) {
+                            while (core.db.csOk(CSPointer)) {
                                 Delimiter = "";
-                                FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer);
+                                FieldNameVariant = core.db.cs_getFirstFieldName(CSPointer);
                                 while (!string.IsNullOrEmpty(FieldNameVariant)) {
-                                    switch (cpCore.db.cs_getFieldTypeId(CSPointer, genericController.encodeText(FieldNameVariant))) {
+                                    switch (core.db.cs_getFieldTypeId(CSPointer, genericController.encodeText(FieldNameVariant))) {
                                         case FieldTypeIdFileText:
                                         case FieldTypeIdFileCSS:
                                         case FieldTypeIdFileXML:
                                         case FieldTypeIdFileJavascript:
                                         case FieldTypeIdFileHTML:
-                                            Copy = csController.getTextEncoded(cpCore, CSPointer, genericController.encodeText(FieldNameVariant));
+                                            Copy = csController.getTextEncoded(core, CSPointer, genericController.encodeText(FieldNameVariant));
                                             break;
                                         case FieldTypeIdLookup:
-                                            Copy = cpCore.db.csGetLookup(CSPointer, genericController.encodeText(FieldNameVariant));
+                                            Copy = core.db.csGetLookup(CSPointer, genericController.encodeText(FieldNameVariant));
                                             break;
                                         case FieldTypeIdRedirect:
                                         case FieldTypeIdManyToMany:
                                             break;
                                         default:
-                                            Copy = cpCore.db.csGetText(CSPointer, genericController.encodeText(FieldNameVariant));
+                                            Copy = core.db.csGetText(CSPointer, genericController.encodeText(FieldNameVariant));
                                             break;
                                     }
                                     if (!string.IsNullOrEmpty(Copy)) {
@@ -179,22 +179,22 @@ namespace Contensive.Core.Controllers {
                                         Copy = genericController.vbReplace(Copy, "\r", " ");
                                         Copy = genericController.vbReplace(Copy, "\n", " ");
                                     }
-                                    cpCore.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + Copy + "\"");
+                                    core.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + Copy + "\"");
                                     Delimiter = ",";
-                                    FieldNameVariant = cpCore.db.cs_getNextFieldName(CSPointer);
+                                    FieldNameVariant = core.db.cs_getNextFieldName(CSPointer);
                                     ///DoEvents
                                 }
-                                cpCore.appRootFiles.appendFile(TestFilename, "\r\n");
-                                cpCore.db.csGoNext(CSPointer);
+                                core.appRootFiles.appendFile(TestFilename, "\r\n");
+                                core.db.csGoNext(CSPointer);
                                 ///DoEvents
                             }
                         }
                         break;
                 }
-                result = cpCore.appRootFiles.readFile(TestFilename);
-                cpCore.appRootFiles.deleteFile(TestFilename);
+                result = core.appRootFiles.readFile(TestFilename);
+                core.appRootFiles.deleteFile(TestFilename);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }

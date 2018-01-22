@@ -27,20 +27,20 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // save custom styles
-                if (cpCore.doc.sessionContext.isAuthenticated & cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
-                    int addonId = cpCore.docProperties.getInteger("AddonID");
+                if (core.doc.sessionContext.isAuthenticated & core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    int addonId = core.docProperties.getInteger("AddonID");
                     if (addonId > 0) {
-                       addonModel styleAddon =addonModel.create(cpCore, addonId);
-                        if (styleAddon.StylesFilename.content != cpCore.docProperties.getText("CustomStyles")) {
-                            styleAddon.StylesFilename.content = cpCore.docProperties.getText("CustomStyles");
-                            styleAddon.save(cpCore);
+                       addonModel styleAddon =addonModel.create(core, addonId);
+                        if (styleAddon.StylesFilename.content != core.docProperties.getText("CustomStyles")) {
+                            styleAddon.StylesFilename.content = core.docProperties.getText("CustomStyles");
+                            styleAddon.save(core);
                             //
                             // Clear Caches
                             //
-                            cpCore.cache.invalidateAllInContent(addonModel.contentName);
+                            core.cache.invalidateAllInContent(addonModel.contentName);
                         }
                     }
                 }

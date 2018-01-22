@@ -24,7 +24,7 @@ namespace Contensive.Core.Controllers {
         //
         // objects passed in that are not disposed
         //
-        private coreController cpCore;
+        private coreController core;
         //
         // internal storage
         //
@@ -36,11 +36,11 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public dbServerController(coreController cpCore) : base() {
+        public dbServerController(coreController core) : base() {
             try {
-                this.cpCore = cpCore;
+                this.core = core;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -64,17 +64,17 @@ namespace Contensive.Core.Controllers {
             //
             string returnConnString = "";
             try {
-                string serverUrl = cpCore.serverConfig.defaultDataSourceAddress;
+                string serverUrl = core.serverConfig.defaultDataSourceAddress;
                 if (serverUrl.IndexOf(":") > 0) {
                     serverUrl = serverUrl.Left( serverUrl.IndexOf(":"));
                 }
                 returnConnString += ""
                     + "server=" + serverUrl + ";"
-                    + "User Id=" + cpCore.serverConfig.defaultDataSourceUsername + ";"
-                    + "Password=" + cpCore.serverConfig.defaultDataSourcePassword + ";"
+                    + "User Id=" + core.serverConfig.defaultDataSourceUsername + ";"
+                    + "Password=" + core.serverConfig.defaultDataSourcePassword + ";"
                     + "";
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnConnString;
@@ -89,7 +89,7 @@ namespace Contensive.Core.Controllers {
             try {
                 executeSql("create database " + catalogName);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -111,7 +111,7 @@ namespace Contensive.Core.Controllers {
                 returnOk = (dt.Rows.Count > 0);
                 dt.Dispose();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnOk;
@@ -145,7 +145,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing master sql [" + sql + "]", ex);
-                cpCore.handleException(newEx);
+                core.handleException(newEx);
             }
             return returnData;
         }

@@ -25,7 +25,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public static string main_GetRemoteQueryKey(coreController cpCore, string SQL, string DataSourceName = "", int maxRows = 1000) {
+        public static string main_GetRemoteQueryKey(coreController core, string SQL, string DataSourceName = "", int maxRows = 1000) {
             //
             int CS = 0;
             string RemoteKey = "";
@@ -34,26 +34,26 @@ namespace Contensive.Core.Controllers {
             if (maxRows == 0) {
                 maxRows = 1000;
             }
-            CS = cpCore.db.csInsertRecord("Remote Queries");
-            if (cpCore.db.csOk(CS)) {
+            CS = core.db.csInsertRecord("Remote Queries");
+            if (core.db.csOk(CS)) {
                 RemoteKey = Guid.NewGuid().ToString();
-                DataSourceID = cpCore.db.getRecordID("Data Sources", DataSourceName);
-                cpCore.db.csSet(CS, "remotekey", RemoteKey);
-                cpCore.db.csSet(CS, "datasourceid", DataSourceID);
-                cpCore.db.csSet(CS, "sqlquery", SQL);
-                cpCore.db.csSet(CS, "maxRows", maxRows);
-                cpCore.db.csSet(CS, "dateexpires", cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.AddDays(1)));
-                cpCore.db.csSet(CS, "QueryTypeID", QueryTypeSQL);
-                cpCore.db.csSet(CS, "VisitId", cpCore.doc.sessionContext.visit.id);
+                DataSourceID = core.db.getRecordID("Data Sources", DataSourceName);
+                core.db.csSet(CS, "remotekey", RemoteKey);
+                core.db.csSet(CS, "datasourceid", DataSourceID);
+                core.db.csSet(CS, "sqlquery", SQL);
+                core.db.csSet(CS, "maxRows", maxRows);
+                core.db.csSet(CS, "dateexpires", core.db.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
+                core.db.csSet(CS, "QueryTypeID", QueryTypeSQL);
+                core.db.csSet(CS, "VisitId", core.doc.sessionContext.visit.id);
             }
-            cpCore.db.csClose(ref CS);
+            core.db.csClose(ref CS);
             //
             return RemoteKey;
         }
         //
         //
         //
-        public static string main_FormatRemoteQueryOutput(coreController cpCore, GoogleDataType gd, RemoteFormatEnum RemoteFormat) {
+        public static string main_FormatRemoteQueryOutput(coreController core, GoogleDataType gd, RemoteFormatEnum RemoteFormat) {
             //
             stringBuilderLegacyController s = null;
             string ColDelim = null;

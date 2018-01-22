@@ -20,16 +20,16 @@ namespace Contensive.Core.Models.Complex {
         private const string cacheNameRouteDictionary = "routeDictionary";
         //
         //===================================================================================================
-        public static Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> create(coreController cpCore) {
+        public static Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> create(coreController core) {
             Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> result = new Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass>();
             try {
-                result = getCache(cpCore);
+                result = getCache(core);
                 if (result == null) {
                     result = new Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass>();
-                    string physicalFile = "~/" + cpCore.siteProperties.getText("serverpagedefault", "default.aspx");
+                    string physicalFile = "~/" + core.siteProperties.getText("serverpagedefault", "default.aspx");
                     //
                     // -- admin route
-                    string adminRoute = genericController.normalizeRoute(cpCore.serverConfig.appConfig.adminRoute);
+                    string adminRoute = genericController.normalizeRoute(core.serverConfig.appConfig.adminRoute);
                     if (!string.IsNullOrWhiteSpace(adminRoute)) {
                         result.Add(adminRoute, new BaseClasses.CPSiteBaseClass.routeClass() {
                             physicalRoute = physicalFile,
@@ -39,12 +39,12 @@ namespace Contensive.Core.Models.Complex {
                     }
                     //
                     // -- remote methods
-                    List<Contensive.Core.Models.DbModels.addonModel> remoteMethods = Contensive.Core.Models.DbModels.addonModel.createList_RemoteMethods(cpCore, new List<string>());
+                    List<Contensive.Core.Models.DbModels.addonModel> remoteMethods = Contensive.Core.Models.DbModels.addonModel.createList_RemoteMethods(core, new List<string>());
                     foreach (Contensive.Core.Models.DbModels.addonModel remoteMethod in remoteMethods) {
                         string route = genericController.normalizeRoute(remoteMethod.name);
                         if (!string.IsNullOrWhiteSpace(route)) {
                             if (result.ContainsKey(route)) {
-                                cpCore.handleException(new ApplicationException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
+                                core.handleException(new ApplicationException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
                             } else {
                                 result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
                                     physicalRoute = physicalFile,
@@ -57,12 +57,12 @@ namespace Contensive.Core.Models.Complex {
                     }
                     //
                     // -- link forwards
-                    List<Models.DbModels.linkForwardModel> linkForwards = linkForwardModel.createList(cpCore, "name Is Not null");
+                    List<Models.DbModels.linkForwardModel> linkForwards = linkForwardModel.createList(core, "name Is Not null");
                     foreach (Models.DbModels.linkForwardModel linkForward in linkForwards) {
                         string route = genericController.normalizeRoute(linkForward.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.ContainsKey(route)) {
-                                cpCore.handleException(new ApplicationException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
+                                core.handleException(new ApplicationException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
                             } else {
                                 result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
                                     physicalRoute = physicalFile,
@@ -75,12 +75,12 @@ namespace Contensive.Core.Models.Complex {
                     }
                     //
                     // -- link aliases
-                    List<Models.DbModels.linkAliasModel> linkAliasList = linkAliasModel.createList(cpCore, "name Is Not null");
+                    List<Models.DbModels.linkAliasModel> linkAliasList = linkAliasModel.createList(core, "name Is Not null");
                     foreach (Models.DbModels.linkAliasModel linkAlias in linkAliasList) {
                         string route = genericController.normalizeRoute(linkAlias.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.ContainsKey(route)) {
-                                cpCore.handleException(new ApplicationException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
+                                core.handleException(new ApplicationException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
                             } else {
                                 result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
                                     physicalRoute = physicalFile,
@@ -91,31 +91,31 @@ namespace Contensive.Core.Models.Complex {
                             }
                         }
                     }
-                    setCache(cpCore, result);
+                    setCache(core, result);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
         //
         //====================================================================================================
-        public static void setCache(coreController cpCore, Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> routeDictionary) {
+        public static void setCache(coreController core, Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> routeDictionary) {
             var dependentKeyList = new List<string>();
             dependentKeyList.Add(Models.DbModels.addonModel.contentTableName);
             dependentKeyList.Add(Models.DbModels.linkAliasModel.contentTableName);
             dependentKeyList.Add(Models.DbModels.linkForwardModel.contentTableName);
-            cpCore.cache.setObject(cacheNameRouteDictionary, routeDictionary,dependentKeyList);
+            core.cache.setObject(cacheNameRouteDictionary, routeDictionary,dependentKeyList);
         }
         //
         //====================================================================================================
-        public static Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> getCache(coreController cpCore) {
-            return cpCore.cache.getObject<Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass>>(cacheNameRouteDictionary);
+        public static Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> getCache(coreController core) {
+            return core.cache.getObject<Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass>>(cacheNameRouteDictionary);
         }
         //
         //====================================================================================================
-        public static void invalidateCache(coreController cpCore) {
-            cpCore.cache.invalidate(cacheNameRouteDictionary);
+        public static void invalidateCache(coreController core) {
+            core.cache.invalidate(cacheNameRouteDictionary);
         }
     }
 }

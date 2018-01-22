@@ -28,24 +28,24 @@ namespace Contensive.Core.Addons.AdminSite {
             string returnHtml = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // return the addons defult AddonOption_String
                 // used in wysiwyg editor - addons in select list have no defaultOption_String
                 // because created it is expensive (lookuplists, etc). This is only called
                 // when the addon is double-clicked in the editor after being dropped
                 //
-                string AddonGuid = cpCore.docProperties.getText("guid");
+                string AddonGuid = core.docProperties.getText("guid");
                 //$$$$$ cache this
-                int CS = cpCore.db.csOpen(cnAddons, "ccguid=" + cpCore.db.encodeSQLText(AddonGuid));
+                int CS = core.db.csOpen(cnAddons, "ccguid=" + core.db.encodeSQLText(AddonGuid));
                 string addonArgumentList = "";
                 bool addonIsInline = false;
-                if (cpCore.db.csOk(CS)) {
-                    addonArgumentList = cpCore.db.csGetText(CS, "argumentlist");
-                    addonIsInline = cpCore.db.csGetBoolean(CS, "IsInline");
-                    returnHtml = addonController.main_GetDefaultAddonOption_String(cpCore, addonArgumentList, AddonGuid, addonIsInline);
+                if (core.db.csOk(CS)) {
+                    addonArgumentList = core.db.csGetText(CS, "argumentlist");
+                    addonIsInline = core.db.csGetBoolean(CS, "IsInline");
+                    returnHtml = addonController.main_GetDefaultAddonOption_String(core, addonArgumentList, AddonGuid, addonIsInline);
                 }
-                cpCore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

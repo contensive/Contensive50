@@ -28,18 +28,18 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // ----- Redirect with RC and RI
                 //
-                cpCore.doc.redirectContentID = cpCore.docProperties.getInteger(rnRedirectContentId);
-                cpCore.doc.redirectRecordID = cpCore.docProperties.getInteger(rnRedirectRecordId);
-                if (cpCore.doc.redirectContentID != 0 & cpCore.doc.redirectRecordID != 0) {
-                    string ContentName = cdefModel.getContentNameByID(cpCore, cpCore.doc.redirectContentID);
+                core.doc.redirectContentID = core.docProperties.getInteger(rnRedirectContentId);
+                core.doc.redirectRecordID = core.docProperties.getInteger(rnRedirectRecordId);
+                if (core.doc.redirectContentID != 0 & core.doc.redirectRecordID != 0) {
+                    string ContentName = cdefModel.getContentNameByID(core, core.doc.redirectContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        iisController.main_RedirectByRecord_ReturnStatus(cpCore, ContentName, cpCore.doc.redirectRecordID);
+                        iisController.main_RedirectByRecord_ReturnStatus(core, ContentName, core.doc.redirectRecordID);
                         result = "";
-                        cpCore.doc.continueProcessing = false;
+                        core.doc.continueProcessing = false;
                     }
                 }
             } catch (Exception ex) {

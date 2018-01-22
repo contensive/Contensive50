@@ -22,7 +22,7 @@
 //    /// </summary>
 //    public class domainLegacyModel {
 //        //
-//        private coreClass cpCore;
+//        private coreClass core;
 //        //
 //        private List<string> domainList_local = new List<string>();
 //        private  bool serverDomainList_localLoaded = false;
@@ -50,8 +50,8 @@
 //        public Dictionary<string, domainModel> domainDetailsList;
 //        public domainModel domainDetails = new domainModel();
 //        //
-//        public domainLegacyModel(coreClass cpCore) : base() {
-//            this.cpCore = cpCore;
+//        public domainLegacyModel(coreClass core) : base() {
+//            this.core = core;
 //        }
 //        //
 //        //===========================================================================================
@@ -66,29 +66,29 @@
 //                //
 //                try {
 //                    if (!serverDomainList_localLoaded) {
-//                        domainList_local = (List<string>)cpCore.cache.getObject<List<string>>(cacheName);
+//                        domainList_local = (List<string>)core.cache.getObject<List<string>>(cacheName);
 //                        if (domainList_local == null) {
 //                            //
 //                            // recreate (non-default) domain table list
 //                            //
 //                            domainList_local = new List<string>();
-//                            domainList_local.Add(cpCore.serverConfig.appConfig.domainList[0]);
+//                            domainList_local.Add(core.serverConfig.appConfig.domainList[0]);
 //                            //
 //                            // select all Normal domains (non-Forward)
 //                            //
 //                            SQL = "select name from ccDomains where typeId=1";
-//                            dt = cpCore.db.executeQuery(SQL);
+//                            dt = core.db.executeQuery(SQL);
 //                            foreach (DataRow dr in dt.Rows) {
 //                                domainList_local.Add(dr[0].ToString());
 //                            }
-//                            cpCore.cache.setObject(cacheName, domainList_local, "domains");
+//                            core.cache.setObject(cacheName, domainList_local, "domains");
 //                            dt.Dispose();
 //                        }
 //                        serverDomainList_localLoaded = true;
 //                    }
 //                    returnDomainDbList = domainList_local;
 //                } catch (Exception ex) {
-//                    cpCore.handleException(ex);
+//                    core.handleException(ex);
 //                    throw;
 //                }
 //                return returnDomainDbList;

@@ -22,15 +22,15 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class sitePropertiesController {
         //
-        private coreController cpCore;
+        private coreController core;
         //
         //====================================================================================================
         /// <summary>
         /// new
         /// </summary>
-        /// <param name="cpCore"></param>
-        public sitePropertiesController(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        /// <param name="core"></param>
+        public sitePropertiesController(coreController core) : base() {
+            this.core = core;
         }
         public int defaultRouteId {
             get {
@@ -45,7 +45,7 @@ namespace Contensive.Core.Controllers {
         //
         private bool dbNotReady {
             get {
-                return (cpCore.serverConfig.appConfig.appStatus != Models.Context.serverConfigModel.appStatusEnum.OK);
+                return (core.serverConfig.appConfig.appStatus != Models.Context.serverConfigModel.appStatusEnum.OK);
             }
         }
         //
@@ -214,30 +214,30 @@ namespace Contensive.Core.Controllers {
                         if (_childListAddonID == null) {
                             _childListAddonID = getInteger("ChildListAddonID", 0);
                             if (_childListAddonID == 0) {
-                                int CS = cpCore.db.csOpen(cnAddons, "ccguid='" + addonGuidChildList + "'", "", true, 0, false, false, "ID");
-                                if (cpCore.db.csOk(CS)) {
-                                    _childListAddonID = cpCore.db.csGetInteger(CS, "ID");
+                                int CS = core.db.csOpen(cnAddons, "ccguid='" + addonGuidChildList + "'", "", true, 0, false, false, "ID");
+                                if (core.db.csOk(CS)) {
+                                    _childListAddonID = core.db.csGetInteger(CS, "ID");
                                 }
-                                cpCore.db.csClose(ref CS);
+                                core.db.csClose(ref CS);
                                 if (_childListAddonID == 0) {
-                                    CS = cpCore.db.csInsertRecord(cnAddons);
-                                    if (cpCore.db.csOk(CS)) {
-                                        _childListAddonID = cpCore.db.csGetInteger(CS, "ID");
-                                        cpCore.db.csSet(CS, "name", "Child Page List");
-                                        cpCore.db.csSet(CS, "ArgumentList", "Name");
-                                        cpCore.db.csSet(CS, "CopyText", "<ac type=\"childlist\" name=\"$name$\">");
-                                        cpCore.db.csSet(CS, "Content", "1");
-                                        cpCore.db.csSet(CS, "StylesFilename", "");
-                                        cpCore.db.csSet(CS, "ccguid", addonGuidChildList);
+                                    CS = core.db.csInsertRecord(cnAddons);
+                                    if (core.db.csOk(CS)) {
+                                        _childListAddonID = core.db.csGetInteger(CS, "ID");
+                                        core.db.csSet(CS, "name", "Child Page List");
+                                        core.db.csSet(CS, "ArgumentList", "Name");
+                                        core.db.csSet(CS, "CopyText", "<ac type=\"childlist\" name=\"$name$\">");
+                                        core.db.csSet(CS, "Content", "1");
+                                        core.db.csSet(CS, "StylesFilename", "");
+                                        core.db.csSet(CS, "ccguid", addonGuidChildList);
                                     }
-                                    cpCore.db.csClose(ref CS);
+                                    core.db.csClose(ref CS);
                                 }
                                 setProperty("ChildListAddonID", encodeText(_childListAddonID));
                             }
                         }
                     }
                 } catch (Exception ex) {
-                    cpCore.handleException(ex);
+                    core.handleException(ex);
                     throw;
                 }
                 return encodeInteger(_childListAddonID);
@@ -312,7 +312,7 @@ namespace Contensive.Core.Controllers {
         //
         public string emailAdmin {
             get {
-                return textPropertyBase("EmailAdmin", "webmaster@" + cpCore.webServer.requestDomain, ref _emailAdmin);
+                return textPropertyBase("EmailAdmin", "webmaster@" + core.webServer.requestDomain, ref _emailAdmin);
             }
         }
         private string _emailAdmin = null;
@@ -337,14 +337,14 @@ namespace Contensive.Core.Controllers {
                         } else {
                             //
                             // -- set value in Db
-                            string SQLNow = cpCore.db.encodeSQLDate(DateTime.Now);
-                            string SQL = "UPDATE ccSetup Set FieldValue=" + cpCore.db.encodeSQLText(Value) + ",ModifiedDate=" + SQLNow + " WHERE name=" + cpCore.db.encodeSQLText(propertyName);
+                            string SQLNow = core.db.encodeSQLDate(DateTime.Now);
+                            string SQL = "UPDATE ccSetup Set FieldValue=" + core.db.encodeSQLText(Value) + ",ModifiedDate=" + SQLNow + " WHERE name=" + core.db.encodeSQLText(propertyName);
                             int recordsAffected = 0;
-                            cpCore.db.executeNonQuery(SQL, "", ref recordsAffected);
+                            core.db.executeNonQuery(SQL, "", ref recordsAffected);
                             if (recordsAffected == 0) {
                                 SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES("
-                            + SQLTrue + "," + cpCore.db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(cpCore, "site properties")) + "," + cpCore.db.encodeSQLText(propertyName.ToUpper()) + "," + cpCore.db.encodeSQLText(Value) + "," + SQLNow + "," + SQLNow + ");";
-                                cpCore.db.executeQuery(SQL);
+                            + SQLTrue + "," + core.db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(core, "site properties")) + "," + core.db.encodeSQLText(propertyName.ToUpper()) + "," + core.db.encodeSQLText(Value) + "," + SQLNow + "," + SQLNow + ");";
+                                core.db.executeQuery(SQL);
                             }
                             //
                             // -- set simple lazy cache
@@ -355,12 +355,12 @@ namespace Contensive.Core.Controllers {
                             nameValueDict.Add(cacheName, Value);
                             //
                             // -- set cache, no memory cache not used, instead load all into local cache on load
-                            //cpCore.cache.setObject(cacheName, Value)
+                            //core.cache.setObject(cacheName, Value)
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -411,7 +411,7 @@ namespace Contensive.Core.Controllers {
         public string getTextFromDb(string PropertyName, string DefaultValue, ref bool return_propertyFound) {
             string returnString = "";
             try {
-                using (DataTable dt = cpCore.db.executeQuery("select FieldValue from ccSetup where name=" + cpCore.db.encodeSQLText(PropertyName) + " order by id")) {
+                using (DataTable dt = core.db.executeQuery("select FieldValue from ccSetup where name=" + core.db.encodeSQLText(PropertyName) + " order by id")) {
                     if (dt.Rows.Count > 0) {
                         returnString = genericController.encodeText(dt.Rows[0]["FieldValue"]);
                         return_propertyFound = true;
@@ -426,7 +426,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnString;
@@ -450,7 +450,7 @@ namespace Contensive.Core.Controllers {
                     returnString = DefaultValue;
                 } else {
                     if (PropertyName.ToLower().Equals("adminurl")) {
-                        returnString = "/" + cpCore.serverConfig.appConfig.adminRoute;
+                        returnString = "/" + core.serverConfig.appConfig.adminRoute;
                     } else {
                         string cacheName = "siteproperty" + PropertyName.Trim().ToLower();
                         if (string.IsNullOrEmpty(PropertyName.Trim())) {
@@ -468,7 +468,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // -- read property from cache, no, with preloaded local cache, this will never be used
                                 if (false) {
-                                    //Dim returnObj As Object = cpCore.cache.getObject(Of String)(cacheName)
+                                    //Dim returnObj As Object = core.cache.getObject(Of String)(cacheName)
                                     //If (returnObj IsNot Nothing) Then
                                     //
                                     // -- found in cache, save in simple cache and return
@@ -483,7 +483,7 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // -- found in Db, already saved in local cache, memory cache not used
                                         // nameValueDict.Add(cacheName, returnString)
-                                        //cpCore.cache.setObject(cacheName, returnString)
+                                        //core.cache.setObject(cacheName, returnString)
                                     } else {
                                         //
                                         // -- property not found in db, if default is not blank, write it and set cache
@@ -499,7 +499,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnString;
@@ -598,7 +598,7 @@ namespace Contensive.Core.Controllers {
                 //    End If
                 //    returnString = _dataBuildVersion
                 //Catch ex As Exception
-                //    cpCore.handleException(ex); : Throw
+                //    core.handleException(ex); : Throw
                 //End Try
                 //Return returnString
             }
@@ -618,7 +618,7 @@ namespace Contensive.Core.Controllers {
                 } else {
                     if (_nameValueDict == null) {
                         _nameValueDict = new Dictionary<string, string>();
-                        csController cs = new csController(cpCore);
+                        csController cs = new csController(core);
                         if (cs.openSQL("select name,FieldValue from ccsetup where (active>0) order by id")) {
                             do {
                                 string name = cs.getText("name").Trim().ToLower();

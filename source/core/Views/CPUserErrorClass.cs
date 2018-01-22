@@ -22,13 +22,13 @@ namespace Contensive.Core {
         public const string EventsId = "B784BFEF-127B-48D5-8C99-B075984227DB";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
-        public CPUserErrorClass(Contensive.Core.Controllers.coreController cpCoreObj) : base() {
-            cpCore = cpCoreObj;
+        public CPUserErrorClass(Contensive.Core.Controllers.coreController coreObj) : base() {
+            core = coreObj;
         }
         //
         //====================================================================================================
@@ -39,7 +39,7 @@ namespace Contensive.Core {
                     //
                     // call .dispose for managed objects
                     //
-                    cpCore = null;
+                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -51,25 +51,25 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void Add(string Message) {
-            errorController.addUserError(cpCore, Message);
+            errorController.addUserError(core, Message);
         }
         //
         //====================================================================================================
         //
         public override string GetList()  {
-            return errorController.getUserError(cpCore);
+            return errorController.getUserError(core);
         }
         //
         //====================================================================================================
         //
         public override bool OK() {
-            return !(cpCore.doc.debug_iUserError != "");
+            return !(core.doc.debug_iUserError != "");
         }
         //
         //====================================================================================================
         //
         private void appendDebugLog(string copy) {
-            logController.appendLogDebug(cpCore, copy);
+            logController.appendLogDebug(core, copy);
         }
         //
         //====================================================================================================

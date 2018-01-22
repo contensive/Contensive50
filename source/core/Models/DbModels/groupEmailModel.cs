@@ -41,98 +41,98 @@ namespace Contensive.Core.Models.DbModels {
         public int TestMemberID { get; set; }
         //
         //====================================================================================================
-        public static groupEmailModel add(coreController cpCore) {
-            return add<groupEmailModel>(cpCore);
+        public static groupEmailModel add(coreController core) {
+            return add<groupEmailModel>(core);
         }
         //
         //====================================================================================================
-        public static groupEmailModel add(coreController cpCore, ref List<string> callersCacheNameList) {
-            return add<groupEmailModel>(cpCore, ref callersCacheNameList);
+        public static groupEmailModel add(coreController core, ref List<string> callersCacheNameList) {
+            return add<groupEmailModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static groupEmailModel create(coreController cpCore, int recordId) {
-            return create<groupEmailModel>(cpCore, recordId);
+        public static groupEmailModel create(coreController core, int recordId) {
+            return create<groupEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static groupEmailModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
-            return create<groupEmailModel>(cpCore, recordId, ref callersCacheNameList);
+        public static groupEmailModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<groupEmailModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static groupEmailModel create(coreController cpCore, string recordGuid) {
-            return create<groupEmailModel>(cpCore, recordGuid);
+        public static groupEmailModel create(coreController core, string recordGuid) {
+            return create<groupEmailModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static groupEmailModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<groupEmailModel>(cpCore, recordGuid, ref callersCacheNameList);
+        public static groupEmailModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<groupEmailModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static groupEmailModel createByName(coreController cpCore, string recordName) {
-            return createByName<groupEmailModel>(cpCore, recordName);
+        public static groupEmailModel createByName(coreController core, string recordName) {
+            return createByName<groupEmailModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static groupEmailModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<groupEmailModel>(cpCore, recordName, ref callersCacheNameList);
+        public static groupEmailModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<groupEmailModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController cpCore) {
-            base.save(cpCore);
+        public new void save(coreController core) {
+            base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, int recordId) {
-            delete<groupEmailModel>(cpCore, recordId);
+        public static void delete(coreController core, int recordId) {
+            delete<groupEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, string ccGuid) {
-            delete<groupEmailModel>(cpCore, ccGuid);
+        public static void delete(coreController core, string ccGuid) {
+            delete<groupEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<groupEmailModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<groupEmailModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<groupEmailModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<groupEmailModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<groupEmailModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
-            return createList<groupEmailModel>(cpCore, sqlCriteria, sqlOrderBy);
+        public static List<groupEmailModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<groupEmailModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<groupEmailModel> createList(coreController cpCore, string sqlCriteria) {
-            return createList<groupEmailModel>(cpCore, sqlCriteria);
+        public static List<groupEmailModel> createList(coreController core, string sqlCriteria) {
+            return createList<groupEmailModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController cpCore, int recordId) {
-            invalidateCacheSingleRecord<groupEmailModel>(cpCore, recordId);
+        public void invalidatePrimaryCache(coreController core, int recordId) {
+            invalidateCacheSingleRecord<groupEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, int recordId) {
-            return baseModel.getRecordName<groupEmailModel>(cpcore, recordId);
+        public static string getRecordName(coreController core, int recordId) {
+            return baseModel.getRecordName<groupEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordName<groupEmailModel>(cpcore, ccGuid);
+        public static string getRecordName(coreController core, string ccGuid) {
+            return baseModel.getRecordName<groupEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordId<groupEmailModel>(cpcore, ccGuid);
+        public static int getRecordId(coreController core, string ccGuid) {
+            return baseModel.getRecordId<groupEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static groupEmailModel createDefault(coreController cpcore) {
-            return createDefault<groupEmailModel>(cpcore);
+        public static groupEmailModel createDefault(coreController core) {
+            return createDefault<groupEmailModel>(core);
         }
     }
 }

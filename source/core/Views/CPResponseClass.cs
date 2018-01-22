@@ -27,13 +27,13 @@ namespace Contensive.Core {
         public const string EventsId = "C7FCA224-8542-46F2-9019-52A7B5BAE4DB";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         protected bool disposed = false;
         //
         // Constructor
         //
-        public CPResponseClass(Contensive.Core.Controllers.coreController cpCoreObj) : base() {
-            cpCore = cpCoreObj;
+        public CPResponseClass(Contensive.Core.Controllers.coreController coreObj) : base() {
+            core = coreObj;
         }
         //
         // dispose
@@ -45,7 +45,7 @@ namespace Contensive.Core {
                     //
                     // call .dispose for managed objects
                     //
-                    cpCore = null;
+                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -58,84 +58,84 @@ namespace Contensive.Core {
         //
         public override string ContentType {
             get {
-                return cpCore.webServer.bufferContentType;
+                return core.webServer.bufferContentType;
             }
             set {
-                cpCore.webServer.setResponseContentType(value);
+                core.webServer.setResponseContentType(value);
             }
         }
 
         public override string Cookies {
             get {
-                return cpCore.webServer.bufferCookies;
+                return core.webServer.bufferCookies;
             }
         }
 
         public override string Header {
             get {
-                return cpCore.webServer.bufferResponseHeader;
+                return core.webServer.bufferResponseHeader;
             }
         }
         //
         //
         //
         public override void Clear() {
-            cpCore.webServer.clearResponseBuffer();
+            core.webServer.clearResponseBuffer();
         }
         //
         //
         //
         public override void Close()  {
-            cpCore.doc.continueProcessing = false;
+            core.doc.continueProcessing = false;
         }
         //
         public override void AddHeader(string HeaderName, string HeaderValue) {
-            cpCore.webServer.addResponseHeader(HeaderName, HeaderValue);
+            core.webServer.addResponseHeader(HeaderName, HeaderValue);
         }
         //
         public override void Flush() {
-            cpCore.webServer.flushStream();
+            core.webServer.flushStream();
         }
         //
         public override void Redirect(string Link) {
-            cpCore.webServer.redirect(Link, "", false, false);
+            core.webServer.redirect(Link, "", false, false);
         }
 
         public override void SetBuffer(bool BufferOn) {
-            cpCore.html.enableOutputBuffer(BufferOn);
+            core.html.enableOutputBuffer(BufferOn);
         }
         /// <summary>
         /// /
         /// </summary>
         /// <param name="status"></param>
         public override void SetStatus(string status) {
-            cpCore.webServer.setResponseStatus(status);
+            core.webServer.setResponseStatus(status);
         }
         //
         public override void SetTimeout(string TimeoutSeconds) {
         }
         //
         public override void SetType(string ContentType) {
-            cpCore.webServer.setResponseContentType(ContentType);
+            core.webServer.setResponseContentType(ContentType);
         }
         //
         public override void SetCookie(string CookieName, string CookieValue) {
-            cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateTime.MinValue, "", "", false);
+            core.webServer.addResponseCookie(CookieName, CookieValue, DateTime.MinValue, "", "", false);
         }
         //
         public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires) {
-            cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, "", "", false);
+            core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, "", "", false);
         }
         public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain) {
-            cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, "", false);
+            core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, "", false);
         }
         //
         public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain, string Path) {
-            cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, false);
+            core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, false);
         }
         //
         public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain, string Path, bool Secure) {
-            cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure);
+            core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure);
         }
         //
         [Obsolete("The write buffer is deprecated")]
@@ -148,7 +148,7 @@ namespace Contensive.Core {
         //
         public override bool isOpen {
             get {
-                return cpCore.doc.continueProcessing;
+                return core.doc.continueProcessing;
             }
         }
         //

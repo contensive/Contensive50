@@ -161,7 +161,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="constants.cs" />
     <Compile Include="Controllers\_blank.cs" />
+    <Compile Include="UnitTests\Controllers\adminUIControllerTests.cs" />
+    <Compile Include="UnitTests\Controllers\addonControllerTests.cs" />
+    <Compile Include="UnitTests\Controllers\activeContentControllerTests.cs" />
     <Compile Include="UnitTests\extensionMethodsUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTests\Controllers\cacheControllerTests.cs" />

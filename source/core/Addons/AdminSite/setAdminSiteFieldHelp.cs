@@ -29,19 +29,19 @@ namespace Contensive.Core.Addons.AdminSite {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 if (cp.User.IsAdmin) {
                     int fieldId = cp.Doc.GetInteger("fieldId");
-                    ContentFieldHelpModel help = ContentFieldHelpModel.createByFieldId(cpCore, fieldId);
+                    ContentFieldHelpModel help = ContentFieldHelpModel.createByFieldId(core, fieldId);
                     if (help == null) {
-                        help = ContentFieldHelpModel.add(cpCore);
+                        help = ContentFieldHelpModel.add(core);
                         help.FieldID = fieldId;
                     }
                     help.HelpCustom = cp.Doc.GetText("helpcustom");
-                    help.save(cpCore);
-                    contentFieldModel contentField = contentFieldModel.create(cpCore, fieldId);
+                    help.save(core);
+                    contentFieldModel contentField = contentFieldModel.create(core, fieldId);
                     if (contentField != null) {
-                        cdefModel.invalidateCache(cpCore, contentField.ContentID);
+                        cdefModel.invalidateCache(core, contentField.ContentID);
                     }
                 }
             } catch (Exception ex) {

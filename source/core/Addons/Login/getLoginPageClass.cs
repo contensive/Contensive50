@@ -28,8 +28,8 @@ namespace Contensive.Core.Addons.Login {
             string returnHtml = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
-                returnHtml = loginController.getLoginPage(cpCore, false);
+                coreController core = processor.core;
+                returnHtml = loginController.getLoginPage(core, false);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

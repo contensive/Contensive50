@@ -17,9 +17,9 @@ using static Contensive.Core.constants;
 namespace Contensive.Core.Addons.SafeAddonManager {
     public class addonManagerClass {
         //
-        // constructor sets cp from argument for use in calls to other objects, then cpCore because cp cannot be uses since that would be a circular depenancy
+        // constructor sets cp from argument for use in calls to other objects, then core because cp cannot be uses since that would be a circular depenancy
         //
-        private coreController cpCore;
+        private coreController core;
         //
         // To interigate Add-on Collections to check for re-use
         //
@@ -49,8 +49,8 @@ namespace Contensive.Core.Addons.SafeAddonManager {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public addonManagerClass(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public addonManagerClass(coreController core) : base() {
+            this.core = core;
         }
         //
         //==========================================================================================================================================
@@ -65,7 +65,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 string LocalCollectionXML = null;
                 bool DisplaySystem = false;
                 bool DbUpToDate = false;
-                collectionXmlController XMLTools = new collectionXmlController(cpCore);
+                collectionXmlController XMLTools = new collectionXmlController(core);
                 string GuidFieldName = null;
                 List<int> InstalledCollectionIDList = new List<int>();
                 List<string> InstalledCollectionGuidList = new List<string>();
@@ -116,25 +116,25 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 string InstallLibCollectionList = "";
                 int TargetCollectionID = 0;
                 string privateFilesInstallPath = null;
-                adminUIController Adminui = new adminUIController(cpCore);
+                adminUIController Adminui = new adminUIController(core);
                 List<string> nonCriticalErrorList = new List<string>();
                 //
-                // BuildVersion = cpcore.app.dataBuildVersion
-                string dataBuildVersion = cpCore.siteProperties.dataBuildVersion;
-                string coreVersion = cpCore.codeVersion();
+                // BuildVersion = core.app.dataBuildVersion
+                string dataBuildVersion = core.siteProperties.dataBuildVersion;
+                string coreVersion = core.codeVersion();
 
                 DbUpToDate = (dataBuildVersion == coreVersion);
                 //
-                Button = cpCore.docProperties.getText(constants.RequestNameButton);
+                Button = core.docProperties.getText(constants.RequestNameButton);
                 AllowInstallFromFolder = false;
                 GuidFieldName = "ccguid";
                 if (Button == constants.ButtonCancel) {
                     //
                     // ----- redirect back to the root
                     //
-                    addonManager = cpCore.webServer.redirect("/" + cpCore.serverConfig.appConfig.adminRoute, "Addon Manager, Cancel Button Pressed");
+                    addonManager = core.webServer.redirect("/" + core.serverConfig.appConfig.adminRoute, "Addon Manager, Cancel Button Pressed");
                 } else {
-                    if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
+                    if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                         //
                         // ----- Put up error message
                         //
@@ -142,7 +142,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                         Content.Add(Adminui.GetFormBodyAdminOnly());
                     } else {
                         //
-                        InstallFolder = "temp\\CollectionUpload" + encodeText(genericController.GetRandomInteger(cpCore));
+                        InstallFolder = "temp\\CollectionUpload" + encodeText(genericController.GetRandomInteger(core));
                         privateFilesInstallPath = InstallFolder + "\\";
                         if (Button == constants.ButtonOK) {
                             //
@@ -150,19 +150,19 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                             // Download and install Collections from the Collection Library
                             //---------------------------------------------------------------------------------------------
                             //
-                            if (cpCore.docProperties.getText("LibraryRow") != "") {
-                                Ptr = cpCore.docProperties.getInteger("LibraryRow");
-                                //If cpcore.main_GetStreamBoolean2("LibraryRow" & Ptr) Then
-                                CollectionGuid = cpCore.docProperties.getText("LibraryRowguid" + Ptr);
+                            if (core.docProperties.getText("LibraryRow") != "") {
+                                Ptr = core.docProperties.getInteger("LibraryRow");
+                                //If core.main_GetStreamBoolean2("LibraryRow" & Ptr) Then
+                                CollectionGuid = core.docProperties.getText("LibraryRowguid" + Ptr);
                                 InstallLibCollectionList = InstallLibCollectionList + "," + CollectionGuid;
                             }
 
-                            //                Cnt = cpcore.main_GetStreamInteger2("LibraryCnt")
+                            //                Cnt = core.main_GetStreamInteger2("LibraryCnt")
                             //                If Cnt > 0 Then
                             //                    For Ptr = 0 To Cnt - 1
-                            //                        If cpcore.main_GetStreamText2("LibraryRow") <> "" Then
-                            //                        'If cpcore.main_GetStreamBoolean2("LibraryRow" & Ptr) Then
-                            //                            CollectionGUID = cpcore.main_GetStreamText2("LibraryRowguid" & Ptr)
+                            //                        If core.main_GetStreamText2("LibraryRow") <> "" Then
+                            //                        'If core.main_GetStreamBoolean2("LibraryRow" & Ptr) Then
+                            //                            CollectionGUID = core.main_GetStreamText2("LibraryRowguid" & Ptr)
                             //                            InstallLibCollectionList = InstallLibCollectionList & "," & CollectionGUID
                             //                        End If
                             //                    Next
@@ -173,28 +173,28 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                             //   Before deleting each addon, make sure it is not in another collection
                             //---------------------------------------------------------------------------------------------
                             //
-                            Cnt = cpCore.docProperties.getInteger("accnt");
+                            Cnt = core.docProperties.getInteger("accnt");
                             if (Cnt > 0) {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
-                                    if (cpCore.docProperties.getBoolean("ac" + Ptr)) {
-                                        TargetCollectionID = cpCore.docProperties.getInteger("acID" + Ptr);
-                                        TargetCollectionName = cpCore.db.getRecordName("Add-on Collections", TargetCollectionID);
+                                    if (core.docProperties.getBoolean("ac" + Ptr)) {
+                                        TargetCollectionID = core.docProperties.getInteger("acID" + Ptr);
+                                        TargetCollectionName = core.db.getRecordName("Add-on Collections", TargetCollectionID);
                                         //
                                         // Delete any addons from this collection
                                         //
-                                        cpCore.db.deleteContentRecords(constants.cnAddons, "collectionid=" + TargetCollectionID);
+                                        core.db.deleteContentRecords(constants.cnAddons, "collectionid=" + TargetCollectionID);
 
                                         //                            '
                                         //                            ' Load all collections into local collection storage
                                         //                            '
-                                        //                            TargetCollectionID = cpcore.main_GetStreamInteger2("acID" & Ptr)
-                                        //                            CS = cpcore.app.csOpen("Add-on Collections")
+                                        //                            TargetCollectionID = core.main_GetStreamInteger2("acID" & Ptr)
+                                        //                            CS = core.app.csOpen("Add-on Collections")
                                         //                            CollectionCnt = 0
                                         //                            TargetCollectionPtr = -1
-                                        //                            Do While cpcore.asv.csv_IsCSOK(CS)
+                                        //                            Do While core.asv.csv_IsCSOK(CS)
                                         //                                ReDim Preserve Collections(CollectionCnt)
-                                        //                                CollectionID = cpcore.app.cs_getInteger(CS, "ID")
-                                        //                                CollectionName = cpcore.db.cs_getText(CS, "Name")
+                                        //                                CollectionID = core.app.cs_getInteger(CS, "ID")
+                                        //                                CollectionName = core.db.cs_getText(CS, "Name")
                                         //                                If CollectionID = TargetCollectionID Then
                                         //                                    TargetCollectionPtr = CollectionCnt
                                         //                                    'TargetCollectionPtr = Ptr
@@ -213,22 +213,22 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         //                                        & " left join ccAddonCollectionRules R on R.AddonID=A.ID" _
                                         //                                        & " where R.CollectionID=" & CollectionID
                                         //                                End If
-                                        //                                CSAddons = cpcore.app.openCsSql_rev("default", SQL)
-                                        //                                Do While cpcore.asv.csv_IsCSOK(CSAddons)
+                                        //                                CSAddons = core.app.openCsSql_rev("default", SQL)
+                                        //                                Do While core.asv.csv_IsCSOK(CSAddons)
                                         //                                    AddonCnt = Collections(CollectionCnt).AddonCnt
                                         //                                    ReDim Preserve Collections(CollectionCnt).AddonName(AddonCnt)
                                         //                                    ReDim Preserve Collections(CollectionCnt).AddonGuid(AddonCnt)
-                                        //                                    addonid = cpcore.app.cs_getInteger(CSAddons, "ID")
-                                        //                                    Collections(CollectionCnt).AddonGuid(AddonCnt) = cpcore.db.cs_getText(CSAddons, GuidFieldName)
-                                        //                                    Collections(CollectionCnt).AddonName(AddonCnt) = cpcore.db.cs_getText(CSAddons, "Name")
+                                        //                                    addonid = core.app.cs_getInteger(CSAddons, "ID")
+                                        //                                    Collections(CollectionCnt).AddonGuid(AddonCnt) = core.db.cs_getText(CSAddons, GuidFieldName)
+                                        //                                    Collections(CollectionCnt).AddonName(AddonCnt) = core.db.cs_getText(CSAddons, "Name")
                                         //                                    Collections(CollectionCnt).AddonCnt = AddonCnt + 1
-                                        //                                    Call cpcore.app.nextCSRecord(CSAddons)
+                                        //                                    Call core.app.nextCSRecord(CSAddons)
                                         //                                Loop
-                                        //                                Call cpcore.app.closeCS(CSAddons)
+                                        //                                Call core.app.closeCS(CSAddons)
                                         //                                '
                                         //                                ' GetCDefs from Collection File to remove cdefs and navigators
                                         //                                '
-                                        //                                CollectionFile = cpcore.app.cs_get(CS, "InstallFile")
+                                        //                                CollectionFile = core.app.cs_get(CS, "InstallFile")
                                         //                                If CollectionFile <> "" Then
                                         //                                    Call Doc.loadXML(CollectionFile)
                                         //                                    If Doc.parseError.ErrorCode <> 0 Then
@@ -284,9 +284,9 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         //                                    End If
                                         //                                End If
                                         //                                CollectionCnt = CollectionCnt + 1
-                                        //                                cpcore.main_NextCSRecord (CS)
+                                        //                                core.main_NextCSRecord (CS)
                                         //                            Loop
-                                        //                            Call cpcore.app.closeCS(CS)
+                                        //                            Call core.app.closeCS(CS)
                                         //                            '
                                         //                            ' Search through the local collection storage for the addons in the one we want to delete
                                         //                            '   if not in any other collections, delete the addon from the system
@@ -295,7 +295,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         //                                '
                                         //                                ' delete all addons associated to this collection
                                         //                                '
-                                        //                                Call cpcore.app.DeleteContentRecords(cnAddons, "collectionid=" & TargetCollectionID)
+                                        //                                Call core.app.DeleteContentRecords(cnAddons, "collectionid=" & TargetCollectionID)
                                         //                            Else
                                         //                                ' deprecated the addoncollectionrules for collectionid in addon
                                         //                                If (TargetCollectionPtr >= 0) And (CollectionCnt <> 0) Then
@@ -333,7 +333,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         //                                            Else
                                         //                                                Criteria = "(name=" & encodeSQLText(TargetAddonName) & ")"
                                         //                                            End If
-                                        //                                            Call cpcore.app.DeleteContentRecords(cnAddons, Criteria)
+                                        //                                            Call core.app.DeleteContentRecords(cnAddons, Criteria)
                                         //                                        End If
                                         //                                    Next
                                         //                                End If
@@ -360,7 +360,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         //                                        '
                                         //                                        ' OK to delete the target addon
                                         //                                        '
-                                        //                                        Call cpcore.app.DeleteContentRecords(cnNavigatorEntries, "(name=" & encodeSQLText(TargetName) & ")")
+                                        //                                        Call core.app.DeleteContentRecords(cnNavigatorEntries, "(name=" & encodeSQLText(TargetName) & ")")
                                         //                                    End If
                                         //                                Next
                                         //                                '
@@ -415,22 +415,22 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         //
                                         if (TargetCollectionID > 0) {
                                             AddonNavigatorID = 0;
-                                            CS = cpCore.db.csOpen(constants.cnNavigatorEntries, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
-                                            if (cpCore.db.csOk(CS)) {
-                                                AddonNavigatorID = cpCore.db.csGetInteger(CS, "ID");
+                                            CS = core.db.csOpen(constants.cnNavigatorEntries, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
+                                            if (core.db.csOk(CS)) {
+                                                AddonNavigatorID = core.db.csGetInteger(CS, "ID");
                                             }
-                                            cpCore.db.csClose( ref CS);
+                                            core.db.csClose( ref CS);
                                             if (AddonNavigatorID > 0) {
                                                 GetForm_SafeModeAddonManager_DeleteNavigatorBranch(TargetCollectionName, AddonNavigatorID);
                                             }
                                             //
                                             // Now delete the Collection record
                                             //
-                                            cpCore.db.deleteContentRecord("Add-on Collections", TargetCollectionID);
+                                            core.db.deleteContentRecord("Add-on Collections", TargetCollectionID);
                                             //
                                             // Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             //
-                                            cpCore.db.deleteContentRecords(constants.cnNavigatorEntries, "installedbycollectionid=" + TargetCollectionID);
+                                            core.db.deleteContentRecords(constants.cnNavigatorEntries, "installedbycollectionid=" + TargetCollectionID);
                                         }
                                     }
                                 }
@@ -440,11 +440,11 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                             // Delete Add-ons
                             //---------------------------------------------------------------------------------------------
                             //
-                            Cnt = cpCore.docProperties.getInteger("aocnt");
+                            Cnt = core.docProperties.getInteger("aocnt");
                             if (Cnt > 0) {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
-                                    if (cpCore.docProperties.getBoolean("ao" + Ptr)) {
-                                        cpCore.db.deleteContentRecord(constants.cnAddons, cpCore.docProperties.getInteger("aoID" + Ptr));
+                                    if (core.docProperties.getBoolean("ao" + Ptr)) {
+                                        core.db.deleteContentRecord(constants.cnAddons, core.docProperties.getInteger("aoID" + Ptr));
                                     }
                                 }
                             }
@@ -453,8 +453,8 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                             // Reinstall core collection
                             //---------------------------------------------------------------------------------------------
                             //
-                            if (cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore) & cpCore.docProperties.getBoolean("InstallCore")) {
-                                UpgradeOK = collectionController.installCollectionFromRemoteRepo(cpCore, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, ref nonCriticalErrorList);
+                            if (core.doc.sessionContext.isAuthenticatedDeveloper(core) & core.docProperties.getBoolean("InstallCore")) {
+                                UpgradeOK = collectionController.installCollectionFromRemoteRepo(core, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, ref nonCriticalErrorList);
                             }
                             //
                             //---------------------------------------------------------------------------------------------
@@ -463,16 +463,16 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                             //
                             List<string> uploadedCollectionPathFilenames = new List<string>();
                             CollectionFilename = "";
-                            if (cpCore.privateFiles.upload("MetaFile", InstallFolder, ref CollectionFilename)) {
+                            if (core.privateFiles.upload("MetaFile", InstallFolder, ref CollectionFilename)) {
                                 status += "<br>Uploaded collection file [" + CollectionFilename + "]";
                                 uploadedCollectionPathFilenames.Add(InstallFolder + CollectionFilename);
                                 AllowInstallFromFolder = true;
                             }
                             //
-                            //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of cpCore.docProperties.getInteger("UploadCount") for every iteration:
-                            int tempVar = cpCore.docProperties.getInteger("UploadCount");
+                            //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of core.docProperties.getInteger("UploadCount") for every iteration:
+                            int tempVar = core.docProperties.getInteger("UploadCount");
                             for (Ptr = 0; Ptr < tempVar; Ptr++) {
-                                if (cpCore.privateFiles.upload("Upload" + Ptr, InstallFolder, ref CollectionFilename)) {
+                                if (core.privateFiles.upload("Upload" + Ptr, InstallFolder, ref CollectionFilename)) {
                                     status += "<br>Uploaded collection file [" + CollectionFilename + "]";
                                     uploadedCollectionPathFilenames.Add(InstallFolder + CollectionFilename);
                                     AllowInstallFromFolder = true;
@@ -490,13 +490,13 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                             Cnt = LibGuids.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 RegisterList = "";
-                                UpgradeOK = collectionController.installCollectionFromRemoteRepo(cpCore, LibGuids[Ptr], ref ErrorMessage, "", false, ref nonCriticalErrorList);
+                                UpgradeOK = collectionController.installCollectionFromRemoteRepo(core, LibGuids[Ptr], ref ErrorMessage, "", false, ref nonCriticalErrorList);
                                 if (!UpgradeOK) {
                                     //
                                     // block the reset because we will loose the error message
                                     //
                                     //IISResetRequired = False
-                                    errorController.addUserError(cpCore, "This Add-on Collection did not install correctly, " + ErrorMessage);
+                                    errorController.addUserError(core, "This Add-on Collection did not install correctly, " + ErrorMessage);
                                 } else {
                                     //
                                     // Save the first collection as the installed collection
@@ -513,22 +513,22 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                         // --------------------------------------------------------------------------------
                         //
                         if (AllowInstallFromFolder) {
-                            //InstallFolder = cpcore.asv.config.physicalFilePath & InstallFolderName & "\"
-                            if (cpCore.privateFiles.pathExists(privateFilesInstallPath)) {
-                                UpgradeOK = collectionController.InstallCollectionsFromPrivateFolder(cpCore, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, ref nonCriticalErrorList);
+                            //InstallFolder = core.asv.config.physicalFilePath & InstallFolderName & "\"
+                            if (core.privateFiles.pathExists(privateFilesInstallPath)) {
+                                UpgradeOK = collectionController.InstallCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, ref nonCriticalErrorList);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
-                                        errorController.addUserError(cpCore, "The Add-on Collection did not install correctly, but no detailed error message was given.");
+                                        errorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");
                                     } else {
-                                        errorController.addUserError(cpCore, "The Add-on Collection did not install correctly, " + ErrorMessage);
+                                        errorController.addUserError(core, "The Add-on Collection did not install correctly, " + ErrorMessage);
                                     }
                                 } else {
                                     foreach (string installedCollectionGuid in InstalledCollectionGuidList) {
-                                        CS = cpCore.db.csOpen("Add-on Collections", GuidFieldName + "=" + cpCore.db.encodeSQLText(installedCollectionGuid));
-                                        if (cpCore.db.csOk(CS)) {
-                                            InstalledCollectionIDList.Add(cpCore.db.csGetInteger(CS, "ID"));
+                                        CS = core.db.csOpen("Add-on Collections", GuidFieldName + "=" + core.db.encodeSQLText(installedCollectionGuid));
+                                        if (core.db.csOk(CS)) {
+                                            InstalledCollectionIDList.Add(core.db.csGetInteger(CS, "ID"));
                                         }
-                                        cpCore.db.csClose(ref CS);
+                                        core.db.csClose(ref CS);
                                     }
                                 }
                             }
@@ -548,8 +548,8 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                         //   Forward to help page
                         // --------------------------------------------------------------------------------
                         //
-                        if ((InstalledCollectionIDList.Count > 0) && (!(cpCore.doc.debug_iUserError != ""))) {
-                            return cpCore.webServer.redirect("/" + cpCore.serverConfig.appConfig.adminRoute + "?helpcollectionid=" + InstalledCollectionIDList[0].ToString(), "Redirecting to help page after collection installation");
+                        if ((InstalledCollectionIDList.Count > 0) && (!(core.doc.debug_iUserError != ""))) {
+                            return core.webServer.redirect("/" + core.serverConfig.appConfig.adminRoute + "?helpcollectionid=" + InstalledCollectionIDList[0].ToString(), "Redirecting to help page after collection installation");
                         }
                         //
                         // --------------------------------------------------------------------------------
@@ -591,7 +591,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 ColSortable[3] = false;
                                 //
                                 LocalCollections = new XmlDocument();
-                                LocalCollectionXML = collectionController.getLocalCollectionStoreListXml(cpCore);
+                                LocalCollectionXML = collectionController.getLocalCollectionStoreListXml(core);
                                 LocalCollections.LoadXml(LocalCollectionXML);
                                 foreach (XmlNode CDef_Node in LocalCollections.DocumentElement.ChildNodes) {
                                     if (genericController.vbLCase(CDef_Node.Name) == "collection") {
@@ -607,12 +607,12 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 LibCollections = new XmlDocument();
                                 bool parseError = false;
                                 try {
-                                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + cpCore.codeVersion());
+                                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion());
                                 } catch (Exception) {
                                     UserError = "There was an error reading the Collection Library. The site may be unavailable.";
                                     HandleClassAppendLog("AddonManager", UserError);
                                     status += "<br>" + UserError;
-                                    errorController.addUserError(cpCore, UserError);
+                                    errorController.addUserError(core, UserError);
                                     parseError = true;
                                 }
                                 Ptr = 0;
@@ -621,7 +621,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         UserError = "There was an error reading the Collection Library file. The '" + CollectionListRootNode + "' element was not found.";
                                         HandleClassAppendLog("AddonManager", UserError);
                                         status += "<br>" + UserError;
-                                        errorController.addUserError(cpCore, UserError);
+                                        errorController.addUserError(core, UserError);
                                     } else {
                                         //
                                         // Go through file to validate the XML, and build status message -- since service process can not communicate to user
@@ -709,9 +709,9 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                                             Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
                                                         } else {
                                                             IsOnServer = genericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
-                                                            CS = cpCore.db.csOpen("Add-on Collections", GuidFieldName + "=" + cpCore.db.encodeSQLText(CollectionGuid));
-                                                            IsOnSite = cpCore.db.csOk(CS);
-                                                            cpCore.db.csClose(ref CS);
+                                                            CS = core.db.csOpen("Add-on Collections", GuidFieldName + "=" + core.db.encodeSQLText(CollectionGuid));
+                                                            IsOnSite = core.db.csOk(CS);
+                                                            core.db.csClose(ref CS);
                                                             if (IsOnSite) {
                                                                 //
                                                                 // Already installed
@@ -720,7 +720,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                                                 Cells3[RowPtr, 1] = Collectionname + "&nbsp;(installed already)";
                                                                 Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
                                                                 Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
-                                                            } else if ((!string.IsNullOrEmpty(CollectionContensiveVersion)) && (string.CompareOrdinal(CollectionContensiveVersion, cpCore.codeVersion()) > 0)) {
+                                                            } else if ((!string.IsNullOrEmpty(CollectionContensiveVersion)) && (string.CompareOrdinal(CollectionContensiveVersion, core.codeVersion()) > 0)) {
                                                                 //
                                                                 // wrong version
                                                                 //
@@ -740,8 +740,8 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                                                 //
                                                                 // Not installed yet
                                                                 //
-                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + cpCore.html.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + cpCore.html.inputHidden("LibraryRowName" + RowPtr, Collectionname);
-                                                                //Cells3(RowPtr, 0) = cpcore.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & cpcore.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & cpcore.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
+                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + core.html.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + core.html.inputHidden("LibraryRowName" + RowPtr, Collectionname);
+                                                                //Cells3(RowPtr, 0) = core.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & core.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & core.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
                                                                 Cells3[RowPtr, 1] = Collectionname + "&nbsp;";
                                                                 Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
                                                                 Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
@@ -768,8 +768,8 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     + "<div style=\"width:100%\">" + Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells3, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>"
                                     + "";
                                     BodyHTML = Adminui.GetEditPanel(true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
-                                    BodyHTML = BodyHTML + cpCore.html.inputHidden("AOCnt", RowPtr);
-                                    cpCore.html.addLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
+                                    BodyHTML = BodyHTML + core.html.inputHidden("AOCnt", RowPtr);
+                                    core.html.addLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
                                 }
                                 //
                                 // --------------------------------------------------------------------------------
@@ -793,19 +793,19 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 ColSortable[1] = false;
                                 //
                                 DisplaySystem = false;
-                                if (!cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore)) {
+                                if (!core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
                                     //
                                     // non-developers
                                     //
-                                    CS = cpCore.db.csOpen("Add-on Collections", "((system is null)or(system=0))", "Name");
+                                    CS = core.db.csOpen("Add-on Collections", "((system is null)or(system=0))", "Name");
                                 } else {
                                     //
                                     // developers
                                     //
                                     DisplaySystem = true;
-                                    CS = cpCore.db.csOpen("Add-on Collections", "", "Name");
+                                    CS = core.db.csOpen("Add-on Collections", "", "Name");
                                 }
-                                string[,] tempVar3 = new string[cpCore.db.csGetRowCount(CS) + 1, ColumnCnt + 1];
+                                string[,] tempVar3 = new string[core.db.csGetRowCount(CS) + 1, ColumnCnt + 1];
                                 if (Cells != null) {
                                     for (int Dimension0 = 0; Dimension0 < Cells.GetLength(0); Dimension0++) {
                                         int CopyLength = Math.Min(Cells.GetLength(1), tempVar3.GetLength(1));
@@ -816,23 +816,23 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 }
                                 Cells = tempVar3;
                                 RowPtr = 0;
-                                while (cpCore.db.csOk(CS)) {
-                                    Cells[RowPtr, 0] = cpCore.html.inputCheckbox("AC" + RowPtr) + cpCore.html.inputHidden("ACID" + RowPtr, cpCore.db.csGetInteger(CS, "ID"));
-                                    //Cells(RowPtr, 1) = "<a href=""" & cpcore.app.SiteProperty_AdminURL & "?id=" & cpcore.app.cs_getInteger(CS, "ID") & "&cid=" & cpcore.app.cs_getInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
-                                    Cells[RowPtr, 1] = cpCore.db.csGetText(CS, "name");
+                                while (core.db.csOk(CS)) {
+                                    Cells[RowPtr, 0] = core.html.inputCheckbox("AC" + RowPtr) + core.html.inputHidden("ACID" + RowPtr, core.db.csGetInteger(CS, "ID"));
+                                    //Cells(RowPtr, 1) = "<a href=""" & core.app.SiteProperty_AdminURL & "?id=" & core.app.cs_getInteger(CS, "ID") & "&cid=" & core.app.cs_getInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
+                                    Cells[RowPtr, 1] = core.db.csGetText(CS, "name");
                                     if (DisplaySystem) {
-                                        if (cpCore.db.csGetBoolean(CS, "system")) {
+                                        if (core.db.csGetBoolean(CS, "system")) {
                                             Cells[RowPtr, 1] = Cells[RowPtr, 1] + " (system)";
                                         }
                                     }
-                                    cpCore.db.csGoNext(CS);
+                                    core.db.csGoNext(CS);
                                     RowPtr = RowPtr + 1;
                                 }
-                                cpCore.db.csClose(ref CS);
+                                core.db.csClose(ref CS);
                                 BodyHTML = "<div style=\"width:100%\">" + Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
                                 BodyHTML = Adminui.GetEditPanel(true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
-                                BodyHTML = BodyHTML + cpCore.html.inputHidden("accnt", RowPtr);
-                                cpCore.html.addLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
+                                BodyHTML = BodyHTML + core.html.inputHidden("accnt", RowPtr);
+                                core.html.addLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Get the Upload Add-ons tab
@@ -843,30 +843,30 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>");
                                 } else {
                                     Body.Add(Adminui.EditTableOpen);
-                                    if (cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore)) {
-                                        Body.Add(Adminui.GetEditRow(cpCore.html.inputCheckbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
+                                    if (core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                                        Body.Add(Adminui.GetEditRow(core.html.inputCheckbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
                                     }
-                                    Body.Add(Adminui.GetEditRow(cpCore.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
+                                    Body.Add(Adminui.GetEditRow(core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
                                     FormInput = ""
                                         + "<table id=\"UploadInsert\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
                                         + "</table>"
                                         + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
                                         + "<tr><td align=\"left\"><a href=\"#\" onClick=\"InsertUpload(); return false;\">+ Add more files</a></td></tr>"
                                         + "</table>"
-                                        + cpCore.html.inputHidden("UploadCount", 1, "UploadCount") + "";
+                                        + core.html.inputHidden("UploadCount", 1, "UploadCount") + "";
                                     Body.Add(Adminui.GetEditRow(FormInput, "&nbsp;", "", true, false, ""));
                                     Body.Add(Adminui.EditTableClose);
                                 }
-                                cpCore.html.addLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
+                                core.html.addLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Build Page from tabs
                                 // --------------------------------------------------------------------------------
                                 //
-                                Content.Add(cpCore.html.getLiveTabs());
+                                Content.Add(core.html.getLiveTabs());
                                 //
                                 ButtonList = ButtonCancel + "," + ButtonOK;
-                                Content.Add(cpCore.html.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));
+                                Content.Add(core.html.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));
                             }
                         }
                     }
@@ -889,10 +889,10 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                         Description = Description + "<div style=\"Margin-left:50px\">" + status + "</div>";
                     }
                     addonManager = Adminui.GetBody(Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
-                    cpCore.html.addTitle("Add-on Manager");
+                    core.html.addTitle("Add-on Manager");
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return addonManager;
@@ -906,26 +906,26 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 int EntryID = 0;
                 //
                 if (EntryParentID == 0) {
-                    CS = cpCore.db.csOpen(cnNavigatorEntries, "(name=" + cpCore.db.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
+                    CS = core.db.csOpen(cnNavigatorEntries, "(name=" + core.db.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
                 } else {
-                    CS = cpCore.db.csOpen(cnNavigatorEntries, "(name=" + cpCore.db.encodeSQLText(EntryName) + ")and(parentID=" + cpCore.db.encodeSQLNumber(EntryParentID) + ")");
+                    CS = core.db.csOpen(cnNavigatorEntries, "(name=" + core.db.encodeSQLText(EntryName) + ")and(parentID=" + core.db.encodeSQLNumber(EntryParentID) + ")");
                 }
-                if (cpCore.db.csOk(CS)) {
-                    EntryID = cpCore.db.csGetInteger(CS, "ID");
+                if (core.db.csOk(CS)) {
+                    EntryID = core.db.csGetInteger(CS, "ID");
                 }
-                cpCore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
                 //
                 if (EntryID != 0) {
-                    CS = cpCore.db.csOpen(cnNavigatorEntries, "(parentID=" + cpCore.db.encodeSQLNumber(EntryID) + ")");
-                    while (cpCore.db.csOk(CS)) {
-                        GetForm_SafeModeAddonManager_DeleteNavigatorBranch(cpCore.db.csGetText(CS, "name"), EntryID);
-                        cpCore.db.csGoNext(CS);
+                    CS = core.db.csOpen(cnNavigatorEntries, "(parentID=" + core.db.encodeSQLNumber(EntryID) + ")");
+                    while (core.db.csOk(CS)) {
+                        GetForm_SafeModeAddonManager_DeleteNavigatorBranch(core.db.csGetText(CS, "name"), EntryID);
+                        core.db.csGoNext(CS);
                     }
-                    cpCore.db.csClose(ref CS);
-                    cpCore.db.deleteContentRecord(cnNavigatorEntries, EntryID);
+                    core.db.csClose(ref CS);
+                    core.db.deleteContentRecord(cnNavigatorEntries, EntryID);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
         }
         //
@@ -965,7 +965,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetXMLAttribute");
@@ -975,7 +975,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
         //
         //
         private void HandleClassAppendLog(string MethodName, string Context) {
-            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", false, true, cpCore.webServer.requestUrl, "", "");
+            logController.appendLogWithLegacyRow(core, core.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", false, true, core.webServer.requestUrl, "", "");
 
         }
         //
@@ -1010,18 +1010,18 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                         ParentNameSpace = menuNameSpace.Left( Pos - 1);
                     }
                     if (string.IsNullOrEmpty(ParentNameSpace)) {
-                        CS = cpCore.db.csOpen(ContentName, "(name=" + cpCore.db.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID", false, 0, false, false, "ID");
-                        if (cpCore.db.csOk(CS)) {
-                            tempGetParentIDFromNameSpace = cpCore.db.csGetInteger(CS, "ID");
+                        CS = core.db.csOpen(ContentName, "(name=" + core.db.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID", false, 0, false, false, "ID");
+                        if (core.db.csOk(CS)) {
+                            tempGetParentIDFromNameSpace = core.db.csGetInteger(CS, "ID");
                         }
-                        cpCore.db.csClose(ref CS);
+                        core.db.csClose(ref CS);
                     } else {
                         ParentID = GetParentIDFromNameSpace(ContentName, ParentNameSpace);
-                        CS = cpCore.db.csOpen(ContentName, "(name=" + cpCore.db.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID", false, 0, false, false, "ID");
-                        if (cpCore.db.csOk(CS)) {
-                            tempGetParentIDFromNameSpace = cpCore.db.csGetInteger(CS, "ID");
+                        CS = core.db.csOpen(ContentName, "(name=" + core.db.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID", false, 0, false, false, "ID");
+                        if (core.db.csOk(CS)) {
+                            tempGetParentIDFromNameSpace = core.db.csGetInteger(CS, "ID");
                         }
-                        cpCore.db.csClose(ref CS);
+                        core.db.csClose(ref CS);
                     }
                 }
                 //
@@ -1030,7 +1030,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetParentIDFromNameSpace");

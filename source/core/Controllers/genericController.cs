@@ -1364,7 +1364,7 @@ namespace Contensive.Core.Controllers {
         //        Case Else
         //            EncodeSQL = app.EncodeSQLText(expression)
         //            On Error GoTo 0
-        //            fixme-- cpCore.handleException(New ApplicationException("")) ' -----ignoreInteger, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
+        //            fixme-- core.handleException(New ApplicationException("")) ' -----ignoreInteger, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
         //    End Select
         //    '
         //End Function
@@ -2176,10 +2176,10 @@ namespace Contensive.Core.Controllers {
         //   Get a Random Long Value
         //=================================================================================
         //
-        public static int GetRandomInteger(coreController cpCore) {
+        public static int GetRandomInteger(coreController core) {
             int RandomBase = 1; ;
             int RandomLimit = encodeInteger( (Math.Pow(2, 31)) - RandomBase - 1);
-            return cpCore.random.Next(RandomBase, RandomLimit);
+            return core.random.Next(RandomBase, RandomLimit);
         }
         //
         //=================================================================================
@@ -3325,11 +3325,11 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public static string runProcess(coreController cpCore, string Cmd, string Arguments = "", bool WaitForReturn = false) {
+        public static string runProcess(coreController core, string Cmd, string Arguments = "", bool WaitForReturn = false) {
             string returnResult = "";
             Process p = new Process();
             //
-            logController.appendLog(cpCore, "ccCommonModule.runProcess, cmd=[" + Cmd + "], Arguments=[" + Arguments + "], WaitForReturn=[" + WaitForReturn + "]");
+            logController.appendLog(core, "ccCommonModule.runProcess, cmd=[" + Cmd + "], Arguments=[" + Arguments + "], WaitForReturn=[" + WaitForReturn + "]");
             //
             p.StartInfo.FileName = Cmd;
             p.StartInfo.Arguments = Arguments;
@@ -4153,7 +4153,7 @@ namespace Contensive.Core.Controllers {
         //   If Name = Value, it returns value
         //=============================================================================
         //
-        public static string main_GetNameValue_Internal(coreController cpcore, string NameValueString, string Name) {
+        public static string main_GetNameValue_Internal(coreController core, string NameValueString, string Name) {
             string result = "";
             //
             string NameValueStringWorking = NameValueString;
@@ -4261,7 +4261,7 @@ namespace Contensive.Core.Controllers {
         //       else (if it start with a file or a path), add the serverFilePath
         //========================================================================
         //
-        public static string getCdnFileLink(coreController cpcore, string virtualFile) {
+        public static string getCdnFileLink(coreController core, string virtualFile) {
             string returnLink = virtualFile;
             returnLink = genericController.vbReplace(returnLink, "\\", "/");
             if (genericController.vbInstr(1, returnLink, "://") != 0) {
@@ -4278,7 +4278,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // icon is a virtual file, add the serverfilepath
                 //
-                return cpcore.serverConfig.appConfig.cdnFilesNetprefix + returnLink;
+                return core.serverConfig.appConfig.cdnFilesNetprefix + returnLink;
             }
         }
         //
@@ -4391,10 +4391,10 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Convert addon argument list to a doc property compatible dictionary of strings
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="SrcOptionList"></param>
         /// <returns></returns>
-        public static Dictionary<string, string> convertAddonArgumentstoDocPropertiesList(coreController cpCore, string SrcOptionList) {
+        public static Dictionary<string, string> convertAddonArgumentstoDocPropertiesList(coreController core, string SrcOptionList) {
             Dictionary<string, string> returnList = new Dictionary<string, string>();
             try {
                 string[] SrcOptions = null;
@@ -4418,7 +4418,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnList;
@@ -4428,7 +4428,7 @@ namespace Contensive.Core.Controllers {
         //   Return just the copy from a content page
         //=============================================================================
         //
-        public static string TextDeScramble(coreController cpcore, string Copy) {
+        public static string TextDeScramble(coreController core, string Copy) {
             string returnCopy = "";
             try {
                 int CPtr = 0;
@@ -4482,7 +4482,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnCopy;
@@ -4492,7 +4492,7 @@ namespace Contensive.Core.Controllers {
         //   Return just the copy from a content page
         //=============================================================================
         //
-        public static string TextScramble(coreController cpcore, string Copy) {
+        public static string TextScramble(coreController core, string Copy) {
             string returnCopy = "";
             try {
                 int CPtr = 0;
@@ -4535,7 +4535,7 @@ namespace Contensive.Core.Controllers {
                 //
                 returnCopy = "_a" + returnCopy + (crc % 9).ToString();
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnCopy;

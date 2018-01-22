@@ -27,19 +27,19 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // -- send password
-                string Emailtext = cpCore.docProperties.getText("email");
+                string Emailtext = core.docProperties.getText("email");
                 if (!string.IsNullOrEmpty(Emailtext)) {
                     string sendStatus = "";
-                    loginController.sendPassword(cpCore, Emailtext, ref sendStatus);
+                    loginController.sendPassword(core, Emailtext, ref sendStatus);
                     result += ""
                         + "<div style=\"width:300px;margin:100px auto 0 auto;\">"
                         + "<p>An attempt to send login information for email address '" + Emailtext + "' has been made.</p>"
-                        + "<p><a href=\"?" + cpCore.doc.refreshQueryString + "\">Return to the Site.</a></p>"
+                        + "<p><a href=\"?" + core.doc.refreshQueryString + "\">Return to the Site.</a></p>"
                         + "</div>";
-                    cpCore.doc.continueProcessing = false;
+                    core.doc.continueProcessing = false;
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

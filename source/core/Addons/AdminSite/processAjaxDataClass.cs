@@ -28,9 +28,9 @@ namespace Contensive.Core.Addons.AdminSite {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
 
-                result = cpCore.executeRoute_ProcessAjaxData();
+                result = core.executeRoute_ProcessAjaxData();
 
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

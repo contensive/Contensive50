@@ -27,29 +27,29 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // -- Should be a remote method in commerce
-                if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
+                if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Administrator required
                     //
-                    cpCore.doc.userErrorList.Add("Error: You must be an administrator to use the ExportAscii method");
+                    core.doc.userErrorList.Add("Error: You must be an administrator to use the ExportAscii method");
                 } else {
-                    string ContentName = cpCore.docProperties.getText("content");
-                    int PageSize = cpCore.docProperties.getInteger("PageSize");
+                    string ContentName = core.docProperties.getText("content");
+                    int PageSize = core.docProperties.getInteger("PageSize");
                     if (PageSize == 0) {
                         PageSize = 20;
                     }
-                    int PageNumber = cpCore.docProperties.getInteger("PageNumber");
+                    int PageNumber = core.docProperties.getInteger("PageNumber");
                     if (PageNumber == 0) {
                         PageNumber = 1;
                     }
                     if (string.IsNullOrEmpty(ContentName)) {
-                        cpCore.doc.userErrorList.Add("Error: ExportAscii method requires ContentName");
+                        core.doc.userErrorList.Add("Error: ExportAscii method requires ContentName");
                     } else {
-                        result = exportAsciiController.exportAscii_GetAsciiExport(cpCore, ContentName, PageSize, PageNumber);
-                        cpCore.doc.continueProcessing = false;
+                        result = exportAsciiController.exportAscii_GetAsciiExport(core, ContentName, PageSize, PageNumber);
+                        core.doc.continueProcessing = false;
                     }
                 }
             } catch (Exception ex) {

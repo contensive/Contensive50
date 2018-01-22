@@ -4,6 +4,7 @@ using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static Contensive.Core.Tests.testConstants;
 
 namespace Contensive.Core.Tests.UnitTests.Views {
 
@@ -16,7 +17,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCS_OpenClose_test() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             int newuserId = cp.Content.AddRecord("people");
             int testuserId;
@@ -52,7 +53,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCS_Insert_Test() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             int newuserId = 0;
             //
@@ -76,7 +77,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCS_OpenRecord_Test() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             int newuserId = 0;
             //
@@ -104,7 +105,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCS_OpenGroupUsers_Test() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             string groupName = "testGroup" + cp.Utils.GetRandomInteger().ToString();
             string user1Name = "testUser1" + cp.Utils.GetRandomInteger().ToString();
@@ -150,7 +151,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCS_FieldOK_Test() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             string user1Name = "testUser1" + cp.Utils.GetRandomInteger().ToString();
             int user1Id = 0;
@@ -188,7 +189,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCS_Delete_Test() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             string user1Name = "testUser1" + cp.Utils.GetRandomInteger().ToString();
             int user1Id = 0;
@@ -216,7 +217,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCS_SetGetField_Test() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             string user1Name = "testUser1" + cp.Utils.GetRandomInteger().ToString();
             int user1Id = 0;
@@ -258,7 +259,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCS_GetRowCount_Test() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             string user1Name = "testUser1" + cp.Utils.GetRandomInteger().ToString();
             string user2Name = "testUser2" + cp.Utils.GetRandomInteger().ToString();
@@ -303,7 +304,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCS_GetSql_Test() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             //
             // act

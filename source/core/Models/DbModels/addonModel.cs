@@ -81,18 +81,18 @@ namespace Contensive.Core.Models.DbModels {
         public string StylesLinkHref { get; set; }
         public bool Template { get; set; }
         //====================================================================================================
-        public static addonModel add(coreController cpCore) {
-            return add<addonModel>(cpCore);
+        public static addonModel add(coreController core) {
+            return add<addonModel>(core);
         }
         //
         //====================================================================================================
-        public static addonModel add(coreController cpCore, ref List<string> callersCacheNameList) {
-            return add<addonModel>(cpCore, ref callersCacheNameList);
+        public static addonModel add(coreController core, ref List<string> callersCacheNameList) {
+            return add<addonModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static addonModel create(coreController cpCore, int recordId) {
-            addonModel result = create<addonModel>(cpCore, recordId);
+        public static addonModel create(coreController core, int recordId) {
+            addonModel result = create<addonModel>(core, recordId);
             if (result != null) {
                 if (string.IsNullOrEmpty(result.ccguid)) {
                     result.ccguid = genericController.createGuid();
@@ -102,8 +102,8 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
-        public static addonModel create(coreController cpCore, int recordId, ref List<string> callersCacheNameList) {
-            addonModel result = create<addonModel>(cpCore, recordId, ref callersCacheNameList);
+        public static addonModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+            addonModel result = create<addonModel>(core, recordId, ref callersCacheNameList);
             if (result != null) {
                 if (string.IsNullOrEmpty(result.ccguid)) {
                     result.ccguid = genericController.createGuid();
@@ -113,79 +113,79 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
-        public static addonModel create(coreController cpCore, string recordGuid) {
-            return create<addonModel>(cpCore, recordGuid);
+        public static addonModel create(coreController core, string recordGuid) {
+            return create<addonModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static addonModel create(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<addonModel>(cpCore, recordGuid, ref callersCacheNameList);
+        public static addonModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<addonModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static addonModel createByName(coreController cpCore, string recordName) {
-            return createByName<addonModel>(cpCore, recordName);
+        public static addonModel createByName(coreController core, string recordName) {
+            return createByName<addonModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static addonModel createByName(coreController cpCore, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<addonModel>(cpCore, recordName, ref callersCacheNameList);
+        public static addonModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<addonModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController cpCore) {
-            base.save(cpCore);
+        public new void save(coreController core) {
+            base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, int recordId) {
-            delete<addonModel>(cpCore, recordId);
+        public static void delete(coreController core, int recordId) {
+            delete<addonModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController cpCore, string ccGuid) {
-            delete<addonModel>(cpCore, ccGuid);
+        public static void delete(coreController core, string ccGuid) {
+            delete<addonModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<addonModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<addonModel>(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<addonModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<addonModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<addonModel> createList(coreController cpCore, string sqlCriteria, string sqlOrderBy) {
-            return createList<addonModel>(cpCore, sqlCriteria, sqlOrderBy);
+        public static List<addonModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<addonModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<addonModel> createList(coreController cpCore, string sqlCriteria) {
-            return createList<addonModel>(cpCore, sqlCriteria);
+        public static List<addonModel> createList(coreController core, string sqlCriteria) {
+            return createList<addonModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public static void invalidateCache(coreController cpCore, int recordId) {
-            invalidateCacheSingleRecord<addonModel>(cpCore, recordId);
-            Models.Complex.routeDictionaryModel.invalidateCache(cpCore);
+        public static void invalidateCache(coreController core, int recordId) {
+            invalidateCacheSingleRecord<addonModel>(core, recordId);
+            Models.Complex.routeDictionaryModel.invalidateCache(core);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, int recordId) {
-            return baseModel.getRecordName<addonModel>(cpcore, recordId);
+        public static string getRecordName(coreController core, int recordId) {
+            return baseModel.getRecordName<addonModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordName<addonModel>(cpcore, ccGuid);
+        public static string getRecordName(coreController core, string ccGuid) {
+            return baseModel.getRecordName<addonModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController cpcore, string ccGuid) {
-            return baseModel.getRecordId<addonModel>(cpcore, ccGuid);
+        public static int getRecordId(coreController core, string ccGuid) {
+            return baseModel.getRecordId<addonModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static addonModel createDefault(coreController cpcore) {
-            return createDefault<addonModel>(cpcore);
+        public static addonModel createDefault(coreController core) {
+            return createDefault<addonModel>(core);
         }
         //
         //====================================================================================================
@@ -195,12 +195,12 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="someCriteria"></param>
         /// <returns></returns>
-        public static List<addonModel> createList_OnNewVisitEvent(coreController cpCore, List<string> callersCacheNameList) {
+        public static List<addonModel> createList_OnNewVisitEvent(coreController core, List<string> callersCacheNameList) {
             List<addonModel> result = new List<addonModel>();
             try {
-                result = createList(cpCore, "(OnNewVisitEvent<>0)");
+                result = createList(core, "(OnNewVisitEvent<>0)");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -213,12 +213,12 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="someCriteria"></param>
         /// <returns></returns>
-        public static List<addonModel> createList_OnPageStartEvent(coreController cpCore, List<string> callersCacheNameList) {
+        public static List<addonModel> createList_OnPageStartEvent(coreController core, List<string> callersCacheNameList) {
             List<addonModel> result = new List<addonModel>();
             try {
-                result = createList(cpCore, "(OnPageStartEvent<>0)");
+                result = createList(core, "(OnPageStartEvent<>0)");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -231,34 +231,34 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="someCriteria"></param>
         /// <returns></returns>
-        public static List<addonModel> createList_RemoteMethods(coreController cpCore, List<string> callersCacheNameList) {
+        public static List<addonModel> createList_RemoteMethods(coreController core, List<string> callersCacheNameList) {
             List<addonModel> result = new List<addonModel>();
             try {
-                result = createList(cpCore, "(remoteMethod=1)");
+                result = createList(core, "(remoteMethod=1)");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
         }
         //
-        public static List<addonModel> createList_pageDependencies(coreController cpCore, int pageId) {
+        public static List<addonModel> createList_pageDependencies(coreController core, int pageId) {
             List<addonModel> result = new List<addonModel>();
             try {
-                result = createList(cpCore, "(id in (select addonId from ccAddonPageRules where (pageId=" + pageId + ")))");
+                result = createList(core, "(id in (select addonId from ccAddonPageRules where (pageId=" + pageId + ")))");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
         }
         //
-        public static List<addonModel> createList_templateDependencies(coreController cpCore, int templateId) {
+        public static List<addonModel> createList_templateDependencies(coreController core, int templateId) {
             List<addonModel> result = new List<addonModel>();
             try {
-                result = createList(cpCore, "(id in (select addonId from ccAddonTemplateRules where (templateId=" + templateId + ")))");
+                result = createList(core, "(id in (select addonId from ccAddonTemplateRules where (templateId=" + templateId + ")))");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -276,18 +276,18 @@ namespace Contensive.Core.Models.DbModels {
             private List<int> OnPageStartIdList = new List<int>();
             public string robotsTxt = "";
             //
-            public void add(coreController cpcore, addonModel addon) {
+            public void add(coreController core, addonModel addon) {
                 if (!dictIdAddon.ContainsKey(addon.id)) {
                     dictIdAddon.Add(addon.id, addon);
                     if (string.IsNullOrEmpty(addon.ccguid)) {
                         addon.ccguid = genericController.createGuid();
-                        addon.save(cpcore);
+                        addon.save(core);
                     }
                     if (!dictGuidId.ContainsKey(addon.ccguid.ToLower())) {
                         dictGuidId.Add(addon.ccguid.ToLower(), addon.id);
                         if (string.IsNullOrEmpty(addon.name.Trim())) {
                             addon.name = "addon " + addon.id.ToString();
-                            addon.save(cpcore);
+                            addon.save(core);
                         }
                         if (!dictNameId.ContainsKey(addon.name.ToLower())) {
                             dictNameId.Add(addon.name.ToLower(), addon.id);

@@ -28,16 +28,16 @@ namespace Contensive.Core.Addons.AdminSite {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
 
                 //
-                cpCore.visitProperty.setProperty("IndexFilterOpen", "1");
-                Contensive.Core.Addons.AdminSite.getHtmlBodyClass adminSite = new Contensive.Core.Addons.AdminSite.getHtmlBodyClass(cpCore.cp_forAddonExecutionOnly);
-                int ContentID = cpCore.docProperties.getInteger("cid");
+                core.visitProperty.setProperty("IndexFilterOpen", "1");
+                Contensive.Core.Addons.AdminSite.getHtmlBodyClass adminSite = new Contensive.Core.Addons.AdminSite.getHtmlBodyClass(core.cp_forAddonExecutionOnly);
+                int ContentID = core.docProperties.getInteger("cid");
                 if (ContentID == 0) {
                     result = "No filter is available";
                 } else {
-                    cdefModel cdef = cdefModel.getCdef(cpCore, ContentID);
+                    cdefModel cdef = cdefModel.getCdef(core, ContentID);
                     result = adminSite.GetForm_IndexFilterContent(cdef);
                 }
                 adminSite = null;

@@ -11,7 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 //
 namespace Contensive.Core.Controllers {
-    // todo - this is not 'cpCore'. It is a 
+    // todo - this is not 'core'. It is a 
     public class coreController : IDisposable {
         //
         //======================================================================
@@ -412,7 +412,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// cpCoreClass constructor for cluster use.
+        /// coreClass constructor for cluster use.
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
@@ -430,7 +430,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// cpCoreClass constructor for app, non-Internet use. cpCoreClass is the primary object internally, created by cp.
+        /// coreClass constructor for app, non-Internet use. coreClass is the primary object internally, created by cp.
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
@@ -449,7 +449,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// cpCoreClass constructor for app, non-Internet use. cpCoreClass is the primary object internally, created by cp.
+        /// coreClass constructor for app, non-Internet use. coreClass is the primary object internally, created by cp.
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
@@ -468,7 +468,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// cpCoreClass constructor for app, non-Internet use. cpCoreClass is the primary object internally, created by cp.
+        /// coreClass constructor for app, non-Internet use. coreClass is the primary object internally, created by cp.
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
@@ -487,7 +487,7 @@ namespace Contensive.Core.Controllers {
         }
         //====================================================================================================
         /// <summary>
-        /// cpCoreClass constructor for a web request/response environment. cpCoreClass is the primary object internally, created by cp.
+        /// coreClass constructor for a web request/response environment. coreClass is the primary object internally, created by cp.
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks>
@@ -1121,7 +1121,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// cpCoreClass constructor common tasks.
+        /// coreClass constructor common tasks.
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
@@ -1159,7 +1159,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// version for cpCore assembly
+        /// version for core assembly
         /// </summary>
         /// <remarks></remarks>
         public string codeVersion() {

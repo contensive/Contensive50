@@ -27,7 +27,7 @@ namespace Contensive.Core.Controllers {
         //       taskRunnerTimer
         //==================================================================================================
         //
-        //Private cpCore As cpCoreClass
+        //Private core As coreClass
         //
         private string runnerGuid { get; set; } // set in constructor. used to tag tasks assigned to this runner
         //
@@ -50,10 +50,10 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <remarks></remarks>
         public taskRunnerController() {
-            //Me.cpCore = cpCore
+            //Me.core = core
             runnerGuid = Guid.NewGuid().ToString();
         }
         //
@@ -70,7 +70,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // call .dispose for managed objects
                     //
-                    // cpCore.dispose()
+                    // core.dispose()
                 }
                 //
                 // cp  creates and destroys cmc

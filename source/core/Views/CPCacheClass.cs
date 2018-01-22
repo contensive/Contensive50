@@ -23,7 +23,7 @@ namespace Contensive.Core {
         public const string EventsId = "11B23802-CBD3-48E6-9C3E-1DC26ED8775A";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController cpCore { get; set; }
+        private Contensive.Core.Controllers.coreController core { get; set; }
         private CPClass cp { get; set; }
         //
         //====================================================================================================
@@ -34,7 +34,7 @@ namespace Contensive.Core {
         /// <remarks></remarks>
         public CPCacheClass(CPClass cpParent) : base() {
             cp = cpParent;
-            cpCore = cp.core;
+            core = cp.core;
         }
         //
         //====================================================================================================
@@ -43,7 +43,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <remarks></remarks>
         public override void ClearAll() {
-            cpCore.cache.invalidateAll();
+            core.cache.invalidateAll();
         }
         //
         //====================================================================================================
@@ -55,7 +55,7 @@ namespace Contensive.Core {
         public override void Clear(string ContentNameList) {
             if (string.IsNullOrEmpty(ContentNameList)) {
                 foreach (var contentName in new List<string>(ContentNameList.Split(','))) {
-                    cpCore.cache.invalidateAllInContent(contentName);
+                    core.cache.invalidateAllInContent(contentName);
                 }
             }
         }
@@ -94,12 +94,12 @@ namespace Contensive.Core {
                     invalidationTagList.AddRange(invalidationTagCommaList.Split(','));
                 }
                 if (invalidationDate.isOld()) {
-                    cpCore.cache.setObject(key, Value, invalidationTagList);
+                    core.cache.setObject(key, Value, invalidationTagList);
                 } else {
-                    cpCore.cache.setObject(key, Value, invalidationDate, invalidationTagList);
+                    core.cache.setObject(key, Value, invalidationDate, invalidationTagList);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -107,7 +107,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override object getObject(string key) {
-            return cpCore.cache.getObject<object>(key);
+            return core.cache.getObject<object>(key);
         }
         //
         //====================================================================================================
@@ -143,19 +143,19 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void InvalidateAll() {
-            cpCore.cache.invalidateAll();
+            core.cache.invalidateAll();
         }
         //
         //====================================================================================================
         //
         public override void InvalidateTag(string tag) {
-            cpCore.cache.invalidate(tag);
+            core.cache.invalidate(tag);
         }
         //
         //====================================================================================================
         //
         public override void InvalidateTagList(List<string> tagList) {
-            cpCore.cache.invalidate(tagList);
+            core.cache.invalidate(tagList);
         }
         //
         //====================================================================================================
@@ -165,7 +165,7 @@ namespace Contensive.Core {
         /// <param name="key"></param>
         /// <param name="value"></param>
         public override void setKey(string key, object value) {
-            cpCore.cache.setObject(key, value);
+            core.cache.setObject(key, value);
         }
         //
         //====================================================================================================
@@ -176,7 +176,7 @@ namespace Contensive.Core {
         /// <param name="value"></param>
         /// <param name="invalidationDate"></param>
         public override void setKey(string key, object value, DateTime invalidationDate) {
-            cpCore.cache.setObject(key, value, invalidationDate, "");
+            core.cache.setObject(key, value, invalidationDate, "");
         }
         //
         //====================================================================================================
@@ -187,7 +187,7 @@ namespace Contensive.Core {
         /// <param name="value"></param>
         /// <param name="tagList"></param>
         public override void setKey(string key, object value, List<string> tagList) {
-            cpCore.cache.setObject(key, value, tagList);
+            core.cache.setObject(key, value, tagList);
         }
         //
         //====================================================================================================
@@ -199,23 +199,23 @@ namespace Contensive.Core {
         /// <param name="tagList"></param>
         /// <param name="invalidationDate"></param>
         public override void setKey(string key, object value, DateTime invalidationDate, List<string> tagList) {
-            cpCore.cache.setObject(key, value, invalidationDate, tagList);
+            core.cache.setObject(key, value, invalidationDate, tagList);
         }
         //
         //====================================================================================================
         //
         public override void setKey(string key, object value, string tag) {
-            cpCore.cache.setObject(key, value, tag);
+            core.cache.setObject(key, value, tag);
         }
         //
         //====================================================================================================
         //
         public override void setKey(string key, object Value, DateTime invalidationDate, string tag) {
-            cpCore.cache.setObject(key, Value, invalidationDate, tag);
+            core.cache.setObject(key, Value, invalidationDate, tag);
         }
         //
         public override void InvalidateContentRecord(string contentName, int recordId) {
-            cpCore.cache.invalidateContent_Entity(cp.core, contentName, recordId);
+            core.cache.invalidateContent_Entity(cp.core, contentName, recordId);
         }
         #region  IDisposable Support 
         //
@@ -229,7 +229,7 @@ namespace Contensive.Core {
                     // call .dispose for managed objects
                     //
                     cp = null;
-                    cpCore = null;
+                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.

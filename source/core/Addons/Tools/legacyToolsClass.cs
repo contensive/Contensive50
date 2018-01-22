@@ -28,7 +28,7 @@ namespace Contensive.Core.Addons.Tools {
         // ----- data fields
         //
         private string[] Findstring = new string[51]; 
-        private coreController cpCore;
+        private coreController core;
         private string ToolsTable;
         private string ToolsContentName;
         private bool DefaultReadOnly;
@@ -151,8 +151,8 @@ namespace Contensive.Core.Addons.Tools {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public legacyToolsClass(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public legacyToolsClass(coreController core) : base() {
+            this.core = core;
         }
         //
         //========================================================================
@@ -167,51 +167,51 @@ namespace Contensive.Core.Addons.Tools {
                 int MenuHeaderID = 0;
                 int MenuDirection = 0;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                adminUIController Adminui = new adminUIController(cpCore);
+                adminUIController Adminui = new adminUIController(core);
                 //
-                Button = cpCore.docProperties.getText("Button");
+                Button = core.docProperties.getText("Button");
                 if (Button == ButtonCancelAll) {
                     //
                     // Cancel to the admin site
                     //
-                    return cpCore.webServer.redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"));
+                    return core.webServer.redirect(core.siteProperties.getText("AdminURL", "/admin/"));
                 }
                 //
                 // ----- Check permissions
                 //
-                if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
+                if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // You must be admin to use this feature
                     //
                     tempGetForm = Adminui.GetFormBodyAdminOnly();
                     tempGetForm = Adminui.GetBody("Admin Tools", ButtonCancelAll, "", false, false, "<div>Administration Tools</div>", "", 0, tempGetForm);
                 } else {
-                    ToolsAction = cpCore.docProperties.getInteger("dta");
-                    Button = cpCore.docProperties.getText("Button");
-                    AdminFormTool = cpCore.docProperties.getInteger(RequestNameAdminForm);
-                    ToolsTable = cpCore.docProperties.getText("dtt");
-                    ToolsContentName = cpCore.docProperties.getText("ContentName");
-                    ToolsQuery = cpCore.docProperties.getText("dtq");
-                    ToolsDataSource = cpCore.docProperties.getText("dtds");
-                    MenuEntryID = cpCore.docProperties.getInteger("dtei");
-                    MenuHeaderID = cpCore.docProperties.getInteger("dthi");
-                    MenuDirection = cpCore.docProperties.getInteger("dtmd");
-                    DefaultReadOnly = cpCore.docProperties.getBoolean("dtdreadonly");
-                    DefaultActive = cpCore.docProperties.getBoolean("dtdactive");
-                    DefaultPassword = cpCore.docProperties.getBoolean("dtdpassword");
-                    DefaulttextBuffered = cpCore.docProperties.getBoolean("dtdtextbuffered");
-                    DefaultRequired = cpCore.docProperties.getBoolean("dtdrequired");
-                    DefaultAdminOnly = cpCore.docProperties.getBoolean("dtdadmin");
-                    DefaultDeveloperOnly = cpCore.docProperties.getBoolean("dtddev");
-                    defaultAddMenu = cpCore.docProperties.getBoolean("dtdam");
-                    DefaultCreateBlankRecord = cpCore.docProperties.getBoolean("dtblank");
+                    ToolsAction = core.docProperties.getInteger("dta");
+                    Button = core.docProperties.getText("Button");
+                    AdminFormTool = core.docProperties.getInteger(RequestNameAdminForm);
+                    ToolsTable = core.docProperties.getText("dtt");
+                    ToolsContentName = core.docProperties.getText("ContentName");
+                    ToolsQuery = core.docProperties.getText("dtq");
+                    ToolsDataSource = core.docProperties.getText("dtds");
+                    MenuEntryID = core.docProperties.getInteger("dtei");
+                    MenuHeaderID = core.docProperties.getInteger("dthi");
+                    MenuDirection = core.docProperties.getInteger("dtmd");
+                    DefaultReadOnly = core.docProperties.getBoolean("dtdreadonly");
+                    DefaultActive = core.docProperties.getBoolean("dtdactive");
+                    DefaultPassword = core.docProperties.getBoolean("dtdpassword");
+                    DefaulttextBuffered = core.docProperties.getBoolean("dtdtextbuffered");
+                    DefaultRequired = core.docProperties.getBoolean("dtdrequired");
+                    DefaultAdminOnly = core.docProperties.getBoolean("dtdadmin");
+                    DefaultDeveloperOnly = core.docProperties.getBoolean("dtddev");
+                    defaultAddMenu = core.docProperties.getBoolean("dtdam");
+                    DefaultCreateBlankRecord = core.docProperties.getBoolean("dtblank");
                     //
-                    cpCore.doc.addRefreshQueryString("dta", ToolsAction.ToString());
+                    core.doc.addRefreshQueryString("dta", ToolsAction.ToString());
                     //
                     if (Button == ButtonCancel) {
                         //
                         // -- Cancel
-                        return cpCore.webServer.redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"));
+                        return core.webServer.redirect(core.siteProperties.getText("AdminURL", "/admin/"));
                     } else {
                         //
                         // -- Print out the page
@@ -234,8 +234,8 @@ namespace Contensive.Core.Addons.Tools {
                                 break;
                             case AdminFormToolConfigureEdit:
                                 //
-                                //Call Stream.Add(cpCore.addon.execute(guid_ToolConfigureEdit))
-                                Stream.Add(GetForm_ConfigureEdit(cpCore.cp_forAddonExecutionOnly));
+                                //Call Stream.Add(core.addon.execute(guid_ToolConfigureEdit))
+                                Stream.Add(GetForm_ConfigureEdit(core.cp_forAddonExecutionOnly));
                                 break;
                             case AdminFormToolManualQuery:
                                 //
@@ -315,7 +315,7 @@ namespace Contensive.Core.Addons.Tools {
                     tempGetForm = Stream.Text;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempGetForm;
         }
@@ -335,7 +335,7 @@ namespace Contensive.Core.Addons.Tools {
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = "";
                 //
-                Stream.Add(SpanClassAdminNormal + "<strong><A href=\"" + cpCore.webServer.requestPage + "?af=" + AdminFormToolRoot + "\">Tools</A></strong></SPAN>");
+                Stream.Add(SpanClassAdminNormal + "<strong><A href=\"" + core.webServer.requestPage + "?af=" + AdminFormToolRoot + "\">Tools</A></strong></SPAN>");
                 Stream.Add(SpanClassAdminNormal + ":Create Content Fields from Table</SPAN>");
                 //
                 //   print out the submit form
@@ -350,11 +350,11 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("<TD>" + SpanClassAdminNormal + "Content Name</SPAN></td>");
                 Stream.Add("<TD><Select name=\"ContentName\">");
                 ItemCount = 0;
-                CSPointer = cpCore.db.csOpen("Content", "", "name");
-                while (cpCore.db.csOk(CSPointer)) {
-                    Stream.Add("<option value=\"" + cpCore.db.csGetText(CSPointer, "name") + "\">" + cpCore.db.csGetText(CSPointer, "name") + "</option>");
+                CSPointer = core.db.csOpen("Content", "", "name");
+                while (core.db.csOk(CSPointer)) {
+                    Stream.Add("<option value=\"" + core.db.csGetText(CSPointer, "name") + "\">" + core.db.csGetText(CSPointer, "name") + "</option>");
                     ItemCount = ItemCount + 1;
-                    cpCore.db.csGoNext(CSPointer);
+                    core.db.csGoNext(CSPointer);
                 }
                 if (ItemCount == 0) {
                     Stream.Add("<option value=\"-1\">System</option>");
@@ -377,7 +377,7 @@ namespace Contensive.Core.Addons.Tools {
                 //   process the button if present
                 //
                 if (Button == ButtonCreateFields) {
-                    ContentName = cpCore.docProperties.getText("ContentName");
+                    ContentName = core.docProperties.getText("ContentName");
                     if (string.IsNullOrEmpty(ContentName)) {
                         Stream.Add("Select a content before submitting. Fields were not changed.");
                     } else {
@@ -385,13 +385,13 @@ namespace Contensive.Core.Addons.Tools {
                         if (ContentID == 0) {
                             Stream.Add("GetContentID failed. Fields were not changed.");
                         } else {
-                            cpCore.db.deleteContentRecords("Content Fields", "ContentID=" + cpCore.db.encodeSQLNumber(ContentID));
+                            core.db.deleteContentRecords("Content Fields", "ContentID=" + core.db.encodeSQLNumber(ContentID));
                         }
                     }
                 }
-                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -434,11 +434,11 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminformToolFindAndReplace, "Find and Replace", "Use this tool to replace text strings in content throughout the site."));
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminformToolIISReset, "IIS Reset", "IIS Reset the server. This will stop all sites on the server for a short period."));
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminFormToolRestart, "Contensive Application Restart", "Restart the Contensive Applicaiton. This will stop your site on the server for a short period."));
-                Stream.Add(GetForm_RootRow(AdminFormTools, AdminformToolCreateGUID, "Create GUID", "Use this tool to create a new GUID. This is useful when creating a new cpcore.addon."));
+                Stream.Add(GetForm_RootRow(AdminFormTools, AdminformToolCreateGUID, "Create GUID", "Use this tool to create a new GUID. This is useful when creating a new core.addon."));
                 Stream.Add("</table>");
-                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result; 
         }
@@ -453,7 +453,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 tempGetForm_RootRow = "";
                 tempGetForm_RootRow = tempGetForm_RootRow + "<tr><td colspan=\"2\">";
-                tempGetForm_RootRow = tempGetForm_RootRow + SpanClassAdminNormal + "<P class=\"ccAdminNormal\"><A href=\"" + cpCore.webServer.requestPage + "?af=" + AdminFormToolId.ToString() + "\"><B>" + Caption + "</b></SPAN></A></p>";
+                tempGetForm_RootRow = tempGetForm_RootRow + SpanClassAdminNormal + "<P class=\"ccAdminNormal\"><A href=\"" + core.webServer.requestPage + "?af=" + AdminFormToolId.ToString() + "\"><B>" + Caption + "</b></SPAN></A></p>";
                 tempGetForm_RootRow = tempGetForm_RootRow + "</td></tr>";
                 if (!string.IsNullOrEmpty(Description)) {
                     tempGetForm_RootRow = tempGetForm_RootRow + "<tr><td width=\"30\"><img src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"30\"></td>";
@@ -464,7 +464,7 @@ namespace Contensive.Core.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempGetForm_RootRow;
         }
@@ -477,10 +477,10 @@ namespace Contensive.Core.Addons.Tools {
             string result = "";
             try {
                 result = ""
-                    + "<p>" + SpanClassAdminNormal + "<a href=\"" + cpCore.webServer.requestPage + "?af=" + AdminFormToolRoot + "\"><b>Tools</b></a>&nbsp;&gt;&nbsp;" + Title + "</p>"
+                    + "<p>" + SpanClassAdminNormal + "<a href=\"" + core.webServer.requestPage + "?af=" + AdminFormToolRoot + "\"><b>Tools</b></a>&nbsp;&gt;&nbsp;" + Title + "</p>"
                     + "<p>" + SpanClassAdminNormal + Description + "</p>";
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -519,7 +519,7 @@ namespace Contensive.Core.Addons.Tools {
                 string SQLName = null;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = null;
-                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("dataSourceid"));
+                dataSourceModel datasource = dataSourceModel.create(core, core.docProperties.getInteger("dataSourceid"));
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
@@ -527,36 +527,36 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Get the members SQL Queue
                 //
-                SQLFilename = cpCore.userProperty.getText("SQLArchive");
+                SQLFilename = core.userProperty.getText("SQLArchive");
                 if (string.IsNullOrEmpty(SQLFilename)) {
-                    SQLFilename = "SQLArchive" + cpCore.doc.sessionContext.user.id.ToString("000000000") + ".txt";
-                    cpCore.userProperty.setProperty("SQLArchive", SQLFilename);
+                    SQLFilename = "SQLArchive" + core.doc.sessionContext.user.id.ToString("000000000") + ".txt";
+                    core.userProperty.setProperty("SQLArchive", SQLFilename);
                 }
-                SQLArchive = cpCore.cdnFiles.readFile(SQLFilename);
+                SQLArchive = core.cdnFiles.readFile(SQLFilename);
                 //
                 // Read in arguments if available
                 //
-                Timeout = cpCore.docProperties.getInteger("Timeout");
+                Timeout = core.docProperties.getInteger("Timeout");
                 if (Timeout == 0) {
                     Timeout = 30;
                 }
                 //
-                PageSize = cpCore.docProperties.getInteger("PageSize");
+                PageSize = core.docProperties.getInteger("PageSize");
                 if (PageSize == 0) {
                     PageSize = 10;
                 }
                 //
-                PageNumber = cpCore.docProperties.getInteger("PageNumber");
+                PageNumber = core.docProperties.getInteger("PageNumber");
                 if (PageNumber == 0) {
                     PageNumber = 1;
                 }
                 //
-                SQL = cpCore.docProperties.getText("SQL");
+                SQL = core.docProperties.getText("SQL");
                 if (string.IsNullOrEmpty(SQL)) {
-                    SQL = cpCore.docProperties.getText("SQLList");
+                    SQL = core.docProperties.getText("SQLList");
                 }
                 //
-                if ((cpCore.docProperties.getText("button")) == ButtonRun) {
+                if ((core.docProperties.getText("button")) == ButtonRun) {
                     //
                     // Add this SQL to the members SQL list
                     //
@@ -568,7 +568,7 @@ namespace Contensive.Core.Addons.Tools {
                         while ((LineCounter < 10) && (!string.IsNullOrEmpty(SQLArchiveOld))) {
                             SQLArchive = SQLArchive + getLine( ref SQLArchiveOld) + "\r\n";
                         }
-                        cpCore.appRootFiles.saveFile(SQLFilename, SQLArchive);
+                        core.appRootFiles.saveFile(SQLFilename, SQLArchive);
                     }
                     //
                     // Run the SQL
@@ -576,7 +576,7 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add("<P>" + SpanClassAdminSmall);
                     Stream.Add(DateTime.Now + " Executing sql [" + SQL + "] on DataSource [" + datasource.Name + "]");
                     try {
-                        dt = cpCore.db.executeQuery(SQL, datasource.Name, PageSize * (PageNumber - 1), PageSize);
+                        dt = core.db.executeQuery(SQL, datasource.Name, PageSize * (PageNumber - 1), PageSize);
                     } catch (Exception ex) {
                         //
                         // ----- error
@@ -609,7 +609,7 @@ namespace Contensive.Core.Addons.Tools {
                         Stream.Add("</tr>");
                         //
                         //Dim dtOK As Boolean
-                        resultArray = cpCore.db.convertDataTabletoArray(dt);
+                        resultArray = core.db.convertDataTabletoArray(dt);
                         //
                         RowMax = resultArray.GetUpperBound(1);
                         ColumnMax = resultArray.GetUpperBound(0);
@@ -651,19 +651,19 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Display form
                 //
-                //Call Stream.Add(SpanClassAdminNormal & cpCore.main_GetFormStart(""))
+                //Call Stream.Add(SpanClassAdminNormal & core.main_GetFormStart(""))
                 //
-                int SQLRows = cpCore.docProperties.getInteger("SQLRows");
+                int SQLRows = core.docProperties.getInteger("SQLRows");
                 if (SQLRows == 0) {
-                    SQLRows = cpCore.userProperty.getInteger("ManualQueryInputRows", 5);
+                    SQLRows = core.userProperty.getInteger("ManualQueryInputRows", 5);
                 } else {
-                    cpCore.userProperty.setProperty("ManualQueryInputRows", SQLRows.ToString());
+                    core.userProperty.setProperty("ManualQueryInputRows", SQLRows.ToString());
                 }
                 Stream.Add("<TEXTAREA NAME=\"SQL\" ROWS=\"" + SQLRows + "\" ID=\"SQL\" STYLE=\"width: 800px;\">" + SQL + "</TEXTAREA>");
                 Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
-                Stream.Add("<br><br>Data Source<br>" + cpCore.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
+                Stream.Add("<br><br>Data Source<br>" + core.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
                 //
-                SelectFieldWidthLimit = cpCore.siteProperties.getInteger("SelectFieldWidthLimit", 200);
+                SelectFieldWidthLimit = core.siteProperties.getInteger("SelectFieldWidthLimit", 200);
                 if (!string.IsNullOrEmpty(SQLArchive)) {
                     Stream.Add("<br><br>Previous Queries<br>");
                     Stream.Add("<select size=\"1\" name=\"SQLList\" ID=\"SQLList\" onChange=\"SQL.value=SQLList.value\">");
@@ -684,24 +684,24 @@ namespace Contensive.Core.Addons.Tools {
                 if (IsNull(PageSize)) {
                     PageSize = 100;
                 }
-                Stream.Add("<br>Page Size:<br>" + cpCore.html.inputText("PageSize", PageSize.ToString()));
+                Stream.Add("<br>Page Size:<br>" + core.html.inputText("PageSize", PageSize.ToString()));
                 //
                 if (IsNull(PageNumber)) {
                     PageNumber = 1;
                 }
-                Stream.Add("<br>Page Number:<br>" + cpCore.html.inputText("PageNumber", PageNumber.ToString()));
+                Stream.Add("<br>Page Number:<br>" + core.html.inputText("PageNumber", PageNumber.ToString()));
                 //
                 if (IsNull(Timeout)) {
                     Timeout = 30;
                 }
-                Stream.Add("<br>Timeout (sec):<br>" + cpCore.html.inputText("Timeout", Timeout.ToString()));
+                Stream.Add("<br>Timeout (sec):<br>" + core.html.inputText("Timeout", Timeout.ToString()));
                 //
-                //Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolManualQuery))
-                //Stream.Add( cpCore.main_GetFormEnd & "</SPAN>")
+                //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolManualQuery))
+                //Stream.Add( core.main_GetFormEnd & "</SPAN>")
                 //
-                returnHtml = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                returnHtml = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnHtml;
@@ -721,12 +721,12 @@ namespace Contensive.Core.Addons.Tools {
                 string ContentName = "";
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = null;
-                adminUIController Adminui = new adminUIController(cpCore);
+                adminUIController Adminui = new adminUIController(core);
                 string Description = null;
                 string Caption = null;
                 int NavID = 0;
                 int ParentNavID = 0;
-                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"));
+                dataSourceModel datasource = dataSourceModel.create(core, core.docProperties.getInteger("DataSourceID"));
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 Caption = "Create Content Definition";
@@ -736,44 +736,44 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 //   print out the submit form
                 //
-                if (cpCore.docProperties.getText("Button") != "") {
+                if (core.docProperties.getText("Button") != "") {
                     //
                     // Process input
                     //
-                    ContentName = cpCore.docProperties.getText("ContentName");
-                    TableName = cpCore.docProperties.getText("TableName");
+                    ContentName = core.docProperties.getText("ContentName");
+                    TableName = core.docProperties.getText("TableName");
                     //
                     Stream.Add(SpanClassAdminSmall);
                     Stream.Add("<P>Creating content [" + ContentName + "] on table [" + TableName + "] on Datasource [" + datasource.Name + "].</P>");
                     if ((!string.IsNullOrEmpty(ContentName)) & (!string.IsNullOrEmpty(TableName)) & (!string.IsNullOrEmpty(datasource.Name))) {
-                        cpCore.db.createSQLTable(datasource.Name, TableName);
-                        cpCore.db.createContentFromSQLTable(datasource, TableName, ContentName);
-                        cpCore.cache.invalidateAll();
-                        cpCore.doc.clearMetaData();
-                        ContentID = Models.Complex.cdefModel.getContentId(cpCore, ContentName);
-                        ParentNavID = cpCore.db.getRecordID(cnNavigatorEntries, "Manage Site Content");
+                        core.db.createSQLTable(datasource.Name, TableName);
+                        core.db.createContentFromSQLTable(datasource, TableName, ContentName);
+                        core.cache.invalidateAll();
+                        core.doc.clearMetaData();
+                        ContentID = Models.Complex.cdefModel.getContentId(core, ContentName);
+                        ParentNavID = core.db.getRecordID(cnNavigatorEntries, "Manage Site Content");
                         if (ParentNavID != 0) {
-                            CS = cpCore.db.csOpen(cnNavigatorEntries, "(name=" + cpCore.db.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
+                            CS = core.db.csOpen(cnNavigatorEntries, "(name=" + core.db.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
                             ParentNavID = 0;
-                            if (cpCore.db.csOk(CS)) {
-                                ParentNavID = cpCore.db.csGetInteger(CS, "ID");
+                            if (core.db.csOk(CS)) {
+                                ParentNavID = core.db.csGetInteger(CS, "ID");
                             }
-                            cpCore.db.csClose(ref CS);
+                            core.db.csClose(ref CS);
                             if (ParentNavID != 0) {
-                                CS = cpCore.db.csOpen(cnNavigatorEntries, "(name=" + cpCore.db.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
-                                if (!cpCore.db.csOk(CS)) {
-                                    cpCore.db.csClose(ref CS);
-                                    CS = cpCore.db.csInsertRecord(cnNavigatorEntries);
+                                CS = core.db.csOpen(cnNavigatorEntries, "(name=" + core.db.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
+                                if (!core.db.csOk(CS)) {
+                                    core.db.csClose(ref CS);
+                                    CS = core.db.csInsertRecord(cnNavigatorEntries);
                                 }
-                                if (cpCore.db.csOk(CS)) {
-                                    cpCore.db.csSet(CS, "name", ContentName);
-                                    cpCore.db.csSet(CS, "parentid", ParentNavID);
-                                    cpCore.db.csSet(CS, "contentid", ContentID);
+                                if (core.db.csOk(CS)) {
+                                    core.db.csSet(CS, "name", ContentName);
+                                    core.db.csSet(CS, "parentid", ParentNavID);
+                                    core.db.csSet(CS, "contentid", ContentID);
                                 }
-                                cpCore.db.csClose(ref CS);
+                                core.db.csClose(ref CS);
                             }
                         }
-                        ContentID = Models.Complex.cdefModel.getContentId(cpCore, ContentName);
+                        ContentID = Models.Complex.cdefModel.getContentId(core, ContentName);
                         Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentID + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
                     } else {
                         Stream.Add("<P>Error, a required field is missing. Content not created.</P>");
@@ -782,18 +782,18 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 Stream.Add(SpanClassAdminNormal);
                 Stream.Add("Data Source<br>");
-                Stream.Add(cpCore.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
+                Stream.Add(core.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
                 Stream.Add("<br><br>");
                 Stream.Add("Content Name<br>");
-                Stream.Add(cpCore.html.inputText("ContentName", ContentName, 1, 40));
+                Stream.Add(core.html.inputText("ContentName", ContentName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("Table Name<br>");
-                Stream.Add(cpCore.html.inputText("TableName", TableName, 1, 40));
+                Stream.Add(core.html.inputText("TableName", TableName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("</SPAN>");
                 result = Adminui.GetBody(Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -841,14 +841,14 @@ namespace Contensive.Core.Addons.Tools {
                 //   Load Request
                 //--------------------------------------------------------------------------------
                 //
-                ToolsAction = cpCore.docProperties.getInteger("dta");
-                TargetFieldID = cpCore.docProperties.getInteger("fi");
-                ContentID = cpCore.docProperties.getInteger(RequestNameToolContentID);
-                //ColumnPointer = cpCore.main_GetStreamInteger("dtcn")
-                FieldNameToAdd = genericController.vbUCase(cpCore.docProperties.getText(RequestNameAddField));
-                FieldIDToAdd = cpCore.docProperties.getInteger(RequestNameAddFieldID);
+                ToolsAction = core.docProperties.getInteger("dta");
+                TargetFieldID = core.docProperties.getInteger("fi");
+                ContentID = core.docProperties.getInteger(RequestNameToolContentID);
+                //ColumnPointer = core.main_GetStreamInteger("dtcn")
+                FieldNameToAdd = genericController.vbUCase(core.docProperties.getText(RequestNameAddField));
+                FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldID);
                 ButtonList = ButtonCancel + "," + ButtonSelect;
-                ReloadCDef = cpCore.docProperties.getBoolean("ReloadCDef");
+                ReloadCDef = core.docProperties.getBoolean("ReloadCDef");
                 //
                 //--------------------------------------------------------------------------------
                 // Process actions
@@ -857,13 +857,13 @@ namespace Contensive.Core.Addons.Tools {
                 if (ContentID != 0) {
                     ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
                     ContentName = Local_GetContentNameByID(ContentID);
-                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentID, true, false);
+                    CDef = Models.Complex.cdefModel.getCdef(core, ContentID, true, false);
                     if (ToolsAction != 0) {
                         //
                         // Block contentautoload, then force a load at the end
                         //
-                        AllowContentAutoLoad = (cpCore.siteProperties.getBoolean("AllowContentAutoLoad", true));
-                        cpCore.siteProperties.setProperty("AllowContentAutoLoad", false);
+                        AllowContentAutoLoad = (core.siteProperties.getBoolean("AllowContentAutoLoad", true));
+                        core.siteProperties.setProperty("AllowContentAutoLoad", false);
                         //
                         // Make sure the FieldNameToAdd is not-inherited, if not, create new field
                         //
@@ -875,17 +875,17 @@ namespace Contensive.Core.Addons.Tools {
                                     if (field.inherited) {
                                         SourceContentID = field.contentId;
                                         SourceName = field.nameLc;
-                                        CSSource = cpCore.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + cpCore.db.encodeSQLText(SourceName) + ")");
-                                        if (cpCore.db.csOk(CSSource)) {
-                                            CSTarget = cpCore.db.csInsertRecord("Content Fields");
-                                            if (cpCore.db.csOk(CSTarget)) {
-                                                cpCore.db.csCopyRecord(CSSource, CSTarget);
-                                                cpCore.db.csSet(CSTarget, "ContentID", ContentID);
+                                        CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + core.db.encodeSQLText(SourceName) + ")");
+                                        if (core.db.csOk(CSSource)) {
+                                            CSTarget = core.db.csInsertRecord("Content Fields");
+                                            if (core.db.csOk(CSTarget)) {
+                                                core.db.csCopyRecord(CSSource, CSTarget);
+                                                core.db.csSet(CSTarget, "ContentID", ContentID);
                                                 ReloadCDef = true;
                                             }
-                                            cpCore.db.csClose(ref CSTarget);
+                                            core.db.csClose(ref CSTarget);
                                         }
-                                        cpCore.db.csClose(ref CSSource);
+                                        core.db.csClose(ref CSSource);
                                     }
                                     break;
                                 }
@@ -901,17 +901,17 @@ namespace Contensive.Core.Addons.Tools {
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
-                                CSSource = cpCore.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + cpCore.db.encodeSQLText(SourceName) + ")");
-                                if (cpCore.db.csOk(CSSource)) {
-                                    CSTarget = cpCore.db.csInsertRecord("Content Fields");
-                                    if (cpCore.db.csOk(CSTarget)) {
-                                        cpCore.db.csCopyRecord(CSSource, CSTarget);
-                                        cpCore.db.csSet(CSTarget, "ContentID", ContentID);
+                                CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + core.db.encodeSQLText(SourceName) + ")");
+                                if (core.db.csOk(CSSource)) {
+                                    CSTarget = core.db.csInsertRecord("Content Fields");
+                                    if (core.db.csOk(CSTarget)) {
+                                        core.db.csCopyRecord(CSSource, CSTarget);
+                                        core.db.csSet(CSTarget, "ContentID", ContentID);
                                         ReloadCDef = true;
                                     }
-                                    cpCore.db.csClose(ref CSTarget);
+                                    core.db.csClose(ref CSTarget);
                                 }
-                                cpCore.db.csClose(ref CSSource);
+                                core.db.csClose(ref CSSource);
                             }
                             if (ColumnNumberMax < field.indexColumn) {
                                 ColumnNumberMax = field.indexColumn;
@@ -934,21 +934,21 @@ namespace Contensive.Core.Addons.Tools {
                                             foreach (var keyValuePair in CDef.adminColumns) {
                                                 Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                                 Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
-                                                CSPointer = cpCore.db.csOpenRecord("Content Fields", field.id);
-                                                cpCore.db.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
-                                                cpCore.db.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 80) / (double)ColumnWidthTotal));
-                                                cpCore.db.csClose(ref CSPointer);
+                                                CSPointer = core.db.csOpenRecord("Content Fields", field.id);
+                                                core.db.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
+                                                core.db.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 80) / (double)ColumnWidthTotal));
+                                                core.db.csClose(ref CSPointer);
                                                 columnPtr += 1;
                                             }
                                         }
-                                        CSPointer = cpCore.db.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
-                                        if (cpCore.db.csOk(CSPointer)) {
-                                            cpCore.db.csSet(CSPointer, "IndexColumn", columnPtr * 10);
-                                            cpCore.db.csSet(CSPointer, "IndexWidth", 20);
-                                            cpCore.db.csSet(CSPointer, "IndexSortPriority", 99);
-                                            cpCore.db.csSet(CSPointer, "IndexSortDirection", 1);
+                                        CSPointer = core.db.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
+                                        if (core.db.csOk(CSPointer)) {
+                                            core.db.csSet(CSPointer, "IndexColumn", columnPtr * 10);
+                                            core.db.csSet(CSPointer, "IndexWidth", 20);
+                                            core.db.csSet(CSPointer, "IndexSortPriority", 99);
+                                            core.db.csSet(CSPointer, "IndexSortDirection", 1);
                                         }
-                                        cpCore.db.csClose(ref CSPointer);
+                                        core.db.csClose(ref CSPointer);
                                         ReloadCDef = true;
                                     }
                                     //
@@ -963,17 +963,17 @@ namespace Contensive.Core.Addons.Tools {
                                         foreach (var keyValuePair in CDef.adminColumns) {
                                             Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
-                                            CSPointer = cpCore.db.csOpenRecord("Content Fields", field.id);
+                                            CSPointer = core.db.csOpenRecord("Content Fields", field.id);
                                             if (fieldId == TargetFieldID) {
-                                                cpCore.db.csSet(CSPointer, "IndexColumn", 0);
-                                                cpCore.db.csSet(CSPointer, "IndexWidth", 0);
-                                                cpCore.db.csSet(CSPointer, "IndexSortPriority", 0);
-                                                cpCore.db.csSet(CSPointer, "IndexSortDirection", 0);
+                                                core.db.csSet(CSPointer, "IndexColumn", 0);
+                                                core.db.csSet(CSPointer, "IndexWidth", 0);
+                                                core.db.csSet(CSPointer, "IndexSortPriority", 0);
+                                                core.db.csSet(CSPointer, "IndexSortDirection", 0);
                                             } else {
-                                                cpCore.db.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
-                                                cpCore.db.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                                core.db.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
+                                                core.db.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
                                             }
-                                            cpCore.db.csClose(ref CSPointer);
+                                            core.db.csClose(ref CSPointer);
                                             columnPtr += 1;
                                         }
                                         ReloadCDef = true;
@@ -991,26 +991,26 @@ namespace Contensive.Core.Addons.Tools {
                                             Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
-                                            CS1 = cpCore.db.csOpenRecord("Content Fields", field.id);
+                                            CS1 = core.db.csOpenRecord("Content Fields", field.id);
                                             if ((CDef.fields[FieldName.ToLower()].id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
-                                                cpCore.db.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
+                                                core.db.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
                                                 //
                                                 MoveNextColumn = true;
                                             } else if (MoveNextColumn) {
                                                 //
                                                 // This is one past target
                                                 //
-                                                cpCore.db.csSet(CS1, "IndexColumn", (columnPtr - 1) * 10);
+                                                core.db.csSet(CS1, "IndexColumn", (columnPtr - 1) * 10);
                                                 MoveNextColumn = false;
                                             } else {
                                                 //
                                                 // not target or one past target
                                                 //
-                                                cpCore.db.csSet(CS1, "IndexColumn", (columnPtr) * 10);
+                                                core.db.csSet(CS1, "IndexColumn", (columnPtr) * 10);
                                                 MoveNextColumn = false;
                                             }
-                                            cpCore.db.csSet(CS1, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
-                                            cpCore.db.csClose(ref CS1);
+                                            core.db.csSet(CS1, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                            core.db.csClose(ref CS1);
                                             columnPtr += 1;
                                         }
                                         ReloadCDef = true;
@@ -1029,26 +1029,26 @@ namespace Contensive.Core.Addons.Tools {
                                             Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
-                                            CS1 = cpCore.db.csOpenRecord("Content Fields", field.id);
+                                            CS1 = core.db.csOpenRecord("Content Fields", field.id);
                                             if ((field.id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
-                                                cpCore.db.csSet(CS1, "IndexColumn", (columnPtr - 1) * 10);
+                                                core.db.csSet(CS1, "IndexColumn", (columnPtr - 1) * 10);
                                                 //
                                                 MoveNextColumn = true;
                                             } else if (MoveNextColumn) {
                                                 //
                                                 // This is one past target
                                                 //
-                                                cpCore.db.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
+                                                core.db.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
                                                 MoveNextColumn = false;
                                             } else {
                                                 //
                                                 // not target or one past target
                                                 //
-                                                cpCore.db.csSet(CS1, "IndexColumn", (columnPtr) * 10);
+                                                core.db.csSet(CS1, "IndexColumn", (columnPtr) * 10);
                                                 MoveNextColumn = false;
                                             }
-                                            cpCore.db.csSet(CS1, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
-                                            cpCore.db.csClose(ref CS1);
+                                            core.db.csSet(CS1, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                            core.db.csClose(ref CS1);
                                             columnPtr += 1;
                                         }
                                         ReloadCDef = true;
@@ -1062,17 +1062,17 @@ namespace Contensive.Core.Addons.Tools {
                                     //        For ColumnPointer = 0 To CDef.adminColumns.Count - 1
                                     //            FieldName = CDef.adminColumns(ColumnPointer).Name
                                     //            fieldId = CDef.fields[FieldName.ToLower()].Id
-                                    //            CSPointer = cpCore.main_OpenCSContentRecord("Content Fields", fieldId)
+                                    //            CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
                                     //            If fieldId = TargetFieldID Then
-                                    //                Call cpCore.app.SetCS(CSPointer, "IndexSortPriority", 0)
-                                    //                Call cpCore.app.SetCS(CSPointer, "IndexSortDirection", 1)
+                                    //                Call core.app.SetCS(CSPointer, "IndexSortPriority", 0)
+                                    //                Call core.app.SetCS(CSPointer, "IndexSortDirection", 1)
                                     //            Else
-                                    //                Call cpCore.app.SetCS(CSPointer, "IndexSortPriority", 99)
-                                    //                Call cpCore.app.SetCS(CSPointer, "IndexSortDirection", 0)
+                                    //                Call core.app.SetCS(CSPointer, "IndexSortPriority", 99)
+                                    //                Call core.app.SetCS(CSPointer, "IndexSortDirection", 0)
                                     //            End If
-                                    //            Call cpCore.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
-                                    //            Call cpCore.app.SetCS(CSPointer, "IndexWidth", Int((CDef.adminColumns(ColumnPointer).Width * 100) / ColumnWidthTotal))
-                                    //            Call cpCore.app.closeCS(CSPointer)
+                                    //            Call core.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
+                                    //            Call core.app.SetCS(CSPointer, "IndexWidth", Int((CDef.adminColumns(ColumnPointer).Width * 100) / ColumnWidthTotal))
+                                    //            Call core.app.closeCS(CSPointer)
                                     //        Next
                                     //        ReloadCDef = True
                                     //    End If
@@ -1085,17 +1085,17 @@ namespace Contensive.Core.Addons.Tools {
                                     //        For ColumnPointer = 0 To CDef.adminColumns.Count - 1
                                     //            FieldName = CDef.adminColumns(ColumnPointer).Name
                                     //            fieldId = CDef.fields[FieldName.ToLower()].Id
-                                    //            CSPointer = cpCore.main_OpenCSContentRecord("Content Fields", fieldId)
+                                    //            CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
                                     //            If fieldId = TargetFieldID Then
-                                    //                Call cpCore.app.SetCS(CSPointer, "IndexSortPriority", 0)
-                                    //                Call cpCore.app.SetCS(CSPointer, "IndexSortDirection", -1)
+                                    //                Call core.app.SetCS(CSPointer, "IndexSortPriority", 0)
+                                    //                Call core.app.SetCS(CSPointer, "IndexSortDirection", -1)
                                     //            Else
-                                    //                Call cpCore.app.SetCS(CSPointer, "IndexSortPriority", 99)
-                                    //                Call cpCore.app.SetCS(CSPointer, "IndexSortDirection", 0)
+                                    //                Call core.app.SetCS(CSPointer, "IndexSortPriority", 99)
+                                    //                Call core.app.SetCS(CSPointer, "IndexSortDirection", 0)
                                     //            End If
-                                    //            Call cpCore.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
-                                    //            Call cpCore.app.SetCS(CSPointer, "IndexWidth", Int((CDef.adminColumns(ColumnPointer).Width * 100) / ColumnWidthTotal))
-                                    //            Call cpCore.app.closeCS(CSPointer)
+                                    //            Call core.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
+                                    //            Call core.app.SetCS(CSPointer, "IndexWidth", Int((CDef.adminColumns(ColumnPointer).Width * 100) / ColumnWidthTotal))
+                                    //            Call core.app.closeCS(CSPointer)
                                     //        Next
                                     //        ReloadCDef = True
                                     //    End If
@@ -1124,22 +1124,22 @@ namespace Contensive.Core.Addons.Tools {
                                     //            For ColumnPointer = 0 To CDef.adminColumns.Count - 1
                                     //                FieldName = CDef.adminColumns(ColumnPointer).Name
                                     //                fieldId = CDef.fields[FieldName.ToLower()].Id
-                                    //                CSPointer = cpCore.main_OpenCSContentRecord("Content Fields", fieldId)
+                                    //                CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
                                     //                If fieldId = TargetFieldID Then
                                     //                    '
                                     //                    ' Target gets 10% increase
                                     //                    '
-                                    //                    Call cpCore.app.SetCS(CSPointer, "IndexWidth", Int(CDef.adminColumns(ColumnPointer).Width + ColumnWidthIncrease))
+                                    //                    Call core.app.SetCS(CSPointer, "IndexWidth", Int(CDef.adminColumns(ColumnPointer).Width + ColumnWidthIncrease))
                                     //                Else
                                     //                    '
                                     //                    ' non-targets get their share of the shrinkage
                                     //                    '
                                     //                    FieldWidth = CDef.adminColumns(ColumnPointer).Width
                                     //                    FieldWidth = FieldWidth - ((ColumnWidthIncrease * FieldWidth) / ColumnWidthBalance)
-                                    //                    Call cpCore.app.SetCS(CSPointer, "IndexWidth", Int(FieldWidth))
+                                    //                    Call core.app.SetCS(CSPointer, "IndexWidth", Int(FieldWidth))
                                     //                End If
-                                    //                Call cpCore.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
-                                    //                Call cpCore.app.closeCS(CSPointer)
+                                    //                Call core.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
+                                    //                Call core.app.closeCS(CSPointer)
                                     //            Next
                                     //            ReloadCDef = True
                                     //        End If
@@ -1175,23 +1175,23 @@ namespace Contensive.Core.Addons.Tools {
                                     //            For ColumnPointer = 0 To CDef.adminColumns.Count - 1
                                     //                FieldName = CDef.adminColumns(ColumnPointer).Name
                                     //                fieldId = CDef.fields[FieldName.ToLower()].Id
-                                    //                CSPointer = cpCore.main_OpenCSContentRecord("Content Fields", fieldId)
+                                    //                CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
                                     //                If fieldId = TargetFieldID Then
                                     //                    '
                                     //                    ' Target gets 10% increase
                                     //                    '
                                     //                    FieldWidth = Int(CDef.adminColumns(ColumnPointer).Width + ColumnWidthIncrease)
-                                    //                    Call cpCore.app.SetCS(CSPointer, "IndexWidth", FieldWidth)
+                                    //                    Call core.app.SetCS(CSPointer, "IndexWidth", FieldWidth)
                                     //                Else
                                     //                    '
                                     //                    ' non-targets get their share of the shrinkage
                                     //                    '
                                     //                    FieldWidth = CDef.adminColumns(ColumnPointer).Width
                                     //                    FieldWidth = FieldWidth - ((ColumnWidthIncrease * FieldWidth) / ColumnWidthBalance)
-                                    //                    Call cpCore.app.SetCS(CSPointer, "IndexWidth", Int(FieldWidth))
+                                    //                    Call core.app.SetCS(CSPointer, "IndexWidth", Int(FieldWidth))
                                     //                End If
-                                    //                Call cpCore.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
-                                    //                Call cpCore.app.closeCS(CSPointer)
+                                    //                Call core.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
+                                    //                Call core.app.closeCS(CSPointer)
                                     //            Next
                                     //            ReloadCDef = True
                                     //        End If
@@ -1202,12 +1202,12 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         // Get a new copy of the content definition
                         //
-                        CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentID, true, false);
+                        CDef = Models.Complex.cdefModel.getCdef(core, ContentID, true, false);
                     }
                     if (Button == ButtonSaveandInvalidateCache) {
-                        cpCore.cache.invalidateAll();
-                        cpCore.doc.clearMetaData();
-                        return cpCore.webServer.redirect("?af=" + AdminFormToolConfigureListing + "&ContentID=" + ContentID);
+                        core.cache.invalidateAll();
+                        core.doc.clearMetaData();
+                        return core.webServer.redirect("?af=" + AdminFormToolConfigureListing + "&ContentID=" + ContentID);
                     }
                     //
                     //--------------------------------------------------------------------------------
@@ -1275,7 +1275,7 @@ namespace Contensive.Core.Addons.Tools {
                                     Caption = Caption + "*";
                                     InheritedFieldCount = InheritedFieldCount + 1;
                                 }
-                                AStart = "<A href=\"" + cpCore.webServer.requestPage + "?" + RequestNameToolContentID + "=" + ContentID + "&af=" + AdminFormToolConfigureListing + "&fi=" + fieldId + "&dtcn=" + ColumnCount;
+                                AStart = "<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentID + "=" + ContentID + "&af=" + AdminFormToolConfigureListing + "&fi=" + fieldId + "&dtcn=" + ColumnCount;
                                 Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
                                 Stream.Add("<IMG src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\">");
                                 Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><IMG src=\"/ccLib/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
@@ -1370,7 +1370,7 @@ namespace Contensive.Core.Addons.Tools {
                                     //
                                     // can be used as column header
                                     //
-                                    Stream.Add("<A href=\"" + cpCore.webServer.requestPage + "?" + RequestNameToolContentID + "=" + ContentID + "&af=" + AdminFormToolConfigureListing + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldID + "=" + field.id + "\"><IMG src=\"/ccLib/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A> " + field.caption + "<br>");
+                                    Stream.Add("<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentID + "=" + ContentID + "&af=" + AdminFormToolConfigureListing + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldID + "=" + field.id + "\"><IMG src=\"/ccLib/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A> " + field.caption + "<br>");
                                 }
                             }
                         }
@@ -1382,15 +1382,15 @@ namespace Contensive.Core.Addons.Tools {
                 //--------------------------------------------------------------------------------
                 //
                 FormPanel = FormPanel + SpanClassAdminNormal + "Select a Content Definition to Configure its Listing Page<br>";
-                //FormPanel = FormPanel & cpCore.main_GetFormInputHidden("af", AdminFormToolConfigureListing)
-                FormPanel = FormPanel + cpCore.html.selectFromContent("ContentID", ContentID, "Content");
-                Stream.Add(cpCore.html.getPanel(FormPanel));
+                //FormPanel = FormPanel & core.main_GetFormInputHidden("af", AdminFormToolConfigureListing)
+                FormPanel = FormPanel + core.html.selectFromContent("ContentID", ContentID, "Content");
+                Stream.Add(core.html.getPanel(FormPanel));
                 //
-                cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
-                Stream.Add(cpCore.html.inputHidden("ReloadCDef", ReloadCDef));
-                result =  htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                core.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
+                Stream.Add(core.html.inputHidden("ReloadCDef", ReloadCDef));
+                result =  htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -1443,8 +1443,8 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(GetTitle("Content Diagnostic", "This tool finds Content and Table problems. To run successfully, the Site Property 'TrapErrors' must be set to true."));
                 Stream.Add(SpanClassAdminNormal + "<br>");
                 //
-                iDiagActionCount = cpCore.docProperties.getInteger("DiagActionCount");
-                Button = cpCore.docProperties.getText("Button");
+                iDiagActionCount = core.docProperties.getInteger("DiagActionCount");
+                Button = core.docProperties.getText("Button");
                 if ((iDiagActionCount != 0) & ((Button == ButtonFix) || (Button == ButtonFixAndRun))) {
                     //
                     //-----------------------------------------------------------------------------------------------
@@ -1453,7 +1453,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     Stream.Add("<br>");
                     for (DiagActionPointer = 0; DiagActionPointer <= iDiagActionCount; DiagActionPointer++) {
-                        DiagAction = cpCore.docProperties.getText("DiagAction" + DiagActionPointer);
+                        DiagAction = core.docProperties.getText("DiagAction" + DiagActionPointer);
                         Stream.Add("Perform Action " + DiagActionPointer + " - " + DiagAction + "<br>");
                         switch (genericController.encodeInteger(DiagArgument(DiagAction, 0))) {
                             case DiagActionSetFieldType:
@@ -1461,11 +1461,11 @@ namespace Contensive.Core.Addons.Tools {
                                 // ----- Set Field Type
                                 //
                                 ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-                                CS = cpCore.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + cpCore.db.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
-                                if (cpCore.db.csOk(CS)) {
-                                    cpCore.db.csSet(CS, "Type", DiagArgument(DiagAction, 3));
+                                CS = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + core.db.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
+                                if (core.db.csOk(CS)) {
+                                    core.db.csSet(CS, "Type", DiagArgument(DiagAction, 3));
                                 }
-                                cpCore.db.csClose(ref CS);
+                                core.db.csClose(ref CS);
                                 //end case
                                 break;
                             case DiagActionSetFieldInactive:
@@ -1473,11 +1473,11 @@ namespace Contensive.Core.Addons.Tools {
                                 // ----- Set Field Inactive
                                 //
                                 ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-                                CS = cpCore.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + cpCore.db.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
-                                if (cpCore.db.csOk(CS)) {
-                                    cpCore.db.csSet(CS, "active", 0);
+                                CS = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + core.db.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
+                                if (core.db.csOk(CS)) {
+                                    core.db.csSet(CS, "active", 0);
                                 }
-                                cpCore.db.csClose(ref CS);
+                                core.db.csClose(ref CS);
                                 //end case
                                 break;
                             case DiagActionDeleteRecord:
@@ -1486,20 +1486,20 @@ namespace Contensive.Core.Addons.Tools {
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
                                 RecordID = genericController.encodeInteger(DiagArgument(DiagAction, 2));
-                                cpCore.db.deleteContentRecord(ContentName, RecordID);
+                                core.db.deleteContentRecord(ContentName, RecordID);
                                 //end case
                                 break;
                             case DiagActionContentDeDupe:
                                 ContentName = DiagArgument(DiagAction, 1);
-                                CS = cpCore.db.csOpen("Content", "name=" + cpCore.db.encodeSQLText(ContentName), "ID");
-                                if (cpCore.db.csOk(CS)) {
-                                    cpCore.db.csGoNext(CS);
-                                    while (cpCore.db.csOk(CS)) {
-                                        cpCore.db.csSet(CS, "active", 0);
-                                        cpCore.db.csGoNext(CS);
+                                CS = core.db.csOpen("Content", "name=" + core.db.encodeSQLText(ContentName), "ID");
+                                if (core.db.csOk(CS)) {
+                                    core.db.csGoNext(CS);
+                                    while (core.db.csOk(CS)) {
+                                        core.db.csSet(CS, "active", 0);
+                                        core.db.csGoNext(CS);
                                     }
                                 }
-                                cpCore.db.csClose(ref CS);
+                                core.db.csClose(ref CS);
                                 //end case
                                 break;
                             case DiagActionSetRecordInactive:
@@ -1508,11 +1508,11 @@ namespace Contensive.Core.Addons.Tools {
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
                                 RecordID = genericController.encodeInteger(DiagArgument(DiagAction, 2));
-                                CS = cpCore.db.csOpen(ContentName, "(ID=" + RecordID + ")");
-                                if (cpCore.db.csOk(CS)) {
-                                    cpCore.db.csSet(CS, "active", 0);
+                                CS = core.db.csOpen(ContentName, "(ID=" + RecordID + ")");
+                                if (core.db.csOk(CS)) {
+                                    core.db.csSet(CS, "active", 0);
                                 }
-                                cpCore.db.csClose(ref CS);
+                                core.db.csClose(ref CS);
                                 //end case
                                 break;
                             case DiagActionSetFieldNotRequired:
@@ -1521,11 +1521,11 @@ namespace Contensive.Core.Addons.Tools {
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
                                 RecordID = genericController.encodeInteger(DiagArgument(DiagAction, 2));
-                                CS = cpCore.db.csOpen(ContentName, "(ID=" + RecordID + ")");
-                                if (cpCore.db.csOk(CS)) {
-                                    cpCore.db.csSet(CS, "required", 0);
+                                CS = core.db.csOpen(ContentName, "(ID=" + RecordID + ")");
+                                if (core.db.csOk(CS)) {
+                                    core.db.csSet(CS, "required", 0);
                                 }
-                                cpCore.db.csClose(ref CS);
+                                core.db.csClose(ref CS);
                                 //end case
                                 break;
                         }
@@ -1535,13 +1535,13 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Process input
                     //
-                    if (!cpCore.siteProperties.trapErrors) {
+                    if (!core.siteProperties.trapErrors) {
                         //
                         // TrapErrors must be true to run this tools
                         //
                         Stream.Add("Site Property 'TrapErrors' is currently set false. This property must be true to run Content Diagnostics successfully.<br>");
                     } else {
-                        cpCore.html.enableOutputBuffer(false);
+                        core.html.enableOutputBuffer(false);
                         //
                         // ----- check Content Sources for duplicates
                         //
@@ -1553,20 +1553,20 @@ namespace Contensive.Core.Addons.Tools {
                                     + " GROUP BY ccContent.Name, ccContent.Active"
                                     + " Having (((Count(ccContent.ID)) > 1) And ((ccContent.active) <> 0))"
                                     + " ORDER BY Count(ccContent.ID) DESC;";
-                            CSPointer = cpCore.db.csOpenSql_rev("Default", SQL);
-                            if (cpCore.db.csOk(CSPointer)) {
-                                while (cpCore.db.csOk(CSPointer)) {
-                                    DiagProblem = "PROBLEM: There are " + cpCore.db.csGetText(CSPointer, "RecordCount") + " records in the Content table with the name [" + cpCore.db.csGetText(CSPointer, "Name") + "]";
+                            CSPointer = core.db.csOpenSql_rev("Default", SQL);
+                            if (core.db.csOk(CSPointer)) {
+                                while (core.db.csOk(CSPointer)) {
+                                    DiagProblem = "PROBLEM: There are " + core.db.csGetText(CSPointer, "RecordCount") + " records in the Content table with the name [" + core.db.csGetText(CSPointer, "Name") + "]";
                                     DiagActions = new  DiagActionType[3];
                                     DiagActions[0].Name = "Ignore, or handle this issue manually";
                                     DiagActions[0].Command = "";
                                     DiagActions[1].Name = "Mark all duplicate definitions inactive";
-                                    DiagActions[1].Command = DiagActionContentDeDupe.ToString() + "," + cpCore.db.cs_getValue(CSPointer, "name");
+                                    DiagActions[1].Command = DiagActionContentDeDupe.ToString() + "," + core.db.cs_getValue(CSPointer, "name");
                                     Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                    cpCore.db.csGoNext(CSPointer);
+                                    core.db.csGoNext(CSPointer);
                                 }
                             }
-                            cpCore.db.csClose(ref CSPointer);
+                            core.db.csClose(ref CSPointer);
                         }
                         //
                         // ----- Content Fields
@@ -1577,22 +1577,22 @@ namespace Contensive.Core.Addons.Tools {
                             SQL = "SELECT ccFields.required AS FieldRequired, ccFields.Authorable AS FieldAuthorable, ccFields.Type AS FieldType, ccFields.Name AS FieldName, ccContent.ID AS ContentID, ccContent.Name AS ContentName, ccTables.Name AS TableName, ccDataSources.Name AS DataSourceName"
                                     + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN (ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID) ON ccContent.ContentTableID = ccTables.ID"
                                     + " WHERE (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0)) OR (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0));";
-                            CS = cpCore.db.csOpenSql_rev("Default", SQL);
-                            if (!cpCore.db.csOk(CS)) {
+                            CS = core.db.csOpenSql_rev("Default", SQL);
+                            if (!core.db.csOk(CS)) {
                                 DiagProblem = "PROBLEM: No Content entries were found in the content table.";
                                 DiagActions = new DiagActionType[2];
                                 DiagActions[0].Name = "Ignore, or handle this issue manually";
                                 DiagActions[0].Command = "";
                                 Stream.Add(GetDiagError(DiagProblem, DiagActions));
                             } else {
-                                while (cpCore.db.csOk(CS) && (DiagActionCount < DiagActionCountMax)) {
-                                    FieldName = cpCore.db.csGetText(CS, "FieldName");
-                                    fieldType = cpCore.db.csGetInteger(CS, "FieldType");
-                                    FieldRequired = cpCore.db.csGetBoolean(CS, "FieldRequired");
-                                    FieldAuthorable = cpCore.db.csGetBoolean(CS, "FieldAuthorable");
-                                    ContentName = cpCore.db.csGetText(CS, "ContentName");
-                                    TableName = cpCore.db.csGetText(CS, "TableName");
-                                    DataSourceName = cpCore.db.csGetText(CS, "DataSourceName");
+                                while (core.db.csOk(CS) && (DiagActionCount < DiagActionCountMax)) {
+                                    FieldName = core.db.csGetText(CS, "FieldName");
+                                    fieldType = core.db.csGetInteger(CS, "FieldType");
+                                    FieldRequired = core.db.csGetBoolean(CS, "FieldRequired");
+                                    FieldAuthorable = core.db.csGetBoolean(CS, "FieldAuthorable");
+                                    ContentName = core.db.csGetText(CS, "ContentName");
+                                    TableName = core.db.csGetText(CS, "TableName");
+                                    DataSourceName = core.db.csGetText(CS, "DataSourceName");
                                     if (string.IsNullOrEmpty(DataSourceName)) {
                                         DataSourceName = "Default";
                                     }
@@ -1609,7 +1609,7 @@ namespace Contensive.Core.Addons.Tools {
                                     }
                                     if ((!string.IsNullOrEmpty(FieldName)) & (fieldType != FieldTypeIdRedirect) & (fieldType != FieldTypeIdManyToMany)) {
                                         SQL = "SELECT " + FieldName + " FROM " + TableName + " WHERE ID=0;";
-                                        CSTest = cpCore.db.csOpenSql_rev(DataSourceName, SQL);
+                                        CSTest = core.db.csOpenSql_rev(DataSourceName, SQL);
                                         if (CSTest == -1) {
                                             DiagProblem = "PROBLEM: Field [" + FieldName + "] in Content Definition [" + ContentName + "] could not be read from database table [" + TableName + "] on datasource [" + DataSourceName + "].";
                                             DiagActions = new DiagActionType[2];
@@ -1620,11 +1620,11 @@ namespace Contensive.Core.Addons.Tools {
                                             Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                         }
                                     }
-                                    cpCore.db.csClose(ref CSTest);
-                                    cpCore.db.csGoNext(CS);
+                                    core.db.csClose(ref CSTest);
+                                    core.db.csGoNext(CS);
                                 }
                             }
-                            cpCore.db.csClose(ref CS);
+                            core.db.csClose(ref CS);
                         }
                         //
                         // ----- Insert Content Testing
@@ -1632,26 +1632,26 @@ namespace Contensive.Core.Addons.Tools {
                         if (DiagActionCount < DiagActionCountMax) {
                             Stream.Add(GetDiagHeader("Checking Content Insertion...<br>"));
                             //
-                            CSContent = cpCore.db.csOpen("Content");
-                            if (!cpCore.db.csOk(CSContent)) {
+                            CSContent = core.db.csOpen("Content");
+                            if (!core.db.csOk(CSContent)) {
                                 DiagProblem = "PROBLEM: No Content entries were found in the content table.";
                                 DiagActions = new DiagActionType[2];
                                 DiagActions[0].Name = "Ignore, or handle this issue manually";
                                 DiagActions[0].Command = "";
                                 Stream.Add(GetDiagError(DiagProblem, DiagActions));
                             } else {
-                                while (cpCore.db.csOk(CSContent) && (DiagActionCount < DiagActionCountMax)) {
-                                    ContentID = cpCore.db.csGetInteger(CSContent, "ID");
-                                    ContentName = cpCore.db.csGetText(CSContent, "name");
-                                    CSTestRecord = cpCore.db.csInsertRecord(ContentName);
-                                    if (!cpCore.db.csOk(CSTestRecord)) {
+                                while (core.db.csOk(CSContent) && (DiagActionCount < DiagActionCountMax)) {
+                                    ContentID = core.db.csGetInteger(CSContent, "ID");
+                                    ContentName = core.db.csGetText(CSContent, "name");
+                                    CSTestRecord = core.db.csInsertRecord(ContentName);
+                                    if (!core.db.csOk(CSTestRecord)) {
                                         DiagProblem = "PROBLEM: Could not insert a record using Content Definition [" + ContentName + "]";
                                         DiagActions = new DiagActionType[2];
                                         DiagActions[0].Name = "Ignore, or handle this issue manually";
                                         DiagActions[0].Command = "";
                                         Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                     } else {
-                                        TestRecordID = cpCore.db.csGetInteger(CSTestRecord, "id");
+                                        TestRecordID = core.db.csGetInteger(CSTestRecord, "id");
                                         if (TestRecordID == 0) {
                                             DiagProblem = "PROBLEM: Content Definition [" + ContentName + "] does not support the required field [ID]\"";
                                             DiagActions = new DiagActionType[2];
@@ -1661,13 +1661,13 @@ namespace Contensive.Core.Addons.Tools {
                                             DiagActions[1].Command = DiagActionSetRecordInactive.ToString() + ",Content," + ContentID;
                                             Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                         } else {
-                                            CSFields = cpCore.db.csOpen("Content Fields", "ContentID=" + ContentID);
-                                            while (cpCore.db.csOk(CSFields)) {
+                                            CSFields = core.db.csOpen("Content Fields", "ContentID=" + ContentID);
+                                            while (core.db.csOk(CSFields)) {
                                                 //
                                                 // ----- read the value of the field to test its presents
                                                 //
-                                                FieldName = cpCore.db.csGetText(CSFields, "name");
-                                                fieldType = cpCore.db.csGetInteger(CSFields, "Type");
+                                                FieldName = core.db.csGetText(CSFields, "name");
+                                                fieldType = core.db.csGetInteger(CSFields, "Type");
                                                 switch (fieldType) {
                                                     case FieldTypeIdManyToMany:
                                                         //
@@ -1678,10 +1678,10 @@ namespace Contensive.Core.Addons.Tools {
                                                         //
                                                         // ----- redirect type, check redirect contentid
                                                         //
-                                                        RedirectContentID = cpCore.db.csGetInteger(CSFields, "RedirectContentID");
-                                                        ErrorCount = cpCore.doc.errorCount;
+                                                        RedirectContentID = core.db.csGetInteger(CSFields, "RedirectContentID");
+                                                        ErrorCount = core.doc.errorCount;
                                                         bitBucket = Local_GetContentNameByID(RedirectContentID);
-                                                        if (IsNull(bitBucket) | (ErrorCount != cpCore.doc.errorCount)) {
+                                                        if (IsNull(bitBucket) | (ErrorCount != core.doc.errorCount)) {
                                                             DiagProblem = "PROBLEM: Content Field [" + ContentName + "].[" + FieldName + "] is a Redirection type, but the ContentID [" + RedirectContentID + "] is not valid.";
                                                             if (string.IsNullOrEmpty(FieldName)) {
                                                                 DiagProblem = DiagProblem + " Also, the field has no name attribute so these diagnostics can not automatically mark the field inactive.";
@@ -1703,9 +1703,9 @@ namespace Contensive.Core.Addons.Tools {
                                                         //
                                                         // ----- lookup type, read value and check lookup contentid
                                                         //
-                                                        ErrorCount = cpCore.doc.errorCount;
-                                                        bitBucket = cpCore.db.cs_getValue(CSTestRecord, FieldName);
-                                                        if (ErrorCount != cpCore.doc.errorCount) {
+                                                        ErrorCount = core.doc.errorCount;
+                                                        bitBucket = core.db.cs_getValue(CSTestRecord, FieldName);
+                                                        if (ErrorCount != core.doc.errorCount) {
                                                             DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
                                                             DiagActions = new DiagActionType[2];
                                                             DiagActions[0].Name = "Ignore, or handle this issue manually";
@@ -1713,13 +1713,13 @@ namespace Contensive.Core.Addons.Tools {
                                                             Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                                         } else {
                                                             bitBucket = "";
-                                                            LookupList = cpCore.db.csGetText(CSFields, "Lookuplist");
-                                                            LookupContentID = cpCore.db.csGetInteger(CSFields, "LookupContentID");
+                                                            LookupList = core.db.csGetText(CSFields, "Lookuplist");
+                                                            LookupContentID = core.db.csGetInteger(CSFields, "LookupContentID");
                                                             if (LookupContentID != 0) {
-                                                                ErrorCount = cpCore.doc.errorCount;
+                                                                ErrorCount = core.doc.errorCount;
                                                                 bitBucket = Local_GetContentNameByID(LookupContentID);
                                                             }
-                                                            if ((string.IsNullOrEmpty(LookupList)) && ((LookupContentID == 0) || (string.IsNullOrEmpty(bitBucket)) || (ErrorCount != cpCore.doc.errorCount))) {
+                                                            if ((string.IsNullOrEmpty(LookupList)) && ((LookupContentID == 0) || (string.IsNullOrEmpty(bitBucket)) || (ErrorCount != core.doc.errorCount))) {
                                                                 DiagProblem = "Content Field [" + ContentName + "].[" + FieldName + "] is a Lookup type, but LookupList is blank and LookupContentID [" + LookupContentID + "] is not valid.";
                                                                 DiagActions = new DiagActionType[3];
                                                                 DiagActions[0].Name = "Ignore, or handle this issue manually";
@@ -1734,9 +1734,9 @@ namespace Contensive.Core.Addons.Tools {
                                                         //
                                                         // ----- check for value in database
                                                         //
-                                                        ErrorCount = cpCore.doc.errorCount;
-                                                        bitBucket = cpCore.db.cs_getValue(CSTestRecord, FieldName);
-                                                        if (ErrorCount != cpCore.doc.errorCount) {
+                                                        ErrorCount = core.doc.errorCount;
+                                                        bitBucket = core.db.cs_getValue(CSTestRecord, FieldName);
+                                                        if (ErrorCount != core.doc.errorCount) {
                                                             DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
                                                             DiagActions = new DiagActionType[4];
                                                             DiagActions[0].Name = "Ignore, or handle this issue manually";
@@ -1747,50 +1747,50 @@ namespace Contensive.Core.Addons.Tools {
                                                         }
                                                         break;
                                                 }
-                                                cpCore.db.csGoNext(CSFields);
+                                                core.db.csGoNext(CSFields);
                                             }
                                         }
-                                        cpCore.db.csClose(ref CSFields);
-                                        cpCore.db.csClose(ref CSTestRecord);
-                                        cpCore.db.deleteContentRecord(ContentName, TestRecordID);
+                                        core.db.csClose(ref CSFields);
+                                        core.db.csClose(ref CSTestRecord);
+                                        core.db.deleteContentRecord(ContentName, TestRecordID);
                                     }
-                                    cpCore.db.csGoNext(CSContent);
+                                    core.db.csGoNext(CSContent);
                                 }
                             }
-                            cpCore.db.csClose(ref CSContent);
+                            core.db.csClose(ref CSContent);
                         }
                         //
                         // ----- Check Navigator Entries
                         //
                         if (DiagActionCount < DiagActionCountMax) {
                             Stream.Add(GetDiagHeader("Checking Navigator Entries...<br>"));
-                            CSPointer = cpCore.db.csOpen(cnNavigatorEntries);
-                            if (!cpCore.db.csOk(CSPointer)) {
+                            CSPointer = core.db.csOpen(cnNavigatorEntries);
+                            if (!core.db.csOk(CSPointer)) {
                                 DiagProblem = "PROBLEM: Could not open the [Navigator Entries] content.";
                                 DiagActions = new DiagActionType[4];
                                 DiagActions[0].Name = "Ignore, or handle this issue manually";
                                 DiagActions[0].Command = "";
                                 Stream.Add(GetDiagError(DiagProblem, DiagActions));
                             } else {
-                                while (cpCore.db.csOk(CSPointer) && (DiagActionCount < DiagActionCountMax)) {
-                                    ContentID = cpCore.db.csGetInteger(CSPointer, "ContentID");
+                                while (core.db.csOk(CSPointer) && (DiagActionCount < DiagActionCountMax)) {
+                                    ContentID = core.db.csGetInteger(CSPointer, "ContentID");
                                     if (ContentID != 0) {
-                                        CSContent = cpCore.db.csOpen("Content", "ID=" + ContentID);
-                                        if (!cpCore.db.csOk(CSContent)) {
-                                            DiagProblem = "PROBLEM: Menu Entry [" + cpCore.db.csGetText(CSPointer, "name") + "] points to an invalid Content Definition.";
+                                        CSContent = core.db.csOpen("Content", "ID=" + ContentID);
+                                        if (!core.db.csOk(CSContent)) {
+                                            DiagProblem = "PROBLEM: Menu Entry [" + core.db.csGetText(CSPointer, "name") + "] points to an invalid Content Definition.";
                                             DiagActions = new DiagActionType[4];
                                             DiagActions[0].Name = "Ignore, or handle this issue manually";
                                             DiagActions[0].Command = "";
                                             DiagActions[1].Name = "Remove this menu entry";
-                                            DiagActions[1].Command = DiagActionDeleteRecord.ToString() + ",Navigator Entries," + cpCore.db.csGetInteger(CSPointer, "ID");
+                                            DiagActions[1].Command = DiagActionDeleteRecord.ToString() + ",Navigator Entries," + core.db.csGetInteger(CSPointer, "ID");
                                             Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                         }
-                                        cpCore.db.csClose(ref CSContent);
+                                        core.db.csClose(ref CSContent);
                                     }
-                                    cpCore.db.csGoNext(CSPointer);
+                                    core.db.csGoNext(CSPointer);
                                 }
                             }
-                            cpCore.db.csClose(ref CSPointer);
+                            core.db.csClose(ref CSPointer);
                         }
                         if (DiagActionCount >= DiagActionCountMax) {
                             DiagProblem = "Diagnostic Problem Limit (" + DiagActionCountMax + ") has been reached. Resolve the above issues to see more.";
@@ -1802,7 +1802,7 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         // ----- Done with diagnostics
                         //
-                        Stream.Add(cpCore.html.inputHidden("DiagActionCount", DiagActionCount));
+                        Stream.Add(core.html.inputHidden("DiagActionCount", DiagActionCount));
                     }
                 }
                 //
@@ -1813,9 +1813,9 @@ namespace Contensive.Core.Addons.Tools {
                     ButtonList = ButtonList + "," + ButtonFix;
                     ButtonList = ButtonList + "," + ButtonFixAndRun;
                 }
-                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -1833,75 +1833,75 @@ namespace Contensive.Core.Addons.Tools {
                 int ColumnCounter = 0;
                 int IndexColumn = 0;
                 //
-                //cpCore.main_'TestPointEnter ("NormalizeIndexColumns()")
+                //core.main_'TestPointEnter ("NormalizeIndexColumns()")
                 //
                 //Call LoadContentDefinitions
                 //
-                CSPointer = cpCore.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexColumn");
-                if (!cpCore.db.csOk(CSPointer)) {
+                CSPointer = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexColumn");
+                if (!core.db.csOk(CSPointer)) {
                     throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Could not read Content Field Definitions")
                 } else {
                     //
                     // Adjust IndexSortOrder to be 0 based, count by 1
                     //
                     ColumnCounter = 0;
-                    while (cpCore.db.csOk(CSPointer)) {
-                        IndexColumn = cpCore.db.csGetInteger(CSPointer, "IndexColumn");
-                        ColumnWidth = cpCore.db.csGetInteger(CSPointer, "IndexWidth");
+                    while (core.db.csOk(CSPointer)) {
+                        IndexColumn = core.db.csGetInteger(CSPointer, "IndexColumn");
+                        ColumnWidth = core.db.csGetInteger(CSPointer, "IndexWidth");
                         if ((IndexColumn == 0) || (ColumnWidth == 0)) {
-                            cpCore.db.csSet(CSPointer, "IndexColumn", 0);
-                            cpCore.db.csSet(CSPointer, "IndexWidth", 0);
-                            cpCore.db.csSet(CSPointer, "IndexSortPriority", 0);
+                            core.db.csSet(CSPointer, "IndexColumn", 0);
+                            core.db.csSet(CSPointer, "IndexWidth", 0);
+                            core.db.csSet(CSPointer, "IndexSortPriority", 0);
                         } else {
                             //
                             // Column appears in Index, clean it up
                             //
-                            cpCore.db.csSet(CSPointer, "IndexColumn", ColumnCounter);
+                            core.db.csSet(CSPointer, "IndexColumn", ColumnCounter);
                             ColumnCounter = ColumnCounter + 1;
                             ColumnWidthTotal = ColumnWidthTotal + ColumnWidth;
                         }
-                        cpCore.db.csGoNext(CSPointer);
+                        core.db.csGoNext(CSPointer);
                     }
                     if (ColumnCounter == 0) {
                         //
                         // No columns found, set name as Column 0, active as column 1
                         //
-                        cpCore.db.cs_goFirst(CSPointer);
-                        while (cpCore.db.csOk(CSPointer)) {
-                            switch (genericController.vbUCase(cpCore.db.csGetText(CSPointer, "name"))) {
+                        core.db.cs_goFirst(CSPointer);
+                        while (core.db.csOk(CSPointer)) {
+                            switch (genericController.vbUCase(core.db.csGetText(CSPointer, "name"))) {
                                 case "ACTIVE":
-                                    cpCore.db.csSet(CSPointer, "IndexColumn", 0);
-                                    cpCore.db.csSet(CSPointer, "IndexWidth", 20);
+                                    core.db.csSet(CSPointer, "IndexColumn", 0);
+                                    core.db.csSet(CSPointer, "IndexWidth", 20);
                                     ColumnWidthTotal = ColumnWidthTotal + 20;
                                     break;
                                 case "NAME":
-                                    cpCore.db.csSet(CSPointer, "IndexColumn", 1);
-                                    cpCore.db.csSet(CSPointer, "IndexWidth", 80);
+                                    core.db.csSet(CSPointer, "IndexColumn", 1);
+                                    core.db.csSet(CSPointer, "IndexWidth", 80);
                                     ColumnWidthTotal = ColumnWidthTotal + 80;
                                     break;
                             }
-                            cpCore.db.csGoNext(CSPointer);
+                            core.db.csGoNext(CSPointer);
                         }
                     }
                     //
                     // ----- Now go back and set a normalized Width value
                     //
                     if (ColumnWidthTotal > 0) {
-                        cpCore.db.cs_goFirst(CSPointer);
-                        while (cpCore.db.csOk(CSPointer)) {
-                            ColumnWidth = cpCore.db.csGetInteger(CSPointer, "IndexWidth");
+                        core.db.cs_goFirst(CSPointer);
+                        while (core.db.csOk(CSPointer)) {
+                            ColumnWidth = core.db.csGetInteger(CSPointer, "IndexWidth");
                             ColumnWidth = encodeInteger((ColumnWidth * 100) / (double)ColumnWidthTotal);
-                            cpCore.db.csSet(CSPointer, "IndexWidth", ColumnWidth);
-                            cpCore.db.csGoNext(CSPointer);
+                            core.db.csSet(CSPointer, "IndexWidth", ColumnWidth);
+                            core.db.csGoNext(CSPointer);
                         }
                     }
                 }
-                cpCore.db.csClose(ref CSPointer);
+                core.db.csClose(ref CSPointer);
                 //
                 // ----- now fixup Sort Priority so only visible fields are sorted.
                 //
-                CSPointer = cpCore.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexSortPriority, IndexColumn");
-                if (!cpCore.db.csOk(CSPointer)) {
+                CSPointer = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexSortPriority, IndexColumn");
+                if (!core.db.csOk(CSPointer)) {
                     throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Error reading Content Field Definitions")
                 } else {
                     //
@@ -1910,13 +1910,13 @@ namespace Contensive.Core.Addons.Tools {
                     int SortValue = 0;
                     int SortDirection = 0;
                     SortValue = 0;
-                    while (cpCore.db.csOk(CSPointer)) {
+                    while (core.db.csOk(CSPointer)) {
                         SortDirection = 0;
-                        if (cpCore.db.csGetInteger(CSPointer, "IndexColumn") == 0) {
-                            cpCore.db.csSet(CSPointer, "IndexSortPriority", 0);
+                        if (core.db.csGetInteger(CSPointer, "IndexColumn") == 0) {
+                            core.db.csSet(CSPointer, "IndexSortPriority", 0);
                         } else {
-                            cpCore.db.csSet(CSPointer, "IndexSortPriority", SortValue);
-                            SortDirection = cpCore.db.csGetInteger(CSPointer, "IndexSortDirection");
+                            core.db.csSet(CSPointer, "IndexSortPriority", SortValue);
+                            SortDirection = core.db.csGetInteger(CSPointer, "IndexSortDirection");
                             if (SortDirection == 0) {
                                 SortDirection = 1;
                             } else {
@@ -1928,19 +1928,19 @@ namespace Contensive.Core.Addons.Tools {
                             }
                             SortValue = SortValue + 1;
                         }
-                        cpCore.db.csSet(CSPointer, "IndexSortDirection", SortDirection);
-                        cpCore.db.csGoNext(CSPointer);
+                        core.db.csSet(CSPointer, "IndexSortDirection", SortDirection);
+                        core.db.csGoNext(CSPointer);
                     }
                 }
                 //
-                //cpCore.main_'TestPointExit
+                //core.main_'TestPointExit
                 //
                 return;
                 //
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
         }
         //
@@ -1961,14 +1961,14 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(GetTitle("Create a Child Content from a Content Definition", "This tool creates a Content Definition based on another Content Definition."));
                 //
                 //   print out the submit form
-                if (cpCore.docProperties.getText("Button") != "") {
+                if (core.docProperties.getText("Button") != "") {
                     //
                     // Process input
                     //
-                    ParentContentID = cpCore.docProperties.getInteger("ParentContentID");
+                    ParentContentID = core.docProperties.getInteger("ParentContentID");
                     ParentContentName = Local_GetContentNameByID(ParentContentID);
-                    ChildContentName = cpCore.docProperties.getText("ChildContentName");
-                    AddAdminMenuEntry = cpCore.docProperties.getBoolean("AddAdminMenuEntry");
+                    ChildContentName = core.docProperties.getText("ChildContentName");
+                    AddAdminMenuEntry = core.docProperties.getBoolean("AddAdminMenuEntry");
                     //
                     Stream.Add(SpanClassAdminSmall);
                     if ((string.IsNullOrEmpty(ParentContentName)) || (string.IsNullOrEmpty(ChildContentName))) {
@@ -1978,27 +1978,27 @@ namespace Contensive.Core.Addons.Tools {
                         // Create Definition
                         //
                         Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]");
-                        Models.Complex.cdefModel.createContentChild(cpCore, ChildContentName, ParentContentName, cpCore.doc.sessionContext.user.id);
+                        Models.Complex.cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.doc.sessionContext.user.id);
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
-                        cpCore.cache.invalidateAll();
-                        cpCore.doc.clearMetaData();
+                        core.cache.invalidateAll();
+                        core.doc.clearMetaData();
                         //
                         // Add Admin Menu Entry
                         //
                         //If AddAdminMenuEntry Then
                         //    Stream.Add("<br>Adding menu entry (will not display until the next page)...")
-                        //    CS = cpCore.db.cs_open(cnNavigatorEntries, "ContentID=" & ParentContentID)
-                        //    If cpCore.db.cs_ok(CS) Then
-                        //        MenuName = cpCore.db.cs_getText(CS, "name")
-                        //        AdminOnly = cpCore.db.cs_getBoolean(CS, "AdminOnly")
-                        //        DeveloperOnly = cpCore.db.cs_getBoolean(CS, "DeveloperOnly")
+                        //    CS = core.db.cs_open(cnNavigatorEntries, "ContentID=" & ParentContentID)
+                        //    If core.db.cs_ok(CS) Then
+                        //        MenuName = core.db.cs_getText(CS, "name")
+                        //        AdminOnly = core.db.cs_getBoolean(CS, "AdminOnly")
+                        //        DeveloperOnly = core.db.cs_getBoolean(CS, "DeveloperOnly")
                         //    End If
-                        //    Call cpCore.db.cs_Close(CS)
+                        //    Call core.db.cs_Close(CS)
                         //    If MenuName <> "" Then
-                        //        Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
+                        //        Call Controllers.appBuilderController.admin_VerifyAdminMenu(core, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
                         //    Else
-                        //        Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, "Site Content", ChildContentName, ChildContentName, "", "")
+                        //        Call Controllers.appBuilderController.admin_VerifyAdminMenu(core, "Site Content", ChildContentName, ChildContentName, "", "")
                         //    End If
                         //End If
                         Stream.Add("<br>Finished</P>");
@@ -2008,23 +2008,23 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(SpanClassAdminNormal);
                 //
                 Stream.Add("Parent Content Name<br>");
-                Stream.Add(cpCore.html.selectFromContent("ParentContentID", ParentContentID, "Content", ""));
+                Stream.Add(core.html.selectFromContent("ParentContentID", ParentContentID, "Content", ""));
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Child Content Name<br>");
-                Stream.Add(cpCore.html.inputText("ChildContentName", ChildContentName, 1, 40));
+                Stream.Add(core.html.inputText("ChildContentName", ChildContentName, 1, 40));
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Add Admin Menu Entry under Parent's Menu Entry<br>");
-                Stream.Add(cpCore.html.inputCheckbox("AddAdminMenuEntry", AddAdminMenuEntry));
+                Stream.Add(core.html.inputCheckbox("AddAdminMenuEntry", AddAdminMenuEntry));
                 Stream.Add("<br><br>");
                 //
-                //Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
+                //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
                 Stream.Add("</SPAN>");
                 //
-                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -2043,19 +2043,19 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(SpanClassAdminNormal);
                 Stream.Add(GetTitle("Clear ContentWatch Links", "This tools nulls the Links field of all Content Watch records. After running this tool, run the diagnostic spider to repopulate the links."));
                 //
-                if (cpCore.docProperties.getText("Button") != "") {
+                if (core.docProperties.getText("Button") != "") {
                     //
                     // Process input
                     //
                     Stream.Add("<br>");
                     Stream.Add("<br>Clearing Content Watch Link field...");
-                    cpCore.db.executeQuery("update ccContentWatch set Link=null;");
+                    core.db.executeQuery("update ccContentWatch set Link=null;");
                     Stream.Add("<br>Content Watch Link field cleared.");
                 }
                 Stream.Add("</span>");
-                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -2080,36 +2080,36 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 Stream.Add(GetTitle("Synchronize Tables to Content Definitions", "This tools goes through all Content Definitions and creates any necessary Tables and Table Fields to support the Definition."));
                 //
-                if (cpCore.docProperties.getText("Button") != "") {
+                if (core.docProperties.getText("Button") != "") {
                     //
                     //   Run Tools
                     //
                     Stream.Add("Synchronizing Tables to Content Definitions<br>");
-                    CSContent = cpCore.db.csOpen("Content", "", "", false, 0, false, false, "id");
-                    if (cpCore.db.csOk(CSContent)) {
+                    CSContent = core.db.csOpen("Content", "", "", false, 0, false, false, "id");
+                    if (core.db.csOk(CSContent)) {
                         do {
-                            CD = Models.Complex.cdefModel.getCdef(cpCore, cpCore.db.csGetInteger(CSContent, "id"));
+                            CD = Models.Complex.cdefModel.getCdef(core, core.db.csGetInteger(CSContent, "id"));
                             TableName = CD.ContentTableName;
                             Stream.Add("Synchronizing Content " + CD.Name + " to table " + TableName + "<br>");
-                            cpCore.db.createSQLTable(CD.ContentDataSourceName, TableName);
+                            core.db.createSQLTable(CD.ContentDataSourceName, TableName);
                             if (CD.fields.Count > 0) {
                                 foreach (var keyValuePair in CD.fields) {
                                     Models.Complex.cdefFieldModel field = keyValuePair.Value;
                                     Stream.Add("...Field " + field.nameLc + "<br>");
-                                    cpCore.db.createSQLTableField(CD.ContentDataSourceName, TableName, field.nameLc, field.fieldTypeId);
+                                    core.db.createSQLTableField(CD.ContentDataSourceName, TableName, field.nameLc, field.fieldTypeId);
                                 }
                             }
-                            cpCore.db.csGoNext(CSContent);
-                        } while (cpCore.db.csOk(CSContent));
-                        ContentNameArray = cpCore.db.cs_getRows(CSContent);
+                            core.db.csGoNext(CSContent);
+                        } while (core.db.csOk(CSContent));
+                        ContentNameArray = core.db.cs_getRows(CSContent);
                         ContentNameCount = ContentNameArray.GetUpperBound(1) + 1;
                     }
-                    cpCore.db.csClose(ref CSContent);
+                    core.db.csClose(ref CSContent);
                 }
                 //
-                returnValue = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                returnValue = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;
@@ -2140,7 +2140,7 @@ namespace Contensive.Core.Addons.Tools {
                         if (!string.IsNullOrEmpty(Caption)) {
                             Panel = Panel + "<tr>";
                             Panel = Panel + "<td width=\"30\" align=\"right\">";
-                            Panel = Panel + cpCore.html.inputRadio("DiagAction" + DiagActionCount, DiagActions[ActionPointer].Command, "");
+                            Panel = Panel + core.html.inputRadio("DiagAction" + DiagActionCount, DiagActions[ActionPointer].Command, "");
                             Panel = Panel + "</td>";
                             Panel = Panel + "<td width=\"100%\">" + SpanClassAdminNormal + Caption + "</SPAN></td>";
                             Panel = Panel + "</tr>";
@@ -2149,9 +2149,9 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 Panel = Panel + "</TABLE>";
                 DiagActionCount = DiagActionCount + 1;
-                result =  cpCore.html.getPanel(Panel);
+                result =  core.html.getPanel(Panel);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -2159,7 +2159,7 @@ namespace Contensive.Core.Addons.Tools {
         //
         //
         private string GetDiagHeader(string Copy) {
-            return cpCore.html.getPanel("<B>" + SpanClassAdminNormal + Copy + "</SPAN><B>");
+            return core.html.getPanel("<B>" + SpanClassAdminNormal + Copy + "</SPAN><B>");
         }
         //
         //
@@ -2222,14 +2222,14 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 Stream.Add(GetTitle("Benchmark", "Run a series of data operations and compare the results to previous known values."));
                 //
-                if (cpCore.docProperties.getText("Button") != "") {
+                if (core.docProperties.getText("Button") != "") {
                     //
                     //   Run Tools
                     //
                     Stream.Add("<br>");
                     //
                     Stream.Add(SpanClassAdminNormal);
-                    TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
+                    TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
                     TestCount = 100;
                     PageSize = 50;
                     PageNumber = 1;
@@ -2240,7 +2240,7 @@ namespace Contensive.Core.Addons.Tools {
                     //Stream.Add(Now & " count=[" & TestCount & "]x, PageSize=[" & PageSize & "]<br>")
                     //For TestPointer = 1 To 1000
                     //    TestTicks = GetTickCount
-                    //    TestCopy = genericController.encodeText(cpCore.csGetFieldCount(1))
+                    //    TestCopy = genericController.encodeText(core.csGetFieldCount(1))
                     //    OpenTicks = OpenTicks + GetTickCount - TestTicks
                     //Next
                     //Stream.Add(Now & " Finished<br>")
@@ -2255,22 +2255,22 @@ namespace Contensive.Core.Addons.Tools {
                     ReadTicks = 0;
                     NextTicks = 0;
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
-                        TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                        RS = cpCore.db.executeQuery(SQL);
-                        OpenTicks = OpenTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                        TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
+                        RS = core.db.executeQuery(SQL);
+                        OpenTicks = OpenTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         RecordCount = 0;
-                        TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
+                        TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
                         foreach (DataRow dr in RS.Rows) {
-                            NextTicks = NextTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                            NextTicks = NextTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
-                            TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
+                            TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
                             TestCopy = genericController.encodeText(dr["NAME"]);
-                            ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                            ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             RecordCount = RecordCount + 1;
-                            TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
+                            TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
                         }
-                        NextTicks = NextTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                        NextTicks = NextTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                     }
                     Stream.Add(DateTime.Now + " Finished<br>");
                     Stream.Add("Records = " + RecordCount + "<br>");
@@ -2288,25 +2288,25 @@ namespace Contensive.Core.Addons.Tools {
                     NextTicks = 0;
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
                         //
-                        TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                        CS = cpCore.db.csOpen("Site Properties", "","",true,0,true,false,"", PageSize, PageNumber);
-                        OpenTicks = OpenTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                        TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
+                        CS = core.db.csOpen("Site Properties", "","",true,0,true,false,"", PageSize, PageNumber);
+                        OpenTicks = OpenTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         //
                         RecordCount = 0;
-                        while (cpCore.db.csOk(CS)) {
+                        while (core.db.csOk(CS)) {
                             //
-                            TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                            TestCopy = genericController.encodeText(cpCore.db.cs_getValue(CS, "Name"));
-                            ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                            TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
+                            TestCopy = genericController.encodeText(core.db.cs_getValue(CS, "Name"));
+                            ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
-                            TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                            cpCore.db.csGoNext(CS);
-                            NextTicks = NextTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                            TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
+                            core.db.csGoNext(CS);
+                            NextTicks = NextTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             RecordCount = RecordCount + 1;
                         }
-                        cpCore.db.csClose(ref CS);
-                        ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                        core.db.csClose(ref CS);
+                        ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                     }
                     Stream.Add(DateTime.Now + " Finished<br>");
                     Stream.Add("Records = " + RecordCount + "<br>");
@@ -2324,25 +2324,25 @@ namespace Contensive.Core.Addons.Tools {
                     NextTicks = 0;
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
                         //
-                        TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                        CS = cpCore.db.csOpen("Site Properties", "", "", true, 0, false, false, "name", PageSize, PageNumber);
-                        OpenTicks = OpenTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                        TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
+                        CS = core.db.csOpen("Site Properties", "", "", true, 0, false, false, "name", PageSize, PageNumber);
+                        OpenTicks = OpenTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         //
                         RecordCount = 0;
-                        while (cpCore.db.csOk(CS)) {
+                        while (core.db.csOk(CS)) {
                             //
-                            TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                            TestCopy = genericController.encodeText(cpCore.db.cs_getValue(CS, "Name"));
-                            ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                            TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
+                            TestCopy = genericController.encodeText(core.db.cs_getValue(CS, "Name"));
+                            ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
-                            TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                            cpCore.db.csGoNext(CS);
-                            NextTicks = NextTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                            TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
+                            core.db.csGoNext(CS);
+                            NextTicks = NextTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             RecordCount = RecordCount + 1;
                         }
-                        cpCore.db.csClose(ref CS);
-                        ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
+                        core.db.csClose(ref CS);
+                        ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                     }
                     Stream.Add(DateTime.Now + " Finished<br>");
                     Stream.Add("Records = " + RecordCount + "<br>");
@@ -2354,9 +2354,9 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 //
                 // Print Start Button
-                result =  htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                result =  htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -2369,12 +2369,12 @@ namespace Contensive.Core.Addons.Tools {
             int tempLocal_GetContentID = 0;
             try {
                 tempLocal_GetContentID = 0;
-                DataTable dt = cpCore.db.executeQuery("Select ID from ccContent where name=" + cpCore.db.encodeSQLText(ContentName));
+                DataTable dt = core.db.executeQuery("Select ID from ccContent where name=" + core.db.encodeSQLText(ContentName));
                 if (dt.Rows.Count > 0) {
                     tempLocal_GetContentID = genericController.encodeInteger(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempLocal_GetContentID;
         }
@@ -2390,12 +2390,12 @@ namespace Contensive.Core.Addons.Tools {
                 DataTable dt = null;
                 //
                 tempLocal_GetContentNameByID = "";
-                dt = cpCore.db.executeQuery("Select name from ccContent where id=" + ContentID);
+                dt = core.db.executeQuery("Select name from ccContent where id=" + ContentID);
                 if (dt.Rows.Count > 0) {
                     tempLocal_GetContentNameByID = genericController.encodeText(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempLocal_GetContentNameByID;
         }
@@ -2411,12 +2411,12 @@ namespace Contensive.Core.Addons.Tools {
                 DataTable RS = null;
                 //
                 tempLocal_GetContentTableName = "";
-                RS = cpCore.db.executeQuery("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" + cpCore.db.encodeSQLText(ContentName));
+                RS = core.db.executeQuery("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" + core.db.encodeSQLText(ContentName));
                 if (RS.Rows.Count > 0) {
                     tempLocal_GetContentTableName = genericController.encodeText(RS.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempLocal_GetContentTableName;
         }
@@ -2433,8 +2433,8 @@ namespace Contensive.Core.Addons.Tools {
                     +"Select ccDataSources.Name"
                     + " from ( ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID )"
                     + " Left Join ccDataSources on ccTables.DataSourceID=ccDataSources.ID"
-                    + " where ccContent.name=" + cpCore.db.encodeSQLText(ContentName);
-                DataTable RS = cpCore.db.executeQuery(SQL);
+                    + " where ccContent.name=" + core.db.encodeSQLText(ContentName);
+                DataTable RS = core.db.executeQuery(SQL);
                 if (isDataTableOk(RS)) {
                     tempLocal_GetContentDataSource = genericController.encodeText(RS.Rows[0]["Name"]);
                 }
@@ -2443,7 +2443,7 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 closeDataTable(RS);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempLocal_GetContentDataSource;
         }
@@ -2473,14 +2473,14 @@ namespace Contensive.Core.Addons.Tools {
                 string ButtonList = null;
                 DataTable RSSchema = null;
                 var tmpList = new List<string> { };
-                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"),ref tmpList);
+                dataSourceModel datasource = dataSourceModel.create(core, core.docProperties.getInteger("DataSourceID"),ref tmpList);
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
                 Stream.Add(GetTitle("Query Database Schema", "This tool examines the database schema for all tables available."));
                 //
                 StatusOK = true;
-                if ((cpCore.docProperties.getText("button")) != ButtonRun) {
+                if ((core.docProperties.getText("button")) != ButtonRun) {
                     //
                     // First pass, initialize
                     //
@@ -2489,16 +2489,16 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Read in arguments
                     //
-                    TableName = cpCore.docProperties.getText("TableName");
+                    TableName = core.docProperties.getText("TableName");
                     //
                     // Run the SQL
                     //
-                    //ConnectionString = cpCore.db.getmain_GetConnectionString(DataSourceName)
+                    //ConnectionString = core.db.getmain_GetConnectionString(DataSourceName)
                     //
                     Stream.Add(SpanClassAdminSmall + "<br><br>");
                     Stream.Add(DateTime.Now + " Opening Table Schema on DataSource [" + datasource.Name + "]<br>");
                     //
-                    RSSchema = cpCore.db.getTableSchemaData(TableName);
+                    RSSchema = core.db.getTableSchemaData(TableName);
                     Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
                     if (!isDataTableOk(RSSchema)) {
                         //
@@ -2522,7 +2522,7 @@ namespace Contensive.Core.Addons.Tools {
                         Stream.Add("</tr>");
                         //
                         //Dim dtok As Boolean = False
-                        arrayOfSchema = cpCore.db.convertDataTabletoArray(RSSchema);
+                        arrayOfSchema = core.db.convertDataTabletoArray(RSSchema);
                         //
                         RowMax = arrayOfSchema.GetUpperBound(1);
                         ColumnMax = arrayOfSchema.GetUpperBound(0);
@@ -2561,7 +2561,7 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add(SpanClassAdminSmall + "<br><br>");
                     Stream.Add(DateTime.Now + " Opening Index Schema<br>");
                     //
-                    RSSchema = cpCore.db.getIndexSchemaData(TableName);
+                    RSSchema = core.db.getIndexSchemaData(TableName);
                     if (!isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
@@ -2584,7 +2584,7 @@ namespace Contensive.Core.Addons.Tools {
                         Stream.Add("</tr>");
                         //
 
-                        arrayOfSchema = cpCore.db.convertDataTabletoArray(RSSchema);
+                        arrayOfSchema = core.db.convertDataTabletoArray(RSSchema);
                         //
                         RowMax = arrayOfSchema.GetUpperBound(1);
                         ColumnMax = arrayOfSchema.GetUpperBound(0);
@@ -2622,7 +2622,7 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add(SpanClassAdminSmall + "<br><br>");
                     Stream.Add(DateTime.Now + " Opening Column Schema<br>");
                     //
-                    RSSchema = cpCore.db.getColumnSchemaData(TableName);
+                    RSSchema = core.db.getColumnSchemaData(TableName);
                     Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
                     if (isDataTableOk(RSSchema)) {
                         //
@@ -2645,7 +2645,7 @@ namespace Contensive.Core.Addons.Tools {
                         }
                         Stream.Add("</tr>");
                         //
-                        arrayOfSchema = cpCore.db.convertDataTabletoArray(RSSchema);
+                        arrayOfSchema = core.db.convertDataTabletoArray(RSSchema);
                         //
                         RowMax = arrayOfSchema.GetUpperBound(1);
                         ColumnMax = arrayOfSchema.GetUpperBound(0);
@@ -2689,18 +2689,18 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 Stream.Add("<br>");
                 Stream.Add("Table Name<br>");
-                Stream.Add(cpCore.html.inputText("Tablename", TableName));
+                Stream.Add(core.html.inputText("Tablename", TableName));
                 //
                 Stream.Add("<br><br>");
                 Stream.Add("Data Source<br>");
-                Stream.Add(cpCore.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
+                Stream.Add(core.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
                 //
-                //Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
+                //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
                 Stream.Add("</SPAN>");
                 //
-                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -2760,7 +2760,7 @@ namespace Contensive.Core.Addons.Tools {
                     if (!string.IsNullOrEmpty(ContentName)) {
                         TableName = cp.Content.GetTable(ContentName);
                         DataSourceName = cp.Content.GetDataSource(ContentName);
-                        CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentID, true, true);
+                        CDef = Models.Complex.cdefModel.getCdef(core, ContentID, true, true);
                     }
                 }
                 if (CDef != null) {
@@ -2796,24 +2796,24 @@ namespace Contensive.Core.Addons.Tools {
                                                 //
                                                 // Was inherited, but make a copy of the field
                                                 //
-                                                CSTarget = cpCore.db.csInsertRecord("Content Fields");
-                                                if (cpCore.db.csOk(CSTarget)) {
-                                                    CSSource = cpCore.db.cs_openContentRecord("Content Fields", formFieldId);
-                                                    if (cpCore.db.csOk(CSSource)) {
-                                                        cpCore.db.csCopyRecord(CSSource, CSTarget);
+                                                CSTarget = core.db.csInsertRecord("Content Fields");
+                                                if (core.db.csOk(CSTarget)) {
+                                                    CSSource = core.db.cs_openContentRecord("Content Fields", formFieldId);
+                                                    if (core.db.csOk(CSSource)) {
+                                                        core.db.csCopyRecord(CSSource, CSTarget);
                                                     }
-                                                    cpCore.db.csClose(ref CSSource);
-                                                    formFieldId = cpCore.db.csGetInteger(CSTarget, "ID");
-                                                    cpCore.db.csSet(CSTarget, "ContentID", ContentID);
+                                                    core.db.csClose(ref CSSource);
+                                                    formFieldId = core.db.csGetInteger(CSTarget, "ID");
+                                                    core.db.csSet(CSTarget, "ContentID", ContentID);
                                                 }
-                                                cpCore.db.csClose(ref CSTarget);
+                                                core.db.csClose(ref CSTarget);
                                                 ReloadCDef = true;
                                             } else if ((!cdefFieldKvp.Value.inherited) && (formFieldInherited)) {
                                                 //
                                                 // Was a field, make it inherit from it's parent
                                                 //
                                                 //CSTarget = CSTarget;
-                                                cpCore.db.deleteContentRecord("Content Fields", formFieldId);
+                                                core.db.deleteContentRecord("Content Fields", formFieldId);
                                                 ReloadCDef = true;
                                             } else if ((!cdefFieldKvp.Value.inherited) && (!formFieldInherited)) {
                                                 //
@@ -2832,7 +2832,7 @@ namespace Contensive.Core.Addons.Tools {
                                                         //
                                                         // Create Db field, Field is good but was not before
                                                         //
-                                                        cpCore.db.createSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId);
+                                                        core.db.createSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId);
                                                         StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + CDef.ContentTableName + "].</LI>";
                                                     } else if ((string.IsNullOrEmpty(formFieldName)) || (formFieldTypeId == 0)) {
                                                         //
@@ -2849,28 +2849,28 @@ namespace Contensive.Core.Addons.Tools {
                                                         //
                                                         // Field Type changed, must be done manually
                                                         //
-                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + cpCore.db.getRecordName("content Field Types", cdefFieldKvp.Value.fieldTypeId) + "] to [" + cpCore.db.getRecordName("content Field Types", formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
-                                                        int DataSourceTypeID = cpCore.db.getDataSourceType(DataSourceName);
+                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + core.db.getRecordName("content Field Types", cdefFieldKvp.Value.fieldTypeId) + "] to [" + core.db.getRecordName("content Field Types", formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
+                                                        int DataSourceTypeID = core.db.getDataSourceType(DataSourceName);
                                                         switch (DataSourceTypeID) {
                                                             case DataSourceTypeODBCMySQL:
-                                                                SQL = "alter table " + CDef.ContentTableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + cpCore.db.getSQLAlterColumnType(DataSourceName, fieldType) + ";";
+                                                                SQL = "alter table " + CDef.ContentTableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, fieldType) + ";";
                                                                 break;
                                                             default:
-                                                                SQL = "alter table " + CDef.ContentTableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + cpCore.db.getSQLAlterColumnType(DataSourceName, fieldType) + ";";
+                                                                SQL = "alter table " + CDef.ContentTableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, fieldType) + ";";
                                                                 break;
                                                         }
-                                                        cpCore.db.executeQuery(SQL, DataSourceName);
+                                                        core.db.executeQuery(SQL, DataSourceName);
                                                     }
                                                     SQL = "Update ccFields"
-                                                + " Set name=" + cpCore.db.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + cpCore.db.encodeSQLText(genericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
-                                                    if (cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
-                                                        SQL += ",adminonly=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." + RecordPointer));
+                                                + " Set name=" + core.db.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + core.db.encodeSQLText(genericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
+                                                    if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                                                        SQL += ",adminonly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." + RecordPointer));
                                                     }
-                                                    if (cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore)) {
-                                                        SQL += ",DeveloperOnly=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." + RecordPointer));
+                                                    if (core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                                                        SQL += ",DeveloperOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." + RecordPointer));
                                                     }
                                                     SQL += " where ID=" + formFieldId;
-                                                    cpCore.db.executeQuery(SQL);
+                                                    core.db.executeQuery(SQL);
                                                     ReloadCDef = true;
                                                 }
                                             }
@@ -2879,28 +2879,28 @@ namespace Contensive.Core.Addons.Tools {
                                     }
                                 }
                             }
-                            cpCore.cache.invalidateAll();
-                            cpCore.doc.clearMetaData();
+                            core.cache.invalidateAll();
+                            core.doc.clearMetaData();
                         }
                         if (ToolButton == ButtonAdd) {
                             //
                             // ----- Insert a blank Field
                             //
-                            CSPointer = cpCore.db.csInsertRecord("Content Fields");
-                            if (cpCore.db.csOk(CSPointer)) {
-                                cpCore.db.csSet(CSPointer, "name", "unnamedField" + cpCore.db.csGetInteger(CSPointer, "id").ToString());
-                                cpCore.db.csSet(CSPointer, "ContentID", ContentID);
-                                cpCore.db.csSet(CSPointer, "EditSortPriority", 0);
+                            CSPointer = core.db.csInsertRecord("Content Fields");
+                            if (core.db.csOk(CSPointer)) {
+                                core.db.csSet(CSPointer, "name", "unnamedField" + core.db.csGetInteger(CSPointer, "id").ToString());
+                                core.db.csSet(CSPointer, "ContentID", ContentID);
+                                core.db.csSet(CSPointer, "EditSortPriority", 0);
                                 ReloadCDef = true;
                             }
-                            cpCore.db.csClose(ref CSPointer);
+                            core.db.csClose(ref CSPointer);
                         }
                         //
                         // ----- Button Reload CDef
                         //
                         if (ToolButton == ButtonSaveandInvalidateCache) {
-                            cpCore.cache.invalidateAll();
-                            cpCore.doc.clearMetaData();
+                            core.cache.invalidateAll();
+                            core.doc.clearMetaData();
                         }
                         //
                         // ----- Restore Content Autoload site property
@@ -2915,7 +2915,7 @@ namespace Contensive.Core.Addons.Tools {
                             //
                             // ----- Exit back to menu
                             //
-                            return cpCore.webServer.redirect(cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + cpCore.webServer.requestPath + cpCore.webServer.requestPage + "?af=" + AdminFormTools);
+                            return core.webServer.redirect(core.webServer.requestProtocol + core.webServer.requestDomain + core.webServer.requestPath + core.webServer.requestPage + "?af=" + AdminFormTools);
                         }
                     }
                 }
@@ -2924,13 +2924,13 @@ namespace Contensive.Core.Addons.Tools {
                 //   Print Output
                 //--------------------------------------------------------------------------------
                 //
-                Stream.Add(SpanClassAdminNormal + "<strong><a href=\"" + cpCore.webServer.requestPage + "?af=" + AdminFormToolRoot + "\">Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>");
+                Stream.Add(SpanClassAdminNormal + "<strong><a href=\"" + core.webServer.requestPage + "?af=" + AdminFormToolRoot + "\">Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>");
                 Stream.Add("<div>");
                 Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field.</div>");
                 if (ContentID == 0) {
                     Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Related Tools:<div style=\"padding-left:20px;\"><a href=\"?af=104\">Set Default Admin Listing page columns</a></div></div>");
                 } else {
-                    Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Related Tools:<div style=\"padding-left:20px;\"><a href=\"?af=104&ContentID=" + ContentID + "\">Set Default Admin Listing page columns for '" + ContentName + "'</a></div><div style=\"padding-left:20px;\"><a href=\"?af=4&cid=" + Models.Complex.cdefModel.getContentId(cpCore, "content") + "&id=" + ContentID + "\">Edit '" + ContentName + "' Content Definition</a></div><div style=\"padding-left:20px;\"><a href=\"?cid=" + ContentID + "\">View records in '" + ContentName + "'</a></div></div>");
+                    Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Related Tools:<div style=\"padding-left:20px;\"><a href=\"?af=104&ContentID=" + ContentID + "\">Set Default Admin Listing page columns for '" + ContentName + "'</a></div><div style=\"padding-left:20px;\"><a href=\"?af=4&cid=" + Models.Complex.cdefModel.getContentId(core, "content") + "&id=" + ContentID + "\">Edit '" + ContentName + "' Content Definition</a></div><div style=\"padding-left:20px;\"><a href=\"?cid=" + ContentID + "\">View records in '" + ContentName + "'</a></div></div>");
                 }
                 Stream.Add("</div>");
                 Stream.Add("<div style=\"clear:both\">&nbsp;</div>");
@@ -2943,7 +2943,7 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add("<div style=\"clear:both\">&nbsp;</div>");
                 }
                 if (ReloadCDef) {
-                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentID, true, true);
+                    CDef = Models.Complex.cdefModel.getCdef(core, ContentID, true, true);
                 }
                 if (ContentID != 0) {
                     //
@@ -2951,7 +2951,7 @@ namespace Contensive.Core.Addons.Tools {
                     // print the Configure edit form
                     //--------------------------------------------------------------------------------
                     //
-                    Stream.Add(cpCore.html.getPanelTop());
+                    Stream.Add(core.html.getPanelTop());
                     ContentName = Local_GetContentNameByID(ContentID);
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd; // & "," & ButtonReloadCDef
                                                                                                      //
@@ -2965,8 +2965,8 @@ namespace Contensive.Core.Addons.Tools {
                         AllowCDefInherit = false;
                     } else {
                         AllowCDefInherit = true;
-                        ParentContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ParentContentID);
-                        ParentCDef = Models.Complex.cdefModel.getCdef(cpCore, ParentContentID, true, true);
+                        ParentContentName = Models.Complex.cdefModel.getContentNameByID(core, ParentContentID);
+                        ParentCDef = Models.Complex.cdefModel.getCdef(core, ParentContentID, true, true);
                     }
                     if (CDef.fields.Count > 0) {
                         Stream.Add("<tr>");
@@ -2999,7 +2999,7 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         // Build a select template for Type
                         //
-                        TypeSelectTemplate = cpCore.html.selectFromContent("menuname", -1, "Content Field Types", "", "unknown");
+                        TypeSelectTemplate = core.html.selectFromContent("menuname", -1, "Content Field Types", "", "unknown");
                         //
                         // Index the sort order
                         //
@@ -3037,7 +3037,7 @@ namespace Contensive.Core.Addons.Tools {
                             // put the menu into the current menu format
                             //
                             formFieldId = fieldsort.field.id;
-                            streamRow.Add(cpCore.html.inputHidden("dtfaID." + RecordCount, formFieldId));
+                            streamRow.Add(core.html.inputHidden("dtfaID." + RecordCount, formFieldId));
                             streamRow.Add("<tr>");
                             //
                             // edit button
@@ -3060,7 +3060,7 @@ namespace Contensive.Core.Addons.Tools {
                                 //
                                 // inherited property
                                 //
-                                streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + cpCore.html.inputCheckbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
+                                streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + core.html.inputCheckbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                             } else {
                                 //
                                 // CDef has a parent, but the field is non-inherited, test for a matching Parent Field
@@ -3077,7 +3077,7 @@ namespace Contensive.Core.Addons.Tools {
                                     streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "False**</span></td>");
                                     NeedFootNote2 = true;
                                 } else {
-                                    streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + cpCore.html.inputCheckbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
+                                    streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + core.html.inputCheckbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                                 }
                             }
                             //
@@ -3091,7 +3091,7 @@ namespace Contensive.Core.Addons.Tools {
                             } else if (FieldLocked) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.nameLc + "&nbsp;</SPAN><input type=hidden name=dtfaName." + RecordCount + " value=\"" + fieldsort.field.nameLc + "\">");
                             } else {
-                                streamRow.Add(cpCore.html.inputText("dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
+                                streamRow.Add(core.html.inputText("dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3101,7 +3101,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.caption + "</SPAN>");
                             } else {
-                                streamRow.Add(cpCore.html.inputText("dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
+                                streamRow.Add(core.html.inputText("dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3111,7 +3111,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.editTabName + "</SPAN>");
                             } else {
-                                streamRow.Add(cpCore.html.inputText("dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
+                                streamRow.Add(core.html.inputText("dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3121,7 +3121,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + genericController.encodeText(fieldsort.field.defaultValue) + "</SPAN>");
                             } else {
-                                streamRow.Add(cpCore.html.inputText("dtfaDefaultValue." + RecordCount, genericController.encodeText(fieldsort.field.defaultValue), 1, 10));
+                                streamRow.Add(core.html.inputText("dtfaDefaultValue." + RecordCount, genericController.encodeText(fieldsort.field.defaultValue), 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3130,15 +3130,15 @@ namespace Contensive.Core.Addons.Tools {
                             rowValid = rowValid && (fieldsort.field.fieldTypeId > 0);
                             streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
-                                CSPointer = cpCore.db.csOpenRecord("Content Field Types", fieldsort.field.fieldTypeId);
-                                if (!cpCore.db.csOk(CSPointer)) {
+                                CSPointer = core.db.csOpenRecord("Content Field Types", fieldsort.field.fieldTypeId);
+                                if (!core.db.csOk(CSPointer)) {
                                     streamRow.Add(SpanClassAdminSmall + "Unknown[" + fieldsort.field.fieldTypeId + "]</SPAN>");
                                 } else {
-                                    streamRow.Add(SpanClassAdminSmall + cpCore.db.csGetText(CSPointer, "Name") + "</SPAN>");
+                                    streamRow.Add(SpanClassAdminSmall + core.db.csGetText(CSPointer, "Name") + "</SPAN>");
                                 }
-                                cpCore.db.csClose(ref CSPointer);
+                                core.db.csClose(ref CSPointer);
                             } else if (FieldLocked) {
-                                streamRow.Add(cpCore.db.getRecordName("content field types", fieldsort.field.fieldTypeId) + cpCore.html.inputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
+                                streamRow.Add(core.db.getRecordName("content field types", fieldsort.field.fieldTypeId) + core.html.inputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
                             } else {
                                 TypeSelect = TypeSelectTemplate;
                                 TypeSelect = genericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
@@ -3153,7 +3153,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.editSortPriority + "</SPAN>");
                             } else {
-                                streamRow.Add(cpCore.html.inputText("dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
+                                streamRow.Add(core.html.inputText("dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3195,13 +3195,13 @@ namespace Contensive.Core.Addons.Tools {
                             //
                             // Admin Only
                             //
-                            if (cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
+                            if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                                 streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, genericController.encodeText(fieldsort.field.adminOnly), fieldsort.field.inherited));
                             }
                             //
                             // Developer Only
                             //
-                            if (cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore)) {
+                            if (core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
                                 streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, genericController.encodeText(fieldsort.field.developerOnly), fieldsort.field.inherited));
                             }
                             //
@@ -3217,13 +3217,13 @@ namespace Contensive.Core.Addons.Tools {
                             }
                         }
                         Stream.Add(StreamValidRows.Text);
-                        Stream.Add(cpCore.html.inputHidden("dtfaRecordCount", RecordCount));
+                        Stream.Add(core.html.inputHidden("dtfaRecordCount", RecordCount));
                     }
                     Stream.Add("</table>");
-                    //Stream.Add( cpcore.htmldoc.main_GetPanelButtons(ButtonList, "Button"))
+                    //Stream.Add( core.htmldoc.main_GetPanelButtons(ButtonList, "Button"))
                     //
-                    Stream.Add(cpCore.html.getPanelBottom());
-                    //Call Stream.Add(cpCore.main_GetFormEnd())
+                    Stream.Add(core.html.getPanelBottom());
+                    //Call Stream.Add(core.main_GetFormEnd())
                     if (NeedFootNote1) {
                         Stream.Add("<br>*Field Inheritance is not allowed because this Content Definition has no parent.");
                     }
@@ -3235,22 +3235,22 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Save the content selection
                     //
-                    Stream.Add(cpCore.html.inputHidden(RequestNameToolContentID, ContentID));
+                    Stream.Add(core.html.inputHidden(RequestNameToolContentID, ContentID));
                 } else {
                     //
                     // content tables that have edit forms to Configure
                     //
                     FormPanel = FormPanel + SpanClassAdminNormal + "Select a Content Definition to Configure its edit form<br>";
                     FormPanel = FormPanel + "<br>";
-                    FormPanel = FormPanel + cpCore.html.selectFromContent(RequestNameToolContentID, ContentID, "Content");
+                    FormPanel = FormPanel + core.html.selectFromContent(RequestNameToolContentID, ContentID, "Content");
                     FormPanel = FormPanel + "</SPAN>";
-                    Stream.Add(cpCore.html.getPanel(FormPanel));
+                    Stream.Add(core.html.getPanel(FormPanel));
                 }
                 //
-                Stream.Add(cpCore.html.inputHidden("ReloadCDef", ReloadCDef));
-                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                Stream.Add(core.html.inputHidden("ReloadCDef", ReloadCDef));
+                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -3263,7 +3263,7 @@ namespace Contensive.Core.Addons.Tools {
             if (Inherited) {
                 tempGetForm_ConfigureEdit_CheckBox = tempGetForm_ConfigureEdit_CheckBox + SpanClassAdminSmall + Value + "</SPAN>";
             } else {
-                tempGetForm_ConfigureEdit_CheckBox = tempGetForm_ConfigureEdit_CheckBox + cpCore.html.inputCheckbox(Label, Value);
+                tempGetForm_ConfigureEdit_CheckBox = tempGetForm_ConfigureEdit_CheckBox + core.html.inputCheckbox(Label, Value);
             }
             return tempGetForm_ConfigureEdit_CheckBox + "</nobr></td>";
         }
@@ -3299,67 +3299,67 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Process Input
                 //
-                Button = cpCore.docProperties.getText("Button");
-                TableID = cpCore.docProperties.getInteger("TableID");
+                Button = core.docProperties.getText("Button");
+                TableID = core.docProperties.getInteger("TableID");
                 //
                 // Get Tablename and DataSource
                 //
-                CS = cpCore.db.csOpenRecord("Tables", TableID,false,false, "Name,DataSourceID");
-                if (cpCore.db.csOk(CS)) {
-                    TableName = cpCore.db.csGetText(CS, "name");
-                    DataSource = cpCore.db.csGetLookup(CS, "DataSourceID");
+                CS = core.db.csOpenRecord("Tables", TableID,false,false, "Name,DataSourceID");
+                if (core.db.csOk(CS)) {
+                    TableName = core.db.csGetText(CS, "name");
+                    DataSource = core.db.csGetLookup(CS, "DataSourceID");
                 }
-                cpCore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
                 //
-                if ((TableID != 0) & (TableID == cpCore.docProperties.getInteger("previoustableid")) & (!string.IsNullOrEmpty(Button))) {
+                if ((TableID != 0) & (TableID == core.docProperties.getInteger("previoustableid")) & (!string.IsNullOrEmpty(Button))) {
                     //
                     // Drop Indexes
                     //
-                    Count = cpCore.docProperties.getInteger("DropCount");
+                    Count = core.docProperties.getInteger("DropCount");
                     if (Count > 0) {
                         for (Pointer = 0; Pointer < Count; Pointer++) {
-                            if (cpCore.docProperties.getBoolean("DropIndex." + Pointer)) {
-                                IndexName = cpCore.docProperties.getText("DropIndexName." + Pointer);
+                            if (core.docProperties.getBoolean("DropIndex." + Pointer)) {
+                                IndexName = core.docProperties.getText("DropIndexName." + Pointer);
                                 result = result + "<br>Dropping index [" + IndexName + "] from table [" + TableName + "]";
-                                cpCore.db.deleteSqlIndex("Default", TableName, IndexName);
+                                core.db.deleteSqlIndex("Default", TableName, IndexName);
                             }
                         }
                     }
                     //
                     // Add Indexes
                     //
-                    Count = cpCore.docProperties.getInteger("AddCount");
+                    Count = core.docProperties.getInteger("AddCount");
                     if (Count > 0) {
                         for (Pointer = 0; Pointer < Count; Pointer++) {
-                            if (cpCore.docProperties.getBoolean("AddIndex." + Pointer)) {
-                                //IndexName = cpCore.main_GetStreamText2("AddIndexFieldName." & Pointer)
-                                FieldName = cpCore.docProperties.getText("AddIndexFieldName." + Pointer);
+                            if (core.docProperties.getBoolean("AddIndex." + Pointer)) {
+                                //IndexName = core.main_GetStreamText2("AddIndexFieldName." & Pointer)
+                                FieldName = core.docProperties.getText("AddIndexFieldName." + Pointer);
                                 IndexName = TableName + FieldName;
                                 result = result + "<br>Adding index [" + IndexName + "] to table [" + TableName + "] for field [" + FieldName + "]";
-                                cpCore.db.createSQLIndex(DataSource, TableName, IndexName, FieldName);
+                                core.db.createSQLIndex(DataSource, TableName, IndexName, FieldName);
                             }
                         }
                     }
                 }
                 //
-                result = result + cpCore.html.formStart();
+                result = result + core.html.formStart();
                 TableColSpan = 3;
                 result = result + StartTable(2, 0, 0);
                 //
                 // Select Table Form
                 //
                 result = result + GetTableRow("<br><br><B>Select table to index</b>", TableColSpan, false);
-                result = result + GetTableRow(cpCore.html.selectFromContent("TableID", TableID, "Tables","", "Select a SQL table to start"), TableColSpan, false);
+                result = result + GetTableRow(core.html.selectFromContent("TableID", TableID, "Tables","", "Select a SQL table to start"), TableColSpan, false);
                 if (TableID != 0) {
                     //
                     // Add/Drop Indexes form
                     //
-                    result = result + cpCore.html.inputHidden("PreviousTableID", TableID);
+                    result = result + core.html.inputHidden("PreviousTableID", TableID);
                     //
                     // Drop Indexes
                     //
                     result = result + GetTableRow("<br><br><B>Select indexes to remove</b>", TableColSpan, TableRowEven);
-                    RSSchema = cpCore.db.getIndexSchemaData(TableName);
+                    RSSchema = core.db.getIndexSchemaData(TableName);
 
 
                     if (RSSchema.Rows.Count == 0) {
@@ -3370,13 +3370,13 @@ namespace Contensive.Core.Addons.Tools {
                         result = result + GetTableRow(Copy, TableColSpan, TableRowEven);
                     } else {
 
-                        Rows = cpCore.db.convertDataTabletoArray(RSSchema);
+                        Rows = core.db.convertDataTabletoArray(RSSchema);
                         RowMax = Rows.GetUpperBound(1);
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             IndexName = genericController.encodeText(Rows[5, RowPointer]);
                             if (!string.IsNullOrEmpty(IndexName)) {
                                 result = result + StartTableRow();
-                                Copy = cpCore.html.inputCheckbox("DropIndex." + RowPointer, false) + cpCore.html.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
+                                Copy = core.html.inputCheckbox("DropIndex." + RowPointer, false) + core.html.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
                                 result = result + GetTableCell(Copy,"",0, TableRowEven);
                                 result = result + GetTableCell(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
                                 result = result + GetTableCell("&nbsp;","",0, TableRowEven);
@@ -3384,14 +3384,14 @@ namespace Contensive.Core.Addons.Tools {
                                 TableRowEven = !TableRowEven;
                             }
                         }
-                        result = result + cpCore.html.inputHidden("DropCount", RowMax + 1);
+                        result = result + core.html.inputHidden("DropCount", RowMax + 1);
                     }
                     //
                     // Add Indexes
                     //
                     TableRowEven = false;
                     result = result + GetTableRow("<br><br><B>Select database fields to index</b>", TableColSpan, TableRowEven);
-                    RSSchema = cpCore.db.getColumnSchemaData(TableName);
+                    RSSchema = core.db.getColumnSchemaData(TableName);
                     if (RSSchema.Rows.Count == 0) {
                         //
                         // ----- no result
@@ -3400,19 +3400,19 @@ namespace Contensive.Core.Addons.Tools {
                         result = result + GetTableRow(Copy, TableColSpan, TableRowEven);
                     } else {
 
-                        Rows = cpCore.db.convertDataTabletoArray(RSSchema);
+                        Rows = core.db.convertDataTabletoArray(RSSchema);
                         //
                         RowMax = Rows.GetUpperBound(1);
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             result = result + StartTableRow();
-                            Copy = cpCore.html.inputCheckbox("AddIndex." + RowPointer, false) + cpCore.html.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
+                            Copy = core.html.inputCheckbox("AddIndex." + RowPointer, false) + core.html.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
                             result = result + GetTableCell(Copy,"",0, TableRowEven);
                             result = result + GetTableCell("&nbsp;","",0, TableRowEven);
                             result = result + GetTableCell("&nbsp;","",0, TableRowEven);
                             result = result + kmaEndTableRow;
                             TableRowEven = !TableRowEven;
                         }
-                        result = result + cpCore.html.inputHidden("AddCount", RowMax + 1);
+                        result = result + core.html.inputHidden("AddCount", RowMax + 1);
                     }
                     //
                     // Spacers
@@ -3427,9 +3427,9 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Buttons
                 //
-                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + result + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                result = htmlController.legacy_openFormTable(core, ButtonList) + result + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -3457,20 +3457,20 @@ namespace Contensive.Core.Addons.Tools {
                 SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName, ccFieldTypes.Name as FieldType"
                         + " FROM ((ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID) LEFT JOIN ccFields ON ccContent.ID = ccFields.ContentID) LEFT JOIN ccFieldTypes ON ccFields.Type = ccFieldTypes.ID"
                         + " ORDER BY ccTables.Name, ccFields.Name;";
-                CS = cpCore.db.csOpenSql_rev("Default", SQL);
+                CS = core.db.csOpenSql_rev("Default", SQL);
                 TableName = "";
-                while (cpCore.db.csOk(CS)) {
-                    if (TableName != cpCore.db.csGetText(CS, "TableName")) {
-                        TableName = cpCore.db.csGetText(CS, "TableName");
+                while (core.db.csOk(CS)) {
+                    if (TableName != core.db.csGetText(CS, "TableName")) {
+                        TableName = core.db.csGetText(CS, "TableName");
                         result = result + GetTableRow("<B>" + TableName + "</b>", TableColSpan, TableEvenRow);
                     }
                     result = result + StartTableRow();
                     result = result + GetTableCell("&nbsp;","",0, TableEvenRow);
-                    result = result + GetTableCell(cpCore.db.csGetText(CS, "FieldName"), "", 0, TableEvenRow);
-                    result = result + GetTableCell(cpCore.db.csGetText(CS, "FieldType"), "", 0, TableEvenRow);
+                    result = result + GetTableCell(core.db.csGetText(CS, "FieldName"), "", 0, TableEvenRow);
+                    result = result + GetTableCell(core.db.csGetText(CS, "FieldType"), "", 0, TableEvenRow);
                     result = result + kmaEndTableRow;
                     TableEvenRow = !TableEvenRow;
-                    cpCore.db.csGoNext(CS);
+                    core.db.csGoNext(CS);
                 }
                 //
                 // Field Type Definitions
@@ -3497,14 +3497,14 @@ namespace Contensive.Core.Addons.Tools {
                 result = result + kmaEndTableRow;
                 result = result + kmaEndTable;
                 //
-                //GetForm_ContentDbSchema = GetForm_ContentDbSchema & cpCore.main_GetFormInputHidden("af", AdminFormToolContentDbSchema)
-                result =  (htmlController.legacy_openFormTable(cpCore, ButtonList)) + result + (htmlController.legacy_closeFormTable(cpCore, ButtonList));
+                //GetForm_ContentDbSchema = GetForm_ContentDbSchema & core.main_GetFormInputHidden("af", AdminFormToolContentDbSchema)
+                result =  (htmlController.legacy_openFormTable(core, ButtonList)) + result + (htmlController.legacy_closeFormTable(core, ButtonList));
                 //
                 //
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -3524,9 +3524,9 @@ namespace Contensive.Core.Addons.Tools {
                 string QueryNew = genericController.ModifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
                 tempGetForm_LogFiles = tempGetForm_LogFiles + genericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
                 //
-                tempGetForm_LogFiles = htmlController.legacy_openFormTable(cpCore, ButtonList) + tempGetForm_LogFiles + (htmlController.legacy_closeFormTable(cpCore, ButtonList));
+                tempGetForm_LogFiles = htmlController.legacy_openFormTable(core, ButtonList) + tempGetForm_LogFiles + (htmlController.legacy_closeFormTable(core, ButtonList));
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempGetForm_LogFiles;
         }
@@ -3573,11 +3573,11 @@ namespace Contensive.Core.Addons.Tools {
                 // StartPath is the root - the top of the directory, it ends in the folder name (no slash)
                 //
                 result = "";
-                StartPath = cpCore.programDataFiles.rootLocalPath + "Logs\\";
+                StartPath = core.programDataFiles.rootLocalPath + "Logs\\";
                 //
                 // CurrentPath is what is concatinated on to StartPath to get the current folder, it must start with a slash
                 //
-                CurrentPath = cpCore.docProperties.getText("SetPath");
+                CurrentPath = core.docProperties.getText("SetPath");
                 if (string.IsNullOrEmpty(CurrentPath)) {
                     CurrentPath = "\\";
                 } else if (CurrentPath.Left( 1) != "\\") {
@@ -3594,13 +3594,13 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 //
                 //
-                if (cpCore.docProperties.getText("SourceFile") != "") {
+                if (core.docProperties.getText("SourceFile") != "") {
                     //
                     // Return the content of the file
                     //
-                    cpCore.webServer.setResponseContentType("text/text");
-                    result = cpCore.appRootFiles.readFile(cpCore.docProperties.getText("SourceFile"));
-                    cpCore.doc.continueProcessing = false;
+                    core.webServer.setResponseContentType("text/text");
+                    result = core.appRootFiles.readFile(core.docProperties.getText("SourceFile"));
+                    core.doc.continueProcessing = false;
                 } else {
                     result = result + GetTableStart;
                     //
@@ -3609,13 +3609,13 @@ namespace Contensive.Core.Addons.Tools {
                     if (CurrentPath != ParentPath) {
                         FileSize = "";
                         FileDate = "";
-                        result = result + GetForm_LogFiles_Details_GetRow("<A href=\"" + cpCore.webServer.requestPage + "?SetPath=" + ParentPath + "\">" + FolderOpenImage + "</A>", "<A href=\"" + cpCore.webServer.requestPage + "?SetPath=" + ParentPath + "\">" + ParentPath + "</A>", FileSize, FileDate, RowEven);
+                        result = result + GetForm_LogFiles_Details_GetRow("<A href=\"" + core.webServer.requestPage + "?SetPath=" + ParentPath + "\">" + FolderOpenImage + "</A>", "<A href=\"" + core.webServer.requestPage + "?SetPath=" + ParentPath + "\">" + ParentPath + "</A>", FileSize, FileDate, RowEven);
                     }
                     //
                     // Sub-Folders
                     //
 
-                    SourceFolders = cpCore.appRootFiles.getFolderNameList(StartPath + CurrentPath);
+                    SourceFolders = core.appRootFiles.getFolderNameList(StartPath + CurrentPath);
                     if (!string.IsNullOrEmpty(SourceFolders)) {
                         FolderSplit = SourceFolders.Split(new[] { "\r\n" }, StringSplitOptions.None);
                         FolderCount = FolderSplit.GetUpperBound(0) + 1;
@@ -3626,14 +3626,14 @@ namespace Contensive.Core.Addons.Tools {
                                 FolderName = LineSplit[0];
                                 FileSize = LineSplit[1];
                                 FileDate = LineSplit[2];
-                                result = result + GetForm_LogFiles_Details_GetRow("<A href=\"" + cpCore.webServer.requestPage + "?SetPath=" + CurrentPath + "\\" + FolderName + "\">" + FolderClosedImage + "</A>", "<A href=\"" + cpCore.webServer.requestPage + "?SetPath=" + CurrentPath + "\\" + FolderName + "\">" + FolderName + "</A>", FileSize, FileDate, RowEven);
+                                result = result + GetForm_LogFiles_Details_GetRow("<A href=\"" + core.webServer.requestPage + "?SetPath=" + CurrentPath + "\\" + FolderName + "\">" + FolderClosedImage + "</A>", "<A href=\"" + core.webServer.requestPage + "?SetPath=" + CurrentPath + "\\" + FolderName + "\">" + FolderName + "</A>", FileSize, FileDate, RowEven);
                             }
                         }
                     }
                     //
                     // Files
                     //
-                    SourceFolders = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.getFileList(StartPath + CurrentPath));
+                    SourceFolders = core.appRootFiles.convertFileINfoArrayToParseString(core.appRootFiles.getFileList(StartPath + CurrentPath));
                     if (string.IsNullOrEmpty(SourceFolders)) {
                         FileSize = "";
                         FileDate = "";
@@ -3649,11 +3649,11 @@ namespace Contensive.Core.Addons.Tools {
                                 FileSize = LineSplit[5];
                                 FileDate = LineSplit[3];
                                 FileURL = StartPath + CurrentPath + "\\" + Filename;
-                                QueryString = cpCore.doc.refreshQueryString;
+                                QueryString = core.doc.refreshQueryString;
                                 QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, encodeText(AdminFormTool), true);
                                 QueryString = genericController.ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, true);
                                 QueryString = genericController.ModifyQueryString(QueryString, "SourceFile", FileURL, true);
-                                CellCopy = "<A href=\"" + cpCore.webServer.requestPath + "?" + QueryString + "\" target=\"_blank\">" + Filename + "</A>";
+                                CellCopy = "<A href=\"" + core.webServer.requestPath + "?" + QueryString + "\" target=\"_blank\">" + Filename + "</A>";
                                 result = result + GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven);
                             }
                         }
@@ -3662,7 +3662,7 @@ namespace Contensive.Core.Addons.Tools {
                     result = result + GetTableEnd;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -3714,7 +3714,7 @@ namespace Contensive.Core.Addons.Tools {
                 ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
                 Stream.Add(GetTitle("Load Content Definitions", "This tool reloads the content definitions. This is necessary when changes are made to the ccContent or ccFields tables outside Contensive. The site will be blocked during the load."));
                 //
-                if ((cpCore.docProperties.getText("button")) != ButtonSaveandInvalidateCache) {
+                if ((core.docProperties.getText("button")) != ButtonSaveandInvalidateCache) {
                     //
                     // First pass, initialize
                     //
@@ -3723,8 +3723,8 @@ namespace Contensive.Core.Addons.Tools {
                     // Restart
                     //
                     Stream.Add("<br>Loading Content Definitions...");
-                    cpCore.cache.invalidateAll();
-                    cpCore.doc.clearMetaData();
+                    core.cache.invalidateAll();
+                    core.doc.clearMetaData();
                     Stream.Add("<br>Content Definitions loaded");
                 }
                 //
@@ -3734,9 +3734,9 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("<br>");
                 Stream.Add("</span>");
                 //
-                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -3757,25 +3757,25 @@ namespace Contensive.Core.Addons.Tools {
                 ButtonList = ButtonCancel + "," + ButtonRestartContensiveApplication;
                 Stream.Add(GetTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."));
                 //
-                if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
+                if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     tempGetForm_Restart = "<P>You must be an administrator to use this tool.</P>";
                     //
-                } else if ((cpCore.docProperties.getText("button")) != ButtonRestartContensiveApplication) {
+                } else if ((core.docProperties.getText("button")) != ButtonRestartContensiveApplication) {
                     //
                     // First pass, initialize
                     //
                 } else {
                     //
                     // Restart
-                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " + cpCore.doc.sessionContext.user.name + " (" + cpCore.doc.sessionContext.user.id + ") restarted using the Restart tool", false, true, cpCore.webServer.requestUrl, "", "");
-                    cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
+                    logController.appendLogWithLegacyRow(core, core.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " + core.doc.sessionContext.user.name + " (" + core.doc.sessionContext.user.id + ") restarted using the Restart tool", false, true, core.webServer.requestUrl, "", "");
+                    core.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
                     //
-                    taskSchedulerController.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, new cmdDetailClass() {
+                    taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, new cmdDetailClass() {
                         addonId = 0,
                         addonName = "commandRestart",
-                        docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, "")
+                        docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, "")
                     }, false);
                 }
                 //
@@ -3785,9 +3785,9 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("<br>");
                 Stream.Add("</SPAN>");
                 //
-                tempGetForm_Restart =  htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                tempGetForm_Restart =  htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempGetForm_Restart;
         }
@@ -3795,14 +3795,14 @@ namespace Contensive.Core.Addons.Tools {
         //
         //
         private Models.Complex.cdefModel GetCDef(string ContentName) {
-            return Models.Complex.cdefModel.getCdef(cpCore, ContentName);
+            return Models.Complex.cdefModel.getCdef(core, ContentName);
         }
 
 
 
         //Function CloseFormTable(ByVal ButtonList As String) As String
         //    If ButtonList <> "" Then
-        //        CloseFormTable = "</td></tr></TABLE>" & cpcore.htmldoc.main_GetPanelButtons(ButtonList, "Button") & "</form>"
+        //        CloseFormTable = "</td></tr></TABLE>" & core.htmldoc.main_GetPanelButtons(ButtonList, "Button") & "</form>"
         //    Else
         //        CloseFormTable = "</td></tr></TABLE></form>"
         //    End If
@@ -3810,16 +3810,16 @@ namespace Contensive.Core.Addons.Tools {
         //
         //
         //
-        //Function genericLegacyView.OpenFormTable(cpcore,ByVal ButtonList As String) As String
+        //Function genericLegacyView.OpenFormTable(core,ByVal ButtonList As String) As String
         //    Dim result As String = ""
         //    Try
-        //        OpenFormTable = cpCore.htmldoc.html_GetFormStart()
+        //        OpenFormTable = core.htmldoc.html_GetFormStart()
         //        If ButtonList <> "" Then
-        //            OpenFormTable = OpenFormTable & cpcore.htmldoc.main_GetPanelButtons(ButtonList, "Button")
+        //            OpenFormTable = OpenFormTable & core.htmldoc.main_GetPanelButtons(ButtonList, "Button")
         //        End If
         //        OpenFormTable = OpenFormTable & "<table border=""0"" cellpadding=""10"" cellspacing=""0"" width=""100%""><tr><TD>"
         //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex)
+        //        core.handleExceptionAndContinue(ex)
         //    End Try
         //    Return result
         //End Function
@@ -3839,14 +3839,14 @@ namespace Contensive.Core.Addons.Tools {
                 bool AllowImageImport = false;
                 bool AllowStyleImport = false;
                 //
-                bool AllowBodyHTML = cpCore.docProperties.getBoolean("AllowBodyHTML");
-                bool AllowScriptLink = cpCore.docProperties.getBoolean("AllowScriptLink");
-                AllowImageImport = cpCore.docProperties.getBoolean("AllowImageImport");
-                AllowStyleImport = cpCore.docProperties.getBoolean("AllowStyleImport");
+                bool AllowBodyHTML = core.docProperties.getBoolean("AllowBodyHTML");
+                bool AllowScriptLink = core.docProperties.getBoolean("AllowScriptLink");
+                AllowImageImport = core.docProperties.getBoolean("AllowImageImport");
+                AllowStyleImport = core.docProperties.getBoolean("AllowStyleImport");
                 //
                 Stream.Add(GetTitle("Load Templates", "This tool creates template records from the HTML files in the root folder of the site."));
                 //
-                if ((cpCore.docProperties.getText("button")) != ButtonImportTemplates) {
+                if ((core.docProperties.getText("button")) != ButtonImportTemplates) {
                     //
                     // First pass, initialize
                     //
@@ -3855,7 +3855,7 @@ namespace Contensive.Core.Addons.Tools {
                     // Restart
                     //
                     Stream.Add("<br>Loading Templates...");
-                    //Call Stream.Add(ImportTemplates(cpCore.appRootFiles.rootLocalPath, "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
+                    //Call Stream.Add(ImportTemplates(core.appRootFiles.rootLocalPath, "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
                     Stream.Add("<br>Templates loaded");
                 }
                 //
@@ -3863,17 +3863,17 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 Stream.Add(SpanClassAdminNormal);
                 Stream.Add("<br>");
-                //Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolLoadTemplates)
-                Stream.Add("<br>" + cpCore.html.inputCheckbox("AllowBodyHTML", AllowBodyHTML) + " Update/Import Soft Templates from the Body of .HTM and .HTML files");
-                Stream.Add("<br>" + cpCore.html.inputCheckbox("AllowScriptLink", AllowScriptLink) + " Update/Import Hard Templates with links to .ASP and .ASPX scripts");
-                Stream.Add("<br>" + cpCore.html.inputCheckbox("AllowImageImport", AllowImageImport) + " Update/Import image links (.GIF,.JPG,.PDF ) into the resource library");
-                Stream.Add("<br>" + cpCore.html.inputCheckbox("AllowStyleImport", AllowStyleImport) + " Import style sheets (.CSS) to Dynamic Styles");
+                //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolLoadTemplates)
+                Stream.Add("<br>" + core.html.inputCheckbox("AllowBodyHTML", AllowBodyHTML) + " Update/Import Soft Templates from the Body of .HTM and .HTML files");
+                Stream.Add("<br>" + core.html.inputCheckbox("AllowScriptLink", AllowScriptLink) + " Update/Import Hard Templates with links to .ASP and .ASPX scripts");
+                Stream.Add("<br>" + core.html.inputCheckbox("AllowImageImport", AllowImageImport) + " Update/Import image links (.GIF,.JPG,.PDF ) into the resource library");
+                Stream.Add("<br>" + core.html.inputCheckbox("AllowStyleImport", AllowStyleImport) + " Import style sheets (.CSS) to Dynamic Styles");
                 Stream.Add("</SPAN>");
                 //
                 ButtonList = ButtonCancel + "," + ButtonImportTemplates;
-                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
+                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -3906,7 +3906,7 @@ namespace Contensive.Core.Addons.Tools {
         //        Dim TemplateName As String
         //        Dim Copy As String
         //        '
-        //        FileList = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.getFileList(FileRootPath & AppPath))
+        //        FileList = core.appRootFiles.convertFileINfoArrayToParseString(core.appRootFiles.getFileList(FileRootPath & AppPath))
         //        Files = Split(FileList, vbCrLf)
         //        For Ptr = 0 To UBound(Files)
         //            FileDetailString = Files[Ptr]
@@ -3924,22 +3924,22 @@ namespace Contensive.Core.Addons.Tools {
 
         //                End If
         //                '
-        //                CS = cpCore.db.cs_open("Page Templates", "Link=" & cpCore.db.encodeSQLText(Link))
-        //                If Not cpCore.db.cs_ok(CS) Then
-        //                    Call cpCore.db.cs_Close(CS)
-        //                    CS = cpCore.db.cs_insertRecord("Page Templates")
-        //                    Call cpCore.db.cs_set(CS, "Link", Link)
+        //                CS = core.db.cs_open("Page Templates", "Link=" & core.db.encodeSQLText(Link))
+        //                If Not core.db.cs_ok(CS) Then
+        //                    Call core.db.cs_Close(CS)
+        //                    CS = core.db.cs_insertRecord("Page Templates")
+        //                    Call core.db.cs_set(CS, "Link", Link)
         //                End If
-        //                If cpCore.db.cs_ok(CS) Then
-        //                    Call cpCore.db.cs_set(CS, "name", TemplateName)
+        //                If core.db.cs_ok(CS) Then
+        //                    Call core.db.cs_set(CS, "name", TemplateName)
         //                End If
-        //                Call cpCore.db.cs_Close(CS)
+        //                Call core.db.cs_Close(CS)
         //            ElseIf AllowBodyHTML And (InStr(1, Filename, ".htm", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
         //                '
         //                ' HTML, import body
         //                '
-        //                PageSource = cpCore.appRootFiles.readFile(Filename)
-        //                Call cpCore.main_EncodePage_SplitBody(PageSource, PageSource, "", "")
+        //                PageSource = core.appRootFiles.readFile(Filename)
+        //                Call core.main_EncodePage_SplitBody(PageSource, PageSource, "", "")
         //                Link = genericController.vbReplace(AppPath & Filename, "\", "/")
         //                TemplateName = genericController.vbReplace(Link, "/", "-")
         //                If genericController.vbInstr(1, TemplateName, ".") <> 0 Then
@@ -3949,18 +3949,18 @@ namespace Contensive.Core.Addons.Tools {
         //                '
         //                result = result & "<br>Create Soft Template from source [" & Link & "]"
         //                '
-        //                CS = cpCore.db.cs_open("Page Templates", "Source=" & cpCore.db.encodeSQLText(Link))
-        //                If Not cpCore.db.cs_ok(CS) Then
-        //                    Call cpCore.db.cs_Close(CS)
-        //                    CS = cpCore.db.cs_insertRecord("Page Templates")
-        //                    Call cpCore.db.cs_set(CS, "Source", Link)
-        //                    Call cpCore.db.cs_set(CS, "name", TemplateName)
+        //                CS = core.db.cs_open("Page Templates", "Source=" & core.db.encodeSQLText(Link))
+        //                If Not core.db.cs_ok(CS) Then
+        //                    Call core.db.cs_Close(CS)
+        //                    CS = core.db.cs_insertRecord("Page Templates")
+        //                    Call core.db.cs_set(CS, "Source", Link)
+        //                    Call core.db.cs_set(CS, "name", TemplateName)
         //                End If
-        //                If cpCore.db.cs_ok(CS) Then
-        //                    Call cpCore.db.cs_set(CS, "Link", "")
-        //                    Call cpCore.db.cs_set(CS, "bodyhtml", PageSource)
+        //                If core.db.cs_ok(CS) Then
+        //                    Call core.db.cs_set(CS, "Link", "")
+        //                    Call core.db.cs_set(CS, "bodyhtml", PageSource)
         //                End If
-        //                Call cpCore.db.cs_Close(CS)
+        //                Call core.db.cs_Close(CS)
         //                '
         //            ElseIf AllowImageImport And (InStr(1, Filename, ".gif", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
         //                '
@@ -3976,21 +3976,21 @@ namespace Contensive.Core.Addons.Tools {
         //                '
         //                Dim DynamicFilename As String
         //                DynamicFilename = "templates\styles.css"
-        //                Copy = cpCore.appRootFiles.readFile(DynamicFilename)
+        //                Copy = core.appRootFiles.readFile(DynamicFilename)
         //                Copy = RemoveStyleTags(Copy)
         //                Copy = Copy _
         //                    & vbCrLf _
         //                    & vbCrLf & "/* Import of " & FileRootPath & AppPath & Filename & "*/" _
         //                    & vbCrLf _
         //                    & vbCrLf
-        //                Copy = Copy & RemoveStyleTags(cpCore.appRootFiles.readFile(Filename))
-        //                Call cpCore.appRootFiles.saveFile(DynamicFilename, Copy)
+        //                Copy = Copy & RemoveStyleTags(core.appRootFiles.readFile(Filename))
+        //                Call core.appRootFiles.saveFile(DynamicFilename, Copy)
         //            End If
         //        Next
         //        '
         //        ' Now process all subfolders
         //        '
-        //        FolderList = cpCore.getFolderNameList(FileRootPath & AppPath)
+        //        FolderList = core.getFolderNameList(FileRootPath & AppPath)
         //        If FolderList <> "" Then
         //            Folders = Split(FolderList, vbCrLf)
         //            For Ptr = 0 To UBound(Folders)
@@ -4005,7 +4005,7 @@ namespace Contensive.Core.Addons.Tools {
         //            Next
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex) : Throw
+        //        core.handleExceptionAndContinue(ex) : Throw
         //    End Try
         //    Return result
         //End Function
@@ -4022,14 +4022,14 @@ namespace Contensive.Core.Addons.Tools {
         //            Dim ParentContentName As String
         //            Dim ParentID As Integer
         //            '
-        //            CSContent = cpCore.db.cs_open("Content", "name=" & cpCore.db.encodeSQLText(ContentName))
-        //            If cpCore.db.cs_ok(CSContent) Then
+        //            CSContent = core.db.cs_open("Content", "name=" & core.db.encodeSQLText(ContentName))
+        //            If core.db.cs_ok(CSContent) Then
         //                '
         //                ' Start with parent CDef
         //                '
-        //                ParentID = cpCore.db.cs_getInteger(CSContent, "parentID")
+        //                ParentID = core.db.cs_getInteger(CSContent, "parentID")
         //                If ParentID <> 0 Then
-        //                    ParentContentName = Models.Complex.cdefModel.getContentNameByID(cpcore,ParentID)
+        //                    ParentContentName = Models.Complex.cdefModel.getContentNameByID(core,ParentID)
         //                    If ParentContentName <> "" Then
         //                        LoadCDef = LoadCDef(ParentContentName)
         //                    End If
@@ -4038,18 +4038,18 @@ namespace Contensive.Core.Addons.Tools {
         //                ' Add this definition on it
         //                '
         //                With LoadCDef
-        //                    CS = cpCore.db.cs_open("Content Fields", "contentid=" & ContentID)
-        //                    Do While cpCore.db.cs_ok(CS)
-        //                        Select Case genericController.vbUCase(cpCore.db.cs_getText(CS, "name"))
+        //                    CS = core.db.cs_open("Content Fields", "contentid=" & ContentID)
+        //                    Do While core.db.cs_ok(CS)
+        //                        Select Case genericController.vbUCase(core.db.cs_getText(CS, "name"))
         //                            Case "NAME"
         //                                .Name = ""
         //                        End Select
-        //                        Call cpCore.db.cs_goNext(CS)
+        //                        Call core.db.cs_goNext(CS)
         //                    Loop
-        //                    Call cpCore.db.cs_Close(CS)
+        //                    Call core.db.cs_Close(CS)
         //                End With
         //            End If
-        //            Call cpCore.db.cs_Close(CSContent)
+        //            Call core.db.cs_Close(CSContent)
         //            throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("ImportTemplates", "ErrorTrap")
         //        End Function
         //        '
@@ -4155,12 +4155,12 @@ namespace Contensive.Core.Addons.Tools {
         private string GetForm_ContentFileManager() {
             string result = "";
             try {
-                adminUIController Adminui = new adminUIController(cpCore);
+                adminUIController Adminui = new adminUIController(core);
                 string InstanceOptionString = "AdminLayout=1&filesystem=content files";
-                addonModel addon = addonModel.create(cpCore, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
-                string Content = cpCore.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                addonModel addon = addonModel.create(core, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
+                string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, InstanceOptionString),
+                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
                     instanceGuid = "-2",
                     errorCaption = "File Manager"
                 });
@@ -4168,7 +4168,7 @@ namespace Contensive.Core.Addons.Tools {
                 string ButtonList = ButtonApply + "," + ButtonCancel;
                 result = Adminui.GetBody("Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -4180,12 +4180,12 @@ namespace Contensive.Core.Addons.Tools {
         private string GetForm_WebsiteFileManager() {
             string result = "";
             try {
-                adminUIController Adminui = new adminUIController(cpCore);
+                adminUIController Adminui = new adminUIController(core);
                 string InstanceOptionString = "AdminLayout=1&filesystem=website files";
-                addonModel addon = addonModel.create(cpCore, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
-                string Content = cpCore.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                addonModel addon = addonModel.create(core, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
+                string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, InstanceOptionString),
+                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
                     instanceGuid = "-2",
                     errorCaption = "File Manager"
                 });
@@ -4193,7 +4193,7 @@ namespace Contensive.Core.Addons.Tools {
                 string ButtonList = ButtonApply + "," + ButtonCancel;
                 result = Adminui.GetBody("Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -4216,7 +4216,7 @@ namespace Contensive.Core.Addons.Tools {
                 int RecordID = 0;
                 int CS = 0;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                // Dim runAtServer As New runAtServerClass(cpCore)
+                // Dim runAtServer As New runAtServerClass(core)
                 string CDefList = "";
                 string FindText = "";
                 string ReplaceText = "";
@@ -4229,15 +4229,15 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Process the form
                 //
-                Button = cpCore.docProperties.getText("button");
+                Button = core.docProperties.getText("button");
                 //
-                IsDeveloper = cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore);
+                IsDeveloper = core.doc.sessionContext.isAuthenticatedDeveloper(core);
                 if (Button == ButtonFindAndReplace) {
-                    RowCnt = cpCore.docProperties.getInteger("CDefRowCnt");
+                    RowCnt = core.docProperties.getInteger("CDefRowCnt");
                     if (RowCnt > 0) {
                         for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
-                            if (cpCore.docProperties.getBoolean("Cdef" + RowPtr)) {
-                                lcName = genericController.vbLCase(cpCore.docProperties.getText("CDefName" + RowPtr));
+                            if (core.docProperties.getBoolean("Cdef" + RowPtr)) {
+                                lcName = genericController.vbLCase(core.docProperties.getText("CDefName" + RowPtr));
                                 if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
                                     CDefList = CDefList + "," + lcName;
                                 }
@@ -4246,14 +4246,14 @@ namespace Contensive.Core.Addons.Tools {
                         if (!string.IsNullOrEmpty(CDefList)) {
                             CDefList = CDefList.Substring(1);
                         }
-                        FindText = cpCore.docProperties.getText("FindText");
-                        ReplaceText = cpCore.docProperties.getText("ReplaceText");
-                        QS = "app=" + encodeNvaArgument(cpCore.serverConfig.appConfig.name) + "&FindText=" + encodeNvaArgument(FindText) + "&ReplaceText=" + encodeNvaArgument(ReplaceText) + "&CDefNameList=" + encodeNvaArgument(CDefList);
+                        FindText = core.docProperties.getText("FindText");
+                        ReplaceText = core.docProperties.getText("ReplaceText");
+                        QS = "app=" + encodeNvaArgument(core.serverConfig.appConfig.name) + "&FindText=" + encodeNvaArgument(FindText) + "&ReplaceText=" + encodeNvaArgument(ReplaceText) + "&CDefNameList=" + encodeNvaArgument(CDefList);
                         cmdDetailClass cmdDetail = new cmdDetailClass();
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
-                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, QS);
-                        taskSchedulerController.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, QS);
+                        taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                         Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
                 } else {
@@ -4264,17 +4264,17 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Display form
                 //
-                FindRows = cpCore.docProperties.getInteger("SQLRows");
+                FindRows = core.docProperties.getInteger("SQLRows");
                 if (FindRows == 0) {
-                    FindRows = cpCore.userProperty.getInteger("FindAndReplaceFindRows", 1);
+                    FindRows = core.userProperty.getInteger("FindAndReplaceFindRows", 1);
                 } else {
-                    cpCore.userProperty.setProperty("FindAndReplaceFindRows", FindRows.ToString());
+                    core.userProperty.setProperty("FindAndReplaceFindRows", FindRows.ToString());
                 }
-                ReplaceRows = cpCore.docProperties.getInteger("ReplaceRows");
+                ReplaceRows = core.docProperties.getInteger("ReplaceRows");
                 if (ReplaceRows == 0) {
-                    ReplaceRows = cpCore.userProperty.getInteger("FindAndReplaceReplaceRows", 1);
+                    ReplaceRows = core.userProperty.getInteger("FindAndReplaceReplaceRows", 1);
                 } else {
-                    cpCore.userProperty.setProperty("FindAndReplaceReplaceRows", ReplaceRows.ToString());
+                    core.userProperty.setProperty("FindAndReplaceReplaceRows", ReplaceRows.ToString());
                 }
                 //
                 Stream.Add("<div>Find</div>");
@@ -4287,27 +4287,27 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"ReplaceTextRows\" SIZE=\"3\" VALUE=\"" + ReplaceRows + "\" ID=\"\"  onchange=\"ReplaceText.rows=ReplaceTextRows.value; return true\"> Rows");
                 Stream.Add("<br><br>");
                 //
-                CS = cpCore.db.csOpen("Content");
-                while (cpCore.db.csOk(CS)) {
-                    RecordName = cpCore.db.csGetText(CS, "Name");
+                CS = core.db.csOpen("Content");
+                while (core.db.csOk(CS)) {
+                    RecordName = core.db.csGetText(CS, "Name");
                     lcName = genericController.vbLCase(RecordName);
                     if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
-                        RecordID = cpCore.db.csGetInteger(CS, "ID");
+                        RecordID = core.db.csGetInteger(CS, "ID");
                         if (genericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
-                            TopHalf = TopHalf + "<div>" + cpCore.html.inputCheckbox("Cdef" + RowPtr, true) + cpCore.html.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + cpCore.db.csGetText(CS, "Name") + "</div>";
+                            TopHalf = TopHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, true) + core.html.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
                         } else {
-                            BottomHalf = BottomHalf + "<div>" + cpCore.html.inputCheckbox("Cdef" + RowPtr, false) + cpCore.html.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + cpCore.db.csGetText(CS, "Name") + "</div>";
+                            BottomHalf = BottomHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, false) + core.html.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
                         }
                     }
-                    cpCore.db.csGoNext(CS);
+                    core.db.csGoNext(CS);
                     RowPtr = RowPtr + 1;
                 }
-                cpCore.db.csClose(ref CS);
-                Stream.Add(TopHalf + BottomHalf + cpCore.html.inputHidden("CDefRowCnt", RowPtr));
+                core.db.csClose(ref CS);
+                Stream.Add(TopHalf + BottomHalf + core.html.inputHidden("CDefRowCnt", RowPtr));
                 //
-                result = htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonFindAndReplace);
+                result = htmlController.legacy_openFormTable(core, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -4326,28 +4326,28 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Process the form
                 //
-                Button = cpCore.docProperties.getText("button");
+                Button = core.docProperties.getText("button");
                 //
                 if (Button == ButtonIISReset) {
                     //
                     //
                     //
-                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " + cpCore.doc.sessionContext.user.name + " (" + cpCore.doc.sessionContext.user.id + ") executed an IISReset using the IISReset tool", false, true, cpCore.webServer.requestUrl, "", "");
-                    //runAtServer = New runAtServerClass(cpCore)
-                    cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
+                    logController.appendLogWithLegacyRow(core, core.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " + core.doc.sessionContext.user.name + " (" + core.doc.sessionContext.user.id + ") executed an IISReset using the IISReset tool", false, true, core.webServer.requestUrl, "", "");
+                    //runAtServer = New runAtServerClass(core)
+                    core.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
                     cmdDetailClass cmdDetail = new cmdDetailClass();
                     cmdDetail.addonId = 0;
                     cmdDetail.addonName = "GetForm_IISReset";
-                    cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, "");
-                    taskSchedulerController.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, "");
+                    taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                 }
                 //
                 // Display form
                 //
-                result = htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonIISReset) + s.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonIISReset);
+                result = htmlController.legacy_openFormTable(core, ButtonCancel + "," + ButtonIISReset) + s.Text + htmlController.legacy_closeFormTable(core, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -4365,14 +4365,14 @@ namespace Contensive.Core.Addons.Tools {
                 s.Add(GetTitle("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
                 //
                 // Process the form
-                Button = cpCore.docProperties.getText("button");
+                Button = core.docProperties.getText("button");
                 //
-                s.Add(cpCore.html.inputText("GUID", Guid.NewGuid().ToString(), 1, 80));
+                s.Add(core.html.inputText("GUID", Guid.NewGuid().ToString(), 1, 80));
                 //
                 // Display form
-                result= htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonCreateGUID) + s.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonCreateGUID);
+                result= htmlController.legacy_openFormTable(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + htmlController.legacy_closeFormTable(core, ButtonCancel + "," + ButtonCreateGUID);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -4385,7 +4385,7 @@ namespace Contensive.Core.Addons.Tools {
         // <param name="ignore0"></param>
         // <remarks></remarks>
         //Private Sub handleLegacyClassErrors1(ByVal MethodName As String, Optional ByVal ignore0 As String = "")
-        //   throw (New ApplicationException("Unexpected exception"))'cpCore.handleLegacyError("Tools", MethodName, Err.Number, Err.Source, Err.Description, True, False)
+        //   throw (New ApplicationException("Unexpected exception"))'core.handleLegacyError("Tools", MethodName, Err.Number, Err.Source, Err.Description, True, False)
         //End Sub
         //
         //====================================================================================================
@@ -4396,7 +4396,7 @@ namespace Contensive.Core.Addons.Tools {
         // <param name="ErrDescription"></param>
         // <remarks></remarks>
         //Private Sub handleLegacyClassErrors2(ByVal MethodName As String, ByVal ErrDescription As String)
-        //    fixme-- cpCore.handleException(New ApplicationException("")) ' -----ignoreInteger, "App.EXEName", ErrDescription)
+        //    fixme-- core.handleException(New ApplicationException("")) ' -----ignoreInteger, "App.EXEName", ErrDescription)
         //End Sub
 
 

@@ -70,10 +70,10 @@ namespace Contensive.Core.Models.Complex {
                                                     //
                                                     //====================================================================================================
                                                     //
-        public List<int> get_childIdList(coreController cpCore) {
+        public List<int> get_childIdList(coreController core) {
             if (_childIdList == null) {
                 string Sql = "select id from cccontent where parentid=" + Id;
-                DataTable dt = cpCore.db.executeQuery(Sql);
+                DataTable dt = core.db.executeQuery(Sql);
                 if (dt.Rows.Count == 0) {
                     _childIdList = new List<int>();
                     foreach (DataRow parentrow in dt.Rows) {
@@ -84,7 +84,7 @@ namespace Contensive.Core.Models.Complex {
             }
             return _childIdList;
         }
-        public void set_childIdList(coreController cpCore, List<int> value) {
+        public void set_childIdList(coreController core, List<int> value) {
             _childIdList = value;
         }
         private List<int> _childIdList = null;
@@ -103,12 +103,12 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        public static cdefModel create(coreController cpcore, int contentId, bool loadInvalidFields = false, bool forceDbLoad = false) {
+        public static cdefModel create(coreController core, int contentId, bool loadInvalidFields = false, bool forceDbLoad = false) {
             cdefModel result = null;
             try {
                 List<string> dependantCacheNameList = new List<string>();
                 if (!forceDbLoad) {
-                    result = getCache(cpcore, contentId);
+                    result = getCache(core, contentId);
                 }
                 if (result == null) {
                     //
@@ -146,7 +146,7 @@ namespace Contensive.Core.Models.Complex {
                         + " left join ccGroups ON c.EditorGroupID = ccGroups.ID"
                         + " where (c.Active<>0)"
                         + " and(c.id=" + contentId.ToString() + ")";
-                    DataTable dt = cpcore.db.executeQuery(sql);
+                    DataTable dt = core.db.executeQuery(sql);
                     if (dt.Rows.Count == 0) {
                         //
                         // cdef not found
@@ -154,7 +154,7 @@ namespace Contensive.Core.Models.Complex {
                     } else {
                         result = new Models.Complex.cdefModel();
                         result.fields = new Dictionary<string, Models.Complex.cdefFieldModel>();
-                        result.set_childIdList(cpcore, new List<int>());
+                        result.set_childIdList(core, new List<int>());
                         result.selectList = new List<string>();
                         // -- !!!!! changed to string because dotnet json cannot serialize an integer key
                         result.adminColumns = new SortedList<string, Models.Complex.cdefModel.CDefAdminColumnClass>();
@@ -195,7 +195,7 @@ namespace Contensive.Core.Models.Complex {
                         if (result.parentID == 0) {
                             result.parentID = -1;
                         } else {
-                            Models.Complex.cdefModel parentCdef = create(cpcore, result.parentID, loadInvalidFields, forceDbLoad);
+                            Models.Complex.cdefModel parentCdef = create(core, result.parentID, loadInvalidFields, forceDbLoad);
                             foreach (var keyvaluepair in parentCdef.fields) {
                                 Models.Complex.cdefFieldModel parentField = keyvaluepair.Value;
                                 Models.Complex.cdefFieldModel childField = new Models.Complex.cdefFieldModel();
@@ -278,7 +278,7 @@ namespace Contensive.Core.Models.Complex {
                                 + " order by"
                                 + " f.ContentID,f.EditTab,f.EditSortPriority"
                                 + "";
-                        dt = cpcore.db.executeQuery(sql);
+                        dt = core.db.executeQuery(sql);
                         if (dt.Rows.Count == 0) {
                             //
                         } else {
@@ -363,13 +363,13 @@ namespace Contensive.Core.Models.Complex {
                                     field.manyToManyRuleContentID = genericController.encodeInteger(rowWithinLoop[29]);
                                     field.ManyToManyRulePrimaryField = genericController.encodeText(rowWithinLoop[30]);
                                     field.ManyToManyRuleSecondaryField = genericController.encodeText(rowWithinLoop[31]);
-                                    field.memberSelectGroupId_set( cpcore, genericController.encodeInteger(rowWithinLoop[36]));
+                                    field.memberSelectGroupId_set( core, genericController.encodeInteger(rowWithinLoop[36]));
                                     field.nameLc = fieldNameLower;
                                     field.notEditable = genericController.encodeBoolean(rowWithinLoop[26]);
                                     field.password = genericController.encodeBoolean(rowWithinLoop[3]);
                                     field.readOnly = genericController.encodeBoolean(rowWithinLoop[17]);
                                     field.redirectContentID = genericController.encodeInteger(rowWithinLoop[19]);
-                                    //.RedirectContentName(cpCore) = ""
+                                    //.RedirectContentName(core) = ""
                                     field.redirectID = genericController.encodeText(rowWithinLoop[21]);
                                     field.redirectPath = genericController.encodeText(rowWithinLoop[20]);
                                     field.required = genericController.encodeBoolean(rowWithinLoop[14]);
@@ -403,21 +403,21 @@ namespace Contensive.Core.Models.Complex {
                         //
                         // ----- Create the ContentControlCriteria
                         //
-                        result.ContentControlCriteria = Models.Complex.cdefModel.getContentControlCriteria(cpcore, result.Id, result.ContentTableName, result.ContentDataSourceName, new List<int>());
+                        result.ContentControlCriteria = Models.Complex.cdefModel.getContentControlCriteria(core, result.Id, result.ContentTableName, result.ContentDataSourceName, new List<int>());
                         //
-                        getCdef_SetAdminColumns(cpcore, result);
+                        getCdef_SetAdminColumns(core, result);
                     }
-                    setCache(cpcore, contentId, result);
+                    setCache(core, contentId, result);
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
         //
         //====================================================================================================
         //
-        private static void getCdef_SetAdminColumns(coreController cpcore, Models.Complex.cdefModel cdef) {
+        private static void getCdef_SetAdminColumns(coreController core, Models.Complex.cdefModel cdef) {
             try {
                 bool FieldActive = false;
                 int FieldWidth = 0;
@@ -472,7 +472,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -483,14 +483,14 @@ namespace Contensive.Core.Models.Complex {
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public static int getContentId(coreController cpcore, string contentName) {
+        public static int getContentId(coreController core, string contentName) {
             int returnId = 0;
             try {
-                if (cpcore.doc.contentNameIdDictionary.ContainsKey(contentName.ToLower())) {
-                    returnId = cpcore.doc.contentNameIdDictionary[contentName.ToLower()];
+                if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLower())) {
+                    returnId = core.doc.contentNameIdDictionary[contentName.ToLower()];
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnId;
@@ -502,15 +502,15 @@ namespace Contensive.Core.Models.Complex {
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public static Models.Complex.cdefModel getCdef(coreController cpcore, string contentName) {
+        public static Models.Complex.cdefModel getCdef(coreController core, string contentName) {
             Models.Complex.cdefModel returnCdef = null;
             try {
-                int ContentId = getContentId(cpcore, contentName);
+                int ContentId = getContentId(core, contentName);
                 if (ContentId > 0) {
-                    returnCdef = getCdef(cpcore, ContentId);
+                    returnCdef = getCdef(core, ContentId);
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnCdef;
@@ -522,27 +522,27 @@ namespace Contensive.Core.Models.Complex {
         /// </summary>
         /// <param name="contentId"></param>
         /// <returns></returns>
-        public static Models.Complex.cdefModel getCdef(coreController cpcore, int contentId, bool forceDbLoad = false, bool loadInvalidFields = false) {
+        public static Models.Complex.cdefModel getCdef(coreController core, int contentId, bool forceDbLoad = false, bool loadInvalidFields = false) {
             Models.Complex.cdefModel returnCdef = null;
             try {
                 if (contentId <= 0) {
                     //
                     // -- invalid id                    
-                } else if ((!forceDbLoad) && (cpcore.doc.cdefDictionary.ContainsKey(contentId.ToString()))) {
+                } else if ((!forceDbLoad) && (core.doc.cdefDictionary.ContainsKey(contentId.ToString()))) {
                     //
                     // -- already loaded and no force re-load, just return the current cdef                    
-                    returnCdef = cpcore.doc.cdefDictionary[contentId.ToString()];
+                    returnCdef = core.doc.cdefDictionary[contentId.ToString()];
                 } else {
-                    if (cpcore.doc.cdefDictionary.ContainsKey(contentId.ToString())) {
+                    if (core.doc.cdefDictionary.ContainsKey(contentId.ToString())) {
                         //
                         // -- key is already there, remove it first                        
-                        cpcore.doc.cdefDictionary.Remove(contentId.ToString());
+                        core.doc.cdefDictionary.Remove(contentId.ToString());
                     }
-                    returnCdef = Models.Complex.cdefModel.create(cpcore, contentId, loadInvalidFields, forceDbLoad);
-                    cpcore.doc.cdefDictionary.Add(contentId.ToString(), returnCdef);
+                    returnCdef = Models.Complex.cdefModel.create(core, contentId, loadInvalidFields, forceDbLoad);
+                    core.doc.cdefDictionary.Add(contentId.ToString(), returnCdef);
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnCdef;
@@ -565,7 +565,7 @@ namespace Contensive.Core.Models.Complex {
         // will include both the content, and its child contents.
         //========================================================================
         //
-        internal static string getContentControlCriteria(coreController cpcore, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
+        internal static string getContentControlCriteria(coreController core, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
             string returnCriteria = "";
             try {
                 //
@@ -574,9 +574,9 @@ namespace Contensive.Core.Models.Complex {
                     if (!parentIdList.Contains(contentId)) {
                         parentIdList.Add(contentId);
                         returnCriteria = "(" + contentTableName + ".contentcontrolId=" + contentId + ")";
-                        foreach (KeyValuePair<int, contentModel> kvp in cpcore.doc.contentIdDict) {
+                        foreach (KeyValuePair<int, contentModel> kvp in core.doc.contentIdDict) {
                             if (kvp.Value.ParentID == contentId) {
-                                returnCriteria += "OR" + getContentControlCriteria(cpcore, kvp.Value.id, contentTableName, contentDAtaSourceName, parentIdList);
+                                returnCriteria += "OR" + getContentControlCriteria(core, kvp.Value.id, contentTableName, contentDAtaSourceName, parentIdList);
                             }
                         }
                         parentIdList.Remove(contentId);
@@ -584,7 +584,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnCriteria;
@@ -596,20 +596,20 @@ namespace Contensive.Core.Models.Complex {
         //       Returns true if ChildContentID is in ParentContentID
         //========================================================================
         //
-        public static bool isWithinContent(coreController cpcore, int ChildContentID, int ParentContentID) {
+        public static bool isWithinContent(coreController core, int ChildContentID, int ParentContentID) {
             bool returnOK = false;
             try {
                 Models.Complex.cdefModel cdef = null;
                 if (ChildContentID == ParentContentID) {
                     returnOK = true;
                 } else {
-                    cdef = getCdef(cpcore, ParentContentID);
+                    cdef = getCdef(core, ParentContentID);
                     if (cdef != null) {
-                        if (cdef.get_childIdList(cpcore).Count > 0) {
-                            returnOK = cdef.get_childIdList(cpcore).Contains(ChildContentID);
+                        if (cdef.get_childIdList(core).Count > 0) {
+                            returnOK = cdef.get_childIdList(core).Contains(ChildContentID);
                             if (!returnOK) {
-                                foreach (int contentId in cdef.get_childIdList(cpcore)) {
-                                    returnOK = isWithinContent(cpcore, contentId, ParentContentID);
+                                foreach (int contentId in cdef.get_childIdList(core)) {
+                                    returnOK = isWithinContent(core, contentId, ParentContentID);
                                     if (returnOK) {
                                         break;
                                     }
@@ -619,7 +619,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnOK;
@@ -630,7 +630,7 @@ namespace Contensive.Core.Models.Complex {
         //       returns a comma delimited list of ContentIDs that the Member can author
         //===========================================================================
         //
-        public static List<int> getEditableCdefIdList(coreController cpcore) {
+        public static List<int> getEditableCdefIdList(coreController core) {
             List<int> returnList = new List<int>();
             try {
                 string SQL = null;
@@ -645,22 +645,22 @@ namespace Contensive.Core.Models.Complex {
                 + " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)"
                 + " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)"
                 + " WHERE"
-                    + " (ccMemberRules.MemberID=" + cpcore.doc.sessionContext.user.id + ")"
+                    + " (ccMemberRules.MemberID=" + core.doc.sessionContext.user.id + ")"
                     + " AND(ccGroupRules.Active<>0)"
                     + " AND(ccContent.Active<>0)"
                     + " AND(ccMemberRules.Active<>0)";
-                cidDataTable = cpcore.db.executeQuery(SQL);
+                cidDataTable = core.db.executeQuery(SQL);
                 CIDCount = cidDataTable.Rows.Count;
                 for (CIDPointer = 0; CIDPointer < CIDCount; CIDPointer++) {
                     ContentID = genericController.encodeInteger(cidDataTable.Rows[CIDPointer][0]);
                     returnList.Add(ContentID);
-                    CDef = getCdef(cpcore, ContentID);
+                    CDef = getCdef(core, ContentID);
                     if (CDef != null) {
-                        returnList.AddRange(CDef.get_childIdList(cpcore));
+                        returnList.AddRange(CDef.get_childIdList(core));
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnList;
@@ -673,7 +673,7 @@ namespace Contensive.Core.Models.Complex {
         //   If child already exists, add any missing fields from parent
         //=============================================================================
         //
-        public static void createContentChild(coreController cpcore, string ChildContentName, string ParentContentName, int MemberID) {
+        public static void createContentChild(coreController core, string ChildContentName, string ParentContentName, int MemberID) {
             try {
                 string DataSourceName = "";
                 string SQL = null;
@@ -688,28 +688,28 @@ namespace Contensive.Core.Models.Complex {
                 DateTime DateNow;
                 //
                 DateNow = DateTime.MinValue;
-                SQL = "select ID from ccContent where name=" + cpcore.db.encodeSQLText(ChildContentName) + ";";
-                rs = cpcore.db.executeQuery(SQL);
+                SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ChildContentName) + ";";
+                rs = core.db.executeQuery(SQL);
                 if (isDataTableOk(rs)) {
-                    ChildContentID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                    ChildContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                     //
                     // mark the record touched so upgrade will not delete it
                     //
-                    cpcore.db.executeQuery("update ccContent set CreateKey=0 where ID=" + ChildContentID);
+                    core.db.executeQuery("update ccContent set CreateKey=0 where ID=" + ChildContentID);
                 }
                 closeDataTable(rs);
                 if (ChildContentID == 0) {
                     //
                     // Get ContentID of parent
                     //
-                    SQL = "select ID from ccContent where name=" + cpcore.db.encodeSQLText(ParentContentName) + ";";
-                    rs = cpcore.db.executeQuery(SQL, DataSourceName);
+                    SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ParentContentName) + ";";
+                    rs = core.db.executeQuery(SQL, DataSourceName);
                     if (isDataTableOk(rs)) {
-                        ParentContentID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                        ParentContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                         //
                         // mark the record touched so upgrade will not delete it
                         //
-                        cpcore.db.executeQuery("update ccContent set CreateKey=0 where ID=" + ParentContentID);
+                        core.db.executeQuery("update ccContent set CreateKey=0 where ID=" + ParentContentID);
                     }
                     closeDataTable(rs);
                     //
@@ -720,16 +720,16 @@ namespace Contensive.Core.Models.Complex {
                         // ----- create child content record, let the csv_ExecuteSQL reload CDef
                         //
                         DataSourceName = "Default";
-                        CSContent = cpcore.db.cs_openContentRecord("Content", ParentContentID);
-                        if (!cpcore.db.csOk(CSContent)) {
+                        CSContent = core.db.cs_openContentRecord("Content", ParentContentID);
+                        if (!core.db.csOk(CSContent)) {
                             throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] was not found."));
                         } else {
-                            SelectFieldList = cpcore.db.cs_getSelectFieldList(CSContent);
+                            SelectFieldList = core.db.cs_getSelectFieldList(CSContent);
                             if (string.IsNullOrEmpty(SelectFieldList)) {
                                 throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] record has not fields."));
                             } else {
-                                CSNew = cpcore.db.csInsertRecord("Content", 0);
-                                if (!cpcore.db.csOk(CSNew)) {
+                                CSNew = core.db.csInsertRecord("Content", 0);
+                                if (!core.db.csOk(CSNew)) {
                                     throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because there was an error creating a new record in ccContent."));
                                 } else {
                                     Fields = SelectFieldList.Split(',');
@@ -741,45 +741,45 @@ namespace Contensive.Core.Models.Complex {
                                                 // do nothing
                                                 break;
                                             case "NAME":
-                                                cpcore.db.csSet(CSNew, FieldName, ChildContentName);
+                                                core.db.csSet(CSNew, FieldName, ChildContentName);
                                                 break;
                                             case "PARENTID":
-                                                cpcore.db.csSet(CSNew, FieldName, cpcore.db.csGetText(CSContent, "ID"));
+                                                core.db.csSet(CSNew, FieldName, core.db.csGetText(CSContent, "ID"));
                                                 break;
                                             case "CREATEDBY":
                                             case "MODIFIEDBY":
-                                                cpcore.db.csSet(CSNew, FieldName, MemberID);
+                                                core.db.csSet(CSNew, FieldName, MemberID);
                                                 break;
                                             case "DATEADDED":
                                             case "MODIFIEDDATE":
-                                                cpcore.db.csSet(CSNew, FieldName, DateNow);
+                                                core.db.csSet(CSNew, FieldName, DateNow);
                                                 break;
                                             case "CCGUID":
 
                                                 //
                                                 // new, non-blank guid so if this cdef is exported, it will be updateable
                                                 //
-                                                cpcore.db.csSet(CSNew, FieldName, createGuid());
+                                                core.db.csSet(CSNew, FieldName, createGuid());
                                                 break;
                                             default:
-                                                cpcore.db.csSet(CSNew, FieldName, cpcore.db.csGetText(CSContent, FieldName));
+                                                core.db.csSet(CSNew, FieldName, core.db.csGetText(CSContent, FieldName));
                                                 break;
                                         }
                                     }
                                 }
-                                cpcore.db.csClose(ref CSNew);
+                                core.db.csClose(ref CSNew);
                             }
                         }
-                        cpcore.db.csClose(ref CSContent);
+                        core.db.csClose(ref CSContent);
                     }
                 }
                 //
                 // ----- Load CDef
                 //
-                cpcore.cache.invalidateAll();
-                cpcore.doc.clearMetaData();
+                core.cache.invalidateAll();
+                core.doc.clearMetaData();
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
             }
         }
         //
@@ -787,17 +787,17 @@ namespace Contensive.Core.Models.Complex {
         // Get a Contents Tablename from the ContentPointer
         //========================================================================
         //
-        public static string getContentTablename(coreController cpcore, string ContentName) {
+        public static string getContentTablename(coreController core, string ContentName) {
             string returnTableName = "";
             try {
                 Models.Complex.cdefModel CDef;
                 //
-                CDef = Models.Complex.cdefModel.getCdef(cpcore, ContentName);
+                CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                 if (CDef != null) {
                     returnTableName = CDef.ContentTableName;
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnTableName;
@@ -806,19 +806,19 @@ namespace Contensive.Core.Models.Complex {
         //========================================================================
         // ----- Get a DataSource Name from its ContentName
         //
-        public static string getContentDataSource(coreController cpcore, string ContentName) {
+        public static string getContentDataSource(coreController core, string ContentName) {
             string returnDataSource = "";
             try {
                 Models.Complex.cdefModel CDef;
                 //
-                CDef = Models.Complex.cdefModel.getCdef(cpcore, ContentName);
+                CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                 if (CDef == null) {
                     //
                 } else {
                     returnDataSource = CDef.ContentDataSourceName;
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnDataSource;
@@ -829,17 +829,17 @@ namespace Contensive.Core.Models.Complex {
         //   Bad ContentID returns blank
         //========================================================================
         //
-        public static string getContentNameByID(coreController cpcore, int ContentID) {
+        public static string getContentNameByID(coreController core, int ContentID) {
             string returnName = "";
             try {
                 Models.Complex.cdefModel cdef;
                 //
-                cdef = Models.Complex.cdefModel.getCdef(cpcore, ContentID);
+                cdef = Models.Complex.cdefModel.getCdef(core, ContentID);
                 if (cdef != null) {
                     returnName = cdef.Name;
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnName;
@@ -850,7 +850,7 @@ namespace Contensive.Core.Models.Complex {
         //       called from upgrade and DeveloperTools
         //========================================================================
         //
-        public static int addContent(coreController cpcore, bool Active, dataSourceModel datasource, string TableName, string contentName, bool AdminOnly = false, bool DeveloperOnly = false, bool AllowAdd = true, bool AllowDelete = true, string ParentName = "", string DefaultSortMethod = "", string DropDownFieldList = "", bool AllowWorkflowAuthoring = false, bool AllowCalendarEvents = false, bool AllowContentTracking = false, bool AllowTopicRules = false, bool AllowContentChildTool = false, bool ignore1 = false, string IconLink = "", int IconWidth = 0, int IconHeight = 0, int IconSprites = 0, string ccGuid = "", bool IsBaseContent = false, string installedByCollectionGuid = "", bool clearMetaCache = false) {
+        public static int addContent(coreController core, bool Active, dataSourceModel datasource, string TableName, string contentName, bool AdminOnly = false, bool DeveloperOnly = false, bool AllowAdd = true, bool AllowDelete = true, string ParentName = "", string DefaultSortMethod = "", string DropDownFieldList = "", bool AllowWorkflowAuthoring = false, bool AllowCalendarEvents = false, bool AllowContentTracking = false, bool AllowTopicRules = false, bool AllowContentChildTool = false, bool ignore1 = false, string IconLink = "", int IconWidth = 0, int IconHeight = 0, int IconSprites = 0, string ccGuid = "", bool IsBaseContent = false, string installedByCollectionGuid = "", bool clearMetaCache = false) {
             int returnContentId = 0;
             try {
                 //
@@ -879,7 +879,7 @@ namespace Contensive.Core.Models.Complex {
                         //
                         // Create the SQL table
                         //
-                        cpcore.db.createSQLTable(datasource.Name, TableName);
+                        core.db.createSQLTable(datasource.Name, TableName);
                         //
                         // Check for a Content Definition
                         //
@@ -890,8 +890,8 @@ namespace Contensive.Core.Models.Complex {
                         //
                         // get contentId, guid, IsBaseContent
                         //
-                        SQL = "select ID,ccguid,IsBaseContent from ccContent where (name=" + cpcore.db.encodeSQLText(contentName) + ") order by id;";
-                        dt = cpcore.db.executeQuery(SQL);
+                        SQL = "select ID,ccguid,IsBaseContent from ccContent where (name=" + core.db.encodeSQLText(contentName) + ") order by id;";
+                        dt = core.db.executeQuery(SQL);
                         if (dt.Rows.Count > 0) {
                             returnContentId = genericController.encodeInteger(dt.Rows[0]["ID"]);
                             LcContentGuid = genericController.vbLCase(genericController.encodeText(dt.Rows[0]["ccguid"]));
@@ -906,7 +906,7 @@ namespace Contensive.Core.Models.Complex {
                             ContentIDofContent = returnContentId;
                         } else {
                             SQL = "select ID from ccContent where (name='content') order by id;";
-                            dt = cpcore.db.executeQuery(SQL);
+                            dt = core.db.executeQuery(SQL);
                             if (dt.Rows.Count > 0) {
                                 ContentIDofContent = genericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
@@ -916,8 +916,8 @@ namespace Contensive.Core.Models.Complex {
                         // get parentId
                         //
                         if (!string.IsNullOrEmpty(ParentName)) {
-                            SQL = "select id from ccContent where (name=" + cpcore.db.encodeSQLText(ParentName) + ") order by id;";
-                            dt = cpcore.db.executeQuery(SQL);
+                            SQL = "select id from ccContent where (name=" + core.db.encodeSQLText(ParentName) + ") order by id;";
+                            dt = core.db.executeQuery(SQL);
                             if (dt.Rows.Count > 0) {
                                 parentId = genericController.encodeInteger(dt.Rows[0][0]);
                             }
@@ -928,8 +928,8 @@ namespace Contensive.Core.Models.Complex {
                         //
                         InstalledByCollectionID = 0;
                         if (!string.IsNullOrEmpty(installedByCollectionGuid)) {
-                            SQL = "select id from ccAddonCollections where ccGuid=" + cpcore.db.encodeSQLText(installedByCollectionGuid);
-                            dt = cpcore.db.executeQuery(SQL);
+                            SQL = "select id from ccAddonCollections where ccGuid=" + core.db.encodeSQLText(installedByCollectionGuid);
+                            dt = core.db.executeQuery(SQL);
                             if (dt.Rows.Count > 0) {
                                 InstalledByCollectionID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
@@ -945,13 +945,13 @@ namespace Contensive.Core.Models.Complex {
                                 //
                                 // ----- Create a new empty Content Record (to get ContentID)
                                 //
-                                returnContentId = cpcore.db.insertTableRecordGetId("Default", "ccContent", SystemMemberID);
+                                returnContentId = core.db.insertTableRecordGetId("Default", "ccContent", SystemMemberID);
                             }
                             //
                             // ----- Get the Table Definition ID, create one if missing
                             //
-                            SQL = "SELECT ID from ccTables where (active<>0) and (name=" + cpcore.db.encodeSQLText(TableName) + ");";
-                            dt = cpcore.db.executeQuery(SQL);
+                            SQL = "SELECT ID from ccTables where (active<>0) and (name=" + core.db.encodeSQLText(TableName) + ");";
+                            dt = core.db.executeQuery(SQL);
                             if (dt.Rows.Count <= 0) {
                                 //
                                 // ----- no table definition found, create one
@@ -961,20 +961,20 @@ namespace Contensive.Core.Models.Complex {
                                 //ElseIf DataSourceName = "" Then
                                 //    DataSourceID = -1
                                 //Else
-                                //    DataSourceID = cpCore.db.getDataSourceId(DataSourceName)
+                                //    DataSourceID = core.db.getDataSourceId(DataSourceName)
                                 //    If DataSourceID = -1 Then
                                 //        throw (New ApplicationException("Could not find DataSource [" & DataSourceName & "] for table [" & TableName & "]"))
                                 //    End If
                                 //End If
-                                TableID = cpcore.db.insertTableRecordGetId("Default", "ccTables", SystemMemberID);
+                                TableID = core.db.insertTableRecordGetId("Default", "ccTables", SystemMemberID);
                                 //
                                 sqlList = new sqlFieldListClass();
-                                sqlList.add("name", cpcore.db.encodeSQLText(TableName));
+                                sqlList.add("name", core.db.encodeSQLText(TableName));
                                 sqlList.add("active", SQLTrue);
-                                sqlList.add("DATASOURCEID", cpcore.db.encodeSQLNumber(datasource.ID));
-                                sqlList.add("CONTENTCONTROLID", cpcore.db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(cpcore, "Tables")));
+                                sqlList.add("DATASOURCEID", core.db.encodeSQLNumber(datasource.ID));
+                                sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(core, "Tables")));
                                 //
-                                cpcore.db.updateTableRecord("Default", "ccTables", "ID=" + TableID, sqlList);
+                                core.db.updateTableRecord("Default", "ccTables", "ID=" + TableID, sqlList);
                             } else {
                                 TableID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
@@ -988,7 +988,7 @@ namespace Contensive.Core.Models.Complex {
                             if (string.IsNullOrEmpty(iDefaultSortMethod)) {
                                 DefaultSortMethodID = 0;
                             } else {
-                                dt = cpcore.db.openTable("Default", "ccSortMethods", "(name=" + cpcore.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
+                                dt = core.db.openTable("Default", "ccSortMethods", "(name=" + core.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
                                 if (dt.Rows.Count > 0) {
                                     DefaultSortMethodID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                                 }
@@ -997,7 +997,7 @@ namespace Contensive.Core.Models.Complex {
                                 //
                                 // fallback - maybe they put the orderbyclause in (common mistake)
                                 //
-                                dt = cpcore.db.openTable("Default", "ccSortMethods", "(OrderByClause=" + cpcore.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
+                                dt = core.db.openTable("Default", "ccSortMethods", "(OrderByClause=" + core.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
                                 if (dt.Rows.Count > 0) {
                                     DefaultSortMethodID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                                 }
@@ -1010,46 +1010,46 @@ namespace Contensive.Core.Models.Complex {
                             // ----- update record
                             //
                             sqlList = new sqlFieldListClass();
-                            sqlList.add("name", cpcore.db.encodeSQLText(contentName));
+                            sqlList.add("name", core.db.encodeSQLText(contentName));
                             sqlList.add("CREATEKEY", "0");
-                            sqlList.add("active", cpcore.db.encodeSQLBoolean(Active));
-                            sqlList.add("ContentControlID", cpcore.db.encodeSQLNumber(ContentIDofContent));
-                            sqlList.add("AllowAdd", cpcore.db.encodeSQLBoolean(AllowAdd));
-                            sqlList.add("AllowDelete", cpcore.db.encodeSQLBoolean(AllowDelete));
-                            sqlList.add("AllowWorkflowAuthoring", cpcore.db.encodeSQLBoolean(AllowWorkflowAuthoring));
-                            sqlList.add("DeveloperOnly", cpcore.db.encodeSQLBoolean(DeveloperOnly));
-                            sqlList.add("AdminOnly", cpcore.db.encodeSQLBoolean(AdminOnly));
-                            sqlList.add("ParentID", cpcore.db.encodeSQLNumber(parentId));
-                            sqlList.add("DefaultSortMethodID", cpcore.db.encodeSQLNumber(DefaultSortMethodID));
-                            sqlList.add("DropDownFieldList", cpcore.db.encodeSQLText(encodeEmptyText(DropDownFieldList, "Name")));
-                            sqlList.add("ContentTableID", cpcore.db.encodeSQLNumber(TableID));
-                            sqlList.add("AuthoringTableID", cpcore.db.encodeSQLNumber(TableID));
-                            sqlList.add("ModifiedDate", cpcore.db.encodeSQLDate(DateTime.Now));
-                            sqlList.add("CreatedBy", cpcore.db.encodeSQLNumber(SystemMemberID));
-                            sqlList.add("ModifiedBy", cpcore.db.encodeSQLNumber(SystemMemberID));
-                            sqlList.add("AllowCalendarEvents", cpcore.db.encodeSQLBoolean(AllowCalendarEvents));
-                            sqlList.add("AllowContentTracking", cpcore.db.encodeSQLBoolean(AllowContentTracking));
-                            sqlList.add("AllowTopicRules", cpcore.db.encodeSQLBoolean(AllowTopicRules));
-                            sqlList.add("AllowContentChildTool", cpcore.db.encodeSQLBoolean(AllowContentChildTool));
-                            //Call sqlList.add("AllowMetaContent", cpCore.db.encodeSQLBoolean(ignore1))
-                            sqlList.add("IconLink", cpcore.db.encodeSQLText(encodeEmptyText(IconLink, "")));
-                            sqlList.add("IconHeight", cpcore.db.encodeSQLNumber(IconHeight));
-                            sqlList.add("IconWidth", cpcore.db.encodeSQLNumber(IconWidth));
-                            sqlList.add("IconSprites", cpcore.db.encodeSQLNumber(IconSprites));
-                            sqlList.add("installedByCollectionid", cpcore.db.encodeSQLNumber(InstalledByCollectionID));
+                            sqlList.add("active", core.db.encodeSQLBoolean(Active));
+                            sqlList.add("ContentControlID", core.db.encodeSQLNumber(ContentIDofContent));
+                            sqlList.add("AllowAdd", core.db.encodeSQLBoolean(AllowAdd));
+                            sqlList.add("AllowDelete", core.db.encodeSQLBoolean(AllowDelete));
+                            sqlList.add("AllowWorkflowAuthoring", core.db.encodeSQLBoolean(AllowWorkflowAuthoring));
+                            sqlList.add("DeveloperOnly", core.db.encodeSQLBoolean(DeveloperOnly));
+                            sqlList.add("AdminOnly", core.db.encodeSQLBoolean(AdminOnly));
+                            sqlList.add("ParentID", core.db.encodeSQLNumber(parentId));
+                            sqlList.add("DefaultSortMethodID", core.db.encodeSQLNumber(DefaultSortMethodID));
+                            sqlList.add("DropDownFieldList", core.db.encodeSQLText(encodeEmptyText(DropDownFieldList, "Name")));
+                            sqlList.add("ContentTableID", core.db.encodeSQLNumber(TableID));
+                            sqlList.add("AuthoringTableID", core.db.encodeSQLNumber(TableID));
+                            sqlList.add("ModifiedDate", core.db.encodeSQLDate(DateTime.Now));
+                            sqlList.add("CreatedBy", core.db.encodeSQLNumber(SystemMemberID));
+                            sqlList.add("ModifiedBy", core.db.encodeSQLNumber(SystemMemberID));
+                            sqlList.add("AllowCalendarEvents", core.db.encodeSQLBoolean(AllowCalendarEvents));
+                            sqlList.add("AllowContentTracking", core.db.encodeSQLBoolean(AllowContentTracking));
+                            sqlList.add("AllowTopicRules", core.db.encodeSQLBoolean(AllowTopicRules));
+                            sqlList.add("AllowContentChildTool", core.db.encodeSQLBoolean(AllowContentChildTool));
+                            //Call sqlList.add("AllowMetaContent", core.db.encodeSQLBoolean(ignore1))
+                            sqlList.add("IconLink", core.db.encodeSQLText(encodeEmptyText(IconLink, "")));
+                            sqlList.add("IconHeight", core.db.encodeSQLNumber(IconHeight));
+                            sqlList.add("IconWidth", core.db.encodeSQLNumber(IconWidth));
+                            sqlList.add("IconSprites", core.db.encodeSQLNumber(IconSprites));
+                            sqlList.add("installedByCollectionid", core.db.encodeSQLNumber(InstalledByCollectionID));
                             if ((string.IsNullOrEmpty(LcContentGuid)) && (!string.IsNullOrEmpty(NewGuid))) {
                                 //
                                 // hard one - only update guid if the tables supports it, and it the new guid is not blank
                                 // if the new guid does no match te old guid
                                 //
-                                sqlList.add("ccGuid", cpcore.db.encodeSQLText(NewGuid));
+                                sqlList.add("ccGuid", core.db.encodeSQLText(NewGuid));
                             } else if ((!string.IsNullOrEmpty(NewGuid)) & (LcContentGuid != genericController.vbLCase(NewGuid))) {
                                 //
                                 // installing content definition with matching name, but different guid -- this is an error that needs to be fixed
                                 //
-                                cpcore.handleException(new ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" + contentName + "], newGuid [" + NewGuid + "], installedGuid [" + LcContentGuid + "] "));
+                                core.handleException(new ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" + contentName + "], newGuid [" + NewGuid + "], installedGuid [" + LcContentGuid + "] "));
                             }
-                            cpcore.db.updateTableRecord("Default", "ccContent", "ID=" + returnContentId, sqlList);
+                            core.db.updateTableRecord("Default", "ccContent", "ID=" + returnContentId, sqlList);
                             //
                             //-----------------------------------------------------------------------------------------------
                             // Verify Core Content Definition Fields
@@ -1059,7 +1059,7 @@ namespace Contensive.Core.Models.Complex {
                                 //
                                 // CDef does not inherit its fields, create what is needed for a non-inherited CDef
                                 //
-                                if (!cpcore.db.isCdefField(returnContentId, "ID")) {
+                                if (!core.db.isCdefField(returnContentId, "ID")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "id";
                                     field.active = true;
@@ -1069,10 +1069,10 @@ namespace Contensive.Core.Models.Complex {
                                     field.caption = "ID";
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
                                 //
-                                if (!cpcore.db.isCdefField(returnContentId, "name")) {
+                                if (!core.db.isCdefField(returnContentId, "name")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "name";
                                     field.active = true;
@@ -1082,10 +1082,10 @@ namespace Contensive.Core.Models.Complex {
                                     field.caption = "Name";
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
                                 //
-                                if (!cpcore.db.isCdefField(returnContentId, "active")) {
+                                if (!core.db.isCdefField(returnContentId, "active")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "active";
                                     field.active = true;
@@ -1095,10 +1095,10 @@ namespace Contensive.Core.Models.Complex {
                                     field.caption = "Active";
                                     field.defaultValue = "1";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
                                 //
-                                if (!cpcore.db.isCdefField(returnContentId, "sortorder")) {
+                                if (!core.db.isCdefField(returnContentId, "sortorder")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "sortorder";
                                     field.active = true;
@@ -1108,10 +1108,10 @@ namespace Contensive.Core.Models.Complex {
                                     field.caption = "Alpha Sort Order";
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
                                 //
-                                if (!cpcore.db.isCdefField(returnContentId, "dateadded")) {
+                                if (!core.db.isCdefField(returnContentId, "dateadded")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "dateadded";
                                     field.active = true;
@@ -1121,9 +1121,9 @@ namespace Contensive.Core.Models.Complex {
                                     field.caption = "Date Added";
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
-                                if (!cpcore.db.isCdefField(returnContentId, "createdby")) {
+                                if (!core.db.isCdefField(returnContentId, "createdby")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "createdby";
                                     field.active = true;
@@ -1131,12 +1131,12 @@ namespace Contensive.Core.Models.Complex {
                                     field.editSortPriority = 9999;
                                     field.authorable = false;
                                     field.caption = "Created By";
-                                    field.set_lookupContentName(cpcore, "People");
+                                    field.set_lookupContentName(core, "People");
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
-                                if (!cpcore.db.isCdefField(returnContentId, "modifieddate")) {
+                                if (!core.db.isCdefField(returnContentId, "modifieddate")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "modifieddate";
                                     field.active = true;
@@ -1146,9 +1146,9 @@ namespace Contensive.Core.Models.Complex {
                                     field.caption = "Date Modified";
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
-                                if (!cpcore.db.isCdefField(returnContentId, "modifiedby")) {
+                                if (!core.db.isCdefField(returnContentId, "modifiedby")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "modifiedby";
                                     field.active = true;
@@ -1156,12 +1156,12 @@ namespace Contensive.Core.Models.Complex {
                                     field.editSortPriority = 9999;
                                     field.authorable = false;
                                     field.caption = "Modified By";
-                                    field.set_lookupContentName(cpcore, "People");
+                                    field.set_lookupContentName(core, "People");
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
-                                if (!cpcore.db.isCdefField(returnContentId, "ContentControlId")) {
+                                if (!core.db.isCdefField(returnContentId, "ContentControlId")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "contentcontrolid";
                                     field.active = true;
@@ -1169,12 +1169,12 @@ namespace Contensive.Core.Models.Complex {
                                     field.editSortPriority = 9999;
                                     field.authorable = false;
                                     field.caption = "Controlling Content";
-                                    field.set_lookupContentName(cpcore, "Content");
+                                    field.set_lookupContentName(core, "Content");
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
-                                if (!cpcore.db.isCdefField(returnContentId, "CreateKey")) {
+                                if (!core.db.isCdefField(returnContentId, "CreateKey")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "createkey";
                                     field.active = true;
@@ -1184,9 +1184,9 @@ namespace Contensive.Core.Models.Complex {
                                     field.caption = "Create Key";
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
-                                if (!cpcore.db.isCdefField(returnContentId, "ccGuid")) {
+                                if (!core.db.isCdefField(returnContentId, "ccGuid")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "ccguid";
                                     field.active = true;
@@ -1196,10 +1196,10 @@ namespace Contensive.Core.Models.Complex {
                                     field.caption = "Guid";
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
                                 // -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
-                                if (!cpcore.db.isCdefField(returnContentId, "ContentCategoryId")) {
+                                if (!core.db.isCdefField(returnContentId, "ContentCategoryId")) {
                                     field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "contentcategoryid";
                                     field.active = true;
@@ -1209,22 +1209,22 @@ namespace Contensive.Core.Models.Complex {
                                     field.caption = "Content Category";
                                     field.defaultValue = "";
                                     field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(cpcore, contentName, field);
+                                    verifyCDefField_ReturnID(core, contentName, field);
                                 }
                             }
                             //
                             // ----- Load CDef
                             //
                             if (clearMetaCache) {
-                                cpcore.cache.invalidateAllInContent(Models.DbModels.contentModel.contentName.ToLower());
-                                cpcore.cache.invalidateAllInContent(Models.DbModels.contentFieldModel.contentName.ToLower());
-                                cpcore.doc.clearMetaData();
+                                core.cache.invalidateAllInContent(Models.DbModels.contentModel.contentName.ToLower());
+                                core.cache.invalidateAllInContent(Models.DbModels.contentFieldModel.contentName.ToLower());
+                                core.doc.clearMetaData();
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnContentId;
@@ -1239,7 +1239,7 @@ namespace Contensive.Core.Models.Complex {
         //
         // ====================================================================================================================
         //
-        public static int verifyCDefField_ReturnID(coreController cpcore, string ContentName, Models.Complex.cdefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
+        public static int verifyCDefField_ReturnID(coreController core, string ContentName, Models.Complex.cdefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
         {
             int returnId = 0;
             try {
@@ -1302,23 +1302,23 @@ namespace Contensive.Core.Models.Complex {
                 //
                 ContentID = -1;
                 TableID = 0;
-                SQL = "select ID,ContentTableID from ccContent where name=" + cpcore.db.encodeSQLText(ContentName) + ";";
-                rs = cpcore.db.executeQuery(SQL);
+                SQL = "select ID,ContentTableID from ccContent where name=" + core.db.encodeSQLText(ContentName) + ";";
+                rs = core.db.executeQuery(SQL);
                 if (isDataTableOk(rs)) {
-                    ContentID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                    TableID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
+                    ContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                    TableID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
                 }
                 //
                 // test if field definition found or not
                 //
                 RecordID = 0;
                 RecordIsBaseField = false;
-                SQL = "select ID,IsBaseField from ccFields where (ContentID=" + cpcore.db.encodeSQLNumber(ContentID) + ")and(name=" + cpcore.db.encodeSQLText(field.nameLc) + ");";
-                rs = cpcore.db.executeQuery(SQL);
+                SQL = "select ID,IsBaseField from ccFields where (ContentID=" + core.db.encodeSQLNumber(ContentID) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ");";
+                rs = core.db.executeQuery(SQL);
                 if (isDataTableOk(rs)) {
                     isNewFieldRecord = false;
-                    RecordID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                    RecordIsBaseField = genericController.encodeBoolean(cpcore.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
+                    RecordID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                    RecordIsBaseField = genericController.encodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
                 }
                 //
                 // check if this is a non-base field updating a base field
@@ -1328,7 +1328,7 @@ namespace Contensive.Core.Models.Complex {
                     //
                     // This update is not allowed
                     //
-                    cpcore.handleException(new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
+                    core.handleException(new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
                 }
                 if (true) {
                     //FieldAdminOnly = field.adminOnly
@@ -1340,10 +1340,10 @@ namespace Contensive.Core.Models.Complex {
                     FieldAuthorable = field.authorable;
                     DefaultValue = genericController.encodeText(field.defaultValue);
                     NotEditable = field.notEditable;
-                    LookupContentName = field.get_lookupContentName(cpcore);
+                    LookupContentName = field.get_lookupContentName(core);
                     AdminIndexWidth = field.indexWidth;
                     AdminIndexSort = field.indexSortOrder;
-                    RedirectContentName = field.get_RedirectContentName(cpcore);
+                    RedirectContentName = field.get_RedirectContentName(core);
                     RedirectIDField = field.redirectID;
                     RedirectPath = field.redirectPath;
                     HTMLContent = field.htmlContent;
@@ -1352,7 +1352,7 @@ namespace Contensive.Core.Models.Complex {
                     FieldRequired = field.required;
                     RSSTitle = field.RSSTitleField;
                     RSSDescription = field.RSSDescriptionField;
-                    MemberSelectGroupID = field.memberSelectGroupId_get( cpcore );
+                    MemberSelectGroupID = field.memberSelectGroupId_get( core );
                     installedByCollectionGuid = field.installedByCollectionGuid;
                     EditTab = field.editTabName;
                     Scramble = field.Scramble;
@@ -1380,12 +1380,12 @@ namespace Contensive.Core.Models.Complex {
                         // Get the TableName and DataSourceID
                         //
                         TableName = "";
-                        rs = cpcore.db.executeQuery("Select Name, DataSourceID from ccTables where ID=" + cpcore.db.encodeSQLNumber(TableID) + ";");
+                        rs = core.db.executeQuery("Select Name, DataSourceID from ccTables where ID=" + core.db.encodeSQLNumber(TableID) + ";");
                         if (!isDataTableOk(rs)) {
                             throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because table For tableID [" + TableID + "] was Not found."));
                         } else {
-                            DataSourceID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
-                            TableName = genericController.encodeText(cpcore.db.getDataRowColumnName(rs.Rows[0], "Name"));
+                            DataSourceID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
+                            TableName = genericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
                         }
                         rs.Dispose();
                         if (!string.IsNullOrEmpty(TableName)) {
@@ -1395,7 +1395,7 @@ namespace Contensive.Core.Models.Complex {
                             if (DataSourceID < 1) {
                                 DataSourceName = "Default";
                             } else {
-                                rs = cpcore.db.executeQuery("Select Name from ccDataSources where ID=" + cpcore.db.encodeSQLNumber(DataSourceID) + ";");
+                                rs = core.db.executeQuery("Select Name from ccDataSources where ID=" + core.db.encodeSQLNumber(DataSourceID) + ";");
                                 if (!isDataTableOk(rs)) {
 
                                     DataSourceName = "Default";
@@ -1404,7 +1404,7 @@ namespace Contensive.Core.Models.Complex {
                                     // resulting datasource does not have this data, then other errors will be generated anyway.
                                     //Call csv_HandleClassInternalError(MethodName, "Could Not create Field [" & field.name & "] because datasource For ID [" & DataSourceID & "] was Not found.")
                                 } else {
-                                    DataSourceName = genericController.encodeText(cpcore.db.getDataRowColumnName(rs.Rows[0], "Name"));
+                                    DataSourceName = genericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
                                 }
                                 rs.Dispose();
                             }
@@ -1413,9 +1413,9 @@ namespace Contensive.Core.Models.Complex {
                             //
                             InstalledByCollectionID = 0;
                             if (!string.IsNullOrEmpty(installedByCollectionGuid)) {
-                                rs = cpcore.db.executeQuery("Select id from ccAddonCollections where ccguid=" + cpcore.db.encodeSQLText(installedByCollectionGuid) + ";");
+                                rs = core.db.executeQuery("Select id from ccAddonCollections where ccguid=" + core.db.encodeSQLText(installedByCollectionGuid) + ";");
                                 if (isDataTableOk(rs)) {
-                                    InstalledByCollectionID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "Id"));
+                                    InstalledByCollectionID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "Id"));
                                 }
                                 rs.Dispose();
                             }
@@ -1434,43 +1434,43 @@ namespace Contensive.Core.Models.Complex {
                                 //
                                 // All other fields
                                 //
-                                cpcore.db.createSQLTableField(DataSourceName, TableName, field.nameLc, fieldTypeId);
+                                core.db.createSQLTableField(DataSourceName, TableName, field.nameLc, fieldTypeId);
                             }
                             //
                             // create or update the field
                             //
                             sqlFieldListClass sqlList = new sqlFieldListClass();
-                            sqlList.add("ACTIVE", cpcore.db.encodeSQLBoolean(field.active)); // Pointer)
-                            sqlList.add("MODIFIEDBY", cpcore.db.encodeSQLNumber(SystemMemberID)); // Pointer)
-                            sqlList.add("MODIFIEDDATE", cpcore.db.encodeSQLDate(DateTime.Now)); // Pointer)
-                            sqlList.add("TYPE", cpcore.db.encodeSQLNumber(fieldTypeId)); // Pointer)
-                            sqlList.add("CAPTION", cpcore.db.encodeSQLText(FieldCaption)); // Pointer)
-                            sqlList.add("ReadOnly", cpcore.db.encodeSQLBoolean(FieldReadOnly)); // Pointer)
-                            sqlList.add("REQUIRED", cpcore.db.encodeSQLBoolean(FieldRequired)); // Pointer)
+                            sqlList.add("ACTIVE", core.db.encodeSQLBoolean(field.active)); // Pointer)
+                            sqlList.add("MODIFIEDBY", core.db.encodeSQLNumber(SystemMemberID)); // Pointer)
+                            sqlList.add("MODIFIEDDATE", core.db.encodeSQLDate(DateTime.Now)); // Pointer)
+                            sqlList.add("TYPE", core.db.encodeSQLNumber(fieldTypeId)); // Pointer)
+                            sqlList.add("CAPTION", core.db.encodeSQLText(FieldCaption)); // Pointer)
+                            sqlList.add("ReadOnly", core.db.encodeSQLBoolean(FieldReadOnly)); // Pointer)
+                            sqlList.add("REQUIRED", core.db.encodeSQLBoolean(FieldRequired)); // Pointer)
                             sqlList.add("TEXTBUFFERED", SQLFalse); // Pointer)
-                            sqlList.add("PASSWORD", cpcore.db.encodeSQLBoolean(Password)); // Pointer)
-                            sqlList.add("EDITSORTPRIORITY", cpcore.db.encodeSQLNumber(field.editSortPriority)); // Pointer)
-                            sqlList.add("ADMINONLY", cpcore.db.encodeSQLBoolean(field.adminOnly)); // Pointer)
-                            sqlList.add("DEVELOPERONLY", cpcore.db.encodeSQLBoolean(FieldDeveloperOnly)); // Pointer)
-                            sqlList.add("CONTENTCONTROLID", cpcore.db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(cpcore, "Content Fields"))); // Pointer)
-                            sqlList.add("DefaultValue", cpcore.db.encodeSQLText(DefaultValue)); // Pointer)
-                            sqlList.add("HTMLCONTENT", cpcore.db.encodeSQLBoolean(HTMLContent)); // Pointer)
-                            sqlList.add("NOTEDITABLE", cpcore.db.encodeSQLBoolean(NotEditable)); // Pointer)
-                            sqlList.add("AUTHORABLE", cpcore.db.encodeSQLBoolean(FieldAuthorable)); // Pointer)
-                            sqlList.add("INDEXCOLUMN", cpcore.db.encodeSQLNumber(field.indexColumn)); // Pointer)
-                            sqlList.add("INDEXWIDTH", cpcore.db.encodeSQLText(AdminIndexWidth)); // Pointer)
-                            sqlList.add("INDEXSORTPRIORITY", cpcore.db.encodeSQLNumber(AdminIndexSort)); // Pointer)
-                            sqlList.add("REDIRECTID", cpcore.db.encodeSQLText(RedirectIDField)); // Pointer)
-                            sqlList.add("REDIRECTPATH", cpcore.db.encodeSQLText(RedirectPath)); // Pointer)
-                            sqlList.add("UNIQUENAME", cpcore.db.encodeSQLBoolean(UniqueName)); // Pointer)
-                            sqlList.add("RSSTITLEFIELD", cpcore.db.encodeSQLBoolean(RSSTitle)); // Pointer)
-                            sqlList.add("RSSDESCRIPTIONFIELD", cpcore.db.encodeSQLBoolean(RSSDescription)); // Pointer)
-                            sqlList.add("MEMBERSELECTGROUPID", cpcore.db.encodeSQLNumber(MemberSelectGroupID)); // Pointer)
-                            sqlList.add("installedByCollectionId", cpcore.db.encodeSQLNumber(InstalledByCollectionID)); // Pointer)
-                            sqlList.add("EDITTAB", cpcore.db.encodeSQLText(EditTab)); // Pointer)
-                            sqlList.add("SCRAMBLE", cpcore.db.encodeSQLBoolean(Scramble)); // Pointer)
-                            sqlList.add("ISBASEFIELD", cpcore.db.encodeSQLBoolean(IsBaseField)); // Pointer)
-                            sqlList.add("LOOKUPLIST", cpcore.db.encodeSQLText(LookupList));
+                            sqlList.add("PASSWORD", core.db.encodeSQLBoolean(Password)); // Pointer)
+                            sqlList.add("EDITSORTPRIORITY", core.db.encodeSQLNumber(field.editSortPriority)); // Pointer)
+                            sqlList.add("ADMINONLY", core.db.encodeSQLBoolean(field.adminOnly)); // Pointer)
+                            sqlList.add("DEVELOPERONLY", core.db.encodeSQLBoolean(FieldDeveloperOnly)); // Pointer)
+                            sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(core, "Content Fields"))); // Pointer)
+                            sqlList.add("DefaultValue", core.db.encodeSQLText(DefaultValue)); // Pointer)
+                            sqlList.add("HTMLCONTENT", core.db.encodeSQLBoolean(HTMLContent)); // Pointer)
+                            sqlList.add("NOTEDITABLE", core.db.encodeSQLBoolean(NotEditable)); // Pointer)
+                            sqlList.add("AUTHORABLE", core.db.encodeSQLBoolean(FieldAuthorable)); // Pointer)
+                            sqlList.add("INDEXCOLUMN", core.db.encodeSQLNumber(field.indexColumn)); // Pointer)
+                            sqlList.add("INDEXWIDTH", core.db.encodeSQLText(AdminIndexWidth)); // Pointer)
+                            sqlList.add("INDEXSORTPRIORITY", core.db.encodeSQLNumber(AdminIndexSort)); // Pointer)
+                            sqlList.add("REDIRECTID", core.db.encodeSQLText(RedirectIDField)); // Pointer)
+                            sqlList.add("REDIRECTPATH", core.db.encodeSQLText(RedirectPath)); // Pointer)
+                            sqlList.add("UNIQUENAME", core.db.encodeSQLBoolean(UniqueName)); // Pointer)
+                            sqlList.add("RSSTITLEFIELD", core.db.encodeSQLBoolean(RSSTitle)); // Pointer)
+                            sqlList.add("RSSDESCRIPTIONFIELD", core.db.encodeSQLBoolean(RSSDescription)); // Pointer)
+                            sqlList.add("MEMBERSELECTGROUPID", core.db.encodeSQLNumber(MemberSelectGroupID)); // Pointer)
+                            sqlList.add("installedByCollectionId", core.db.encodeSQLNumber(InstalledByCollectionID)); // Pointer)
+                            sqlList.add("EDITTAB", core.db.encodeSQLText(EditTab)); // Pointer)
+                            sqlList.add("SCRAMBLE", core.db.encodeSQLBoolean(Scramble)); // Pointer)
+                            sqlList.add("ISBASEFIELD", core.db.encodeSQLBoolean(IsBaseField)); // Pointer)
+                            sqlList.add("LOOKUPLIST", core.db.encodeSQLText(LookupList));
                             //
                             // -- conditional fields
                             switch (fieldTypeId) {
@@ -1479,63 +1479,63 @@ namespace Contensive.Core.Models.Complex {
                                     // -- lookup field
                                     //
                                     if (!string.IsNullOrEmpty(LookupContentName)) {
-                                        LookupContentID = Models.Complex.cdefModel.getContentId(cpcore, LookupContentName);
+                                        LookupContentID = Models.Complex.cdefModel.getContentId(core, LookupContentName);
                                         if (LookupContentID <= 0) {
-                                            logController.appendLog(cpcore, "Could not create lookup field [" + field.nameLc + "] for content definition [" + ContentName + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
+                                            logController.appendLog(core, "Could not create lookup field [" + field.nameLc + "] for content definition [" + ContentName + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
                                         }
                                     }
-                                    sqlList.add("LOOKUPCONTENTID", cpcore.db.encodeSQLNumber(LookupContentID)); // Pointer)
+                                    sqlList.add("LOOKUPCONTENTID", core.db.encodeSQLNumber(LookupContentID)); // Pointer)
                                     break;
                                 case FieldTypeIdManyToMany:
                                     //
                                     // -- many-to-many field
                                     //
-                                    string ManyToManyContent = field.get_ManyToManyContentName(cpcore);
+                                    string ManyToManyContent = field.get_ManyToManyContentName(core);
                                     if (!string.IsNullOrEmpty(ManyToManyContent)) {
-                                        int ManyToManyContentID = Models.Complex.cdefModel.getContentId(cpcore, ManyToManyContent);
+                                        int ManyToManyContentID = Models.Complex.cdefModel.getContentId(core, ManyToManyContent);
                                         if (ManyToManyContentID <= 0) {
-                                            logController.appendLog(cpcore, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
+                                            logController.appendLog(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
                                         }
-                                        sqlList.add("MANYTOMANYCONTENTID", cpcore.db.encodeSQLNumber(ManyToManyContentID));
+                                        sqlList.add("MANYTOMANYCONTENTID", core.db.encodeSQLNumber(ManyToManyContentID));
                                     }
                                     //
-                                    string ManyToManyRuleContent = field.get_ManyToManyRuleContentName(cpcore);
+                                    string ManyToManyRuleContent = field.get_ManyToManyRuleContentName(core);
                                     if (!string.IsNullOrEmpty(ManyToManyRuleContent)) {
-                                        int ManyToManyRuleContentID = Models.Complex.cdefModel.getContentId(cpcore, ManyToManyRuleContent);
+                                        int ManyToManyRuleContentID = Models.Complex.cdefModel.getContentId(core, ManyToManyRuleContent);
                                         if (ManyToManyRuleContentID <= 0) {
-                                            logController.appendLog(cpcore, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
+                                            logController.appendLog(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
                                         }
-                                        sqlList.add("MANYTOMANYRULECONTENTID", cpcore.db.encodeSQLNumber(ManyToManyRuleContentID));
+                                        sqlList.add("MANYTOMANYRULECONTENTID", core.db.encodeSQLNumber(ManyToManyRuleContentID));
                                     }
-                                    sqlList.add("MANYTOMANYRULEPRIMARYFIELD", cpcore.db.encodeSQLText(field.ManyToManyRulePrimaryField));
-                                    sqlList.add("MANYTOMANYRULESECONDARYFIELD", cpcore.db.encodeSQLText(field.ManyToManyRuleSecondaryField));
+                                    sqlList.add("MANYTOMANYRULEPRIMARYFIELD", core.db.encodeSQLText(field.ManyToManyRulePrimaryField));
+                                    sqlList.add("MANYTOMANYRULESECONDARYFIELD", core.db.encodeSQLText(field.ManyToManyRuleSecondaryField));
                                     break;
                                 case FieldTypeIdRedirect:
                                     //
                                     // -- redirect field
                                     if (!string.IsNullOrEmpty(RedirectContentName)) {
-                                        RedirectContentID = Models.Complex.cdefModel.getContentId(cpcore, RedirectContentName);
+                                        RedirectContentID = Models.Complex.cdefModel.getContentId(core, RedirectContentName);
                                         if (RedirectContentID <= 0) {
-                                            logController.appendLog(cpcore, "Could not create redirect field [" + field.nameLc + "] for Content Definition [" + ContentName + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
+                                            logController.appendLog(core, "Could not create redirect field [" + field.nameLc + "] for Content Definition [" + ContentName + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
                                         }
                                     }
-                                    sqlList.add("REDIRECTCONTENTID", cpcore.db.encodeSQLNumber(RedirectContentID)); // Pointer)
+                                    sqlList.add("REDIRECTCONTENTID", core.db.encodeSQLNumber(RedirectContentID)); // Pointer)
                                     break;
                             }
                             //
                             if (RecordID == 0) {
-                                sqlList.add("NAME", cpcore.db.encodeSQLText(field.nameLc)); // Pointer)
-                                sqlList.add("CONTENTID", cpcore.db.encodeSQLNumber(ContentID)); // Pointer)
+                                sqlList.add("NAME", core.db.encodeSQLText(field.nameLc)); // Pointer)
+                                sqlList.add("CONTENTID", core.db.encodeSQLNumber(ContentID)); // Pointer)
                                 sqlList.add("CREATEKEY", "0"); // Pointer)
-                                sqlList.add("DATEADDED", cpcore.db.encodeSQLDate(DateTime.Now)); // Pointer)
-                                sqlList.add("CREATEDBY", cpcore.db.encodeSQLNumber(SystemMemberID)); // Pointer)
+                                sqlList.add("DATEADDED", core.db.encodeSQLDate(DateTime.Now)); // Pointer)
+                                sqlList.add("CREATEDBY", core.db.encodeSQLNumber(SystemMemberID)); // Pointer)
                                                                                                      //
-                                RecordID = cpcore.db.insertTableRecordGetId("Default", "ccFields");
+                                RecordID = core.db.insertTableRecordGetId("Default", "ccFields");
                             }
                             if (RecordID == 0) {
                                 throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because insert into ccfields failed."));
                             } else {
-                                cpcore.db.updateTableRecord("Default", "ccFields", "ID=" + RecordID, sqlList);
+                                core.db.updateTableRecord("Default", "ccFields", "ID=" + RecordID, sqlList);
                             }
                             //
                         }
@@ -1543,13 +1543,13 @@ namespace Contensive.Core.Models.Complex {
                 }
                 //
                 if (!isNewFieldRecord) {
-                    cpcore.cache.invalidateAll();
-                    cpcore.doc.clearMetaData();
+                    core.cache.invalidateAll();
+                    core.doc.clearMetaData();
                 }
                 //
                 returnId = RecordID;
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnId;
@@ -1559,17 +1559,17 @@ namespace Contensive.Core.Models.Complex {
         //
         //=============================================================
         //
-        public static bool isContentFieldSupported(coreController cpcore, string ContentName, string FieldName) {
+        public static bool isContentFieldSupported(coreController core, string ContentName, string FieldName) {
             bool returnOk = false;
             try {
                 Models.Complex.cdefModel cdef;
                 //
-                cdef = Models.Complex.cdefModel.getCdef(cpcore, ContentName);
+                cdef = Models.Complex.cdefModel.getCdef(core, ContentName);
                 if (cdef != null) {
                     returnOk = cdef.fields.ContainsKey(FieldName.ToLower());
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnOk;
@@ -1579,7 +1579,7 @@ namespace Contensive.Core.Models.Complex {
         // Get a tables first ContentID from Tablename
         //========================================================================
         //
-        public static int getContentIDByTablename(coreController cpcore, string TableName) {
+        public static int getContentIDByTablename(coreController core, string TableName) {
             int tempgetContentIDByTablename = 0;
             //
             string SQL = null;
@@ -1588,19 +1588,19 @@ namespace Contensive.Core.Models.Complex {
             tempgetContentIDByTablename = -1;
             if (!string.IsNullOrEmpty(TableName)) {
                 SQL = "select ContentControlID from " + TableName + " where contentcontrolid is not null order by contentcontrolid;";
-                CS = cpcore.db.csOpenSql_rev("Default", SQL, 1, 1);
-                if (cpcore.db.csOk(CS)) {
-                    tempgetContentIDByTablename = cpcore.db.csGetInteger(CS, "ContentControlID");
+                CS = core.db.csOpenSql_rev("Default", SQL, 1, 1);
+                if (core.db.csOk(CS)) {
+                    tempgetContentIDByTablename = core.db.csGetInteger(CS, "ContentControlID");
                 }
-                cpcore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
             }
             return tempgetContentIDByTablename;
         }
         //
         //========================================================================
         //
-        public static string getContentControlCriteria(coreController cpcore, string ContentName) {
-            return Models.Complex.cdefModel.getCdef(cpcore, ContentName).ContentControlCriteria;
+        public static string getContentControlCriteria(coreController core, string ContentName) {
+            return Models.Complex.cdefModel.getCdef(core, ContentName).ContentControlCriteria;
         }
         //
         //============================================================================================================
@@ -1610,7 +1610,7 @@ namespace Contensive.Core.Models.Complex {
         //   read it first to main_Get the correct contentid
         //============================================================================================================
         //
-        public static void setContentControlId(coreController cpcore, int ContentID, int RecordID, int NewContentControlID, string UsedIDString = "") {
+        public static void setContentControlId(coreController core, int ContentID, int RecordID, int NewContentControlID, string UsedIDString = "") {
             string SQL = null;
             int CS = 0;
             string RecordTableName = null;
@@ -1621,39 +1621,39 @@ namespace Contensive.Core.Models.Complex {
             string DataSourceName = null;
             //
             if (!genericController.IsInDelimitedString(UsedIDString, RecordID.ToString(), ",")) {
-                ContentName = getContentNameByID(cpcore, ContentID);
-                CS = cpcore.db.csOpenRecord(ContentName, RecordID, false, false);
-                if (cpcore.db.csOk(CS)) {
-                    HasParentID = cpcore.db.cs_isFieldSupported(CS, "ParentID");
-                    RecordContentID = cpcore.db.csGetInteger(CS, "ContentControlID");
-                    RecordContentName = getContentNameByID(cpcore, RecordContentID);
+                ContentName = getContentNameByID(core, ContentID);
+                CS = core.db.csOpenRecord(ContentName, RecordID, false, false);
+                if (core.db.csOk(CS)) {
+                    HasParentID = core.db.cs_isFieldSupported(CS, "ParentID");
+                    RecordContentID = core.db.csGetInteger(CS, "ContentControlID");
+                    RecordContentName = getContentNameByID(core, RecordContentID);
                 }
-                cpcore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
                 if (!string.IsNullOrEmpty(RecordContentName)) {
                     //
                     //
                     //
-                    DataSourceName = getContentDataSource(cpcore, RecordContentName);
-                    RecordTableName = Models.Complex.cdefModel.getContentTablename(cpcore, RecordContentName);
+                    DataSourceName = getContentDataSource(core, RecordContentName);
+                    RecordTableName = Models.Complex.cdefModel.getContentTablename(core, RecordContentName);
                     //
                     // either Workflow on non-workflow - it changes everything
                     //
                     SQL = "update " + RecordTableName + " set ContentControlID=" + NewContentControlID + " where ID=" + RecordID;
-                    cpcore.db.executeQuery(SQL, DataSourceName);
+                    core.db.executeQuery(SQL, DataSourceName);
                     if (HasParentID) {
                         SQL = "select contentcontrolid,ID from " + RecordTableName + " where ParentID=" + RecordID;
-                        CS = cpcore.db.csOpenSql_rev(DataSourceName, SQL);
-                        while (cpcore.db.csOk(CS)) {
-                            setContentControlId(cpcore, cpcore.db.csGetInteger(CS, "contentcontrolid"), cpcore.db.csGetInteger(CS, "ID"), NewContentControlID, UsedIDString + "," + RecordID);
-                            cpcore.db.csGoNext(CS);
+                        CS = core.db.csOpenSql_rev(DataSourceName, SQL);
+                        while (core.db.csOk(CS)) {
+                            setContentControlId(core, core.db.csGetInteger(CS, "contentcontrolid"), core.db.csGetInteger(CS, "ID"), NewContentControlID, UsedIDString + "," + RecordID);
+                            core.db.csGoNext(CS);
                         }
-                        cpcore.db.csClose(ref CS);
+                        core.db.csClose(ref CS);
                     }
                     //
                     // fix content watch
                     //
                     SQL = "update ccContentWatch set ContentID=" + NewContentControlID + ", ContentRecordKey='" + NewContentControlID + "." + RecordID + "' where ContentID=" + ContentID + " and RecordID=" + RecordID;
-                    cpcore.db.executeQuery(SQL);
+                    core.db.executeQuery(SQL);
                 }
             }
         }
@@ -1662,10 +1662,10 @@ namespace Contensive.Core.Models.Complex {
         //
         //========================================================================
         //
-        public static string GetContentFieldProperty(coreController cpcore, string ContentName, string FieldName, string PropertyName) {
+        public static string GetContentFieldProperty(coreController core, string ContentName, string FieldName, string PropertyName) {
             string result = "";
             try {
-                cdefModel Contentdefinition = cdefModel.getCdef(cpcore, ContentName);
+                cdefModel Contentdefinition = cdefModel.getCdef(core, ContentName);
                 if ((string.IsNullOrEmpty(FieldName)) || (Contentdefinition.fields.Count < 1)) {
                     throw (new ApplicationException("Content Name [" + genericController.encodeText(ContentName) + "] or FieldName [" + FieldName + "] was not valid")); 
                 } else {
@@ -1705,7 +1705,7 @@ namespace Contensive.Core.Models.Complex {
                                     result = genericController.encodeText(field.defaultValue);
                                     break;
                                 case "MEMBERSELECTGROUPID":
-                                    result = field.memberSelectGroupId_get( cpcore ).ToString() ;
+                                    result = field.memberSelectGroupId_get( core ).ToString() ;
                                     break;
                                 default:
                                     break;
@@ -1715,7 +1715,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
 
@@ -1726,11 +1726,11 @@ namespace Contensive.Core.Models.Complex {
         //
         //========================================================================
         //
-        public static string GetContentProperty(coreController cpcore, string ContentName, string PropertyName) {
+        public static string GetContentProperty(coreController core, string ContentName, string PropertyName) {
             string result = "";
             Models.Complex.cdefModel Contentdefinition;
             //
-            Contentdefinition = Models.Complex.cdefModel.getCdef(cpcore, genericController.encodeText(ContentName));
+            Contentdefinition = Models.Complex.cdefModel.getCdef(core, genericController.encodeText(ContentName));
             switch (genericController.vbUCase(genericController.encodeText(PropertyName))) {
                 case "CONTENTCONTROLCRITERIA":
                     result = Contentdefinition.ContentControlCriteria;
@@ -1813,14 +1813,14 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        public static cdefModel getCache(coreController cpcore, int contentId) {
+        public static cdefModel getCache(coreController core, int contentId) {
             cdefModel result = null;
             try {
                 try {
                     string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
-                    result = cpcore.cache.getObject<Models.Complex.cdefModel>(cacheName);
+                    result = core.cache.getObject<Models.Complex.cdefModel>(cacheName);
                 } catch (Exception ex) {
-                    cpcore.handleException(ex);
+                    core.handleException(ex);
                 }
             } catch (Exception) {}
             return result;
@@ -1828,26 +1828,26 @@ namespace Contensive.Core.Models.Complex {
         //
         //====================================================================================================
         //
-        public static void setCache(coreController cpcore, int contentId, cdefModel cdef) {
+        public static void setCache(coreController core, int contentId, cdefModel cdef) {
             string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
             //
             // -- make it dependant on cacheNameInvalidateAll. If invalidated, all cdef will invalidate
             List<string> dependantList = new List<string>();
             dependantList.Add(cacheNameInvalidateAll);
-            cpcore.cache.setObject(cacheName, cdef, dependantList);
+            core.cache.setObject(cacheName, cdef, dependantList);
         }
         //
         //====================================================================================================
         //
-        public static void invalidateCache(coreController cpCore, int contentId) {
+        public static void invalidateCache(coreController core, int contentId) {
             string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
-            cpCore.cache.invalidate(cacheName);
+            core.cache.invalidate(cacheName);
         }
         //
         //====================================================================================================
         //
-        public static void invalidateCacheAll(coreController cpCore) {
-            cpCore.cache.invalidate(cacheNameInvalidateAll);
+        public static void invalidateCacheAll(coreController core) {
+            core.cache.invalidate(cacheNameInvalidateAll);
         }
     }
 }

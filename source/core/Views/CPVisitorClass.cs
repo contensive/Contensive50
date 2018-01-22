@@ -23,12 +23,12 @@ namespace Contensive.Core {
         public const string EventsId = "835C660E-92B5-4055-B620-64268319E31B";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         private CPClass cp;
         protected bool disposed = false;
         //
-        public CPVisitorClass(Contensive.Core.Controllers.coreController cpCoreObj, CPClass cpParent) : base() {
-            this.cpCore = cpCoreObj;
+        public CPVisitorClass(Contensive.Core.Controllers.coreController coreObj, CPClass cpParent) : base() {
+            this.core = coreObj;
             cp = cpParent;
         }
         //
@@ -42,7 +42,7 @@ namespace Contensive.Core {
                     // call .dispose for managed objects
                     //
                     cp = null;
-                    cpCore = null;
+                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -54,15 +54,15 @@ namespace Contensive.Core {
         public override bool ForceBrowserMobile
         {
             get {
-                return genericController.encodeBoolean(cpCore.doc.sessionContext.visitor.ForceBrowserMobile);
+                return genericController.encodeBoolean(core.doc.sessionContext.visitor.ForceBrowserMobile);
             }
         }
 
         public override string GetProperty(string PropertyName, string DefaultValue = "", int TargetVisitorId = 0) {
             if (TargetVisitorId == 0) {
-                return cpCore.visitorProperty.getText(PropertyName, DefaultValue);
+                return core.visitorProperty.getText(PropertyName, DefaultValue);
             } else {
-                return cpCore.visitorProperty.getText(PropertyName, DefaultValue, TargetVisitorId);
+                return core.visitorProperty.getText(PropertyName, DefaultValue, TargetVisitorId);
             }
         }
         //
@@ -109,29 +109,29 @@ namespace Contensive.Core {
         public override int Id
         {
             get {
-                return cpCore.doc.sessionContext.visitor.id;
+                return core.doc.sessionContext.visitor.id;
             }
         }
 
         public override bool IsNew //Inherits BaseClasses.CPVisitorBaseClass.IsNew
         {
             get {
-                return cpCore.doc.sessionContext.visit.VisitorNew;
+                return core.doc.sessionContext.visit.VisitorNew;
             }
         }
 
         public override void SetProperty(string PropertyName, string Value, int TargetVisitorid = 0) //Inherits BaseClasses.CPVisitorBaseClass.SetProperty
         {
             if (TargetVisitorid == 0) {
-                cpCore.visitorProperty.setProperty(PropertyName, Value);
+                core.visitorProperty.setProperty(PropertyName, Value);
             } else {
-                cpCore.visitorProperty.setProperty(PropertyName, Value, TargetVisitorid);
+                core.visitorProperty.setProperty(PropertyName, Value, TargetVisitorid);
             }
         }
 
         public override int UserId {
             get {
-                return cpCore.doc.sessionContext.visitor.MemberID;
+                return core.doc.sessionContext.visitor.MemberID;
             }
         }
         //

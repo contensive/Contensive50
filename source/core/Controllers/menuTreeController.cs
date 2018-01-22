@@ -73,7 +73,7 @@ namespace Contensive.Core.Controllers {
         //
         // ----- Local storage
         //
-        private coreController cpCore;
+        private coreController core;
         //
         // ----- Menu Entry storage
         //
@@ -90,10 +90,10 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <remarks></remarks>
-        public menuTreeController(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public menuTreeController(coreController core) : base() {
+            this.core = core;
             EntryIndexName = new keyPtrController();
             Microsoft.VisualBasic.VBMath.Randomize();
             MenuFlyoutNamePrefix = "id" + encodeText(encodeInteger(Math.Floor(encodeNumber(9999 * Microsoft.VisualBasic.VBMath.Rnd()))));
@@ -144,7 +144,7 @@ namespace Contensive.Core.Controllers {
                 return;
                 //
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception")); // Call HandleClassError("AddEntry", Err.Number, Err.Source, Err.Description)
@@ -253,7 +253,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -261,7 +261,7 @@ namespace Contensive.Core.Controllers {
         // Temp log file solution
         //
         private void AppendLog(string Message) {
-            logController.appendLog(cpCore, Message, "menuing");
+            logController.appendLog(core, Message, "menuing");
         }
         //
         //===============================================================================
@@ -288,7 +288,7 @@ namespace Contensive.Core.Controllers {
                 return null;
                 //
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception")); // Call HandleClassError("GetMenuTreeList", Err.Number, Err.Source, Err.Description)
@@ -355,7 +355,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -402,7 +402,7 @@ namespace Contensive.Core.Controllers {
         //                            If .Name = UcaseMenuName Then
         //                                Caption = .Caption
         //                                If .Link <> "" Then
-        //                                    Caption = "<a href=""" & cpcore.html.html_EncodeHTML(.Link) & """>" & Caption & "</a>"
+        //                                    Caption = "<a href=""" & core.html.html_EncodeHTML(.Link) & """>" & Caption & "</a>"
         //                                End If
         //                                UsedEntries = UsedEntries & "," & CStr(EntryPointer)
         //                                GetTree = "" _
@@ -475,11 +475,11 @@ namespace Contensive.Core.Controllers {
         //                        If (InStr(1, iUsedEntries & ",", "," & EntryPointer & ",") = 0) Then
         //                            Caption = .Caption
         //                            If .OnClick <> "" And .Link <> "" Then
-        //                                Caption = "<a href=""" & cpcore.html.html_EncodeHTML(.Link) & """ onClick=""" & .OnClick & """>" & Caption & "</a>"
+        //                                Caption = "<a href=""" & core.html.html_EncodeHTML(.Link) & """ onClick=""" & .OnClick & """>" & Caption & "</a>"
         //                            ElseIf .OnClick <> "" Then
         //                                Caption = "<a href=""#"" onClick=""" & .OnClick & """>" & Caption & "</a>"
         //                            ElseIf .Link <> "" Then
-        //                                Caption = "<a href=""" & cpcore.html.html_EncodeHTML(.Link) & """>" & Caption & "</a>"
+        //                                Caption = "<a href=""" & core.html.html_EncodeHTML(.Link) & """>" & Caption & "</a>"
         //                            Else
         //                                Caption = Caption
         //                            End If

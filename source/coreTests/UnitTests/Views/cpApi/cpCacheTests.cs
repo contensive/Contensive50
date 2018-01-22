@@ -4,6 +4,7 @@ using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static Contensive.Core.Tests.testConstants;
 
 namespace Contensive.Core.Tests.UnitTests.Views {
 
@@ -16,7 +17,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCache_LegacySaveRead() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             cp.core.siteProperties.setProperty("AllowBake", true);
             // act
             cp.Cache.Save("testString", "testValue");
@@ -32,7 +33,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCache_SetGet_integration() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             DateTime testDate = new DateTime(1990, 8, 7);
             cp.core.siteProperties.setProperty("AllowBake", true);
             // act
@@ -57,7 +58,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCache_InvalidateAll_integration() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             DateTime testDate = new DateTime(1990, 8, 7);
             cp.core.siteProperties.setProperty("AllowBake", true);
             // act
@@ -91,7 +92,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCache_InvalidateList_integration() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             cp.core.siteProperties.setProperty("AllowBake", true);
             DateTime testDate = new DateTime(1990, 8, 7);
             List<string> tagList = new List<string>();
@@ -131,7 +132,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCache_InvalidationOnEdit_integration() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             cp.core.siteProperties.setProperty("AllowBake", true);
             string contentName = "testContent" + cp.Utils.GetRandomInteger().ToString();
             try {
@@ -170,7 +171,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpCache_TagInvalidationString() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             cp.core.siteProperties.setProperty("AllowBake", true);
             // act
             cp.Cache.Save("keyA", "testValue", "a,b,c,d,e");

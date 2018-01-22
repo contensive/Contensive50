@@ -237,7 +237,6 @@
     <Compile Include="Views\CPUtilsClass.cs" />
     <Compile Include="Views\CPVisitClass.cs" />
     <Compile Include="Views\CPVisitorClass.cs" />
-    <Compile Include="Views\NumericHelper.cs" />
     <Compile Include="Views\mainCsvCompatibilityClass.cs" />
     <Compile Include="Models\Complex\cdefFieldModel.cs" />
     <Compile Include="Models\Complex\cdefModel.cs" />

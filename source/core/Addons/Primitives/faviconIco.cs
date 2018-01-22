@@ -27,19 +27,19 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
-                string Filename = cpCore.siteProperties.getText("FaviconFilename", "");
+                coreController core = processor.core;
+                string Filename = core.siteProperties.getText("FaviconFilename", "");
                 if (string.IsNullOrEmpty(Filename)) {
                     //
                     // no favicon, 404 the call
                     //
-                    cpCore.webServer.setResponseStatus("404 Not Found");
-                    cpCore.webServer.setResponseContentType("image/gif");
-                    cpCore.doc.continueProcessing = false;
+                    core.webServer.setResponseStatus("404 Not Found");
+                    core.webServer.setResponseContentType("image/gif");
+                    core.doc.continueProcessing = false;
                     return string.Empty;
                 } else {
-                    cpCore.doc.continueProcessing = false;
-                    return cpCore.webServer.redirect(genericController.getCdnFileLink(cpCore, Filename), "favicon request", false, false);
+                    core.doc.continueProcessing = false;
+                    return core.webServer.redirect(genericController.getCdnFileLink(core, Filename), "favicon request", false, false);
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

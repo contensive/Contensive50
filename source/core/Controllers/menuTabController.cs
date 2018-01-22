@@ -27,7 +27,7 @@ namespace Contensive.Core.Controllers {
         //
         // ----- objects passed in constructor, do not dispose
         //
-        private coreController cpCore;
+        private coreController core;
         //
         // ----- constants
         //
@@ -39,8 +39,8 @@ namespace Contensive.Core.Controllers {
         // ----- private globals
         //
         //
-        public menuTabController(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public menuTabController(coreController core) : base() {
+            this.core = core;
         }
         //
         private struct TabType {
@@ -73,7 +73,7 @@ namespace Contensive.Core.Controllers {
                 Tabs[TabsCnt].LiveBody = "";
                 TabsCnt = TabsCnt + 1;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -111,7 +111,7 @@ namespace Contensive.Core.Controllers {
                     TabEdgeStyle = "ccTabEdge";
                     result = result + "<table border=0 cellspacing=0 cellpadding=0><tr>";
                     for (TabPtr = 0; TabPtr < TabsCnt; TabPtr++) {
-                        TabID = "Tab" + encodeText(genericController.GetRandomInteger(cpCore));
+                        TabID = "Tab" + encodeText(genericController.GetRandomInteger(core));
                         TabStyle = Tabs[TabPtr].StylePrefix;
                         TabHitStyle = TabStyle + "Hit";
                         TabLinkStyle = TabStyle + "Link";
@@ -162,7 +162,7 @@ namespace Contensive.Core.Controllers {
                     TabsCnt = 0;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -182,7 +182,7 @@ namespace Contensive.Core.Controllers {
                 // code
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnValue;

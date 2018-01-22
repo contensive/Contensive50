@@ -20,7 +20,7 @@ namespace Contensive.Core.Controllers {
         // ----- global scope variables
         //
         private const string ApplicationNameLocal = "unknown";
-        private coreController cpCore;
+        private coreController core;
         //
         private const string ContentSelectList = ""
             + " id,name,active,adminonly,allowadd"
@@ -85,8 +85,8 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        public collectionXmlController(coreController cpCore) {
-            this.cpCore = cpCore;
+        public collectionXmlController(coreController core) {
+            this.core = core;
         }
         //
         //========================================================================
@@ -140,11 +140,11 @@ namespace Contensive.Core.Controllers {
                 int CFieldPtr = 0;
                 string appName;
                 //
-                appName = cpCore.serverConfig.appConfig.name;
+                appName = core.serverConfig.appConfig.name;
                 iContentName = ContentName;
                 if (!string.IsNullOrEmpty(iContentName)) {
-                    SQL = "select id from cccontent where name=" + cpCore.db.encodeSQLText(iContentName);
-                    dt = cpCore.db.executeQuery(SQL);
+                    SQL = "select id from cccontent where name=" + core.db.encodeSQLText(iContentName);
+                    dt = core.db.executeQuery(SQL);
                     if (dt.Rows.Count > 0) {
                         ContentID = genericController.encodeInteger(dt.Rows[0]["id"]);
                     }
@@ -158,8 +158,8 @@ namespace Contensive.Core.Controllers {
                     // Build table lookup
                     //
                     SQL = "select T.ID,T.Name as TableName,D.Name as DataSourceName from ccTables T Left Join ccDataSources D on D.ID=T.DataSourceID";
-                    dt = cpCore.db.executeQuery(SQL);
-                    Tables = cpCore.db.convertDataTabletoArray(dt);
+                    dt = core.db.executeQuery(SQL);
+                    Tables = core.db.convertDataTabletoArray(dt);
                     if (Tables == null) {
                         TableCnt = 0;
                     } else {
@@ -169,8 +169,8 @@ namespace Contensive.Core.Controllers {
                     // Build SortMethod lookup
                     //
                     SQL = "select ID,Name from ccSortMethods";
-                    dt = cpCore.db.executeQuery(SQL);
-                    Sorts = cpCore.db.convertDataTabletoArray(dt);
+                    dt = core.db.executeQuery(SQL);
+                    Sorts = core.db.convertDataTabletoArray(dt);
                     if (Sorts == null) {
                         SortCnt = 0;
                     } else {
@@ -180,8 +180,8 @@ namespace Contensive.Core.Controllers {
                     // Build SortMethod lookup
                     //
                     SQL = "select ID,Name from ccGroups";
-                    dt = cpCore.db.executeQuery(SQL);
-                    Groups = cpCore.db.convertDataTabletoArray(dt);
+                    dt = core.db.executeQuery(SQL);
+                    Groups = core.db.convertDataTabletoArray(dt);
                     if (Groups == null) {
                         GroupCnt = 0;
                     } else {
@@ -191,8 +191,8 @@ namespace Contensive.Core.Controllers {
                     // Build Content lookup
                     //
                     SQL = "select id,name from ccContent";
-                    dt = cpCore.db.executeQuery(SQL);
-                    Contents = cpCore.db.convertDataTabletoArray(dt);
+                    dt = core.db.executeQuery(SQL);
+                    Contents = core.db.convertDataTabletoArray(dt);
                     if (Contents == null) {
                         ContentCnt = 0;
                     } else {
@@ -216,8 +216,8 @@ namespace Contensive.Core.Controllers {
                         SQL += " and ((f.IsBaseField is null)or(f.IsBaseField=0))";
                     }
                     SQL += " order by f.contentid,f.id,h.id desc";
-                    dt = cpCore.db.executeQuery(SQL);
-                    CFields = cpCore.db.convertDataTabletoArray(dt);
+                    dt = core.db.executeQuery(SQL);
+                    CFields = core.db.convertDataTabletoArray(dt);
                     CFieldCnt = CFields.GetUpperBound(1) + 1;
                     //
                     // select the content
@@ -227,7 +227,7 @@ namespace Contensive.Core.Controllers {
                     } else {
                         SQL = "select " + ContentSelectList + " from ccContent where (name<>'')and(name is not null)and(contenttableid is not null)and(contentcontrolid is not null) order by id";
                     }
-                    dt = cpCore.db.executeQuery(SQL);
+                    dt = core.db.executeQuery(SQL);
                     //
                     // create output
                     //
@@ -333,7 +333,7 @@ namespace Contensive.Core.Controllers {
                             } else if ((FieldContentID == ContentID) && (fieldId != LastFieldID)) {
                                 if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
                                     sb.Append("\r\n\t\t<Field");
-                                    fieldType = cpCore.db.getFieldTypeNameFromFieldTypeId(encodeInteger(CFields[f_Type, CFieldPtr]));
+                                    fieldType = core.db.getFieldTypeNameFromFieldTypeId(encodeInteger(CFields[f_Type, CFieldPtr]));
                                     sb.Append(" Name=\"" + xmlValueText(FieldName) + "\"");
                                     sb.Append(" active=\"" + xmlValueBoolean(CFields[f_Active, CFieldPtr]) + "\"");
                                     sb.Append(" AdminOnly=\"" + xmlValueBoolean(CFields[f_AdminOnly, CFieldPtr]) + "\"");
@@ -387,7 +387,7 @@ namespace Contensive.Core.Controllers {
                                     RecordID = genericController.encodeInteger(CFields[f_MemberSelectGroupId, CFieldPtr]);
                                     RecordName = "";
                                     if (RecordID>0) {
-                                        RecordName = cpCore.db.getRecordName("groups", RecordID);
+                                        RecordName = core.db.getRecordName("groups", RecordID);
                                     }
                                     sb.Append(" MemberSelectGroup=\"" + xmlValueText(CFields[f_MemberSelectGroupId, CFieldPtr]) + "\"");
 
@@ -429,7 +429,7 @@ namespace Contensive.Core.Controllers {
                     tempGetXMLContentDefinition3 = "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + "\r\n</" + CollectionFileRootNode + ">";
                 }
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempGetXMLContentDefinition3;
         }
@@ -464,10 +464,10 @@ namespace Contensive.Core.Controllers {
         //    sb.append( "<ContensiveContent>" & vbCrLf)
         //    If ContentName <> "" Then
         //        Call sb.append("<CDef Name=""" & ContentName & """>" & vbCrLf)
-        //        CS = cpCore.csOpen(ContentName)
-        //        CSRows = cpCore.Csv_cs_getRows(CS)
+        //        CS = core.csOpen(ContentName)
+        //        CSRows = core.Csv_cs_getRows(CS)
         //        RowCount = UBound(CSRows, 2)
-        //        CSRowCaptions = cpCore.Csv_cs_getRowFields(CS)
+        //        CSRowCaptions = core.Csv_cs_getRowFields(CS)
         //        ColumnCount = UBound(CSRowCaptions)
         //        For RowPointer = 0 To RowCount - 1
         //            sb.append( "<CR>")
@@ -539,7 +539,7 @@ namespace Contensive.Core.Controllers {
         //        // ----- Error Trap
         //        //
         //    } catch( Exception ex ) {
-        //        cpCore.handleException(ex);
+        //        core.handleException(ex);
         //    }
         //    return tempGetXMLAttribute;
         //}
@@ -602,11 +602,11 @@ namespace Contensive.Core.Controllers {
         //    dim dt as datatable
         //    Dim appName As String
         //    '
-        //    appName = cpCore.appEnvironment.name
+        //    appName = core.appEnvironment.name
         //    GetContentNameByID = ""
-        //    RS = cpCore.app.executeSql("Default", "Select Name from ccContent where ID=" & encodeSQLNumber(ContentID))
+        //    RS = core.app.executeSql("Default", "Select Name from ccContent where ID=" & encodeSQLNumber(ContentID))
         //    If isDataTableOk(RS) Then
-        //        GetContentNameByID = cpCore.getDataRowColumnName(RS.rows(0), "Name")
+        //        GetContentNameByID = core.getDataRowColumnName(RS.rows(0), "Name")
         //        End If
         //    Call closeDataTable(RS)
         //    If (isDataTableOk(rs)) Then
@@ -632,16 +632,16 @@ namespace Contensive.Core.Controllers {
             string result = "";
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                string appName = cpCore.serverConfig.appConfig.name;
+                string appName = core.serverConfig.appConfig.name;
                 string SQL  = ""
                     + " select D.name as DataSourceName,T.name as TableName"
                     + " from cctables T left join ccDataSources d on D.ID=T.DataSourceID"
                     + " where t.active<>0";
-                int CS = cpCore.db.csOpenSql(SQL);
-                while (cpCore.db.csOk(CS)) {
-                    string DataSourceName = cpCore.db.csGetText(CS, "DataSourceName");
-                    string TableName = cpCore.db.csGetText(CS, "TableName");
-                    string IndexList = cpCore.db.getSQLIndexList(DataSourceName, TableName);
+                int CS = core.db.csOpenSql(SQL);
+                while (core.db.csOk(CS)) {
+                    string DataSourceName = core.db.csGetText(CS, "DataSourceName");
+                    string TableName = core.db.csGetText(CS, "TableName");
+                    string IndexList = core.db.getSQLIndexList(DataSourceName, TableName);
                     //
                     if (!string.IsNullOrEmpty(IndexList)) {
                         string[] ListRows = genericController.stringSplit(IndexList, "\r\n");
@@ -696,12 +696,12 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                     }
-                    cpCore.db.csGoNext(CS);
+                    core.db.csGoNext(CS);
                 }
-                cpCore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
                 result = sb.ToString();
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -713,11 +713,11 @@ namespace Contensive.Core.Controllers {
         private string GetXMLContentDefinition_AdminMenus() {
             string s = "";
             try {
-                string appName = cpCore.serverConfig.appConfig.name;
+                string appName = core.serverConfig.appConfig.name;
                 s = s + GetXMLContentDefinition_AdminMenus_MenuEntries();
                 s = s + GetXMLContentDefinition_AdminMenus_NavigatorEntries();
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return s;
         }
@@ -744,9 +744,9 @@ namespace Contensive.Core.Controllers {
                 //
                 // ****************************** if cdef not loaded, this fails
                 //
-                appName = cpCore.serverConfig.appConfig.name;
-                MenuContentID = cpCore.db.getRecordID("Content", cnNavigatorEntries);
-                dt = cpCore.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
+                appName = core.serverConfig.appConfig.name;
+                MenuContentID = core.db.getRecordID("Content", cnNavigatorEntries);
+                dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (dt.Rows.Count > 0) {
                     NavIconType = 0;
                     NavIconTitle = "";
@@ -778,7 +778,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = sb.ToString();
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -791,9 +791,9 @@ namespace Contensive.Core.Controllers {
             string result = "";
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                string appName = cpCore.serverConfig.appConfig.name;
-                int MenuContentID = cpCore.db.getRecordID("Content", cnNavigatorEntries);
-                DataTable rs = cpCore.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
+                string appName = core.serverConfig.appConfig.name;
+                int MenuContentID = core.db.getRecordID("Content", cnNavigatorEntries);
+                DataTable rs = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (isDataTableOk(rs)) {
                     if (true) {
                         foreach (DataRow dr in rs.Rows) {
@@ -815,7 +815,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = sb.ToString();
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -831,8 +831,8 @@ namespace Contensive.Core.Controllers {
         //        DataTable rs = null;
         //        string appName;
         //        //
-        //        appName = cpCore.serverConfig.appConfig.name;
-        //        rs = cpCore.db.executeQuery("select * from ccAggregateFunctions");
+        //        appName = core.serverConfig.appConfig.name;
+        //        rs = core.db.executeQuery("select * from ccAggregateFunctions");
         //        if (isDataTableOk(rs)) {
         //            if (true) {
         //                foreach (DataRow rsdr in rs.Rows) {
@@ -848,7 +848,7 @@ namespace Contensive.Core.Controllers {
         //            }
         //        }
         //    } catch( Exception ex ) {
-        //        cpCore.handleException(ex);
+        //        core.handleException(ex);
         //    }
         //    return sb.ToString();
         //}
@@ -872,15 +872,15 @@ namespace Contensive.Core.Controllers {
                 DataTable dt = null;
                 string appName;
                 //
-                appName = cpCore.serverConfig.appConfig.name;
+                appName = core.serverConfig.appConfig.name;
                 if (RecordID != 0 & !string.IsNullOrEmpty(TableName)) {
-                    dt = cpCore.db.executeQuery("select Name from " + TableName + " where ID=" + RecordID);
+                    dt = core.db.executeQuery("select Name from " + TableName + " where ID=" + RecordID);
                     if (dt.Rows.Count > 0) {
                         tempGetTableRecordName = dt.Rows[0][0].ToString();
                     }
                 }
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempGetTableRecordName;
         }
@@ -909,16 +909,16 @@ namespace Contensive.Core.Controllers {
                 string ParentSpace = "";
                 string appName;
                 //
-                appName = cpCore.serverConfig.appConfig.name;
+                appName = core.serverConfig.appConfig.name;
                 if (RecordID != 0) {
                     if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + RecordID + ",", 1) != 0) {
-                        logController.appendLog(cpCore, "getMenuNameSpace, Circular reference found in UsedIDString [" + UsedIDString + "] getting ccMenuEntries namespace for recordid [" + RecordID + "]");
+                        logController.appendLog(core, "getMenuNameSpace, Circular reference found in UsedIDString [" + UsedIDString + "] getting ccMenuEntries namespace for recordid [" + RecordID + "]");
                         tempgetMenuNameSpace = "";
                     } else {
                         UsedIDString = UsedIDString + "," + RecordID;
                         ParentID = 0;
                         if (RecordID != 0) {
-                            rs = cpCore.db.executeQuery("select Name,ParentID from ccMenuEntries where ID=" + RecordID);
+                            rs = core.db.executeQuery("select Name,ParentID from ccMenuEntries where ID=" + RecordID);
                             if (isDataTableOk(rs)) {
                                 ParentID = genericController.encodeInteger(rs.Rows[0]["ParentID"]);
                                 RecordName = genericController.encodeText(rs.Rows[0]["Name"]);
@@ -935,7 +935,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // circular reference
                                 //
-                                logController.appendLog(cpCore, "getMenuNameSpace, Circular reference found (ParentID=RecordID) getting ccMenuEntries namespace for recordid [" + RecordID + "]");
+                                logController.appendLog(core, "getMenuNameSpace, Circular reference found (ParentID=RecordID) getting ccMenuEntries namespace for recordid [" + RecordID + "]");
                                 tempgetMenuNameSpace = "";
                             } else {
                                 if (ParentID != 0) {
@@ -956,7 +956,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempgetMenuNameSpace;
         }

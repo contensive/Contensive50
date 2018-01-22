@@ -4,6 +4,7 @@ using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static Contensive.Core.Tests.testConstants;
 
 namespace Contensive.Core.Tests.UnitTests.Views {
     [TestClass()]
@@ -31,7 +32,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cp_ConstructorWithApp() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             // act
             bool clusterOK = cp.serverOk;
             bool appOK = cp.appOk;
@@ -48,7 +49,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cp_ExecuteAddontest() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             string addonName = "testAddon" + cp.Utils.GetRandomInteger().ToString();
             int recordId = 0;
@@ -86,7 +87,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cp_ExecuteRouteTest() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             string addonName = "testAddon" + cp.Utils.GetRandomInteger().ToString();
             int recordId = 0;

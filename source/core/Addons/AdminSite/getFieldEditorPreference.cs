@@ -28,7 +28,7 @@ namespace Contensive.Core.Addons.AdminSite {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
 
                 //
                 // When editing in admin site, if a field has multiple editors (addons as editors), you main_Get an icon
@@ -38,7 +38,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 string addonDefaultEditorName = "";
                 int addonDefaultEditorId = 0;
-                int fieldId = cpCore.docProperties.getInteger("fieldid");
+                int fieldId = core.docProperties.getInteger("fieldid");
                 //
                 // main_Get name of default editor
                 //
@@ -47,7 +47,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         + " from ccfields f left join ccAggregateFunctions a on a.id=f.editorAddonId"
                                         + " where"
                                         + " f.ID = " + fieldId + "";
-                DataTable dt = cpCore.db.executeQuery(Sql);
+                DataTable dt = core.db.executeQuery(Sql);
                 if (dt.Rows.Count > 0) {
                     foreach (DataRow rsDr in dt.Rows) {
                         addonDefaultEditorName = "&nbsp;(" + genericController.encodeText(rsDr["name"]) + ")";
@@ -56,8 +56,8 @@ namespace Contensive.Core.Addons.AdminSite {
                 }
                 //
                 string radioGroupName = "setEditorPreference" + fieldId;
-                int currentEditorAddonId = cpCore.docProperties.getInteger("currentEditorAddonId");
-                int submitFormId = cpCore.docProperties.getInteger("submitFormId");
+                int currentEditorAddonId = core.docProperties.getInteger("currentEditorAddonId");
+                int submitFormId = core.docProperties.getInteger("submitFormId");
                 Sql = "select f.name,c.name,r.addonid,a.name as addonName"
                                         + " from (((cccontent c"
                                         + " left join ccfields f on f.contentid=c.id)"
@@ -65,12 +65,12 @@ namespace Contensive.Core.Addons.AdminSite {
                                         + " left join ccAggregateFunctions a on a.id=r.AddonId)"
                                         + " where f.id=" + fieldId;
 
-                dt = cpCore.db.executeQuery(Sql);
+                dt = core.db.executeQuery(Sql);
                 if (dt.Rows.Count > 0) {
                     foreach (DataRow rsDr in dt.Rows) {
                         int addonId = genericController.encodeInteger(rsDr["addonid"]);
                         if ((addonId != 0) & (addonId != addonDefaultEditorId)) {
-                            result = result + "\r\n\t<div class=\"radioCon\">" + cpCore.html.inputRadio(radioGroupName, genericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + genericController.encodeText(rsDr["addonName"]) + "</div>";
+                            result = result + "\r\n\t<div class=\"radioCon\">" + core.html.inputRadio(radioGroupName, genericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + genericController.encodeText(rsDr["addonName"]) + "</div>";
                         }
 
                     }
@@ -89,7 +89,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 result = ""
                                         + "\r\n\t<h1>Editor Preference</h1>"
                                         + "\r\n\t<p>Select the editor you will use for this field. Select default if you want to use the current system default.</p>"
-                                        + "\r\n\t<div class=\"radioCon\">" + cpCore.html.inputRadio("setEditorPreference" + fieldId, "0", "0") + "&nbsp;Use Default Editor" + addonDefaultEditorName + "</div>"
+                                        + "\r\n\t<div class=\"radioCon\">" + core.html.inputRadio("setEditorPreference" + fieldId, "0", "0") + "&nbsp;Use Default Editor" + addonDefaultEditorName + "</div>"
                                         + "\r\n\t" + result + "\r\n\t<div class=\"buttonCon\">"
                                         + "\r\n\t<button type=\"button\" onclick=\"" + OnClick + "\">Select</button>"
                                         + "\r\n\t</div>"

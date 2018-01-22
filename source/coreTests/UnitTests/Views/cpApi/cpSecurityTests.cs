@@ -4,6 +4,7 @@ using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static Contensive.Core.Tests.testConstants;
 
 namespace Contensive.Core.Tests.UnitTests.Views {
     [TestClass]
@@ -15,7 +16,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod]
         public void Controllers_Security_EncryptDecrypt() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             int testNumber = 12345;
             DateTime testDate = new DateTime(1990, 8, 7);

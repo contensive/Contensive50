@@ -59,9 +59,9 @@ namespace Contensive.Core.Controllers {
         //            DotNetInstallPath = Microsoft.Win32.Registry.GetValue(keyName, "InstallRoot", "")
         //            If DotNetInstallPath = "" Then
         //                DotNetInstallPath = "C:\WINNT\Microsoft.NET\Framework\"
-        //                If Not cpCore.app.publicFiles.checkPath(DotNetInstallPath) Then
+        //                If Not core.app.publicFiles.checkPath(DotNetInstallPath) Then
         //                    DotNetInstallPath = "C:\Windows\Microsoft.NET\Framework\"
-        //                    If Not cpCore.app.publicFiles.checkPath(DotNetInstallPath) Then
+        //                    If Not core.app.publicFiles.checkPath(DotNetInstallPath) Then
         //                        DotNetInstallPath = ""
         //                    End If
         //                End If
@@ -71,11 +71,11 @@ namespace Contensive.Core.Controllers {
         //            Else
         //                RegAsmFound = True
         //                RegAsmFilename = DotNetInstallPath & "v2.0.50727\regasm.exe"
-        //                If Not cpCore.app.publicFiles.checkFile(RegAsmFilename) Then
+        //                If Not core.app.publicFiles.checkFile(RegAsmFilename) Then
         //                    RegAsmFilename = DotNetInstallPath & "v3.0\regasm.exe"
-        //                    If Not cpCore.app.publicFiles.checkFile(RegAsmFilename) Then
+        //                    If Not core.app.publicFiles.checkFile(RegAsmFilename) Then
         //                        RegAsmFilename = DotNetInstallPath & "v3.5\regasm.exe"
-        //                        If Not cpCore.app.publicFiles.checkFile(RegAsmFilename) Then
+        //                        If Not core.app.publicFiles.checkFile(RegAsmFilename) Then
         //                            RegAsmFound = False
         //                        End If
         //                    End If
@@ -98,12 +98,12 @@ namespace Contensive.Core.Controllers {
         //                        End If
         //                        LogFilename = getProgramFilesPath() & "\Logs\addoninstall\" & LogFilename & DayNumber & ".log"
         //                        Cmd = """" & RegAsmFilename & """ """ & FilePathFileName & """ /codebase"
-        //                        Call runProcess(cpCore, Cmd, , True)
+        //                        Call runProcess(core, Cmd, , True)
         //                    End If
         //                End If
         //            End If
 
-        //            'cpCore.AppendLog("dll" & ".SiteBuilderClass.RegisterDotnet called Regsvr32, called but the output could not be captured")
+        //            'core.AppendLog("dll" & ".SiteBuilderClass.RegisterDotnet called Regsvr32, called but the output could not be captured")
         //            '
         //            Exit Sub
         ////ErrorTrap:
@@ -126,7 +126,7 @@ namespace Contensive.Core.Controllers {
         //        '
         //        useIIS = False
         //        iisDefaultDoc = ""
-        //        Select Case cpCore.cluster.config.appPattern.ToLower
+        //        Select Case core.cluster.config.appPattern.ToLower
         //            Case "php"
         //                useIIS = True
         //                iisDefaultDoc = "index.php"
@@ -149,11 +149,11 @@ namespace Contensive.Core.Controllers {
         //        '
         //        cpNewApp = New CPClass(appName)
         //        builder = New builderClass(cpNewApp.core)
-        //        Call builder.upgrade(cpcore,cpcore,True)
+        //        Call builder.upgrade(core,core,True)
         //        Call cpNewApp.core.app.siteProperty_set(siteproperty_serverPageDefault_name, iisDefaultDoc)
         //        cpNewApp.Dispose()
         //    Catch ex As Exception
-        //        cpCore.handleException(ex);
+        //        core.handleException(ex);
         //    End Try
         //    Return returnOk
         //End Function
@@ -163,7 +163,7 @@ namespace Contensive.Core.Controllers {
         //       Returns nothing if all OK, else returns an error message
         //=============================================================================================================
         //
-        //Public Function importApp(cpCore As coreClass, ByVal siteName As String, ByVal IPAddress As String, ByVal DomainName As String, ByVal ODBCConnectionString As String, ByVal ContentFilesPath As String, ByVal WWWRootPath As String, ByVal defaultDoc As String, ByVal SMTPServer As String, ByVal AdminEmail As String) As String
+        //Public Function importApp(core As coreClass, ByVal siteName As String, ByVal IPAddress As String, ByVal DomainName As String, ByVal ODBCConnectionString As String, ByVal ContentFilesPath As String, ByVal WWWRootPath As String, ByVal defaultDoc As String, ByVal SMTPServer As String, ByVal AdminEmail As String) As String
         //    Dim returnMessage As String = ""
         //    Try
         //        If siteName = "" Then
@@ -217,11 +217,11 @@ namespace Contensive.Core.Controllers {
         //            '
         //            ' Rebuild IIS Server
         //            '
-        //            Call iisController.verifySite(cpCore, siteName, DomainName, "\", defaultDoc)
+        //            Call iisController.verifySite(core, siteName, DomainName, "\", defaultDoc)
         //            '
         //            ' Now wait here for site to start with upgrade
         //            '
-        //            Call upgrade(cpCore, False)
+        //            Call upgrade(core, False)
         //            returnMessage = ""
         //        End If
         //    Catch ex As Exception
@@ -235,7 +235,7 @@ namespace Contensive.Core.Controllers {
         //   Init()
         //========================================================================
         //
-        //Public shared Sub Init(appservicesObj As cpCoreClass)
+        //Public shared Sub Init(appservicesObj As coreClass)
         //    appservices = appservicesObj
         //    On Error GoTo ErrorTrap
         //    '
@@ -243,13 +243,13 @@ namespace Contensive.Core.Controllers {
         //    '
         //    MethodName = "Init"
         //    '
-        //    ApplicationNameLocal = cpcore.app.appEnvironment.name
+        //    ApplicationNameLocal = core.app.appEnvironment.name
         //    ClassInitialized = True
         //    '
         //    Exit Sub
         //    '
         ////ErrorTrap:
-        //    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "Init", True, False)
+        //    dim ex as new exception("todo"): Call HandleClassError(ex,core.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "Init", True, False)
         //End Sub
         //
         //=========================================================================
@@ -264,10 +264,10 @@ namespace Contensive.Core.Controllers {
         //End Sub
         //Public shared Sub upgrade(ByVal appName As String, ByVal clusterServices As clusterServicesClass, isNewSite As Boolean)
         //    Dim appservices As New appServicesClass(appName, clusterServices)
-        //    If Not cpcore.app.config.enabled Then
+        //    If Not core.app.config.enabled Then
         //        Call Upgrade2( isNewSite)
         //    Else
-        //        cpCore.AppendLog("Cannot upgrade until the site is disabled")
+        //        core.AppendLog("Cannot upgrade until the site is disabled")
         //    End If
         //End Sub
         //
@@ -275,51 +275,51 @@ namespace Contensive.Core.Controllers {
         // upgrade
         //=========================================================================
         //
-        public static void upgrade(coreController cpcore, bool isNewBuild) {
+        public static void upgrade(coreController core, bool isNewBuild) {
             try {
-                if (cpcore.doc.upgradeInProgress) {
+                if (core.doc.upgradeInProgress) {
                     // leftover from 4.1
                 } else {
-                    cpcore.doc.upgradeInProgress = true;
-                    string DataBuildVersion = cpcore.siteProperties.dataBuildVersion;
+                    core.doc.upgradeInProgress = true;
+                    string DataBuildVersion = core.siteProperties.dataBuildVersion;
                     List<string> nonCriticalErrorList = new List<string>();
                     //
                     // -- determine primary domain
-                    string primaryDomain = cpcore.serverConfig.appConfig.name;
-                    if (cpcore.serverConfig.appConfig.domainList.Count > 0) {
-                        primaryDomain = cpcore.serverConfig.appConfig.domainList[0];
+                    string primaryDomain = core.serverConfig.appConfig.name;
+                    if (core.serverConfig.appConfig.domainList.Count > 0) {
+                        primaryDomain = core.serverConfig.appConfig.domainList[0];
                     }
                     //
                     // -- Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods), then other basic system ops work, like site properties
-                    VerifyBasicTables(cpcore);
+                    VerifyBasicTables(core);
                     //
                     // -- verify base collection
-                    logController.appendLogInstall(cpcore, "Install base collection");
-                    collectionController.installBaseCollection(cpcore, isNewBuild,ref  nonCriticalErrorList);
+                    logController.appendLogInstall(core, "Install base collection");
+                    collectionController.installBaseCollection(core, isNewBuild,ref  nonCriticalErrorList);
                     //
                     // -- Update server config file
-                    logController.appendLogInstall(cpcore, "Update configuration file");
-                    if (!cpcore.serverConfig.appConfig.appStatus.Equals(Models.Context.serverConfigModel.appStatusEnum.OK)) {
-                        cpcore.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.appStatusEnum.OK;
-                        cpcore.serverConfig.saveObject(cpcore);
+                    logController.appendLogInstall(core, "Update configuration file");
+                    if (!core.serverConfig.appConfig.appStatus.Equals(Models.Context.serverConfigModel.appStatusEnum.OK)) {
+                        core.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.appStatusEnum.OK;
+                        core.serverConfig.saveObject(core);
                     }
                     //
                     // -- verify iis configuration
-                    logController.appendLogInstall(cpcore, "Verify iis configuration");
-                    Controllers.iisController.verifySite(cpcore, cpcore.serverConfig.appConfig.name, primaryDomain, cpcore.serverConfig.appConfig.appRootFilesPath, "default.aspx");
+                    logController.appendLogInstall(core, "Verify iis configuration");
+                    Controllers.iisController.verifySite(core, core.serverConfig.appConfig.name, primaryDomain, core.serverConfig.appConfig.appRootFilesPath, "default.aspx");
                     //
                     // -- verify root developer
-                    logController.appendLogInstall(cpcore, "verify developer user");
-                    var rootList = personModel.createList(cpcore, "(Developer<>0)");
+                    logController.appendLogInstall(core, "verify developer user");
+                    var rootList = personModel.createList(core, "(Developer<>0)");
                     if ( rootList.Count==0 ) {
-                        logController.appendLogInstall(cpcore, "verify root user, no developers found, adding root/contensive");
-                        var root = personModel.add(cpcore);
+                        logController.appendLogInstall(core, "verify root user, no developers found, adding root/contensive");
+                        var root = personModel.add(core);
                         root.name = "root";
                         root.FirstName = "root";
                         root.Username = "root";
                         root.Password = "contensive";
                         root.Developer = true;
-                        root.save(cpcore);
+                        root.save(core);
                     }
                     //
                     //---------------------------------------------------------------------
@@ -329,94 +329,94 @@ namespace Contensive.Core.Controllers {
                     if (isNewBuild) {
                         //
                         // -- Copy default styles into Template Styles
-                        //logController.appendLogInstall(cpcore, "New build, verify legacy styles");
-                        //cpcore.appRootFiles.copyFile("ccLib\\Config\\Styles.css", "Templates\\Styles.css", cpcore.cdnFiles);
+                        //logController.appendLogInstall(core, "New build, verify legacy styles");
+                        //core.appRootFiles.copyFile("ccLib\\Config\\Styles.css", "Templates\\Styles.css", core.cdnFiles);
                         //
                         // -- set build version so a scratch build will not go through data conversion
-                        DataBuildVersion = cpcore.codeVersion();
-                        cpcore.siteProperties.dataBuildVersion = cpcore.codeVersion();
+                        DataBuildVersion = core.codeVersion();
+                        core.siteProperties.dataBuildVersion = core.codeVersion();
                     }
                     //
                     //---------------------------------------------------------------------
                     // ----- Upgrade Database fields if not new
                     //---------------------------------------------------------------------
                     //
-                    if (string.CompareOrdinal(DataBuildVersion, cpcore.codeVersion()) < 0) {
+                    if (string.CompareOrdinal(DataBuildVersion, core.codeVersion()) < 0) {
                         //
                         // -- data updates
-                        logController.appendLogInstall(cpcore, "Run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + cpcore.codeVersion() + "]");
-                        Upgrade_Conversion(cpcore, DataBuildVersion);
+                        logController.appendLogInstall(core, "Run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + core.codeVersion() + "]");
+                        Upgrade_Conversion(core, DataBuildVersion);
                     }
                     //
                     //---------------------------------------------------------------------
                     // ----- Verify content
                     //---------------------------------------------------------------------
                     //
-                    logController.appendLogInstall(cpcore, "Verify records required");
+                    logController.appendLogInstall(core, "Verify records required");
                     //
                     // ##### menus are created in ccBase.xml, this just checks for dups
-                    VerifyAdminMenus(cpcore, DataBuildVersion);
-                    VerifyLanguageRecords(cpcore);
-                    VerifyCountries(cpcore);
-                    VerifyStates(cpcore);
-                    VerifyLibraryFolders(cpcore);
-                    VerifyLibraryFileTypes(cpcore);
-                    VerifyDefaultGroups(cpcore);
-                    VerifyScriptingRecords(cpcore);
+                    VerifyAdminMenus(core, DataBuildVersion);
+                    VerifyLanguageRecords(core);
+                    VerifyCountries(core);
+                    VerifyStates(core);
+                    VerifyLibraryFolders(core);
+                    VerifyLibraryFileTypes(core);
+                    VerifyDefaultGroups(core);
+                    VerifyScriptingRecords(core);
                     //
                     //---------------------------------------------------------------------
                     // ----- Set Default SitePropertyDefaults
                     //       must be after upgrade_conversion
                     //---------------------------------------------------------------------
                     //
-                    logController.appendLogInstall(cpcore, "Verify Site Properties");
+                    logController.appendLogInstall(core, "Verify Site Properties");
                     //
-                    cpcore.siteProperties.getText("AllowAutoHomeSectionOnce", genericController.encodeText(isNewBuild));
-                    cpcore.siteProperties.getText("AllowAutoLogin", "False");
-                    cpcore.siteProperties.getText("AllowBake", "True");
-                    cpcore.siteProperties.getText("AllowChildMenuHeadline", "True");
-                    cpcore.siteProperties.getText("AllowContentAutoLoad", "True");
-                    cpcore.siteProperties.getText("AllowContentSpider", "False");
-                    cpcore.siteProperties.getText("AllowContentWatchLinkUpdate", "True");
-                    cpcore.siteProperties.getText("AllowDuplicateUsernames", "False");
-                    cpcore.siteProperties.getText("ConvertContentText2HTML", "False");
-                    cpcore.siteProperties.getText("AllowMemberJoin", "False");
-                    cpcore.siteProperties.getText("AllowPasswordEmail", "True");
-                    cpcore.siteProperties.getText("AllowPathBlocking", "True");
-                    cpcore.siteProperties.getText("AllowPopupErrors", "True");
-                    cpcore.siteProperties.getText("AllowTestPointLogging", "False");
-                    cpcore.siteProperties.getText("AllowTestPointPrinting", "False");
-                    cpcore.siteProperties.getText("AllowTransactionLog", "False");
-                    cpcore.siteProperties.getText("AllowTrapEmail", "True");
-                    cpcore.siteProperties.getText("AllowTrapLog", "True");
-                    cpcore.siteProperties.getText("AllowWorkflowAuthoring", "False");
-                    cpcore.siteProperties.getText("ArchiveAllowFileClean", "False");
-                    cpcore.siteProperties.getText("ArchiveRecordAgeDays", "90");
-                    cpcore.siteProperties.getText("ArchiveTimeOfDay", "2:00:00 AM");
-                    cpcore.siteProperties.getText("BreadCrumbDelimiter", "&nbsp;&gt;&nbsp;");
-                    cpcore.siteProperties.getText("CalendarYearLimit", "1");
-                    cpcore.siteProperties.getText("ContentPageCompatibility21", "false");
-                    cpcore.siteProperties.getText("DefaultFormInputHTMLHeight", "500");
-                    cpcore.siteProperties.getText("DefaultFormInputTextHeight", "1");
-                    cpcore.siteProperties.getText("DefaultFormInputWidth", "60");
-                    cpcore.siteProperties.getText("EditLockTimeout", "5");
-                    cpcore.siteProperties.getText("EmailAdmin", "webmaster@" + cpcore.serverConfig.appConfig.domainList[0]);
-                    cpcore.siteProperties.getText("EmailFromAddress", "webmaster@" + cpcore.serverConfig.appConfig.domainList[0]);
-                    cpcore.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" + cpcore.serverConfig.appConfig.domainList[0]);
-                    cpcore.siteProperties.getText("Language", "English");
-                    cpcore.siteProperties.getText("PageContentMessageFooter", "Copyright " + cpcore.serverConfig.appConfig.domainList[0]);
-                    cpcore.siteProperties.getText("SelectFieldLimit", "4000");
-                    cpcore.siteProperties.getText("SelectFieldWidthLimit", "100");
-                    cpcore.siteProperties.getText("SMTPServer", "127.0.0.1");
-                    cpcore.siteProperties.getText("TextSearchEndTag", "<!-- TextSearchEnd -->");
-                    cpcore.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->");
-                    cpcore.siteProperties.getText("TrapEmail", "");
-                    cpcore.siteProperties.getText("TrapErrors", "0");
-                    addonModel defaultRouteAddon = addonModel.create(cpcore, cpcore.siteProperties.defaultRouteId);
+                    core.siteProperties.getText("AllowAutoHomeSectionOnce", genericController.encodeText(isNewBuild));
+                    core.siteProperties.getText("AllowAutoLogin", "False");
+                    core.siteProperties.getText("AllowBake", "True");
+                    core.siteProperties.getText("AllowChildMenuHeadline", "True");
+                    core.siteProperties.getText("AllowContentAutoLoad", "True");
+                    core.siteProperties.getText("AllowContentSpider", "False");
+                    core.siteProperties.getText("AllowContentWatchLinkUpdate", "True");
+                    core.siteProperties.getText("AllowDuplicateUsernames", "False");
+                    core.siteProperties.getText("ConvertContentText2HTML", "False");
+                    core.siteProperties.getText("AllowMemberJoin", "False");
+                    core.siteProperties.getText("AllowPasswordEmail", "True");
+                    core.siteProperties.getText("AllowPathBlocking", "True");
+                    core.siteProperties.getText("AllowPopupErrors", "True");
+                    core.siteProperties.getText("AllowTestPointLogging", "False");
+                    core.siteProperties.getText("AllowTestPointPrinting", "False");
+                    core.siteProperties.getText("AllowTransactionLog", "False");
+                    core.siteProperties.getText("AllowTrapEmail", "True");
+                    core.siteProperties.getText("AllowTrapLog", "True");
+                    core.siteProperties.getText("AllowWorkflowAuthoring", "False");
+                    core.siteProperties.getText("ArchiveAllowFileClean", "False");
+                    core.siteProperties.getText("ArchiveRecordAgeDays", "90");
+                    core.siteProperties.getText("ArchiveTimeOfDay", "2:00:00 AM");
+                    core.siteProperties.getText("BreadCrumbDelimiter", "&nbsp;&gt;&nbsp;");
+                    core.siteProperties.getText("CalendarYearLimit", "1");
+                    core.siteProperties.getText("ContentPageCompatibility21", "false");
+                    core.siteProperties.getText("DefaultFormInputHTMLHeight", "500");
+                    core.siteProperties.getText("DefaultFormInputTextHeight", "1");
+                    core.siteProperties.getText("DefaultFormInputWidth", "60");
+                    core.siteProperties.getText("EditLockTimeout", "5");
+                    core.siteProperties.getText("EmailAdmin", "webmaster@" + core.serverConfig.appConfig.domainList[0]);
+                    core.siteProperties.getText("EmailFromAddress", "webmaster@" + core.serverConfig.appConfig.domainList[0]);
+                    core.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" + core.serverConfig.appConfig.domainList[0]);
+                    core.siteProperties.getText("Language", "English");
+                    core.siteProperties.getText("PageContentMessageFooter", "Copyright " + core.serverConfig.appConfig.domainList[0]);
+                    core.siteProperties.getText("SelectFieldLimit", "4000");
+                    core.siteProperties.getText("SelectFieldWidthLimit", "100");
+                    core.siteProperties.getText("SMTPServer", "127.0.0.1");
+                    core.siteProperties.getText("TextSearchEndTag", "<!-- TextSearchEnd -->");
+                    core.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->");
+                    core.siteProperties.getText("TrapEmail", "");
+                    core.siteProperties.getText("TrapErrors", "0");
+                    addonModel defaultRouteAddon = addonModel.create(core, core.siteProperties.defaultRouteId);
                     if (defaultRouteAddon == null) {
-                        defaultRouteAddon = addonModel.create(cpcore, addonGuidPageManager);
+                        defaultRouteAddon = addonModel.create(core, addonGuidPageManager);
                         if (defaultRouteAddon != null) {
-                            cpcore.siteProperties.defaultRouteId = defaultRouteAddon.id;
+                            core.siteProperties.defaultRouteId = defaultRouteAddon.id;
                         }
                     }
                     //
@@ -424,39 +424,39 @@ namespace Contensive.Core.Controllers {
                     // ----- Changes that effect the web server or content files, not the Database
                     //---------------------------------------------------------------------
                     //
-                    int StyleSN = (cpcore.siteProperties.getInteger("StylesheetSerialNumber"));
+                    int StyleSN = (core.siteProperties.getInteger("StylesheetSerialNumber"));
                     if (StyleSN > 0) {
                         StyleSN += 1;
-                        cpcore.siteProperties.setProperty("StylesheetSerialNumber", StyleSN.ToString());
+                        core.siteProperties.setProperty("StylesheetSerialNumber", StyleSN.ToString());
                         // too lazy
-                        //Call cpcore.app.publicFiles.SaveFile(cpcore.app.genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), cpcore.app.csv_getStyleSheetProcessed)
-                        //Call cpcore.app.publicFiles.SaveFile(cpcore.app.genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css", cpcore.app.csv_getStyleSheetDefault)
+                        //Call core.app.publicFiles.SaveFile(core.app.genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), core.app.csv_getStyleSheetProcessed)
+                        //Call core.app.publicFiles.SaveFile(core.app.genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css", core.app.csv_getStyleSheetDefault)
                     }
                     //
                     // clear all cache
                     //
-                    cpcore.cache.invalidateAll();
+                    core.cache.invalidateAll();
                     //
                     if (isNewBuild) {
                         //
                         // -- primary domain
-                        domainModel domain = domainModel.createByName(cpcore, primaryDomain);
+                        domainModel domain = domainModel.createByName(core, primaryDomain);
                         if (domain == null) {
-                            domain = domainModel.add(cpcore);
+                            domain = domainModel.add(core);
                             domain.name = primaryDomain;
                         }
                         //
                         // -- Landing Page
-                        pageContentModel landingPage = pageContentModel.create(cpcore, DefaultLandingPageGuid);
+                        pageContentModel landingPage = pageContentModel.create(core, DefaultLandingPageGuid);
                         if (landingPage == null) {
-                            landingPage = pageContentModel.add(cpcore);
+                            landingPage = pageContentModel.add(core);
                             landingPage.ccguid = DefaultLandingPageGuid;
                         }
                         //
                         // -- default template
-                        pageTemplateModel defaultTemplate = pageTemplateModel.createByName(cpcore, "Default");
+                        pageTemplateModel defaultTemplate = pageTemplateModel.createByName(core, "Default");
                         if (defaultTemplate == null) {
-                            defaultTemplate = pageTemplateModel.add(cpcore);
+                            defaultTemplate = pageTemplateModel.add(core);
                             defaultTemplate.name = "Default";
                         }
                         domain.defaultTemplateId = defaultTemplate.id;
@@ -465,17 +465,17 @@ namespace Contensive.Core.Controllers {
                         domain.rootPageId = landingPage.id;
                         domain.typeId = (int) domainModel.domainTypeEnum.Normal;
                         domain.visited = false;
-                        domain.save(cpcore);
+                        domain.save(core);
                         //
                         landingPage.TemplateID = defaultTemplate.id;
                         landingPage.Copyfilename.content = constants.defaultLandingPageHtml;
-                        landingPage.save(cpcore);
+                        landingPage.save(core);
                         //
-                        defaultTemplate.bodyHTML = cpcore.appRootFiles.readFile(defaultTemplateHomeFilename);
-                        defaultTemplate.save(cpcore);
+                        defaultTemplate.bodyHTML = core.appRootFiles.readFile(defaultTemplateHomeFilename);
+                        defaultTemplate.save(core);
                         //
-                        if (cpcore.siteProperties.getInteger("LandingPageID", landingPage.id) == 0) {
-                            cpcore.siteProperties.setProperty("LandingPageID", landingPage.id);
+                        if (core.siteProperties.getInteger("LandingPageID", landingPage.id) == 0) {
+                            core.siteProperties.setProperty("LandingPageID", landingPage.id);
                         }
                     }
                     //
@@ -484,8 +484,8 @@ namespace Contensive.Core.Controllers {
                     //---------------------------------------------------------------------
                     //
                     if (true) {
-                        logController.appendLogInstall(cpcore, "Internal upgrade complete, set Buildversion to " + cpcore.codeVersion());
-                        cpcore.siteProperties.setProperty("BuildVersion", cpcore.codeVersion());
+                        logController.appendLogInstall(core, "Internal upgrade complete, set Buildversion to " + core.codeVersion());
+                        core.siteProperties.setProperty("BuildVersion", core.codeVersion());
                         //
                         //---------------------------------------------------------------------
                         // ----- Upgrade local collections
@@ -502,22 +502,22 @@ namespace Contensive.Core.Controllers {
                             string ErrorMessage = "";
                             bool IISResetRequired = false;
                             //RegisterList = ""
-                            logController.appendLogInstall(cpcore, "Upgrading All Local Collections to new server build.");
+                            logController.appendLogInstall(core, "Upgrading All Local Collections to new server build.");
                             string tmpString = "";
-                            bool UpgradeOK = collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpcore, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, ref  nonCriticalErrorList);
+                            bool UpgradeOK = collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, ref  nonCriticalErrorList);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
-                                throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             } else if (!UpgradeOK) {
-                                throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             }
                             //
                             //---------------------------------------------------------------------
                             // ----- Upgrade collections added during upgrade process
                             //---------------------------------------------------------------------
                             //
-                            //Call appendUpgradeLog(cpcore, "Installing Add-on Collections gathered during upgrade")
+                            //Call appendUpgradeLog(core, "Installing Add-on Collections gathered during upgrade")
                             //If InstallCollectionList = "" Then
-                            //    Call appendUpgradeLog(cpCore.app.config.name, MethodName, "No Add-on collections added during upgrade")
+                            //    Call appendUpgradeLog(core.app.config.name, MethodName, "No Add-on collections added during upgrade")
                             //Else
                             //    ErrorMessage = ""
                             //    Guids = Split(InstallCollectionList, ",")
@@ -533,7 +533,7 @@ namespace Contensive.Core.Controllers {
                             //                ' This collection is installed locally, install from local collections
                             //                '
                             //                saveLogFolder = classLogFolder
-                            //                Call addonInstall.installCollectionFromLocalRepo(Me, IISResetRequired, Guid, cpCore.version, ErrorMessage, "", "", isNewBuild)
+                            //                Call addonInstall.installCollectionFromLocalRepo(Me, IISResetRequired, Guid, core.version, ErrorMessage, "", "", isNewBuild)
                             //                classLogFolder = saveLogFolder
                             //                'Call AddonInstall.UpgradeAppFromLocalCollection( Me, ParentNavigatorID, IISResetRequired, Guid, getcodeversion, ErrorMessage, RegisterList, "")
                             //            Else
@@ -544,7 +544,7 @@ namespace Contensive.Core.Controllers {
                             //                addonInstallOk = addonInstall.installCollectionFromRemoteRepo(Guid, DataBuildVersion, IISResetRequired, "", ErrorMessage, "", isNewBuild)
                             //                classLogFolder = saveLogFolder
                             //                If Not addonInstallOk Then
-                            //                   throw (New ApplicationException("Unexpected exception"))'cpCore.handleLegacyError3(cpCore.app.config.name, "Error upgrading Addon Collection [" & Guid & "], " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                            //                   throw (New ApplicationException("Unexpected exception"))'core.handleLegacyError3(core.app.config.name, "Error upgrading Addon Collection [" & Guid & "], " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             //                End If
 
                             //            End If
@@ -559,22 +559,22 @@ namespace Contensive.Core.Controllers {
                             string Collectionname = null;
                             string CollectionGuid = null;
                             bool localCollectionFound = false;
-                            logController.appendLogInstall(cpcore, "Checking all installed collections for upgrades from Collection Library");
-                            logController.appendLogInstall(cpcore, "...Open collectons.xml");
+                            logController.appendLogInstall(core, "Checking all installed collections for upgrades from Collection Library");
+                            logController.appendLogInstall(core, "...Open collectons.xml");
                             try {
                                 XmlDocument Doc = new XmlDocument();
-                                Doc.LoadXml(collectionController.getLocalCollectionStoreListXml(cpcore));
+                                Doc.LoadXml(collectionController.getLocalCollectionStoreListXml(core));
                                 if (true) {
                                     if (genericController.vbLCase(Doc.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
-                                        throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
+                                        throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
                                     } else {
                                         if (genericController.vbLCase(Doc.DocumentElement.Name) == "collectionlist") {
                                             //
                                             // now go through each collection in this app and check the last updated agains the one here
                                             //
-                                            logController.appendLogInstall(cpcore, "...Open site collectons, iterate through all collections");
+                                            logController.appendLogInstall(core, "...Open site collectons, iterate through all collections");
                                             //Dim dt As DataTable
-                                            DataTable dt = cpcore.db.executeQuery("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)");
+                                            DataTable dt = core.db.executeQuery("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)");
                                             if (dt.Rows.Count > 0) {
                                                 int rowptr = 0;
                                                 for (rowptr = 0; rowptr < dt.Rows.Count; rowptr++) {
@@ -582,7 +582,7 @@ namespace Contensive.Core.Controllers {
                                                     ErrorMessage = "";
                                                     CollectionGuid = genericController.vbLCase(dt.Rows[rowptr]["ccguid"].ToString());
                                                     Collectionname = dt.Rows[rowptr]["name"].ToString();
-                                                    logController.appendLogInstall(cpcore, "...checking collection [" + Collectionname + "], guid [" + CollectionGuid + "]");
+                                                    logController.appendLogInstall(core, "...checking collection [" + Collectionname + "], guid [" + CollectionGuid + "]");
                                                     if (CollectionGuid != "{7c6601a7-9d52-40a3-9570-774d0d43d758}") {
                                                         //
                                                         // upgrade all except base collection from the local collections
@@ -595,7 +595,7 @@ namespace Contensive.Core.Controllers {
                                                             // app version has no lastchangedate
                                                             //
                                                             upgradeCollection = true;
-                                                            appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection installed in the application has no LastChangeDate. It may have been installed manually.");
+                                                            appendUpgradeLog(core, core.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection installed in the application has no LastChangeDate. It may have been installed manually.");
                                                         } else {
                                                             //
                                                             // compare to last change date in collection config file
@@ -621,10 +621,10 @@ namespace Contensive.Core.Controllers {
                                                                 }
                                                                 if (CollectionGuid == genericController.vbLCase(LocalGuid)) {
                                                                     localCollectionFound = true;
-                                                                    logController.appendLogInstall(cpcore, "...local collection found");
+                                                                    logController.appendLogInstall(core, "...local collection found");
                                                                     if (LocalLastChangeDate != DateTime.MinValue) {
                                                                         if (LocalLastChangeDate > LastChangeDate) {
-                                                                            appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
+                                                                            appendUpgradeLog(core, core.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
                                                                             upgradeCollection = true;
                                                                         }
                                                                     }
@@ -634,18 +634,18 @@ namespace Contensive.Core.Controllers {
                                                         }
                                                         ErrorMessage = "";
                                                         if (!localCollectionFound) {
-                                                            logController.appendLogInstall(cpcore, "...site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
-                                                            bool addonInstallOk = collectionController.installCollectionFromRemoteRepo(cpcore, CollectionGuid, ref  ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
+                                                            logController.appendLogInstall(core, "...site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
+                                                            bool addonInstallOk = collectionController.installCollectionFromRemoteRepo(core, CollectionGuid, ref  ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
                                                             if (!addonInstallOk) {
                                                                 //
                                                                 // this may be OK so log, but do not call it an error
                                                                 //
-                                                                logController.appendLogInstall(cpcore, "...site collection [" + Collectionname + "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" + CollectionGuid + "]");
+                                                                logController.appendLogInstall(core, "...site collection [" + Collectionname + "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" + CollectionGuid + "]");
                                                             }
                                                         } else {
                                                             if (upgradeCollection) {
-                                                                logController.appendLogInstall(cpcore, "...upgrading collection");
-                                                                collectionController.installCollectionFromLocalRepo(cpcore, CollectionGuid, cpcore.codeVersion(), ref ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
+                                                                logController.appendLogInstall(core, "...upgrading collection");
+                                                                collectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
                                                             }
                                                         }
                                                     }
@@ -656,7 +656,7 @@ namespace Contensive.Core.Controllers {
                                 }
 
                             } catch (Exception ex9) {
-                                cpcore.handleException(ex9);
+                                core.handleException(ex9);
                             }
                         }
                     }
@@ -665,12 +665,12 @@ namespace Contensive.Core.Controllers {
                     // ----- Explain, put up a link and exit without continuing
                     //---------------------------------------------------------------------
                     //
-                    cpcore.cache.invalidateAll();
-                    logController.appendLogInstall(cpcore, "Upgrade Complete");
-                    cpcore.doc.upgradeInProgress = false;
+                    core.cache.invalidateAll();
+                    logController.appendLogInstall(core, "Upgrade Complete");
+                    core.doc.upgradeInProgress = false;
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -688,14 +688,14 @@ namespace Contensive.Core.Controllers {
         //            MethodName = "RenameContentDefinition"
         //            '
         //            SQL = "UPDATE ccContent SET ccContent.name = '" & NewName & "' WHERE (((ccContent.name)='" & OldName & "'));"
-        //            Call cpCore.app.executeSql(SQL)
+        //            Call core.app.executeSql(SQL)
         //            '
         //            Exit Sub
         //            '
         //            ' ----- Error Trap
         //            '
         ////ErrorTrap:
-        //            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "RenameContentDefinition", True, False)
+        //            Dim ex As New Exception("todo") : Call handleClassException(ex, core.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "RenameContentDefinition", True, False)
         //        End Sub
 
         //        '
@@ -708,31 +708,31 @@ namespace Contensive.Core.Controllers {
         //            Dim CSPointer As Integer
         //            Dim methodName As String = "UpgradeSortOrder"
         //            '
-        //            Call cpcore.app.csv_CreateSQLTableField(DataSourceName, TableName, "TempField", FieldTypeText)
-        //            CSPointer = cpcore.app.csv_OpenCSSQL(DataSourceName, "SELECT ID, Sortorder from " & TableName & " Order By Sortorder;")
-        //            If Not cpcore.app.csv_IsCSOK(CSPointer) Then
-        //                Dim ex2 As New Exception("todo") : Call HandleClassError(ex2, cpcore.app.config.name, methodName) ' ignoreInteger, "dll", "Could not upgrade SortOrder", "UpgradeSortOrder", False, True)
+        //            Call core.app.csv_CreateSQLTableField(DataSourceName, TableName, "TempField", FieldTypeText)
+        //            CSPointer = core.app.csv_OpenCSSQL(DataSourceName, "SELECT ID, Sortorder from " & TableName & " Order By Sortorder;")
+        //            If Not core.app.csv_IsCSOK(CSPointer) Then
+        //                Dim ex2 As New Exception("todo") : Call HandleClassError(ex2, core.app.config.name, methodName) ' ignoreInteger, "dll", "Could not upgrade SortOrder", "UpgradeSortOrder", False, True)
         //            Else
-        //                Do While cpcore.app.csv_IsCSOK(CSPointer)
-        //                    Call cpcore.app.ExecuteSQL(DataSourceName, "UPDATE " & TableName & " SET TempField=" & encodeSQLText(Format(cpcore.app.csv_cs_getInteger(CSPointer, "sortorder"), "00000000")) & " WHERE ID=" & encodeSQLNumber(cpcore.app.csv_cs_getInteger(CSPointer, "ID")) & ";")
-        //                    cpcore.app.csv_NextCSRecord(CSPointer)
+        //                Do While core.app.csv_IsCSOK(CSPointer)
+        //                    Call core.app.ExecuteSQL(DataSourceName, "UPDATE " & TableName & " SET TempField=" & encodeSQLText(Format(core.app.csv_cs_getInteger(CSPointer, "sortorder"), "00000000")) & " WHERE ID=" & encodeSQLNumber(core.app.csv_cs_getInteger(CSPointer, "ID")) & ";")
+        //                    core.app.csv_NextCSRecord(CSPointer)
         //                Loop
-        //                Call cpcore.app.csv_CloseCS(CSPointer)
-        //                Call cpcore.app.csv_DeleteTableIndex(DataSourceName, TableName, "SORTORDER")
-        //                Call cpcore.app.csv_DeleteTableIndex(DataSourceName, TableName, TableName & "SORTORDER")
-        //                Call cpcore.app.csv_DeleteTableField(DataSourceName, TableName, "SortOrder")
-        //                Call cpcore.app.csv_CreateSQLTableField(DataSourceName, TableName, "SortOrder", FieldTypeText)
-        //                Call cpcore.app.ExecuteSQL(DataSourceName, "UPDATE " & TableName & " SET SortOrder=TempField;")
-        //                Call cpcore.app.csv_CreateSQLIndex(DataSourceName, TableName, TableName & "SORTORDER", "SortOrder")
+        //                Call core.app.csv_CloseCS(CSPointer)
+        //                Call core.app.csv_DeleteTableIndex(DataSourceName, TableName, "SORTORDER")
+        //                Call core.app.csv_DeleteTableIndex(DataSourceName, TableName, TableName & "SORTORDER")
+        //                Call core.app.csv_DeleteTableField(DataSourceName, TableName, "SortOrder")
+        //                Call core.app.csv_CreateSQLTableField(DataSourceName, TableName, "SortOrder", FieldTypeText)
+        //                Call core.app.ExecuteSQL(DataSourceName, "UPDATE " & TableName & " SET SortOrder=TempField;")
+        //                Call core.app.csv_CreateSQLIndex(DataSourceName, TableName, TableName & "SORTORDER", "SortOrder")
         //            End If
-        //            Call cpcore.app.csv_DeleteTableField(DataSourceName, TableName, "TempField")
+        //            Call core.app.csv_DeleteTableField(DataSourceName, TableName, "TempField")
         //            '
         //            Exit Sub
         //            '
         //            ' ----- Error Trap
         //            '
         ////ErrorTrap:
-        //            Dim ex As New exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "UpgradeSortOrder", True, False)
+        //            Dim ex As New exception("todo") : Call HandleClassError(ex, core.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "UpgradeSortOrder", True, False)
         //        End Sub
         //        '
         //        '=============================================================================
@@ -753,10 +753,10 @@ namespace Contensive.Core.Controllers {
         //            '
         //            ExistsSQLTableField = False
         //            '
-        //            dt = cpCore.app.executeSql("SELECT * FROM " & TableName & ";")
+        //            dt = core.app.executeSql("SELECT * FROM " & TableName & ";")
         //            If dt.Rows.Count = 0 Then
-        //                Call cpCore.app.executeSql("INSERT INTO " & TableName & " (Name)VALUES('no name');")
-        //                dt = cpCore.app.executeSql("SELECT * FROM " & TableName & ";")
+        //                Call core.app.executeSql("INSERT INTO " & TableName & " (Name)VALUES('no name');")
+        //                dt = core.app.executeSql("SELECT * FROM " & TableName & ";")
         //            End If
         //            If dt.Rows.Count > 0 Then
 
@@ -773,7 +773,7 @@ namespace Contensive.Core.Controllers {
         //            ' ----- Error Trap
         //            '
         ////ErrorTrap:
-        //            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "ExistsSQLTableField", True, False)
+        //            Dim ex As New Exception("todo") : Call handleClassException(ex, core.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "ExistsSQLTableField", True, False)
         //        End Function
         //        '
         //        '
@@ -786,22 +786,22 @@ namespace Contensive.Core.Controllers {
         //            Dim RecordID As Integer
         //            Dim Filename As String
         //            '
-        //            CSPointer = cpcore.app.csv_InsertCSRecord(ContentName)
-        //            If cpcore.app.csv_IsCSOK(CSPointer) Then
-        //                RecordID = (cpcore.app.csv_cs_getInteger(CSPointer, "ID"))
-        //                Filename = cpcore.app.csv_cs_getFilename(CSPointer, "Name", "")
-        //                'Filename = cpcore.app.csv_GetVirtualFilename(ContentName, "Name", RecordID)
-        //                Call cpcore.app.csv_SetCSField(CSPointer, "name", PageName)
-        //                Call cpcore.app.csv_SetCSField(CSPointer, "copyfilename", Filename)
-        //                Call cpcore.app.publicFiles.SaveFile(Filename, PageCopy)
+        //            CSPointer = core.app.csv_InsertCSRecord(ContentName)
+        //            If core.app.csv_IsCSOK(CSPointer) Then
+        //                RecordID = (core.app.csv_cs_getInteger(CSPointer, "ID"))
+        //                Filename = core.app.csv_cs_getFilename(CSPointer, "Name", "")
+        //                'Filename = core.app.csv_GetVirtualFilename(ContentName, "Name", RecordID)
+        //                Call core.app.csv_SetCSField(CSPointer, "name", PageName)
+        //                Call core.app.csv_SetCSField(CSPointer, "copyfilename", Filename)
+        //                Call core.app.publicFiles.SaveFile(Filename, PageCopy)
         //            End If
-        //            cpcore.app.csv_CloseCS(CSPointer)
+        //            core.app.csv_CloseCS(CSPointer)
         //            Exit Sub
         //            '
         //            ' ----- Error Trap
         //            '
         ////ErrorTrap:
-        //            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "createPage") ' Err.Number, Err.Source, Err.Description, "CreatePage", True, False)
+        //            Dim ex As New Exception("todo") : Call HandleClassError(ex, core.app.config.name, "createPage") ' Err.Number, Err.Source, Err.Description, "CreatePage", True, False)
         //        End Sub
         //        '
         //        '==========================================================================================
@@ -834,46 +834,46 @@ namespace Contensive.Core.Controllers {
         //            '
         //            ' ----- Make sure content definition exists
         //            '
-        //            Call cpcore.app.csv_CreateContentFromSQLTable("Default", "ccTables", "Tables")
-        //            TablesCID = cpcore.app.csv_GetContentID("Tables")
+        //            Call core.app.csv_CreateContentFromSQLTable("Default", "ccTables", "Tables")
+        //            TablesCID = core.app.csv_GetContentID("Tables")
         //            If True Then
         //                '
         //                ' ----- Create the ccTables TableName entry in the ccContent Table
         //                '
         //                SQL = "Update ccContent set sqlTable='ccTables' where name='tables';"
-        //                Call cpcore.app.executeSql(SQL)
+        //                Call core.app.executeSql(SQL)
         //                '
         //                ' ----- Append tables from ccContent
         //                '
         //                SQL = "Select ID, sqlTable,DataSourceID From ccContent where active<>0;"
-        //                RS = cpcore.app.executeSql(SQL)
+        //                RS = core.app.executeSql(SQL)
         //                If (isDataTableOk(rs)) Then
         //                    '
         //                    ' if no error, field exists, and it is OK to continue
         //                    '
         //                    Do While Not rs.rows.count=0
-        //                        TableName = genericController.encodeText(cpcore.app.getDataRowColumnName(RS.rows(0), "sqlTable"))
+        //                        TableName = genericController.encodeText(core.app.getDataRowColumnName(RS.rows(0), "sqlTable"))
         //                        TableID = 0
-        //                        DataSourceID = genericController.EncodeInteger(cpcore.app.getDataRowColumnName(RS.rows(0), "DataSourceID"))
-        //                        ContentID = genericController.EncodeInteger(cpcore.app.getDataRowColumnName(RS.rows(0), "ID"))
+        //                        DataSourceID = genericController.EncodeInteger(core.app.getDataRowColumnName(RS.rows(0), "DataSourceID"))
+        //                        ContentID = genericController.EncodeInteger(core.app.getDataRowColumnName(RS.rows(0), "ID"))
         //                        If TableName <> "" Then
         //                            '
         //                            ' ----- Get TableID from TableName
         //                            '
         //                            SQL = "SELECT ID FROM ccTables where name=" & EncodeSQLText(TableName) & ";"
-        //                            RSTables = cpcore.app.executeSql(SQL)
+        //                            RSTables = core.app.executeSql(SQL)
         //                            If Not RSTables.EOF Then
         //                                '
         //                                ' ----- Table entry found
         //                                '
-        //                                TableID = cpcore.app.getDataRowColumnName(RSTables, "ID")
+        //                                TableID = core.app.getDataRowColumnName(RSTables, "ID")
         //                            Else
         //                                '
         //                                ' ----- Table entry not found in ccTables, Create it
         //                                '
-        //                                RSNewTable = cpcore.app.csv_InsertTableRecordGetDataTable("Default", "ccTables")
+        //                                RSNewTable = core.app.csv_InsertTableRecordGetDataTable("Default", "ccTables")
         //                                If Not (RSNewTable Is Nothing) Then
-        //                                    TableID = cpcore.app.getDataRowColumnName(RSNewTable, "ID")
+        //                                    TableID = core.app.getDataRowColumnName(RSNewTable, "ID")
         //                                    Call RSNewTable.Close()
         //                                    If DataSourceID = 0 Then
         //                                        '
@@ -886,7 +886,7 @@ namespace Contensive.Core.Controllers {
         //                                        '
         //                                        SQL = "Update ccTables set active=" & SQLTrue & ", ContentControlID=" & EncodeSQLNumber(TablesCID) & ", Name=" & EncodeSQLText(TableName) & ", DataSourceId=" & EncodeSQLNumber(DataSourceID) & " where ID=" & TableID & ";"
         //                                    End If
-        //                                    Call cpcore.app.executeSql(SQL)
+        //                                    Call core.app.executeSql(SQL)
         //                                End If
         //                                RSNewTable = Nothing
         //                            End If
@@ -894,7 +894,7 @@ namespace Contensive.Core.Controllers {
         //                        End If
         //                        If TableID <> 0 Then
         //                            SQL = "Update ccContent set ContentTableID=" & EncodeSQLNumber(TableID) & ", AuthoringTableID=" & EncodeSQLNumber(TableID) & " where ID=" & ContentID & ";"
-        //                            Call cpcore.app.executeSql(SQL)
+        //                            Call core.app.executeSql(SQL)
         //                        End If
         //                        Call RS.MoveNext()
         //                    Loop
@@ -913,9 +913,9 @@ namespace Contensive.Core.Controllers {
         //            '
         ////ErrorTrap:
         //            UpgradeErrorCount = UpgradeErrorCount + 1
-        //            Dim ex As New exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "PopulateTableTable (error #" & UpgradeErrorCount & ")", True, True)
+        //            Dim ex As New exception("todo") : Call HandleClassError(ex, core.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "PopulateTableTable (error #" & UpgradeErrorCount & ")", True, True)
         //            If UpgradeErrorCount >= UpgradeErrorTheshold Then
-        //                Dim ex3 As New Exception("todo") : Call HandleClassError(ex3, cpcore.app.config.name, MethodName) ' Err.Number, Err.Source, Err.Description, "PopulateTableTable (error #" & UpgradeErrorCount & ")", True, False)
+        //                Dim ex3 As New Exception("todo") : Call HandleClassError(ex3, core.app.config.name, MethodName) ' Err.Number, Err.Source, Err.Description, "PopulateTableTable (error #" & UpgradeErrorCount & ")", True, False)
         //            End If
         //            //Resume Next
         //        End Sub
@@ -953,8 +953,8 @@ namespace Contensive.Core.Controllers {
         //            Dim TimeoutSave As Integer
         //            Dim CID As Integer
         //            ''
-        //            'TimeoutSave = cpcore.app.csv_SQLCommandTimeout
-        //            'cpcore.app.csv_SQLCommandTimeout = 1800
+        //            'TimeoutSave = core.app.csv_SQLCommandTimeout
+        //            'core.app.csv_SQLCommandTimeout = 1800
         //            '
         //            If False Then
         //                Exit Sub
@@ -963,44 +963,44 @@ namespace Contensive.Core.Controllers {
         //                MethodName = "Upgrade_Conversion_to_41"
         //                '
         //                If false Then
-        //                    Call appendUpgradeLogAddStep(cpcore.app.config.name,MethodName, "4.1.279 upgrade")
+        //                    Call appendUpgradeLogAddStep(core.app.config.name,MethodName, "4.1.279 upgrade")
         //                    '
         //                    ' added ccguid to all cdefs, but non-base did not upgrade automatically
         //                    '
-        //                    CS = cpcore.app.csOpen("content")
-        //                    Do While cpcore.app.csv_IsCSOK(CS)
-        //                        Call metaData_VerifyCDefField_ReturnID(True, cpcore.app.csv_cs_getText(CS, "name"), "ccguid", FieldTypeText, , False, "Guid", , , , , , , , , , , , , , , , , True)
-        //                        Call cpcore.app.csv_NextCSRecord(CS)
+        //                    CS = core.app.csOpen("content")
+        //                    Do While core.app.csv_IsCSOK(CS)
+        //                        Call metaData_VerifyCDefField_ReturnID(True, core.app.csv_cs_getText(CS, "name"), "ccguid", FieldTypeText, , False, "Guid", , , , , , , , , , , , , , , , , True)
+        //                        Call core.app.csv_NextCSRecord(CS)
         //                    Loop
-        //                    Call cpcore.app.csv_CloseCS(CS)
+        //                    Call core.app.csv_CloseCS(CS)
         //                End If
         //                If false Then
-        //                    Call appendUpgradeLogAddStep(cpcore.app.config.name,MethodName, "4.1.288 upgrade")
+        //                    Call appendUpgradeLogAddStep(core.app.config.name,MethodName, "4.1.288 upgrade")
         //                    '
         //                    ' added updatable again (was originally added in 275)
         //                    '
-        //                    Call cpcore.app.ExecuteSQL("", "update ccAddonCollections set updatable=1")
+        //                    Call core.app.ExecuteSQL("", "update ccAddonCollections set updatable=1")
         //                End If
         //                If false Then
-        //                    Call appendUpgradeLogAddStep(cpcore.app.config.name,MethodName, "4.1.290 upgrade")
+        //                    Call appendUpgradeLogAddStep(core.app.config.name,MethodName, "4.1.290 upgrade")
         //                    '
         //                    ' delete blank field help records, new method creates dups of inheritance cdef parent fields
         //                    '
-        //                    Call cpcore.app.ExecuteSQL("", "delete from ccfieldhelp where (HelpDefault is null)and(HelpCustom is null)")
+        //                    Call core.app.ExecuteSQL("", "delete from ccfieldhelp where (HelpDefault is null)and(HelpCustom is null)")
         //                End If
         //                If false Then
-        //                    Call appendUpgradeLogAddStep(cpcore.app.config.name,MethodName, "4.1.294 upgrade")
+        //                    Call appendUpgradeLogAddStep(core.app.config.name,MethodName, "4.1.294 upgrade")
         //                    '
         //                    ' convert fieldtypelongtext + htmlcontent to fieldtypehtml
         //                    '
-        //                    Call cpcore.app.ExecuteSQL("", "update ccfields set type=" & FieldTypeHTML & " where type=" & FieldTypeLongText & " and (htmlcontent<>0)")
+        //                    Call core.app.ExecuteSQL("", "update ccfields set type=" & FieldTypeHTML & " where type=" & FieldTypeLongText & " and (htmlcontent<>0)")
         //                    '
         //                    ' convert fieldtypetextfile + htmlcontent to fieldtypehtmlfile
         //                    '
-        //                    Call cpcore.app.ExecuteSQL("", "update ccfields set type=" & FieldTypeHTMLFile & " where type=" & FieldTypeTextFile & " and (htmlcontent<>0)")
+        //                    Call core.app.ExecuteSQL("", "update ccfields set type=" & FieldTypeHTMLFile & " where type=" & FieldTypeTextFile & " and (htmlcontent<>0)")
         //                End If
         //                If false Then
-        //                    Call appendUpgradeLogAddStep(cpcore.app.config.name,MethodName, "4.1.352 upgrade")
+        //                    Call appendUpgradeLogAddStep(core.app.config.name,MethodName, "4.1.352 upgrade")
         //                    '
         //                    ' try again - from 4.1.195
         //                    ' Some content used to be base, but now they are in add-ons
@@ -1045,102 +1045,102 @@ namespace Contensive.Core.Controllers {
         //                    Call RemoveIsBase( "Organization Address Types")
         //                End If
         //                If false Then
-        //                    Call appendUpgradeLogAddStep(cpcore.app.config.name,MethodName, "4.1.374 upgrade")
+        //                    Call appendUpgradeLogAddStep(core.app.config.name,MethodName, "4.1.374 upgrade")
         //                    '
         //                    ' repair the country table (abbreviation was set to an integer a long time ago)
         //                    '
         //                    SQL = "insert into cccountries (abbreviation)values('US')"
         //                    //On Error //Resume Next
-        //                    Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                    Call core.app.ExecuteSQL("", CStr(SQL))
         //                    ErrMessage = Err.Description
         //                    Err.Clear()
         //                    On Error GoTo ErrorTrap
         //                    SQL = "delete from cccountries where (name is null) or (name='')"
-        //                    Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                    Call core.app.ExecuteSQL("", CStr(SQL))
         //                    If ErrMessage <> "" Then
         //                        '
         //                        ' needs to be fixed
         //                        '
-        //                        typeId = cpcore.app.csv_GetDataSourceType("default")
+        //                        typeId = core.app.csv_GetDataSourceType("default")
         //                        If typeId = DataSourceTypeODBCAccess Then
         //                            '
         //                            ' MS Access
         //                            '
         //                            SQL = "alter table cccountries add column abbr VarChar(255) NULL"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                            '
         //                            SQL = "update cccountries set abbr=abbreviation"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                            '
         //                            SQL = "alter table cccountries drop abbreviation"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                            '
         //                            SQL = "alter table cccountries add column abbreviation VarChar(255) NULL"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                            '
         //                            SQL = "update cccountries set abbreviation=abbr"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                            '
         //                            SQL = "alter table cccountries drop abbr"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                        ElseIf typeId = DataSourceTypeODBCSQLServer Then
         //                            '
         //                            ' MS SQL Server
         //                            '
         //                            SQL = "alter table cccountries add abbr VarChar(255) NULL"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                            '
         //                            SQL = "update cccountries set abbr=abbreviation"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                            '
         //                            SQL = "alter table cccountries drop column abbreviation"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                            '
         //                            SQL = "alter table cccountries add abbreviation VarChar(255) NULL"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                            '
         //                            SQL = "update cccountries set abbreviation=abbr"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                            '
         //                            SQL = "alter table cccountries drop column abbr"
-        //                            Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                            Call core.app.ExecuteSQL("", CStr(SQL))
         //                        End If
         //                    End If
         //                    '
         //                    ' remove all ccwebx3 and ccwebx4 addons
         //                    '
         //                    SQL = "delete from ccaggregatefunctions where ObjectProgramID like '%ccwebx3%'"
-        //                    Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                    Call core.app.ExecuteSQL("", CStr(SQL))
         //                End If
         //                If false Then
-        //                    Call appendUpgradeLogAddStep(cpcore.app.config.name,MethodName, "4.1.508 upgrade")
+        //                    Call appendUpgradeLogAddStep(core.app.config.name,MethodName, "4.1.508 upgrade")
         //                    '
         //                    ' repair the country table (abbreviation was set to an integer a long time ago)
         //                    '
-        //                    Call cpcore.app.setSiteProperty("DefaultFormInputHTMLHeight", "500", 0)
+        //                    Call core.app.setSiteProperty("DefaultFormInputHTMLHeight", "500", 0)
         //                End If
         //                If false Then
-        //                    Call appendUpgradeLogAddStep(cpcore.app.config.name,MethodName, "4.1.517 upgrade")
+        //                    Call appendUpgradeLogAddStep(core.app.config.name,MethodName, "4.1.517 upgrade")
         //                    '
-        //                    ' prepopulate docpcore.app.main_allowCrossLogin
+        //                    ' prepopulate docore.app.main_allowCrossLogin
         //                    '
         //                    SQL = "update ccDomains set allowCrossLogin=1 where typeid=1"
-        //                    Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                    Call core.app.ExecuteSQL("", CStr(SQL))
         //                End If
         //                If false Then
-        //                    Call appendUpgradeLogAddStep(cpcore.app.config.name,MethodName, "4.1.588 upgrade")
+        //                    Call appendUpgradeLogAddStep(core.app.config.name,MethodName, "4.1.588 upgrade")
         //                    '
         //                    ' ccfields.htmlContent redefined
         //                    '   means nothing for fields not set to html or htmlFile
         //                    '   for these, it means the initial editor should show the HTML (not wysiwyg) -- "real html"
         //                    '
-        //                    SQL = "update ccFields set htmlcontent=null where (name<>'layout')or(contentid<>" & cpcore.app.csv_GetContentID("layouts") & ")"
-        //                    Call cpcore.app.ExecuteSQL("", CStr(SQL))
+        //                    SQL = "update ccFields set htmlcontent=null where (name<>'layout')or(contentid<>" & core.app.csv_GetContentID("layouts") & ")"
+        //                    Call core.app.ExecuteSQL("", CStr(SQL))
         //                End If
         //                '
         //                ' return the normal timeout
         //                '
-        //                cpcore.app.csv_SQLCommandTimeout = TimeoutSave
+        //                core.app.csv_SQLCommandTimeout = TimeoutSave
         //                '
         //                ' Regsiter and IISReset if needed
         //                '
@@ -1167,9 +1167,9 @@ namespace Contensive.Core.Controllers {
         //            '
         ////ErrorTrap:
         //            UpgradeErrorCount = UpgradeErrorCount + 1
-        //            Dim ex As New exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "Upgrade_Conversion_to_41 (error #" & UpgradeErrorCount & ")", True, True)
+        //            Dim ex As New exception("todo") : Call HandleClassError(ex, core.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "Upgrade_Conversion_to_41 (error #" & UpgradeErrorCount & ")", True, True)
         //            If UpgradeErrorCount >= UpgradeErrorTheshold Then
-        //                Dim ex4 As New Exception("todo") : Call HandleClassError(ex4, cpcore.app.config.name, MethodName) ' Err.Number, Err.Source, Err.Description, "Upgrade_Conversion_to_41 (error #" & UpgradeErrorCount & ")", True, False)
+        //                Dim ex4 As New Exception("todo") : Call HandleClassError(ex4, core.app.config.name, MethodName) ' Err.Number, Err.Source, Err.Description, "Upgrade_Conversion_to_41 (error #" & UpgradeErrorCount & ")", True, False)
         //            End If
         //            //Resume Next
         //        End Sub
@@ -1186,20 +1186,20 @@ namespace Contensive.Core.Controllers {
         //            '
         //            ' Delete any indexes found for this field
         //            '
-        //            Call cpcore.app.csv_DeleteTableIndex(DataSourceName, TableName, TableName & FieldName)
-        //            'Call cpcore.app.csv_DeleteTableIndex(DataSourceName, TableName, TableName & FieldName)
+        //            Call core.app.csv_DeleteTableIndex(DataSourceName, TableName, TableName & FieldName)
+        //            'Call core.app.csv_DeleteTableIndex(DataSourceName, TableName, TableName & FieldName)
         //            '
         //            ' Delete all Content Definition Fields associated with this field
         //            '
-        //            RSTables = cpcore.app.ExecuteSQL(DataSourceName, "SELECT ID from ccTables where name='" & TableName & "';")
+        //            RSTables = core.app.ExecuteSQL(DataSourceName, "SELECT ID from ccTables where name='" & TableName & "';")
         //            If Not (RSTables Is Nothing) Then
         //                Do While Not RSTables.EOF
         //                    TableID = genericController.EncodeInteger(RSTables("ID"))
-        //                    RSContent = cpcore.app.ExecuteSQL(DataSourceName, "Select ID from ccContent where (ContentTableID=" & TableID & ")or(AuthoringTableID=" & TableID & ");")
+        //                    RSContent = core.app.ExecuteSQL(DataSourceName, "Select ID from ccContent where (ContentTableID=" & TableID & ")or(AuthoringTableID=" & TableID & ");")
         //                    If Not (RSContent Is Nothing) Then
         //                        Do While Not RSContent.EOF
         //                            ContentID = genericController.EncodeInteger(RSContent("ID"))
-        //                            Call cpcore.app.ExecuteSQL(DataSourceName, "Delete From ccFields where (ContentID=" & ContentID & ")and(name=" & encodeSQLText(FieldName) & ");")
+        //                            Call core.app.ExecuteSQL(DataSourceName, "Delete From ccFields where (ContentID=" & ContentID & ")and(name=" & encodeSQLText(FieldName) & ");")
         //                            RSContent.MoveNext()
         //                        Loop
         //                        Call RSContent.Close()
@@ -1213,12 +1213,12 @@ namespace Contensive.Core.Controllers {
         //            '
         //            ' Drop the field from the table
         //            '
-        //            Call cpcore.app.csv_DeleteTableField(DataSourceName, TableName, FieldName)
+        //            Call core.app.csv_DeleteTableField(DataSourceName, TableName, FieldName)
         //            '
         //            Exit Sub
         //            '
         ////ErrorTrap:
-        //            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "deleteField") ' Err.Number, Err.Source, Err.Description, "DeleteField", True, False)
+        //            Dim ex As New Exception("todo") : Call HandleClassError(ex, core.app.config.name, "deleteField") ' Err.Number, Err.Source, Err.Description, "DeleteField", True, False)
         //        End Sub
         //        '
         //        '   Returns TableID
@@ -1231,17 +1231,17 @@ namespace Contensive.Core.Controllers {
         //            dim dt as datatable
         //            '
         //            GetTableID = -1
-        //            RS = cpcore.app.ExecuteSQL( "Select ID from ccTables where name=" & encodeSQLText(TableName) & ";")
+        //            RS = core.app.ExecuteSQL( "Select ID from ccTables where name=" & encodeSQLText(TableName) & ";")
         //            If (isDataTableOk(rs)) Then
         //                If Not rs.rows.count=0 Then
-        //                    GetTableID = cpcore.app.getDataRowColumnName(RS.rows(0), "ID")
+        //                    GetTableID = core.app.getDataRowColumnName(RS.rows(0), "ID")
         //                End If
         //            End If
         //            '
         //            Exit Function
         //            '
         ////ErrorTrap:
-        //            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "GetTableID", True, False)
+        //            Dim ex As New Exception("todo") : Call HandleClassError(ex, core.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "GetTableID", True, False)
         //        End Function
         //        '
         //        '
@@ -1251,19 +1251,19 @@ namespace Contensive.Core.Controllers {
         //            '
         //            Dim dt As DataTable
         //            Dim sql As String
-        //            Dim createkey As Integer = genericController.GetRandomInteger(cpCore)
+        //            Dim createkey As Integer = genericController.GetRandomInteger(core)
         //            Dim cid As Integer
         //            '
         //            core_group_add = 0
-        //            dt = cpCore.app.executeSql("SELECT ID FROM CCGROUPS WHERE NAME='" & GroupName & "';")
+        //            dt = core.app.executeSql("SELECT ID FROM CCGROUPS WHERE NAME='" & GroupName & "';")
         //            If dt.Rows.Count > 0 Then
         //                core_group_add = genericController.EncodeInteger(dt.Rows[0]["ID"))
         //            Else
         //                cid = GetContentID("groups")
         //                sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" & cid & ",1," & createkey & "," & EncodeSQLText(GroupName) & "," & EncodeSQLText(GroupName) & ")"
-        //                Call cpCore.app.executeSql(sql)
+        //                Call core.app.executeSql(sql)
         //                sql = "select id from ccgroups where createkey=" & createkey & " order by id desc"
-        //                dt = cpCore.app.executeSql(sql)
+        //                dt = core.app.executeSql(sql)
         //                If dt.Rows.Count > 0 Then
         //                    core_group_add = genericController.EncodeInteger(dt.Rows[0]["id"))
         //                End If
@@ -1273,12 +1273,12 @@ namespace Contensive.Core.Controllers {
         //            Exit Function
         //            '
         ////ErrorTrap:
-        //            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "AddGroup", True, False)
+        //            Dim ex As New Exception("todo") : Call handleClassException(ex, core.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "AddGroup", True, False)
         //        End Function
         //
         //
         //
-        private static void VerifyAdminMenus(coreController cpCore, string DataBuildVersion) {
+        private static void VerifyAdminMenus(coreController core, string DataBuildVersion) {
             try {
                 DataTable dt = null;
                 //
@@ -1288,27 +1288,27 @@ namespace Contensive.Core.Controllers {
                 string FieldLast = null;
                 int FieldRecordID = 0;
                 //Dim dt As DataTable
-                dt = cpCore.db.executeQuery("Select ID,Name,ParentID from ccMenuEntries where (active<>0) Order By ParentID,Name");
+                dt = core.db.executeQuery("Select ID,Name,ParentID from ccMenuEntries where (active<>0) Order By ParentID,Name");
                 if (dt.Rows.Count > 0) {
                     FieldLast = "";
                     for (var rowptr = 0; rowptr < dt.Rows.Count; rowptr++) {
                         FieldNew = genericController.encodeText(dt.Rows[rowptr]["name"]) + "." + genericController.encodeText(dt.Rows[rowptr]["parentid"]);
                         if (FieldNew == FieldLast) {
                             FieldRecordID = genericController.encodeInteger(dt.Rows[rowptr]["ID"]);
-                            cpCore.db.executeQuery("Update ccMenuEntries set active=0 where ID=" + FieldRecordID + ";");
+                            core.db.executeQuery("Update ccMenuEntries set active=0 where ID=" + FieldRecordID + ";");
                         }
                         FieldLast = FieldNew;
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
         //
         // Get the Menu for FormInputHTML
         //
-        private static void VerifyRecord(coreController cpcore, string ContentName, string Name, string CodeFieldName = "", string Code = "", bool InActive = false) {
+        private static void VerifyRecord(coreController core, string ContentName, string Name, string CodeFieldName = "", string Code = "", bool InActive = false) {
             try {
                 bool Active = false;
                 DataTable dt = null;
@@ -1317,23 +1317,23 @@ namespace Contensive.Core.Controllers {
                 string sql3 = null;
                 //
                 Active = !InActive;
-                Models.Complex.cdefModel cdef = Models.Complex.cdefModel.getCdef(cpcore, ContentName);
+                Models.Complex.cdefModel cdef = Models.Complex.cdefModel.getCdef(core, ContentName);
                 string tableName = cdef.ContentTableName;
                 int cid = cdef.Id;
                 //
-                dt = cpcore.db.executeQuery("SELECT ID FROM " + tableName + " WHERE NAME=" + cpcore.db.encodeSQLText(Name) + ";");
+                dt = core.db.executeQuery("SELECT ID FROM " + tableName + " WHERE NAME=" + core.db.encodeSQLText(Name) + ";");
                 if (dt.Rows.Count == 0) {
                     sql1 = "insert into " + tableName + " (contentcontrolid,createkey,active,name";
-                    sql2 = ") values (" + cid + ",0," + cpcore.db.encodeSQLBoolean(Active) + "," + cpcore.db.encodeSQLText(Name);
+                    sql2 = ") values (" + cid + ",0," + core.db.encodeSQLBoolean(Active) + "," + core.db.encodeSQLText(Name);
                     sql3 = ")";
                     if (!string.IsNullOrEmpty(CodeFieldName)) {
                         sql1 += "," + CodeFieldName;
                         sql2 += "," + Code;
                     }
-                    cpcore.db.executeQuery(sql1 + sql2 + sql3);
+                    core.db.executeQuery(sql1 + sql2 + sql3);
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1342,17 +1342,17 @@ namespace Contensive.Core.Controllers {
         // ----- Upgrade Conversion
         //========================================================================
         //
-        private static void Upgrade_Conversion(coreController cpCore, string DataBuildVersion) {
+        private static void Upgrade_Conversion(coreController core, string DataBuildVersion) {
             try {
                 //
                 // -- Roll the style sheet cache if it is setup
-                cpCore.siteProperties.setProperty("StylesheetSerialNumber", (-1).ToString());
+                core.siteProperties.setProperty("StylesheetSerialNumber", (-1).ToString());
                 //
                 // -- Reload
-                cpCore.cache.invalidateAll();
-                cpCore.doc.clearMetaData();
+                core.cache.invalidateAll();
+                core.doc.clearMetaData();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1361,7 +1361,7 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyTableCoreFields(coreController cpCore) {
+        public static void VerifyTableCoreFields(coreController core) {
             try {
                 //
                 int IDVariant = 0;
@@ -1374,13 +1374,13 @@ namespace Contensive.Core.Controllers {
                 //
                 MethodName = "VerifyTableCoreFields";
                 //
-                appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, MethodName, "Verify core fields in all tables registered in [Tables] content.");
+                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, MethodName, "Verify core fields in all tables registered in [Tables] content.");
                 //
                 SQL = "SELECT ccDataSources.Name as DataSourceName, ccDataSources.ID as DataSourceID, ccDataSources.Active as DataSourceActive, ccTables.Name as TableName"
                 + " FROM ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID"
                 + " Where (((ccTables.active) <> 0))"
                 + " ORDER BY ccDataSources.Name, ccTables.Name;";
-                dt = cpCore.db.executeQuery(SQL);
+                dt = core.db.executeQuery(SQL);
                 ptr = 0;
                 while (ptr < dt.Rows.Count) {
                     IDVariant = genericController.encodeInteger(dt.Rows[ptr]["DataSourceID"]);
@@ -1392,12 +1392,12 @@ namespace Contensive.Core.Controllers {
                         DataSourceName = genericController.encodeText(dt.Rows[ptr]["DataSourcename"]);
                     }
                     if (Active) {
-                        cpCore.db.createSQLTable(DataSourceName, genericController.encodeText(dt.Rows[ptr]["Tablename"]));
+                        core.db.createSQLTable(DataSourceName, genericController.encodeText(dt.Rows[ptr]["Tablename"]));
                     }
                     ptr += 1;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1406,15 +1406,15 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyScriptingRecords(coreController cpCore) {
+        public static void VerifyScriptingRecords(coreController core) {
             try {
                 //
-                appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.");
+                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.");
                 //
-                VerifyRecord(cpCore, "Scripting Languages", "VBScript", "", "");
-                VerifyRecord(cpCore, "Scripting Languages", "JScript", "", "");
+                VerifyRecord(core, "Scripting Languages", "VBScript", "", "");
+                VerifyRecord(core, "Scripting Languages", "JScript", "", "");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1423,36 +1423,36 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyLanguageRecords(coreController cpCore) {
+        public static void VerifyLanguageRecords(coreController core) {
             try {
                 //
-                appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.");
+                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.");
                 //
-                VerifyRecord(cpCore, "Languages", "English", "HTTP_Accept_Language", "'en'");
-                VerifyRecord(cpCore, "Languages", "Spanish", "HTTP_Accept_Language", "'es'");
-                VerifyRecord(cpCore, "Languages", "French", "HTTP_Accept_Language", "'fr'");
-                VerifyRecord(cpCore, "Languages", "Any", "HTTP_Accept_Language", "'any'");
+                VerifyRecord(core, "Languages", "English", "HTTP_Accept_Language", "'en'");
+                VerifyRecord(core, "Languages", "Spanish", "HTTP_Accept_Language", "'es'");
+                VerifyRecord(core, "Languages", "French", "HTTP_Accept_Language", "'fr'");
+                VerifyRecord(core, "Languages", "Any", "HTTP_Accept_Language", "'any'");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
         //
         //   Verify Library Folder records
         //
-        private static void VerifyLibraryFolders(coreController cpCore) {
+        private static void VerifyLibraryFolders(coreController core) {
             try {
                 DataTable dt = null;
                 //
-                appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads");
+                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads");
                 //
-                dt = cpCore.db.executeQuery("select id from cclibraryfiles");
+                dt = core.db.executeQuery("select id from cclibraryfiles");
                 if (dt.Rows.Count == 0) {
-                    VerifyRecord(cpCore, "Library Folders", "Images");
-                    VerifyRecord(cpCore, "Library Folders", "Downloads");
+                    VerifyRecord(core, "Library Folders", "Images");
+                    VerifyRecord(core, "Library Folders", "Downloads");
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1465,15 +1465,15 @@ namespace Contensive.Core.Controllers {
         //            Dim CS As Integer
         //            Dim FieldName As String
         //            '
-        //            Call appendUpgradeLogAddStep(cpcore.app.config.name,"VerifyContentWatchLists", "Verify Content Watch Lists: What's New and What's Related")
+        //            Call appendUpgradeLogAddStep(core.app.config.name,"VerifyContentWatchLists", "Verify Content Watch Lists: What's New and What's Related")
         //            '
         //            If Not (False) Then
-        //                CS = cpcore.app.csOpen("Content Watch Lists", , "name", , , , , "ID")
-        //                If Not cpcore.app.csv_IsCSOK(CS) Then
+        //                CS = core.app.csOpen("Content Watch Lists", , "name", , , , , "ID")
+        //                If Not core.app.csv_IsCSOK(CS) Then
         //                    Call VerifyRecord( "Content Watch Lists", "What's New", "Active", "1", True)
         //                    Call VerifyRecord( "Content Watch Lists", "What's Related", "Active", "1", True)
         //                End If
-        //                Call cpcore.app.csv_CloseCS(CS)
+        //                Call core.app.csv_CloseCS(CS)
         //            End If
         //            '
         //            Exit Sub
@@ -1481,7 +1481,7 @@ namespace Contensive.Core.Controllers {
         //            ' ----- Error Trap
         //            '
         ////ErrorTrap:
-        //            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyContentWatchLists", True, True)
+        //            Dim ex As New Exception("todo") : Call HandleClassError(ex, core.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyContentWatchLists", True, True)
         //        End Sub
         //
         //=============================================================================
@@ -1498,13 +1498,13 @@ namespace Contensive.Core.Controllers {
         //        Dim TableBad As Boolean
         //        Dim RowsNeeded As Integer
         //        '
-        //        Call appendUpgradeLogAddStep(cpCore.app.config.name, "VerifySurveyQuestionTypes", "Verify Survey Question Types")
+        //        Call appendUpgradeLogAddStep(core.app.config.name, "VerifySurveyQuestionTypes", "Verify Survey Question Types")
         //        '
         //        ' ----- make sure there are enough records
         //        '
         //        TableBad = False
         //        RowsFound = 0
-        //        rs = cpCore.app.executeSql("Select ID from ccSurveyQuestionTypes order by id")
+        //        rs = core.app.executeSql("Select ID from ccSurveyQuestionTypes order by id")
         //        If (Not isDataTableOk(rs)) Then
         //            '
         //            ' problem
@@ -1531,9 +1531,9 @@ namespace Contensive.Core.Controllers {
         //        ' ----- Replace table if needed
         //        '
         //        If TableBad Then
-        //            Call cpCore.app.csv_DeleteTable("Default", "ccSurveyQuestionTypes")
-        //            'Call cpcore.app.ExecuteSQL( "Drop table ccSurveyQuestionTypes")
-        //            Call cpCore.app.CreateSQLTable("Default", "ccSurveyQuestionTypes")
+        //            Call core.app.csv_DeleteTable("Default", "ccSurveyQuestionTypes")
+        //            'Call core.app.ExecuteSQL( "Drop table ccSurveyQuestionTypes")
+        //            Call core.app.CreateSQLTable("Default", "ccSurveyQuestionTypes")
         //            RowsFound = 0
         //        End If
         //        '
@@ -1541,15 +1541,15 @@ namespace Contensive.Core.Controllers {
         //        '
         //        RowsNeeded = 3 - RowsFound
         //        If RowsNeeded > 0 Then
-        //            CID = cpCore.app.csv_GetContentID("Survey Question Types")
+        //            CID = core.app.csv_GetContentID("Survey Question Types")
         //            If CID <= 0 Then
         //                '
         //                ' Problem
         //                '
-        //                fixme-- cpCore.handleException(New ApplicationException("")) ' -----ignoreInteger, "dll", "Survey Question Types content definition was not found")
+        //                fixme-- core.handleException(New ApplicationException("")) ' -----ignoreInteger, "dll", "Survey Question Types content definition was not found")
         //            Else
         //                Do While RowsNeeded > 0
-        //                    Call cpCore.app.executeSql("Insert into ccSurveyQuestionTypes (active,contentcontrolid)values(1," & CID & ")")
+        //                    Call core.app.executeSql("Insert into ccSurveyQuestionTypes (active,contentcontrolid)values(1," & CID & ")")
         //                    RowsNeeded = RowsNeeded - 1
         //                Loop
         //            End If
@@ -1557,11 +1557,11 @@ namespace Contensive.Core.Controllers {
         //        '
         //        ' ----- Update the Names of each row
         //        '
-        //        Call cpCore.app.executeSql("Update ccSurveyQuestionTypes Set Name='Text Field' where ID=1;")
-        //        Call cpCore.app.executeSql("Update ccSurveyQuestionTypes Set Name='Select Dropdown' where ID=2;")
-        //        Call cpCore.app.executeSql("Update ccSurveyQuestionTypes Set Name='Radio Buttons' where ID=3;")
+        //        Call core.app.executeSql("Update ccSurveyQuestionTypes Set Name='Text Field' where ID=1;")
+        //        Call core.app.executeSql("Update ccSurveyQuestionTypes Set Name='Select Dropdown' where ID=2;")
+        //        Call core.app.executeSql("Update ccSurveyQuestionTypes Set Name='Radio Buttons' where ID=3;")
         //    Catch ex As Exception
-        //        cpCore.handleException(ex);
+        //        core.handleException(ex);
         //    End Try
         //    Return returnType
         //End Function
@@ -1575,7 +1575,7 @@ namespace Contensive.Core.Controllers {
         //            Try
 
         //            Catch ex As Exception
-        //                cpCore.handleException(ex);
+        //                core.handleException(ex);
         //            End Try
         //            Return returnAttr
 
@@ -1585,9 +1585,9 @@ namespace Contensive.Core.Controllers {
         //            '
         //            If ParentMenuName <> "" Then
         //                ParentID = GetIDBYName("ccMenuEntries", ParentMenuName)
-        //                Call cpCore.app.executeSql("Delete from ccMenuEntries where name=" & EncodeSQLText(MenuName) & " and ParentID=" & ParentID)
+        //                Call core.app.executeSql("Delete from ccMenuEntries where name=" & EncodeSQLText(MenuName) & " and ParentID=" & ParentID)
         //            Else
-        //                Call cpCore.app.executeSql("Delete from ccMenuEntries where name=" & EncodeSQLText(MenuName))
+        //                Call core.app.executeSql("Delete from ccMenuEntries where name=" & EncodeSQLText(MenuName))
         //            End If
         //            '
         //            Exit Function
@@ -1595,27 +1595,27 @@ namespace Contensive.Core.Controllers {
         //            ' ----- Error Trap
         //            '
         ////ErrorTrap:
-        //            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "DeleteAdminMenu", True, False)
+        //            Dim ex As New Exception("todo") : Call handleClassException(ex, core.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "DeleteAdminMenu", True, False)
         //        End Function
         //
         //=============================================================================
         //
         //=============================================================================
         //
-        private static int GetIDBYName(coreController cpCore, string TableName, string RecordName) {
+        private static int GetIDBYName(coreController core, string TableName, string RecordName) {
             int tempGetIDBYName = 0;
             int returnid = 0;
             try {
                 //
                 DataTable rs;
                 //
-                rs = cpCore.db.executeQuery("Select ID from " + TableName + " where name=" + cpCore.db.encodeSQLText(RecordName));
+                rs = core.db.executeQuery("Select ID from " + TableName + " where name=" + core.db.encodeSQLText(RecordName));
                 if (isDataTableOk(rs)) {
                     tempGetIDBYName = genericController.encodeInteger(rs.Rows[0]["ID"]);
                 }
                 rs.Dispose();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnid;
@@ -1623,84 +1623,84 @@ namespace Contensive.Core.Controllers {
         //
         //   Verify Library Folder records
         //
-        private static void VerifyLibraryFileTypes(coreController cpCore) {
+        private static void VerifyLibraryFileTypes(coreController core) {
             try {
                 //
                 // Load basic records -- default images are handled in the REsource Library through the /ccLib/config/DefaultValues.txt GetDefaultValue(key) mechanism
                 //
-                if (cpCore.db.getRecordID("Library File Types", "Image") == 0) {
-                    VerifyRecord(cpCore, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'", false);
-                    VerifyRecord(cpCore, "Library File Types", "Image", "IsImage", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "Image", "IsVideo", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Image", "IsDownload", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "Image", "IsFlash", "0", false);
+                if (core.db.getRecordID("Library File Types", "Image") == 0) {
+                    VerifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'", false);
+                    VerifyRecord(core, "Library File Types", "Image", "IsImage", "1", false);
+                    VerifyRecord(core, "Library File Types", "Image", "IsVideo", "0", false);
+                    VerifyRecord(core, "Library File Types", "Image", "IsDownload", "1", false);
+                    VerifyRecord(core, "Library File Types", "Image", "IsFlash", "0", false);
                 }
                 //
-                if (cpCore.db.getRecordID("Library File Types", "Video") == 0) {
-                    VerifyRecord(cpCore, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'", false);
-                    VerifyRecord(cpCore, "Library File Types", "Video", "IsImage", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Video", "IsVideo", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "Video", "IsDownload", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "Video", "IsFlash", "0", false);
+                if (core.db.getRecordID("Library File Types", "Video") == 0) {
+                    VerifyRecord(core, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'", false);
+                    VerifyRecord(core, "Library File Types", "Video", "IsImage", "0", false);
+                    VerifyRecord(core, "Library File Types", "Video", "IsVideo", "1", false);
+                    VerifyRecord(core, "Library File Types", "Video", "IsDownload", "1", false);
+                    VerifyRecord(core, "Library File Types", "Video", "IsFlash", "0", false);
                 }
                 //
-                if (cpCore.db.getRecordID("Library File Types", "Audio") == 0) {
-                    VerifyRecord(cpCore, "Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'", false);
-                    VerifyRecord(cpCore, "Library File Types", "Audio", "IsImage", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Audio", "IsVideo", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Audio", "IsDownload", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "Audio", "IsFlash", "0", false);
+                if (core.db.getRecordID("Library File Types", "Audio") == 0) {
+                    VerifyRecord(core, "Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'", false);
+                    VerifyRecord(core, "Library File Types", "Audio", "IsImage", "0", false);
+                    VerifyRecord(core, "Library File Types", "Audio", "IsVideo", "0", false);
+                    VerifyRecord(core, "Library File Types", "Audio", "IsDownload", "1", false);
+                    VerifyRecord(core, "Library File Types", "Audio", "IsFlash", "0", false);
                 }
                 //
-                if (cpCore.db.getRecordID("Library File Types", "Word") == 0) {
-                    VerifyRecord(cpCore, "Library File Types", "Word", "ExtensionList", "'DOC'", false);
-                    VerifyRecord(cpCore, "Library File Types", "Word", "IsImage", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Word", "IsVideo", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Word", "IsDownload", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "Word", "IsFlash", "0", false);
+                if (core.db.getRecordID("Library File Types", "Word") == 0) {
+                    VerifyRecord(core, "Library File Types", "Word", "ExtensionList", "'DOC'", false);
+                    VerifyRecord(core, "Library File Types", "Word", "IsImage", "0", false);
+                    VerifyRecord(core, "Library File Types", "Word", "IsVideo", "0", false);
+                    VerifyRecord(core, "Library File Types", "Word", "IsDownload", "1", false);
+                    VerifyRecord(core, "Library File Types", "Word", "IsFlash", "0", false);
                 }
                 //
-                if (cpCore.db.getRecordID("Library File Types", "Flash") == 0) {
-                    VerifyRecord(cpCore, "Library File Types", "Flash", "ExtensionList", "'SWF'", false);
-                    VerifyRecord(cpCore, "Library File Types", "Flash", "IsImage", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Flash", "IsVideo", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Flash", "IsDownload", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "Flash", "IsFlash", "1", false);
+                if (core.db.getRecordID("Library File Types", "Flash") == 0) {
+                    VerifyRecord(core, "Library File Types", "Flash", "ExtensionList", "'SWF'", false);
+                    VerifyRecord(core, "Library File Types", "Flash", "IsImage", "0", false);
+                    VerifyRecord(core, "Library File Types", "Flash", "IsVideo", "0", false);
+                    VerifyRecord(core, "Library File Types", "Flash", "IsDownload", "1", false);
+                    VerifyRecord(core, "Library File Types", "Flash", "IsFlash", "1", false);
                 }
                 //
-                if (cpCore.db.getRecordID("Library File Types", "PDF") == 0) {
-                    VerifyRecord(cpCore, "Library File Types", "PDF", "ExtensionList", "'PDF'", false);
-                    VerifyRecord(cpCore, "Library File Types", "PDF", "IsImage", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "PDF", "IsVideo", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "PDF", "IsDownload", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "PDF", "IsFlash", "0", false);
+                if (core.db.getRecordID("Library File Types", "PDF") == 0) {
+                    VerifyRecord(core, "Library File Types", "PDF", "ExtensionList", "'PDF'", false);
+                    VerifyRecord(core, "Library File Types", "PDF", "IsImage", "0", false);
+                    VerifyRecord(core, "Library File Types", "PDF", "IsVideo", "0", false);
+                    VerifyRecord(core, "Library File Types", "PDF", "IsDownload", "1", false);
+                    VerifyRecord(core, "Library File Types", "PDF", "IsFlash", "0", false);
                 }
                 //
-                if (cpCore.db.getRecordID("Library File Types", "XLS") == 0) {
-                    VerifyRecord(cpCore, "Library File Types", "Excel", "ExtensionList", "'XLS'", false);
-                    VerifyRecord(cpCore, "Library File Types", "Excel", "IsImage", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Excel", "IsVideo", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Excel", "IsDownload", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "Excel", "IsFlash", "0", false);
+                if (core.db.getRecordID("Library File Types", "XLS") == 0) {
+                    VerifyRecord(core, "Library File Types", "Excel", "ExtensionList", "'XLS'", false);
+                    VerifyRecord(core, "Library File Types", "Excel", "IsImage", "0", false);
+                    VerifyRecord(core, "Library File Types", "Excel", "IsVideo", "0", false);
+                    VerifyRecord(core, "Library File Types", "Excel", "IsDownload", "1", false);
+                    VerifyRecord(core, "Library File Types", "Excel", "IsFlash", "0", false);
                 }
                 //
-                if (cpCore.db.getRecordID("Library File Types", "PPT") == 0) {
-                    VerifyRecord(cpCore, "Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'", false);
-                    VerifyRecord(cpCore, "Library File Types", "Power Point", "IsImage", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Power Point", "IsVideo", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Power Point", "IsDownload", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "Power Point", "IsFlash", "0", false);
+                if (core.db.getRecordID("Library File Types", "PPT") == 0) {
+                    VerifyRecord(core, "Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'", false);
+                    VerifyRecord(core, "Library File Types", "Power Point", "IsImage", "0", false);
+                    VerifyRecord(core, "Library File Types", "Power Point", "IsVideo", "0", false);
+                    VerifyRecord(core, "Library File Types", "Power Point", "IsDownload", "1", false);
+                    VerifyRecord(core, "Library File Types", "Power Point", "IsFlash", "0", false);
                 }
                 //
-                if (cpCore.db.getRecordID("Library File Types", "Default") == 0) {
-                    VerifyRecord(cpCore, "Library File Types", "Default", "ExtensionList", "''", false);
-                    VerifyRecord(cpCore, "Library File Types", "Default", "IsImage", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Default", "IsVideo", "0", false);
-                    VerifyRecord(cpCore, "Library File Types", "Default", "IsDownload", "1", false);
-                    VerifyRecord(cpCore, "Library File Types", "Default", "IsFlash", "0", false);
+                if (core.db.getRecordID("Library File Types", "Default") == 0) {
+                    VerifyRecord(core, "Library File Types", "Default", "ExtensionList", "''", false);
+                    VerifyRecord(core, "Library File Types", "Default", "IsImage", "0", false);
+                    VerifyRecord(core, "Library File Types", "Default", "IsVideo", "0", false);
+                    VerifyRecord(core, "Library File Types", "Default", "IsDownload", "1", false);
+                    VerifyRecord(core, "Library File Types", "Default", "IsFlash", "0", false);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1709,34 +1709,34 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        private static void VerifyState(coreController cpcore, string Name, string Abbreviation, double SaleTax, int CountryID, string FIPSState) {
+        private static void VerifyState(coreController core, string Name, string Abbreviation, double SaleTax, int CountryID, string FIPSState) {
             try {
                 //
                 int CS = 0;
                 const string ContentName = "States";
                 //
-                CS = cpcore.db.csOpen(ContentName, "name=" + cpcore.db.encodeSQLText(Name),"", false);
-                if (!cpcore.db.csOk(CS)) {
+                CS = core.db.csOpen(ContentName, "name=" + core.db.encodeSQLText(Name),"", false);
+                if (!core.db.csOk(CS)) {
                     //
                     // create new record
                     //
-                    cpcore.db.csClose(ref CS);
-                    CS = cpcore.db.csInsertRecord(ContentName, SystemMemberID);
-                    cpcore.db.csSet(CS, "NAME", Name);
-                    cpcore.db.csSet(CS, "ACTIVE", true);
-                    cpcore.db.csSet(CS, "Abbreviation", Abbreviation);
-                    cpcore.db.csSet(CS, "CountryID", CountryID);
-                    cpcore.db.csSet(CS, "FIPSState", FIPSState);
+                    core.db.csClose(ref CS);
+                    CS = core.db.csInsertRecord(ContentName, SystemMemberID);
+                    core.db.csSet(CS, "NAME", Name);
+                    core.db.csSet(CS, "ACTIVE", true);
+                    core.db.csSet(CS, "Abbreviation", Abbreviation);
+                    core.db.csSet(CS, "CountryID", CountryID);
+                    core.db.csSet(CS, "FIPSState", FIPSState);
                 } else {
                     //
                     // verify only fields needed for contensive
                     //
-                    cpcore.db.csSet(CS, "CountryID", CountryID);
-                    cpcore.db.csSet(CS, "Abbreviation", Abbreviation);
+                    core.db.csSet(CS, "CountryID", CountryID);
+                    core.db.csSet(CS, "Abbreviation", Abbreviation);
                 }
-                cpcore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1745,101 +1745,101 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyStates(coreController cpCore) {
+        public static void VerifyStates(coreController core) {
             try {
                 //
-                appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyStates", "Verify States");
+                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyStates", "Verify States");
                 //
                 int CountryID = 0;
                 //
-                VerifyCountry(cpCore, "United States", "US");
-                CountryID = cpCore.db.getRecordID("Countries", "United States");
+                VerifyCountry(core, "United States", "US");
+                CountryID = core.db.getRecordID("Countries", "United States");
                 //
-                VerifyState(cpCore, "Alaska", "AK", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Alabama", "AL", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Arizona", "AZ", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Arkansas", "AR", 0.0D, CountryID, "");
-                VerifyState(cpCore, "California", "CA", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Connecticut", "CT", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Colorado", "CO", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Delaware", "DE", 0.0D, CountryID, "");
-                VerifyState(cpCore, "District of Columbia", "DC", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Florida", "FL", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Georgia", "GA", 0.0D, CountryID, "");
+                VerifyState(core, "Alaska", "AK", 0.0D, CountryID, "");
+                VerifyState(core, "Alabama", "AL", 0.0D, CountryID, "");
+                VerifyState(core, "Arizona", "AZ", 0.0D, CountryID, "");
+                VerifyState(core, "Arkansas", "AR", 0.0D, CountryID, "");
+                VerifyState(core, "California", "CA", 0.0D, CountryID, "");
+                VerifyState(core, "Connecticut", "CT", 0.0D, CountryID, "");
+                VerifyState(core, "Colorado", "CO", 0.0D, CountryID, "");
+                VerifyState(core, "Delaware", "DE", 0.0D, CountryID, "");
+                VerifyState(core, "District of Columbia", "DC", 0.0D, CountryID, "");
+                VerifyState(core, "Florida", "FL", 0.0D, CountryID, "");
+                VerifyState(core, "Georgia", "GA", 0.0D, CountryID, "");
 
-                VerifyState(cpCore, "Hawaii", "HI", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Idaho", "ID", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Illinois", "IL", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Indiana", "IN", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Iowa", "IA", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Kansas", "KS", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Kentucky", "KY", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Louisiana", "LA", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Massachusetts", "MA", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Maine", "ME", 0.0D, CountryID, "");
+                VerifyState(core, "Hawaii", "HI", 0.0D, CountryID, "");
+                VerifyState(core, "Idaho", "ID", 0.0D, CountryID, "");
+                VerifyState(core, "Illinois", "IL", 0.0D, CountryID, "");
+                VerifyState(core, "Indiana", "IN", 0.0D, CountryID, "");
+                VerifyState(core, "Iowa", "IA", 0.0D, CountryID, "");
+                VerifyState(core, "Kansas", "KS", 0.0D, CountryID, "");
+                VerifyState(core, "Kentucky", "KY", 0.0D, CountryID, "");
+                VerifyState(core, "Louisiana", "LA", 0.0D, CountryID, "");
+                VerifyState(core, "Massachusetts", "MA", 0.0D, CountryID, "");
+                VerifyState(core, "Maine", "ME", 0.0D, CountryID, "");
 
-                VerifyState(cpCore, "Maryland", "MD", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Michigan", "MI", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Minnesota", "MN", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Missouri", "MO", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Mississippi", "MS", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Montana", "MT", 0.0D, CountryID, "");
-                VerifyState(cpCore, "North Carolina", "NC", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Nebraska", "NE", 0.0D, CountryID, "");
-                VerifyState(cpCore, "New Hampshire", "NH", 0.0D, CountryID, "");
-                VerifyState(cpCore, "New Mexico", "NM", 0.0D, CountryID, "");
+                VerifyState(core, "Maryland", "MD", 0.0D, CountryID, "");
+                VerifyState(core, "Michigan", "MI", 0.0D, CountryID, "");
+                VerifyState(core, "Minnesota", "MN", 0.0D, CountryID, "");
+                VerifyState(core, "Missouri", "MO", 0.0D, CountryID, "");
+                VerifyState(core, "Mississippi", "MS", 0.0D, CountryID, "");
+                VerifyState(core, "Montana", "MT", 0.0D, CountryID, "");
+                VerifyState(core, "North Carolina", "NC", 0.0D, CountryID, "");
+                VerifyState(core, "Nebraska", "NE", 0.0D, CountryID, "");
+                VerifyState(core, "New Hampshire", "NH", 0.0D, CountryID, "");
+                VerifyState(core, "New Mexico", "NM", 0.0D, CountryID, "");
 
-                VerifyState(cpCore, "New Jersey", "NJ", 0.0D, CountryID, "");
-                VerifyState(cpCore, "New York", "NY", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Nevada", "NV", 0.0D, CountryID, "");
-                VerifyState(cpCore, "North Dakota", "ND", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Ohio", "OH", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Oklahoma", "OK", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Oregon", "OR", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Pennsylvania", "PA", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Rhode Island", "RI", 0.0D, CountryID, "");
-                VerifyState(cpCore, "South Carolina", "SC", 0.0D, CountryID, "");
+                VerifyState(core, "New Jersey", "NJ", 0.0D, CountryID, "");
+                VerifyState(core, "New York", "NY", 0.0D, CountryID, "");
+                VerifyState(core, "Nevada", "NV", 0.0D, CountryID, "");
+                VerifyState(core, "North Dakota", "ND", 0.0D, CountryID, "");
+                VerifyState(core, "Ohio", "OH", 0.0D, CountryID, "");
+                VerifyState(core, "Oklahoma", "OK", 0.0D, CountryID, "");
+                VerifyState(core, "Oregon", "OR", 0.0D, CountryID, "");
+                VerifyState(core, "Pennsylvania", "PA", 0.0D, CountryID, "");
+                VerifyState(core, "Rhode Island", "RI", 0.0D, CountryID, "");
+                VerifyState(core, "South Carolina", "SC", 0.0D, CountryID, "");
 
-                VerifyState(cpCore, "South Dakota", "SD", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Tennessee", "TN", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Texas", "TX", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Utah", "UT", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Vermont", "VT", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Virginia", "VA", 0.045, CountryID, "");
-                VerifyState(cpCore, "Washington", "WA", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Wisconsin", "WI", 0.0D, CountryID, "");
-                VerifyState(cpCore, "West Virginia", "WV", 0.0D, CountryID, "");
-                VerifyState(cpCore, "Wyoming", "WY", 0.0D, CountryID, "");
+                VerifyState(core, "South Dakota", "SD", 0.0D, CountryID, "");
+                VerifyState(core, "Tennessee", "TN", 0.0D, CountryID, "");
+                VerifyState(core, "Texas", "TX", 0.0D, CountryID, "");
+                VerifyState(core, "Utah", "UT", 0.0D, CountryID, "");
+                VerifyState(core, "Vermont", "VT", 0.0D, CountryID, "");
+                VerifyState(core, "Virginia", "VA", 0.045, CountryID, "");
+                VerifyState(core, "Washington", "WA", 0.0D, CountryID, "");
+                VerifyState(core, "Wisconsin", "WI", 0.0D, CountryID, "");
+                VerifyState(core, "West Virginia", "WV", 0.0D, CountryID, "");
+                VerifyState(core, "Wyoming", "WY", 0.0D, CountryID, "");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
         //
         // Get the Menu for FormInputHTML
         //
-        private static void VerifyCountry(coreController cpCore, string Name, string Abbreviation) {
+        private static void VerifyCountry(coreController core, string Name, string Abbreviation) {
             try {
                 int CS;
                 //
-                CS = cpCore.db.csOpen("Countries", "name=" + cpCore.db.encodeSQLText(Name));
-                if (!cpCore.db.csOk(CS)) {
-                    cpCore.db.csClose(ref CS);
-                    CS = cpCore.db.csInsertRecord("Countries", SystemMemberID);
-                    if (cpCore.db.csOk(CS)) {
-                        cpCore.db.csSet(CS, "ACTIVE", true);
+                CS = core.db.csOpen("Countries", "name=" + core.db.encodeSQLText(Name));
+                if (!core.db.csOk(CS)) {
+                    core.db.csClose(ref CS);
+                    CS = core.db.csInsertRecord("Countries", SystemMemberID);
+                    if (core.db.csOk(CS)) {
+                        core.db.csSet(CS, "ACTIVE", true);
                     }
                 }
-                if (cpCore.db.csOk(CS)) {
-                    cpCore.db.csSet(CS, "NAME", Name);
-                    cpCore.db.csSet(CS, "Abbreviation", Abbreviation);
+                if (core.db.csOk(CS)) {
+                    core.db.csSet(CS, "NAME", Name);
+                    core.db.csSet(CS, "Abbreviation", Abbreviation);
                     if (genericController.vbLCase(Name) == "united states") {
-                        cpCore.db.csSet(CS, "DomesticShipping", "1");
+                        core.db.csSet(CS, "DomesticShipping", "1");
                     }
                 }
-                cpCore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1848,23 +1848,23 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyCountries(coreController cpCore) {
+        public static void VerifyCountries(coreController core) {
             try {
                 //
-                appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyCountries", "Verify Countries");
+                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyCountries", "Verify Countries");
                 //
-                string list = cpCore.appRootFiles.readFile("cclib\\config\\isoCountryList.txt");
+                string list = core.appRootFiles.readFile("cclib\\config\\isoCountryList.txt");
                 string[] rows  = genericController.stringSplit(list, "\r\n");
                 foreach( var row in rows) {
                     if (!string.IsNullOrEmpty(row)) {
                         string[] attrs = row.Split(';');
                         foreach (var attr in attrs) {
-                            VerifyCountry(cpCore, EncodeInitialCaps(attr), attrs[1]);
+                            VerifyCountry(core, EncodeInitialCaps(attr), attrs[1]);
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1873,19 +1873,19 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyDefaultGroups(coreController cpCore) {
+        public static void VerifyDefaultGroups(coreController core) {
             try {
                 //
                 int GroupID = 0;
                 string SQL = null;
                 //
-                appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups");
+                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups");
                 //
-                GroupID = groupController.group_add(cpCore, "Site Managers");
-                SQL = "Update ccContent Set EditorGroupID=" + cpCore.db.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
-                cpCore.db.executeQuery(SQL);
+                GroupID = groupController.group_add(core, "Site Managers");
+                SQL = "Update ccContent Set EditorGroupID=" + core.db.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
+                core.db.executeQuery(SQL);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -1904,7 +1904,7 @@ namespace Contensive.Core.Controllers {
         //        '
         //        ' Now Create / Modify Db based on all CDef records that are 'CDefChanged'
         //        '
-        //        Call UpgradeCDef_BuildDbFromCollection(CollectionWorking, IISResetRequired, cpCore.app.DataBuildVersion_DontUseThis)
+        //        Call UpgradeCDef_BuildDbFromCollection(CollectionWorking, IISResetRequired, core.app.DataBuildVersion_DontUseThis)
         //        '
         //        ' IISReset if needed
         //        '
@@ -1912,16 +1912,16 @@ namespace Contensive.Core.Controllers {
         //            '
         //            ' Restart IIS if stopped
         //            '
-        //            runAtServer = New runAtServerClass(cpCore)
+        //            runAtServer = New runAtServerClass(core)
         //            Call runAtServer.executeCmd("IISReset", "")
         //        End If
         //        '
         //        ' Clear the CDef folder
         //        '
-        //        Call cpCore.app.publicFiles.DeleteFileFolder(FilePath)
-        //        Call cpCore.app.publicFiles.createPath(FilePath)
+        //        Call core.app.publicFiles.DeleteFileFolder(FilePath)
+        //        Call core.app.publicFiles.createPath(FilePath)
         //    Catch ex As Exception
-        //        cpCore.handleException(ex);
+        //        core.handleException(ex);
         //    End Try
         //End Sub
         //
@@ -1934,30 +1934,30 @@ namespace Contensive.Core.Controllers {
         //    Dim ParentID As Integer
         //    '
         //    If ParentName <> "" Then
-        //        CS = cpcore.app.csOpen(cnNavigatorEntries, "name=" & encodeSQLText(ParentName), "ID", , , , , "ID")
-        //        If Not cpcore.app.csv_IsCSOK(CS) Then
-        //            Call cpcore.app.csv_CloseCS(CS)
-        //            CS = cpcore.app.csv_InsertCSRecord(cnNavigatorEntries)
+        //        CS = core.app.csOpen(cnNavigatorEntries, "name=" & encodeSQLText(ParentName), "ID", , , , , "ID")
+        //        If Not core.app.csv_IsCSOK(CS) Then
+        //            Call core.app.csv_CloseCS(CS)
+        //            CS = core.app.csv_InsertCSRecord(cnNavigatorEntries)
         //        End If
-        //        If cpcore.app.csv_IsCSOK(CS) Then
-        //            ParentID = cpcore.app.csv_cs_getInteger(CS, "ID")
+        //        If core.app.csv_IsCSOK(CS) Then
+        //            ParentID = core.app.csv_cs_getInteger(CS, "ID")
         //        End If
         //    End If
-        //    CS = cpcore.app.csOpen(cnNavigatorEntries, "name=" & encodeSQLText(EntryName), "ID", , , , , "ID,Name,ParentID,AddonID")
-        //    If Not cpcore.app.csv_IsCSOK(CS) Then
-        //        Call cpcore.app.csv_CloseCS(CS)
-        //        CS = cpcore.app.csv_InsertCSRecord(cnNavigatorEntries)
+        //    CS = core.app.csOpen(cnNavigatorEntries, "name=" & encodeSQLText(EntryName), "ID", , , , , "ID,Name,ParentID,AddonID")
+        //    If Not core.app.csv_IsCSOK(CS) Then
+        //        Call core.app.csv_CloseCS(CS)
+        //        CS = core.app.csv_InsertCSRecord(cnNavigatorEntries)
         //    End If
-        //    If cpcore.app.csv_IsCSOK(CS) Then
-        //        Call cpcore.app.csv_SetCS(CS, "Name", EntryName)
-        //        Call cpcore.app.csv_SetCS(CS, "ParentID", ParentID)
-        //        Call cpcore.app.csv_SetCS(CS, "AddonID", AddonID)
+        //    If core.app.csv_IsCSOK(CS) Then
+        //        Call core.app.csv_SetCS(CS, "Name", EntryName)
+        //        Call core.app.csv_SetCS(CS, "ParentID", ParentID)
+        //        Call core.app.csv_SetCS(CS, "AddonID", AddonID)
         //    End If
-        //    Call cpcore.app.csv_CloseCS(CS)
+        //    Call core.app.csv_CloseCS(CS)
         //    '
         //    Exit Sub
         ////ErrorTrap:
-        //    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "SetNavigatorEntry", True, False)
+        //    dim ex as new exception("todo"): Call HandleClassError(ex,core.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "SetNavigatorEntry", True, False)
         //End Sub
         //
         //
@@ -1969,33 +1969,33 @@ namespace Contensive.Core.Controllers {
         //    Dim ParentID As Integer
         //    '
         //    If ParentGuid <> "" Then
-        //        CS = cpcore.app.csOpen(cnNavigatorEntries, "NavGuid=" & encodeSQLText(ParentGuid), "ID", , , , , "ID")
-        //        If cpcore.app.csv_IsCSOK(CS) Then
-        //            ParentID = cpcore.app.csv_cs_getInteger(CS, "ID")
+        //        CS = core.app.csOpen(cnNavigatorEntries, "NavGuid=" & encodeSQLText(ParentGuid), "ID", , , , , "ID")
+        //        If core.app.csv_IsCSOK(CS) Then
+        //            ParentID = core.app.csv_cs_getInteger(CS, "ID")
         //        End If
-        //        Call cpcore.app.csv_CloseCS(CS)
+        //        Call core.app.csv_CloseCS(CS)
         //    End If
         //    If ParentID > 0 Then
-        //        CS = cpcore.app.csOpen(cnNavigatorEntries, "(parentid=" & ParentID & ")and(name=" & encodeSQLText(EntryName) & ")", "ID", , , , , "ID,Name,ParentID,AddonID")
-        //        If Not cpcore.app.csv_IsCSOK(CS) Then
-        //            Call cpcore.app.csv_CloseCS(CS)
-        //            CS = cpcore.app.csv_InsertCSRecord(cnNavigatorEntries)
+        //        CS = core.app.csOpen(cnNavigatorEntries, "(parentid=" & ParentID & ")and(name=" & encodeSQLText(EntryName) & ")", "ID", , , , , "ID,Name,ParentID,AddonID")
+        //        If Not core.app.csv_IsCSOK(CS) Then
+        //            Call core.app.csv_CloseCS(CS)
+        //            CS = core.app.csv_InsertCSRecord(cnNavigatorEntries)
         //        End If
-        //        If cpcore.app.csv_IsCSOK(CS) Then
-        //            Call cpcore.app.csv_SetCS(CS, "Name", EntryName)
-        //            Call cpcore.app.csv_SetCS(CS, "ParentID", ParentID)
-        //            Call cpcore.app.csv_SetCS(CS, "AddonID", AddonID)
+        //        If core.app.csv_IsCSOK(CS) Then
+        //            Call core.app.csv_SetCS(CS, "Name", EntryName)
+        //            Call core.app.csv_SetCS(CS, "ParentID", ParentID)
+        //            Call core.app.csv_SetCS(CS, "AddonID", AddonID)
         //            If true Then
-        //                Call cpcore.app.csv_SetCS(CS, "NavIconTypeID", NavIconTypeID)
-        //                Call cpcore.app.csv_SetCS(CS, "NavIconTitle", NavIconTitle)
+        //                Call core.app.csv_SetCS(CS, "NavIconTypeID", NavIconTypeID)
+        //                Call core.app.csv_SetCS(CS, "NavIconTitle", NavIconTitle)
         //            End If
         //        End If
-        //        Call cpcore.app.csv_CloseCS(CS)
+        //        Call core.app.csv_CloseCS(CS)
         //    End If
         //    '
         //    Exit Sub
         ////ErrorTrap:
-        //    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "SetNavigatorEntry", True, False)
+        //    dim ex as new exception("todo"): Call HandleClassError(ex,core.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "SetNavigatorEntry", True, False)
         //End Sub
         //
         //======================================================================================================
@@ -2008,23 +2008,23 @@ namespace Contensive.Core.Controllers {
         //        '
         //        Dim IISResetRequired As Boolean
         //        Dim runAtServer As runAtServerClass
-        //        Dim addonInstall As New addonInstallClass(cpCore)
+        //        Dim addonInstall As New addonInstallClass(core)
         //        Dim saveLogFolder As String
         //        '
         //        InstallAddons = False
         //        '
         //        saveLogFolder = classLogFolder
-        //        InstallAddons = addonInstall.InstallCollectionFromPrivateFolder(Me, buildVersion, "Install\", IISResetRequired, cpCore.app.config.name, "", "", IsNewBuild)
+        //        InstallAddons = addonInstall.InstallCollectionFromPrivateFolder(Me, buildVersion, "Install\", IISResetRequired, core.app.config.name, "", "", IsNewBuild)
         //        classLogFolder = saveLogFolder
         //        '
         //        ' IISReset if needed
         //        '
         //        If IISResetRequired Then
-        //            runAtServer = New runAtServerClass(cpCore)
+        //            runAtServer = New runAtServerClass(core)
         //            Call runAtServer.executeCmd("IISReset", "")
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleException(ex);
+        //        core.handleException(ex);
         //    End Try
         //    Return returnOk
         //End Function
@@ -2032,7 +2032,7 @@ namespace Contensive.Core.Controllers {
         //
         ///
         //Public Shared Sub ReplaceAddonWithCollection(ByVal AddonProgramID As String, ByVal CollectionGuid As String, ByRef return_IISResetRequired As Boolean, ByRef return_RegisterList As String)
-        //    Dim ex As New Exception("todo") : Call handleClassException(cpCore, ex, cpCore.serverConfig.appConfig.name, "methodNameFPO") ' ignoreInteger, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
+        //    Dim ex As New Exception("todo") : Call handleClassException(core, ex, core.serverConfig.appConfig.name, "methodNameFPO") ' ignoreInteger, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
         //End Sub
         //    On Error GoTo ErrorTrap
         //    '
@@ -2040,22 +2040,22 @@ namespace Contensive.Core.Controllers {
         //    Dim ErrorMessage As String
         //    Dim addonInstall As addonInstallClass
         //    '
-        //    CS = cpcore.app.csOpen(cnAddons, "objectProgramID=" & encodeSQLText(AddonProgramID))
-        //    If cpcore.app.csv_IsCSOK(CS) Then
-        //        Call cpcore.app.csv_DeleteCSRecord(CS)
+        //    CS = core.app.csOpen(cnAddons, "objectProgramID=" & encodeSQLText(AddonProgramID))
+        //    If core.app.csv_IsCSOK(CS) Then
+        //        Call core.app.csv_DeleteCSRecord(CS)
         //        InstallCollectionList = InstallCollectionList & "," & CollectionGuid
         //        'Set AddonInstall = New AddonInstallClass
-        //        'If Not AddonInstall.UpgradeAllAppsFromLibCollection2(CollectionGuid, cpcore.app.appEnvironment.name, Return_IISResetRequired, Return_RegisterList, ErrorMessage) Then
+        //        'If Not AddonInstall.UpgradeAllAppsFromLibCollection2(CollectionGuid, core.app.appEnvironment.name, Return_IISResetRequired, Return_RegisterList, ErrorMessage) Then
         //        'End If
         //    End If
-        //    Call cpcore.app.csv_CloseCS(CS)
+        //    Call core.app.csv_CloseCS(CS)
         //    '
         //    Exit Sub
         //    '
         //    ' ----- Error Trap
         //    '
         ////ErrorTrap:
-        //    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name, Err.Number, Err.Source, Err.Description, "ReplaceAddonWithCollection", True, True)
+        //    dim ex as new exception("todo"): Call HandleClassError(ex,core.app.appEnvironment.name, Err.Number, Err.Source, Err.Description, "ReplaceAddonWithCollection", True, True)
         //    Err.Clear
         //End Sub
         //
@@ -2066,104 +2066,104 @@ namespace Contensive.Core.Controllers {
         //       it will fail if they are not up to date.
         //===================================================================================================================
         //
-        internal static void VerifyBasicTables(coreController cpCore) {
+        internal static void VerifyBasicTables(coreController core) {
             try {
                 //
                 if (!false) {
-                    appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables");
+                    appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables");
                     //
-                    cpCore.db.createSQLTable("Default", "ccDataSources");
-                    cpCore.db.createSQLTableField("Default", "ccDataSources", "typeId", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccDataSources", "address", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccDataSources", "username", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccDataSources", "password", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccDataSources", "ConnString", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccDataSources", "endpoint", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccDataSources", "dbtypeid", FieldTypeIdLookup);
+                    core.db.createSQLTable("Default", "ccDataSources");
+                    core.db.createSQLTableField("Default", "ccDataSources", "typeId", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccDataSources", "address", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccDataSources", "username", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccDataSources", "password", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccDataSources", "ConnString", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccDataSources", "endpoint", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccDataSources", "dbtypeid", FieldTypeIdLookup);
                     //
-                    cpCore.db.createSQLTable("Default", "ccTables");
-                    cpCore.db.createSQLTableField("Default", "ccTables", "DataSourceID", FieldTypeIdLookup);
+                    core.db.createSQLTable("Default", "ccTables");
+                    core.db.createSQLTableField("Default", "ccTables", "DataSourceID", FieldTypeIdLookup);
                     //
-                    cpCore.db.createSQLTable("Default", "ccContent");
-                    cpCore.db.createSQLTableField("Default", "ccContent", "ContentTableID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "AuthoringTableID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "AllowAdd", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "AllowDelete", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "AllowWorkflowAuthoring", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "DeveloperOnly", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "AdminOnly", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "ParentID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "DefaultSortMethodID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "DropDownFieldList", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "EditorGroupID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "AllowCalendarEvents", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "AllowContentTracking", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "AllowTopicRules", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "AllowContentChildTool", FieldTypeIdBoolean);
-                    //Call cpCore.db.createSQLTableField("Default", "ccContent", "AllowMetaContent", FieldTypeIdBoolean)
-                    cpCore.db.createSQLTableField("Default", "ccContent", "IconLink", FieldTypeIdLink);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "IconHeight", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "IconWidth", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "IconSprites", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccContent", "installedByCollectionId", FieldTypeIdInteger);
-                    //Call cpCore.app.csv_CreateSQLTableField("Default", "ccContent", "ccGuid", FieldTypeText)
-                    cpCore.db.createSQLTableField("Default", "ccContent", "IsBaseContent", FieldTypeIdBoolean);
-                    //Call cpcore.app.csv_CreateSQLTableField("Default", "ccContent", "WhereClause", FieldTypeText)
+                    core.db.createSQLTable("Default", "ccContent");
+                    core.db.createSQLTableField("Default", "ccContent", "ContentTableID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccContent", "AuthoringTableID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccContent", "AllowAdd", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccContent", "AllowDelete", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccContent", "AllowWorkflowAuthoring", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccContent", "DeveloperOnly", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccContent", "AdminOnly", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccContent", "ParentID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccContent", "DefaultSortMethodID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccContent", "DropDownFieldList", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccContent", "EditorGroupID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccContent", "AllowCalendarEvents", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccContent", "AllowContentTracking", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccContent", "AllowTopicRules", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccContent", "AllowContentChildTool", FieldTypeIdBoolean);
+                    //Call core.db.createSQLTableField("Default", "ccContent", "AllowMetaContent", FieldTypeIdBoolean)
+                    core.db.createSQLTableField("Default", "ccContent", "IconLink", FieldTypeIdLink);
+                    core.db.createSQLTableField("Default", "ccContent", "IconHeight", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccContent", "IconWidth", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccContent", "IconSprites", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccContent", "installedByCollectionId", FieldTypeIdInteger);
+                    //Call core.app.csv_CreateSQLTableField("Default", "ccContent", "ccGuid", FieldTypeText)
+                    core.db.createSQLTableField("Default", "ccContent", "IsBaseContent", FieldTypeIdBoolean);
+                    //Call core.app.csv_CreateSQLTableField("Default", "ccContent", "WhereClause", FieldTypeText)
                     //
-                    cpCore.db.createSQLTable("Default", "ccFields");
-                    cpCore.db.createSQLTableField("Default", "ccFields", "ContentID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "Type", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "Caption", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "ReadOnly", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "NotEditable", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "LookupContentID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "RedirectContentID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "RedirectPath", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "RedirectID", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "HelpMessage", FieldTypeIdLongText); // deprecated but Im chicken to remove this
-                    cpCore.db.createSQLTableField("Default", "ccFields", "UniqueName", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "TextBuffered", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "Password", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "IndexColumn", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "IndexWidth", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "IndexSortPriority", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "IndexSortDirection", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "EditSortPriority", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "AdminOnly", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "DeveloperOnly", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "DefaultValue", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "Required", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "HTMLContent", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "Authorable", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "ManyToManyContentID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "ManyToManyRuleContentID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "ManyToManyRulePrimaryField", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "ManyToManyRuleSecondaryField", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "RSSTitleField", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "RSSDescriptionField", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "MemberSelectGroupID", FieldTypeIdInteger);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "EditTab", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "Scramble", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "LookupList", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "IsBaseField", FieldTypeIdBoolean);
-                    cpCore.db.createSQLTableField("Default", "ccFields", "installedByCollectionId", FieldTypeIdInteger);
+                    core.db.createSQLTable("Default", "ccFields");
+                    core.db.createSQLTableField("Default", "ccFields", "ContentID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "Type", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "Caption", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccFields", "ReadOnly", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "NotEditable", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "LookupContentID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "RedirectContentID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "RedirectPath", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccFields", "RedirectID", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccFields", "HelpMessage", FieldTypeIdLongText); // deprecated but Im chicken to remove this
+                    core.db.createSQLTableField("Default", "ccFields", "UniqueName", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "TextBuffered", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "Password", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "IndexColumn", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "IndexWidth", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccFields", "IndexSortPriority", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "IndexSortDirection", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "EditSortPriority", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "AdminOnly", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "DeveloperOnly", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "DefaultValue", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccFields", "Required", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "HTMLContent", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "Authorable", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "ManyToManyContentID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "ManyToManyRuleContentID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "ManyToManyRulePrimaryField", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccFields", "ManyToManyRuleSecondaryField", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccFields", "RSSTitleField", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "RSSDescriptionField", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "MemberSelectGroupID", FieldTypeIdInteger);
+                    core.db.createSQLTableField("Default", "ccFields", "EditTab", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccFields", "Scramble", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "LookupList", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccFields", "IsBaseField", FieldTypeIdBoolean);
+                    core.db.createSQLTableField("Default", "ccFields", "installedByCollectionId", FieldTypeIdInteger);
                     //
-                    cpCore.db.createSQLTable("Default", "ccFieldHelp");
-                    cpCore.db.createSQLTableField("Default", "ccFieldHelp", "FieldID", FieldTypeIdLookup);
-                    cpCore.db.createSQLTableField("Default", "ccFieldHelp", "HelpDefault", FieldTypeIdLongText);
-                    cpCore.db.createSQLTableField("Default", "ccFieldHelp", "HelpCustom", FieldTypeIdLongText);
+                    core.db.createSQLTable("Default", "ccFieldHelp");
+                    core.db.createSQLTableField("Default", "ccFieldHelp", "FieldID", FieldTypeIdLookup);
+                    core.db.createSQLTableField("Default", "ccFieldHelp", "HelpDefault", FieldTypeIdLongText);
+                    core.db.createSQLTableField("Default", "ccFieldHelp", "HelpCustom", FieldTypeIdLongText);
                     //
-                    cpCore.db.createSQLTable("Default", "ccSetup");
-                    cpCore.db.createSQLTableField("Default", "ccSetup", "FieldValue", FieldTypeIdText);
-                    cpCore.db.createSQLTableField("Default", "ccSetup", "DeveloperOnly", FieldTypeIdBoolean);
+                    core.db.createSQLTable("Default", "ccSetup");
+                    core.db.createSQLTableField("Default", "ccSetup", "FieldValue", FieldTypeIdText);
+                    core.db.createSQLTableField("Default", "ccSetup", "DeveloperOnly", FieldTypeIdBoolean);
                     //
-                    cpCore.db.createSQLTable("Default", "ccSortMethods");
-                    cpCore.db.createSQLTableField("Default", "ccSortMethods", "OrderByClause", FieldTypeIdText);
+                    core.db.createSQLTable("Default", "ccSortMethods");
+                    core.db.createSQLTableField("Default", "ccSortMethods", "OrderByClause", FieldTypeIdText);
                     //
-                    cpCore.db.createSQLTable("Default", "ccFieldTypes");
+                    core.db.createSQLTable("Default", "ccFieldTypes");
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -2173,31 +2173,31 @@ namespace Contensive.Core.Controllers {
         //   Error handler
         //===========================================================================
         //
-        private static void handleClassException(coreController cpCore, Exception ex, string ApplicationName, string MethodName) {
-            logController.appendLog(cpCore, "exception in builderClass." + MethodName + ", application [" + ApplicationName + "], ex [" + ex.ToString() + "]");
+        private static void handleClassException(coreController core, Exception ex, string ApplicationName, string MethodName) {
+            logController.appendLog(core, "exception in builderClass." + MethodName + ", application [" + ApplicationName + "], ex [" + ex.ToString() + "]");
         }
         //
         //===========================================================================
         //   Append Log File
         //===========================================================================
         //
-        private static void appendUpgradeLog(coreController cpCore, string appName, string Method, string Message) {
-            logController.appendLogInstall(cpCore, "app [" + appName + "], Method [" + Method + "], Message [" + Message + "]");
+        private static void appendUpgradeLog(coreController core, string appName, string Method, string Message) {
+            logController.appendLogInstall(core, "app [" + appName + "], Method [" + Method + "], Message [" + Message + "]");
         }
         //
         //=============================================================================
         //   Get a ContentID from the ContentName using just the tables
         //=============================================================================
         //
-        private static void appendUpgradeLogAddStep(coreController cpCore, string appName, string Method, string Message) {
-            appendUpgradeLog(cpCore, appName, Method, Message);
+        private static void appendUpgradeLogAddStep(coreController core, string appName, string Method, string Message) {
+            appendUpgradeLog(core, appName, Method, Message);
         }
         //
         //=====================================================================================================
         //   a value in a name/value pair
         //=====================================================================================================
         //
-        public static void SetNameValueArrays(coreController cpCore, string InputName, string InputValue, ref string[] SQLName, ref string[] SQLValue, ref int Index) {
+        public static void SetNameValueArrays(coreController core, string InputName, string InputValue, ref string[] SQLName, ref string[] SQLValue, ref int Index) {
             // ##### removed to catch err<>0 problem //On Error //Resume Next
             //
             SQLName[Index] = InputName;
@@ -2223,12 +2223,12 @@ namespace Contensive.Core.Controllers {
         //            Call csv_VerifyAggregateReplacement2(Name, "", ArgumentList, SortOrder)
         //        End If
         //    Catch ex As Exception
-        //        cpCore.handleException(ex);
+        //        core.handleException(ex);
         //    End Try
         //End Sub '
 
         // -- deprecated
-        //Public Shared Sub admin_VerifyMenuEntry(cpCore As coreClass, ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, ByVal AdminOnly As Boolean, ByVal DeveloperOnly As Boolean, ByVal NewWindow As Boolean, ByVal Active As Boolean, ByVal MenuContentName As String, ByVal AddonName As String)
+        //Public Shared Sub admin_VerifyMenuEntry(core As coreClass, ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, ByVal AdminOnly As Boolean, ByVal DeveloperOnly As Boolean, ByVal NewWindow As Boolean, ByVal Active As Boolean, ByVal MenuContentName As String, ByVal AddonName As String)
         //    Try
         //        '
         //        Const AddonContentName = "Aggregate Functions"
@@ -2242,7 +2242,7 @@ namespace Contensive.Core.Controllers {
         //        Dim SupportAddonID As Boolean
         //        '
         //        SelectList = "Name,ContentID,ParentID,LinkPage,SortOrder,AdminOnly,DeveloperOnly,NewWindow,Active"
-        //        SupportAddonID = Models.Complex.cdefModel.isContentFieldSupported(cpcore,MenuContentName, "AddonID")
+        //        SupportAddonID = Models.Complex.cdefModel.isContentFieldSupported(core,MenuContentName, "AddonID")
         //        '
         //        ' Get AddonID from AddonName
         //        '
@@ -2252,11 +2252,11 @@ namespace Contensive.Core.Controllers {
         //        Else
         //            SelectList = SelectList & ",AddonID"
         //            If AddonName <> "" Then
-        //                CS = cpCore.db.cs_open(AddonContentName, "name=" & cpCore.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
-        //                If cpCore.db.cs_ok(CS) Then
-        //                    addonId = (cpCore.db.cs_getInteger(CS, "ID"))
+        //                CS = core.db.cs_open(AddonContentName, "name=" & core.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
+        //                If core.db.cs_ok(CS) Then
+        //                    addonId = (core.db.cs_getInteger(CS, "ID"))
         //                End If
-        //                Call cpCore.db.cs_Close(CS)
+        //                Call core.db.cs_Close(CS)
         //            End If
         //        End If
         //        '
@@ -2264,57 +2264,57 @@ namespace Contensive.Core.Controllers {
         //        '
         //        ParentID = 0
         //        If ParentName <> "" Then
-        //            CS = cpCore.db.cs_open(MenuContentName, "name=" & cpCore.db.encodeSQLText(ParentName), "ID", False, , , , "ID", 1)
-        //            If cpCore.db.cs_ok(CS) Then
-        //                ParentID = (cpCore.db.cs_getInteger(CS, "ID"))
+        //            CS = core.db.cs_open(MenuContentName, "name=" & core.db.encodeSQLText(ParentName), "ID", False, , , , "ID", 1)
+        //            If core.db.cs_ok(CS) Then
+        //                ParentID = (core.db.cs_getInteger(CS, "ID"))
         //            End If
-        //            Call cpCore.db.cs_Close(CS)
+        //            Call core.db.cs_Close(CS)
         //        End If
         //        '
         //        ' Set ContentID from ContentName
         //        '
         //        ContentID = -1
         //        If ContentName <> "" Then
-        //            ContentID = Models.Complex.cdefModel.getContentId(cpcore,ContentName)
+        //            ContentID = Models.Complex.cdefModel.getContentId(core,ContentName)
         //        End If
         //        '
         //        ' Locate current entry
         //        '
-        //        CSEntry = cpCore.db.cs_open(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")", "ID", False, , , , SelectList)
+        //        CSEntry = core.db.cs_open(MenuContentName, "(name=" & core.db.encodeSQLText(EntryName) & ")", "ID", False, , , , SelectList)
         //        '
         //        ' If no current entry, create one
         //        '
-        //        If Not cpCore.db.cs_ok(CSEntry) Then
-        //            cpCore.db.cs_Close(CSEntry)
-        //            CSEntry = cpCore.db.cs_insertRecord(MenuContentName, SystemMemberID)
-        //            If cpCore.db.cs_ok(CSEntry) Then
-        //                Call cpCore.db.cs_set(CSEntry, "name", EntryName)
+        //        If Not core.db.cs_ok(CSEntry) Then
+        //            core.db.cs_Close(CSEntry)
+        //            CSEntry = core.db.cs_insertRecord(MenuContentName, SystemMemberID)
+        //            If core.db.cs_ok(CSEntry) Then
+        //                Call core.db.cs_set(CSEntry, "name", EntryName)
         //            End If
         //        End If
-        //        If cpCore.db.cs_ok(CSEntry) Then
+        //        If core.db.cs_ok(CSEntry) Then
         //            If ParentID = 0 Then
-        //                Call cpCore.db.cs_set(CSEntry, "ParentID", 0)
+        //                Call core.db.cs_set(CSEntry, "ParentID", 0)
         //            Else
-        //                Call cpCore.db.cs_set(CSEntry, "ParentID", ParentID)
+        //                Call core.db.cs_set(CSEntry, "ParentID", ParentID)
         //            End If
         //            If (ContentID = -1) Then
-        //                Call cpCore.db.cs_set(CSEntry, "ContentID", 0)
+        //                Call core.db.cs_set(CSEntry, "ContentID", 0)
         //            Else
-        //                Call cpCore.db.cs_set(CSEntry, "ContentID", ContentID)
+        //                Call core.db.cs_set(CSEntry, "ContentID", ContentID)
         //            End If
-        //            Call cpCore.db.cs_set(CSEntry, "LinkPage", LinkPage)
-        //            Call cpCore.db.cs_set(CSEntry, "SortOrder", SortOrder)
-        //            Call cpCore.db.cs_set(CSEntry, "AdminOnly", AdminOnly)
-        //            Call cpCore.db.cs_set(CSEntry, "DeveloperOnly", DeveloperOnly)
-        //            Call cpCore.db.cs_set(CSEntry, "NewWindow", NewWindow)
-        //            Call cpCore.db.cs_set(CSEntry, "Active", Active)
+        //            Call core.db.cs_set(CSEntry, "LinkPage", LinkPage)
+        //            Call core.db.cs_set(CSEntry, "SortOrder", SortOrder)
+        //            Call core.db.cs_set(CSEntry, "AdminOnly", AdminOnly)
+        //            Call core.db.cs_set(CSEntry, "DeveloperOnly", DeveloperOnly)
+        //            Call core.db.cs_set(CSEntry, "NewWindow", NewWindow)
+        //            Call core.db.cs_set(CSEntry, "Active", Active)
         //            If SupportAddonID Then
-        //                Call cpCore.db.cs_set(CSEntry, "AddonID", addonId)
+        //                Call core.db.cs_set(CSEntry, "AddonID", addonId)
         //            End If
         //        End If
-        //        Call cpCore.db.cs_Close(CSEntry)
+        //        Call core.db.cs_Close(CSEntry)
         //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex) : Throw
+        //        core.handleExceptionAndContinue(ex) : Throw
         //    End Try
         //End Sub
         //
@@ -2323,9 +2323,9 @@ namespace Contensive.Core.Controllers {
         //       Entries are unique by their name
         //=============================================================================
         //
-        //Public Shared Sub admin_VerifyAdminMenu(cpCore As coreClass, ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False, Optional ByVal Active As Boolean = True)
+        //Public Shared Sub admin_VerifyAdminMenu(core As coreClass, ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False, Optional ByVal Active As Boolean = True)
 
-        //    'Call admin_VerifyMenuEntry(cpCore, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, cnNavigatorEntries, "")
+        //    'Call admin_VerifyMenuEntry(core, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, cnNavigatorEntries, "")
         //End Sub
         //
         //=============================================================================
@@ -2335,18 +2335,18 @@ namespace Contensive.Core.Controllers {
         //       returns the entry id
         //=============================================================================
         //
-        public static int verifyNavigatorEntry(coreController cpCore, string ccGuid, string menuNameSpace, string EntryName, string ContentName, string LinkPage, string SortOrder, bool AdminOnly, bool DeveloperOnly, bool NewWindow, bool Active, string AddonName, string NavIconType, string NavIconTitle, int InstalledByCollectionID) {
+        public static int verifyNavigatorEntry(coreController core, string ccGuid, string menuNameSpace, string EntryName, string ContentName, string LinkPage, string SortOrder, bool AdminOnly, bool DeveloperOnly, bool NewWindow, bool Active, string AddonName, string NavIconType, string NavIconTitle, int InstalledByCollectionID) {
             int returnEntry = 0;
             try {
                 if (!string.IsNullOrEmpty(EntryName.Trim())) {
-                    int addonId = cpCore.db.getRecordID(cnAddons, AddonName);
-                    int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(cpCore, menuNameSpace);
-                    int contentId = Models.Complex.cdefModel.getContentId(cpCore, ContentName);
-                    string listCriteria = "(name=" + cpCore.db.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
-                    List<Models.DbModels.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(cpCore, listCriteria, "id");
+                    int addonId = core.db.getRecordID(cnAddons, AddonName);
+                    int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menuNameSpace);
+                    int contentId = Models.Complex.cdefModel.getContentId(core, ContentName);
+                    string listCriteria = "(name=" + core.db.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
+                    List<Models.DbModels.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
                     NavigatorEntryModel entry = null;
                     if (entryList.Count == 0) {
-                        entry = NavigatorEntryModel.add(cpCore);
+                        entry = NavigatorEntryModel.add(core);
                         entry.name = EntryName.Trim();
                         entry.ParentID = parentId;
                     } else {
@@ -2368,16 +2368,16 @@ namespace Contensive.Core.Controllers {
                     entry.NavIconTitle = NavIconTitle;
                     entry.NavIconType = GetListIndex(NavIconType, NavIconTypeList);
                     entry.InstalledByCollectionID = InstalledByCollectionID;
-                    entry.save(cpCore);
+                    entry.save(core);
                     returnEntry = entry.id;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnEntry;
         }
-        //Public Shared Function verifyNavigatorEntry(cpCore As coreClass, ByVal ccGuid As String, ByVal menuNameSpace As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, ByVal AdminOnly As Boolean, ByVal DeveloperOnly As Boolean, ByVal NewWindow As Boolean, ByVal Active As Boolean, ByVal AddonName As String, ByVal NavIconType As String, ByVal NavIconTitle As String, ByVal InstalledByCollectionID As Integer) As Integer
+        //Public Shared Function verifyNavigatorEntry(core As coreClass, ByVal ccGuid As String, ByVal menuNameSpace As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, ByVal AdminOnly As Boolean, ByVal DeveloperOnly As Boolean, ByVal NewWindow As Boolean, ByVal Active As Boolean, ByVal AddonName As String, ByVal NavIconType As String, ByVal NavIconTitle As String, ByVal InstalledByCollectionID As Integer) As Integer
         //    Dim returnEntry As Integer = 0
         //    Try
         //        '
@@ -2409,8 +2409,8 @@ namespace Contensive.Core.Controllers {
         //            ' Setup misc arguments
         //            '
         //            SelectList = "Name,ContentID,ParentID,LinkPage,SortOrder,AdminOnly,DeveloperOnly,NewWindow,Active,NavIconType,NavIconTitle"
-        //            SupportAddonID = Models.Complex.cdefModel.isContentFieldSupported(cpcore,cnNavigatorEntries, "AddonID")
-        //            SupportInstalledByCollectionID = Models.Complex.cdefModel.isContentFieldSupported(cpcore,cnNavigatorEntries, "InstalledByCollectionID")
+        //            SupportAddonID = Models.Complex.cdefModel.isContentFieldSupported(core,cnNavigatorEntries, "AddonID")
+        //            SupportInstalledByCollectionID = Models.Complex.cdefModel.isContentFieldSupported(core,cnNavigatorEntries, "InstalledByCollectionID")
         //            If SupportAddonID Then
         //                SelectList = SelectList & ",AddonID"
         //            Else
@@ -2419,12 +2419,12 @@ namespace Contensive.Core.Controllers {
         //            If SupportInstalledByCollectionID Then
         //                SelectList = SelectList & ",InstalledByCollectionID"
         //            End If
-        //            If Models.Complex.cdefModel.isContentFieldSupported(cpcore,cnNavigatorEntries, "ccGuid") Then
+        //            If Models.Complex.cdefModel.isContentFieldSupported(core,cnNavigatorEntries, "ccGuid") Then
         //                SupportGuid = True
         //                SupportccGuid = True
         //                GuidFieldName = "ccguid"
         //                SelectList = SelectList & ",ccGuid"
-        //            ElseIf Models.Complex.cdefModel.isContentFieldSupported(cpcore,cnNavigatorEntries, "NavGuid") Then
+        //            ElseIf Models.Complex.cdefModel.isContentFieldSupported(core,cnNavigatorEntries, "NavGuid") Then
         //                SupportGuid = True
         //                SupportNavGuid = True
         //                GuidFieldName = "navguid"
@@ -2432,19 +2432,19 @@ namespace Contensive.Core.Controllers {
         //            Else
         //                SelectList = SelectList & ",'' as ccGuid"
         //            End If
-        //            SupportNavIcon = Models.Complex.cdefModel.isContentFieldSupported(cpcore,cnNavigatorEntries, "NavIconType")
+        //            SupportNavIcon = Models.Complex.cdefModel.isContentFieldSupported(core,cnNavigatorEntries, "NavIconType")
         //            addonId = 0
         //            If SupportAddonID And (AddonName <> "") Then
-        //                CS = cpCore.db.cs_open(AddonContentName, "name=" & cpCore.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
-        //                If cpCore.db.cs_ok(CS) Then
-        //                    addonId = cpCore.db.cs_getInteger(CS, "ID")
+        //                CS = core.db.cs_open(AddonContentName, "name=" & core.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
+        //                If core.db.cs_ok(CS) Then
+        //                    addonId = core.db.cs_getInteger(CS, "ID")
         //                End If
-        //                Call cpCore.db.cs_Close(CS)
+        //                Call core.db.cs_Close(CS)
         //            End If
-        //            ParentID = getNavigatorEntryParentIDFromNameSpace(cpCore, cnNavigatorEntries, menuNameSpace)
+        //            ParentID = getNavigatorEntryParentIDFromNameSpace(core, cnNavigatorEntries, menuNameSpace)
         //            ContentID = -1
         //            If ContentName <> "" Then
-        //                ContentID = Models.Complex.cdefModel.getContentId(cpcore,ContentName)
+        //                ContentID = Models.Complex.cdefModel.getContentId(core,ContentName)
         //            End If
         //            '
         //            ' Locate current entry(s)
@@ -2457,36 +2457,36 @@ namespace Contensive.Core.Controllers {
         //                    '
         //                    ' ----- Find match by menuNameSpace
         //                    '
-        //                    CSEntry = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(Parentid=" & ParentID & ")and((" & GuidFieldName & " is null)or(" & GuidFieldName & "=''))", "ID", True, , , , SelectList)
+        //                    CSEntry = core.db.cs_open(cnNavigatorEntries, "(name=" & core.db.encodeSQLText(EntryName) & ")and(Parentid=" & ParentID & ")and((" & GuidFieldName & " is null)or(" & GuidFieldName & "=''))", "ID", True, , , , SelectList)
         //                Else
         //                    '
         //                    ' ----- Find match by guid
         //                    '
-        //                    CSEntry = cpCore.db.cs_open(cnNavigatorEntries, "(" & GuidFieldName & "=" & cpCore.db.encodeSQLText(ccGuid) & ")", "ID", True, , , , SelectList)
+        //                    CSEntry = core.db.cs_open(cnNavigatorEntries, "(" & GuidFieldName & "=" & core.db.encodeSQLText(ccGuid) & ")", "ID", True, , , , SelectList)
         //                End If
-        //                If Not cpCore.db.cs_ok(CSEntry) Then
+        //                If Not core.db.cs_ok(CSEntry) Then
         //                    '
         //                    ' ----- if not found by guid, look for a name/parent match with a blank guid
         //                    '
-        //                    Call cpCore.db.cs_Close(CSEntry)
+        //                    Call core.db.cs_Close(CSEntry)
         //                    Criteria = "AND((" & GuidFieldName & " is null)or(" & GuidFieldName & "=''))"
         //                End If
         //            End If
-        //            If Not cpCore.db.cs_ok(CSEntry) Then
+        //            If Not core.db.cs_ok(CSEntry) Then
         //                If ParentID = 0 Then
         //                    ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to update the active entries
-        //                    Criteria = Criteria & "And(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID is null)"
+        //                    Criteria = Criteria & "And(name=" & core.db.encodeSQLText(EntryName) & ")and(ParentID is null)"
         //                Else
         //                    ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to update the active entries
-        //                    Criteria = Criteria & "And(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")"
+        //                    Criteria = Criteria & "And(name=" & core.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")"
         //                End If
-        //                CSEntry = cpCore.db.cs_open(cnNavigatorEntries, Mid(Criteria, 4), "ID", True, , , , SelectList)
+        //                CSEntry = core.db.cs_open(cnNavigatorEntries, Mid(Criteria, 4), "ID", True, , , , SelectList)
         //            End If
         //            '
         //            ' If no current entry, create one
         //            '
-        //            If Not cpCore.db.cs_ok(CSEntry) Then
-        //                cpCore.db.cs_Close(CSEntry)
+        //            If Not core.db.cs_ok(CSEntry) Then
+        //                core.db.cs_Close(CSEntry)
         //                '
         //                ' This entry was not found - insert a new record if there is no other name/menuNameSpace match
         //                '
@@ -2496,13 +2496,13 @@ namespace Contensive.Core.Controllers {
         //                    '
         //                    DupFound = False
         //                ElseIf ParentID = 0 Then
-        //                    CSEntry = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID is null)", "ID", False, , , , SelectList)
-        //                    DupFound = cpCore.db.cs_ok(CSEntry)
-        //                    cpCore.db.cs_Close(CSEntry)
+        //                    CSEntry = core.db.cs_open(cnNavigatorEntries, "(name=" & core.db.encodeSQLText(EntryName) & ")and(ParentID is null)", "ID", False, , , , SelectList)
+        //                    DupFound = core.db.cs_ok(CSEntry)
+        //                    core.db.cs_Close(CSEntry)
         //                Else
-        //                    CSEntry = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")", "ID", False, , , , SelectList)
-        //                    DupFound = cpCore.db.cs_ok(CSEntry)
-        //                    cpCore.db.cs_Close(CSEntry)
+        //                    CSEntry = core.db.cs_open(cnNavigatorEntries, "(name=" & core.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")", "ID", False, , , , SelectList)
+        //                    DupFound = core.db.cs_ok(CSEntry)
+        //                    core.db.cs_Close(CSEntry)
         //                End If
         //                If DupFound Then
         //                    '
@@ -2513,87 +2513,87 @@ namespace Contensive.Core.Controllers {
         //                    '
         //                    ' Create new entry
         //                    '
-        //                    CSEntry = cpCore.db.cs_insertRecord(cnNavigatorEntries, SystemMemberID)
+        //                    CSEntry = core.db.cs_insertRecord(cnNavigatorEntries, SystemMemberID)
         //                End If
         //            End If
-        //            If cpCore.db.cs_ok(CSEntry) Then
-        //                EntryID = cpCore.db.cs_getInteger(CSEntry, "ID")
+        //            If core.db.cs_ok(CSEntry) Then
+        //                EntryID = core.db.cs_getInteger(CSEntry, "ID")
         //                If EntryID = 265 Then
         //                    EntryID = EntryID
         //                End If
-        //                Call cpCore.db.cs_set(CSEntry, "name", EntryName)
+        //                Call core.db.cs_set(CSEntry, "name", EntryName)
         //                If ParentID = 0 Then
-        //                    Call cpCore.db.cs_set(CSEntry, "ParentID", 0)
+        //                    Call core.db.cs_set(CSEntry, "ParentID", 0)
         //                Else
-        //                    Call cpCore.db.cs_set(CSEntry, "ParentID", ParentID)
+        //                    Call core.db.cs_set(CSEntry, "ParentID", ParentID)
         //                End If
         //                If (ContentID = -1) Then
-        //                    Call cpCore.db.cs_set(CSEntry, "ContentID", 0)
+        //                    Call core.db.cs_set(CSEntry, "ContentID", 0)
         //                Else
-        //                    Call cpCore.db.cs_set(CSEntry, "ContentID", ContentID)
+        //                    Call core.db.cs_set(CSEntry, "ContentID", ContentID)
         //                End If
-        //                Call cpCore.db.cs_set(CSEntry, "LinkPage", LinkPage)
-        //                Call cpCore.db.cs_set(CSEntry, "SortOrder", SortOrder)
-        //                Call cpCore.db.cs_set(CSEntry, "AdminOnly", AdminOnly)
-        //                Call cpCore.db.cs_set(CSEntry, "DeveloperOnly", DeveloperOnly)
-        //                Call cpCore.db.cs_set(CSEntry, "NewWindow", NewWindow)
-        //                Call cpCore.db.cs_set(CSEntry, "Active", Active)
+        //                Call core.db.cs_set(CSEntry, "LinkPage", LinkPage)
+        //                Call core.db.cs_set(CSEntry, "SortOrder", SortOrder)
+        //                Call core.db.cs_set(CSEntry, "AdminOnly", AdminOnly)
+        //                Call core.db.cs_set(CSEntry, "DeveloperOnly", DeveloperOnly)
+        //                Call core.db.cs_set(CSEntry, "NewWindow", NewWindow)
+        //                Call core.db.cs_set(CSEntry, "Active", Active)
         //                If SupportAddonID Then
-        //                    Call cpCore.db.cs_set(CSEntry, "AddonID", addonId)
+        //                    Call core.db.cs_set(CSEntry, "AddonID", addonId)
         //                End If
         //                If SupportGuid Then
-        //                    Call cpCore.db.cs_set(CSEntry, GuidFieldName, ccGuid)
+        //                    Call core.db.cs_set(CSEntry, GuidFieldName, ccGuid)
         //                End If
         //                If SupportNavIcon Then
-        //                    Call cpCore.db.cs_set(CSEntry, "NavIconTitle", NavIconTitle)
+        //                    Call core.db.cs_set(CSEntry, "NavIconTitle", NavIconTitle)
         //                    Dim NavIconID As Integer
         //                    NavIconID = GetListIndex(NavIconType, NavIconTypeList)
-        //                    Call cpCore.db.cs_set(CSEntry, "NavIconType", NavIconID)
+        //                    Call core.db.cs_set(CSEntry, "NavIconType", NavIconID)
         //                End If
         //                If SupportInstalledByCollectionID Then
-        //                    Call cpCore.db.cs_set(CSEntry, "InstalledByCollectionID", InstalledByCollectionID)
+        //                    Call core.db.cs_set(CSEntry, "InstalledByCollectionID", InstalledByCollectionID)
         //                End If
         //                '
         //                ' merge any duplicate guid matches
         //                '
-        //                Call cpCore.db.cs_goNext(CSEntry)
-        //                Do While cpCore.db.cs_ok(CSEntry)
-        //                    DuplicateID = cpCore.db.cs_getInteger(CSEntry, "ID")
-        //                    Call cpCore.db.executeSql("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
-        //                    Call cpCore.db.deleteContentRecord(cnNavigatorEntries, DuplicateID)
-        //                    Call cpCore.db.cs_goNext(CSEntry)
+        //                Call core.db.cs_goNext(CSEntry)
+        //                Do While core.db.cs_ok(CSEntry)
+        //                    DuplicateID = core.db.cs_getInteger(CSEntry, "ID")
+        //                    Call core.db.executeSql("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
+        //                    Call core.db.deleteContentRecord(cnNavigatorEntries, DuplicateID)
+        //                    Call core.db.cs_goNext(CSEntry)
         //                Loop
         //            End If
-        //            Call cpCore.db.cs_Close(CSEntry)
+        //            Call core.db.cs_Close(CSEntry)
         //            '
         //            ' Merge duplicates with menuNameSpace.Name match
         //            '
         //            If EntryID <> 0 Then
         //                If ParentID = 0 Then
-        //                    CSEntry = cpCore.db.cs_openCsSql_rev("default", "select * from ccMenuEntries where (parentid is null)and(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
+        //                    CSEntry = core.db.cs_openCsSql_rev("default", "select * from ccMenuEntries where (parentid is null)and(name=" & core.db.encodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
         //                Else
-        //                    CSEntry = cpCore.db.cs_openCsSql_rev("default", "select * from ccMenuEntries where (parentid=" & ParentID & ")and(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
+        //                    CSEntry = core.db.cs_openCsSql_rev("default", "select * from ccMenuEntries where (parentid=" & ParentID & ")and(name=" & core.db.encodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
         //                End If
-        //                Do While cpCore.db.cs_ok(CSEntry)
-        //                    DuplicateID = cpCore.db.cs_getInteger(CSEntry, "ID")
-        //                    Call cpCore.db.executeSql("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
-        //                    Call cpCore.db.deleteContentRecord(cnNavigatorEntries, DuplicateID)
-        //                    Call cpCore.db.cs_goNext(CSEntry)
+        //                Do While core.db.cs_ok(CSEntry)
+        //                    DuplicateID = core.db.cs_getInteger(CSEntry, "ID")
+        //                    Call core.db.executeSql("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
+        //                    Call core.db.deleteContentRecord(cnNavigatorEntries, DuplicateID)
+        //                    Call core.db.cs_goNext(CSEntry)
         //                Loop
-        //                Call cpCore.db.cs_Close(CSEntry)
+        //                Call core.db.cs_Close(CSEntry)
         //            End If
         //        End If
         //        '
         //        returnEntry = EntryID
         //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex) : Throw
+        //        core.handleExceptionAndContinue(ex) : Throw
         //    End Try
         //    Return returnEntry
         //End Function
         //
         //
         //
-        public static int verifyNavigatorEntry_getParentIdFromNameSpace(coreController cpCore, string menuNameSpace) {
+        public static int verifyNavigatorEntry_getParentIdFromNameSpace(coreController core, string menuNameSpace) {
             int parentRecordId = 0;
             try {
                 if (!string.IsNullOrEmpty(menuNameSpace.Trim())) {
@@ -2601,33 +2601,33 @@ namespace Contensive.Core.Controllers {
                     foreach( var parent in parents ) {
                         string recordName = parent.Trim();
                         if (!string.IsNullOrEmpty(recordName)) {
-                            string Criteria = "(name=" + cpCore.db.encodeSQLText(recordName) + ")";
+                            string Criteria = "(name=" + core.db.encodeSQLText(recordName) + ")";
                             if (parentRecordId == 0) {
                                 Criteria += "and((Parentid is null)or(Parentid=0))";
                             } else {
                                 Criteria += "and(Parentid=" + parentRecordId + ")";
                             }
                             int RecordID = 0;
-                            int CS = cpCore.db.csOpen(cnNavigatorEntries, Criteria, "ID", true, 0, false, false, "ID", 1);
-                            if (cpCore.db.csOk(CS)) {
-                                RecordID = (cpCore.db.csGetInteger(CS, "ID"));
+                            int CS = core.db.csOpen(cnNavigatorEntries, Criteria, "ID", true, 0, false, false, "ID", 1);
+                            if (core.db.csOk(CS)) {
+                                RecordID = (core.db.csGetInteger(CS, "ID"));
                             }
-                            cpCore.db.csClose(ref CS);
+                            core.db.csClose(ref CS);
                             if (RecordID == 0) {
-                                CS = cpCore.db.csInsertRecord(cnNavigatorEntries, SystemMemberID);
-                                if (cpCore.db.csOk(CS)) {
-                                    RecordID = cpCore.db.csGetInteger(CS, "ID");
-                                    cpCore.db.csSet(CS, "name", recordName);
-                                    cpCore.db.csSet(CS, "parentID", parentRecordId);
+                                CS = core.db.csInsertRecord(cnNavigatorEntries, SystemMemberID);
+                                if (core.db.csOk(CS)) {
+                                    RecordID = core.db.csGetInteger(CS, "ID");
+                                    core.db.csSet(CS, "name", recordName);
+                                    core.db.csSet(CS, "parentID", parentRecordId);
                                 }
-                                cpCore.db.csClose(ref CS);
+                                core.db.csClose(ref CS);
                             }
                             parentRecordId = RecordID;
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return parentRecordId;

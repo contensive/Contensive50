@@ -27,15 +27,15 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // -- Email click detected
-                emailDropModel emailDrop = emailDropModel.create(cpCore, cpCore.docProperties.getInteger(rnEmailClickFlag));
+                emailDropModel emailDrop = emailDropModel.create(core, core.docProperties.getInteger(rnEmailClickFlag));
                 if (emailDrop != null) {
-                    personModel recipient = personModel.create(cpCore, cpCore.docProperties.getInteger(rnEmailMemberID));
+                    personModel recipient = personModel.create(core, core.docProperties.getInteger(rnEmailMemberID));
                     if (recipient != null) {
                         emailLogModel log = new emailLogModel() {
-                            name = "User " + recipient.name + " clicked link from email drop " + emailDrop.name + " at " + cpCore.doc.profileStartTime.ToString(),
+                            name = "User " + recipient.name + " clicked link from email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),
                             EmailDropID = emailDrop.id,
                             MemberID = recipient.id,
                             LogType = EmailLogTypeOpen

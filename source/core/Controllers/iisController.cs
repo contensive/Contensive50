@@ -23,7 +23,7 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class iisController {
         //
-        private coreController cpCore;
+        private coreController core;
         //
         // if this instance is a webRole, retain pointer for callbacks
         //
@@ -60,7 +60,7 @@ namespace Contensive.Core.Controllers {
                                                            //Public Property readStreamJSForm As Boolean = False                  ' When true, the request comes from a browser handling a JSPage script line
         public bool pageExcludeFromAnalytics { get; set; } = false; // For this page - true for remote methods and ajax
                                                                     //
-                                                                    // refactor - this method stears the stream between controllers, put it in cpcore
+                                                                    // refactor - this method stears the stream between controllers, put it in core
                                                                     //Public Property outStreamDevice As Integer = 0
         public int memberAction { get; set; } = 0; // action to be performed during init
         public string adminMessage { get; set; } = ""; // For more information message
@@ -95,8 +95,8 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public iisController(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public iisController(coreController core) : base() {
+            this.core = core;
             requestCookies = new Dictionary<string, cookieClass>();
         }
         //
@@ -113,17 +113,17 @@ namespace Contensive.Core.Controllers {
                 string LogFilename = null;
                 string Copy = null;
                 //
-                LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger(cpCore)) + ".Log";
+                LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger(core)) + ".Log";
                 Cmd = "IISReset.exe";
                 arg = "/restart >> \"" + LogFilename + "\"";
-                runProcess(cpCore, Cmd, arg, true);
-                Copy = cpCore.privateFiles.readFile(LogFilename);
-                cpCore.privateFiles.deleteFile(LogFilename);
+                runProcess(core, Cmd, arg, true);
+                Copy = core.privateFiles.readFile(LogFilename);
+                core.privateFiles.deleteFile(LogFilename);
                 Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = genericController.vbReplace(Copy, "\r", "\\n");
                 Copy = genericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -140,16 +140,16 @@ namespace Contensive.Core.Controllers {
                 string LogFilename = null;
                 string Copy = null;
                 //
-                LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger(cpCore)) + ".Log";
+                LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger(core)) + ".Log";
                 Cmd = "%comspec% /c IISReset /stop >> \"" + LogFilename + "\"";
-                runProcess(cpCore, Cmd, "", true);
-                Copy = cpCore.privateFiles.readFile(LogFilename);
-                cpCore.privateFiles.deleteFile(LogFilename);
+                runProcess(core, Cmd, "", true);
+                Copy = core.privateFiles.readFile(LogFilename);
+                core.privateFiles.deleteFile(LogFilename);
                 Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = genericController.vbReplace(Copy, "\r", "\\n");
                 Copy = genericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -164,18 +164,18 @@ namespace Contensive.Core.Controllers {
         public void start() {
             try {
                 string Cmd = null;
-                string LogFilename = cpCore.privateFiles.rootLocalPath + "iisResetPipe.log";
+                string LogFilename = core.privateFiles.rootLocalPath + "iisResetPipe.log";
                 string Copy = null;
                 //
                 Cmd = "%comspec% /c IISReset /start >> \"" + LogFilename + "\"";
-                runProcess(cpCore, Cmd, "", true);
-                Copy = cpCore.privateFiles.readFile(LogFilename);
-                cpCore.privateFiles.deleteFile(LogFilename);
+                runProcess(core, Cmd, "", true);
+                Copy = core.privateFiles.readFile(LogFilename);
+                core.privateFiles.deleteFile(LogFilename);
                 Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = genericController.vbReplace(Copy, "\r", "\\n");
                 Copy = genericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -198,7 +198,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -235,7 +235,7 @@ namespace Contensive.Core.Controllers {
                     requestQueryString = "";
                     foreach (string key in iisContext.Request.QueryString) {
                         string keyValue = iisContext.Request.QueryString[key];
-                        cpCore.docProperties.setProperty(key, keyValue);
+                        core.docProperties.setProperty(key, keyValue);
                         requestQueryString = genericController.ModifyQueryString(requestQueryString, key, keyValue);
                     }
                 }
@@ -244,7 +244,7 @@ namespace Contensive.Core.Controllers {
                 requestFormDict.Clear();
                 foreach (string key in iisContext.Request.Form.Keys) {
                     string keyValue = iisContext.Request.Form[key];
-                    cpCore.docProperties.setProperty(key, keyValue, true);
+                    core.docProperties.setProperty(key, keyValue, true);
                     if (requestFormDict.ContainsKey(keyValue)) {
                         requestFormDict.Remove(keyValue);
                     }
@@ -266,10 +266,10 @@ namespace Contensive.Core.Controllers {
                             prop.IsFile = true;
                             prop.IsForm = true;
                             prop.tempfilename = instanceId + "-" + filePtr.ToString() + ".bin";
-                            file.SaveAs(cpCore.tempFiles.joinPath(cpCore.tempFiles.rootLocalPath, prop.tempfilename));
-                            cpCore.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
+                            file.SaveAs(core.tempFiles.joinPath(core.tempFiles.rootLocalPath, prop.tempfilename));
+                            core.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
                             prop.FileSize = encodeInteger(file.ContentLength);
-                            cpCore.docProperties.setProperty(formName, prop);
+                            core.docProperties.setProperty(formName, prop);
                             filePtr += 1;
                         }
                     }
@@ -285,7 +285,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //--------------------------------------------------------------------------
                 //
-                if (cpCore.serverConfig.appConfig.appStatus != Models.Context.serverConfigModel.appStatusEnum.OK) {
+                if (core.serverConfig.appConfig.appStatus != Models.Context.serverConfigModel.appStatusEnum.OK) {
                     //
                     // did not initialize correctly
                     //
@@ -295,13 +295,13 @@ namespace Contensive.Core.Controllers {
                     //
                     //initCounter += 1
                     //
-                    cpCore.html.enableOutputBuffer(true);
-                    cpCore.doc.continueProcessing = true;
+                    core.html.enableOutputBuffer(true);
+                    core.doc.continueProcessing = true;
                     setResponseContentType("text/html");
                     //
                     //--------------------------------------------------------------------------
-                    // ----- Process QueryString to cpcore.doc.main_InStreamArray
-                    //       Do this first to set cpcore.main_ReadStreamJSForm, cpcore.main_ReadStreamJSProcess, cpcore.main_ReadStreamBinaryRead (must be in QS)
+                    // ----- Process QueryString to core.doc.main_InStreamArray
+                    //       Do this first to set core.main_ReadStreamJSForm, core.main_ReadStreamJSProcess, core.main_ReadStreamBinaryRead (must be in QS)
                     //--------------------------------------------------------------------------
                     //
                     linkForwardSource = "";
@@ -321,7 +321,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Add query string to stream
                         //
-                        cpCore.docProperties.addQueryString(requestQueryString);
+                        core.docProperties.addQueryString(requestQueryString);
                     }
                     //
                     // Other Server variables
@@ -334,44 +334,44 @@ namespace Contensive.Core.Controllers {
                         requestProtocol = "http://";
                     }
                     //
-                    cpCore.doc.blockExceptionReporting = false;
+                    core.doc.blockExceptionReporting = false;
                     //
                     //   javascript cookie detect on page1 of all visits
-                    string CookieDetectKey = cpCore.docProperties.getText(RequestNameCookieDetectVisitID);
+                    string CookieDetectKey = core.docProperties.getText(RequestNameCookieDetectVisitID);
                     if (!string.IsNullOrEmpty(CookieDetectKey)) {
                         //
                         DateTime cookieDetectDate = new DateTime();
                         int CookieDetectVisitId = 0;
-                        cpCore.security.decodeToken(CookieDetectKey, ref CookieDetectVisitId, ref  cookieDetectDate);
+                        core.security.decodeToken(CookieDetectKey, ref CookieDetectVisitId, ref  cookieDetectDate);
                         if (CookieDetectVisitId != 0) {
-                            cpCore.db.executeQuery("update ccvisits set CookieSupport=1 where id=" + CookieDetectVisitId);
-                            cpCore.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
-                            return cpCore.doc.continueProcessing;
+                            core.db.executeQuery("update ccvisits set CookieSupport=1 where id=" + CookieDetectVisitId);
+                            core.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
+                            return core.doc.continueProcessing;
                         }
                     }
                     //
                     //   verify Domain table entry
                     bool updateDomainCache = false;
                     //
-                    cpCore.domain.name = requestDomain;
-                    cpCore.domain.rootPageId = 0;
-                    cpCore.domain.noFollow = false;
-                    cpCore.domain.typeId = 1;
-                    cpCore.domain.visited = false;
-                    cpCore.domain.id = 0;
-                    cpCore.domain.forwardUrl = ""; 
-                    cpCore.domainDictionary = cpCore.cache.getObject<Dictionary<string, domainModel>>("domainContentList");
-                    if (cpCore.domainDictionary == null) {
+                    core.domain.name = requestDomain;
+                    core.domain.rootPageId = 0;
+                    core.domain.noFollow = false;
+                    core.domain.typeId = 1;
+                    core.domain.visited = false;
+                    core.domain.id = 0;
+                    core.domain.forwardUrl = ""; 
+                    core.domainDictionary = core.cache.getObject<Dictionary<string, domainModel>>("domainContentList");
+                    if (core.domainDictionary == null) {
                         //
                         //  no cache found, build domainContentList from database
-                        cpCore.domainDictionary = domainModel.createDictionary(cpCore, "(active<>0)and(name is not null)");
+                        core.domainDictionary = domainModel.createDictionary(core, "(active<>0)and(name is not null)");
                         updateDomainCache = true;
                     }
                     //
                     // verify app config domainlist is in the domainlist cache
-                    foreach (string domain in cpCore.serverConfig.appConfig.domainList) {
-                        if (!cpCore.domainDictionary.ContainsKey(domain.ToLower())) {
-                            var newDomain = domainModel.add(cpCore);
+                    foreach (string domain in core.serverConfig.appConfig.domainList) {
+                        if (!core.domainDictionary.ContainsKey(domain.ToLower())) {
+                            var newDomain = domainModel.add(core);
                             newDomain.name = domain;
                             newDomain.rootPageId = 0;
                             newDomain.noFollow = false;
@@ -381,15 +381,15 @@ namespace Contensive.Core.Controllers {
                             newDomain.defaultTemplateId = 0;
                             newDomain.pageNotFoundPageId = 0;
                             newDomain.forwardDomainId = 0;
-                            newDomain.defaultRouteId = cpCore.siteProperties.getInteger("");
-                            cpCore.domainDictionary.Add(domain.ToLower(), newDomain);
+                            newDomain.defaultRouteId = core.siteProperties.getInteger("");
+                            core.domainDictionary.Add(domain.ToLower(), newDomain);
                             updateDomainCache = true;
                         }
                     }
                     //
                     // -- verify request domain
-                    if (!cpCore.domainDictionary.ContainsKey(requestDomain.ToLower())) {
-                        var newDomain = domainModel.add( cpCore );
+                    if (!core.domainDictionary.ContainsKey(requestDomain.ToLower())) {
+                        var newDomain = domainModel.add( core );
                         newDomain.name = requestDomain;
                         newDomain.rootPageId = 0;
                         newDomain.noFollow = false;
@@ -399,87 +399,87 @@ namespace Contensive.Core.Controllers {
                         newDomain.defaultTemplateId = 0;
                         newDomain.pageNotFoundPageId = 0;
                         newDomain.forwardDomainId = 0;
-                        newDomain.save(cpCore);
-                        cpCore.domainDictionary.Add(requestDomain.ToLower(), newDomain);
+                        newDomain.save(core);
+                        core.domainDictionary.Add(requestDomain.ToLower(), newDomain);
                         updateDomainCache = true;
                     }
                     if (updateDomainCache) {
                         //
                         // if there was a change, update the cache
                         //
-                        cpCore.cache.setObject("domainContentList", cpCore.domainDictionary, "domains");
+                        core.cache.setObject("domainContentList", core.domainDictionary, "domains");
                     }
                     //
                     // domain found
                     //
-                    cpCore.domain = cpCore.domainDictionary[requestDomain.ToLower()];
-                    if (cpCore.domain.id == 0) {
+                    core.domain = core.domainDictionary[requestDomain.ToLower()];
+                    if (core.domain.id == 0) {
                         //
                         // this is a default domain or a new domain -- add to the domain table
                         var domain = new domainModel() {
                             name = requestDomain,
                             typeId = 1,
-                            rootPageId = cpCore.domain.rootPageId,
-                            forwardUrl = cpCore.domain.forwardUrl,
-                            noFollow = cpCore.domain.noFollow,
-                            visited = cpCore.domain.visited,
-                            defaultTemplateId = cpCore.domain.defaultTemplateId,
-                            pageNotFoundPageId = cpCore.domain.pageNotFoundPageId
+                            rootPageId = core.domain.rootPageId,
+                            forwardUrl = core.domain.forwardUrl,
+                            noFollow = core.domain.noFollow,
+                            visited = core.domain.visited,
+                            defaultTemplateId = core.domain.defaultTemplateId,
+                            pageNotFoundPageId = core.domain.pageNotFoundPageId
                         };
-                        cpCore.domain.id = domain.id;
+                        core.domain.id = domain.id;
                     }
-                    if (!cpCore.domain.visited) {
+                    if (!core.domain.visited) {
                         //
                         // set visited true
                         //
-                        cpCore.db.executeQuery("update ccdomains set visited=1 where name=" + cpCore.db.encodeSQLText(requestDomain));
-                        cpCore.cache.invalidate("domainContentList");
+                        core.db.executeQuery("update ccdomains set visited=1 where name=" + core.db.encodeSQLText(requestDomain));
+                        core.cache.invalidate("domainContentList");
                     }
-                    if (cpCore.domain.typeId == 1) {
+                    if (core.domain.typeId == 1) {
                         //
                         // normal domain, leave it
                         //
-                    } else if (genericController.vbInstr(1, requestPathPage, "/" + cpCore.serverConfig.appConfig.adminRoute, 1) != 0) {
+                    } else if (genericController.vbInstr(1, requestPathPage, "/" + core.serverConfig.appConfig.adminRoute, 1) != 0) {
                         //
                         // forwarding does not work in the admin site
                         //
-                    } else if ((cpCore.domain.typeId == 2) && (cpCore.domain.forwardUrl != "")) {
+                    } else if ((core.domain.typeId == 2) && (core.domain.forwardUrl != "")) {
                         //
                         // forward to a URL
                         //
                         //
                         //Call AppendLog("main_init(), 1710 - exit for domain forward")
                         //
-                        if (genericController.vbInstr(1, cpCore.domain.forwardUrl, "://") == 0) {
-                            cpCore.domain.forwardUrl = "http://" + cpCore.domain.forwardUrl;
+                        if (genericController.vbInstr(1, core.domain.forwardUrl, "://") == 0) {
+                            core.domain.forwardUrl = "http://" + core.domain.forwardUrl;
                         }
-                        redirect(cpCore.domain.forwardUrl, "Forwarding to [" + cpCore.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this URL", false, false);
-                        return cpCore.doc.continueProcessing;
-                    } else if ((cpCore.domain.typeId == 3) && (cpCore.domain.forwardDomainId != 0) & (cpCore.domain.forwardDomainId != cpCore.domain.id)) {
+                        redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this URL", false, false);
+                        return core.doc.continueProcessing;
+                    } else if ((core.domain.typeId == 3) && (core.domain.forwardDomainId != 0) & (core.domain.forwardDomainId != core.domain.id)) {
                         //
                         // forward to a replacement domain
                         //
-                        string forwardDomain = cpCore.db.getRecordName("domains", cpCore.domain.forwardDomainId);
+                        string forwardDomain = core.db.getRecordName("domains", core.domain.forwardDomainId);
                         if (!string.IsNullOrEmpty(forwardDomain)) {
                             int pos = requestUrlSource.IndexOf( requestDomain ,0,1,StringComparison.CurrentCultureIgnoreCase);
                             if (pos > 0) {
-                                cpCore.domain.forwardUrl = requestUrlSource.ToString().Left( pos - 1) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length) - 1);
-                                redirect(cpCore.domain.forwardUrl, "Forwarding to [" + cpCore.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
-                                return cpCore.doc.continueProcessing;
+                                core.domain.forwardUrl = requestUrlSource.ToString().Left( pos - 1) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length) - 1);
+                                redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
+                                return core.doc.continueProcessing;
                             }
                         }
                     }
-                    if (cpCore.domain.noFollow) {
+                    if (core.domain.noFollow) {
                         response_NoFollow = true;
                     }
                     //
-                    requestVirtualFilePath = "/" + cpCore.serverConfig.appConfig.name;
+                    requestVirtualFilePath = "/" + core.serverConfig.appConfig.name;
                     //
                     requestContentWatchPrefix = requestProtocol + requestDomain + requestAppRootPath;
                     requestContentWatchPrefix = requestContentWatchPrefix.Left( requestContentWatchPrefix.Length - 1);
                     //
                     requestPath = "/";
-                    requestPage = cpCore.siteProperties.serverPageDefault;
+                    requestPage = core.siteProperties.serverPageDefault;
                     int TextStartPointer = requestPathPage.ToString().LastIndexOf("/") + 1;
                     if (TextStartPointer != 0) {
                         requestPath = requestPathPage.ToString().Left( TextStartPointer);
@@ -498,7 +498,7 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     // ----- Style tag
-                    adminMessage = "For more information, please contact the <a href=\"mailto:" + cpCore.siteProperties.emailAdmin + "?subject=Re: " + requestDomain + "\">Site Administrator</A>.";
+                    adminMessage = "For more information, please contact the <a href=\"mailto:" + core.siteProperties.emailAdmin + "?subject=Re: " + requestDomain + "\">Site Administrator</A>.";
                     //
                     requestUrl = requestProtocol + requestDomain + requestAppRootPath + requestPath + requestPage;
                     if (requestQueryString != "") {
@@ -512,11 +512,11 @@ namespace Contensive.Core.Controllers {
                         } else {
                             redirect(requestProtocol + requestDomain + requestPath + requestPage, Copy, false, false);
                         }
-                        cpCore.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
-                        return cpCore.doc.continueProcessing;
+                        core.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
+                        return core.doc.continueProcessing;
                     }
                     //
-                    // ----- Create cpcore.main_ServerFormActionURL if it has not been overridden manually
+                    // ----- Create core.main_ServerFormActionURL if it has not been overridden manually
                     if (serverFormActionURL == "") {
                         serverFormActionURL = requestProtocol + requestDomain + requestPath + requestPage;
                     }
@@ -524,10 +524,10 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- done at last
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
-            return cpCore.doc.continueProcessing;
+            return core.doc.continueProcessing;
         }
         //
         //========================================================================
@@ -561,8 +561,8 @@ namespace Contensive.Core.Controllers {
             try {
                 string s = null;
                 //
-                if (cpCore.doc.continueProcessing) {
-                    //If cpCore.doc.continueProcessing And cpCore.doc.outputBufferEnabled Then
+                if (core.doc.continueProcessing) {
+                    //If core.doc.continueProcessing And core.doc.outputBufferEnabled Then
                     if (false) {
                         //
                         // no domain provided, new mode
@@ -570,7 +570,7 @@ namespace Contensive.Core.Controllers {
                         //   - write an iframe that called the cross-Site login
                         //   - http://127.0.0.1/ccLib/clientside/cross.html?v=1&vPath=%2F&vExpires=1%2F1%2F2012
                         //
-                        //domainListSplit = Split(cpCore.main_ServerDomainCrossList, ",")
+                        //domainListSplit = Split(core.main_ServerDomainCrossList, ",")
                         //For Ptr = 0 To UBound(domainListSplit)
                         //    domainSet = Trim(domainListSplit[Ptr])
                         //    If (domainSet <> "") And (InStr(1, "," & usedDomainList & ",", "," & domainSet & ",", vbTextCompare) = 0) Then
@@ -649,8 +649,8 @@ namespace Contensive.Core.Controllers {
                         //                C = genericController.vbReplace(C, "/", "%2F")
                         //                Link = Link & "&e=" & C
                         //            End If
-                        //            Link = cpCore.htmlDoc.html_EncodeHTML(Link)
-                        //            cpCore.htmlDoc.htmlForEndOfBody = cpCore.htmlDoc.htmlForEndOfBody & vbCrLf & vbTab & "<iframe style=""display:none;"" width=""0"" height=""0"" src=""" & Link & """></iframe>"
+                        //            Link = core.htmlDoc.html_EncodeHTML(Link)
+                        //            core.htmlDoc.htmlForEndOfBody = core.htmlDoc.htmlForEndOfBody & vbCrLf & vbTab & "<iframe style=""display:none;"" width=""0"" height=""0"" src=""" & Link & """></iframe>"
                         //        End If
                         //    End If
                         //Next
@@ -711,7 +711,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -733,7 +733,7 @@ namespace Contensive.Core.Controllers {
         public void addResponseHeader(object HeaderName, object HeaderValue) {
             try {
                 //
-                if (cpCore.doc.continueProcessing) {
+                if (core.doc.continueProcessing) {
                     if (bufferResponseHeader != "") {
                         bufferResponseHeader = bufferResponseHeader + "\r\n";
                     }
@@ -745,10 +745,10 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_SetStreamHeader")
+            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_SetStreamHeader")
                                                                     //
         }
         //
@@ -770,8 +770,8 @@ namespace Contensive.Core.Controllers {
                 string FullLink = null;
                 int redirectCycles = 0;
                 //
-                if (cpCore.doc.continueProcessing) {
-                    redirectCycles = cpCore.docProperties.getInteger(rnRedirectCycleFlag);
+                if (core.doc.continueProcessing) {
+                    redirectCycles = core.docProperties.getInteger(rnRedirectCycleFlag);
                     //
                     // convert link to a long link on this domain
                     if (NonEncodedLink.Left( 4).ToLower() == "http") {
@@ -799,7 +799,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Link is not valid
                         //
-                        cpCore.handleException(new ApplicationException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
+                        core.handleException(new ApplicationException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
                         return string.Empty;
                         //
                         // changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
@@ -810,18 +810,18 @@ namespace Contensive.Core.Controllers {
                         //
                         // Loop redirect error, throw trap and block redirect to prevent loop
                         //
-                        cpCore.handleException(new ApplicationException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
+                        core.handleException(new ApplicationException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
                         return string.Empty;
                     } else if (IsPageNotFound) {
                         //
                         // Do a PageNotFound then redirect
                         //
-                        logController.appendLogPageNotFound(cpCore, requestUrlSource);
+                        logController.appendLogPageNotFound(core, requestUrlSource);
                         if (!string.IsNullOrEmpty(ShortLink)) {
-                            cpCore.db.executeQuery("Update ccContentWatch set link=null where link=" + cpCore.db.encodeSQLText(ShortLink));
+                            core.db.executeQuery("Update ccContentWatch set link=null where link=" + core.db.encodeSQLText(ShortLink));
                         }
                         //
-                        if (allowDebugMessage && cpCore.doc.visitPropertyAllowDebugging) {
+                        if (allowDebugMessage && core.doc.visitPropertyAllowDebugging) {
                             //
                             // -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink;
@@ -833,10 +833,10 @@ namespace Contensive.Core.Controllers {
                         //
                         // Go ahead and redirect
                         //
-                        Copy = "\"" + cpCore.doc.profileStartTime.ToString("") + "\",\"" + requestDomain + "\",\"" + requestUrlSource + "\",\"" + NonEncodedLink + "\",\"" + RedirectReason + "\"";
-                        logController.appendLog(cpCore, Copy, "performance", "redirects");
+                        Copy = "\"" + core.doc.profileStartTime.ToString("") + "\",\"" + requestDomain + "\",\"" + requestUrlSource + "\",\"" + NonEncodedLink + "\",\"" + RedirectReason + "\"";
+                        logController.appendLog(core, Copy, "performance", "redirects");
                         //
-                        if (allowDebugMessage && cpCore.doc.visitPropertyAllowDebugging) {
+                        if (allowDebugMessage && core.doc.visitPropertyAllowDebugging) {
                             //
                             // -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink;
@@ -857,10 +857,10 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     // -- close the output stream
-                    cpCore.doc.continueProcessing = false;
+                    core.doc.continueProcessing = false;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -884,18 +884,18 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Verify a site exists, it not add it, it is does, verify all its settings
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="appName"></param>
         /// <param name="DomainName"></param>
         /// <param name="rootPublicFilesPath"></param>
         /// <param name="defaultDocOrBlank"></param>
         /// '
-        public static void verifySite(coreController cpCore, string appName, string DomainName, string rootPublicFilesPath, string defaultDocOrBlank) {
+        public static void verifySite(coreController core, string appName, string DomainName, string rootPublicFilesPath, string defaultDocOrBlank) {
             try {
-                verifyAppPool(cpCore, appName);
-                verifyWebsite(cpCore, appName, DomainName, rootPublicFilesPath, appName);
+                verifyAppPool(core, appName);
+                verifyWebsite(core, appName, DomainName, rootPublicFilesPath, appName);
             } catch (Exception ex) {
-                cpCore.handleException(ex, "verifySite");
+                core.handleException(ex, "verifySite");
             }
         }
         //
@@ -903,9 +903,9 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// verify the application pool. If it exists, update it. If not, create it
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="poolName"></param>
-        public static void verifyAppPool(coreController cpCore, string poolName) {
+        public static void verifyAppPool(coreController core, string poolName) {
             try {
                 using (ServerManager serverManager = new ServerManager()) {
                     bool poolFound = false;
@@ -928,7 +928,7 @@ namespace Contensive.Core.Controllers {
                     serverManager.CommitChanges();
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex, "verifyAppPool");
+                core.handleException(ex, "verifyAppPool");
             }
         }
         //
@@ -936,12 +936,12 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// verify the website. If it exists, update it. If not, create it
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="appName"></param>
         /// <param name="domainName"></param>
         /// <param name="phyPath"></param>
         /// <param name="appPool"></param>
-        private static void verifyWebsite(coreController cpCore, string appName, string domainName, string phyPath, string appPool) {
+        private static void verifyWebsite(coreController core, string appName, string domainName, string phyPath, string appPool) {
             try {
 
                 using (ServerManager iisManager = new ServerManager()) {
@@ -963,8 +963,8 @@ namespace Contensive.Core.Controllers {
                     site = iisManager.Sites[appName];
                     //
                     // -- verify the bindings
-                    verifyWebsite_Binding(cpCore, site, "*:80:" + appName, "http");
-                    verifyWebsite_Binding(cpCore, site, "*:80:" + domainName, "http");
+                    verifyWebsite_Binding(core, site, "*:80:" + appName, "http");
+                    verifyWebsite_Binding(core, site, "*:80:" + domainName, "http");
                     //
                     // -- verify the application pool
                     site.ApplicationDefaults.ApplicationPoolName = appPool;
@@ -973,16 +973,16 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     // -- verify the cdn virtual directory (if configured)
-                    string cdnFilesPrefix = cpCore.serverConfig.appConfig.cdnFilesNetprefix;
+                    string cdnFilesPrefix = core.serverConfig.appConfig.cdnFilesNetprefix;
                     if (cdnFilesPrefix.IndexOf("://") < 0) {
-                        verifyWebsite_VirtualDirectory(cpCore, site, appName, cdnFilesPrefix, cpCore.serverConfig.appConfig.cdnFilesPath);
+                        verifyWebsite_VirtualDirectory(core, site, appName, cdnFilesPrefix, core.serverConfig.appConfig.cdnFilesPath);
                     }
                     //
                     // -- commit any changes
                     iisManager.CommitChanges();
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex, "verifyWebsite");
+                core.handleException(ex, "verifyWebsite");
             }
         }
         //
@@ -990,11 +990,11 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Verify the binding
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="site"></param>
         /// <param name="bindingInformation"></param>
         /// <param name="bindingProtocol"></param>
-        private static void verifyWebsite_Binding(coreController cpCore, Site site, string bindingInformation, string bindingProtocol) {
+        private static void verifyWebsite_Binding(coreController core, Site site, string bindingInformation, string bindingProtocol) {
             try {
                 using (ServerManager iisManager = new ServerManager()) {
                     Binding binding = null;
@@ -1016,13 +1016,13 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex, "verifyWebsite_Binding");
+                core.handleException(ex, "verifyWebsite_Binding");
             }
         }
         //
         //====================================================================================================
         //
-        private static void verifyWebsite_VirtualDirectory(coreController cpCore, Site site, string appName, string virtualFolder, string physicalPath) {
+        private static void verifyWebsite_VirtualDirectory(coreController core, Site site, string appName, string virtualFolder, string physicalPath) {
             try {
                 bool found = false;
                 foreach ( Application iisApp in site.Applications) {
@@ -1059,7 +1059,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex, "verifyWebsite_VirtualDirectory");
+                core.handleException(ex, "verifyWebsite_VirtualDirectory");
             }
         }
         //========================================================================
@@ -1069,7 +1069,7 @@ namespace Contensive.Core.Controllers {
         //   returns true if the redirect happened OK
         //========================================================================
         //
-        public static bool main_RedirectByRecord_ReturnStatus(coreController cpcore, string ContentName, int RecordID, string FieldName = "") {
+        public static bool main_RedirectByRecord_ReturnStatus(coreController core, string ContentName, int RecordID, string FieldName = "") {
             bool tempmain_RedirectByRecord_ReturnStatus = false;
             int CSPointer = 0;
             string MethodName = null;
@@ -1093,13 +1093,13 @@ namespace Contensive.Core.Controllers {
             //
             tempmain_RedirectByRecord_ReturnStatus = false;
             BlockRedirect = false;
-            CSPointer = cpcore.db.csOpen(iContentName, "ID=" + iRecordID);
-            if (cpcore.db.csOk(CSPointer)) {
+            CSPointer = core.db.csOpen(iContentName, "ID=" + iRecordID);
+            if (core.db.csOk(CSPointer)) {
                 // 2/18/2008 - EncodeLink change
                 //
                 // Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
                 //
-                EncodedLink = encodeText(cpcore.db.csGetText(CSPointer, iFieldName)).Trim(' ');
+                EncodedLink = encodeText(core.db.csGetText(CSPointer, iFieldName)).Trim(' ');
                 if (string.IsNullOrEmpty(EncodedLink)) {
                     BlockRedirect = true;
                 } else {
@@ -1114,40 +1114,40 @@ namespace Contensive.Core.Controllers {
                             //       if this is a content watch record, check the underlying content for
                             //       inactive or expired before redirecting
                             //
-                            LinkPrefix = cpcore.webServer.requestContentWatchPrefix;
-                            ContentID = (cpcore.db.csGetInteger(CSPointer, "ContentID"));
-                            HostContentName = Models.Complex.cdefModel.getContentNameByID(cpcore, ContentID);
+                            LinkPrefix = core.webServer.requestContentWatchPrefix;
+                            ContentID = (core.db.csGetInteger(CSPointer, "ContentID"));
+                            HostContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
                             if (string.IsNullOrEmpty(HostContentName)) {
                                 //
                                 // ----- Content Watch with a bad ContentID, mark inactive
                                 //
                                 BlockRedirect = true;
-                                cpcore.db.csSet(CSPointer, "active", 0);
+                                core.db.csSet(CSPointer, "active", 0);
                             } else {
-                                HostRecordID = (cpcore.db.csGetInteger(CSPointer, "RecordID"));
+                                HostRecordID = (core.db.csGetInteger(CSPointer, "RecordID"));
                                 if (HostRecordID == 0) {
                                     //
                                     // ----- Content Watch with a bad iRecordID, mark inactive
                                     //
                                     BlockRedirect = true;
-                                    cpcore.db.csSet(CSPointer, "active", 0);
+                                    core.db.csSet(CSPointer, "active", 0);
                                 } else {
-                                    CSHost = cpcore.db.csOpen(HostContentName, "ID=" + HostRecordID);
-                                    if (!cpcore.db.csOk(CSHost)) {
+                                    CSHost = core.db.csOpen(HostContentName, "ID=" + HostRecordID);
+                                    if (!core.db.csOk(CSHost)) {
                                         //
                                         // ----- Content Watch host record not found, mark inactive
                                         //
                                         BlockRedirect = true;
-                                        cpcore.db.csSet(CSPointer, "active", 0);
+                                        core.db.csSet(CSPointer, "active", 0);
                                     }
                                 }
-                                cpcore.db.csClose(ref CSHost);
+                                core.db.csClose(ref CSHost);
                             }
                             if (BlockRedirect) {
                                 //
                                 // ----- if a content watch record is blocked, delete the content tracking
                                 //
-                                cpcore.db.deleteContentRules(Models.Complex.cdefModel.getContentId(cpcore, HostContentName), HostRecordID);
+                                core.db.deleteContentRules(Models.Complex.cdefModel.getContentId(core, HostContentName), HostRecordID);
                             }
                             break;
                     }
@@ -1157,22 +1157,22 @@ namespace Contensive.Core.Controllers {
                     // If link incorrectly includes the LinkPrefix, take it off first, then add it back
                     //
                     NonEncodedLink = genericController.ConvertShortLinkToLink(NonEncodedLink, LinkPrefix);
-                    if (cpcore.db.cs_isFieldSupported(CSPointer, "Clicks")) {
-                        cpcore.db.csSet(CSPointer, "Clicks", (cpcore.db.csGetNumber(CSPointer, "Clicks")) + 1);
+                    if (core.db.cs_isFieldSupported(CSPointer, "Clicks")) {
+                        core.db.csSet(CSPointer, "Clicks", (core.db.csGetNumber(CSPointer, "Clicks")) + 1);
                     }
-                    cpcore.webServer.redirect(LinkPrefix + NonEncodedLink, "Call to " + MethodName + ", no reason given.", false, false);
+                    core.webServer.redirect(LinkPrefix + NonEncodedLink, "Call to " + MethodName + ", no reason given.", false, false);
                     tempmain_RedirectByRecord_ReturnStatus = true;
                 }
             }
-            cpcore.db.csClose(ref CSPointer);
+            core.db.csClose(ref CSPointer);
             return tempmain_RedirectByRecord_ReturnStatus;
         }
         //
         //========================================================================
         //
-        public static string getBrowserAcceptLanguage(coreController cpCore) {
+        public static string getBrowserAcceptLanguage(coreController core) {
             try {
-                string AcceptLanguageString = genericController.encodeText(cpCore.webServer.requestLanguage) + ",";
+                string AcceptLanguageString = genericController.encodeText(core.webServer.requestLanguage) + ",";
                 int CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",");
                 while (CommaPosition != 0) {
                     string AcceptLanguage = (AcceptLanguageString.Left( CommaPosition - 1)).Trim(' ');
@@ -1190,7 +1190,7 @@ namespace Contensive.Core.Controllers {
                     CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",");
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return "";
         }

@@ -79,9 +79,9 @@ namespace Contensive.Core.Models.DbModels {
             // -- 
             // during load
             //   -- The filename is loaded into the model (blank or not). No content Is read from the file during load.
-            //   -- the internalCpCore must be set
+            //   -- the internalcore must be set
             //
-            // during a cache load, the internalCpCore must be set
+            // during a cache load, the internalcore must be set
             //
             // content property read:
             //   -- If the filename Is blank, a blank Is returned
@@ -119,9 +119,9 @@ namespace Contensive.Core.Models.DbModels {
                 }
                 get {
                     if (!contentLoaded) {
-                        if ((!string.IsNullOrEmpty(filename)) && (internalCpCore != null)) {
+                        if ((!string.IsNullOrEmpty(filename)) && (internalcore != null)) {
                             contentLoaded = true;
-                            _content = internalCpCore.cdnFiles.readFile(filename);
+                            _content = internalcore.cdnFiles.readFile(filename);
                         }
                     }
                     return _content;
@@ -138,7 +138,7 @@ namespace Contensive.Core.Models.DbModels {
             public bool contentUpdated { get; set; } = false;
             //
             // -- set by load(). Used by field to read content from filename when needed
-            public coreController internalCpCore { get; set; } = null;
+            public coreController internalcore { get; set; } = null;
         }
 
         //
@@ -208,11 +208,11 @@ namespace Contensive.Core.Models.DbModels {
         /// Add a new recod to the db and open it. Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <returns></returns>
-        protected static T add<T>(coreController cpCore) where T : baseModel {
+        protected static T add<T>(coreController core) where T : baseModel {
             var tempVar = new List<string>();
-            return add<T>(cpCore, ref tempVar);
+            return add<T>(core, ref tempVar);
         }
         //
         //====================================================================================================
@@ -220,27 +220,27 @@ namespace Contensive.Core.Models.DbModels {
         /// Add a new recod to the db and open it. Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
         /// include callersCacheNameList to get a list of cacheNames used to assemble this response
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        protected static T add<T>(coreController cpCore, ref List<string> callersCacheNameList) where T : baseModel {
+        protected static T add<T>(coreController core, ref List<string> callersCacheNameList) where T : baseModel {
             T result = default(T);
             try {
-                if (cpCore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpCore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     Type instanceType = typeof(T);
                     string contentName = derivedContentName(instanceType);
-                    result = create<T>(cpCore, cpCore.db.insertContentRecordGetID(contentName, cpCore.doc.sessionContext.user.id), ref callersCacheNameList);
+                    result = create<T>(core, core.db.insertContentRecordGetID(contentName, core.doc.sessionContext.user.id), ref callersCacheNameList);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
                 throw;
             }
@@ -251,12 +251,12 @@ namespace Contensive.Core.Models.DbModels {
         /// <summary>
         /// return a new model with the data selected.
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        protected static T create<T>(coreController cpCore, int recordId) where T : baseModel {
+        protected static T create<T>(coreController core, int recordId) where T : baseModel {
             var tempVar = new List<string>();
-            return create<T>(cpCore, recordId, ref tempVar);
+            return create<T>(core, recordId, ref tempVar);
         }
         //
         //====================================================================================================
@@ -266,31 +266,31 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="recordId">The id of the record to be read into the new object</param>
         /// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        protected static T create<T>(coreController cpCore, int recordId, ref List<string> callersCacheNameList) where T : baseModel {
+        protected static T create<T>(coreController core, int recordId, ref List<string> callersCacheNameList) where T : baseModel {
             T result = default(T);
             try {
-                if (cpCore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpCore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
-                        result = readModelCache<T>(cpCore, "id", recordId.ToString());
+                        result = readModelCache<T>(core, "id", recordId.ToString());
                         if (result == null) {
-                            using (csController cs = new csController(cpCore)) {
+                            using (csController cs = new csController(core)) {
                                 if (cs.open(contentName, "(id=" + recordId.ToString() + ")")) {
-                                    result = loadRecord<T>(cpCore, cs, ref callersCacheNameList);
+                                    result = loadRecord<T>(core, cs, ref callersCacheNameList);
                                 }
                             }
                         }
                         //
-                        // -- store cpCore in all extended fields that need it (file fields so content read can happen on demand instead of at load)
+                        // -- store core in all extended fields that need it (file fields so content read can happen on demand instead of at load)
                         if (result != null) {
                             foreach (PropertyInfo instanceProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                                 switch (instanceProperty.PropertyType.Name) {
@@ -301,22 +301,22 @@ namespace Contensive.Core.Models.DbModels {
                                         switch (instanceProperty.PropertyType.Name) {
                                             case "fieldTypeJavascriptFile": {
                                                     fieldTypeJavascriptFile fileProperty = (fieldTypeJavascriptFile)instanceProperty.GetValue(result);
-                                                    fileProperty.internalCpCore = cpCore;
+                                                    fileProperty.internalcore = core;
                                                     break;
                                                 }
                                             case "fieldTypeCSSFile": {
                                                     fieldTypeCSSFile fileProperty = (fieldTypeCSSFile)instanceProperty.GetValue(result);
-                                                    fileProperty.internalCpCore = cpCore;
+                                                    fileProperty.internalcore = core;
                                                     break;
                                                 }
                                             case "fieldTypeHTMLFile": {
                                                     fieldTypeHTMLFile fileProperty = (fieldTypeHTMLFile)instanceProperty.GetValue(result);
-                                                    fileProperty.internalCpCore = cpCore;
+                                                    fileProperty.internalcore = core;
                                                     break;
                                                 }
                                             default: {
                                                     fieldTypeTextFile fileProperty = (fieldTypeTextFile)instanceProperty.GetValue(result);
-                                                    fileProperty.internalCpCore = cpCore;
+                                                    fileProperty.internalcore = core;
                                                     break;
                                                 }
                                         }
@@ -327,16 +327,16 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
         }
         //
         //====================================================================================================
-        protected static T create<T>(coreController cpCore, string recordGuid) where T : baseModel {
+        protected static T create<T>(coreController core, string recordGuid) where T : baseModel {
             var tempVar = new List<string>();
-            return create<T>(cpCore, recordGuid, ref tempVar);
+            return create<T>(core, recordGuid, ref tempVar);
         }
         //
         //====================================================================================================
@@ -345,33 +345,33 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
-        protected static T create<T>(coreController cpCore, string recordGuid, ref List<string> callersCacheNameList) where T : baseModel {
+        protected static T create<T>(coreController core, string recordGuid, ref List<string> callersCacheNameList) where T : baseModel {
             T result = default(T);
             try {
-                if (cpCore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpCore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(recordGuid)) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
-                        result = readModelCache<T>(cpCore, "ccguid", recordGuid);
+                        result = readModelCache<T>(core, "ccguid", recordGuid);
                         if (result == null) {
-                            using (csController cs = new csController(cpCore)) {
-                                if (cs.open(contentName, "(ccGuid=" + cpCore.db.encodeSQLText(recordGuid) + ")")) {
-                                    result = loadRecord<T>(cpCore, cs, ref callersCacheNameList);
+                            using (csController cs = new csController(core)) {
+                                if (cs.open(contentName, "(ccGuid=" + core.db.encodeSQLText(recordGuid) + ")")) {
+                                    result = loadRecord<T>(core, cs, ref callersCacheNameList);
                                 }
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
                 throw;
             }
@@ -379,9 +379,9 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
-        protected static T createByName<T>(coreController cpCore, string recordName) where T : baseModel {
+        protected static T createByName<T>(coreController core, string recordName) where T : baseModel {
             var tempVar = new List<string>();
-            return createByName<T>(cpCore, recordName, ref tempVar);
+            return createByName<T>(core, recordName, ref tempVar);
         }
         //
         //====================================================================================================
@@ -390,33 +390,33 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordName"></param>
-        protected static T createByName<T>(coreController cpCore, string recordName, ref List<string> callersCacheNameList) where T : baseModel {
+        protected static T createByName<T>(coreController core, string recordName, ref List<string> callersCacheNameList) where T : baseModel {
             T result = default(T);
             try {
-                if (cpCore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpCore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(recordName)) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
-                        result = readModelCache<T>(cpCore, "name", recordName);
+                        result = readModelCache<T>(core, "name", recordName);
                         if (result == null) {
-                            using (csController cs = new csController(cpCore)) {
-                                if (cs.open(contentName, "(name=" + cpCore.db.encodeSQLText(recordName) + ")", "id")) {
-                                    result = loadRecord<T>(cpCore, cs, ref callersCacheNameList);
+                            using (csController cs = new csController(core)) {
+                                if (cs.open(contentName, "(name=" + core.db.encodeSQLText(recordName) + ")", "id")) {
+                                    result = loadRecord<T>(core, cs, ref callersCacheNameList);
                                 }
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -428,7 +428,7 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
-        private static T loadRecord<T>(coreController cpCore, csController cs, ref List<string> callersCacheNameList) where T : baseModel {
+        private static T loadRecord<T>(coreController core, csController cs, ref List<string> callersCacheNameList) where T : baseModel {
             T modelInstance = default(T);
             try {
                 if (cs.ok()) {
@@ -469,7 +469,7 @@ namespace Contensive.Core.Models.DbModels {
                                             fieldTypeTextFile instanceFileType = new fieldTypeTextFile();
                                             instanceFileType.filename = cs.getValue(modelProperty.Name);
                                             //If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            //    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                            //    instanceFileType.content = core.cdnFiles.readFile(instanceFileType.filename)
                                             //End If
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
@@ -480,7 +480,7 @@ namespace Contensive.Core.Models.DbModels {
                                             fieldTypeJavascriptFile instanceFileType = new fieldTypeJavascriptFile();
                                             instanceFileType.filename = cs.getValue(modelProperty.Name);
                                             //If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            //    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                            //    instanceFileType.content = core.cdnFiles.readFile(instanceFileType.filename)
                                             //End If
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
@@ -491,7 +491,7 @@ namespace Contensive.Core.Models.DbModels {
                                             fieldTypeCSSFile instanceFileType = new fieldTypeCSSFile();
                                             instanceFileType.filename = cs.getValue(modelProperty.Name);
                                             //If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            //    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                            //    instanceFileType.content = core.cdnFiles.readFile(instanceFileType.filename)
                                             //End If
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
@@ -502,7 +502,7 @@ namespace Contensive.Core.Models.DbModels {
                                             fieldTypeHTMLFile instanceFileType = new fieldTypeHTMLFile();
                                             instanceFileType.filename = cs.getValue(modelProperty.Name);
                                             //If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            //    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                            //    instanceFileType.content = core.cdnFiles.readFile(instanceFileType.filename)
                                             //End If
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
@@ -524,16 +524,16 @@ namespace Contensive.Core.Models.DbModels {
                         if (baseInstance != null) {
                             string cacheName0 = Controllers.cacheController.getCacheKey_Entity(tableName, "id", baseInstance.id.ToString());
                             callersCacheNameList.Add(cacheName0);
-                            cpCore.cache.setObject(cacheName0, modelInstance);
+                            core.cache.setObject(cacheName0, modelInstance);
                             //
                             string cacheName1 = Controllers.cacheController.getCacheKey_Entity(tableName, "ccguid", baseInstance.ccguid);
                             callersCacheNameList.Add(cacheName1);
-                            cpCore.cache.setAlias(cacheName1, cacheName0);
+                            core.cache.setAlias(cacheName1, cacheName0);
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return modelInstance;
@@ -543,20 +543,20 @@ namespace Contensive.Core.Models.DbModels {
         /// <summary>
         /// save the instance properties to a record with matching id. If id is not provided, a new record is created.
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <returns></returns>
-        protected int save(coreController cpCore) {
+        protected int save(coreController core) {
             try {
-                if (cpCore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpCore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
-                    csController cs = new csController(cpCore);
+                    csController cs = new csController(core);
                     Type instanceType = this.GetType();
                     string contentName = derivedContentName(instanceType);
                     string tableName = derivedContentTableName(instanceType);
@@ -622,7 +622,7 @@ namespace Contensive.Core.Models.DbModels {
                                             case "fieldTypeJavascriptFile": {
                                                     fieldTypeId = FieldTypeIdFileJavascript;
                                                     fieldTypeJavascriptFile fileProperty = (fieldTypeJavascriptFile)instanceProperty.GetValue(this);
-                                                    fileProperty.internalCpCore = cpCore;
+                                                    fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
                                                     contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
                                                     contentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
@@ -632,7 +632,7 @@ namespace Contensive.Core.Models.DbModels {
                                             case "fieldTypeCSSFile": {
                                                     fieldTypeId = FieldTypeIdFileCSS;
                                                     fieldTypeCSSFile fileProperty = (fieldTypeCSSFile)instanceProperty.GetValue(this);
-                                                    fileProperty.internalCpCore = cpCore;
+                                                    fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
                                                     contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
                                                     contentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
@@ -642,7 +642,7 @@ namespace Contensive.Core.Models.DbModels {
                                             case "fieldTypeHTMLFile": {
                                                     fieldTypeId = FieldTypeIdFileHTML;
                                                     fieldTypeHTMLFile fileProperty = (fieldTypeHTMLFile)instanceProperty.GetValue(this);
-                                                    fileProperty.internalCpCore = cpCore;
+                                                    fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
                                                     contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
                                                     contentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
@@ -652,7 +652,7 @@ namespace Contensive.Core.Models.DbModels {
                                             default: {
                                                     fieldTypeId = FieldTypeIdFileText;
                                                     fieldTypeTextFile fileProperty = (fieldTypeTextFile)instanceProperty.GetValue(this);
-                                                    fileProperty.internalCpCore = cpCore;
+                                                    fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
                                                     contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
                                                     contentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
@@ -667,7 +667,7 @@ namespace Contensive.Core.Models.DbModels {
                                                 // -- empty content
                                                 if (!string.IsNullOrEmpty(filename)) {
                                                     cs.setField(instanceProperty.Name, "");
-                                                    cpCore.cdnFiles.deleteFile(filename);
+                                                    core.cdnFiles.deleteFile(filename);
                                                 }
                                             } else {
                                                 //
@@ -675,13 +675,13 @@ namespace Contensive.Core.Models.DbModels {
                                                 if (string.IsNullOrEmpty(filename)) {
                                                     filename = fileController.getVirtualRecordPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, fieldTypeId);
                                                 }
-                                                cpCore.cdnFiles.saveFile(filename, content);
+                                                core.cdnFiles.saveFile(filename, content);
                                                 cs.setFieldFilename(instanceProperty.Name, filename);
                                             }
                                         }
                                         //Case "fieldTypeJavascriptFile"
                                         //    Dim textFileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeJavascriptFile)
-                                        //    textFileProperty.internalCpCore = cpCore
+                                        //    textFileProperty.internalcore = core
                                         //    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
                                         //    Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
                                         //    If (String.IsNullOrEmpty(copy)) Then
@@ -690,7 +690,7 @@ namespace Contensive.Core.Models.DbModels {
                                         //        Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
                                         //        If (Not String.IsNullOrEmpty(filename)) Then
                                         //            cs.setField(instanceProperty.Name, "")
-                                        //            cpCore.cdnFiles.deleteFile(filename)
+                                        //            core.cdnFiles.deleteFile(filename)
                                         //        End If
                                         //    Else
                                         //        '
@@ -699,7 +699,7 @@ namespace Contensive.Core.Models.DbModels {
                                         //    End If
                                         //Case "fieldTypeCSSFile"
                                         //    Dim textFileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeCSSFile)
-                                        //    textFileProperty.internalCpCore = cpCore
+                                        //    textFileProperty.internalcore = core
                                         //    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
                                         //    Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
                                         //    If (String.IsNullOrEmpty(copy)) Then
@@ -708,7 +708,7 @@ namespace Contensive.Core.Models.DbModels {
                                         //        Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
                                         //        If (Not String.IsNullOrEmpty(filename)) Then
                                         //            cs.setField(instanceProperty.Name, "")
-                                        //            cpCore.cdnFiles.deleteFile(filename)
+                                        //            core.cdnFiles.deleteFile(filename)
                                         //        End If
                                         //    Else
                                         //        '
@@ -717,7 +717,7 @@ namespace Contensive.Core.Models.DbModels {
                                         //    End If
                                         //Case "fieldTypeHTMLFile"
                                         //    Dim textFileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeHTMLFile)
-                                        //    textFileProperty.internalCpCore = cpCore
+                                        //    textFileProperty.internalcore = core
                                         //    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
                                         //    Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
                                         //    If (String.IsNullOrEmpty(copy)) Then
@@ -726,7 +726,7 @@ namespace Contensive.Core.Models.DbModels {
                                         //        Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
                                         //        If (Not String.IsNullOrEmpty(filename)) Then
                                         //            cs.setField(instanceProperty.Name, "")
-                                        //            cpCore.cdnFiles.deleteFile(filename)
+                                        //            core.cdnFiles.deleteFile(filename)
                                         //        End If
                                         //    Else
                                         //        '
@@ -746,15 +746,15 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- invalidate objects
                     // -- no, the primary is invalidated by the cs.save()
-                    //cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"id", id.ToString))
+                    //core.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"id", id.ToString))
                     // -- no, the secondary points to the pirmary, which is invalidated. Dont waste resources invalidating
-                    //cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
+                    //core.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
                     //
                     // -- object is here, but the cache was invalidated, setting
-                    cpCore.cache.setObject(Controllers.cacheController.getCacheKey_Entity(tableName, "id", this.id.ToString()), this);
+                    core.cache.setObject(Controllers.cacheController.getCacheKey_Entity(tableName, "id", this.id.ToString()), this);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return id;
@@ -766,27 +766,27 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        protected static void delete<T>(coreController cpCore, int recordId) where T : baseModel {
+        protected static void delete<T>(coreController core, int recordId) where T : baseModel {
             try {
-                if (cpCore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpCore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
                         string tableName = derivedContentTableName(instanceType);
-                        cpCore.db.deleteContentRecords(contentName, "id=" + recordId.ToString());
-                        cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
+                        core.db.deleteContentRecords(contentName, "id=" + recordId.ToString());
+                        core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -797,41 +797,41 @@ namespace Contensive.Core.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="ccguid"></param>
-        protected static void delete<T>(coreController cpCore, string ccguid) where T : baseModel {
+        protected static void delete<T>(coreController core, string ccguid) where T : baseModel {
             try {
-                if (cpCore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpCore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(ccguid)) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
-                        baseModel instance = create<baseModel>(cpCore, ccguid);
+                        baseModel instance = create<baseModel>(core, ccguid);
                         if (instance != null) {
-                            invalidateCacheSingleRecord<T>(cpCore, instance.id);
-                            cpCore.db.deleteContentRecords(contentName, "(ccguid=" + cpCore.db.encodeSQLText(ccguid) + ")");
+                            invalidateCacheSingleRecord<T>(core, instance.id);
+                            core.db.deleteContentRecords(contentName, "(ccguid=" + core.db.encodeSQLText(ccguid) + ")");
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
         //
         //====================================================================================================
-        protected static List<T> createList<T>(coreController cpCore, string sqlCriteria) where T : baseModel {
-            return createList<T>(cpCore, sqlCriteria, "id", new List<string> { });
+        protected static List<T> createList<T>(coreController core, string sqlCriteria) where T : baseModel {
+            return createList<T>(core, sqlCriteria, "id", new List<string> { });
         }
         //
         //====================================================================================================
-        protected static List<T> createList<T>(coreController cpCore, string sqlCriteria, string sqlOrderBy) where T : baseModel {
-            return createList<T>(cpCore, sqlCriteria, sqlOrderBy, new List<string> { });
+        protected static List<T> createList<T>(coreController core, string sqlCriteria, string sqlOrderBy) where T : baseModel {
+            return createList<T>(core, sqlCriteria, sqlOrderBy, new List<string> { });
         }
         //
         //====================================================================================================
@@ -841,19 +841,19 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        protected static List<T> createList<T>(coreController cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : baseModel {
+        protected static List<T> createList<T>(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : baseModel {
             List<T> result = new List<T>();
             try {
-                if (cpCore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpCore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
-                    csController cs = new csController(cpCore);
+                    csController cs = new csController(core);
                     string sql = getSelectSql<T>(null, sqlCriteria, sqlOrderBy);
                     //Dim ignoreCacheNames As New List(Of String)
                     //Dim instanceType As Type = GetType(T)
@@ -863,7 +863,7 @@ namespace Contensive.Core.Models.DbModels {
                         //If (cs.open(contentName, sqlCriteria, sqlOrderBy)) Then
                         T instance = default(T);
                         do {
-                            instance = loadRecord<T>(cpCore, cs, ref callersCacheNameList);
+                            instance = loadRecord<T>(core, cs, ref callersCacheNameList);
                             if (instance != null) {
                                 result.Add(instance);
                             }
@@ -873,7 +873,7 @@ namespace Contensive.Core.Models.DbModels {
                     cs.Close();
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -883,28 +883,28 @@ namespace Contensive.Core.Models.DbModels {
         /// <summary>
         /// invalidate the primary key (which depends on all secondary keys)
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <param name="recordId"></param>
-        protected static void invalidateCacheSingleRecord<T>(coreController cpCore, int recordId) where T : baseModel {
+        protected static void invalidateCacheSingleRecord<T>(coreController core, int recordId) where T : baseModel {
             try {
-                if (cpCore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpCore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     object instanceType = typeof(T);
                     string tableName = derivedContentTableName((Type)instanceType);
-                    cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
+                    core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
                     //
                     // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-                    cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, "id", "0"));
+                    core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, "id", "0"));
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
         }
         //
@@ -915,21 +915,21 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="recordId"></param>record
         /// <returns></returns>
-        protected static string getRecordName<T>(coreController cpcore, int recordId) where T : baseModel {
+        protected static string getRecordName<T>(coreController core, int recordId) where T : baseModel {
             try {
-                if (cpcore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpcore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpcore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpcore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         Type instanceType = typeof(T);
                         string tableName = derivedContentTableName(instanceType);
-                        using (csController cs = new csController(cpcore)) {
+                        using (csController cs = new csController(core)) {
                             if (cs.openSQL("select name from " + tableName + " where id=" + recordId.ToString())) {
                                 return cs.getText("name");
                             }
@@ -937,7 +937,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
             }
             return "";
         }
@@ -949,29 +949,29 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="ccGuid"></param>record
         /// <returns></returns>
-        protected static string getRecordName<T>(coreController cpcore, string ccGuid) where T : baseModel {
+        protected static string getRecordName<T>(coreController core, string ccGuid) where T : baseModel {
             try {
-                if (cpcore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpcore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpcore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpcore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(ccGuid)) {
                         Type instanceType = typeof(T);
                         string tableName = derivedContentTableName(instanceType);
-                        using (csController cs = new csController(cpcore)) {
-                            if (cs.openSQL("select name from " + tableName + " where ccguid=" + cpcore.db.encodeSQLText(ccGuid))) {
+                        using (csController cs = new csController(core)) {
+                            if (cs.openSQL("select name from " + tableName + " where ccguid=" + core.db.encodeSQLText(ccGuid))) {
                                 return cs.getText("name");
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
             }
             return "";
         }
@@ -983,51 +983,51 @@ namespace Contensive.Core.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="ccGuid"></param>record
         /// <returns></returns>
-        protected static int getRecordId<T>(coreController cpcore, string ccGuid) where T : baseModel {
+        protected static int getRecordId<T>(coreController core, string ccGuid) where T : baseModel {
             try {
-                if (cpcore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpcore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpcore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpcore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(ccGuid)) {
                         Type instanceType = typeof(T);
                         string tableName = derivedContentTableName(instanceType);
-                        using (csController cs = new csController(cpcore)) {
-                            if (cs.openSQL("select id from " + tableName + " where ccguid=" + cpcore.db.encodeSQLText(ccGuid))) {
+                        using (csController cs = new csController(core)) {
+                            if (cs.openSQL("select id from " + tableName + " where ccguid=" + core.db.encodeSQLText(ccGuid))) {
                                 return cs.getInteger("id");
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
             }
             return 0;
         }
         //
         //====================================================================================================
         //
-        protected static T createDefault<T>(coreController cpcore) where T : baseModel {
+        protected static T createDefault<T>(coreController core) where T : baseModel {
             T instance = default(T);
             try {
                 Type instanceType = typeof(T);
                 instance = (T)Activator.CreateInstance(instanceType);
-                if (cpcore.serverConfig == null) {
+                if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpcore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (cpcore.serverConfig.appConfig == null) {
+                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.serverConfig.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    cpcore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     string contentName = derivedContentName(instanceType);
-                    Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(cpcore, contentName);
+                    Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(core, contentName);
                     if (CDef == null) {
                         throw new ApplicationException("content [" + contentName + "] could Not be found.");
                     } else if (CDef.Id <= 0) {
@@ -1062,16 +1062,16 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                core.handleException(ex);
             }
             return instance;
         }
         //
-        private static T readModelCache<T>(coreController cpCore, string fieldName, string fieldValue) where T : baseModel {
+        private static T readModelCache<T>(coreController core, string fieldName, string fieldValue) where T : baseModel {
             Type instanceType = typeof(T);
             string tableName = derivedContentTableName(instanceType);
             string cacheName = Controllers.cacheController.getCacheKey_Entity(tableName, fieldName, fieldValue);
-            return cpCore.cache.getObject<T>(cacheName);
+            return core.cache.getObject<T>(cacheName);
         }
         //
         private static string getSelectSql<T>(List<string> fieldList = null, string criteria = "", string orderBy = "") where T : baseModel {

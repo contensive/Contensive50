@@ -40,7 +40,7 @@ namespace Contensive.Core.Controllers {
         //
         //   Internal Storage
         //
-        private coreController cpCore;
+        private coreController core;
         //
         private const bool NewWay = true;
         //
@@ -76,8 +76,8 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public htmlParserController(coreController cpCore) {
-            this.cpCore = cpCore;
+        public htmlParserController(coreController core) {
+            this.core = core;
         }
         //
         //====================================================================================================
@@ -106,7 +106,7 @@ namespace Contensive.Core.Controllers {
                 // get a unique signature
                 //
                 do {
-                    BlobSN = "/blob" + encodeText(genericController.GetRandomInteger(cpCore)) + ":";
+                    BlobSN = "/blob" + encodeText(genericController.GetRandomInteger(core)) + ":";
                     Ptr = Ptr + 1;
                 } while ((WorkingSrc.IndexOf(BlobSN, System.StringComparison.OrdinalIgnoreCase) != -1) && (Ptr < 10));
                 //
@@ -176,10 +176,10 @@ namespace Contensive.Core.Controllers {
                 LocalElements = new Contensive.Core.Controllers.htmlParserController.Element[LocalElementCount + 1];
                 return tempLoad;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
             return tempLoad;
         }
         //
@@ -203,7 +203,7 @@ namespace Contensive.Core.Controllers {
                     result = LocalElements[ElementPointer].IsTag;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -223,10 +223,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempText;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
             return tempText;
         }
         //
@@ -245,10 +245,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempTagName;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
             return tempTagName;
         }
         //
@@ -267,10 +267,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempPosition;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
             return tempPosition;
         }
         //
@@ -289,10 +289,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempElementAttributeCount;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
             return tempElementAttributeCount;
         }
         //
@@ -313,10 +313,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempElementAttributeName;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
             return tempElementAttributeName;
         }
         //
@@ -337,10 +337,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempElementAttributeValue;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
             return tempElementAttributeValue;
         }
         //
@@ -372,10 +372,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempElementAttribute;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
             return tempElementAttribute;
         }
         //
@@ -513,10 +513,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
         }
         //
         //====================================================================================================
@@ -541,10 +541,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempGetLesserNonZero;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
             return tempGetLesserNonZero;
         }
         //
@@ -562,10 +562,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempPassWhiteSpace;
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
-            cpCore.handleException(new Exception("unexpected exception"));
+            core.handleException(new Exception("unexpected exception"));
             return tempPassWhiteSpace;
         }
         //

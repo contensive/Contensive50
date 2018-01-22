@@ -28,8 +28,8 @@ namespace Contensive.Core.Addons.PageManager {
             string returnHtml = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
-                returnHtml = "<div class=\"ccBodyWeb\">" + pageContentController.getHtmlBody(cpCore) + "</div>";
+                coreController core = processor.core;
+                returnHtml = "<div class=\"ccBodyWeb\">" + pageContentController.getHtmlBody(core) + "</div>";
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

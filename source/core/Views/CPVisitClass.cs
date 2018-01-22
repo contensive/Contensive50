@@ -23,12 +23,12 @@ namespace Contensive.Core {
         public const string EventsId = "2AFEB1A8-5B27-45AC-A9DF-F99849BE1FAE";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         private CPClass cp;
         protected bool disposed = false;
         //
-        public CPVisitClass(Contensive.Core.Controllers.coreController cpCoreObj, CPClass cpParent) : base() {
-            this.cpCore = cpCoreObj;
+        public CPVisitClass(Contensive.Core.Controllers.coreController coreObj, CPClass cpParent) : base() {
+            this.core = coreObj;
             cp = cpParent;
         }
         //
@@ -42,7 +42,7 @@ namespace Contensive.Core {
                     // call .dispose for managed objects
                     //
                     cp = null;
-                    cpCore = null;
+                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -54,7 +54,7 @@ namespace Contensive.Core {
         public override bool CookieSupport
         {
             get {
-                return cpCore.doc.sessionContext.visit.CookieSupport;
+                return core.doc.sessionContext.visit.CookieSupport;
             }
         }
         //
@@ -62,9 +62,9 @@ namespace Contensive.Core {
         //
         public override string GetProperty(string PropertyName, string DefaultValue = "", int TargetVisitId = 0) {
             if (TargetVisitId == 0) {
-                return cpCore.visitProperty.getText(PropertyName, DefaultValue);
+                return core.visitProperty.getText(PropertyName, DefaultValue);
             } else {
-                return cpCore.visitProperty.getText(PropertyName, DefaultValue, TargetVisitId);
+                return core.visitProperty.getText(PropertyName, DefaultValue, TargetVisitId);
             }
         }
         //
@@ -72,7 +72,7 @@ namespace Contensive.Core {
         //
         public override int Id {
             get {
-                return cpCore.doc.sessionContext.visit.id;
+                return core.doc.sessionContext.visit.id;
             }
         }
         //
@@ -81,7 +81,7 @@ namespace Contensive.Core {
         public override DateTime LastTime
         {
             get {
-                return cpCore.doc.sessionContext.visit.LastVisitTime;
+                return core.doc.sessionContext.visit.LastVisitTime;
             }
         }
         //
@@ -90,7 +90,7 @@ namespace Contensive.Core {
         public override int LoginAttempts
         {
             get {
-                return cpCore.doc.sessionContext.visit.LoginAttempts;
+                return core.doc.sessionContext.visit.LoginAttempts;
             }
         }
         //
@@ -99,7 +99,7 @@ namespace Contensive.Core {
         public override string Name
         {
             get {
-                return cpCore.doc.sessionContext.visit.name;
+                return core.doc.sessionContext.visit.name;
             }
         }
         //
@@ -108,7 +108,7 @@ namespace Contensive.Core {
         public override int Pages
         {
             get {
-                return cpCore.doc.sessionContext.visit.PageVisits;
+                return core.doc.sessionContext.visit.PageVisits;
             }
         }
         //
@@ -117,7 +117,7 @@ namespace Contensive.Core {
         public override string Referer
         {
             get {
-                return cpCore.doc.sessionContext.visit.HTTP_REFERER;
+                return core.doc.sessionContext.visit.HTTP_REFERER;
             }
         }
         //
@@ -125,9 +125,9 @@ namespace Contensive.Core {
         //
         public override void SetProperty(string PropertyName, string Value, int TargetVisitId = 0) {
             if (TargetVisitId == 0) {
-                cpCore.visitProperty.setProperty(PropertyName, Value);
+                core.visitProperty.setProperty(PropertyName, Value);
             } else {
-                cpCore.visitProperty.setProperty(PropertyName, Value, TargetVisitId);
+                core.visitProperty.setProperty(PropertyName, Value, TargetVisitId);
             }
         }
         //
@@ -172,14 +172,14 @@ namespace Contensive.Core {
         public override int StartDateValue
         {
             get {
-                return cpCore.doc.sessionContext.visit.StartDateValue;
+                return core.doc.sessionContext.visit.StartDateValue;
             }
         }
 
         public override DateTime StartTime
         {
             get {
-                return cpCore.doc.sessionContext.visit.StartTime;
+                return core.doc.sessionContext.visit.StartTime;
             }
         }
         //

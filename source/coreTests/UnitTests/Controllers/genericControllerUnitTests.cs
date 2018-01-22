@@ -2,6 +2,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Core.Controllers;
+using static Contensive.Core.Tests.testConstants;
 
 namespace Contensive.Core.Tests.UnitTests.Controllers {
     [TestClass]

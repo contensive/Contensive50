@@ -23,14 +23,14 @@ namespace Contensive.Core {
         public const string EventsId = "5E88DB23-E8D7-4CE8-9793-9C7A20F4CF3A";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         private CPClass CP;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
-        public CPSiteClass(Contensive.Core.Controllers.coreController cpCoreObj, CPClass CPParent) : base() {
-            cpCore = cpCoreObj;
+        public CPSiteClass(Contensive.Core.Controllers.coreController coreObj, CPClass CPParent) : base() {
+            core = coreObj;
             CP = CPParent;
         }
         //
@@ -43,7 +43,7 @@ namespace Contensive.Core {
                     // call .dispose for managed objects
                     //
                     CP = null;
-                    cpCore = null;
+                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -56,57 +56,57 @@ namespace Contensive.Core {
         //
         public override string Name {
             get {
-                return cpCore.serverConfig.appConfig.name;
+                return core.serverConfig.appConfig.name;
             }
         }
         //
         //====================================================================================================
         //
         public override void SetProperty(string FieldName, string FieldValue) {
-            cpCore.siteProperties.setProperty(FieldName, FieldValue);
+            core.siteProperties.setProperty(FieldName, FieldValue);
         }
         //
         //====================================================================================================
         //
         public override string GetProperty(string propertyName, string DefaultValue = "") {
-            return cpCore.siteProperties.getText(propertyName, DefaultValue);
+            return core.siteProperties.getText(propertyName, DefaultValue);
         }
         //
         //====================================================================================================
         //
         public override bool GetBoolean(string propertyName, string DefaultValue = "") {
-            return cpCore.siteProperties.getBoolean(propertyName, genericController.encodeBoolean(DefaultValue));
+            return core.siteProperties.getBoolean(propertyName, genericController.encodeBoolean(DefaultValue));
         }
         public override bool GetBoolean(string propertyName, bool DefaultValue ) {
-            return cpCore.siteProperties.getBoolean(propertyName, DefaultValue);
+            return core.siteProperties.getBoolean(propertyName, DefaultValue);
         }
 
         //
         //====================================================================================================
         //
         public override DateTime GetDate(string propertyName, string DefaultValue = "") {
-            return cpCore.siteProperties.getDate(propertyName, genericController.encodeDate(DefaultValue));
+            return core.siteProperties.getDate(propertyName, genericController.encodeDate(DefaultValue));
         }
         public override DateTime GetDate(string propertyName, DateTime DefaultValue) {
-            return cpCore.siteProperties.getDate(propertyName, DefaultValue);
+            return core.siteProperties.getDate(propertyName, DefaultValue);
         }
         //
         //====================================================================================================
         //
         public override int GetInteger(string propertyName, string DefaultValue = "") {
-            return cpCore.siteProperties.getInteger(propertyName, genericController.encodeInteger(DefaultValue));
+            return core.siteProperties.getInteger(propertyName, genericController.encodeInteger(DefaultValue));
         }
         public override int GetInteger(string propertyName, int DefaultValue ) {
-            return cpCore.siteProperties.getInteger(propertyName, DefaultValue);
+            return core.siteProperties.getInteger(propertyName, DefaultValue);
         }
         //
         //====================================================================================================
         //
         public override double GetNumber(string propertyName, string DefaultValue = "") {
-            return cpCore.siteProperties.getNumber(propertyName, genericController.encodeNumber(DefaultValue));
+            return core.siteProperties.getNumber(propertyName, genericController.encodeNumber(DefaultValue));
         }
         public override double GetNumber(string propertyName, double DefaultValue) {
-            return cpCore.siteProperties.getNumber(propertyName, DefaultValue);
+            return core.siteProperties.getNumber(propertyName, DefaultValue);
         }
         //
         //====================================================================================================
@@ -124,7 +124,7 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
         public override string PhysicalFilePath {
             get {
-                return cpCore.cdnFiles.rootLocalPath;
+                return core.cdnFiles.rootLocalPath;
             }
         }
         //
@@ -133,7 +133,7 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
         public override string PhysicalInstallPath {
             get {
-                return cpCore.privateFiles.rootLocalPath;
+                return core.privateFiles.rootLocalPath;
             }
         }
         //
@@ -142,7 +142,7 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
         public override string PhysicalWWWPath {
             get {
-                return cpCore.appRootFiles.rootLocalPath;
+                return core.appRootFiles.rootLocalPath;
             }
         }
         //
@@ -176,8 +176,8 @@ namespace Contensive.Core {
             get {
                 string tempDomainPrimary = null;
                 tempDomainPrimary = "";
-                if (cpCore.serverConfig.appConfig.domainList.Count > 0) {
-                    tempDomainPrimary = cpCore.serverConfig.appConfig.domainList[0];
+                if (core.serverConfig.appConfig.domainList.Count > 0) {
+                    tempDomainPrimary = core.serverConfig.appConfig.domainList[0];
                 }
                 return tempDomainPrimary;
             }
@@ -187,7 +187,7 @@ namespace Contensive.Core {
         //
         public override string Domain {
             get {
-                return cpCore.webServer.requestDomain;
+                return core.webServer.requestDomain;
             }
         }
         //
@@ -195,7 +195,7 @@ namespace Contensive.Core {
         //
         public override string DomainList {
             get {
-                return string.Join(",", cpCore.serverConfig.appConfig.domainList);
+                return string.Join(",", core.serverConfig.appConfig.domainList);
             }
         }
         //
@@ -203,7 +203,7 @@ namespace Contensive.Core {
         //
         public override string FilePath {
             get {
-                return cpCore.serverConfig.appConfig.cdnFilesNetprefix;
+                return core.serverConfig.appConfig.cdnFilesNetprefix;
             }
         }
         //
@@ -211,7 +211,7 @@ namespace Contensive.Core {
         //
         public override string PageDefault {
             get {
-                return cpCore.siteProperties.serverPageDefault;
+                return core.siteProperties.serverPageDefault;
             }
         }
         //
@@ -219,14 +219,14 @@ namespace Contensive.Core {
         //
         public override string VirtualPath {
             get {
-                return "/" + cpCore.serverConfig.appConfig.name;
+                return "/" + core.serverConfig.appConfig.name;
             }
         }
         //
         //====================================================================================================
         //
         public override string EncodeAppRootPath(string Link) {
-            return genericController.EncodeAppRootPath(genericController.encodeText(Link), cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain);
+            return genericController.EncodeAppRootPath(genericController.encodeText(Link), core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
         }
         //
         //====================================================================================================
@@ -236,19 +236,19 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void LogActivity(string Message, int UserID, int OrganizationID) {
-            logController.logActivity(cpCore, Message, 0, UserID, OrganizationID);
+            logController.logActivity(core, Message, 0, UserID, OrganizationID);
         }
         //
         //====================================================================================================
         //
         public override void LogWarning(string name, string description, string typeOfWarningKey, string instanceKey) {
-            logController.reportWarning(cpCore, name, description, "", 0, description, typeOfWarningKey, instanceKey);
+            logController.reportWarning(core, name, description, "", 0, description, typeOfWarningKey, instanceKey);
         }
         //
         //====================================================================================================
         //
         public override void LogAlarm(string cause) {
-            logController.appendLog(cpCore, cause, "Alarm");
+            logController.appendLog(core, cause, "Alarm");
         }
         //
         //====================================================================================================
@@ -259,9 +259,9 @@ namespace Contensive.Core {
         //
         public override void ErrorReport(System.Exception Ex, string Message = "") {
             if (string.IsNullOrEmpty(Message)) {
-                cpCore.handleException(Ex, "n/a", 2);
+                core.handleException(Ex, "n/a", 2);
             } else {
-                cpCore.handleException(Ex, Message, 2);
+                core.handleException(Ex, Message, 2);
             }
         }
         //
@@ -269,9 +269,9 @@ namespace Contensive.Core {
         //
         public override void RequestTask(string Command, string SQL, string ExportName, string Filename) {
             try {
-                var ExportCSVAddon = Models.DbModels.addonModel.create(cpCore, addonGuidExportCSV);
+                var ExportCSVAddon = Models.DbModels.addonModel.create(core, addonGuidExportCSV);
                 if (ExportCSVAddon == null) {
-                    cpCore.handleException(new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
+                    core.handleException(new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {
                     var docProperties = new Dictionary<string, string>();
                     docProperties.Add("sql", SQL);
@@ -282,7 +282,7 @@ namespace Contensive.Core {
                         addonName = ExportCSVAddon.name,
                         docProperties = docProperties
                     };
-                    taskSchedulerController.addTaskToQueue(cpCore, taskCommandBuildCsv, cmdDetail, false);
+                    taskSchedulerController.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
                 }
             } catch (Exception) {
                 throw;
@@ -292,7 +292,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void TestPoint(string Message) {
-            debugController.testPoint(cpCore, Message);
+            debugController.testPoint(core, Message);
         }
         //
         //====================================================================================================
@@ -313,19 +313,19 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "") {
-            linkAliasController.addLinkAlias(cpCore, linkAlias, pageId, queryStringSuffix);
+            linkAliasController.addLinkAlias(core, linkAlias, pageId, queryStringSuffix);
         }
         //
         //====================================================================================================
         //
         public override string ThrowEvent(string eventNameIdOrGuid) {
-            return cpCore.addon.throwEvent(eventNameIdOrGuid);
+            return core.addon.throwEvent(eventNameIdOrGuid);
         }
         //
         //====================================================================================================
         //
         public override Dictionary<string, routeClass> getRouteDictionary() {
-            return cpCore.routeDictionary;
+            return core.routeDictionary;
         }
 
         #region  IDisposable Support 

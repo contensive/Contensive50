@@ -41,26 +41,26 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="groupName"></param>
         /// <returns></returns>
-        public static int group_add(coreController cpCore, string groupName) {
+        public static int group_add(coreController core, string groupName) {
             int returnGroupId = 0;
             try {
                 DataTable dt = null;
                 string sql = null;
                 int createkey = 0;
                 int cid = 0;
-                string sqlGroupName = cpCore.db.encodeSQLText(groupName);
+                string sqlGroupName = core.db.encodeSQLText(groupName);
                 //
-                dt = cpCore.db.executeQuery("SELECT ID FROM CCGROUPS WHERE NAME=" + sqlGroupName + "");
+                dt = core.db.executeQuery("SELECT ID FROM CCGROUPS WHERE NAME=" + sqlGroupName + "");
                 if (dt.Rows.Count > 0) {
                     returnGroupId = genericController.encodeInteger(dt.Rows[0]["ID"]);
                 } else {
-                    cid = Models.Complex.cdefModel.getContentId(cpCore, "groups");
-                    createkey = genericController.GetRandomInteger(cpCore);
+                    cid = Models.Complex.cdefModel.getContentId(core, "groups");
+                    createkey = genericController.GetRandomInteger(core);
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" + cid + ",1," + createkey + "," + sqlGroupName + "," + sqlGroupName + ")";
-                    cpCore.db.executeQuery(sql);
+                    core.db.executeQuery(sql);
                     //
                     sql = "select top 1 id from ccgroups where createkey=" + createkey + " order by id desc";
-                    dt = cpCore.db.executeQuery(sql);
+                    dt = core.db.executeQuery(sql);
                     if (dt.Rows.Count > 0) {
                         returnGroupId = genericController.encodeInteger(dt.Rows[0][0]);
                     }
@@ -79,13 +79,13 @@ namespace Contensive.Core.Controllers {
         /// <param name="GroupNameOrGuid"></param>
         /// <param name="groupCaption"></param>
         /// <returns></returns>
-        public static int group_add2(coreController cpCore, string GroupNameOrGuid, string groupCaption = "") {
+        public static int group_add2(coreController core, string GroupNameOrGuid, string groupCaption = "") {
             int returnGroupId = 0;
             try {
                 //
-                csController cs = new csController(cpCore);
+                csController cs = new csController(core);
                 bool IsAlreadyThere = false;
-                string sqlCriteria = cpCore.db.getNameIdOrGuidSqlCriteria(GroupNameOrGuid);
+                string sqlCriteria = core.db.getNameIdOrGuidSqlCriteria(GroupNameOrGuid);
                 string groupName = null;
                 string groupGuid = null;
                 //
@@ -129,7 +129,7 @@ namespace Contensive.Core.Controllers {
         //
         // Add User
         //
-        public static void group_addUser(coreController cpCore, int groupId, int userid, DateTime dateExpires) {
+        public static void group_addUser(coreController core, int groupId, int userid, DateTime dateExpires) {
             try {
                 //
                 string groupName = null;
@@ -139,16 +139,16 @@ namespace Contensive.Core.Controllers {
                         throw (new ApplicationException("Could not find or create the group with id [" + groupId + "]"));
                     } else {
                         if (userid == 0) {
-                            userid = cpCore.doc.sessionContext.user.id;
+                            userid = core.doc.sessionContext.user.id;
                         }
-                        using (csController cs = new csController(cpCore)) {
+                        using (csController cs = new csController(core)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + groupId.ToString() + ")", "", false);
                             if (!cs.ok()) {
                                 cs.Close();
                                 cs.insert("Member Rules");
                             }
                             if (!cs.ok()) {
-                                groupName = cpCore.db.getRecordName("groups", groupId);
+                                groupName = core.db.getRecordName("groups", groupId);
                                 throw (new ApplicationException("Could not find or create the Member Rule to add this member [" + userid + "] to the Group [" + groupId + ", " + groupName + "]"));
                             } else {
                                 cs.setField("active", "1");
@@ -168,29 +168,29 @@ namespace Contensive.Core.Controllers {
                 throw (ex);
             }
         }
-        public static void group_addUser(coreController cpCore, int groupId, int userid) { group_addUser(cpCore, groupId, userid, DateTime.MinValue ); }
-        public static void group_addUser(coreController cpCore, int groupId) { group_addUser(cpCore, groupId, 0, DateTime.MinValue); }
+        public static void group_addUser(coreController core, int groupId, int userid) { group_addUser(core, groupId, userid, DateTime.MinValue ); }
+        public static void group_addUser(coreController core, int groupId) { group_addUser(core, groupId, 0, DateTime.MinValue); }
         //
         //====================================================================================================
         //
-        public static void group_AddUser(coreController cpCore, string groupNameOrGuid, int userid, DateTime dateExpires) {
+        public static void group_AddUser(coreController core, string groupNameOrGuid, int userid, DateTime dateExpires) {
             try {
                 //
                 int GroupID = 0;
                 //
                 if (!string.IsNullOrEmpty(groupNameOrGuid)) {
-                    GroupID = cpCore.db.getRecordID("groups", groupNameOrGuid);
+                    GroupID = core.db.getRecordID("groups", groupNameOrGuid);
                     if (GroupID < 1) {
-                        group_add2(cpCore, groupNameOrGuid);
-                        GroupID = cpCore.db.getRecordID("groups", groupNameOrGuid);
+                        group_add2(core, groupNameOrGuid);
+                        GroupID = core.db.getRecordID("groups", groupNameOrGuid);
                     }
                     if (GroupID < 1) {
                         throw (new ApplicationException("Could not find or create the group [" + groupNameOrGuid + "]"));
                     } else {
                         if (userid == 0) {
-                            userid = cpCore.doc.sessionContext.user.id;
+                            userid = core.doc.sessionContext.user.id;
                         }
-                        using (csController cs = new csController(cpCore)) {
+                        using (csController cs = new csController(core)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + GroupID.ToString() + ")", "", false);
                             if (!cs.ok()) {
                                 cs.Close();
@@ -216,15 +216,15 @@ namespace Contensive.Core.Controllers {
                 throw (ex);
             }
         }
-        public static void group_AddUser(coreController cpCore, string groupNameOrGuid, int userid = 0) { var tmpDate = DateTime.MinValue; group_AddUser(cpCore, groupNameOrGuid, userid, tmpDate); }
-        public static void group_AddUser(coreController cpCore, string groupNameOrGuid) { var tmpDate = DateTime.MinValue; group_AddUser(cpCore, groupNameOrGuid, 0, tmpDate); }
+        public static void group_AddUser(coreController core, string groupNameOrGuid, int userid = 0) { var tmpDate = DateTime.MinValue; group_AddUser(core, groupNameOrGuid, userid, tmpDate); }
+        public static void group_AddUser(coreController core, string groupNameOrGuid) { var tmpDate = DateTime.MinValue; group_AddUser(core, groupNameOrGuid, 0, tmpDate); }
 
         //
         //=============================================================================
         // main_Get the GroupID from iGroupName
         //=============================================================================
         //
-        public static int group_GetGroupID(coreController cpcore, string GroupName) {
+        public static int group_GetGroupID(coreController core, string GroupName) {
             int tempgroup_GetGroupID = 0;
             DataTable dt = null;
             //
@@ -234,7 +234,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- main_Get the Group ID
                 //
-                dt = cpcore.db.executeQuery("select top 1 id from ccGroups where name=" + cpcore.db.encodeSQLText(iGroupName));
+                dt = core.db.executeQuery("select top 1 id from ccGroups where name=" + core.db.encodeSQLText(iGroupName));
                 if (dt.Rows.Count > 0) {
                     tempgroup_GetGroupID = genericController.encodeInteger(dt.Rows[0][0]);
                 }
@@ -246,7 +246,7 @@ namespace Contensive.Core.Controllers {
         // main_Get the GroupName from iGroupID
         //=============================================================================
         //
-        public static string group_GetGroupName(coreController cpcore, int GroupID) {
+        public static string group_GetGroupName(coreController core, int GroupID) {
             string tempgroup_GetGroupName = null;
             //
             int CS = 0;
@@ -257,11 +257,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- main_Get the Group name
                 //
-                CS = cpcore.db.cs_open2("Groups", iGroupID);
-                if (cpcore.db.csOk(CS)) {
-                    tempgroup_GetGroupName = genericController.encodeText(cpcore.db.cs_getValue(CS, "Name"));
+                CS = core.db.cs_open2("Groups", iGroupID);
+                if (core.db.csOk(CS)) {
+                    tempgroup_GetGroupName = genericController.encodeText(core.db.cs_getValue(CS, "Name"));
                 }
-                cpcore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
             }
             return tempgroup_GetGroupName;
         }
@@ -270,7 +270,7 @@ namespace Contensive.Core.Controllers {
         // Add a new group, return its GroupID
         //=============================================================================
         //
-        public static int group_Add(coreController cpcore, string GroupName, string GroupCaption = "") {
+        public static int group_Add(coreController core, string GroupName, string GroupCaption = "") {
             int tempgroup_Add = 0;
             int CS = 0;
             string iGroupName = null;
@@ -280,18 +280,18 @@ namespace Contensive.Core.Controllers {
             iGroupCaption = genericController.encodeEmptyText(GroupCaption, iGroupName);
             //
             tempgroup_Add = -1;
-            DataTable dt = cpcore.db.executeQuery("SELECT ID FROM ccgroups WHERE NAME=" + cpcore.db.encodeSQLText(iGroupName));
+            DataTable dt = core.db.executeQuery("SELECT ID FROM ccgroups WHERE NAME=" + core.db.encodeSQLText(iGroupName));
             if (dt.Rows.Count > 0) {
                 tempgroup_Add = genericController.encodeInteger(dt.Rows[0][0]);
             } else {
-                CS = cpcore.db.csInsertRecord("Groups", SystemMemberID);
-                if (cpcore.db.csOk(CS)) {
-                    tempgroup_Add = genericController.encodeInteger(cpcore.db.cs_getValue(CS, "ID"));
-                    cpcore.db.csSet(CS, "name", iGroupName);
-                    cpcore.db.csSet(CS, "caption", iGroupCaption);
-                    cpcore.db.csSet(CS, "active", true);
+                CS = core.db.csInsertRecord("Groups", SystemMemberID);
+                if (core.db.csOk(CS)) {
+                    tempgroup_Add = genericController.encodeInteger(core.db.cs_getValue(CS, "ID"));
+                    core.db.csSet(CS, "name", iGroupName);
+                    core.db.csSet(CS, "caption", iGroupCaption);
+                    core.db.csSet(CS, "active", true);
                 }
-                cpcore.db.csClose(ref CS);
+                core.db.csClose(ref CS);
             }
             return tempgroup_Add;
         }
@@ -301,15 +301,15 @@ namespace Contensive.Core.Controllers {
         // Add a new group, return its GroupID
         //=============================================================================
         //
-        public static void group_DeleteGroup(coreController cpcore, string GroupName) {
-            cpcore.db.deleteContentRecords("Groups", "name=" + cpcore.db.encodeSQLText(GroupName));
+        public static void group_DeleteGroup(coreController core, string GroupName) {
+            core.db.deleteContentRecords("Groups", "name=" + core.db.encodeSQLText(GroupName));
         }
         //
         //=============================================================================
         // Add a member to a group
         //=============================================================================
         //
-        public static void group_AddGroupMember(coreController cpcore, string GroupName, int NewMemberID = SystemMemberID, DateTime DateExpires = default(DateTime)) {
+        public static void group_AddGroupMember(coreController core, string GroupName, int NewMemberID = SystemMemberID, DateTime DateExpires = default(DateTime)) {
             //
             int CS = 0;
             int GroupID = 0;
@@ -319,31 +319,31 @@ namespace Contensive.Core.Controllers {
             iGroupName = genericController.encodeText(GroupName);
             iDateExpires = DateExpires;
             if (!string.IsNullOrEmpty(iGroupName)) {
-                GroupID = group_GetGroupID(cpcore, iGroupName);
+                GroupID = group_GetGroupID(core, iGroupName);
                 if (GroupID < 1) {
-                    GroupID = group_Add(cpcore, GroupName, GroupName);
+                    GroupID = group_Add(core, GroupName, GroupName);
                 }
                 if (GroupID < 1) {
                     throw (new ApplicationException("main_AddGroupMember could not find or add Group [" + GroupName + "]")); // handleLegacyError14(MethodName, "")
                 } else {
-                    CS = cpcore.db.csOpen("Member Rules", "(MemberID=" + cpcore.db.encodeSQLNumber(NewMemberID) + ")and(GroupID=" + cpcore.db.encodeSQLNumber(GroupID) + ")", "", false);
-                    if (!cpcore.db.csOk(CS)) {
-                        cpcore.db.csClose(ref CS);
-                        CS = cpcore.db.csInsertRecord("Member Rules");
+                    CS = core.db.csOpen("Member Rules", "(MemberID=" + core.db.encodeSQLNumber(NewMemberID) + ")and(GroupID=" + core.db.encodeSQLNumber(GroupID) + ")", "", false);
+                    if (!core.db.csOk(CS)) {
+                        core.db.csClose(ref CS);
+                        CS = core.db.csInsertRecord("Member Rules");
                     }
-                    if (!cpcore.db.csOk(CS)) {
+                    if (!core.db.csOk(CS)) {
                         throw (new ApplicationException("main_AddGroupMember could not add this member to the Group [" + GroupName + "]")); // handleLegacyError14(MethodName, "")
                     } else {
-                        cpcore.db.csSet(CS, "active", true);
-                        cpcore.db.csSet(CS, "memberid", NewMemberID);
-                        cpcore.db.csSet(CS, "groupid", GroupID);
+                        core.db.csSet(CS, "active", true);
+                        core.db.csSet(CS, "memberid", NewMemberID);
+                        core.db.csSet(CS, "groupid", GroupID);
                         if (iDateExpires != DateTime.MinValue) {
-                            cpcore.db.csSet(CS, "DateExpires", iDateExpires);
+                            core.db.csSet(CS, "DateExpires", iDateExpires);
                         } else {
-                            cpcore.db.csSet(CS, "DateExpires", "");
+                            core.db.csSet(CS, "DateExpires", "");
                         }
                     }
-                    cpcore.db.csClose(ref CS);
+                    core.db.csClose(ref CS);
                 }
             }
         }
@@ -352,7 +352,7 @@ namespace Contensive.Core.Controllers {
         // Delete a member from a group
         //=============================================================================
         //
-        public static void group_DeleteGroupMember(coreController cpcore, string GroupName, int NewMemberID = SystemMemberID) {
+        public static void group_DeleteGroupMember(coreController core, string GroupName, int NewMemberID = SystemMemberID) {
             //
             int GroupID = 0;
             string iGroupName;
@@ -360,12 +360,12 @@ namespace Contensive.Core.Controllers {
             iGroupName = genericController.encodeText(GroupName);
             //
             if (!string.IsNullOrEmpty(iGroupName)) {
-                GroupID = group_GetGroupID(cpcore, iGroupName);
+                GroupID = group_GetGroupID(core, iGroupName);
                 if (GroupID < 1) {
                 } else if (NewMemberID < 1) {
                     throw (new ApplicationException("Member ID is invalid")); // handleLegacyError14(MethodName, "")
                 } else {
-                    cpcore.db.deleteContentRecords("Member Rules", "(MemberID=" + cpcore.db.encodeSQLNumber(NewMemberID) + ")AND(groupid=" + cpcore.db.encodeSQLNumber(GroupID) + ")");
+                    core.db.deleteContentRecords("Member Rules", "(MemberID=" + core.db.encodeSQLNumber(NewMemberID) + ")AND(groupid=" + core.db.encodeSQLNumber(GroupID) + ")");
                 }
             }
         }

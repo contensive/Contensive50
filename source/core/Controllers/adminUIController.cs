@@ -29,7 +29,7 @@ namespace Contensive.Core {
             SortableNotSet = 3
         }
         //
-        private coreController cpCore;
+        private coreController core;
         //
         //====================================================================================================
         /// <summary>
@@ -37,8 +37,8 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public adminUIController(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public adminUIController(coreController core) : base() {
+            this.core = core;
         }
         //
         //===========================================================================
@@ -54,8 +54,8 @@ namespace Contensive.Core {
                 //
                 // Add Errors
                 //
-                if (cpCore.doc.debug_iUserError != "") {
-                    Copy += "<div>" + errorController.getUserError(cpCore) + "</div>";
+                if (core.doc.debug_iUserError != "") {
+                    Copy += "<div>" + errorController.getUserError(core) + "</div>";
                 }
                 //
                 if (!string.IsNullOrEmpty(Copy)) {
@@ -67,7 +67,7 @@ namespace Contensive.Core {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             handleLegacyClassError("GetTitleBar");
@@ -142,49 +142,49 @@ namespace Contensive.Core {
                 //    '
                 //    ' Publish
                 //    '
-                //    GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublish, RequestNameButton)
+                //    GetEditButtonBar2 = GetEditButtonBar2 & core.html.html_GetFormButton(ButtonPublish, RequestNameButton)
                 //End If
                 //If ignorefalse2 Then
                 //    '
                 //    ' Abort
                 //    '
-                //    GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonAbortEdit, RequestNameButton)
+                //    GetEditButtonBar2 = GetEditButtonBar2 & core.html.html_GetFormButton(ButtonAbortEdit, RequestNameButton)
                 //End If
                 //If ignorefalse3 Then
                 //    '
                 //    ' Submit for Publishing
                 //    '
-                //    GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublishSubmit, RequestNameButton)
+                //    GetEditButtonBar2 = GetEditButtonBar2 & core.html.html_GetFormButton(ButtonPublishSubmit, RequestNameButton)
                 //End If
                 //If ignorefalse4 Then
                 //    '
                 //    ' Approve Publishing
                 //    '
-                //    GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublishApprove, RequestNameButton)
+                //    GetEditButtonBar2 = GetEditButtonBar2 & core.html.html_GetFormButton(ButtonPublishApprove, RequestNameButton)
                 //End If
                 if (ignore_AllowReloadCDef) {
                     //
                     // Reload Content Definitions
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.button(ButtonSaveandInvalidateCache, RequestNameButton);
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + core.html.button(ButtonSaveandInvalidateCache, RequestNameButton);
                 }
                 if (AllowMarkReviewed) {
                     //
                     // Reload Content Definitions
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.button(ButtonMarkReviewed, RequestNameButton);
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + core.html.button(ButtonMarkReviewed, RequestNameButton);
                 }
                 if (AllowRefresh) {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.button(ButtonRefresh, RequestNameButton);
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + core.html.button(ButtonRefresh, RequestNameButton);
                 }
                 if (AllowCreateDuplicate) {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.button(ButtonCreateDuplicate, RequestNameButton, "", "return processSubmit(this)");
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + core.html.button(ButtonCreateDuplicate, RequestNameButton, "", "return processSubmit(this)");
                 }
                 //
                 tempGetEditButtonBar2 = ""
@@ -196,7 +196,7 @@ namespace Contensive.Core {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             handleLegacyClassError("GetEditButtonBar2");
@@ -212,7 +212,7 @@ namespace Contensive.Core {
             string s = "";
             try {
                 if (string.IsNullOrEmpty(RightSideMessage)) {
-                    RightSideMessage = cpCore.doc.profileStartTime.ToString("G");
+                    RightSideMessage = core.doc.profileStartTime.ToString("G");
                 }
                 if (isInStr(1, HeaderMessage + RightSideMessage, "\r\n")) {
                     s = ""
@@ -235,7 +235,7 @@ namespace Contensive.Core {
                     + "";
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return s;
         }
@@ -262,7 +262,7 @@ namespace Contensive.Core {
                         }
                         //ORIGINAL LINE: Case Trim(ButtonClose)
                         else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonClose).Trim(' ')) {
-                            s = s + cpCore.html.button(Buttons[Ptr], "", "", "window.close();");
+                            s = s + core.html.button(Buttons[Ptr], "", "", "window.close();");
                         }
                         //ORIGINAL LINE: Case Trim(ButtonAdd)
                         else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonAdd).Trim(' ')) {
@@ -277,7 +277,7 @@ namespace Contensive.Core {
                         }
                         //ORIGINAL LINE: Case Else
                         else {
-                            s = s + cpCore.html.button(Buttons[Ptr], ButtonName);
+                            s = s + core.html.button(Buttons[Ptr], ButtonName);
                         }
                     }
                 }
@@ -285,7 +285,7 @@ namespace Contensive.Core {
 
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return s;
         }
@@ -325,7 +325,7 @@ namespace Contensive.Core {
                 return tempGetButtonBar;
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             handleLegacyClassError("GetButtonBar");
@@ -381,7 +381,7 @@ namespace Contensive.Core {
                 return tempGetButtonBarForIndex;
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             handleLegacyClassError("GetButtonBar");
@@ -414,7 +414,7 @@ namespace Contensive.Core {
                 if (!string.IsNullOrEmpty(ContentSummary)) {
                     CellContentSummary = ""
                     + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
-                    + htmlIndent(cpCore.html.getPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) + "\r</div>";
+                    + htmlIndent(core.html.getPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) + "\r</div>";
                 }
                 //
                 ContentCell = ""
@@ -422,9 +422,9 @@ namespace Contensive.Core {
                 + htmlIndent(Content) + "\r</div>";
                 result = result + htmlIndent(ButtonBar) + htmlIndent(GetTitleBar(Caption, Description)) + htmlIndent(CellContentSummary) + htmlIndent(ContentCell) + htmlIndent(ButtonBar) + "";
 
-                result = '\r' + cpCore.html.formStartMultipart() + htmlIndent(result) + '\r' + cpCore.html.formEnd();
+                result = '\r' + core.html.formStartMultipart() + htmlIndent(result) + '\r' + core.html.formEnd();
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -446,9 +446,9 @@ namespace Contensive.Core {
                 }
                 tempGetEditRow = "<tr><td class=\"ccEditCaptionCon\"><nobr>" + Copy + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=15 >";
                 //GetEditRow = "<tr><td class=""ccAdminEditCaption""><nobr>" & Copy & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=15 >"
-                //If cpCore.visitProperty.getboolean("AllowHelpIcon") Then
+                //If core.visitProperty.getboolean("AllowHelpIcon") Then
                 //    'If HelpMessage <> "" Then
-                //        GetEditRow = GetEditRow & "&nbsp;" & cpCore.main_GetHelpLinkEditable(0, Caption, HelpMessage, FormInputName)
+                //        GetEditRow = GetEditRow & "&nbsp;" & core.main_GetHelpLinkEditable(0, Caption, HelpMessage, FormInputName)
                 //    'Else
                 //    '    GetEditRow = GetEditRow & "&nbsp;<img alt=""space"" src=""/ccLib/images/spacer.gif"" " & IconWidthHeight & ">"
                 //    'End If
@@ -471,7 +471,7 @@ namespace Contensive.Core {
                 //
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             handleLegacyClassError("GetEditRow");
@@ -492,7 +492,7 @@ namespace Contensive.Core {
                     Copy = "&nbsp;";
                 }
                 tempGetEditRowWithHelpEdit = "<tr><td class=\"ccAdminEditCaption\"><nobr>" + Copy;
-                if (cpCore.visitProperty.getBoolean("AllowHelpIcon")) {}
+                if (core.visitProperty.getBoolean("AllowHelpIcon")) {}
                 tempGetEditRowWithHelpEdit = tempGetEditRowWithHelpEdit + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=15 ></nobr></td>";
                 Copy = HTMLFieldString;
                 if (string.IsNullOrEmpty(Copy)) {
@@ -500,7 +500,7 @@ namespace Contensive.Core {
                 }
                 return tempGetEditRowWithHelpEdit + "<td class=\"ccAdminEditField\">" + Copy + "</td></tr>";
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return tempGetEditRowWithHelpEdit;
         }
@@ -540,7 +540,7 @@ namespace Contensive.Core {
                 //
                 result = result + PanelBody + "</div>";
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -665,7 +665,7 @@ namespace Contensive.Core {
                 }
                 result = "\r\n<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -680,7 +680,7 @@ namespace Contensive.Core {
             int tempGetReportSortColumnPtr = 0;
             string VarText;
             //
-            VarText = cpCore.docProperties.getText("ColPtr");
+            VarText = core.docProperties.getText("ColPtr");
             tempGetReportSortColumnPtr = genericController.encodeInteger(VarText);
             if ((tempGetReportSortColumnPtr == 0) && (VarText != "0")) {
                 tempGetReportSortColumnPtr = DefaultSortColumnPtr;
@@ -705,12 +705,12 @@ namespace Contensive.Core {
             int tempGetReportSortType = 0;
             string VarText;
             //
-            VarText = cpCore.docProperties.getText("ColPtr");
+            VarText = core.docProperties.getText("ColPtr");
             if ((encodeInteger(VarText) != 0) || (VarText == "0")) {
                 //
                 // A valid ColPtr was found
                 //
-                tempGetReportSortType = cpCore.docProperties.getInteger("ColSort");
+                tempGetReportSortType = core.docProperties.getInteger("ColSort");
             } else {
                 tempGetReportSortType = (int)SortingStateEnum.SortableSetAZ;
             }
@@ -732,7 +732,7 @@ namespace Contensive.Core {
                 //
                 result = GetReport2(RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle, ColSortable, 0);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -786,7 +786,7 @@ namespace Contensive.Core {
                 //If IsArray(Cells) Then
                 ColumnCount = Cells.GetUpperBound(1);
                 //End If
-                RQS = cpCore.doc.refreshQueryString;
+                RQS = core.doc.refreshQueryString;
                 //
                 SortColPtr = GetReportSortColumnPtr(DefaultSortColumnPtr);
                 SortColType = GetReportSortType();
@@ -871,29 +871,29 @@ namespace Contensive.Core {
                     if (PageCount > 1) {
                         result = result + "<br>Go to Page ";
                         if (PagePointer != 1) {
-                            WorkingQS = cpCore.doc.refreshQueryString;
+                            WorkingQS = core.doc.refreshQueryString;
                             WorkingQS = genericController.ModifyQueryString(WorkingQS, "GotoPage", "1", true);
-                            result = result + "<a href=\"" + cpCore.webServer.requestPage + "?" + WorkingQS + "\">1</A>...&nbsp;";
+                            result = result + "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">1</A>...&nbsp;";
                         }
-                        WorkingQS = cpCore.doc.refreshQueryString;
+                        WorkingQS = core.doc.refreshQueryString;
                         WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageSize, ReportPageSize.ToString(), true);
                         while ((PagePointer <= PageCount) && (LinkCount < 20)) {
                             if (PagePointer == ReportPageNumber) {
                                 result = result + PagePointer + "&nbsp;";
                             } else {
                                 WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, PagePointer.ToString(), true);
-                                result = result + "<a href=\"" + cpCore.webServer.requestPage + "?" + WorkingQS + "\">" + PagePointer + "</A>&nbsp;";
+                                result = result + "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PagePointer + "</A>&nbsp;";
                             }
                             PagePointer = PagePointer + 1;
                             LinkCount = LinkCount + 1;
                         }
                         if (PagePointer < PageCount) {
                             WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, PageCount.ToString(), true);
-                            result = result + "...<a href=\"" + cpCore.webServer.requestPage + "?" + WorkingQS + "\">" + PageCount + "</A>&nbsp;";
+                            result = result + "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PageCount + "</A>&nbsp;";
                         }
                         if (ReportPageNumber < PageCount) {
                             WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, (ReportPageNumber + 1).ToString(), true);
-                            result = result + "...<a href=\"" + cpCore.webServer.requestPage + "?" + WorkingQS + "\">next</A>&nbsp;";
+                            result = result + "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">next</A>&nbsp;";
                         }
                         result = result + "<br>&nbsp;";
                     }
@@ -904,7 +904,7 @@ namespace Contensive.Core {
                 + result + "</td></tr></table>"
                 + PostTableCopy + "";
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }

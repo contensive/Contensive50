@@ -4,6 +4,7 @@ using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static Contensive.Core.Tests.testConstants;
 
 namespace Contensive.Core.Tests.UnitTests.Views {
 
@@ -16,7 +17,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpContent_AddRecordTest() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             int recordAId = 0;
             int recordBId = 0;
@@ -39,7 +40,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpContent_DeleteRecordTest() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             int peopleCntBefore = 0;
             int peopleCntAfter = 0;
@@ -68,7 +69,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpContent_GetCopyTest() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             int recordId = 0;
             string testCopy = "test copy " + cp.Utils.GetRandomInteger().ToString();
@@ -90,7 +91,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpContent_SetCopyTest() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             string testCopyA = "test copy A " + cp.Utils.GetRandomInteger().ToString();
             string testCopyB = "test copy B " + cp.Utils.GetRandomInteger().ToString();
             string copyName = "copy record name " + cp.Utils.GetRandomInteger().ToString();
@@ -113,7 +114,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpContent_GetId() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             int peopleContentId = 0;
             string peopleContentName = "people";
@@ -135,7 +136,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpContent_AddContentTest() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             string contentName1 = "testContent" + cp.Utils.GetRandomInteger().ToString();
             string contentName2 = "testContent" + cp.Utils.GetRandomInteger().ToString();
@@ -177,7 +178,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cpContent_AddContentFieldTest() {
             // arrange
-            CPClass cp = new CPClass("testapp");
+            CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
             int recordId = 0;
             string contentName1 = "testContent" + cp.Utils.GetRandomInteger().ToString();

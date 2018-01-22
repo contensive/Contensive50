@@ -28,9 +28,9 @@ namespace Contensive.Core.Addons.AdminSite {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
 
-                string ArgList = cpCore.docProperties.getText("args");
+                string ArgList = core.docProperties.getText("args");
                 string[] Args = ArgList.Split('&');
                 GoogleDataType gd = new GoogleDataType();
                 gd.IsEmpty = true;
@@ -41,10 +41,10 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (ArgNameValue.GetUpperBound(0) > 0) {
                         PropertyValue = ArgNameValue[1];
                     }
-                    cpCore.visitProperty.setProperty(PropertyName, PropertyValue);
+                    core.visitProperty.setProperty(PropertyName, PropertyValue);
                 }
-                result = remoteQueryController.main_FormatRemoteQueryOutput(cpCore, gd, RemoteFormatEnum.RemoteFormatJsonNameValue);
-                result = cpCore.html.encodeHTML(result);
+                result = remoteQueryController.main_FormatRemoteQueryOutput(core, gd, RemoteFormatEnum.RemoteFormatJsonNameValue);
+                result = core.html.encodeHTML(result);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

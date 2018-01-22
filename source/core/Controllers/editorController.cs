@@ -27,7 +27,7 @@ namespace Contensive.Core.Controllers {
         // ----- Process the active editor form
         //========================================================================
         //
-        public static void processActiveEditor(coreController cpCore) {
+        public static void processActiveEditor(coreController core) {
             //
             int CS = 0;
             string Button = null;
@@ -37,7 +37,7 @@ namespace Contensive.Core.Controllers {
             string FieldName = null;
             string ContentCopy = null;
             //
-            Button = cpCore.docProperties.getText("Button");
+            Button = core.docProperties.getText("Button");
             switch (Button) {
                 case ButtonCancel:
                     //
@@ -48,24 +48,24 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- read the form fields
                     //
-                    ContentID = cpCore.docProperties.getInteger("cid");
-                    RecordID = cpCore.docProperties.getInteger("id");
-                    FieldName = cpCore.docProperties.getText("fn");
-                    ContentCopy = cpCore.docProperties.getText("ContentCopy");
+                    ContentID = core.docProperties.getInteger("cid");
+                    RecordID = core.docProperties.getInteger("id");
+                    FieldName = core.docProperties.getText("fn");
+                    ContentCopy = core.docProperties.getText("ContentCopy");
                     //
                     // ----- convert editor active edit icons
                     //
-                    ContentCopy = activeContentController.convertEditorResponseToActiveContent(cpCore,ContentCopy);
+                    ContentCopy = activeContentController.processWysiwygResponseForSave(core,ContentCopy);
                     //
                     // ----- save the content
                     //
-                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID);
+                    ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        CS = cpCore.db.csOpen(ContentName, "ID=" + cpCore.db.encodeSQLNumber(RecordID), "", false);
-                        if (cpCore.db.csOk(CS)) {
-                            cpCore.db.csSet(CS, FieldName, ContentCopy);
+                        CS = core.db.csOpen(ContentName, "ID=" + core.db.encodeSQLNumber(RecordID), "", false);
+                        if (core.db.csOk(CS)) {
+                            core.db.csSet(CS, FieldName, ContentCopy);
                         }
-                        cpCore.db.csClose(ref CS);
+                        core.db.csClose(ref CS);
                     }
                     break;
             }
@@ -75,7 +75,7 @@ namespace Contensive.Core.Controllers {
         // Print the active editor form
         //========================================================================
         //
-        public static string main_GetActiveEditor(coreController cpcore, string ContentName, int RecordID, string FieldName, string FormElements = "") {
+        public static string main_GetActiveEditor(coreController core, string ContentName, int RecordID, string FieldName, string FormElements = "") {
             //
             int ContentID = 0;
             int CSPointer = 0;
@@ -94,35 +94,35 @@ namespace Contensive.Core.Controllers {
             strFieldName = genericController.encodeText(FieldName);
             //
             EditorPanel = "";
-            ContentID = Models.Complex.cdefModel.getContentId(cpcore, intContentName);
+            ContentID = Models.Complex.cdefModel.getContentId(core, intContentName);
             if ((ContentID < 1) || (intRecordId < 1) || (string.IsNullOrEmpty(strFieldName))) {
                 PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
-                EditorPanel = EditorPanel + cpcore.html.getPanel(PanelCopy);
+                EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
             } else {
-                intContentName = Models.Complex.cdefModel.getContentNameByID(cpcore, ContentID);
+                intContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(intContentName)) {
-                    CSPointer = cpcore.db.csOpen(intContentName, "ID=" + intRecordId);
-                    if (!cpcore.db.csOk(CSPointer)) {
+                    CSPointer = core.db.csOpen(intContentName, "ID=" + intRecordId);
+                    if (!core.db.csOk(CSPointer)) {
                         PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
-                        EditorPanel = EditorPanel + cpcore.html.getPanel(PanelCopy);
+                        EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
                     } else {
-                        Copy = cpcore.db.csGet(CSPointer, strFieldName);
-                        EditorPanel = EditorPanel + cpcore.html.inputHidden("Type", FormTypeActiveEditor);
-                        EditorPanel = EditorPanel + cpcore.html.inputHidden("cid", ContentID);
-                        EditorPanel = EditorPanel + cpcore.html.inputHidden("ID", intRecordId);
-                        EditorPanel = EditorPanel + cpcore.html.inputHidden("fn", strFieldName);
+                        Copy = core.db.csGet(CSPointer, strFieldName);
+                        EditorPanel = EditorPanel + core.html.inputHidden("Type", FormTypeActiveEditor);
+                        EditorPanel = EditorPanel + core.html.inputHidden("cid", ContentID);
+                        EditorPanel = EditorPanel + core.html.inputHidden("ID", intRecordId);
+                        EditorPanel = EditorPanel + core.html.inputHidden("fn", strFieldName);
                         EditorPanel = EditorPanel + genericController.encodeText(FormElements);
-                        EditorPanel = EditorPanel + cpcore.html.getFormInputHTML("ContentCopy", Copy, "3", "45", false, true);
+                        EditorPanel = EditorPanel + core.html.getFormInputHTML("ContentCopy", Copy, "3", "45", false, true);
                         //EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
-                        ButtonPanel = cpcore.html.getPanelButtons(ButtonCancel + "," + ButtonSave, "button");
+                        ButtonPanel = core.html.getPanelButtons(ButtonCancel + "," + ButtonSave, "button");
                         EditorPanel = EditorPanel + ButtonPanel;
                     }
-                    cpcore.db.csClose(ref CSPointer);
+                    core.db.csClose(ref CSPointer);
                 }
             }
-            Stream = Stream + cpcore.html.getPanelHeader("Contensive Active Content Editor");
-            Stream = Stream + cpcore.html.getPanel(EditorPanel);
-            Stream = cpcore.html.formStart() + Stream + cpcore.html.formEnd();
+            Stream = Stream + core.html.getPanelHeader("Contensive Active Content Editor");
+            Stream = Stream + core.html.getPanel(EditorPanel);
+            Stream = core.html.formStart() + Stream + core.html.formEnd();
             return Stream;
         }
         //
@@ -133,7 +133,7 @@ namespace Contensive.Core.Controllers {
         //   to use it, split the list on comma and use the fieldtype as index
         //========================================================================
         //
-        public static string getFieldTypeDefaultEditorAddonIdList(coreController cpCore) {
+        public static string getFieldTypeDefaultEditorAddonIdList(coreController core) {
             string result = "";
             try {
                 string[] editorAddonIds = null;
@@ -150,7 +150,7 @@ namespace Contensive.Core.Controllers {
                     + " from ccFieldTypes t"
                     + " left join ccaggregatefunctions a on a.id=t.editorAddonId"
                     + " where (t.active<>0)and(a.active<>0) order by t.id";
-                RS = cpCore.db.executeQuery(SQL);
+                RS = core.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
                     fieldTypeID = genericController.encodeInteger(dr["contentfieldtypeid"]);
                     if (fieldTypeID <= FieldTypeIdMax) {
@@ -160,7 +160,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- set any editors not specifically requested in fieldtype
                 SQL = "select contentfieldtypeid, max(addonId) as editorAddonId from ccAddonContentFieldTypeRules group by contentfieldtypeid";
-                RS = cpCore.db.executeQuery(SQL);
+                RS = core.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
                     fieldTypeID = genericController.encodeInteger(dr["contentfieldtypeid"]);
                     if (fieldTypeID <= FieldTypeIdMax) {
@@ -172,7 +172,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = string.Join(",", editorAddonIds);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }

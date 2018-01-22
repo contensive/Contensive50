@@ -28,13 +28,13 @@ namespace Contensive.Core {
         public const string EventsId = "C8938AB2-26F0-41D2-A282-3313FD7BA490";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController cpCore;
+        private Contensive.Core.Controllers.coreController core;
         protected bool disposed = false;
         //
         //====================================================================================================
         // Constructor
-        public CPRequestClass(Contensive.Core.Controllers.coreController cpCoreObj) : base() {
-            cpCore = cpCoreObj;
+        public CPRequestClass(Contensive.Core.Controllers.coreController coreObj) : base() {
+            core = coreObj;
         }
         //
         //====================================================================================================
@@ -45,7 +45,7 @@ namespace Contensive.Core {
                     //
                     // call .dispose for managed objects
                     //
-                    cpCore = null;
+                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -57,7 +57,7 @@ namespace Contensive.Core {
         //====================================================================================================
         public override string Browser {
             get {
-                return cpCore.webServer.requestBrowser;
+                return core.webServer.requestBrowser;
             }
         }
         //
@@ -65,7 +65,7 @@ namespace Contensive.Core {
         [Obsolete]
         public override bool BrowserIsIE {
             get {
-                return cpCore.doc.sessionContext.visit_browserIsIE;
+                return core.doc.sessionContext.visit_browserIsIE;
             }
         }
         //
@@ -73,14 +73,14 @@ namespace Contensive.Core {
         [Obsolete]
         public override bool BrowserIsMac {
             get {
-                return cpCore.doc.sessionContext.visit_browserIsMac;
+                return core.doc.sessionContext.visit_browserIsMac;
             }
         }
         //
         //====================================================================================================
         public override bool BrowserIsMobile {
             get {
-                return cpCore.doc.sessionContext.visit.Mobile;
+                return core.doc.sessionContext.visit.Mobile;
             }
         }
         //
@@ -88,20 +88,20 @@ namespace Contensive.Core {
         [Obsolete]
         public override bool BrowserIsWindows {
             get {
-                return cpCore.doc.sessionContext.visit_browserIsWindows;
+                return core.doc.sessionContext.visit_browserIsWindows;
             }
         }
         //
         //====================================================================================================
         [Obsolete] public override string BrowserVersion {
             get {
-                return cpCore.doc.sessionContext.visit_browserVersion;
+                return core.doc.sessionContext.visit_browserVersion;
             }
         }
         //
         //====================================================================================================
         public override string Cookie(string CookieName) {
-            return cpCore.webServer.getRequestCookie(CookieName);
+            return core.webServer.getRequestCookie(CookieName);
         }
         //
         //====================================================================================================
@@ -112,7 +112,7 @@ namespace Contensive.Core {
         public override string CookieString {
             get {
                 string returnCookies = "";
-                foreach (KeyValuePair<string, iisController.cookieClass> kvp in cpCore.webServer.requestCookies) {
+                foreach (KeyValuePair<string, iisController.cookieClass> kvp in core.webServer.requestCookies) {
                     returnCookies += "&" + kvp.Key + "=" + kvp.Value.value;
                 }
                 if (returnCookies.Length > 0) {
@@ -125,84 +125,84 @@ namespace Contensive.Core {
         //====================================================================================================
         public override string Form {
             get {
-                return Controllers.genericController.convertNameValueDictToREquestString(cpCore.webServer.requestFormDict);
+                return Controllers.genericController.convertNameValueDictToREquestString(core.webServer.requestFormDict);
             }
         }
         //
         //====================================================================================================
         public override string FormAction {
             get {
-                return cpCore.webServer.serverFormActionURL;
+                return core.webServer.serverFormActionURL;
             }
         }
         //
         //====================================================================================================
         public override bool GetBoolean(string RequestName) {
-            return cpCore.docProperties.getBoolean(RequestName);
+            return core.docProperties.getBoolean(RequestName);
         }
         //
         //====================================================================================================
         public override DateTime GetDate(string RequestName) {
-            return cpCore.docProperties.getDate(RequestName);
+            return core.docProperties.getDate(RequestName);
         }
         //
         //====================================================================================================
         public override int GetInteger(string RequestName) {
-            return cpCore.docProperties.getInteger(RequestName);
+            return core.docProperties.getInteger(RequestName);
         }
         //
         //====================================================================================================
         public override double GetNumber(string RequestName) {
-            return cpCore.docProperties.getNumber(RequestName);
+            return core.docProperties.getNumber(RequestName);
         }
         //
         //====================================================================================================
         public override string GetText(string RequestName) {
-            return cpCore.docProperties.getText(RequestName);
+            return core.docProperties.getText(RequestName);
         }
         //
         //====================================================================================================
         public override string Host {
             get {
-                return cpCore.webServer.requestDomain;
+                return core.webServer.requestDomain;
             }
         }
         //
         //====================================================================================================
         public override string HTTPAccept {
             get {
-                return cpCore.webServer.requestHttpAccept;
+                return core.webServer.requestHttpAccept;
             }
         }
         //
         //====================================================================================================
         public override string HTTPAcceptCharset {
             get {
-                return cpCore.webServer.requestHttpAcceptCharset;
+                return core.webServer.requestHttpAcceptCharset;
             }
         }
         //
         //====================================================================================================
         public override string HTTPProfile {
             get {
-                return cpCore.webServer.requestHttpProfile;
+                return core.webServer.requestHttpProfile;
             }
         }
         //
         //====================================================================================================
         public override string HTTPXWapProfile {
             get {
-                return cpCore.webServer.requestxWapProfile;
+                return core.webServer.requestxWapProfile;
             }
         }
         //
         //====================================================================================================
         public override string Language {
             get {
-                if (cpCore.doc.sessionContext.userLanguage == null) {
+                if (core.doc.sessionContext.userLanguage == null) {
                     return "";
                 }
-                languageModel userLanguage = languageModel.create(cpCore, cpCore.doc.sessionContext.user.LanguageID);
+                languageModel userLanguage = languageModel.create(core, core.doc.sessionContext.user.LanguageID);
                 if (userLanguage != null) {
                     return userLanguage.name;
                 }
@@ -213,83 +213,83 @@ namespace Contensive.Core {
         //====================================================================================================
         public override string Link {
             get {
-                return cpCore.webServer.requestUrl;
+                return core.webServer.requestUrl;
             }
         }
         //
         //====================================================================================================
         public override string LinkForwardSource {
             get {
-                return cpCore.webServer.linkForwardSource;
+                return core.webServer.linkForwardSource;
             }
         }
         //
         //====================================================================================================
         public override string LinkSource {
             get {
-                return cpCore.webServer.requestUrlSource;
+                return core.webServer.requestUrlSource;
             }
         }
         //
         //====================================================================================================
         public override string Page {
             get {
-                return cpCore.webServer.requestPage;
+                return core.webServer.requestPage;
             }
         }
         //
         //====================================================================================================
         public override string Path {
             get {
-                return cpCore.webServer.requestPath;
+                return core.webServer.requestPath;
             }
         }
         //
         //====================================================================================================
         public override string PathPage {
             get {
-                return cpCore.webServer.requestPathPage;
+                return core.webServer.requestPathPage;
             }
         }
         //
         //====================================================================================================
         public override string Protocol {
             get {
-                return cpCore.webServer.requestProtocol;
+                return core.webServer.requestProtocol;
             }
         }
         //
         //====================================================================================================
         public override string QueryString {
             get {
-                return cpCore.webServer.requestQueryString;
+                return core.webServer.requestQueryString;
             }
         }
         //
         //====================================================================================================
         public override string Referer {
             get {
-                return cpCore.webServer.requestReferer;
+                return core.webServer.requestReferer;
             }
         }
         //
         //====================================================================================================
         public override string RemoteIP {
             get {
-                return cpCore.webServer.requestRemoteIP;
+                return core.webServer.requestRemoteIP;
             }
         }
         //
         //====================================================================================================
         public override bool Secure {
             get {
-                return cpCore.webServer.requestSecure;
+                return core.webServer.requestSecure;
             }
         }
         //
         //====================================================================================================
         public override bool OK(string RequestName) {
-            return cpCore.docProperties.containsKey(RequestName);
+            return core.docProperties.containsKey(RequestName);
         }
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.

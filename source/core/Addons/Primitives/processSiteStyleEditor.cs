@@ -27,25 +27,25 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
-                if (cpCore.doc.sessionContext.isAuthenticated & cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
+                coreController core = processor.core;
+                if (core.doc.sessionContext.isAuthenticated & core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Save the site sites
                     //
-                    cpCore.appRootFiles.saveFile(DynamicStylesFilename, cpCore.docProperties.getText("SiteStyles"));
-                    if (cpCore.docProperties.getBoolean(RequestNameInlineStyles)) {
+                    core.appRootFiles.saveFile(DynamicStylesFilename, core.docProperties.getText("SiteStyles"));
+                    if (core.docProperties.getBoolean(RequestNameInlineStyles)) {
                         //
                         // Inline Styles
                         //
-                        cpCore.siteProperties.setProperty("StylesheetSerialNumber", "0");
+                        core.siteProperties.setProperty("StylesheetSerialNumber", "0");
                     } else {
                         //
                         // Linked Styles
                         // Bump the Style Serial Number so next fetch is not cached
                         //
-                        int StyleSN = cpCore.siteProperties.getInteger("StylesheetSerialNumber", 0);
+                        int StyleSN = core.siteProperties.getInteger("StylesheetSerialNumber", 0);
                         StyleSN = StyleSN + 1;
-                        cpCore.siteProperties.setProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN));
+                        core.siteProperties.setProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN));
                         //
                         // Save new public stylesheet
                         //

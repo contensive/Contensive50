@@ -60,15 +60,15 @@ namespace Contensive.Core.Controllers {
         //
         private string MenuFlyoutNamePrefix; // Random prefix added to element IDs to avoid namespace collision
         private string MenuFlyoutIcon_Local; // string used to mark a button that has a non-hover flyout
-        private coreController cpCore;
+        private coreController core;
         //
         //==================================================================================================
         /// <summary>
         /// constructor
         /// </summary>
         /// <remarks></remarks>
-        public menuFlyoutController(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public menuFlyoutController(coreController core) : base() {
+            this.core = core;
             //
             EntryIndexName = new keyPtrController();
             Random rnd = new Random();
@@ -86,7 +86,7 @@ namespace Contensive.Core.Controllers {
                 string MenuFlyoutIcon = null;
                 const string DefaultIcon = "&#187;";
                 //
-                MenuFlyoutIcon = cpCore.siteProperties.getText("MenuFlyoutIcon", DefaultIcon);
+                MenuFlyoutIcon = core.siteProperties.getText("MenuFlyoutIcon", DefaultIcon);
                 if (MenuFlyoutIcon != DefaultIcon) {
                     //MenuFlyoutIcon = MenuFlyoutIcon;
                 }
@@ -117,7 +117,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return returnHtml;
@@ -167,7 +167,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = GetMenuFlyout(MenuName, MenuStyle, StyleSheetPrefix);
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -216,7 +216,7 @@ namespace Contensive.Core.Controllers {
                 return;
                 //
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
@@ -255,7 +255,7 @@ namespace Contensive.Core.Controllers {
                 return tempReadLine;
                 //
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
@@ -308,7 +308,7 @@ namespace Contensive.Core.Controllers {
                         MouseClickCode = "";
                         MouseOverCode = "";
                         MouseOutCode = "";
-                        ImageID = "img" + encodeText(genericController.GetRandomInteger(cpCore)) + "s";
+                        ImageID = "img" + encodeText(genericController.GetRandomInteger(core)) + "s";
                         FlyoutStyle = LocalStyleSheetPrefix + "Button";
                         //
                         switch (MenuStyle) {
@@ -445,7 +445,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }
@@ -539,7 +539,7 @@ namespace Contensive.Core.Controllers {
                 return tempGetMenuFlyoutPanel;
                 //
             } catch( Exception ex ) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             //ErrorTrap:
             //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
@@ -588,7 +588,7 @@ namespace Contensive.Core.Controllers {
                     ImageOver = "";
                 }
             }
-            cpCore.menuFlyout.AddEntry(genericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption, "", NewWindow);
+            core.menuFlyout.AddEntry(genericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption, "", NewWindow);
         }
         //
         //========================================================================
@@ -602,16 +602,16 @@ namespace Contensive.Core.Controllers {
             try {
                 string MenuFlyoutIcon = null;
                 //
-                if (cpCore.menuFlyout != null) {
-                    cpCore.doc.menuSystemCloseCount = cpCore.doc.menuSystemCloseCount + 1;
-                    result = result + cpCore.menuFlyout.GetMenuClose();
-                    MenuFlyoutIcon = cpCore.siteProperties.getText("MenuFlyoutIcon", "&#187;");
+                if (core.menuFlyout != null) {
+                    core.doc.menuSystemCloseCount = core.doc.menuSystemCloseCount + 1;
+                    result = result + core.menuFlyout.GetMenuClose();
+                    MenuFlyoutIcon = core.siteProperties.getText("MenuFlyoutIcon", "&#187;");
                     if (MenuFlyoutIcon != "&#187;") {
                         result = genericController.vbReplace(result, "&#187;</a>", MenuFlyoutIcon + "</a>");
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
             return result;
         }

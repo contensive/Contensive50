@@ -65,7 +65,7 @@ namespace Contensive.Core.Controllers {
         //
         // ----- objects passed in constructor, do not dispose
         //
-        private coreController cpCore;
+        private coreController core;
         //
         // ----- objects constructed that must be disposed
         //
@@ -97,7 +97,7 @@ namespace Contensive.Core.Controllers {
                         if (dateCompare >= 0) {
                             //
                             // -- global invalidation
-                            logController.appendLogCache( cpCore,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "] is after the globalInvalidationDate [" + globalInvalidationDate + "]");
+                            logController.appendLogCache( core,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "] is after the globalInvalidationDate [" + globalInvalidationDate + "]");
                         } else {
                             //
                             // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
@@ -115,7 +115,7 @@ namespace Contensive.Core.Controllers {
                                     dateCompare = dependantObject.saveDate.CompareTo(wrappedContent.saveDate);
                                     if (dateCompare >= 0) {
                                         cacheMiss = true;
-                                        logController.appendLogCache(cpCore, "GetObject(" + key + "), invalidated because the dependantobject [" + dependentKey + "] has a saveDate [" + dependantObject.saveDate.ToString() + "] after the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "]");
+                                        logController.appendLogCache(core, "GetObject(" + key + "), invalidated because the dependantobject [" + dependentKey + "] has a saveDate [" + dependantObject.saveDate.ToString() + "] after the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "]");
                                         break;
                                     }
                                 }
@@ -148,11 +148,11 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                     }
-                    //logController.appendCacheLog(cpCore,"getObject(" + key + "), exit(" + sw.ElapsedMilliseconds + "ms)");
+                    //logController.appendCacheLog(core,"getObject(" + key + "), exit(" + sw.ElapsedMilliseconds + "ms)");
                     //sw.Stop();
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 // 20171222 
                 // -- cache errors should be warnings, not critical errors. Dont take down the application over a cache issue.
                 // -- cache errors likely did not original above the cache api, so failing the caller would not be productive
@@ -192,47 +192,47 @@ namespace Contensive.Core.Controllers {
                             } else {
                                 //
                                 // -- some other error
-                                cpCore.handleException(ex);
+                                core.handleException(ex);
                                 throw;
                             }
                         }
                         if (result != null) {
-                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), remoteCache hit");
+                            //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), remoteCache hit");
                         } else {
-                            logController.appendLogCache(cpCore,"getCacheWrapper(" + key + "), remoteCache miss");
+                            logController.appendLogCache(core,"getCacheWrapper(" + key + "), remoteCache miss");
                         }
                     }
-                    if ((result == null) && cpCore.serverConfig.enableLocalMemoryCache) {
+                    if ((result == null) && core.serverConfig.enableLocalMemoryCache) {
                         //
                         // -- local memory cache
                         //Dim cache As ObjectCache = MemoryCache.Default
                         result = (cacheWrapperClass)MemoryCache.Default[wrapperKey];
                         if (result != null) {
-                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), memoryCache hit");
+                            //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), memoryCache hit");
                         } else {
-                            logController.appendLogCache(cpCore,"getCacheWrapper(" + key + "), memoryCache miss");
+                            logController.appendLogCache(core,"getCacheWrapper(" + key + "), memoryCache miss");
                         }
                     }
-                    if ((result == null) && cpCore.serverConfig.enableLocalFileCache) {
+                    if ((result == null) && core.serverConfig.enableLocalFileCache) {
                         //
                         // -- local file cache
                         string serializedDataObject = null;
                         using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, wrapperKey)) {
                             mutex.WaitOne();
-                            serializedDataObject = cpCore.privateFiles.readFile("appCache\\" + genericController.encodeFilename(wrapperKey + ".txt"));
+                            serializedDataObject = core.privateFiles.readFile("appCache\\" + genericController.encodeFilename(wrapperKey + ".txt"));
                             mutex.ReleaseMutex();
                         }
                         if (string.IsNullOrEmpty(serializedDataObject)) {
-                            logController.appendLogCache(cpCore,"getCacheWrapper(" + key + "), file miss");
+                            logController.appendLogCache(core,"getCacheWrapper(" + key + "), file miss");
                         } else {
-                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), file hit, write to memory cache");
+                            //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), file hit, write to memory cache");
                             result = Newtonsoft.Json.JsonConvert.DeserializeObject<cacheWrapperClass>(serializedDataObject);
                             setWrappedContent_MemoryCache(wrapperKey, result);
                         }
                         if (result != null) {
-                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), fileCache hit");
+                            //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), fileCache hit");
                         } else {
-                            logController.appendLogCache(cpCore,"getCacheWrapper(" + key + "), fileCache miss");
+                            logController.appendLogCache(core,"getCacheWrapper(" + key + "), fileCache miss");
                         }
                     }
                     if (result != null) {
@@ -243,9 +243,9 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), exit ");
+                //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), exit ");
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
             return result;
@@ -269,7 +269,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(key, wrappedContent);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -294,7 +294,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(key, wrappedContent);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
         }
         //
@@ -319,7 +319,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(key, wrappedContent);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
         }
         //
@@ -344,7 +344,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(key, cacheWrapper);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -372,7 +372,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(key, cacheWrapper);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -390,7 +390,7 @@ namespace Contensive.Core.Controllers {
             try {
                 setObject(key, content, new List<string> { dependantKey });
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
         }
         //
@@ -415,7 +415,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(keyAlias, cacheWrapper);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
         }
         //
@@ -430,7 +430,7 @@ namespace Contensive.Core.Controllers {
                 setWrappedContent(key, new cacheWrapperClass { saveDate = DateTime.Now });
                 _globalInvalidationDate = null;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -461,7 +461,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -474,13 +474,13 @@ namespace Contensive.Core.Controllers {
         public void invalidateAllInContent(string ContentName) {
             try {
                 //
-                logController.appendLogCache(cpCore,"invalidateAllObjectsInContent(" + ContentName + ")");
+                logController.appendLogCache(core,"invalidateAllObjectsInContent(" + ContentName + ")");
                 //
                 // -- save the cache key that represents any record in the content, set as a dependent key for saves
                 invalidate(ContentName);
-                invalidate(Models.Complex.cdefModel.getContentTablename(cpCore, ContentName));
+                invalidate(Models.Complex.cdefModel.getContentTablename(core, ContentName));
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -496,7 +496,7 @@ namespace Contensive.Core.Controllers {
                 string key = Regex.Replace(dbTableName, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
                 invalidate(key);
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -513,7 +513,7 @@ namespace Contensive.Core.Controllers {
                     invalidate(key);
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -523,7 +523,7 @@ namespace Contensive.Core.Controllers {
         /// Encode a string to be memCacheD compatible, removing 0x00-0x20 and space
         /// </summary>
         private string getWrapperKey(string key) {
-            string result = cpCore.serverConfig.appConfig.name + "-" + cpCore.codeVersion() + "-" + key;
+            string result = core.serverConfig.appConfig.name + "-" + core.codeVersion() + "-" + key;
             result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
             return result;
         }
@@ -562,18 +562,18 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public void invalidateContent_Entity(coreController cpcore, string tableName, int recordId) {
+        public void invalidateContent_Entity(coreController core, string tableName, int recordId) {
             //
             invalidate(getCacheKey_Entity(tableName, recordId));
             if (tableName.ToLower() == linkAliasModel.contentTableName.ToLower()) {
                 //
-                Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
+                Models.Complex.routeDictionaryModel.invalidateCache(core);
             } else if (tableName.ToLower() == linkForwardModel.contentTableName.ToLower()) {
                 //
-                Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
+                Models.Complex.routeDictionaryModel.invalidateCache(core);
             } else if (tableName.ToLower() == addonModel.contentTableName.ToLower()) {
                 //
-                Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
+                Models.Complex.routeDictionaryModel.invalidateCache(core);
             }
         }
         //
@@ -640,14 +640,14 @@ namespace Contensive.Core.Controllers {
         /// Initializes cache client
         /// </summary>
         /// <remarks></remarks>
-        public cacheController(coreController cpCore) {
+        public cacheController(coreController core) {
             try {
-                this.cpCore = cpCore;
+                this.core = core;
                 //
                 _globalInvalidationDate = null;
                 remoteCacheInitialized = false;
-                if (cpCore.serverConfig.enableRemoteCache) {
-                    string cacheEndpoint = cpCore.serverConfig.awsElastiCacheConfigurationEndpoint;
+                if (core.serverConfig.enableRemoteCache) {
+                    string cacheEndpoint = core.serverConfig.awsElastiCacheConfigurationEndpoint;
                     if (!string.IsNullOrEmpty(cacheEndpoint)) {
                         string[] cacheEndpointSplit = cacheEndpoint.Split(':');
                         int cacheEndpointPort = 11211;
@@ -680,28 +680,28 @@ namespace Contensive.Core.Controllers {
         private void setWrappedContent(string key, cacheWrapperClass wrappedContent) {
             try {
                 //
-                //logController.appendCacheLog(cpCore,"setWrappedContent(" + key + ")");
+                //logController.appendCacheLog(core,"setWrappedContent(" + key + ")");
                 //
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("cache key cannot be blank");
                 } else {
                     string wrapperKey = getWrapperKey(key);
-                    if (cpCore.serverConfig.enableLocalMemoryCache) {
+                    if (core.serverConfig.enableLocalMemoryCache) {
                         //
                         // -- save local memory cache
                         setWrappedContent_MemoryCache(wrapperKey, wrappedContent);
                     }
-                    if (cpCore.serverConfig.enableLocalFileCache) {
+                    if (core.serverConfig.enableLocalFileCache) {
                         //
                         // -- save local file cache
                         string serializedData = Newtonsoft.Json.JsonConvert.SerializeObject(wrappedContent);
                         using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, wrapperKey)) {
                             mutex.WaitOne();
-                            cpCore.privateFiles.saveFile("appCache\\" + genericController.encodeFilename(wrapperKey + ".txt"), serializedData);
+                            core.privateFiles.saveFile("appCache\\" + genericController.encodeFilename(wrapperKey + ".txt"), serializedData);
                             mutex.ReleaseMutex();
                         }
                     }
-                    if (cpCore.serverConfig.enableRemoteCache) {
+                    if (core.serverConfig.enableRemoteCache) {
                         if (remoteCacheInitialized) {
                             //
                             // -- save remote cache
@@ -710,7 +710,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
             }
         }
         //

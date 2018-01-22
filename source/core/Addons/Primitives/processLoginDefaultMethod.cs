@@ -29,13 +29,13 @@ namespace Contensive.Core.Addons.Primitives {
             string result = "";
             try {
                 CPClass processor = (CPClass)cp;
-                coreController cpCore = processor.core;
+                coreController core = processor.core;
                 //
                 // -- default login page
-                cpCore.doc.continueProcessing = false;
+                core.doc.continueProcessing = false;
                 Dictionary<string, string> addonArguments = new Dictionary<string, string>();
                 addonArguments.Add("Force Default Login", "true");
-                return cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
+                return core.addon.execute(addonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
                     instanceArguments = addonArguments
                 });

@@ -19,7 +19,7 @@ namespace Contensive.Core.Controllers {
         //
         // ----- global scope variables
         //
-        private coreController cpCore;
+        private coreController core;
         private XmlDocument MSxml;
         //
         // ----- Tracking values, should be set before each exit
@@ -49,10 +49,10 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        /// <param name="cpCore"></param>
+        /// <param name="core"></param>
         /// <remarks></remarks>
-        public dataTreeController(coreController cpCore) : base() {
-            this.cpCore = cpCore;
+        public dataTreeController(coreController core) : base() {
+            this.core = core;
         }
         //
         //
@@ -91,7 +91,7 @@ namespace Contensive.Core.Controllers {
                             break;
                     }
                 } catch (Exception ex) {
-                    cpCore.handleException(ex);
+                    core.handleException(ex);
                     loadOK = false;
                 }
                 if (loadOK) {
@@ -137,7 +137,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         public void LoadFile(string Filename) {
-            Load(cpCore.appRootFiles.readFile(Filename), 0);
+            Load(core.appRootFiles.readFile(Filename), 0);
         }
         //
         // Get Name
@@ -192,7 +192,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -269,7 +269,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                core.handleException(ex);
                 throw;
             }
         }
@@ -468,7 +468,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         public void SaveFile(string Filename) {
-            cpCore.appRootFiles.saveFile(Filename, XML);
+            core.appRootFiles.saveFile(Filename, XML);
         }
         //
         //

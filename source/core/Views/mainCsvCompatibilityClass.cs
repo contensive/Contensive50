@@ -20,13 +20,13 @@ namespace Contensive.Core {
         public const string InterfaceId = "CE342EA5-339F-4C31-9F90-F878F527E17A";
         public const string EventsId = "21D9D0FB-9B5B-43C2-A7A5-3C84ABFAF90A";
         // 
-        private coreController cpCore;
-        public mainCsvScriptCompatibilityClass(coreController cpCore) {
-            this.cpCore = cpCore;
+        private coreController core;
+        public mainCsvScriptCompatibilityClass(coreController core) {
+            this.core = core;
         }
         //
         public void SetViewingProperty( string propertyName , string propertyValue ) {
-            cpCore.siteProperties.setProperty(propertyName, propertyValue);
+            core.siteProperties.setProperty(propertyName, propertyValue);
         }
 
         // 
@@ -50,7 +50,7 @@ namespace Contensive.Core {
                     int i14, 
                     string s15, 
                     int i16) {
-            return activeContentController.convertActiveContentToHtmlForWysiwygEditor(cpCore, Controllers.genericController.encodeText(Source));
+            return activeContentController.renderHtmlForWysiwygEditor(core, Controllers.genericController.encodeText(Source));
         }
     }
 }
