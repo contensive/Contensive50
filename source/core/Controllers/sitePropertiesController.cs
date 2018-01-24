@@ -11,6 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Core;
 using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
+using Contensive.Core.Models.Context;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
@@ -45,7 +46,7 @@ namespace Contensive.Core.Controllers {
         //
         private bool dbNotReady {
             get {
-                return (core.serverConfig.appConfig.appStatus != Models.Context.serverConfigModel.appStatusEnum.OK);
+                return (core.appConfig.appStatus != appConfigModel.appStatusEnum.OK);
             }
         }
         //
@@ -450,7 +451,7 @@ namespace Contensive.Core.Controllers {
                     returnString = DefaultValue;
                 } else {
                     if (PropertyName.ToLower().Equals("adminurl")) {
-                        returnString = "/" + core.serverConfig.appConfig.adminRoute;
+                        returnString = "/" + core.appConfig.adminRoute;
                     } else {
                         string cacheName = "siteproperty" + PropertyName.Trim().ToLower();
                         if (string.IsNullOrEmpty(PropertyName.Trim())) {

@@ -59,7 +59,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             + "\r\nbinary header:"
                             + "\r\n" + BinaryHeaderString + "\r\n";
                 }
-                logController.appendLog(core, SaveContent, "admin", core.serverConfig.appConfig.name + "-request-");
+                logController.appendLog(core, SaveContent, "admin", core.appConfig.name + "-request-");
                 //
                 if (!core.doc.sessionContext.isAuthenticated) {
                     //
@@ -77,7 +77,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         + "<p>" + SpanClassAdminNormal + "You are attempting to enter an area which your account does not have access."
                         + "\r<ul class=\"ccList\">"
                         + "\r<li class=\"ccListItem\">To return to the public web site, use your back button, or <a href=\"" + requestAppRootPath + "\">Click Here</A>."
-                        + "\r<li class=\"ccListItem\">To login under a different account, <a href=\"/" + core.serverConfig.appConfig.adminRoute + "?method=logout\" rel=\"nofollow\">Click Here</A>"
+                        + "\r<li class=\"ccListItem\">To login under a different account, <a href=\"/" + core.appConfig.adminRoute + "?method=logout\" rel=\"nofollow\">Click Here</A>"
                         + "\r<li class=\"ccListItem\">To have your account access changed to include this area, please contact the <a href=\"mailto:" + core.siteProperties.getText("EmailAdmin") + "\">system administrator</A>. "
                         + "\r</ul>"
                         + "</span></p>";
@@ -1118,7 +1118,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         IconHeight = core.db.csGetInteger(CS, "IconHeight");
                         IconSprites = core.db.csGetInteger(CS, "IconSprites");
                         IconIsInline = core.db.csGetBoolean(CS, "IsInline");
-                        IconImg = genericController.GetAddonIconImg("/" + core.serverConfig.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, core.serverConfig.appConfig.cdnFilesNetprefix, AddonName, AddonName, "", 0);
+                        IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, core.appConfig.cdnFilesNetprefix, AddonName, AddonName, "", 0);
                         helpLink = core.db.csGet(CS, "helpLink");
                     }
                     core.db.csClose(ref CS);
@@ -2753,7 +2753,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 //if this is a current sort ,add the reverse flag
                                 //
-                                ButtonHref = "/" + core.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormIndex + "&SetSortField=" + FieldName + "&RT=0&" + RequestNameTitleExtension + "=" + genericController.EncodeRequestVariable(TitleExtension) + "&cid=" + adminContent.Id + "&ad=" + MenuDepth;
+                                ButtonHref = "/" + core.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormIndex + "&SetSortField=" + FieldName + "&RT=0&" + RequestNameTitleExtension + "=" + genericController.EncodeRequestVariable(TitleExtension) + "&cid=" + adminContent.Id + "&ad=" + MenuDepth;
                                 foreach (var sortKvp in IndexConfig.Sorts) {
                                     indexConfigSortClass sort = sortKvp.Value;
 
@@ -2852,7 +2852,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     // --- Edit button column
                                     //
                                     DataTable_DataRows += "<td align=center " + RowColor + ">";
-                                    URI = "\\" + core.serverConfig.appConfig.adminRoute + "?" + rnAdminAction + "=" + AdminActionNop + "&cid=" + adminContent.Id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + genericController.EncodeRequestVariable(TitleExtension) + "&ad=" + MenuDepth + "&" + rnAdminSourceForm + "=" + AdminForm + "&" + RequestNameAdminForm + "=" + AdminFormEdit;
+                                    URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + AdminActionNop + "&cid=" + adminContent.Id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + genericController.EncodeRequestVariable(TitleExtension) + "&ad=" + MenuDepth + "&" + rnAdminSourceForm + "=" + AdminForm + "&" + RequestNameAdminForm + "=" + AdminFormEdit;
                                     if (WherePairCount > 0) {
                                         for (WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
                                             URI = URI + "&wl" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair[1, WhereCount]);
@@ -3106,7 +3106,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     returnContent += "<div class=\"ccFilterHead\">Remove&nbsp;Filters</div>";
                     QS = RQS;
                     QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveAll", "1");
-                    Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                    Link = "/" + core.appConfig.adminRoute + "?" + QS;
                     returnContent += "<div class=\"ccFilterSubHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;Remove All</a></div>";
                     //
                     // Last Edited Edited by me
@@ -3115,25 +3115,25 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (IndexConfig.LastEditedByMe) {
                         QS = RQS;
                         QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedByMe", 0.ToString(), true);
-                        Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                        Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">By&nbsp;Me</a></div>";
                     }
                     if (IndexConfig.LastEditedToday) {
                         QS = RQS;
                         QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedToday", 0.ToString(), true);
-                        Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                        Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Today</a></div>";
                     }
                     if (IndexConfig.LastEditedPast7Days) {
                         QS = RQS;
                         QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast7Days", 0.ToString(), true);
-                        Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                        Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Past Week</a></div>";
                     }
                     if (IndexConfig.LastEditedPast30Days) {
                         QS = RQS;
                         QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast30Days", 0.ToString(), true);
-                        Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                        Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Past 30 Days</a></div>";
                     }
                     if (!string.IsNullOrEmpty(SubFilterList)) {
@@ -3148,7 +3148,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         SubContentName = cdefModel.getContentNameByID(core, IndexConfig.SubCDefID);
                         QS = RQS;
                         QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveCDef", encodeText(IndexConfig.SubCDefID));
-                        Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                        Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">" + SubContentName + "</a></div>";
                     }
                     if (!string.IsNullOrEmpty(SubFilterList)) {
@@ -3168,7 +3168,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 }
                                 QS = RQS;
                                 QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveGroup", IndexConfig.GroupList[Ptr]);
-                                Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                                Link = "/" + core.appConfig.adminRoute + "?" + QS;
                                 SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">" + GroupName + "</a></div>";
                             }
                         }
@@ -3183,7 +3183,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (IndexConfig.ActiveOnly) {
                         QS = RQS;
                         QS = genericController.ModifyQueryString(QS, "IndexFilterActiveOnly", 0.ToString(), true);
-                        Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                        Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Active&nbsp;Only</a></div>";
                     }
                     if (!string.IsNullOrEmpty(SubFilterList)) {
@@ -3197,7 +3197,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         FieldCaption = genericController.encodeText(cdefModel.GetContentFieldProperty(core, ContentName, findWord.Name, "caption"));
                         QS = RQS;
                         QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name);
-                        Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                        Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         switch (findWord.MatchOption) {
                             case FindWordMatchEnum.matchincludes:
                                 returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'</a></div>";
@@ -3241,25 +3241,25 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (!IndexConfig.LastEditedByMe) {
                     QS = RQS;
                     QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedByMe", "1", true);
-                    Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                    Link = "/" + core.appConfig.adminRoute + "?" + QS;
                     SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">By&nbsp;Me</a></div>";
                 }
                 if (!IndexConfig.LastEditedToday) {
                     QS = RQS;
                     QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedToday", "1", true);
-                    Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                    Link = "/" + core.appConfig.adminRoute + "?" + QS;
                     SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Today</a></div>";
                 }
                 if (!IndexConfig.LastEditedPast7Days) {
                     QS = RQS;
                     QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast7Days", "1", true);
-                    Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                    Link = "/" + core.appConfig.adminRoute + "?" + QS;
                     SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Past Week</a></div>";
                 }
                 if (!IndexConfig.LastEditedPast30Days) {
                     QS = RQS;
                     QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast30Days", "1", true);
-                    Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                    Link = "/" + core.appConfig.adminRoute + "?" + QS;
                     SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Past 30 Days</a></div>";
                 }
                 if (!string.IsNullOrEmpty(SubFilterList)) {
@@ -3282,7 +3282,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     Caption = "<span style=\"white-space:nowrap;\">" + cdefModel.getContentNameByID(core, subContentID) + "</span>";
                                     QS = RQS;
                                     QS = genericController.ModifyQueryString(QS, "IndexFilterAddCDef", subContentID.ToString(), true);
-                                    Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                                    Link = "/" + core.appConfig.adminRoute + "?" + QS;
                                     SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
                                 }
                             }
@@ -3329,7 +3329,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             } else {
                                 QS = genericController.ModifyQueryString(QS, "IndexFilterAddGroup", RecordID.ToString(), true);
                             }
-                            Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                            Link = "/" + core.appConfig.adminRoute + "?" + QS;
                             SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
                         }
                         core.db.csGoNext(CS);
@@ -3345,7 +3345,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (!IndexConfig.ActiveOnly) {
                     QS = RQS;
                     QS = genericController.ModifyQueryString(QS, "IndexFilterActiveOnly", "1", true);
-                    Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                    Link = "/" + core.appConfig.adminRoute + "?" + QS;
                     SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Active&nbsp;Only</a></div>";
                 }
                 if (!string.IsNullOrEmpty(SubFilterList)) {
@@ -3358,7 +3358,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 QS = RQS;
                 QS = genericController.ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormAdvancedSearch, true);
-                Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                Link = "/" + core.appConfig.adminRoute + "?" + QS;
                 returnContent += "<div class=\"ccFilterHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Advanced&nbsp;Search</a></div>";
                 //
                 returnContent += "<div style=\"border-bottom:1px dotted #808080;\">&nbsp;</div>";
@@ -3367,7 +3367,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 QS = RQS;
                 QS = genericController.ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns, true);
-                Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                Link = "/" + core.appConfig.adminRoute + "?" + QS;
                 returnContent += "<div class=\"ccFilterHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Set&nbsp;Columns</a></div>";
                 //
                 returnContent += "<div style=\"border-bottom:1px dotted #808080;\">&nbsp;</div>";
@@ -3376,7 +3376,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 QS = RQS;
                 QS = genericController.ModifyQueryString(QS, RequestNameAdminForm, AdminFormImportWizard, true);
-                Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                Link = "/" + core.appConfig.adminRoute + "?" + QS;
                 returnContent += "<div class=\"ccFilterHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Import</a></div>";
                 //
                 returnContent += "<div style=\"border-bottom:1px dotted #808080;\">&nbsp;</div>";
@@ -3385,7 +3385,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 QS = RQS;
                 QS = genericController.ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormExport, true);
-                Link = "/" + core.serverConfig.appConfig.adminRoute + "?" + QS;
+                Link = "/" + core.appConfig.adminRoute + "?" + QS;
                 returnContent += "<div class=\"ccFilterHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Export</a></div>";
                 //
                 returnContent += "<div style=\"border-bottom:1px dotted #808080;\">&nbsp;</div>";
@@ -4778,7 +4778,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     if (AllowAdminFieldCheck() & (FormFieldLcListToBeLoaded.Count > 0)) {
                         errorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
-                        throw (new ApplicationException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.serverConfig.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
+                        throw (new ApplicationException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
                     } else {
                         //
                         // if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
@@ -4899,7 +4899,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         errorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" + field.nameLc + " Not found]. There may have been others.");
                                     }
-                                    throw (new ApplicationException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    throw (new ApplicationException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                 }
                             }
                             if (genericController.encodeInteger(ResponseFieldValueText) != genericController.encodeInteger(editRecord.fieldsLc[field.nameLc].value)) {
@@ -6929,7 +6929,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     //
-                    return core.webServer.redirect("/" + core.serverConfig.appConfig.adminRoute, "Admin Publish, Cancel Button Pressed");
+                    return core.webServer.redirect("/" + core.appConfig.adminRoute, "Admin Publish, Cancel Button Pressed");
                 } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     //
@@ -7522,7 +7522,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 // ----- Default Editor, Redirect fields (the same for normal/readonly/spelling)
                                 //--------------------------------------------------------------------------------------------
                                 //
-                                RedirectPath = core.serverConfig.appConfig.adminRoute;
+                                RedirectPath = core.appConfig.adminRoute;
                                 if (field.redirectPath != "") {
                                     RedirectPath = field.redirectPath;
                                 }
@@ -9214,7 +9214,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     PageCount = core.db.csGetNumber(CS, "pageCount");
                     Stream.Add("<tr>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "All Visits</span></td>");
-                    Stream.Add("<td style=\"width:150px;border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(core.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + core.doc.profileStartTime + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
+                    Stream.Add("<td style=\"width:150px;border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(core.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + core.doc.profileStartTime + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
                     Stream.Add("</tr>");
                 }
@@ -9229,7 +9229,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     PageCount = core.db.csGetNumber(CS, "pageCount");
                     Stream.Add("<tr>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "Non-bot Visits</span></td>");
-                    Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(core.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + core.doc.profileStartTime.ToShortDateString() + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
+                    Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(core.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + core.doc.profileStartTime.ToShortDateString() + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
                     Stream.Add("</tr>");
                 }
@@ -9244,7 +9244,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     PageCount = core.db.csGetNumber(CS, "pageCount");
                     Stream.Add("<tr>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "Visits by New Visitors</span></td>");
-                    Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(core.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&ExcludeOldVisitors=1&DateFrom=" + core.doc.profileStartTime.ToShortDateString() + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
+                    Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(core.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&ExcludeOldVisitors=1&DateFrom=" + core.doc.profileStartTime.ToShortDateString() + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
                     Stream.Add("</tr>");
                 }
@@ -9276,11 +9276,11 @@ namespace Contensive.Core.Addons.AdminSite {
                         while (core.db.csOk(CS)) {
                             VisitID = core.db.csGetInteger(CS, "VisitID");
                             Panel = Panel + "<tr class=\"" + RowColor + "\">";
-                            Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(core.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=16&MemberID=" + core.db.csGetInteger(CS, "MemberID")) + "\">" + core.db.csGet(CS, "MemberName") + "</A></span></td>";
+                            Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(core.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=16&MemberID=" + core.db.csGetInteger(CS, "MemberID")) + "\">" + core.db.csGet(CS, "MemberName") + "</A></span></td>";
                             Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + core.db.csGet(CS, "Remote_Addr") + "</span></td>";
                             Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + core.db.csGetDate(CS, "LastVisitTime").ToString("") + "</span></td>";
-                            Panel = Panel + "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=10&VisitID=" + VisitID + "\">" + core.db.csGet(CS, "PageVisits") + "</A></span></td>";
-                            Panel = Panel + "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=17&VisitID=" + VisitID + "\">" + VisitID + "</A></span></td>";
+                            Panel = Panel + "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=10&VisitID=" + VisitID + "\">" + core.db.csGet(CS, "PageVisits") + "</A></span></td>";
+                            Panel = Panel + "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=17&VisitID=" + VisitID + "\">" + VisitID + "</A></span></td>";
                             Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + "&nbsp;" + core.db.csGetText(CS, "referer") + "</span></td>";
                             Panel = Panel + "</tr>";
                             if (RowColor == "ccPanelRowEven") {
@@ -9821,8 +9821,8 @@ namespace Contensive.Core.Addons.AdminSite {
                 FastString.Add("<td valign=\"top\" align=\"right\">&nbsp;</td>");
                 FastString.Add("<td colspan=\"2\" class=\"ccAdminEditField\" align=\"left\">" + SpanClassAdminNormal);
                 FastString.Add("<ul class=\"ccList\">");
-                FastString.Add("<li class=\"ccListItem\"><a target=\"_blank\" href=\"/" + core.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&MemberID=" + editRecord.id + "&DateTo=" + encodeInteger(Math.Floor(encodeNumber(core.doc.profileStartTime.ToOADate()))) + "&DateFrom=" + (encodeInteger(Math.Floor(encodeNumber(core.doc.profileStartTime.ToOADate()))) - 365) + "\">All visits from this person</A></LI>");
-                FastString.Add("<li class=\"ccListItem\"><a target=\"_blank\" href=\"/" + core.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=13&MemberID=" + editRecord.id + "&DateTo=" + Math.Floor(encodeNumber(core.doc.profileStartTime.ToOADate())) + "&DateFrom=" + Math.Floor(encodeNumber(core.doc.profileStartTime.ToOADate()) - 365) + "\">All orders from this person</A></LI>");
+                FastString.Add("<li class=\"ccListItem\"><a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&MemberID=" + editRecord.id + "&DateTo=" + encodeInteger(Math.Floor(encodeNumber(core.doc.profileStartTime.ToOADate()))) + "&DateFrom=" + (encodeInteger(Math.Floor(encodeNumber(core.doc.profileStartTime.ToOADate()))) - 365) + "\">All visits from this person</A></LI>");
+                FastString.Add("<li class=\"ccListItem\"><a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=13&MemberID=" + editRecord.id + "&DateTo=" + Math.Floor(encodeNumber(core.doc.profileStartTime.ToOADate())) + "&DateFrom=" + Math.Floor(encodeNumber(core.doc.profileStartTime.ToOADate()) - 365) + "\">All orders from this person</A></LI>");
                 FastString.Add("</ul>");
                 FastString.Add("</span></td></tr>");
                 tempGetForm_Edit_MemberReports = Adminui.GetEditPanel((!allowAdminTabs), "Contensive Reporting", "", Adminui.EditTableOpen + FastString.Text + Adminui.EditTableClose);
@@ -10267,10 +10267,10 @@ namespace Contensive.Core.Addons.AdminSite {
                 QS = core.doc.refreshQueryString;
                 if (allowAdminTabs) {
                     QS = genericController.ModifyQueryString(QS, "tabs", "0", true);
-                    RightSide = RightSide + getActiveImage(core.serverConfig.appConfig.adminRoute + "?" + QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "");
+                    RightSide = RightSide + getActiveImage(core.appConfig.adminRoute + "?" + QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "");
                 } else {
                     QS = genericController.ModifyQueryString(QS, "tabs", "1", true);
-                    RightSide = RightSide + getActiveImage(core.serverConfig.appConfig.adminRoute + "?" + QS, "Enable Tabs", "LibButtonTabs.GIF", "LibButtonTabsRev.GIF", "Enable Tabs", "16", "16", "", "", "");
+                    RightSide = RightSide + getActiveImage(core.appConfig.adminRoute + "?" + QS, "Enable Tabs", "LibButtonTabs.GIF", "LibButtonTabsRev.GIF", "Enable Tabs", "16", "16", "", "", "");
                 }
                 //
                 // Menu Mode
@@ -10280,17 +10280,17 @@ namespace Contensive.Core.Addons.AdminSite {
                     RightSide = RightSide + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"16\" >";
                     if (AdminMenuModeID == AdminMenuModeTop) {
                         QS = genericController.ModifyQueryString(QS, "mm", "1", true);
-                        RightSide = RightSide + getActiveImage(core.serverConfig.appConfig.adminRoute + "?" + QS, "Use Navigator", "LibButtonMenuTop.GIF", "LibButtonMenuTopOver.GIF", "Use Navigator", "16", "16", "", "", "");
+                        RightSide = RightSide + getActiveImage(core.appConfig.adminRoute + "?" + QS, "Use Navigator", "LibButtonMenuTop.GIF", "LibButtonMenuTopOver.GIF", "Use Navigator", "16", "16", "", "", "");
                     } else {
                         QS = genericController.ModifyQueryString(QS, "mm", "2", true);
-                        RightSide = RightSide + getActiveImage(core.serverConfig.appConfig.adminRoute + "?" + QS, "Use Dropdown Menus", "LibButtonMenuLeft.GIF", "LibButtonMenuLeftOver.GIF", "Use Dropdown Menus", "16", "16", "", "", "");
+                        RightSide = RightSide + getActiveImage(core.appConfig.adminRoute + "?" + QS, "Use Dropdown Menus", "LibButtonMenuLeft.GIF", "LibButtonMenuLeftOver.GIF", "Use Dropdown Menus", "16", "16", "", "", "");
                     }
                 }
                 //
                 // Refresh Button
                 //
                 RightSide = RightSide + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"16\" >";
-                RightSide = RightSide + getActiveImage(core.serverConfig.appConfig.adminRoute + "?" + core.doc.refreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "");
+                RightSide = RightSide + getActiveImage(core.appConfig.adminRoute + "?" + core.doc.refreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "");
                 //
                 // Assemble header
                 //
@@ -10480,10 +10480,10 @@ namespace Contensive.Core.Addons.AdminSite {
                     tempGetMenuLink = LinkPage;
                     if (!string.IsNullOrEmpty(tempGetMenuLink)) {
                         if (tempGetMenuLink.Left(1) == "?" || tempGetMenuLink.Left(1) == "#") {
-                            tempGetMenuLink = "/" + core.serverConfig.appConfig.adminRoute + tempGetMenuLink;
+                            tempGetMenuLink = "/" + core.appConfig.adminRoute + tempGetMenuLink;
                         }
                     } else {
-                        tempGetMenuLink = "/" + core.serverConfig.appConfig.adminRoute;
+                        tempGetMenuLink = "/" + core.appConfig.adminRoute;
                     }
                     ContentID = genericController.encodeInteger(LinkCID);
                     if (ContentID != 0) {
@@ -11287,7 +11287,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonCancel) {
-                    return core.webServer.redirect("/" + core.serverConfig.appConfig.adminRoute, "Downloads, Cancel Button Pressed");
+                    return core.webServer.redirect("/" + core.appConfig.adminRoute, "Downloads, Cancel Button Pressed");
                 }
                 //
                 if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
@@ -11406,7 +11406,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (PageNumber == 0) {
                         PageNumber = 1;
                     }
-                    AdminURL = "/" + core.serverConfig.appConfig.adminRoute;
+                    AdminURL = "/" + core.appConfig.adminRoute;
                     TopCount = PageNumber * PageSize;
                     //
                     // Setup Headings
@@ -11452,7 +11452,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         RowPointer = 1;
                     } else {
                         DataRowCount = core.db.csGetRowCount(CS);
-                        LinkPrefix = "<a href=\"" + core.serverConfig.appConfig.cdnFilesNetprefix;
+                        LinkPrefix = "<a href=\"" + core.appConfig.cdnFilesNetprefix;
                         LinkSuffix = "\" target=_blank>Available</a>";
                         while (core.db.csOk(CS) && (RowPointer < PageSize)) {
                             RecordID = core.db.csGetInteger(CS, "ID");
@@ -11699,7 +11699,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             // Ajax Tab
                             //
                             //AjaxLink = "/admin/index.asp?"
-                            AjaxLink = "/" + core.serverConfig.appConfig.adminRoute + "?"
+                            AjaxLink = "/" + core.appConfig.adminRoute + "?"
                             + RequestNameAjaxFunction + "=" + AjaxGetFormEditTabContent + "&ID=" + editRecord.id + "&CID=" + adminContent.Id + "&ReadOnly=" + readOnlyField + "&IsLandingPage=" + IsLandingPage + "&IsRootPage=" + IsRootPage + "&EditTab=" + genericController.EncodeRequestVariable(field.editTabName) + "&EditorContext=" + EditorContext + "&NewFormFieldList=" + genericController.EncodeRequestVariable(NewFormFieldList);
                             returnHtml += GetForm_Edit_AddTab2(editTabCaption, "", true, AjaxLink);
                         }
@@ -11793,7 +11793,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (!string.IsNullOrEmpty(Button)) {
                         switch (Button) {
                             case ButtonCancel:
-                                return core.webServer.redirect("/" + core.serverConfig.appConfig.adminRoute, "CustomReports, Cancel Button Pressed");
+                                return core.webServer.redirect("/" + core.appConfig.adminRoute, "CustomReports, Cancel Button Pressed");
                             //Call core.main_Redirect2(encodeAppRootPath(core.main_GetSiteProperty2("AdminURL"), core.main_ServerVirtualPath, core.app.RootPath, core.main_ServerHost))
                             case ButtonDelete:
                                 RowCnt = core.docProperties.getInteger("RowCnt");
@@ -11870,7 +11870,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (PageNumber == 0) {
                         PageNumber = 1;
                     }
-                    AdminURL = "/" + core.serverConfig.appConfig.adminRoute;
+                    AdminURL = "/" + core.appConfig.adminRoute;
                     TopCount = PageNumber * PageSize;
                     //
                     // Setup Headings
@@ -12143,7 +12143,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 if (AccessOK) {
                                     Link = GetMenuLink(core.db.csGet(CSMenus, "LinkPage"), ContentID);
                                     if (genericController.vbInstr(1, Link, "?") == 1) {
-                                        Link = core.serverConfig.appConfig.adminRoute + Link;
+                                        Link = core.appConfig.adminRoute + Link;
                                     }
                                 } else {
                                     Link = "";
@@ -12358,7 +12358,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     //
-                    return core.webServer.redirect("/" + core.serverConfig.appConfig.adminRoute, "GetContentChildTool, Cancel Button Pressed");
+                    return core.webServer.redirect("/" + core.appConfig.adminRoute, "GetContentChildTool, Cancel Button Pressed");
                 } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     //
@@ -12646,7 +12646,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     //
-                    return core.webServer.redirect("/" + core.serverConfig.appConfig.adminRoute, "HouseKeepingControl, Cancel Button Pressed");
+                    return core.webServer.redirect("/" + core.appConfig.adminRoute, "HouseKeepingControl, Cancel Button Pressed");
                 } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     //
@@ -12683,7 +12683,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                     //
                     if (Button == ButtonOK) {
-                        return core.webServer.redirect("/" + core.serverConfig.appConfig.adminRoute, "StaticPublishControl, OK Button Pressed");
+                        return core.webServer.redirect("/" + core.appConfig.adminRoute, "StaticPublishControl, OK Button Pressed");
                     }
                     //
                     // ----- Status
@@ -12834,7 +12834,7 @@ namespace Contensive.Core.Addons.AdminSite {
             //                '
             //                '
             //                '
-            //                Call core.webServer.redirect("/" & core.serverconfig.appconfig.adminRoute, "StyleEditor, Cancel Button Pressed", False)
+            //                Call core.webServer.redirect("/" & core.appConfig.adminRoute, "StyleEditor, Cancel Button Pressed", False)
             //            ElseIf Not core.doc.authContext.isAuthenticatedAdmin(core) Then
             //                '
             //                '

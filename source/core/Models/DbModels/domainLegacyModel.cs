@@ -72,7 +72,7 @@
 //                            // recreate (non-default) domain table list
 //                            //
 //                            domainList_local = new List<string>();
-//                            domainList_local.Add(core.serverConfig.appConfig.domainList[0]);
+//                            domainList_local.Add(core.appConfig.domainList[0]);
 //                            //
 //                            // select all Normal domains (non-Forward)
 //                            //

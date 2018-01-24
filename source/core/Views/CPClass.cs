@@ -15,6 +15,7 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
 using Contensive.BaseClasses;
+using Contensive.Core.Models.Context;
 //
 namespace Contensive.Core {
     public class CPClass : CPBaseClass, IDisposable {
@@ -50,8 +51,8 @@ namespace Contensive.Core {
         /// constructor for non-Internet app use. Configuration provided manually
         /// </summary>
         /// <remarks></remarks>
-        public CPClass(Models.Context.serverConfigModel serverConfig) : base() {
-            core = new coreController(this, serverConfig);
+        public CPClass(string appName, serverConfigModel serverConfig ) : base() {
+            core = new coreController(this, appName, serverConfig);
         }
         //
         //=========================================================================================================
@@ -60,8 +61,8 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="httpContext"></param>
         /// <remarks></remarks>
-        public CPClass(Models.Context.serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
-            core = new coreController(this, serverConfig, httpContext);
+        public CPClass(string appName, serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
+            core = new coreController(this, appName, serverConfig, httpContext);
         }
         //
         //=========================================================================================================
@@ -76,9 +77,9 @@ namespace Contensive.Core {
         //
         //=========================================================================================================
         //
-        public Models.Context.serverConfigModel.appStatusEnum status {
+        public appConfigModel.appStatusEnum status {
             get {
-                return core.serverConfig.appConfig.appStatus;
+                return core.appConfig.appStatus;
             }
         }
         //
@@ -86,7 +87,7 @@ namespace Contensive.Core {
         //
         public string statusMessage {
             get {
-                return GetApplicationStatusMessage(core.serverConfig.appConfig.appStatus);
+                return GetApplicationStatusMessage(core.appConfig.appStatus);
             }
         }
         //
@@ -115,8 +116,8 @@ namespace Contensive.Core {
             get {
                 if (core != null) {
                     if (core.serverConfig != null) {
-                        if (core.serverConfig.appConfig != null) {
-                            return (core.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK);
+                        if (core.appConfig != null) {
+                            return (core.appConfig.appStatus == appConfigModel.appStatusEnum.OK);
                         }
                     }
                 }

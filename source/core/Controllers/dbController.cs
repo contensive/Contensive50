@@ -10,9 +10,10 @@ using System.Data.SqlClient;
 using Contensive.Core;
 using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
+using Contensive.Core.Models.Complex;
+using Contensive.Core.Models.Context;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
-using Contensive.Core.Models.Complex;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -265,13 +266,13 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- server config fail
                     core.handleException(new ApplicationException("Cannot execute Sql in dbController without an application"));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- server config fail
                     core.handleException(new ApplicationException("Cannot execute Sql in dbController without an application"));
                 } else {
-                    string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, dataSourceName);
-                    //returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(core.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
+                    string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
+                    //returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(core.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
                     //
                     // REFACTOR
                     // consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
@@ -318,7 +319,7 @@ namespace Contensive.Core.Controllers {
             //
             //Dim cn As ADODB.Connection = New ADODB.Connection()
             ADODB.Recordset rs = new ADODB.Recordset();
-            string connString = getConnectionStringOLEDB(core.serverConfig.appConfig.name, dataSourceName);
+            string connString = getConnectionStringOLEDB(core.appConfig.name, dataSourceName);
             try {
                 if (dbEnabled) {
                     if (maxRecords > 0) {
@@ -354,7 +355,7 @@ namespace Contensive.Core.Controllers {
         public void executeNonQuery(string sql, string dataSourceName, ref int recordsAffected) {
             try {
                 if (dbEnabled) {
-                    string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, dataSourceName);
+                    string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
                         using (SqlCommand cmdSQL = new SqlCommand()) {
@@ -381,7 +382,7 @@ namespace Contensive.Core.Controllers {
         public void executeNonQueryAsync(string sql, string dataSourceName = "") {
             try {
                 if (dbEnabled) {
-                    string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, dataSourceName);
+                    string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
                         using (SqlCommand cmdSQL = new SqlCommand()) {
@@ -546,7 +547,7 @@ namespace Contensive.Core.Controllers {
                 saveTransactionLog_InProcess = true;
                 //
                 // -- block before appStatus OK because need site properties
-                if ((core.serverConfig.enableLogging) && (core.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
+                if ((core.serverConfig.enableLogging) && (core.appConfig.appStatus == appConfigModel.appStatusEnum.OK)) {
                     if (core.siteProperties.allowTransactionLog) {
                         string LogEntry = ("duration [" + ElapsedMilliseconds + "], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
                         logController.appendLog(core, LogEntry, "DbTransactions");
@@ -1461,7 +1462,7 @@ namespace Contensive.Core.Controllers {
                                         Filename = csGetText(CSPointer, fieldName);
                                         if (!string.IsNullOrEmpty(Filename)) {
                                             core.cdnFiles.deleteFile(Filename);
-                                            //Call core.cdnFiles.deleteFile(core.cdnFiles.joinPath(core.serverConfig.appConfig.cdnFilesNetprefix, Filename))
+                                            //Call core.cdnFiles.deleteFile(core.cdnFiles.joinPath(core.appConfig.cdnFilesNetprefix, Filename))
                                         }
                                         break;
                                     case constants.FieldTypeIdFileText:
@@ -4419,10 +4420,10 @@ namespace Contensive.Core.Controllers {
         public DataTable getTableSchemaData(string tableName) {
             DataTable returnDt = new DataTable();
             try {
-                string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, "default");
+                string connString = getConnectionStringADONET(core.appConfig.name, "default");
                 using (SqlConnection connSQL = new SqlConnection(connString)) {
                     connSQL.Open();
-                    returnDt = connSQL.GetSchema("Tables", new[] { core.serverConfig.appConfig.name, null, tableName, null });
+                    returnDt = connSQL.GetSchema("Tables", new[] { core.appConfig.name, null, tableName, null });
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -4443,10 +4444,10 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(tableName.Trim())) {
                     throw new ArgumentException("tablename cannot be blank");
                 } else {
-                    string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, "default");
+                    string connString = getConnectionStringADONET(core.appConfig.name, "default");
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
-                        returnDt = connSQL.GetSchema("Columns", new[] { core.serverConfig.appConfig.name, null, tableName, null });
+                        returnDt = connSQL.GetSchema("Columns", new[] { core.appConfig.name, null, tableName, null });
                     }
                 }
             } catch (Exception ex) {
@@ -4464,10 +4465,10 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(tableName.Trim())) {
                     throw new ArgumentException("tablename cannot be blank");
                 } else {
-                    string connString = getConnectionStringADONET(core.serverConfig.appConfig.name, "default");
+                    string connString = getConnectionStringADONET(core.appConfig.name, "default");
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
-                        returnDt = connSQL.GetSchema("Indexes", new[] { core.serverConfig.appConfig.name, null, tableName, null });
+                        returnDt = connSQL.GetSchema("Indexes", new[] { core.appConfig.name, null, tableName, null });
                     }
                 }
             } catch (Exception ex) {
@@ -4495,11 +4496,11 @@ namespace Contensive.Core.Controllers {
         //            Dim testDt As DataTable
         //            testDt = executeSql("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='ccContent'")
         //            If testDt.Rows.Count <> 1 Then
-        //                core.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        //                core.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
         //            End If
         //            testDt.Dispose()
         //        Catch ex As Exception
-        //            core.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        //            core.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
         //        End Try
         //        '
         //        '--------------------------------------------------------------------------
@@ -4511,7 +4512,7 @@ namespace Contensive.Core.Controllers {
         //            '
         //            ' Bad Db and no upgrade - exit
         //            '
-        //            core.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
+        //            core.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
         //        Else
         //        End If
         //    Catch ex As Exception

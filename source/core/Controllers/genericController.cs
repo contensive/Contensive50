@@ -16,6 +16,7 @@ using static Contensive.Core.constants;
 //
 using System.Net;
 using System.Text;
+using Contensive.Core.Models.Context;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -1384,46 +1385,14 @@ namespace Contensive.Core.Controllers {
         //    '
         //    '
         //    '
-        public static string GetApplicationStatusMessage(Models.Context.serverConfigModel.appStatusEnum ApplicationStatus) {
+        public static string GetApplicationStatusMessage(appConfigModel.appStatusEnum ApplicationStatus) {
             string tempGetApplicationStatusMessage = null;
 
             switch (ApplicationStatus) {
-                //Case Models.Context.serverConfigModel.appStatusEnum.notFound
-                //    GetApplicationStatusMessage = "Application not found"
-                //Case Models.Context.serverConfigModel.appStatusEnum.notEnabled
-                //    GetApplicationStatusMessage = "Application not enabled"
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorDbBad
-                //    GetApplicationStatusMessage = "Error verifying core database records"
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorDbNotFound
-                //    GetApplicationStatusMessage = "Error opening application database"
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorDbFoundButContentMetaMissing
-                //    GetApplicationStatusMessage = "The database for this application was found, but content meta table could not be read."
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorAppConfigNotValid
-                //    GetApplicationStatusMessage = "The application configuration file on this front-end server is not valid."
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorAppConfigNotFound
-                //    GetApplicationStatusMessage = "The application configuration file was not be found on this front-end server."
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorNoHostService
-                //    GetApplicationStatusMessage = "Contensive server not running"
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorKernelFailure
-                //    GetApplicationStatusMessage = "Error contacting Contensive kernel services"
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorLicenseFailure
-                //    GetApplicationStatusMessage = "Error verifying Contensive site license, see Http://www.Contensive.com/License"
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorConnectionObjectFailure
-                //    GetApplicationStatusMessage = "Error creating ODBC Connection object"
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorConnectionStringFailure
-                //    GetApplicationStatusMessage = "ODBC Data Source connection failed"
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorDataSourceFailure
-                //    GetApplicationStatusMessage = "Error opening default data source"
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorDuplicateDomains
-                //    GetApplicationStatusMessage = "Can not determine application because there are multiple applications with domain names that match this site's domain (See Application Manager)"
-                //Case Models.Context.serverConfigModel.appStatusEnum.errorFailedToInitialize
-                //    GetApplicationStatusMessage = "Application failed to initialize, see trace log for details"
-                //    'Case Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusPaused
-                //    '    GetApplicationStatusMessage = "Contensive application paused"
-                case Models.Context.serverConfigModel.appStatusEnum.OK:
+                case appConfigModel.appStatusEnum.OK:
                     tempGetApplicationStatusMessage = "Application OK";
                     break;
-                case Models.Context.serverConfigModel.appStatusEnum.building:
+                case appConfigModel.appStatusEnum.building:
                     tempGetApplicationStatusMessage = "Application building";
                     break;
                 default:
@@ -4278,7 +4247,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // icon is a virtual file, add the serverfilepath
                 //
-                return core.serverConfig.appConfig.cdnFilesNetprefix + returnLink;
+                return core.appConfig.cdnFilesNetprefix + returnLink;
             }
         }
         //

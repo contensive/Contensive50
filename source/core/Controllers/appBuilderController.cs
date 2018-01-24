@@ -11,6 +11,7 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 using System.Data;
 using System.Linq;
+using Contensive.Core.Models.Context;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -285,9 +286,9 @@ namespace Contensive.Core.Controllers {
                     List<string> nonCriticalErrorList = new List<string>();
                     //
                     // -- determine primary domain
-                    string primaryDomain = core.serverConfig.appConfig.name;
-                    if (core.serverConfig.appConfig.domainList.Count > 0) {
-                        primaryDomain = core.serverConfig.appConfig.domainList[0];
+                    string primaryDomain = core.appConfig.name;
+                    if (core.appConfig.domainList.Count > 0) {
+                        primaryDomain = core.appConfig.domainList[0];
                     }
                     //
                     // -- Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods), then other basic system ops work, like site properties
@@ -299,14 +300,14 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- Update server config file
                     logController.appendLogInstall(core, "Update configuration file");
-                    if (!core.serverConfig.appConfig.appStatus.Equals(Models.Context.serverConfigModel.appStatusEnum.OK)) {
-                        core.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.appStatusEnum.OK;
+                    if (!core.appConfig.appStatus.Equals(appConfigModel.appStatusEnum.OK)) {
+                        core.appConfig.appStatus = appConfigModel.appStatusEnum.OK;
                         core.serverConfig.saveObject(core);
                     }
                     //
                     // -- verify iis configuration
                     logController.appendLogInstall(core, "Verify iis configuration");
-                    Controllers.iisController.verifySite(core, core.serverConfig.appConfig.name, primaryDomain, core.serverConfig.appConfig.appRootFilesPath, "default.aspx");
+                    Controllers.iisController.verifySite(core, core.appConfig.name, primaryDomain, core.appConfig.appRootFilesPath, "default.aspx");
                     //
                     // -- verify root developer
                     logController.appendLogInstall(core, "verify developer user");
@@ -400,11 +401,11 @@ namespace Contensive.Core.Controllers {
                     core.siteProperties.getText("DefaultFormInputTextHeight", "1");
                     core.siteProperties.getText("DefaultFormInputWidth", "60");
                     core.siteProperties.getText("EditLockTimeout", "5");
-                    core.siteProperties.getText("EmailAdmin", "webmaster@" + core.serverConfig.appConfig.domainList[0]);
-                    core.siteProperties.getText("EmailFromAddress", "webmaster@" + core.serverConfig.appConfig.domainList[0]);
-                    core.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" + core.serverConfig.appConfig.domainList[0]);
+                    core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
+                    core.siteProperties.getText("EmailFromAddress", "webmaster@" + core.appConfig.domainList[0]);
+                    core.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" + core.appConfig.domainList[0]);
                     core.siteProperties.getText("Language", "English");
-                    core.siteProperties.getText("PageContentMessageFooter", "Copyright " + core.serverConfig.appConfig.domainList[0]);
+                    core.siteProperties.getText("PageContentMessageFooter", "Copyright " + core.appConfig.domainList[0]);
                     core.siteProperties.getText("SelectFieldLimit", "4000");
                     core.siteProperties.getText("SelectFieldWidthLimit", "100");
                     core.siteProperties.getText("SMTPServer", "127.0.0.1");
@@ -506,9 +507,9 @@ namespace Contensive.Core.Controllers {
                             string tmpString = "";
                             bool UpgradeOK = collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, ref  nonCriticalErrorList);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
-                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             } else if (!UpgradeOK) {
-                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             }
                             //
                             //---------------------------------------------------------------------
@@ -566,7 +567,7 @@ namespace Contensive.Core.Controllers {
                                 Doc.LoadXml(collectionController.getLocalCollectionStoreListXml(core));
                                 if (true) {
                                     if (genericController.vbLCase(Doc.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
-                                        throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
+                                        throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
                                     } else {
                                         if (genericController.vbLCase(Doc.DocumentElement.Name) == "collectionlist") {
                                             //
@@ -595,7 +596,7 @@ namespace Contensive.Core.Controllers {
                                                             // app version has no lastchangedate
                                                             //
                                                             upgradeCollection = true;
-                                                            appendUpgradeLog(core, core.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection installed in the application has no LastChangeDate. It may have been installed manually.");
+                                                            appendUpgradeLog(core, core.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection installed in the application has no LastChangeDate. It may have been installed manually.");
                                                         } else {
                                                             //
                                                             // compare to last change date in collection config file
@@ -624,7 +625,7 @@ namespace Contensive.Core.Controllers {
                                                                     logController.appendLogInstall(core, "...local collection found");
                                                                     if (LocalLastChangeDate != DateTime.MinValue) {
                                                                         if (LocalLastChangeDate > LastChangeDate) {
-                                                                            appendUpgradeLog(core, core.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
+                                                                            appendUpgradeLog(core, core.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
                                                                             upgradeCollection = true;
                                                                         }
                                                                     }
@@ -1374,7 +1375,7 @@ namespace Contensive.Core.Controllers {
                 //
                 MethodName = "VerifyTableCoreFields";
                 //
-                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, MethodName, "Verify core fields in all tables registered in [Tables] content.");
+                appendUpgradeLogAddStep(core, core.appConfig.name, MethodName, "Verify core fields in all tables registered in [Tables] content.");
                 //
                 SQL = "SELECT ccDataSources.Name as DataSourceName, ccDataSources.ID as DataSourceID, ccDataSources.Active as DataSourceActive, ccTables.Name as TableName"
                 + " FROM ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID"
@@ -1409,7 +1410,7 @@ namespace Contensive.Core.Controllers {
         public static void VerifyScriptingRecords(coreController core) {
             try {
                 //
-                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.");
+                appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.");
                 //
                 VerifyRecord(core, "Scripting Languages", "VBScript", "", "");
                 VerifyRecord(core, "Scripting Languages", "JScript", "", "");
@@ -1426,7 +1427,7 @@ namespace Contensive.Core.Controllers {
         public static void VerifyLanguageRecords(coreController core) {
             try {
                 //
-                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.");
+                appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.");
                 //
                 VerifyRecord(core, "Languages", "English", "HTTP_Accept_Language", "'en'");
                 VerifyRecord(core, "Languages", "Spanish", "HTTP_Accept_Language", "'es'");
@@ -1444,7 +1445,7 @@ namespace Contensive.Core.Controllers {
             try {
                 DataTable dt = null;
                 //
-                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads");
+                appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads");
                 //
                 dt = core.db.executeQuery("select id from cclibraryfiles");
                 if (dt.Rows.Count == 0) {
@@ -1748,7 +1749,7 @@ namespace Contensive.Core.Controllers {
         public static void VerifyStates(coreController core) {
             try {
                 //
-                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyStates", "Verify States");
+                appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyStates", "Verify States");
                 //
                 int CountryID = 0;
                 //
@@ -1851,7 +1852,7 @@ namespace Contensive.Core.Controllers {
         public static void VerifyCountries(coreController core) {
             try {
                 //
-                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyCountries", "Verify Countries");
+                appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCountries", "Verify Countries");
                 //
                 string list = core.appRootFiles.readFile("cclib\\config\\isoCountryList.txt");
                 string[] rows  = genericController.stringSplit(list, "\r\n");
@@ -1879,7 +1880,7 @@ namespace Contensive.Core.Controllers {
                 int GroupID = 0;
                 string SQL = null;
                 //
-                appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups");
+                appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups");
                 //
                 GroupID = groupController.group_add(core, "Site Managers");
                 SQL = "Update ccContent Set EditorGroupID=" + core.db.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
@@ -2032,7 +2033,7 @@ namespace Contensive.Core.Controllers {
         //
         ///
         //Public Shared Sub ReplaceAddonWithCollection(ByVal AddonProgramID As String, ByVal CollectionGuid As String, ByRef return_IISResetRequired As Boolean, ByRef return_RegisterList As String)
-        //    Dim ex As New Exception("todo") : Call handleClassException(core, ex, core.serverConfig.appConfig.name, "methodNameFPO") ' ignoreInteger, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
+        //    Dim ex As New Exception("todo") : Call handleClassException(core, ex, core.appConfig.name, "methodNameFPO") ' ignoreInteger, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
         //End Sub
         //    On Error GoTo ErrorTrap
         //    '
@@ -2070,7 +2071,7 @@ namespace Contensive.Core.Controllers {
             try {
                 //
                 if (!false) {
-                    appendUpgradeLogAddStep(core, core.serverConfig.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables");
+                    appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables");
                     //
                     core.db.createSQLTable("Default", "ccDataSources");
                     core.db.createSQLTableField("Default", "ccDataSources", "typeId", FieldTypeIdInteger);

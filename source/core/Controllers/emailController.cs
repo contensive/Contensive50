@@ -196,7 +196,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Fix links for HTML send
                         //
-                        rootUrl = "http://" + core.serverConfig.appConfig.domainList[0] + "/";
+                        rootUrl = "http://" + core.appConfig.domainList[0] + "/";
                         BodyMessage = genericController.ConvertLinksToAbsolute(BodyMessage, rootUrl);
                         //
                         // compose body
@@ -336,7 +336,7 @@ namespace Contensive.Core.Controllers {
                     email = systemEmailModel.add(core);
                     email.name = emailName; 
                     email.Subject = emailName;
-                    email.FromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.serverConfig.appConfig.domainList[0]);
+                    email.FromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
                     email.save(core);
                     core.handleException(new ApplicationException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
                 } else {
@@ -368,7 +368,7 @@ namespace Contensive.Core.Controllers {
                         // This field is default true, and non-authorable
                         // It will be true in all cases, except a possible unforseen exception
                         //
-                        EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML("http://" + core.serverConfig.appConfig.domainList[0] + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                        EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML("http://" + core.appConfig.domainList[0] + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                     }
                     //
                     // --- Send message to the additional member
@@ -436,7 +436,7 @@ namespace Contensive.Core.Controllers {
                             //
                             string EmailStatus = "";
                             string queryStringForLinkAppend = "";
-                            sendPerson(core, person, EmailFrom, "System Email confirmation from " + core.serverConfig.appConfig.domainList[0], ConfirmBody, false, true, EmailRecordID, "", false, ref EmailStatus, queryStringForLinkAppend );
+                            sendPerson(core, person, EmailFrom, "System Email confirmation from " + core.appConfig.domainList[0], ConfirmBody, false, true, EmailRecordID, "", false, ref EmailStatus, queryStringForLinkAppend );
                             if (isAdmin && (!string.IsNullOrEmpty(EmailStatus))) {
                                 returnString = "Administrator: There was a problem sending the confirmation email, " + EmailStatus;
                             }

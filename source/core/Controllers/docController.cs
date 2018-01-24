@@ -1410,7 +1410,7 @@ namespace Contensive.Core.Controllers {
                 //
                 FromAddress = core.siteProperties.getText("EmailPublishSubmitFrom", core.siteProperties.emailAdmin);
                 CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
-                Link = "/" + core.serverConfig.appConfig.adminRoute + "?af=" + AdminFormPublishing;
+                Link = "/" + core.appConfig.adminRoute + "?af=" + AdminFormPublishing;
                 Copy = Msg_AuthoringSubmittedNotification;
                 Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + genericController.encodeHTML(Link) + "\">" + core.webServer.requestDomain + "</a>");
                 Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName);

@@ -89,7 +89,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     collectionController.installCollectionFromRemoteRepo(core, CoreCollectionGuid, ref ErrorMessage, "", false, ref nonCriticalErrorList);
                     //
-                    string DomainNamePrimary = core.serverConfig.appConfig.domainList[0];
+                    string DomainNamePrimary = core.appConfig.domainList[0];
                     int Pos = genericController.vbInstr(1, DomainNamePrimary, ",");
                     if (Pos > 1) {
                         DomainNamePrimary = DomainNamePrimary.Left(Pos - 1);
@@ -144,7 +144,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                             // Move Archived pages from their current parent to their archive parent
                             //
                             bool NeedToClearCache = false;
-                            AppendClassLog(core, "Archive update for pages on [" + core.serverConfig.appConfig.name + "]");
+                            AppendClassLog(core, "Archive update for pages on [" + core.appConfig.name + "]");
                             SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + SQLNow + "))and(active<>0)";
                             CS = core.db.csOpenSql_rev("default", SQL);
                             while (core.db.csOk(CS)) {
@@ -444,7 +444,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 Yesterday = rightNow.AddDays(-1).Date;
                 MidnightTwoDaysAgo = rightNow.AddDays(-2).Date;
                 thirtyDaysAgo = rightNow.AddDays(-30).Date;
-                appName = core.serverConfig.appConfig.name;
+                appName = core.appConfig.name;
                 ArchiveDeleteNoCookie = genericController.encodeBoolean(core.siteProperties.getText("ArchiveDeleteNoCookie", "1"));
                 DataSourceType = core.db.getDataSourceType("default");
                 TimeoutSave = core.db.sqlCommandTimeout;
@@ -1388,7 +1388,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 SQLTablePeople = Models.Complex.cdefModel.getContentTablename(core, "People");
                 //
-                appName = core.serverConfig.appConfig.name;
+                appName = core.appConfig.name;
                 DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);
                 //
                 // Visits older then archive age
@@ -1454,7 +1454,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 SQLTablePeople = Models.Complex.cdefModel.getContentTablename(core, "People");
                 //
-                appName = core.serverConfig.appConfig.name;
+                appName = core.appConfig.name;
                 DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);
                 //
                 AppendClassLog(core, "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");

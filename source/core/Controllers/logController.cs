@@ -52,14 +52,20 @@ namespace Contensive.Core.Controllers {
         /// <remarks></remarks>
         public static void appendLog(coreController core, string LogLine, string LogFolder = "", string LogNamePrefix = "", bool allowErrorHandling = true) {
             try {
-                Console.WriteLine(LogLine);
+                if (core.serverConfig.enableLogging) {
+                    //
+                    // -- logging enabled, write log to consol
+                    Console.WriteLine(LogLine);
+                }
                 if (string.IsNullOrEmpty(LogFolder) || core.serverConfig.enableLogging) {
+                    //
+                    // -- logging enabled or trace log, append log
                     int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
                     string threadName = threadId.ToString("00000000");
                     string absContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine;
                     fileController fileSystem = null;
                     if (core.serverConfig != null) {
-                        if (core.serverConfig.appConfig != null) {
+                        if (core.appConfig != null) {
                             //
                             // -- use app log space
                             fileSystem = core.privateFiles;
@@ -73,12 +79,12 @@ namespace Contensive.Core.Controllers {
                     //
                     if (core.useMicrosoftTraceLogging) {
                         string logName;
-                        if (core.serverConfig.appConfig == null) {
+                        if (core.appConfig == null) {
                             // -- no app, log to server
                             logName = ("server/log/" + LogFolder).ToLower();
                         } else {
                             // -- use app log
-                            logName = (core.serverConfig.appConfig.name + "/log/" + LogFolder).ToLower();
+                            logName = (core.appConfig.name + "/log/" + LogFolder).ToLower();
                         }
                         if (!core.doc.logList.ContainsKey(logName)) {
                             string logPathFile = fileSystem.rootLocalPath + "logs\\" + LogFolder.ToLower() + "\\" + getDateString(DateTime.Now) + ".log";

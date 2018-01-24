@@ -13,6 +13,7 @@ using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using Contensive.Core.Models.Context;
 //
 namespace Contensive.Core.Controllers {
     public class taskRunnerController : IDisposable {
@@ -150,7 +151,7 @@ namespace Contensive.Core.Controllers {
                 string sql = null;
                 string AppName = null;
                 //
-                foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> kvp in cpClusterCore.serverConfig.apps) {
+                foreach (KeyValuePair<string, Models.Context.appConfigModel> kvp in cpClusterCore.serverConfig.apps) {
                     AppName = kvp.Value.name;
                     //
                     logController.appendLogTasks(cpClusterCore, "runTasks, appname=[" + AppName + "]");
@@ -158,7 +159,7 @@ namespace Contensive.Core.Controllers {
                     // query tasks that need to be run
                     //
                     using (CPClass cpSite = new CPClass(AppName)) {
-                        if ((cpSite.core.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK) && (cpSite.core.serverConfig.appConfig.appMode == Models.Context.serverConfigModel.appModeEnum.normal)) {
+                        if ((cpSite.core.appConfig.appStatus == appConfigModel.appStatusEnum.OK) && (cpSite.core.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
                             try {
                                 do {
                                     //

@@ -89,7 +89,7 @@ namespace Contensive.Core.Controllers {
                 //   if the is no CollectionDst for the CollectionSrc, add it and set okToUpdateDstFromSrc
                 // -------------------------------------------------------------------------------------------------
                 //
-                logController.appendLogInstall(core, "Application: " + core.serverConfig.appConfig.name + ", UpgradeCDef_AddSrcToDst");
+                logController.appendLogInstall(core, "Application: " + core.appConfig.name + ", UpgradeCDef_AddSrcToDst");
                 //
                 foreach (var srcKeyValuePair in srcCollection.cdef) {
                     srcCdef = srcKeyValuePair.Value;
@@ -1977,12 +1977,12 @@ namespace Contensive.Core.Controllers {
                                                             switch (resourceType.ToLower()) {
                                                                 case "www":
                                                                     wwwFileList = wwwFileList + "\r\n" + DstFilePath + filename;
-                                                                    logController.appendLogInstall(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.serverConfig.appConfig.appRootFilesPath + DstFilePath + "].");
-                                                                    //Call logcontroller.appendInstallLog(core, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & core.serverConfig.clusterPath & core.serverconfig.appConfig.appRootFilesPath & DstFilePath & "].")
+                                                                    logController.appendLogInstall(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.appRootFilesPath + DstFilePath + "].");
+                                                                    //Call logcontroller.appendInstallLog(core, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & core.serverConfig.clusterPath & core.appConfig.appRootFilesPath & DstFilePath & "].")
                                                                     core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, DstFilePath + filename, core.appRootFiles);
                                                                     if (genericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
-                                                                        logController.appendLogInstall(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping www file [" + core.serverConfig.appConfig.appRootFilesPath + DstFilePath + filename + "].");
-                                                                        //Call logcontroller.appendInstallLog(core, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & core.serverConfig.clusterPath & core.serverconfig.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
+                                                                        logController.appendLogInstall(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping www file [" + core.appConfig.appRootFilesPath + DstFilePath + filename + "].");
+                                                                        //Call logcontroller.appendInstallLog(core, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & core.serverConfig.clusterPath & core.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
                                                                         core.appRootFiles.UnzipFile(DstFilePath + filename);
                                                                     }
                                                                     break;
@@ -3840,7 +3840,7 @@ namespace Contensive.Core.Controllers {
         public static void installCollectionFromLocalRepo_BuildDbFromXmlData(coreController core, string XMLText, bool isNewBuild, bool isBaseCollection, ref List<string> nonCriticalErrorList) {
             try {
                 //
-                logController.appendLogInstall(core, "Application: " + core.serverConfig.appConfig.name);
+                logController.appendLogInstall(core, "Application: " + core.appConfig.name);
                 //
                 // ----- Import any CDef files, allowing for changes
                 miniCollectionModel miniCollectionToAdd = new miniCollectionModel();
@@ -3892,7 +3892,7 @@ namespace Contensive.Core.Controllers {
                 //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode FieldChildNode = null;
                 //
-                logController.appendLogInstall(core, "Application: " + core.serverConfig.appConfig.name + ", UpgradeCDef_LoadDataToCollection");
+                logController.appendLogInstall(core, "Application: " + core.appConfig.name + ", UpgradeCDef_LoadDataToCollection");
                 //
                 result = new miniCollectionModel();
                 //
@@ -3921,7 +3921,7 @@ namespace Contensive.Core.Controllers {
                         //hint = "get collection name"
                         Collectionname = GetXMLAttribute(core, Found, srcXmlDom.DocumentElement, "name", "");
                         if (string.IsNullOrEmpty(Collectionname)) {
-                            logController.appendLogInstall(core, "UpgradeCDef_LoadDataToCollection, Application: " + core.serverConfig.appConfig.name + ", Collection has no name");
+                            logController.appendLogInstall(core, "UpgradeCDef_LoadDataToCollection, Application: " + core.appConfig.name + ", Collection has no name");
                         } else {
                             //Call AppendClassLogFile(core.app.config.name,"UpgradeCDef_LoadDataToCollection", "UpgradeCDef_LoadDataToCollection, Application: " & core.app.appEnvironment.name & ", Collection: " & Collectionname)
                         }
@@ -3954,7 +3954,7 @@ namespace Contensive.Core.Controllers {
                                     ContentName = GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "name", "");
                                     contentNameLc = genericController.vbLCase(ContentName);
                                     if (string.IsNullOrEmpty(ContentName)) {
-                                        throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
+                                        throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
                                     } else {
                                         //
                                         // setup a cdef from the application collection to use as a default for missing attributes (for inherited cdef)
@@ -4389,7 +4389,7 @@ namespace Contensive.Core.Controllers {
                 string TableName = null;
                 bool Found = false;
                 //
-                logController.appendLogInstall(core, "Application: " + core.serverConfig.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
+                logController.appendLogInstall(core, "Application: " + core.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 logController.appendLogInstall(core, "CDef Load, stage 1: verify core sql tables");
@@ -4507,7 +4507,7 @@ namespace Contensive.Core.Controllers {
                             }
                             rs.Dispose();
                             if (fieldId == 0) {
-                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
+                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
                             } else {
                                 SQL = "select id from ccfieldhelp where fieldid=" + fieldId + " order by id";
                                 rs = core.db.executeQuery(SQL);
@@ -4583,7 +4583,7 @@ namespace Contensive.Core.Controllers {
                         //
                         bool addonInstallOk = installCollectionFromRemoteRepo(core, Guid, ref errorMessage, "", isNewBuild, ref nonCriticalErrorList);
                         if (!addonInstallOk) {
-                            throw (new ApplicationException("Failure to install addon collection from remote repository. Collection [" + Guid + "] was referenced in collection [" + Collection.name + "]")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                            throw (new ApplicationException("Failure to install addon collection from remote repository. Collection [" + Guid + "] was referenced in collection [" + Collection.name + "]")); //core.handleLegacyError3(core.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                         }
                     }
                 }

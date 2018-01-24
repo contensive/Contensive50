@@ -251,60 +251,60 @@ namespace Contensive.WindowsServices {
                             Content = Content + StatusLine(0, "");
                             Content = Content + StatusLine(0, "Applications");
 
-                            foreach (KeyValuePair<string, serverConfigModel.appConfigModel> kvp in cpCore.serverConfig.apps) {
+                            foreach (KeyValuePair<string, appConfigModel> kvp in cpCore.serverConfig.apps) {
                                 AppName = kvp.Value.name;
                                 cpApp = new CPClass(AppName);
-                                if (cpApp.core.serverConfig.appConfig.allowSiteMonitor) {
+                                if (cpApp.core.appConfig.allowSiteMonitor) {
 
 
                                     //hint = "Checking status for application [" & AppName & "]"
-                                    switch (cpApp.core.serverConfig.appConfig.appStatus) {
-                                        //Case serverConfigModel.appStatusEnum.errorConnectionObjectFailure
+                                    switch (cpApp.core.appConfig.appStatus) {
+                                        //Case appConfigModel.appStatusEnum.errorConnectionObjectFailure
                                         //    ReDim Preserve errors(ErrorCount)
                                         //    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection Object failure")
                                         //    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //    ErrorCount = ErrorCount + 1
-                                        //Case serverConfigModel.appStatusEnum.errorConnectionStringFailure
+                                        //Case appConfigModel.appStatusEnum.errorConnectionStringFailure
                                         //    ReDim Preserve errors(ErrorCount)
                                         //    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection String Failure")
                                         //    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //    ErrorCount = ErrorCount + 1
-                                        //Case serverConfigModel.appStatusEnum.errorDataSourceFailure
+                                        //Case appConfigModel.appStatusEnum.errorDataSourceFailure
                                         //    ReDim Preserve errors(ErrorCount)
                                         //    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Data Source Failure")
                                         //    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //    ErrorCount = ErrorCount + 1
-                                        //Case serverConfigModel.appStatusEnum.errorDbBad
+                                        //Case appConfigModel.appStatusEnum.errorDbBad
                                         //    ReDim Preserve errors(ErrorCount)
                                         //    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Bad Database")
                                         //    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //    ErrorCount = ErrorCount + 1
-                                        //Case serverConfigModel.appStatusEnum.errorDbNotFound
+                                        //Case appConfigModel.appStatusEnum.errorDbNotFound
                                         //    ReDim Preserve errors(ErrorCount)
                                         //    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Database Failure")
                                         //    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //    ErrorCount = ErrorCount + 1
-                                        //Case serverConfigModel.appStatusEnum.errorKernelFailure
+                                        //Case appConfigModel.appStatusEnum.errorKernelFailure
                                         //    ReDim Preserve errors(ErrorCount)
                                         //    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Kernel Failure")
                                         //    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //    ErrorCount = ErrorCount + 1
-                                        //Case serverConfigModel.appStatusEnum.errorLicenseFailure
+                                        //Case appConfigModel.appStatusEnum.errorLicenseFailure
                                         //    ReDim Preserve errors(ErrorCount)
                                         //    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned License Failure")
                                         //    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //    ErrorCount = ErrorCount + 1
-                                        //Case serverConfigModel.appStatusEnum.errorNoHostService
+                                        //Case appConfigModel.appStatusEnum.errorNoHostService
                                         //    ReDim Preserve errors(ErrorCount)
                                         //    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned ccServer Service is not running")
                                         //    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //    ErrorCount = ErrorCount + 1
-                                        //Case serverConfigModel.appStatusEnum.notFound
+                                        //Case appConfigModel.appStatusEnum.notFound
                                         //    ReDim Preserve errors(ErrorCount)
                                         //    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application not found")
                                         //    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //    ErrorCount = ErrorCount + 1
-                                        //Case serverConfigModel.appStatusEnum.notEnabled
+                                        //Case appConfigModel.appStatusEnum.notEnabled
                                         //    ReDim Preserve errors(ErrorCount)
                                         //    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application not running")
                                         //    Content = Content & StatusLine(2, errors(ErrorCount))
@@ -314,7 +314,7 @@ namespace Contensive.WindowsServices {
                                         //        '    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application starting")
                                         //        '    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //        '    ErrorCount = ErrorCount + 1
-                                        case serverConfigModel.appStatusEnum.OK:
+                                        case appConfigModel.appStatusEnum.OK:
                                             if (true) {
                                                 //
                                                 // access content server for this application

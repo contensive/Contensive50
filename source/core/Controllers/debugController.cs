@@ -29,7 +29,7 @@ namespace Contensive.Core.Controllers {
         //
         public static void testPoint(coreController core, string message) {
             //
-            if ((core != null) && (core.serverConfig != null) && (core.serverConfig.appConfig != null)) {
+            if ((core != null) && (core.serverConfig != null) && (core.appConfig != null)) {
                 bool debugging = core.doc.visitPropertyAllowDebugging;
                 bool logging = core.siteProperties.allowTestPointLogging;
                 double ElapsedTime = 0;
@@ -43,7 +43,7 @@ namespace Contensive.Core.Controllers {
                 if (logging) {
                     message = message.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
                     message = DateTime.Now.ToString("") + "\t" + (ElapsedTime).ToString("00.000") + "\t" + core.doc.sessionContext.visit.id + "\t" + message;
-                    logController.appendLog(core, message, "", "testPoints_" + core.serverConfig.appConfig.name);
+                    logController.appendLog(core, message, "", "testPoints_" + core.appConfig.name);
                 }
             }
         }

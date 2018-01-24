@@ -29,31 +29,17 @@ Public Class configurationClass
     '
     '====================================================================================================
     ''' <summary>
-    ''' Site settings come from the contensive json configuration file in c:\ProgramData\Contensive, unless overridden by aspx app settings
+    ''' Create serverConfig object from appConfig or webConfig. This is alternative to configuration with config.json file
     ''' </summary>
     ''' <returns></returns>
     Public Shared Function getServerConfig() As serverConfigModel
-        Dim serverConfig As serverConfigModel = Nothing
+        Dim serverConfig As New serverConfigModel()
         Try
-            serverConfig = New serverConfigModel
-            serverConfig.appConfig = New serverConfigModel.appConfigModel
-            '
             serverConfig.allowTaskRunnerService = False
             serverConfig.allowTaskSchedulerService = False
-            serverConfig.appConfig.name = getAppName()
-            serverConfig.appConfig.adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute")
-            serverConfig.appConfig.appRootFilesPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath")
-            serverConfig.appConfig.cdnFilesNetprefix = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
-            serverConfig.appConfig.cdnFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath")
-            serverConfig.appConfig.domainList.Add(ConfigurationManager.AppSettings("ContensivePrimaryDomain"))
-            serverConfig.appConfig.enabled = True
-            serverConfig.appConfig.privateFilesPath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
-            serverConfig.appConfig.privateKey = ConfigurationManager.AppSettings("ContensivePrivateKey")
-            serverConfig.apps.Add(serverConfig.appConfig.name, serverConfig.appConfig)
             serverConfig.cdnFilesRemoteEndpoint = ConfigurationManager.AppSettings("ContensiveCdnFilesRemoteEndpoint")
             serverConfig.defaultDataSourceAddress = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceAddress")
             serverConfig.defaultDataSourcePassword = ConfigurationManager.AppSettings("ContensiveDefaultDataSourcePassword")
-            'serverConfig.defaultDataSourceType = genericController.EncodeInteger(ConfigurationManager.AppSettings("ContensiveDefaultDataSourceType"))
             serverConfig.defaultDataSourceUsername = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceUsername")
             serverConfig.enableLocalMemoryCache = genericController.encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
             serverConfig.isLocalFileSystem = genericController.encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
@@ -62,6 +48,17 @@ Public Class configurationClass
             serverConfig.password = ConfigurationManager.AppSettings("ContensiveServerGroupPassword")
             serverConfig.programFilesPath = ""
             serverConfig.username = ConfigurationManager.AppSettings("ContensiveServerGroupUsername")
+            Dim appConfig As New appConfigModel
+            appConfig.name = getAppName()
+            appConfig.adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute")
+            appConfig.appRootFilesPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath")
+            appConfig.cdnFilesNetprefix = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
+            appConfig.cdnFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath")
+            appConfig.domainList.Add(ConfigurationManager.AppSettings("ContensivePrimaryDomain"))
+            appConfig.enabled = True
+            appConfig.privateFilesPath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
+            appConfig.privateKey = ConfigurationManager.AppSettings("ContensivePrivateKey")
+            serverConfig.apps.Add(appConfig.name.ToLower(), appConfig)
         Catch ex As Exception
             Logger.appendProgramDataLog(ex.ToString)
         End Try

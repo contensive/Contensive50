@@ -132,7 +132,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                     //
                     // ----- redirect back to the root
                     //
-                    addonManager = core.webServer.redirect("/" + core.serverConfig.appConfig.adminRoute, "Addon Manager, Cancel Button Pressed");
+                    addonManager = core.webServer.redirect("/" + core.appConfig.adminRoute, "Addon Manager, Cancel Button Pressed");
                 } else {
                     if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
                         //
@@ -549,7 +549,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                         // --------------------------------------------------------------------------------
                         //
                         if ((InstalledCollectionIDList.Count > 0) && (!(core.doc.debug_iUserError != ""))) {
-                            return core.webServer.redirect("/" + core.serverConfig.appConfig.adminRoute + "?helpcollectionid=" + InstalledCollectionIDList[0].ToString(), "Redirecting to help page after collection installation");
+                            return core.webServer.redirect("/" + core.appConfig.adminRoute + "?helpcollectionid=" + InstalledCollectionIDList[0].ToString(), "Redirecting to help page after collection installation");
                         }
                         //
                         // --------------------------------------------------------------------------------
@@ -975,7 +975,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
         //
         //
         private void HandleClassAppendLog(string MethodName, string Context) {
-            logController.appendLogWithLegacyRow(core, core.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", false, true, core.webServer.requestUrl, "", "");
+            logController.appendLogWithLegacyRow(core, core.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", false, true, core.webServer.requestUrl, "", "");
 
         }
         //

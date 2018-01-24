@@ -1395,7 +1395,7 @@ namespace Contensive.Core.Controllers {
                     // ----- do anonymous access blocking
                     //
                     if (!core.doc.sessionContext.isAuthenticated) {
-                        if ((core.webServer.requestPath != "/") & genericController.vbInstr(1, "/" + core.serverConfig.appConfig.adminRoute, core.webServer.requestPath, 1) != 0) {
+                        if ((core.webServer.requestPath != "/") & genericController.vbInstr(1, "/" + core.appConfig.adminRoute, core.webServer.requestPath, 1) != 0) {
                             //
                             // admin page is excluded from custom blocking
                             //

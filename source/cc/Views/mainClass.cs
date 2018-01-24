@@ -22,6 +22,11 @@ namespace Contensive.CLI {
                     // -- create an instance of cp to execute commands
                     using (Core.CPClass cp = new Core.CPClass()) {
                         //
+                        // -- if logging enabled, tell user the output includes log append
+                        if (cp.core.serverConfig.enableLogging) {
+                            Console.WriteLine("Logging enabled, all internal logging will be included.");
+                        }
+                        //
                         // start by creating an application event log entry - because you must be admin to make this entry so making it here will create the "source"
                         string eventLogSource = "Contensive";
                         string eventLogLog = "Application";
@@ -84,7 +89,7 @@ namespace Contensive.CLI {
                                             Console.WriteLine("Collection was not found on the distribution server");
                                         } else {
                                             if (string.IsNullOrEmpty(appName)) {
-                                                foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                                foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
                                                     using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(kvp.Key)) {
                                                         string returnErrorMessage = "";
                                                         collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false);
@@ -117,7 +122,7 @@ namespace Contensive.CLI {
                                     } else {
                                         //
                                         // -- housekeep all apps
-                                        foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                        foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
                                             String upgradeAppName = kvp.Key;
                                             using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(upgradeAppName)) {
                                                 cpApp.Doc.SetProperty("force", "1");
@@ -178,8 +183,8 @@ namespace Contensive.CLI {
                                         Console.WriteLine("Logging:");
                                         Console.WriteLine("    enableLogging: " + cp.core.serverConfig.enableLogging.ToString());
                                         Console.WriteLine("Applications: " + cp.core.serverConfig.apps.Count);
-                                        foreach (KeyValuePair<string, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
-                                            serverConfigModel.appConfigModel app = kvp.Value;
+                                        foreach (KeyValuePair<string, appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                            appConfigModel app = kvp.Value;
                                             Console.WriteLine("    name: " + app.name);
                                             Console.WriteLine("        enabled: " + app.enabled);
                                             Console.WriteLine("        adminRoute: " + app.adminRoute);
@@ -205,7 +210,7 @@ namespace Contensive.CLI {
                                     } else {
                                         //
                                         // -- upgrade all apps
-                                        foreach (KeyValuePair<String, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                        foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
                                             using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(kvp.Key)) {
                                                 Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false);
                                             }

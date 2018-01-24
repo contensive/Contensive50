@@ -109,7 +109,7 @@ namespace Contensive.Core.Controllers {
                             WorkingLinkAlias = "/" + WorkingLinkAlias;
                         }
                         //
-                        if (genericController.vbLCase(WorkingLinkAlias) == genericController.vbLCase("/" + core.serverConfig.appConfig.name)) {
+                        if (genericController.vbLCase(WorkingLinkAlias) == genericController.vbLCase("/" + core.appConfig.name)) {
                             //
                             // This alias points to the cclib folder
                             //
@@ -127,8 +127,8 @@ namespace Contensive.Core.Controllers {
                                     + "The Link Alias being created (" + WorkingLinkAlias + ") can not be used because there is a virtual directory in your website directory that already uses this name."
                                     + " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page.";
                             }
-                        } else if (core.appRootFiles.pathExists(core.serverConfig.appConfig.appRootFilesPath + "\\" + WorkingLinkAlias.Substring(1))) {
-                            //ElseIf appRootFiles.pathExists(serverConfig.clusterPath & serverconfig.appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                        } else if (core.appRootFiles.pathExists(core.appConfig.appRootFilesPath + "\\" + WorkingLinkAlias.Substring(1))) {
+                            //ElseIf appRootFiles.pathExists(serverConfig.clusterPath & appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
                             //
                             // This alias points to a different link, call it an error
                             //

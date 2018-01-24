@@ -15,6 +15,7 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
 using Microsoft.Web.Administration;
+using Contensive.Core.Models.Context;
 //
 namespace Contensive.Core.Controllers {
     /// <summary>
@@ -285,7 +286,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //--------------------------------------------------------------------------
                 //
-                if (core.serverConfig.appConfig.appStatus != Models.Context.serverConfigModel.appStatusEnum.OK) {
+                if (core.appConfig.appStatus != appConfigModel.appStatusEnum.OK) {
                     //
                     // did not initialize correctly
                     //
@@ -369,7 +370,7 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     // verify app config domainlist is in the domainlist cache
-                    foreach (string domain in core.serverConfig.appConfig.domainList) {
+                    foreach (string domain in core.appConfig.domainList) {
                         if (!core.domainDictionary.ContainsKey(domain.ToLower())) {
                             var newDomain = domainModel.add(core);
                             newDomain.name = domain;
@@ -439,7 +440,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // normal domain, leave it
                         //
-                    } else if (genericController.vbInstr(1, requestPathPage, "/" + core.serverConfig.appConfig.adminRoute, 1) != 0) {
+                    } else if (genericController.vbInstr(1, requestPathPage, "/" + core.appConfig.adminRoute, 1) != 0) {
                         //
                         // forwarding does not work in the admin site
                         //
@@ -473,7 +474,7 @@ namespace Contensive.Core.Controllers {
                         response_NoFollow = true;
                     }
                     //
-                    requestVirtualFilePath = "/" + core.serverConfig.appConfig.name;
+                    requestVirtualFilePath = "/" + core.appConfig.name;
                     //
                     requestContentWatchPrefix = requestProtocol + requestDomain + requestAppRootPath;
                     requestContentWatchPrefix = requestContentWatchPrefix.Left( requestContentWatchPrefix.Length - 1);
@@ -973,9 +974,9 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     // -- verify the cdn virtual directory (if configured)
-                    string cdnFilesPrefix = core.serverConfig.appConfig.cdnFilesNetprefix;
+                    string cdnFilesPrefix = core.appConfig.cdnFilesNetprefix;
                     if (cdnFilesPrefix.IndexOf("://") < 0) {
-                        verifyWebsite_VirtualDirectory(core, site, appName, cdnFilesPrefix, core.serverConfig.appConfig.cdnFilesPath);
+                        verifyWebsite_VirtualDirectory(core, site, appName, cdnFilesPrefix, core.appConfig.cdnFilesPath);
                     }
                     //
                     // -- commit any changes

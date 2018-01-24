@@ -13,6 +13,7 @@ using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using Contensive.Core.Models.Context;
 //
 namespace Contensive.Core.Controllers {
     public class taskSchedulerController : IDisposable {
@@ -125,14 +126,14 @@ namespace Contensive.Core.Controllers {
             try {
                 //
                 // -- run tasks for each app
-                foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> appKvp in coreServer.serverConfig.apps) {
+                foreach (KeyValuePair<string, Models.Context.appConfigModel> appKvp in coreServer.serverConfig.apps) {
                     logController.appendLogTasks(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
                     using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
                         coreController coreApp = cpApp.core;
-                        if (!(coreApp.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
+                        if (!(coreApp.appConfig.appStatus == appConfigModel.appStatusEnum.OK)) {
                             //
                             logController.appendLogTasks(coreServer, "scheduleTasks, app status not ok");
-                        } else if (!(coreApp.serverConfig.appConfig.appMode == Models.Context.serverConfigModel.appModeEnum.normal)) {
+                        } else if (!(coreApp.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
                             //
                             logController.appendLogTasks(coreServer, "scheduleTasks, app mode not normal");
                         } else {

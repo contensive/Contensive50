@@ -11,19 +11,46 @@ using System.Diagnostics;
 using System.Linq;
 //
 namespace Contensive.Core.Controllers {
-    // todo - this is not 'core'. It is a 
+    //
+    //===================================================================================================
+    /// <summary>
+    /// central object, passed for dependancy injection, provides access to persistent objects (document persistence/scope)
+    /// </summary>
     public class coreController : IDisposable {
         //
-        //======================================================================
-        // -- provides object dependancy injection
-        //
+        //===================================================================================================
+        /// <summary>
+        /// a reference to the cp api interface that parents this object. CP is the api to addons, based on the abstract classes exposed to developers.
+        /// </summary>
         internal CPClass cp_forAddonExecutionOnly { get; set; }
+        //
+        //===================================================================================================
         // todo - take appConfig out of serverConfig. saved server structure should not include it.
-        public Models.Context.serverConfigModel serverConfig { get; set; }
+        /// <summary>
+        /// server configuration - this is the node's configuration, including everything needed to attach to resources required (db,cache,filesystem,etc)
+        /// and the configuration of all applications within this group of servers. This file is shared between all servers in the group.
+        /// </summary>
+        public serverConfigModel serverConfig { get; set; }
+        //
+        //===================================================================================================
+        // todo - this should be a pointer into the serverConfig
+        /// <summary>
+        /// The configuration for this app, a copy of the data in the serverconfig file
+        /// </summary>
+        public appConfigModel appConfig { get; set; }
+        //
+        //===================================================================================================
         // todo move persistent objects to .doc (keeping of document scope persistence)
+        /// <summary>
+        /// rnd resource used during this scope
+        /// </summary>
         public Random random = new Random();
         //
-        // option switch
+        //===================================================================================================
+        // todo move to doc persistence object (doccontroller)
+        /// <summary>
+        /// when enable, use MS trace logging. An attempt to stop file append permission issues
+        /// </summary>
         public bool useMicrosoftTraceLogging = false;
         //
         //===================================================================================================
@@ -200,7 +227,7 @@ namespace Contensive.Core.Controllers {
         public securityController security {
             get {
                 if (_security == null) {
-                    _security = new securityController(this, serverConfig.appConfig.privateKey);
+                    _security = new securityController(this, appConfig.privateKey);
                 }
                 return _security;
             }
@@ -211,16 +238,16 @@ namespace Contensive.Core.Controllers {
         public fileController appRootFiles {
             get {
                 if (_appRootFiles == null) {
-                    if (serverConfig.appConfig != null) {
-                        if (serverConfig.appConfig.enabled) {
+                    if (appConfig != null) {
+                        if (appConfig.enabled) {
                             if (serverConfig.isLocalFileSystem) {
                                 //
                                 // local server -- everything is ephemeral
-                                _appRootFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(serverConfig.appConfig.appRootFilesPath));
+                                _appRootFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(appConfig.appRootFilesPath));
                             } else {
                                 //
                                 // cluster mode - each filesystem is configured accordingly
-                                _appRootFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.activeSync, fileController.normalizePath(serverConfig.appConfig.appRootFilesPath));
+                                _appRootFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.activeSync, fileController.normalizePath(appConfig.appRootFilesPath));
                             }
                         }
                     }
@@ -236,7 +263,7 @@ namespace Contensive.Core.Controllers {
                 if (_tmpFiles == null) {
                     //
                     // local server -- everything is ephemeral
-                    _tmpFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(serverConfig.appConfig.tempFilesPath));
+                    _tmpFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(appConfig.tempFilesPath));
                 }
                 return _tmpFiles;
             }
@@ -247,16 +274,16 @@ namespace Contensive.Core.Controllers {
         public fileController privateFiles {
             get {
                 if (_privateFiles == null) {
-                    if (serverConfig.appConfig != null) {
-                        if (serverConfig.appConfig.enabled) {
+                    if (appConfig != null) {
+                        if (appConfig.enabled) {
                             if (serverConfig.isLocalFileSystem) {
                                 //
                                 // local server -- everything is ephemeral
-                                _privateFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(serverConfig.appConfig.privateFilesPath));
+                                _privateFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(appConfig.privateFilesPath));
                             } else {
                                 //
                                 // cluster mode - each filesystem is configured accordingly
-                                _privateFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.passiveSync, fileController.normalizePath(serverConfig.appConfig.privateFilesPath));
+                                _privateFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.passiveSync, fileController.normalizePath(appConfig.privateFilesPath));
                             }
                         }
                     }
@@ -297,16 +324,16 @@ namespace Contensive.Core.Controllers {
         public fileController cdnFiles {
             get {
                 if (_cdnFiles == null) {
-                    if (serverConfig.appConfig != null) {
-                        if (serverConfig.appConfig.enabled) {
+                    if (appConfig != null) {
+                        if (appConfig.enabled) {
                             if (serverConfig.isLocalFileSystem) {
                                 //
                                 // local server -- everything is ephemeral
-                                _cdnFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(serverConfig.appConfig.cdnFilesPath));
+                                _cdnFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(appConfig.cdnFilesPath));
                             } else {
                                 //
                                 // cluster mode - each filesystem is configured accordingly
-                                _cdnFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.passiveSync, fileController.normalizePath(serverConfig.appConfig.cdnFilesPath));
+                                _cdnFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.passiveSync, fileController.normalizePath(appConfig.cdnFilesPath));
                             }
                         }
                     }
@@ -351,7 +378,8 @@ namespace Contensive.Core.Controllers {
             set {
                 _domains = value;
             }
-        } private domainModel _domains = null;
+        }
+        private domainModel _domains = null;
         //
         public Dictionary<string, domainModel> domainDictionary;
         //
@@ -389,6 +417,10 @@ namespace Contensive.Core.Controllers {
         private Controllers.cacheController _cache = null;
         //
         //===================================================================================================
+        // todo - convert to dictionary, one entry per datasource, remove datasource selection from all methods
+        /// <summary>
+        /// controller for the application's database
+        /// </summary>
         public dbController db {
             get {
                 if (_db == null) {
@@ -400,6 +432,9 @@ namespace Contensive.Core.Controllers {
         private dbController _db;
         //
         //===================================================================================================
+        /// <summary>
+        /// db access to the server to add and query catalogs
+        /// </summary>
         public dbServerController dbServer {
             get {
                 if (_dbEngine == null) {
@@ -434,15 +469,37 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public coreController(CPClass cp, Models.Context.serverConfigModel serverConfig) : base() {
+        public coreController(CPClass cp, string applicationName) : base() {
             this.cp_forAddonExecutionOnly = cp;
+            //
+            // -- create default auth objects for non-user methods, or until auth is available
+            doc.sessionContext = new sessionContextModel(this);
+            //
+            serverConfig = serverConfigModel.getObject(this);
+            serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
+            appConfig = appConfigModel.getObject(this, serverConfig, applicationName);
+            if (appConfig != null) {
+                webServer.iisContext = null;
+                constructorInitialize(false);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// coreClass constructor for app, non-Internet use. coreClass is the primary object internally, created by cp.
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <remarks></remarks>
+        public coreController(CPClass cp, string applicationName, serverConfigModel serverConfig) : base() {
+            cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
             doc.sessionContext = new sessionContextModel(this);
             //
             this.serverConfig = serverConfig;
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
-            this.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.appStatusEnum.OK;
+            appConfig = appConfigModel.getObject(this, serverConfig, applicationName);
+            appConfig.appStatus = appConfigModel.appStatusEnum.OK;
             webServer.iisContext = null;
             constructorInitialize(false);
         }
@@ -453,7 +510,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public coreController(CPClass cp, Models.Context.serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
+        public coreController(CPClass cp, string applicationName, serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -461,47 +518,25 @@ namespace Contensive.Core.Controllers {
             //
             this.serverConfig = serverConfig;
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
-            this.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.appStatusEnum.OK;
+            appConfig = appConfigModel.getObject(this, serverConfig, applicationName);
+            this.appConfig.appStatus = appConfigModel.appStatusEnum.OK;
             webServer.initWebContext(httpContext);
             constructorInitialize(true);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// coreClass constructor for app, non-Internet use. coreClass is the primary object internally, created by cp.
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <remarks></remarks>
-        public coreController(CPClass cp, string applicationName) : base() {
-            this.cp_forAddonExecutionOnly = cp;
-            //
-            // -- create default auth objects for non-user methods, or until auth is available
-            doc.sessionContext = new sessionContextModel(this);
-            //
-            serverConfig = Models.Context.serverConfigModel.getObject(this, applicationName);
-            serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
-            if (serverConfig.appConfig != null) {
-                webServer.iisContext = null;
-                constructorInitialize(false);
-            }
         }
         //====================================================================================================
         /// <summary>
         /// coreClass constructor for a web request/response environment. coreClass is the primary object internally, created by cp.
         /// </summary>
-        /// <param name="cp"></param>
-        /// <remarks>
-        /// All iis httpContext is loaded here and the context should not be used after this method.
-        /// </remarks>
         public coreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
             doc.sessionContext = new sessionContextModel(this);
             //
-            serverConfig = Models.Context.serverConfigModel.getObject(this, applicationName);
+            serverConfig = serverConfigModel.getObject(this);
             serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
-            if (serverConfig.appConfig != null) {
+            appConfig = appConfigModel.getObject(this, serverConfig, applicationName);
+            if (appConfig != null) {
                 webServer.initWebContext(httpContext);
                 constructorInitialize(true);
             }
@@ -525,7 +560,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- test point message
                 debugController.testPoint(this, "executeRoute enter");
-                if (serverConfig.appConfig != null) {
+                if (appConfig != null) {
                     //
                     // -- execute intercept methods first, like login, that run before the route that returns the page
                     // -- intercept routes should be addons alos
@@ -714,9 +749,9 @@ namespace Contensive.Core.Controllers {
                             case HardCodedPageExportAscii:
                                 //
                                 return (new Addons.Primitives.processExportAsciiMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
-                            //case HardCodedPagePayPalConfirm:
-                            //    //
-                            //    return (new Addons.Primitives.processPayPalConformMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                //case HardCodedPagePayPalConfirm:
+                                //    //
+                                //    return (new Addons.Primitives.processPayPalConformMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                         }
                     }
                     //
@@ -741,29 +776,39 @@ namespace Contensive.Core.Controllers {
                     if (routeFound) {
                         CPSiteBaseClass.routeClass route = routeDictionary[routeTest];
                         switch (route.routeType) {
-                            case CPSiteBaseClass.routeTypeEnum.admin:
-                                //
-                                // -- admin site
-                                //
-                                return this.addon.execute(addonModel.create(this, addonGuidAdminSite), new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
-                            case CPSiteBaseClass.routeTypeEnum.remoteMethod:
-                                //
-                                // -- remote method
-                                addonModel addon = addonCache.getAddonById(route.remoteMethodAddonId);
-                                if (addon != null) {
-                                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                                        addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson,
-                                        cssContainerClass = "",
-                                        cssContainerId = "",
-                                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                            contentName = docProperties.getText("hostcontentname"),
-                                            fieldName = "",
-                                            recordId = docProperties.getInteger("HostRecordID")
-                                        },
-                                        personalizationAuthenticated = doc.sessionContext.isAuthenticated,
-                                        personalizationPeopleId = doc.sessionContext.user.id
-                                    };
-                                    return this.addon.execute(addon, executeContext);
+                            case CPSiteBaseClass.routeTypeEnum.admin: {
+                                    //
+                                    // -- admin site
+                                    addonModel addon = addonModel.create(this, addonGuidAdminSite);
+                                    if (addon == null) {
+                                        handleException(new ApplicationException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
+                                        return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -u )";
+                                    } else {
+                                        return this.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
+                                    }
+                                }
+                            case CPSiteBaseClass.routeTypeEnum.remoteMethod: {
+                                    //
+                                    // -- remote method
+                                    addonModel addon = addonCache.getAddonById(route.remoteMethodAddonId);
+                                    if (addon == null) {
+                                        handleException(new ApplicationException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
+                                        return "";
+                                    } else { 
+                                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                            addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson,
+                                            cssContainerClass = "",
+                                            cssContainerId = "",
+                                            hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                                contentName = docProperties.getText("hostcontentname"),
+                                                fieldName = "",
+                                                recordId = docProperties.getInteger("HostRecordID")
+                                            },
+                                            personalizationAuthenticated = doc.sessionContext.isAuthenticated,
+                                            personalizationPeopleId = doc.sessionContext.user.id
+                                        };
+                                        return this.addon.execute(addon, executeContext);
+                                    }
                                 }
                                 break;
                             case CPSiteBaseClass.routeTypeEnum.linkAlias:
@@ -1134,11 +1179,11 @@ namespace Contensive.Core.Controllers {
                 doc.visitPropertyAllowDebugging = true;
                 //
                 // -- attempt auth load
-                if (serverConfig.appConfig == null) {
+                if (appConfig == null) {
                     //
                     // -- server mode, there is no application
                     doc.sessionContext = Models.Context.sessionContextModel.create(this, false);
-                } else if ((serverConfig.appConfig.appMode != Models.Context.serverConfigModel.appModeEnum.normal) | (serverConfig.appConfig.appStatus != Models.Context.serverConfigModel.appStatusEnum.OK)) {
+                } else if ((appConfig.appMode != appConfigModel.appModeEnum.normal) | (appConfig.appStatus != appConfigModel.appStatusEnum.OK)) {
                     //
                     // -- application is not ready, might be error, or in maintainence mode
                     doc.sessionContext = Models.Context.sessionContextModel.create(this, false);
@@ -1234,8 +1279,8 @@ namespace Contensive.Core.Controllers {
                     // content server object is valid
                     //
                     if (serverConfig != null) {
-                        if (serverConfig.appConfig != null) {
-                            if ((serverConfig.appConfig.appMode == serverConfigModel.appModeEnum.normal) && (serverConfig.appConfig.appStatus == serverConfigModel.appStatusEnum.OK)) {
+                        if (appConfig != null) {
+                            if ((appConfig.appMode == appConfigModel.appModeEnum.normal) && (appConfig.appStatus == appConfigModel.appStatusEnum.OK)) {
                                 if (siteProperties.allowVisitTracking) {
                                     //
                                     // If visit tracking, save the viewing record

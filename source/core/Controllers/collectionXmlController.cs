@@ -140,7 +140,7 @@ namespace Contensive.Core.Controllers {
                 int CFieldPtr = 0;
                 string appName;
                 //
-                appName = core.serverConfig.appConfig.name;
+                appName = core.appConfig.name;
                 iContentName = ContentName;
                 if (!string.IsNullOrEmpty(iContentName)) {
                     SQL = "select id from cccontent where name=" + core.db.encodeSQLText(iContentName);
@@ -632,7 +632,7 @@ namespace Contensive.Core.Controllers {
             string result = "";
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                string appName = core.serverConfig.appConfig.name;
+                string appName = core.appConfig.name;
                 string SQL  = ""
                     + " select D.name as DataSourceName,T.name as TableName"
                     + " from cctables T left join ccDataSources d on D.ID=T.DataSourceID"
@@ -713,7 +713,7 @@ namespace Contensive.Core.Controllers {
         private string GetXMLContentDefinition_AdminMenus() {
             string s = "";
             try {
-                string appName = core.serverConfig.appConfig.name;
+                string appName = core.appConfig.name;
                 s = s + GetXMLContentDefinition_AdminMenus_MenuEntries();
                 s = s + GetXMLContentDefinition_AdminMenus_NavigatorEntries();
             } catch( Exception ex ) {
@@ -744,7 +744,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // ****************************** if cdef not loaded, this fails
                 //
-                appName = core.serverConfig.appConfig.name;
+                appName = core.appConfig.name;
                 MenuContentID = core.db.getRecordID("Content", cnNavigatorEntries);
                 dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (dt.Rows.Count > 0) {
@@ -791,7 +791,7 @@ namespace Contensive.Core.Controllers {
             string result = "";
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                string appName = core.serverConfig.appConfig.name;
+                string appName = core.appConfig.name;
                 int MenuContentID = core.db.getRecordID("Content", cnNavigatorEntries);
                 DataTable rs = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (isDataTableOk(rs)) {
@@ -831,7 +831,7 @@ namespace Contensive.Core.Controllers {
         //        DataTable rs = null;
         //        string appName;
         //        //
-        //        appName = core.serverConfig.appConfig.name;
+        //        appName = core.appConfig.name;
         //        rs = core.db.executeQuery("select * from ccAggregateFunctions");
         //        if (isDataTableOk(rs)) {
         //            if (true) {
@@ -872,7 +872,7 @@ namespace Contensive.Core.Controllers {
                 DataTable dt = null;
                 string appName;
                 //
-                appName = core.serverConfig.appConfig.name;
+                appName = core.appConfig.name;
                 if (RecordID != 0 & !string.IsNullOrEmpty(TableName)) {
                     dt = core.db.executeQuery("select Name from " + TableName + " where ID=" + RecordID);
                     if (dt.Rows.Count > 0) {
@@ -909,7 +909,7 @@ namespace Contensive.Core.Controllers {
                 string ParentSpace = "";
                 string appName;
                 //
-                appName = core.serverConfig.appConfig.name;
+                appName = core.appConfig.name;
                 if (RecordID != 0) {
                     if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + RecordID + ",", 1) != 0) {
                         logController.appendLog(core, "getMenuNameSpace, Circular reference found in UsedIDString [" + UsedIDString + "] getting ccMenuEntries namespace for recordid [" + RecordID + "]");

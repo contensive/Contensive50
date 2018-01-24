@@ -56,7 +56,7 @@ namespace Contensive.Core {
         //
         public override string Name {
             get {
-                return core.serverConfig.appConfig.name;
+                return core.appConfig.name;
             }
         }
         //
@@ -176,8 +176,8 @@ namespace Contensive.Core {
             get {
                 string tempDomainPrimary = null;
                 tempDomainPrimary = "";
-                if (core.serverConfig.appConfig.domainList.Count > 0) {
-                    tempDomainPrimary = core.serverConfig.appConfig.domainList[0];
+                if (core.appConfig.domainList.Count > 0) {
+                    tempDomainPrimary = core.appConfig.domainList[0];
                 }
                 return tempDomainPrimary;
             }
@@ -195,7 +195,7 @@ namespace Contensive.Core {
         //
         public override string DomainList {
             get {
-                return string.Join(",", core.serverConfig.appConfig.domainList);
+                return string.Join(",", core.appConfig.domainList);
             }
         }
         //
@@ -203,7 +203,7 @@ namespace Contensive.Core {
         //
         public override string FilePath {
             get {
-                return core.serverConfig.appConfig.cdnFilesNetprefix;
+                return core.appConfig.cdnFilesNetprefix;
             }
         }
         //
@@ -219,7 +219,7 @@ namespace Contensive.Core {
         //
         public override string VirtualPath {
             get {
-                return "/" + core.serverConfig.appConfig.name;
+                return "/" + core.appConfig.name;
             }
         }
         //

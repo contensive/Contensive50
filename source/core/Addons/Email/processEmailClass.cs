@@ -83,7 +83,7 @@ namespace Contensive.Core.Addons.Email {
                 string EmailFrom = null;
                 //
                 SQLDateNow = core.db.encodeSQLDate(DateTime.Now);
-                PrimaryLink = "http://" + core.serverConfig.appConfig.domainList[0];
+                PrimaryLink = "http://" + core.appConfig.domainList[0];
                 //
                 // Open the email records
                 //
@@ -218,7 +218,7 @@ namespace Contensive.Core.Addons.Email {
                 core.handleException(ex);
             }
             //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
                                                                       //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
             //Microsoft.VisualBasic.Information.Err().Clear();
         }
@@ -437,7 +437,7 @@ namespace Contensive.Core.Addons.Email {
                 core.handleException(ex);
             }
             //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
                                                                       //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
             //Microsoft.VisualBasic.Information.Err().Clear();
         }
@@ -640,7 +640,7 @@ namespace Contensive.Core.Addons.Email {
         //====================================================================================================
         //
         private string GetPrimaryDomainName(coreController core) {
-            return core.serverConfig.appConfig.domainList[0];
+            return core.appConfig.domainList[0];
         }
         //
         //====================================================================================================
@@ -660,7 +660,7 @@ namespace Contensive.Core.Addons.Email {
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
-                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
+                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
             }
             return tempGetEmailTemplate;
         }

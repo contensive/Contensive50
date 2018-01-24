@@ -523,7 +523,7 @@ namespace Contensive.Core.Controllers {
         /// Encode a string to be memCacheD compatible, removing 0x00-0x20 and space
         /// </summary>
         private string getWrapperKey(string key) {
-            string result = core.serverConfig.appConfig.name + "-" + core.codeVersion() + "-" + key;
+            string result = core.appConfig.name + "-" + core.codeVersion() + "-" + key;
             result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
             return result;
         }

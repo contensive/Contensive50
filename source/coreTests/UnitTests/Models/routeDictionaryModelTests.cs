@@ -24,7 +24,7 @@ namespace Contensive.Core.Tests.UnitTests.Models {
                 var routes = routeDictionaryModel.create(cp.core);
                 // assert only one route, matching the default admin route
                 Assert.AreEqual(1, routes.Count);
-                Assert.AreEqual(genericController.normalizeRoute(cp.core.serverConfig.appConfig.adminRoute), routes.First().Key);
+                Assert.AreEqual(genericController.normalizeRoute(cp.core.appConfig.adminRoute), routes.First().Key);
             }
         }
 

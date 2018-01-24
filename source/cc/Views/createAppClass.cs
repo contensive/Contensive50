@@ -39,7 +39,7 @@ namespace  Contensive.CLI {
                     //
                     // -- create app
                     Console.Write("\n\nCreate application within the server group [" + cp.core.serverConfig.name + "].");
-                    serverConfigModel.appConfigModel appConfig = new serverConfigModel.appConfigModel();
+                    appConfigModel appConfig = new appConfigModel();
                     //
                     // -- app name
                     bool appNameOk = false;
@@ -194,10 +194,11 @@ namespace  Contensive.CLI {
 
                     //
                     // -- save the app configuration and reload the server using this app
-                    appConfig.appStatus = serverConfigModel.appStatusEnum.building;
+                    appConfig.appStatus = appConfigModel.appStatusEnum.building;
                     cp.core.serverConfig.apps.Add(appName, appConfig);
                     cp.core.serverConfig.saveObject(cp.core);
-                    cp.core.serverConfig = serverConfigModel.getObject(cp.core, appName);
+                    cp.core.serverConfig = serverConfigModel.getObject(cp.core);
+                    cp.core.appConfig = appConfigModel.getObject(cp.core, cp.core.serverConfig, appName);
                     // 
                     // update local host file
                     //
@@ -233,11 +234,11 @@ namespace  Contensive.CLI {
                 //
                 using (CPClass cp = new CPClass(appName))
                 {
-                    Core.Controllers.iisController.verifySite(cp.core,appName, domainName, cp.core.serverConfig.appConfig.appRootFilesPath, iisDefaultDoc);
+                    Core.Controllers.iisController.verifySite(cp.core,appName, domainName, cp.core.appConfig.appRootFilesPath, iisDefaultDoc);
                     Core.Controllers.appBuilderController.upgrade(cp.core,true);
                     //
                     // -- set the application back to normal mode
-                    cp.core.serverConfig.apps[appName].appMode = serverConfigModel.appModeEnum.normal;
+                    cp.core.serverConfig.apps[appName].appMode = appConfigModel.appModeEnum.normal;
                     cp.core.serverConfig.saveObject(cp.core);
                     cp.core.siteProperties.setProperty(constants.siteproperty_serverPageDefault_name, iisDefaultDoc);
                 }

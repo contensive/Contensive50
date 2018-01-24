@@ -206,6 +206,7 @@
     <Compile Include="Controllers\_blankStaticController.cs" />
     <Compile Include="Extensions\extensionMethodsClass.cs" />
     <Compile Include="Extensions\webClientExtensionClass.cs" />
+    <Compile Include="Models\Context\appConfigModel.cs" />
     <Compile Include="Models\DbModels\emailQueueModel.cs" />
     <Compile Include="Models\DbModels\conditionalEmailModel.cs" />
     <Compile Include="Models\DbModels\groupEmailModel.cs" />

@@ -3768,7 +3768,7 @@ namespace Contensive.Core.Addons.Tools {
                 } else {
                     //
                     // Restart
-                    logController.appendLogWithLegacyRow(core, core.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " + core.doc.sessionContext.user.name + " (" + core.doc.sessionContext.user.id + ") restarted using the Restart tool", false, true, core.webServer.requestUrl, "", "");
+                    logController.appendLogWithLegacyRow(core, core.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " + core.doc.sessionContext.user.name + " (" + core.doc.sessionContext.user.id + ") restarted using the Restart tool", false, true, core.webServer.requestUrl, "", "");
                     core.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
                     //
@@ -4248,7 +4248,7 @@ namespace Contensive.Core.Addons.Tools {
                         }
                         FindText = core.docProperties.getText("FindText");
                         ReplaceText = core.docProperties.getText("ReplaceText");
-                        QS = "app=" + encodeNvaArgument(core.serverConfig.appConfig.name) + "&FindText=" + encodeNvaArgument(FindText) + "&ReplaceText=" + encodeNvaArgument(ReplaceText) + "&CDefNameList=" + encodeNvaArgument(CDefList);
+                        QS = "app=" + encodeNvaArgument(core.appConfig.name) + "&FindText=" + encodeNvaArgument(FindText) + "&ReplaceText=" + encodeNvaArgument(ReplaceText) + "&CDefNameList=" + encodeNvaArgument(CDefList);
                         cmdDetailClass cmdDetail = new cmdDetailClass();
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
@@ -4332,7 +4332,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     //
                     //
-                    logController.appendLogWithLegacyRow(core, core.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " + core.doc.sessionContext.user.name + " (" + core.doc.sessionContext.user.id + ") executed an IISReset using the IISReset tool", false, true, core.webServer.requestUrl, "", "");
+                    logController.appendLogWithLegacyRow(core, core.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " + core.doc.sessionContext.user.name + " (" + core.doc.sessionContext.user.id + ") executed an IISReset using the IISReset tool", false, true, core.webServer.requestUrl, "", "");
                     //runAtServer = New runAtServerClass(core)
                     core.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);

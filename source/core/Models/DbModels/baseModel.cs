@@ -230,7 +230,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -273,7 +273,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -352,7 +352,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -397,7 +397,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -551,7 +551,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -772,7 +772,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -803,7 +803,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -848,7 +848,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -891,7 +891,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -921,7 +921,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -955,7 +955,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -989,7 +989,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
@@ -1021,7 +1021,7 @@ namespace Contensive.Core.Models.DbModels {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.serverConfig.appConfig == null) {
+                } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
                     core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));

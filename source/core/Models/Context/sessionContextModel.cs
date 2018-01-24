@@ -153,7 +153,7 @@ namespace Contensive.Core.Models.Context {
                     string msg = "SessionContext.create, enter";
                     debugController.testPoint(core, msg);
                     logController.appendLogDebug(core, msg);
-                    if (core.serverConfig.appConfig == null) {
+                    if (core.appConfig == null) {
                         //
                         // -- no application, this is a server-only call not related to a 
                         resultSessionContext = new sessionContextModel(core);
@@ -174,7 +174,7 @@ namespace Contensive.Core.Models.Context {
                         bool visit_changes = false;
                         bool visitor_changes = false;
                         bool user_changes = false;
-                        string main_appNameCookiePrefix = genericController.vbLCase(genericController.main_encodeCookieName(core.serverConfig.appConfig.name));
+                        string main_appNameCookiePrefix = genericController.vbLCase(genericController.main_encodeCookieName(core.appConfig.name));
                         //
                         resultSessionContext = new sessionContextModel(core);
                         visitCookieTimestamp = DateTime.MinValue;

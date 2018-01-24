@@ -58,7 +58,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetConnectionString(string DataSourcename) {
-            return cp.core.db.getConnectionStringADONET(cp.core.serverConfig.appConfig.name, DataSourcename);
+            return cp.core.db.getConnectionStringADONET(cp.core.appConfig.name, DataSourcename);
         }
         //
         //====================================================================================================

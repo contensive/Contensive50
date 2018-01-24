@@ -285,7 +285,7 @@ namespace Contensive.Core.Controllers {
                     if (KmaHTML.ElementCount > 0) {
                         ElementPointer = 0;
                         workingContent = "";
-                        serverFilePath = ProtocolHostLink + "/" + core.serverConfig.appConfig.name + "/files/";
+                        serverFilePath = ProtocolHostLink + "/" + core.appConfig.name + "/files/";
                         Stream = new stringBuilderLegacyController();
                         while (ElementPointer < KmaHTML.ElementCount) {
                             Copy = KmaHTML.Text(ElementPointer).ToString();
@@ -345,7 +345,7 @@ namespace Contensive.Core.Controllers {
                                                                 Link = Link.Left(Pos - 1);
                                                             }
                                                         }
-                                                        if ((string.IsNullOrEmpty(Link)) || (("," + core.serverConfig.appConfig.domainList[0] + ",").IndexOf("," + Link + ",", System.StringComparison.OrdinalIgnoreCase) != -1)) {
+                                                        if ((string.IsNullOrEmpty(Link)) || (("," + core.appConfig.domainList[0] + ",").IndexOf("," + Link + ",", System.StringComparison.OrdinalIgnoreCase) != -1)) {
                                                             //
                                                             // ----- link is for this site
                                                             //
@@ -1212,7 +1212,7 @@ namespace Contensive.Core.Controllers {
                                             if (AttributeCount > 0) {
                                                 ImageID = DHTML.ElementAttribute(ElementPointer, "id");
                                                 ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src");
-                                                VirtualFilePathBad = core.serverConfig.appConfig.name + "/files/";
+                                                VirtualFilePathBad = core.appConfig.name + "/files/";
                                                 serverFilePath = "/" + VirtualFilePathBad;
                                                 if (ImageSrcOriginal.ToLower().Left(VirtualFilePathBad.Length) == genericController.vbLCase(VirtualFilePathBad)) {
                                                     //
@@ -1677,7 +1677,7 @@ namespace Contensive.Core.Controllers {
                                                                                                         //
                                                                                                         // image load failed, use raw filename
                                                                                                         //
-                                                                                                        throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "coreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
+                                                                                                        throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "coreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
                                                                                                     } else {
                                                                                                         //
                                                                                                         //
@@ -1813,7 +1813,7 @@ namespace Contensive.Core.Controllers {
 
                 //hint = "csv_EncodeContent9 enter"
                 if (!string.IsNullOrEmpty(result)) {
-                    AdminURL = "/" + core.serverConfig.appConfig.adminRoute;
+                    AdminURL = "/" + core.appConfig.adminRoute;
                     //
                     //--------
                     // cut-paste from csv_EncodeContent8
@@ -2189,7 +2189,7 @@ namespace Contensive.Core.Controllers {
                 bool ParseError = false;
                 result = Source;
                 //
-                ContentFilesLinkPrefix = "/" + core.serverConfig.appConfig.name + "/files/";
+                ContentFilesLinkPrefix = "/" + core.appConfig.name + "/files/";
                 ResourceLibraryLinkPrefix = ContentFilesLinkPrefix + "ccLibraryFiles/";
                 ImageAllowUpdate = core.siteProperties.getBoolean("ImageAllowUpdate", true);
                 ImageAllowUpdate = ImageAllowUpdate && (Source.IndexOf(ResourceLibraryLinkPrefix, System.StringComparison.OrdinalIgnoreCase) != -1);

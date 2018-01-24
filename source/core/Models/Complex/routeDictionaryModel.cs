@@ -29,7 +29,7 @@ namespace Contensive.Core.Models.Complex {
                     string physicalFile = "~/" + core.siteProperties.getText("serverpagedefault", "default.aspx");
                     //
                     // -- admin route
-                    string adminRoute = genericController.normalizeRoute(core.serverConfig.appConfig.adminRoute);
+                    string adminRoute = genericController.normalizeRoute(core.appConfig.adminRoute);
                     if (!string.IsNullOrWhiteSpace(adminRoute)) {
                         result.Add(adminRoute, new BaseClasses.CPSiteBaseClass.routeClass() {
                             physicalRoute = physicalFile,

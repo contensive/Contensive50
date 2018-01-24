@@ -73,63 +73,47 @@ namespace Contensive.Core.Models.Context {
         public Dictionary<string, appConfigModel> apps = new Dictionary<string, appConfigModel>();
         //
         // -- the specific application in use for this instance (may be empty if this instance is not initialized
-        [NonSerialized()]
-        public appConfigModel appConfig;
-        //
-        //====================================================================================================
-        /// <summary>
-        /// application configuration class
-        /// </summary>
-        public class appConfigModel {
-            public string name = "";
-            public appStatusEnum appStatus = appStatusEnum.building;
-            public appModeEnum appMode = appModeEnum.maintainence; // must be set to normal after setup
-            public bool enabled = false;
-            public string privateKey = ""; // rename hashKey
-            public string appRootFilesPath = ""; // local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
-            public string cdnFilesPath = ""; // local file path to the content files (i.e. d:\inetpub\myApp\files\)
-            public string privateFilesPath = ""; // local file path to the content files (i.e. d:\inetpub\myApp\private\)
-            public string tempFilesPath = ""; // ephemeral storage, files live just during rendering life
-            public string cdnFilesNetprefix = ""; // in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
-            public bool allowSiteMonitor = false;
-            public List<string> domainList = new List<string>(); // primary domain is the first item in the list
-            public string adminRoute = ""; // The url pathpath that executes the addon site
-            public string defaultPage = "default.aspx"; // when exeecuting iis
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
-        /// </summary>
-        public enum appModeEnum {
-            normal = 0,
-            maintainence = 1
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
-        /// </summary>
-        public enum appStatusEnum {
-            //notFound = 0
-            //notEnabled = 1
-            OK = 2,
-            building = 3
-            //errorKernelFailure = 6     ' can not create Kernel
-            //errorNoHostService = 7     ' host service process ID not set
-            //errorLicenseFailure = 8    ' failed to start because of License failure
-            //errorDbNotFound = 9         ' failed to start because ccSetup table not found
-            //errorFailedToInitialize = 10   ' failed to start because of unknown error, see trace log
-            //errorDbBad = 11            ' ccContent,ccFields no records found
-            //errorConnectionObjectFailure = 12 ' Connection Object FAiled
-            //errorConnectionStringFailure = 13 ' Connection String FAiled to open the ODBC connection
-            //errorDataSourceFailure = 14 ' DataSource failed to open
-            //errorDuplicateDomains = 15 ' Can not locate application because there are 1+ apps that match the domain
-            //paused = 16           ' Running, but all activity is blocked (for backup)
-            //errorAppConfigNotFound = 17
-            //errorAppConfigNotValid = 18
-            //errorDbFoundButContentMetaMissing = 19
-        }
+//        [NonSerialized()]
+//        public appConfigModel appConfig;
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// application configuration class
+        ///// </summary>
+        //public class appConfigModel {
+        //    public string name = "";
+        //    public appStatusEnum appStatus = appStatusEnum.building;
+        //    public appModeEnum appMode = appModeEnum.maintainence; // must be set to normal after setup
+        //    public bool enabled = false;
+        //    public string privateKey = ""; // rename hashKey
+        //    public string appRootFilesPath = ""; // local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
+        //    public string cdnFilesPath = ""; // local file path to the content files (i.e. d:\inetpub\myApp\files\)
+        //    public string privateFilesPath = ""; // local file path to the content files (i.e. d:\inetpub\myApp\private\)
+        //    public string tempFilesPath = ""; // ephemeral storage, files live just during rendering life
+        //    public string cdnFilesNetprefix = ""; // in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
+        //    public bool allowSiteMonitor = false;
+        //    public List<string> domainList = new List<string>(); // primary domain is the first item in the list
+        //    public string adminRoute = ""; // The url pathpath that executes the addon site
+        //    public string defaultPage = "default.aspx"; // when exeecuting iis
+        //}
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
+        ///// </summary>
+        //public enum appModeEnum {
+        //    normal = 0,
+        //    maintainence = 1
+        //}
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
+        ///// </summary>
+        //public enum appStatusEnum {
+        //    OK = 2,
+        //    building = 3
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -145,8 +129,8 @@ namespace Contensive.Core.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static Models.Context.serverConfigModel getObject(coreController core) {
-            Models.Context.serverConfigModel returnModel = null;
+        public static serverConfigModel getObject(coreController core) {
+            serverConfigModel returnModel = null;
             try {
                 System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
                 string JSONTemp;
@@ -165,44 +149,41 @@ namespace Contensive.Core.Models.Context {
                 } else {
                     returnModel = json_serializer.Deserialize<serverConfigModel>(JSONTemp);
                 }
-                //
-                // -- block the configured app that last saved the server model
-                returnModel.appConfig = null;
             } catch (Exception ex) {
                 core.handleException(ex, "exception in serverConfigModel.getObject");
             }
             return returnModel;
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// get the server configuration and assign an application to the appConf
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="recordId"></param>
-        public static Models.Context.serverConfigModel getObject(coreController core, string appName) {
-            Models.Context.serverConfigModel returnModel = null;
-            try {
-                returnModel = getObject(core);
-                if (!string.IsNullOrEmpty(appName)) {
-                    if (!returnModel.apps.ContainsKey(appName.ToLower())) {
-                        //
-                        // -- application not configured
-                        returnModel.appConfig = null;
-                        throw new Exception("application [" + appName + "] was not found in this server group.");
-                    } else {
-                        returnModel.appConfig = returnModel.apps[appName.ToLower()];
-                        //
-                        // -- no, leave the status setup with the last status saved -- there is not status that describes how it is running, because there is not server. This is the status of the configuration, OK or building
-                        // -- build is set when the app is created, and OK is set at the end of upgrade
-                        //returnModel.appConfig.appStatus = appStatusEnum.OK
-                    }
-                }
-            } catch (Exception ex) {
-                core.handleException(ex, "exception in serverConfigModel.getObject");
-            }
-            return returnModel;
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// get the server configuration and assign an application to the appConf
+        ///// </summary>
+        ///// <param name="cp"></param>
+        ///// <param name="recordId"></param>
+        //public static Models.Context.serverConfigModel getObject(coreController core, string appName) {
+        //    serverConfigModel returnModel = null;
+        //    try {
+        //        returnModel = getObject(core);
+        //        if (!string.IsNullOrEmpty(appName)) {
+        //            if (!returnModel.apps.ContainsKey(appName.ToLower())) {
+        //                //
+        //                // -- application not configured
+        //                returnModel.appConfig = null;
+        //                throw new Exception("application [" + appName + "] was not found in this server group.");
+        //            } else {
+        //                returnModel.appConfig = returnModel.apps[appName.ToLower()];
+        //                //
+        //                // -- no, leave the status setup with the last status saved -- there is not status that describes how it is running, because there is not server. This is the status of the configuration, OK or building
+        //                // -- build is set when the app is created, and OK is set at the end of upgrade
+        //                //returnModel.appConfig.appStatus = appStatusEnum.OK
+        //            }
+        //        }
+        //    } catch (Exception ex) {
+        //        core.handleException(ex, "exception in serverConfigModel.getObject");
+        //    }
+        //    return returnModel;
+        //}
         //
         //====================================================================================================
         /// <summary>

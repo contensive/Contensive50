@@ -9,8 +9,9 @@
         Dim useWebConfig As Boolean = (ConfigurationManager.AppSettings("ContensiveUseWebConfig").ToLower = "true")
         If useWebConfig Then
             '
-            ' -- initialize with appSettings in web.config
-            Using cp As New Contensive.Core.CPClass(DefaultSite.configurationClass.getServerConfig(), HttpContext.Current)
+            ' -- initialize with web.config
+            Dim serverConfig As Contensive.Core.Models.Context.serverConfigModel = DefaultSite.configurationClass.getServerConfig()
+            Using cp As New Contensive.Core.CPClass(serverConfig.apps(0).name, serverConfig, HttpContext.Current)
                 Response.Write(cp.executeRoute())
                 DefaultSite.configurationClass.loadRouteMap(cp)
             End Using
