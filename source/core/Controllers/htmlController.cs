@@ -2905,7 +2905,7 @@ namespace Contensive.Core.Controllers {
                     if (PosACInstanceID == 0) {
                         core.handleException(new Exception("AC Instance [" + ACInstanceID + "] not found in record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                     } else {
-                        Copy = activeContentController.upgradeActiveContent(core, Copy);
+                        Copy = activeContentController.optimizeLibraryFileImagesInHtmlContent(core, Copy);
                         ParseOK = false;
                         PosStart = Copy.LastIndexOf("<ac ", PosACInstanceID - 1, System.StringComparison.OrdinalIgnoreCase) + 1;
                         if (PosStart != 0) {

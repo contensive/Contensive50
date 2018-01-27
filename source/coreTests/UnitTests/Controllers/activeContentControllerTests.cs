@@ -21,7 +21,20 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         public void Controllers_ActiveContent_blank() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
+                string source = "<ac Type=\"Date\">";
                 // act
+                string result = Contensive.Core.Controllers.activeContentController.renderHtmlForWeb(
+                    core: cp.core,
+                    Source: source,
+                    ContextContentName: "",
+                    ContextRecordID: 0,
+                    ContextContactPeopleID: 0,
+                    ProtocolHostString: "",
+                    DefaultWrapperID: 0,
+                    addonContext: BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
+                );
+
+                    
                 // assert
                 Assert.Fail("activeContentControllerTests Not Implemented");
             }

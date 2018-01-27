@@ -24,7 +24,6 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         // 
-        //       ...
         //       AllowLinkEID    Boolean, if yes, the EID=000... string is added to all links in the content
         //                       Use this for email so links will include the members longin.
         //
@@ -74,10 +73,42 @@ namespace Contensive.Core.Controllers {
         //   BlockLabel()    the string identifier for the block
         //   BlockCount  the total blocks in the message
         //   BlockPointer    the current block being examined
+        //
         //====================================================================================================
         //
-        //
-        private static string renderActiveParts(coreController core, string Source, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool AddLinkEID, bool EncodeCachableTags, bool EncodeImages, bool EncodeEditIcons, bool EncodeNonCachableTags, string AddAnchorQuery, string ProtocolHostLink, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
+        public static string renderHtmlForWeb(coreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, CPUtilsBaseClass.addonContext addonContext) {
+            return renderHtmlInternal(core, Source, core.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.doc.sessionContext.isAuthenticated, null, core.doc.sessionContext.isEditingAnything());
+            //False, False, True, True, False, True, ""
+        }
+        // todo - remove EncodeCachableTags
+        //====================================================================================================
+        /// <summary>
+        /// render addLinkAuthToAllLinks, ActiveFormatting, ActiveImages and ActiveEditIcons. 
+        /// 1) addLinkAuthToAllLinks adds a link authentication querystring to all anchor tags pointed to this application's domains.
+        /// 2) ActiveFormatting converts <AC type=""></AC> tags into thier rendered equvalent.
+        /// 3) ActiveImages ?
+        /// 4) ActiveEditIcons: if true, it converts <AC type=""></AC> tags into <img> tags with instance properties encoded
+        ///
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="sourceHtmlContent">The html source to be parsed.</param>
+        /// <param name="personalizationPeopleId">The user to whom this rendering will be targeted</param>
+        /// <param name="ContextContentName">If this content is from a DbModel, this is the content name.</param>
+        /// <param name="ContextRecordID">If this content is from a DbModel, this is the record id.</param>
+        /// <param name="moreInfoPeopleId">If the content includes either a more-information link, or a feedback form, this is the person to whom the feedback or more-information applies.</param>
+        /// <param name="addLinkAuthenticationToAllLinks">If true, link authentication is added to all anchor tags</param>
+        /// <param name="EncodeCachableTags">to be deprecated: some tags could be cached and some not, this was a way to divide them.</param>
+        /// <param name="encodeACResourceLibraryImages">To be deprecated: this was a way to store only a reference to library images in the content, then replace with img tag while rendering</param>
+        /// <param name="encodeForWysiwygEditor">When true, active content (and addons?) are converted to images for the editor. process</param>
+        /// <param name="EncodeNonCachableTags">to be deprecated: some tags could be cached and some not, this was a way to divide them.</param>
+        /// <param name="queryStringToAppendToAllLinks">If provided, this querystring will be added to all anchor tags that link back to the domains for this application</param>
+        /// <param name="ProtocolHostLink">The protocol plus domain desired if encoding Resource Library Images or encoding for the Wysiwyg editor</param>
+        /// <param name="IsEmailContent">If true, this rendering is for an email.</param>
+        /// <param name="AdminURL"></param>
+        /// <param name="personalizationIsAuthenticated"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        private static string renderActiveContent(coreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool addLinkAuthenticationToAllLinks, bool EncodeCachableTags, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string ProtocolHostLink, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = "";
             try {
                 string ACGuid = null;
@@ -164,16 +195,16 @@ namespace Contensive.Core.Controllers {
                 string workingContent = null;
                 string NewName = null;
                 //
-                workingContent = Source;
+                workingContent = sourceHtmlContent;
                 //
                 // Fixup Anchor Query (additional AddonOptionString pairs to add to the end)
                 //
-                if (AddLinkEID && (personalizationPeopleId != 0)) {
-                    AnchorQuery = AnchorQuery + "&EID=" + core.security.encodeToken(genericController.encodeInteger(personalizationPeopleId), DateTime.Now);
+                if (addLinkAuthenticationToAllLinks && (personalizationPeopleId != 0)) {
+                    AnchorQuery = AnchorQuery + "&eid=" + core.security.encodeToken(personalizationPeopleId, DateTime.Now);
                 }
                 //
-                if (!string.IsNullOrEmpty(AddAnchorQuery)) {
-                    AnchorQuery = AnchorQuery + "&" + AddAnchorQuery;
+                if (!string.IsNullOrEmpty(queryStringToAppendToAllLinks)) {
+                    AnchorQuery = AnchorQuery + "&" + queryStringToAppendToAllLinks;
                 }
                 //
                 if (!string.IsNullOrEmpty(AnchorQuery)) {
@@ -229,7 +260,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Special case -- if any of these are in the source, this is legacy. Convert them to icons,
                 //       and they will be converted to AC tags when the icons are saved
                 //
-                if (EncodeEditIcons) {
+                if (encodeForWysiwygEditor) {
                     //
                     IconIDControlString = "AC," + ACTypeTemplateContent + "," + NotUsedID + "," + ACName + ",";
                     IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0);
@@ -270,7 +301,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // Test early if this needs to run at all
                 //
-                ProcessACTags = (((EncodeCachableTags || EncodeNonCachableTags || EncodeImages || EncodeEditIcons)) & (workingContent.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) != -1));
+                ProcessACTags = (((EncodeCachableTags || EncodeNonCachableTags || encodeACResourceLibraryImages || encodeForWysiwygEditor)) & (workingContent.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) != -1));
                 ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) & (workingContent.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase) != -1);
                 if ((!string.IsNullOrEmpty(workingContent)) & (ProcessAnchorTags || ProcessACTags)) {
                     //
@@ -311,7 +342,7 @@ namespace Contensive.Core.Controllers {
                                                 //
                                                 Copy = genericController.vbReplace(Copy, "ContensiveUserForm=1", "", 1, 99, 1);
                                                 Copy = genericController.vbReplace(Copy, "ContensiveUserForm=\"1\"", "", 1, 99, 1);
-                                                if (!EncodeEditIcons) {
+                                                if (!encodeForWysiwygEditor) {
                                                     Copy += "<input type=hidden name=ContensiveUserForm value=1>";
                                                 }
                                             }
@@ -394,7 +425,7 @@ namespace Contensive.Core.Controllers {
                                                     //       It is removed by with EncodeEditIcons (on the way to the editor)
                                                     //       It is added to the end of the content with Decode(activecontent)
                                                     //
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         Copy = "";
                                                     } else if (EncodeNonCachableTags) {
                                                         Copy = "<!-- Language ANY -->";
@@ -405,7 +436,7 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     // Date Tag
                                                     //
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         IconIDControlString = "AC," + ACTypeDate;
                                                         IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0);
                                                         Copy = IconImg;
@@ -430,7 +461,7 @@ namespace Contensive.Core.Controllers {
                                                     if (string.IsNullOrEmpty(FieldName)) {
                                                         FieldName = "Name";
                                                     }
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         switch (genericController.vbUCase(FieldName)) {
                                                             case "FIRSTNAME":
                                                                 //
@@ -477,7 +508,7 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     ListName = genericController.encodeText((KmaHTML.ElementAttribute(ElementPointer, "name")));
 
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         IconIDControlString = "AC," + ACType + ",," + ACName;
                                                         IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0);
                                                         Copy = IconImg;
@@ -494,7 +525,7 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     // Formatting Tag
                                                     //
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         //
                                                         IconIDControlString = "AC," + ACType;
                                                         IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0);
@@ -512,7 +543,7 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     // Formatting tag - change from information to be included after submission
                                                     //
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         //
                                                         IconIDControlString = "AC," + ACType;
                                                         IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, false, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0);
@@ -531,7 +562,7 @@ namespace Contensive.Core.Controllers {
                                                     // Personalization Tag - block languages not from the visitor
                                                     //
                                                     ACLanguageName = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"));
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         switch (genericController.vbUCase(ACLanguageName)) {
                                                             case "ANY":
                                                                 //
@@ -680,7 +711,7 @@ namespace Contensive.Core.Controllers {
                                                         // Addon - for web
                                                         //
 
-                                                        if (EncodeEditIcons) {
+                                                        if (encodeForWysiwygEditor) {
                                                             //
                                                             // Get IconFilename, update the optionstring, and execute optionstring replacement functions
                                                             //
@@ -817,7 +848,7 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     // ----- Image Tag, substitute image placeholder with the link from the REsource Library Record
                                                     //
-                                                    if (EncodeImages) {
+                                                    if (encodeACResourceLibraryImages) {
                                                         Copy = "";
                                                         ACAttrRecordID = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"));
                                                         ACAttrWidth = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "WIDTH"));
@@ -899,7 +930,7 @@ namespace Contensive.Core.Controllers {
                                                     ACAttrRecordID = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"));
                                                     ACAttrAlt = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"));
                                                     //
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         //
                                                         // Encoding the edit icons for the active editor form
                                                         //
@@ -908,7 +939,7 @@ namespace Contensive.Core.Controllers {
                                                         Copy = IconImg;
                                                         //
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
-                                                    } else if (EncodeImages) {
+                                                    } else if (encodeACResourceLibraryImages) {
                                                         //
                                                         libraryFilesModel file = libraryFilesModel.create(core, ACAttrRecordID);
                                                         if (file != null) {
@@ -928,7 +959,7 @@ namespace Contensive.Core.Controllers {
                                                     AddonOptionStringHTMLEncoded = "";
                                                     addonOptionString = "";
                                                     NotUsedID = 0;
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         //
                                                         IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
                                                         IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0);
@@ -953,7 +984,7 @@ namespace Contensive.Core.Controllers {
                                                     AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
                                                     addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded);
                                                     NotUsedID = 0;
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         //
                                                         IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
                                                         IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0);
@@ -1042,7 +1073,7 @@ namespace Contensive.Core.Controllers {
                                                     //ACName = encodeInitialCaps(UCaseACName)
                                                     AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
                                                     addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded);
-                                                    if (EncodeEditIcons) {
+                                                    if (encodeForWysiwygEditor) {
                                                         //
                                                         IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
                                                         IconImg = genericController.GetAddonIconImg(AdminURL, 109, 10, 0, true, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" + ACName + "]", ACInstanceID, 0);
@@ -1094,17 +1125,20 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //
+        //   
         //====================================================================================================
-        //   Decodes ActiveContent and EditIcons into <AC tags
-        //       Detect IMG tags
-        //           If IMG ID attribute is "AC,IMAGE,recordid", convert to AC Image tag
-        //           If IMG ID attribute is "AC,DOWNLOAD,recordid", convert to AC Download tag
-        //           If IMG ID attribute is "AC,ACType,ACFieldName,ACInstanceName,QueryStringArguments,AddonGuid", convert it to generic AC tag
-        //   ACInstanceID - used to identify an AC tag on a page. Each instance of an AC tag must havea unique ACinstanceID
-        //====================================================================================================
-        //
-        public static string processWysiwygResponseForSave(coreController core, string SourceCopy) {
+        /// <summary>
+        /// Decodes ActiveContent and EditIcons into AC tags.
+        /// Detect IMG tags:
+        /// - If IMG ID attribute is "AC,IMAGE,recordid", convert to AC Image tag
+        /// - If IMG ID attribute is "AC,DOWNLOAD,recordid", convert to AC Download tag
+        /// - If IMG ID attribute is "AC,ACType,ACFieldName,ACInstanceName,QueryStringArguments,AddonGuid", convert it to generic AC tag
+        /// - ACInstanceID - used to identify an AC tag on a page. Each instance of an AC tag must havea unique ACinstanceID
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="sourceHtmlContent"></param>
+        /// <returns></returns>
+        public static string processWysiwygResponseForSave(coreController core, string sourceHtmlContent) {
             string result = "";
             try {
                 string imageNewLink = null;
@@ -1177,7 +1211,7 @@ namespace Contensive.Core.Controllers {
                 bool ImageAllowSFResize = false;
                 imageEditController sf = null;
                 //
-                result = SourceCopy;
+                result = sourceHtmlContent;
                 if (!string.IsNullOrEmpty(result)) {
                     //
                     // leave this in to make sure old <acform tags are converted back
@@ -1770,84 +1804,96 @@ namespace Contensive.Core.Controllers {
         }
         //
         //===================================================================================================
-        // To support the special case when the template calls this to encode itself, and the page content has already been rendered.
+        /// <summary>
+        /// Internal routine to render htmlContent.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="sourceHtmlContent"></param>
+        /// <param name="personalizationPeopleId"></param>
+        /// <param name="ContextContentName"></param>
+        /// <param name="ContextRecordID"></param>
+        /// <param name="ContextContactPeopleID"></param>
+        /// <param name="convertHtmlToText">if true, the html source will be converted to plain text.</param>
+        /// <param name="addLinkAuthToAllLinks"></param>
+        /// <param name="EncodeActiveFormatting"></param>
+        /// <param name="EncodeActiveImages"></param>
+        /// <param name="EncodeActiveEditIcons"></param>
+        /// <param name="EncodeActivePersonalization"></param>
+        /// <param name="queryStringForLinkAppend"></param>
+        /// <param name="ProtocolHostLink"></param>
+        /// <param name="IsEmailContent"></param>
+        /// <param name="ignore_DefaultWrapperID"></param>
+        /// <param name="ignore_TemplateCaseOnly_Content"></param>
+        /// <param name="Context"></param>
+        /// <param name="personalizationIsAuthenticated"></param>
+        /// <param name="nothingObject"></param>
+        /// <param name="isEditingAnything"></param>
+        /// <returns></returns>
         //
-        private static string render(coreController core, string Source, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool PlainText, bool AddLinkEID, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
-            string result = Source;
+        private static string renderHtmlInternal(coreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
+            string result = sourceHtmlContent;
             try {
                 //
                 const string StartFlag = "<!-- ADDON";
                 const string EndFlag = " -->";
                 //
-                bool DoAnotherPass = false;
-                int ArgCnt = 0;
-                string AddonGuid = null;
-                string ACInstanceID = null;
-                string[] ArgSplit = null;
-                string AddonName = null;
-                string addonOptionString = null;
-                int LineStart = 0;
-                int LineEnd = 0;
-                string Copy = null;
-                string[] Wrapper = null;
-                string[] SegmentSplit = null;
-                string AcCmd = null;
-                string SegmentSuffix = null;
-                string[] AcCmdSplit = null;
-                string ACType = null;
-                string[] ContentSplit = null;
-                int ContentSplitCnt = 0;
-                string Segment = null;
-                int Ptr = 0;
-                string CopyName = null;
-                string ListName = null;
-                string SortField = null;
-                bool SortReverse = false;
-                string AdminURL = null;
-                //
-                int iPersonalizationPeopleId = personalizationPeopleId;
-                if (iPersonalizationPeopleId == 0) {
-                    iPersonalizationPeopleId = core.doc.sessionContext.user.id;
-                }
-                //
-
-                //hint = "csv_EncodeContent9 enter"
-                if (!string.IsNullOrEmpty(result)) {
-                    AdminURL = "/" + core.appConfig.adminRoute;
+                if (!string.IsNullOrEmpty(sourceHtmlContent)) {
                     //
-                    //--------
-                    // cut-paste from csv_EncodeContent8
-                    //--------
+                    bool DoAnotherPass = false;
+                    int ArgCnt = 0;
+                    string AddonGuid = null;
+                    string ACInstanceID = null;
+                    string[] ArgSplit = null;
+                    string AddonName = null;
+                    string addonOptionString = null;
+                    int LineStart = 0;
+                    int LineEnd = 0;
+                    string Copy = null;
+                    string[] Wrapper = null;
+                    string[] SegmentSplit = null;
+                    string AcCmd = null;
+                    string SegmentSuffix = null;
+                    string[] AcCmdSplit = null;
+                    string ACType = null;
+                    string[] ContentSplit = null;
+                    int ContentSplitCnt = 0;
+                    string Segment = null;
+                    int Ptr = 0;
+                    string CopyName = null;
+                    string ListName = null;
+                    string SortField = null;
+                    bool SortReverse = false;
                     //
-                    // ----- Do EncodeCRLF Conversion
+                    if (personalizationPeopleId <= 0) {
+                        personalizationPeopleId = core.doc.sessionContext.user.id;
+                    }
+                    // 20180124 removed, cannot find a use case for this
+                    //if (core.siteProperties.getBoolean("ConvertContentCRLF2BR", false) && (!convertHtmlToText)) {
+                    //    result = genericController.vbReplace(result, "\r", "");
+                    //    result = genericController.vbReplace(result, "\n", "<br>");
+                    //}
                     //
-                    //hint = hint & ",010"
-                    if (core.siteProperties.getBoolean("ConvertContentCRLF2BR", false) && (!PlainText)) {
-                        result = genericController.vbReplace(result, "\r", "");
-                        result = genericController.vbReplace(result, "\n", "<br>");
+                    // Convert ACTypeDynamicForm to Add-on
+                    if (genericController.vbInstr(1, result, "<ac type=\"" + ACTypeDynamicForm, 1) != 0) {
+                        result = genericController.vbReplace(result, "type=\"DYNAMICFORM\"", "TYPE=\"aggregatefunction\"", 1, 99, 1);
+                        result = genericController.vbReplace(result, "name=\"DYNAMICFORM\"", "name=\"DYNAMIC FORM\"", 1, 99, 1);
                     }
                     //
-                    // ----- Do upgrade conversions (upgrade legacy objects and upgrade old images)
+                    // -- Do upgrade conversions (upgrade legacy objects and upgrade old images)
+                    result = optimizeLibraryFileImagesInHtmlContent(core , result);
                     //
-                    //hint = hint & ",020"
-                    result = upgradeActiveContent(core , result);
-                    //
-                    // ----- Do Active Content Conversion
-                    //
-                    //hint = hint & ",030"
-                    if (AddLinkEID || EncodeActiveFormatting || EncodeActiveImages || EncodeActiveEditIcons) {
-                        result = renderActiveParts(core, result, iPersonalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostLink, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context);
+                    // -- Do Active Content Conversion
+                    if (addLinkAuthToAllLinks || EncodeActiveFormatting || EncodeActiveImages || EncodeActiveEditIcons) {
+                        string AdminURL = "/" + core.appConfig.adminRoute;
+                        result = renderActiveContent(core, result, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, addLinkAuthToAllLinks, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostLink, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context);
                     }
                     //
-                    // ----- Do Plain Text Conversion
-                    //
-                    if (PlainText) {
+                    // -- Do Plain Text Conversion
+                    if (convertHtmlToText) {
                         result = NUglify.Uglify.HtmlToText(result).Code; // htmlToTextControllers.convert(core, result);
                     }
                     //
-                    // Process Active Content that must be run here to access webclass objects
-                    //     parse as {{functionname?querystring}}
-                    //
+                    // -- Process Active Content that must be run here to access webclass objects parse as {{functionname?querystring}}
                     if ((!EncodeActiveEditIcons) && (result.IndexOf("{{") != -1)) {
                         ContentSplit = genericController.stringSplit(result, "{{");
                         result = "";
@@ -1907,7 +1953,7 @@ namespace Contensive.Core.Controllers {
                                                         recordId = ContextRecordID
                                                     },
                                                     personalizationAuthenticated = personalizationIsAuthenticated,
-                                                    personalizationPeopleId = iPersonalizationPeopleId,
+                                                    personalizationPeopleId = personalizationPeopleId,
                                                     instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString)
                                                 };
                                                 addonModel addon = addonModel.create(core, addonGuidDynamicForm);
@@ -1932,7 +1978,7 @@ namespace Contensive.Core.Controllers {
                                                         CopyName = "Default";
                                                     }
                                                 }
-                                                result = result + core.html.getContentCopy(CopyName, "", iPersonalizationPeopleId, false, personalizationIsAuthenticated);
+                                                result = result + core.html.getContentCopy(CopyName, "", personalizationPeopleId, false, personalizationIsAuthenticated);
                                                 break;
                                             case ACTypeWatchList:
                                                 //
@@ -2022,16 +2068,16 @@ namespace Contensive.Core.Controllers {
                                             recordId = ContextRecordID
                                         },
                                         personalizationAuthenticated = personalizationIsAuthenticated,
-                                        personalizationPeopleId = iPersonalizationPeopleId,
+                                        personalizationPeopleId = personalizationPeopleId,
                                         instanceGuid = ACInstanceID,
                                         instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString)
                                     };
                                     if (!string.IsNullOrEmpty(AddonGuid)) {
                                         Copy = core.addon.execute(Models.DbModels.addonModel.create(core, AddonGuid), executeContext);
-                                        //Copy = core.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                        //Copy = core.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                     } else {
                                         Copy = core.addon.execute(Models.DbModels.addonModel.createByName(core, AddonName), executeContext);
-                                        //Copy = core.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                        //Copy = core.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                     }
                                 }
                             }
@@ -2152,60 +2198,31 @@ namespace Contensive.Core.Controllers {
         //
         //================================================================================================================
         /// <summary>
-        /// Upgrade old objects in content, and update changed resource library images
+        /// for html content, this routine optimizes images referenced in the html if they are from library file
         /// </summary>
-        public static string upgradeActiveContent( coreController core, string Source) {
-            string result = Source;
+        public static string optimizeLibraryFileImagesInHtmlContent( coreController core, string htmlContent) {
+            string result = htmlContent;
             try {
-                string RecordVirtualPath = "";
-                string RecordVirtualFilename = null;
-                string RecordFilename = null;
-                string RecordFilenameNoExt = null;
-                string RecordFilenameExt = "";
-                string[] SizeTest = null;
-                string RecordAltSizeList = null;
-                int TagPosEnd = 0;
-                int TagPosStart = 0;
-                bool InTag = false;
-                int Pos = 0;
-                string FilenameSegment = null;
-                int EndPos1 = 0;
-                int EndPos2 = 0;
-                string[] LinkSplit = null;
-                int LinkCnt = 0;
-                int LinkPtr = 0;
-                string[] TableSplit = null;
-                string TableName = null;
-                string FieldName = null;
-                int RecordID = 0;
+                // todo - upgradeActiveContent runs every render, can it be eliminated/minimized
+                string ContentFilesLinkPrefix = ContentFilesLinkPrefix = "/" + core.appConfig.name + "/files/";
+                string ResourceLibraryLinkPrefix = ContentFilesLinkPrefix + "ccLibraryFiles/";
+                bool ImageAllowUpdate = core.siteProperties.getBoolean("ImageAllowUpdate", true);
+                ImageAllowUpdate = ImageAllowUpdate && (htmlContent.IndexOf(ResourceLibraryLinkPrefix, System.StringComparison.OrdinalIgnoreCase) != -1);
                 bool SaveChanges = false;
-                int EndPos = 0;
-                int Ptr = 0;
-                string FilePrefixSegment = null;
-                bool ImageAllowUpdate = false;
-                string ContentFilesLinkPrefix = null;
-                string ResourceLibraryLinkPrefix = null;
-                string TestChr = null;
                 bool ParseError = false;
-                result = Source;
-                //
-                ContentFilesLinkPrefix = "/" + core.appConfig.name + "/files/";
-                ResourceLibraryLinkPrefix = ContentFilesLinkPrefix + "ccLibraryFiles/";
-                ImageAllowUpdate = core.siteProperties.getBoolean("ImageAllowUpdate", true);
-                ImageAllowUpdate = ImageAllowUpdate && (Source.IndexOf(ResourceLibraryLinkPrefix, System.StringComparison.OrdinalIgnoreCase) != -1);
                 if (ImageAllowUpdate) {
                     //
                     // ----- Process Resource Library Images (swap in most current file)
-                    ParseError = false;
-                    LinkSplit = genericController.stringSplit(Source, ContentFilesLinkPrefix);
-                    LinkCnt = LinkSplit.GetUpperBound(0) + 1;
-                    for (LinkPtr = 1; LinkPtr < LinkCnt; LinkPtr++) {
+                    string[] LinkSplit = genericController.stringSplit(htmlContent, ContentFilesLinkPrefix);
+                    int LinkCnt = LinkSplit.GetUpperBound(0) + 1;
+                    bool InTag = false;
+                    for (int LinkPtr = 1; LinkPtr < LinkCnt; LinkPtr++) {
                         //
                         // Each LinkSplit(1...) is a segment that would have started with '/appname/files/'
                         // Next job is to determine if this sement is in a tag (<img src="...">) or in content (&quot...&quote)
                         // For now, skip the ones in content
-                        TagPosEnd = genericController.vbInstr(1, LinkSplit[LinkPtr], ">");
-                        TagPosStart = genericController.vbInstr(1, LinkSplit[LinkPtr], "<");
+                        int TagPosEnd = genericController.vbInstr(1, LinkSplit[LinkPtr], ">");
+                        int TagPosStart = genericController.vbInstr(1, LinkSplit[LinkPtr], "<");
                         if (TagPosEnd == 0 && TagPosStart == 0) {
                             //
                             // no tags found, skip it
@@ -2224,20 +2241,16 @@ namespace Contensive.Core.Controllers {
                             InTag = false;
                         }
                         if (InTag) {
-                            TableSplit = LinkSplit[LinkPtr].Split('/');
+                            string[] TableSplit = LinkSplit[LinkPtr].Split('/');
                             if (TableSplit.GetUpperBound(0) > 2) {
-                                TableName = TableSplit[0];
-                                FieldName = TableSplit[1];
-                                RecordID = genericController.encodeInteger(TableSplit[2]);
-                                FilenameSegment = TableSplit[3];
+                                string TableName = TableSplit[0];
+                                string FieldName = TableSplit[1];
+                                int RecordID = genericController.encodeInteger(TableSplit[2]);
+                                string FilenameSegment = TableSplit[3];
                                 if ((TableName.ToLower() == "cclibraryfiles") && (FieldName.ToLower() == "filename") && (RecordID != 0)) {
                                     libraryFilesModel file = libraryFilesModel.create(core, RecordID);
                                     if (file != null) {
-                                        //hint = hint & ",060"
                                         FieldName = "filename";
-                                        //SQL = "select filename,altsizelist from " & TableName & " where id=" & RecordID
-                                        //CS = app.csv_OpenCSSQL("default", SQL)
-                                        //If app.csv_IsCSOK(CS) Then
                                         if (true) {
                                             //
                                             // now figure out how the link is delimited by how it starts
@@ -2252,8 +2265,8 @@ namespace Contensive.Core.Controllers {
                                             // odd cases:
                                             //   URL( /image.jpg) -
                                             //
-                                            RecordVirtualFilename = file.Filename;
-                                            RecordAltSizeList = file.AltSizeList;
+                                            string RecordVirtualFilename = file.Filename;
+                                            //RecordAltSizeList = file.AltSizeList;
                                             if (RecordVirtualFilename == genericController.EncodeJavascript(RecordVirtualFilename)) {
                                                 //
                                                 // The javascript version of the filename must match the filename, since we have no way
@@ -2281,19 +2294,21 @@ namespace Contensive.Core.Controllers {
                                                 //   xRecordFilenameNoExt = "test"
                                                 //
                                                 //hint = hint & ",080"
-                                                Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
-                                                RecordFilename = "";
+                                                int Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
+                                                string RecordVirtualPath = "";
+                                                string RecordFilename = "";
                                                 if (Pos > 0) {
                                                     RecordVirtualPath = RecordVirtualFilename.Left(Pos);
                                                     RecordFilename = RecordVirtualFilename.Substring(Pos);
                                                 }
                                                 Pos = RecordFilename.LastIndexOf(".") + 1;
-                                                RecordFilenameNoExt = "";
+                                                string RecordFilenameNoExt = "";
+                                                string RecordFilenameExt = "";
                                                 if (Pos > 0) {
                                                     RecordFilenameExt = genericController.vbLCase(RecordFilename.Substring(Pos));
                                                     RecordFilenameNoExt = genericController.vbLCase(RecordFilename.Left(Pos - 1));
                                                 }
-                                                FilePrefixSegment = LinkSplit[LinkPtr - 1];
+                                                string FilePrefixSegment = LinkSplit[LinkPtr - 1];
                                                 if (FilePrefixSegment.Length > 1) {
                                                     //
                                                     // Look into FilePrefixSegment and see if we are in the querystring attribute of an <AC tag
@@ -2304,16 +2319,16 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             // look back in the FilePrefixSegment to find the character before the link
                                                             //
-                                                            EndPos = 0;
-                                                            for (Ptr = FilePrefixSegment.Length; Ptr >= 1; Ptr--) {
-                                                                TestChr = FilePrefixSegment.Substring(Ptr - 1, 1);
+                                                            int EndPos = 0;
+                                                            for (int Ptr = FilePrefixSegment.Length; Ptr >= 1; Ptr--) {
+                                                                string TestChr = FilePrefixSegment.Substring(Ptr - 1, 1);
                                                                 switch (TestChr) {
                                                                     case "=":
                                                                         //
                                                                         // Ends in ' ' or '>', find the first
                                                                         //
-                                                                        EndPos1 = genericController.vbInstr(1, FilenameSegment, " ");
-                                                                        EndPos2 = genericController.vbInstr(1, FilenameSegment, ">");
+                                                                        int EndPos1 = genericController.vbInstr(1, FilenameSegment, " ");
+                                                                        int EndPos2 = genericController.vbInstr(1, FilenameSegment, ">");
                                                                         if (EndPos1 != 0 & EndPos2 != 0) {
                                                                             if (EndPos1 < EndPos2) {
                                                                                 EndPos = EndPos1;
@@ -2420,7 +2435,7 @@ namespace Contensive.Core.Controllers {
                                                                         ImageAltSize = "";
                                                                     } else {
                                                                         ImageAltSize = ImageAltSize.Substring(1);
-                                                                        SizeTest = ImageAltSize.Split('x');
+                                                                        string[] SizeTest = ImageAltSize.Split('x');
                                                                         if (SizeTest.GetUpperBound(0) != 1) {
                                                                             ImageAltSize = "";
                                                                         } else {
@@ -2478,13 +2493,13 @@ namespace Contensive.Core.Controllers {
                 }
                 //hint = hint & ",920"
                 if (!ParseError) {
-                    //
-                    // Convert ACTypeDynamicForm to Add-on
-                    //
-                    if (genericController.vbInstr(1, result, "<ac type=\"" + ACTypeDynamicForm, 1) != 0) {
-                        result = genericController.vbReplace(result, "type=\"DYNAMICFORM\"", "TYPE=\"aggregatefunction\"", 1, 99, 1);
-                        result = genericController.vbReplace(result, "name=\"DYNAMICFORM\"", "name=\"DYNAMIC FORM\"", 1, 99, 1);
-                    }
+                    ////
+                    //// Convert ACTypeDynamicForm to Add-on
+                    ////
+                    //if (genericController.vbInstr(1, result, "<ac type=\"" + ACTypeDynamicForm, 1) != 0) {
+                    //    result = genericController.vbReplace(result, "type=\"DYNAMICFORM\"", "TYPE=\"aggregatefunction\"", 1, 99, 1);
+                    //    result = genericController.vbReplace(result, "name=\"DYNAMICFORM\"", "name=\"DYNAMIC FORM\"", 1, 99, 1);
+                    //}
                 }
                 //hint = hint & ",930"
                 if (ParseError) {
@@ -2511,27 +2526,20 @@ namespace Contensive.Core.Controllers {
         /// Convert an active content field (html data stored with <ac></ac> html tags) to a wysiwyg editor request (html with edit icon <img> for <ac></ac>)
         /// </summary>
         public static string renderHtmlForWysiwygEditor(coreController core, string editorValue) {
-            return render(core, editorValue, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, null, false);
+            return renderHtmlInternal(core, editorValue, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, null, false);
         }
         //
         //====================================================================================================
         //
         public static string renderJSONForRemoteMethod(coreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
-            return render(core, Source, core.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.doc.sessionContext.isAuthenticated, null, core.doc.sessionContext.isEditingAnything());
-            //False, False, True, True, False, True, ""
-        }
-        //
-        //====================================================================================================
-        //
-        public static string renderHtmlForWeb(coreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, CPUtilsBaseClass.addonContext addonContext) {
-            return render(core, Source, core.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.doc.sessionContext.isAuthenticated, null, core.doc.sessionContext.isEditingAnything());
+            return renderHtmlInternal(core, Source, core.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.doc.sessionContext.isAuthenticated, null, core.doc.sessionContext.isEditingAnything());
             //False, False, True, True, False, True, ""
         }
         //
         //====================================================================================================
         //
         public static  string renderHtmlForEmail(coreController core, string Source, int personalizationPeopleID, string queryStringForLinkAppend) {
-            return render(core, Source, personalizationPeopleID, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
+            return renderHtmlInternal(core, Source, personalizationPeopleID, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
             //False, False, True, True, False, True, ""
         }
     }

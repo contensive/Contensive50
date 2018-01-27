@@ -52,8 +52,9 @@
       <HintPath>..\packages\Amazon.ElastiCacheCluster.1.0.1.0\lib\net35\Amazon.ElastiCacheCluster.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClearScript">
-      <HintPath>..\..\..\..\h\ClearScript-master\bin\Debug\ClearScript.dll</HintPath>
+    <Reference Include="ClearScriptV8-32, Version=5.5.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\clearScript\ClearScriptV8-32.dll</HintPath>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
       <HintPath>..\packages\EnyimMemcached.2.16.0\lib\net35\Enyim.Caching.dll</HintPath>

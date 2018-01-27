@@ -810,7 +810,6 @@ namespace Contensive.Core.Controllers {
                                         return this.addon.execute(addon, executeContext);
                                     }
                                 }
-                                break;
                             case CPSiteBaseClass.routeTypeEnum.linkAlias:
                                 //
                                 // - link alias
