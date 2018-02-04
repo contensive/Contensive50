@@ -502,14 +502,14 @@ namespace Contensive.Core.Models.DbModels {
                 Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(core, primaryContentName);
                 if (CDef == null) {
                     throw new ApplicationException("content [" + primaryContentName + "] could Not be found.");
-                } else if (CDef.Id <= 0) {
+                } else if (CDef.id <= 0) {
                     throw new ApplicationException("content [" + primaryContentName + "] could Not be found.");
                 } else {
                     instance.Active = genericController.encodeBoolean(CDef.fields["Active"].defaultValue);
                     instance.BodyHTML = genericController.encodeText(CDef.fields["BodyHTML"].defaultValue);
                     // instance.BodyTag = genericController.encodeText(.fields["BodyTag"].defaultValue)
                     instance.ccGuid = genericController.encodeText(CDef.fields["ccGuid"].defaultValue);
-                    instance.ContentControlID = CDef.Id;
+                    instance.ContentControlID = CDef.id;
                     instance.CreatedBy = genericController.encodeInteger(CDef.fields["CreatedBy"].defaultValue);
                     instance.CreateKey = genericController.encodeInteger(CDef.fields["CreateKey"].defaultValue);
                     instance.DateAdded = genericController.encodeDate(CDef.fields["DateAdded"].defaultValue);

@@ -47,6 +47,7 @@ namespace Contensive.Core.Controllers {
         // -- current page
         public pageContentModel page { get; set; }
         //
+        // todo docController properties relating to html page rending should go in a pageController property, and not spread out
         // -- current page to it's root
         public List<Models.DbModels.pageContentModel> pageToRootList { get; set; }
         //
@@ -194,6 +195,8 @@ namespace Contensive.Core.Controllers {
         //
         // -- todo
         internal List<int> addonsCurrentlyRunningIdList { get; set; } = new List<int>();
+        //
+        public Stack<Models.DbModels.addonModel> addonModelStack = new Stack<addonModel>();
         //
         // -- todo
         public int addonInstanceCnt { get; set; } = 0;
@@ -1248,10 +1251,10 @@ namespace Contensive.Core.Controllers {
                     //
                     AllowCancel = true;
                     allowSave = true;
-                    if ((CDef.AllowDelete) & (!IsDeleted) & (RecordID != 0)) {
+                    if ((CDef.allowDelete) & (!IsDeleted) & (RecordID != 0)) {
                         AllowDelete = true;
                     }
-                    if ((CDef.AllowAdd) && (!IsInserted)) {
+                    if ((CDef.allowAdd) && (!IsInserted)) {
                         AllowInsert = true;
                     }
                     //ElseIf core.doc.authContext.isAuthenticatedAdmin(core) Then

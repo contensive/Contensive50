@@ -15,8 +15,13 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
 namespace Contensive.Core {
+    //
+    // todo implement or deprecate. might be nice to have this convenient api, but a model does the same, costs one query but will
+    // always have the model at the save version as the addon code - this cp interface will match the database, but not the addon.
+    // not sure which is better
     public class CPAddonClass : BaseClasses.CPAddonBaseClass, IDisposable {
         //
+        // todo remove all com guid references
         #region COM GUIDs
         public const string ClassId = "6F43E5CA-6367-475C-AE65-FC988234922A";
         public const string InterfaceId = "440D19E3-47A9-4CA2-B20C-077221015525";
@@ -24,14 +29,18 @@ namespace Contensive.Core {
         #endregion
         //
         private CPClass cp;
-        private bool UpgradeOK { get; set; }
+        //private bool UpgradeOK { get; set; }
+        //
+        // ====================================================================================================
         //
         public CPAddonClass(CPClass cp) : base() {
             this.cp = cp;
         }
         //
-        // dispose
-        //
+        // ====================================================================================================
+        /// <summary>
+        /// must call to dispose
+        /// </summary>
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
                 appendDebugLog(".dispose, dereference main, csv");
@@ -53,7 +62,7 @@ namespace Contensive.Core {
         //
         public override bool Admin {
             get {
-                return false;
+                return  (cp.core.doc.addonModelStack.Count==0) ? false : cp.core.doc.addonModelStack.Peek().Admin;
             }
         }
         //
@@ -61,7 +70,7 @@ namespace Contensive.Core {
         //
         public override string ArgumentList {
             get {
-                return "";
+                return (cp.core.doc.addonModelStack.Count == 0) ? "" : cp.core.doc.addonModelStack.Peek().ArgumentList;
             }
         }
         //
@@ -69,7 +78,7 @@ namespace Contensive.Core {
         //
         public override bool AsAjax {
             get {
-                return false;
+                return (cp.core.doc.addonModelStack.Count == 0) ? false : cp.core.doc.addonModelStack.Peek().Admin;
             }
         }
         //
@@ -87,8 +96,7 @@ namespace Contensive.Core {
         //
         public override string ccGuid {
             get {
-                return "";
-
+                return (cp.core.doc.addonModelStack.Count == 0) ? "" : cp.core.doc.addonModelStack.Peek().ccguid;
             }
         }
         //
@@ -96,7 +104,7 @@ namespace Contensive.Core {
         //
         public override int CollectionID {
             get {
-                return 0;
+                return (cp.core.doc.addonModelStack.Count == 0) ? 0 : cp.core.doc.addonModelStack.Peek().CollectionID;
             }
         }
         //
@@ -104,7 +112,7 @@ namespace Contensive.Core {
         //
         public override bool Content {
             get {
-                return false;
+                return (cp.core.doc.addonModelStack.Count == 0) ? false : cp.core.doc.addonModelStack.Peek().Content;
             }
         }
         //
@@ -112,7 +120,7 @@ namespace Contensive.Core {
         //
         public override string Copy {
             get {
-                return "";
+                return (cp.core.doc.addonModelStack.Count == 0) ? "" : cp.core.doc.addonModelStack.Peek().Copy;
 
             }
         }
@@ -121,8 +129,7 @@ namespace Contensive.Core {
         //
         public override string CopyText {
             get {
-                return "";
-
+                return (cp.core.doc.addonModelStack.Count == 0) ? "" : cp.core.doc.addonModelStack.Peek().CopyText;
             }
         }
         //
@@ -131,7 +138,6 @@ namespace Contensive.Core {
         public override string CustomStyles {
             get {
                 return "";
-
             }
         }
         //
@@ -139,22 +145,20 @@ namespace Contensive.Core {
         //
         public override string DefaultStyles {
             get {
-                return "";
-
+                return (cp.core.doc.addonModelStack.Count == 0) ? "" : cp.core.doc.addonModelStack.Peek().StylesFilename.content;
             }
         }
         //
         //====================================================================================================
-        //
+        // todo deprecate
         public override string Description {
             get {
                 return "";
-
             }
         }
         //
         //====================================================================================================
-        //
+        // todo finish the methods -- read from doc addonmodelstack peak
         public override string DotNetClass {
             get {
                 return "";

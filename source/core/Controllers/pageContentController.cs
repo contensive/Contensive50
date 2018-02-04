@@ -851,8 +851,8 @@ namespace Contensive.Core.Controllers {
                 tempisChildRecord = (ChildRecordID == ParentRecordID);
                 if (!tempisChildRecord) {
                     CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
-                    if (genericController.IsInDelimitedString(CDef.SelectCommaList.ToUpper(), "PARENTID", ",")) {
-                        tempisChildRecord = main_IsChildRecord_Recurse(core, CDef.ContentDataSourceName, CDef.ContentTableName, ChildRecordID, ParentRecordID, "");
+                    if (genericController.IsInDelimitedString(CDef.selectCommaList.ToUpper(), "PARENTID", ",")) {
+                        tempisChildRecord = main_IsChildRecord_Recurse(core, CDef.contentDataSourceName, CDef.contentTableName, ChildRecordID, ParentRecordID, "");
                     }
                 }
                 return tempisChildRecord;

@@ -329,10 +329,6 @@ namespace Contensive.Core.Controllers {
                     //
                     if (isNewBuild) {
                         //
-                        // -- Copy default styles into Template Styles
-                        //logController.appendLogInstall(core, "New build, verify legacy styles");
-                        //core.appRootFiles.copyFile("ccLib\\Config\\Styles.css", "Templates\\Styles.css", core.cdnFiles);
-                        //
                         // -- set build version so a scratch build will not go through data conversion
                         DataBuildVersion = core.codeVersion();
                         core.siteProperties.dataBuildVersion = core.codeVersion();
@@ -350,12 +346,12 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     //---------------------------------------------------------------------
-                    // ----- Verify content
+                    // ----- Verify content needed internally
                     //---------------------------------------------------------------------
                     //
                     logController.appendLogInstall(core, "Verify records required");
                     //
-                    // ##### menus are created in ccBase.xml, this just checks for dups
+                    //  menus are created in ccBase.xml, this just checks for dups
                     VerifyAdminMenus(core, DataBuildVersion);
                     VerifyLanguageRecords(core);
                     VerifyCountries(core);
@@ -371,7 +367,7 @@ namespace Contensive.Core.Controllers {
                     //---------------------------------------------------------------------
                     //
                     logController.appendLogInstall(core, "Verify Site Properties");
-                    //
+                    // todo remove site properties not used, put all in preferences
                     core.siteProperties.getText("AllowAutoHomeSectionOnce", genericController.encodeText(isNewBuild));
                     core.siteProperties.getText("AllowAutoLogin", "False");
                     core.siteProperties.getText("AllowBake", "True");
@@ -484,7 +480,7 @@ namespace Contensive.Core.Controllers {
                     // ----- internal upgrade complete
                     //---------------------------------------------------------------------
                     //
-                    if (true) {
+                    {
                         logController.appendLogInstall(core, "Internal upgrade complete, set Buildversion to " + core.codeVersion());
                         core.siteProperties.setProperty("BuildVersion", core.codeVersion());
                         //
@@ -495,8 +491,7 @@ namespace Contensive.Core.Controllers {
                         //       This means a dataupgrade is required with a new build - You can expect errors
                         //---------------------------------------------------------------------
                         //
-                        if (true) {
-                            //If Not UpgradeDbOnly Then
+                        {
                             //
                             // 4.1.575 - 8/28 - put this code behind the DbOnly check, makes DbOnly beuild MUCH faster
                             //
@@ -547,7 +542,6 @@ namespace Contensive.Core.Controllers {
                             //                If Not addonInstallOk Then
                             //                   throw (New ApplicationException("Unexpected exception"))'core.handleLegacyError3(core.app.config.name, "Error upgrading Addon Collection [" & Guid & "], " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             //                End If
-
                             //            End If
                             //        End If
                             //    Next
@@ -1319,8 +1313,8 @@ namespace Contensive.Core.Controllers {
                 //
                 Active = !InActive;
                 Models.Complex.cdefModel cdef = Models.Complex.cdefModel.getCdef(core, ContentName);
-                string tableName = cdef.ContentTableName;
-                int cid = cdef.Id;
+                string tableName = cdef.contentTableName;
+                int cid = cdef.id;
                 //
                 dt = core.db.executeQuery("SELECT ID FROM " + tableName + " WHERE NAME=" + core.db.encodeSQLText(Name) + ";");
                 if (dt.Rows.Count == 0) {

@@ -123,8 +123,8 @@ namespace Contensive.CLI {
                                         //
                                         // -- housekeep all apps
                                         foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
-                                            String upgradeAppName = kvp.Key;
-                                            using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(upgradeAppName)) {
+                                            String housekeepAppName = kvp.Key;
+                                            using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(housekeepAppName)) {
                                                 cpApp.Doc.SetProperty("force", "1");
                                                 cpApp.executeAddon(Contensive.Core.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
                                             }

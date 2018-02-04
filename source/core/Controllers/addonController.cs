@@ -90,6 +90,8 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- ok to execute
                     debugController.testPoint(core, "execute enter [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
+                    core.doc.addonModelStack.Push(addon);
+                    
                     string parentInstanceId = core.docProperties.getText("instanceId");
                     core.docProperties.setProperty("instanceId", executeContext.instanceGuid);
                     core.doc.addonsCurrentlyRunningIdList.Add(addon.id);
@@ -323,19 +325,19 @@ namespace Contensive.Core.Controllers {
                         // Do replacements from Option String and Pick out WrapperID, and AsAjax
                         //-----------------------------------------------------------------
                         //
-                        string TestString = addon.Copy + addon.CopyText + addon.PageTitle + addon.MetaDescription + addon.MetaKeywordList + addon.OtherHeadTags + addon.FormXML;
-                        if (!string.IsNullOrEmpty(TestString)) {
+                        string testString = (addon.Copy + addon.CopyText + addon.PageTitle + addon.MetaDescription + addon.MetaKeywordList + addon.OtherHeadTags + addon.FormXML).ToLower();
+                        if (!string.IsNullOrWhiteSpace(testString)) {
                             foreach (var key in core.docProperties.getKeyList()) {
-                                string ReplaceSource = "$" + key + "$";
-                                if (TestString.IndexOf(ReplaceSource) >= 0) {
+                                if (testString.Contains(("$" + key + "$").ToLower())) {
+                                    string ReplaceSource = "$" + key + "$";
                                     string ReplaceValue = core.docProperties.getText(key);
-                                    addon.Copy = addon.Copy.Replace(ReplaceSource, ReplaceValue);
-                                    addon.CopyText = addon.CopyText.Replace(ReplaceSource, ReplaceValue);
-                                    addon.PageTitle = addon.PageTitle.Replace(ReplaceSource, ReplaceValue);
-                                    addon.MetaDescription = addon.MetaDescription.Replace(ReplaceSource, ReplaceValue);
-                                    addon.MetaKeywordList = addon.MetaKeywordList.Replace(ReplaceSource, ReplaceValue);
-                                    addon.OtherHeadTags = addon.OtherHeadTags.Replace(ReplaceSource, ReplaceValue);
-                                    addon.FormXML = addon.FormXML.Replace(ReplaceSource, ReplaceValue);
+                                    addon.Copy = addon.Copy.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                    addon.CopyText = addon.CopyText.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                    addon.PageTitle = addon.PageTitle.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                    addon.MetaDescription = addon.MetaDescription.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                    addon.MetaKeywordList = addon.MetaKeywordList.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                    addon.OtherHeadTags = addon.OtherHeadTags.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                    addon.FormXML = addon.FormXML.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
                                 }
                             }
                         }
@@ -584,7 +586,8 @@ namespace Contensive.Core.Controllers {
                     core.doc.addonsCurrentlyRunningIdList.Remove(addon.id);
                     core.doc.addonInstanceCnt = core.doc.addonInstanceCnt + 1;
                     //
-                    // -- test point message
+                    // -- pop modelstack and test point message
+                    core.doc.addonModelStack.Pop();
                     debugController.testPoint(core, "execute exit (" + (core.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                 }
             } catch (Exception ex) {

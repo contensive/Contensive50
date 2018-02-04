@@ -23,23 +23,22 @@ namespace Contensive.Core.Controllers {
     public class activeContentController {
         //
         //====================================================================================================
-        // 
+        //
+        //  active content:
+        //      1) addons dropped into wysiwyg editor
+        //              processed here
+        //      2) json formatted content commands
+        //              contentCommandController called (see contentcommandcontroller for syntax and details
+        //  
+        //
+        //
+        //      addons drag-dropped into wysiwyg editor
+        //          format: <ac type="AGGREGATEFUNCTION" name="(addon's Name)" guid="(addon's guid)" acinstanceid="(guid for this instance)" querystring="(qs formatted addon arguments)">
+        //
+        // Deprecate all of this:
+        //
         //       AllowLinkEID    Boolean, if yes, the EID=000... string is added to all links in the content
         //                       Use this for email so links will include the members longin.
-        //
-        //       Some Active elements can not be replaced here because they incorporate content from  the wbeclient.
-        //       For instance the Aggregate Function Objects. These elements create
-        //       <!-- FPO1 --> placeholders in the content, and commented instructions, one per line, at the top of the content
-        //       Replacement instructions
-        //       <!-- Replace FPO1,AFObject,ObjectName,OptionString -->
-        //           Aggregate Function Object, ProgramID=ObjectName, Optionstring=Optionstring
-        //       <!-- Replace FPO1,AFObject,ObjectName,OptionString -->
-        //           Aggregate Function Object, ProgramID=ObjectName, Optionstring=Optionstring
-        //
-        // Tag descriptions:
-        //
-        //   primary methods
-        //
         //   <Ac Type="Date">
         //   <Ac Type="Member" Field="Name">
         //   <Ac Type="Organization" Field="Name">
@@ -75,8 +74,19 @@ namespace Contensive.Core.Controllers {
         //   BlockPointer    the current block being examined
         //
         //====================================================================================================
-        //
-        public static string renderHtmlForWeb(coreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, CPUtilsBaseClass.addonContext addonContext) {
+        /// <summary>
+        /// shortcut to renderActiveContent - see renderActiveContent for arguments
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Source"></param>
+        /// <param name="ContextContentName">content of the data being rendered</param>
+        /// <param name="ContextRecordID">id of the record of the data being rendered</param>
+        /// <param name="ContextContactPeopleID">the id of the person who should be contacted for this content</param>
+        /// <param name="ProtocolHostString"></param>
+        /// <param name="DefaultWrapperID"></param>
+        /// <param name="addonContext"></param>
+        /// <returns></returns>
+        public static string renderHtmlForWeb(coreController core, string Source, string ContextContentName = "", int ContextRecordID = 0, int ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
             return renderHtmlInternal(core, Source, core.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.doc.sessionContext.isAuthenticated, null, core.doc.sessionContext.isEditingAnything());
             //False, False, True, True, False, True, ""
         }
@@ -137,9 +147,9 @@ namespace Contensive.Core.Controllers {
                 string ResultOptionListHTMLEncoded = null;
                 string UCaseACName = null;
                 string IconFilename = null;
-                string FieldName = null;
+                string reScopeMe_FieldName = null;
                 int Ptr = 0;
-                int ElementPointer = 0;
+                
                 int CSVisitor = 0;
                 int CSVisit = 0;
                 bool CSVisitorSet = false;
@@ -149,7 +159,7 @@ namespace Contensive.Core.Controllers {
                 string ACField = null;
                 string ACName = "";
                 string Copy = null;
-                htmlParserController KmaHTML = null;
+                
                 int AttributeCount = 0;
                 int AttributePointer = 0;
                 string Name = null;
@@ -165,8 +175,8 @@ namespace Contensive.Core.Controllers {
                 int ACAttrHSpace = 0;
                 string Filename = "";
                 string ACAttrAlign = null;
-                bool ProcessAnchorTags = false;
-                bool ProcessACTags = false;
+                
+                
                 string ACLanguageName = null;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string AnchorQuery = "";
@@ -189,9 +199,6 @@ namespace Contensive.Core.Controllers {
                 int FormCount = 0;
                 int FormInputCount = 0;
                 string ACInstanceID = null;
-                int PosStart = 0;
-                int PosEnd = 0;
-                string AllowGroups = null;
                 string workingContent = null;
                 string NewName = null;
                 //
@@ -213,6 +220,10 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- xml contensive process instruction
                 //
+                Pos = genericController.vbInstr(1, workingContent, "<?contensive", 1);
+                if (Pos > 0) {
+                    throw new ApplicationException("Structured xml data commands are no longer supported");
+                }
                 //TemplateBodyContent
                 //Pos = genericController.vbInstr(1, TemplateBodyContent, "<?contensive", vbTextCompare)
                 //If Pos > 0 Then
@@ -223,96 +234,98 @@ namespace Contensive.Core.Controllers {
                 //    LayoutEngineOptionString = "data=" & encodeNvaArgument(TemplateBodyContent)
                 //    TemplateBodyContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", nothing, LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
                 //End If
-                Pos = genericController.vbInstr(1, workingContent, "<?contensive", 1);
-                if (Pos > 0) {
-                    throw new ApplicationException("Structured xml data commands are no longer supported");
-                    //
-                    // convert content if provided
-                    //
-                    //workingContent = Mid(workingContent, Pos)
-                    //LayoutEngineOptionString = "data=" & encodeNvaArgument(workingContent)
-                    //Dim structuredData As New core_primitivesStructuredDataClass(Me)
-                    //workingContent = structuredData.execute()
-                    //workingContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
-                }
+                //Pos = genericController.vbInstr(1, workingContent, "<?contensive", 1);
+                //if (Pos > 0) {
+                //    //
+                //    // convert content if provided
+                //    //
+                //    //workingContent = Mid(workingContent, Pos)
+                //    //LayoutEngineOptionString = "data=" & encodeNvaArgument(workingContent)
+                //    //Dim structuredData As New core_primitivesStructuredDataClass(Me)
+                //    //workingContent = structuredData.execute()
+                //    //workingContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
+                //}
                 //
-                // Special Case
+                // -- start-end gtroup - deprecated
+                if (workingContent.IndexOf("<!-- STARTGROUPACCESS ") > 0) {
+                    throw new ApplicationException("Structured xml data commands are no longer supported");
+                }
                 // Convert <!-- STARTGROUPACCESS 10,11,12 --> format to <AC type=GROUPACCESS AllowGroups="10,11,12">
                 // Convert <!-- ENDGROUPACCESS --> format to <AC type=GROUPACCESSEND>
                 //
-                PosStart = genericController.vbInstr(1, workingContent, "<!-- STARTGROUPACCESS ", 1);
-                if (PosStart > 0) {
-                    PosEnd = genericController.vbInstr(PosStart, workingContent, "-->");
-                    if (PosEnd > 0) {
-                        AllowGroups = workingContent.Substring(PosStart + 21, PosEnd - PosStart - 23);
-                        workingContent = workingContent.Left(PosStart - 1) + "<AC type=\"" + ACTypeAggregateFunction + "\" name=\"block text\" querystring=\"allowgroups=" + AllowGroups + "\">" + workingContent.Substring(PosEnd + 2);
-                    }
+                //PosStart = genericController.vbInstr(1, workingContent, "<!-- STARTGROUPACCESS ", 1);
+                //if (PosStart > 0) {
+                //    PosEnd = genericController.vbInstr(PosStart, workingContent, "-->");
+                //    if (PosEnd > 0) {
+                //        AllowGroups = workingContent.Substring(PosStart + 21, PosEnd - PosStart - 23);
+                //        workingContent = workingContent.Left(PosStart - 1) + "<AC type=\"" + ACTypeAggregateFunction + "\" name=\"block text\" querystring=\"allowgroups=" + AllowGroups + "\">" + workingContent.Substring(PosEnd + 2);
+                //    }
+                //}
+                //
+                if (workingContent.IndexOf("<!-- ENDGROUPACCESS ") > 0) {
+                    throw new ApplicationException("Structured xml data commands are no longer supported");
                 }
-                //
-                PosStart = genericController.vbInstr(1, workingContent, "<!-- ENDGROUPACCESS ", 1);
-                if (PosStart > 0) {
-                    PosEnd = genericController.vbInstr(PosStart, workingContent, "-->");
-                    if (PosEnd > 0) {
-                        workingContent = workingContent.Left(PosStart - 1) + "<AC type=\"" + ACTypeAggregateFunction + "\" name=\"block text end\" >" + workingContent.Substring(PosEnd + 2);
-                    }
-                }
-                //
-                // ----- Special case -- if any of these are in the source, this is legacy. Convert them to icons,
-                //       and they will be converted to AC tags when the icons are saved
-                //
-                if (encodeForWysiwygEditor) {
-                    //
-                    IconIDControlString = "AC," + ACTypeTemplateContent + "," + NotUsedID + "," + ACName + ",";
-                    IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0);
-                    workingContent = genericController.vbReplace(workingContent, "{{content}}", IconImg, 1, 99, 1);
-                    //WorkingContent = genericController.vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
-                    //
-                    // replace all other {{...}}
-                    //
-                    //LoopPtr = 0
-                    //Pos = 1
-                    //Do While Pos > 0 And LoopPtr < 100
-                    //    Pos = genericController.vbInstr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
-                    //    If Pos > 0 Then
-                    //        addonOptionString = ""
-                    //        PosStart = Pos
-                    //        If PosStart <> 0 Then
-                    //            'PosStart = PosStart + 2 + Len(ACTypeDynamicMenu)
-                    //            PosEnd = genericController.vbInstr(PosStart, workingContent, "}}", vbTextCompare)
-                    //            If PosEnd <> 0 Then
-                    //                Cmd = Mid(workingContent, PosStart + 2, PosEnd - PosStart - 2)
-                    //                Pos = genericController.vbInstr(1, Cmd, "?")
-                    //                If Pos <> 0 Then
-                    //                    addonOptionString = genericController.decodeHtml(Mid(Cmd, Pos + 1))
-                    //                End If
-                    //                TextName = core.csv_GetAddonOptionStringValue("menu", addonOptionString)
-                    //                '
-                    //                addonOptionString = "Menu=" & TextName & "[" & core.csv_GetDynamicMenuACSelect() & "]&NewMenu="
-                    //                AddonOptionStringHTMLEncoded = html_EncodeHTML("Menu=" & TextName & "[" & core.csv_GetDynamicMenuACSelect() & "]&NewMenu=")
-                    //                '
-                    //                IconIDControlString = "AC," & ACTypeDynamicMenu & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                    //                IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
-                    //                workingContent = Mid(workingContent, 1, PosStart - 1) & IconImg & Mid(workingContent, PosEnd + 2)
-                    //            End If
-                    //        End If
-                    //    End If
-                    //Loop
-                }
-                //
+                //PosStart = genericController.vbInstr(1, workingContent, "<!-- ENDGROUPACCESS ", 1);
+                //if (PosStart > 0) {
+                //    PosEnd = genericController.vbInstr(PosStart, workingContent, "-->");
+                //    if (PosEnd > 0) {
+                //        workingContent = workingContent.Left(PosStart - 1) + "<AC type=\"" + ACTypeAggregateFunction + "\" name=\"block text end\" >" + workingContent.Substring(PosEnd + 2);
+                //    }
+                //}
+                ////
+                //// ----- Special case -- if any of these are in the source, this is legacy. Convert them to icons,
+                ////       and they will be converted to AC tags when the icons are saved
+                ////
+                //if (encodeForWysiwygEditor) {
+                //    //
+                //    IconIDControlString = "AC," + ACTypeTemplateContent + "," + NotUsedID + "," + ACName + ",";
+                //    IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0);
+                //    workingContent = genericController.vbReplace(workingContent, "{{content}}", IconImg, 1, 99, 1);
+                //    //WorkingContent = genericController.vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
+                //    //
+                //    // replace all other {{...}}
+                //    //
+                //    //LoopPtr = 0
+                //    //Pos = 1
+                //    //Do While Pos > 0 And LoopPtr < 100
+                //    //    Pos = genericController.vbInstr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
+                //    //    If Pos > 0 Then
+                //    //        addonOptionString = ""
+                //    //        PosStart = Pos
+                //    //        If PosStart <> 0 Then
+                //    //            'PosStart = PosStart + 2 + Len(ACTypeDynamicMenu)
+                //    //            PosEnd = genericController.vbInstr(PosStart, workingContent, "}}", vbTextCompare)
+                //    //            If PosEnd <> 0 Then
+                //    //                Cmd = Mid(workingContent, PosStart + 2, PosEnd - PosStart - 2)
+                //    //                Pos = genericController.vbInstr(1, Cmd, "?")
+                //    //                If Pos <> 0 Then
+                //    //                    addonOptionString = genericController.decodeHtml(Mid(Cmd, Pos + 1))
+                //    //                End If
+                //    //                TextName = core.csv_GetAddonOptionStringValue("menu", addonOptionString)
+                //    //                '
+                //    //                addonOptionString = "Menu=" & TextName & "[" & core.csv_GetDynamicMenuACSelect() & "]&NewMenu="
+                //    //                AddonOptionStringHTMLEncoded = html_EncodeHTML("Menu=" & TextName & "[" & core.csv_GetDynamicMenuACSelect() & "]&NewMenu=")
+                //    //                '
+                //    //                IconIDControlString = "AC," & ACTypeDynamicMenu & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
+                //    //                IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
+                //    //                workingContent = Mid(workingContent, 1, PosStart - 1) & IconImg & Mid(workingContent, PosEnd + 2)
+                //    //            End If
+                //    //        End If
+                //    //    End If
+                //    //Loop
+                //}
+                ////
                 // Test early if this needs to run at all
                 //
-                ProcessACTags = (((EncodeCachableTags || EncodeNonCachableTags || encodeACResourceLibraryImages || encodeForWysiwygEditor)) & (workingContent.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) != -1));
-                ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) & (workingContent.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase) != -1);
+                bool ProcessACTags = (((EncodeCachableTags || EncodeNonCachableTags || encodeACResourceLibraryImages || encodeForWysiwygEditor)) & (workingContent.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) != -1));
+                bool ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) & (workingContent.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase) != -1);
                 if ((!string.IsNullOrEmpty(workingContent)) & (ProcessAnchorTags || ProcessACTags)) {
                     //
                     // ----- Load the Active Elements
                     //
-                    KmaHTML = new htmlParserController(core);
+                    htmlParserController KmaHTML = new htmlParserController(core);
                     KmaHTML.Load(workingContent);
-                    //
-                    // ----- Execute and output elements
-                    //
-                    ElementPointer = 0;
+                    int ElementPointer = 0;
                     if (KmaHTML.ElementCount > 0) {
                         ElementPointer = 0;
                         workingContent = "";
@@ -446,6 +459,35 @@ namespace Contensive.Core.Controllers {
                                                     }
                                                     break;
                                                 }
+                                            case ACTypeOrganization: {
+                                                    string fieldName = KmaHTML.ElementAttribute(ElementPointer, "FIELD").ToLower();
+                                                    if ( string.IsNullOrWhiteSpace(fieldName)) {
+                                                        fieldName = "name";
+                                                    }
+                                                    if (encodeForWysiwygEditor) {
+                                                        IconIDControlString = "AC," + ACType + "," + fieldName;
+                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Organization " + reScopeMe_FieldName, "Renders as [User's Organization " + reScopeMe_FieldName + "]", ACInstanceID, 0);
+                                                        Copy = IconImg;
+                                                    } else if (EncodeNonCachableTags) {
+                                                        if (personalizationPeopleId != 0) {
+                                                            if (!CSOrganizationSet ) {
+                                                                if (!CSPeopleSet) {
+                                                                    CSPeople = core.db.csOpenRecord("People", personalizationPeopleId);
+                                                                    CSPeopleSet = true;
+                                                                }
+                                                                int personOrgId = core.db.csGetInteger(CSPeople, "organizationId");
+                                                                if (personOrgId != 0) {
+                                                                    CSOrganization = core.db.csOpenRecord("organizations", personOrgId);
+                                                                    CSOrganizationSet = true;
+                                                                }
+                                                            }
+                                                            if ((core.db.csOk(CSOrganization) & core.db.cs_isFieldSupported(CSOrganization, fieldName))) {
+                                                                Copy = core.db.csGetLookup(CSOrganization, fieldName);
+                                                            }
+                                                        }
+                                                    }
+                                                    break;
+                                                }
                                             case ACTypeMember:
                                             case ACTypePersonalization: {
                                                     //
@@ -457,45 +499,45 @@ namespace Contensive.Core.Controllers {
                                                         // compatibility for old personalization type
                                                         ACField = htmlController.getAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"));
                                                     }
-                                                    FieldName = genericController.EncodeInitialCaps(ACField);
-                                                    if (string.IsNullOrEmpty(FieldName)) {
-                                                        FieldName = "Name";
+                                                    reScopeMe_FieldName = genericController.EncodeInitialCaps(ACField);
+                                                    if (string.IsNullOrEmpty(reScopeMe_FieldName)) {
+                                                        reScopeMe_FieldName = "Name";
                                                     }
                                                     if (encodeForWysiwygEditor) {
-                                                        switch (genericController.vbUCase(FieldName)) {
+                                                        switch (genericController.vbUCase(reScopeMe_FieldName)) {
                                                             case "FIRSTNAME":
                                                                 //
-                                                                IconIDControlString = "AC," + ACType + "," + FieldName;
+                                                                IconIDControlString = "AC," + ACType + "," + reScopeMe_FieldName;
                                                                 IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0);
                                                                 Copy = IconImg;
                                                                 //
                                                                 break;
                                                             case "LASTNAME":
                                                                 //
-                                                                IconIDControlString = "AC," + ACType + "," + FieldName;
+                                                                IconIDControlString = "AC," + ACType + "," + reScopeMe_FieldName;
                                                                 IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0);
                                                                 Copy = IconImg;
                                                                 //
                                                                 break;
                                                             default:
                                                                 //
-                                                                IconIDControlString = "AC," + ACType + "," + FieldName;
-                                                                IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's " + FieldName, "Renders as [User's " + FieldName + "]", ACInstanceID, 0);
+                                                                IconIDControlString = "AC," + ACType + "," + reScopeMe_FieldName;
+                                                                IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's " + reScopeMe_FieldName, "Renders as [User's " + reScopeMe_FieldName + "]", ACInstanceID, 0);
                                                                 Copy = IconImg;
                                                                 //
                                                                 break;
                                                         }
                                                     } else if (EncodeNonCachableTags) {
                                                         if (personalizationPeopleId != 0) {
-                                                            if (genericController.vbUCase(FieldName) == "EID") {
+                                                            if (genericController.vbUCase(reScopeMe_FieldName) == "EID") {
                                                                 Copy = core.security.encodeToken(personalizationPeopleId, DateTime.Now);
                                                             } else {
                                                                 if (!CSPeopleSet) {
                                                                     CSPeople = core.db.cs_openContentRecord("People", personalizationPeopleId);
                                                                     CSPeopleSet = true;
                                                                 }
-                                                                if ((core.db.csOk(CSPeople) & core.db.cs_isFieldSupported(CSPeople, FieldName))) {
-                                                                    Copy = core.db.csGetLookup(CSPeople, FieldName);
+                                                                if ((core.db.csOk(CSPeople) & core.db.cs_isFieldSupported(CSPeople, reScopeMe_FieldName))) {
+                                                                    Copy = core.db.csGetLookup(CSPeople, reScopeMe_FieldName);
                                                                 }
                                                             }
                                                         }
@@ -1879,7 +1921,7 @@ namespace Contensive.Core.Controllers {
                         result = genericController.vbReplace(result, "name=\"DYNAMICFORM\"", "name=\"DYNAMIC FORM\"", 1, 99, 1);
                     }
                     //
-                    // -- Do upgrade conversions (upgrade legacy objects and upgrade old images)
+                    // -- resize images
                     result = optimizeLibraryFileImagesInHtmlContent(core , result);
                     //
                     // -- Do Active Content Conversion

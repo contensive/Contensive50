@@ -951,8 +951,8 @@ namespace Contensive.Core.Models.Context {
                         // admin is content manager if the CDef is not developer only
                         //
                         CDef = cdefModel.getCdef(core, ContentName);
-                        if (CDef.Id != 0) {
-                            if (!CDef.DeveloperOnly) {
+                        if (CDef.id != 0) {
+                            if (!CDef.developerOnly) {
                                 returnAllowEdit = true;
                                 returnAllowAdd = true;
                                 returnAllowDelete = true;

@@ -176,9 +176,9 @@ namespace Contensive.Core.Controllers {
                     // This was commented out -- I really do not know why -- seems like the best way
                     //
                     CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
-                    TableName = CDef.ContentTableName;
-                    DataSource = CDef.ContentDataSourceName;
-                    ContentControlCriteria = CDef.ContentControlCriteria;
+                    TableName = CDef.contentTableName;
+                    DataSource = CDef.contentDataSourceName;
+                    ContentControlCriteria = CDef.contentControlCriteria;
                     //
                     // This is what was there
                     //
@@ -224,7 +224,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- Generate Drop Down Field Names
                         //
-                        DropDownFieldList = CDef.DropDownFieldList;
+                        DropDownFieldList = CDef.dropDownFieldList;
                         //DropDownFieldList = main_GetContentProperty(ContentName, "DropDownFieldList")
                         if (string.IsNullOrEmpty(DropDownFieldList)) {
                             DropDownFieldList = "NAME";
@@ -1276,8 +1276,8 @@ namespace Contensive.Core.Controllers {
                 // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                 //
                 SecondaryCDef = Models.Complex.cdefModel.getCdef(core, SecondaryContentName);
-                SecondaryTablename = SecondaryCDef.ContentTableName;
-                SecondaryContentID = SecondaryCDef.Id;
+                SecondaryTablename = SecondaryCDef.contentTableName;
+                SecondaryContentID = SecondaryCDef.id;
                 SecondaryCDef.get_childIdList(core).Add(SecondaryContentID);
                 SingularPrefix = genericController.GetSingular(SecondaryContentName) + "&nbsp;";
                 //
@@ -3147,8 +3147,8 @@ namespace Contensive.Core.Controllers {
                     //
                     PrimaryContentID = Models.Complex.cdefModel.getContentId(core, PrimaryContentName);
                     SecondaryCDef = Models.Complex.cdefModel.getCdef(core, SecondaryContentName);
-                    SecondaryTablename = SecondaryCDef.ContentTableName;
-                    SecondaryContentID = SecondaryCDef.Id;
+                    SecondaryTablename = SecondaryCDef.contentTableName;
+                    SecondaryContentID = SecondaryCDef.id;
                     ContentIDList.Add(SecondaryContentID);
                     ContentIDList.AddRange(SecondaryCDef.get_childIdList(core));
                     //

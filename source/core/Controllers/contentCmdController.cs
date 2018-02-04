@@ -15,140 +15,183 @@ using System.Data;
 using Contensive.BaseClasses;
 //
 namespace Contensive.Core.Controllers {
+    //
+    //============================================================================================
+    //      commands manually entered into html = {% {jsonFormAddonExecution} %} = called content commands in the doc
+    //          format: context switch on {% and %}
+    //
+    //              commands:
+    //                  commands append their output to an acumulator, and the accumulator is returned at the end of the commands
+    //
+    //              simple syntax:
+    //                  {% user firstname %} - outputs the users firstname
+    //                  {% "user" "firstname" %} - double quote words, required if they have spaces
+    //                  {% open "/my template.html" %} - opens the file named "my template.html" from the website root folder and outputs it
+    //
+    //              single command syntax:
+    //                  {%{"commandName":"commandArgument"}%} -- commands with single arguments
+    //                      ex: {% "user":"firstname"}%} - outputs the users firstname
+    //                  {%{"commandName":{"argName1":"argValue1","argName2":"argValue2"}}%} -- commands with mulitple arguments
+    //                      ex: {%{"addon":{"addon":"My Custom Addon","color":"blue }}%} - runs an addon named "My Custom Addon" with the argument color=blue
+    //
+    //              multiple command syntax:
+    //                  {%[{"command1":"commandArgument"},{"command2":"commandArgument"}]%}
+    //
+    //                  addon - executes an addon
+    //                      arguments:
+    //                          addon: the name or guid of the addon to execute
+    //                          any arguments the addon needs
+    //                      ex: {% addon "my account" %}
+    //                      ex: {%{"addon":{"addon":"my account","myAccountArg":"valueForArg"}}%}
+    //
+    //                  textbox - returns the copy in a record in copy content, includes edit icon when enabled
+    //                      arguments: name
+    //                      ex: {% textbox "home page footer" %}
+    //                      ex: {%{"textbox":{"name":"home page footer"}}%}
+    //
+    //                  openCopy - returns the copy in a record in copy content
+    //                      arguments: name
+    //                      ex: {% opencopy "home page footer" %}
+    //                      ex: {%{"opencopy":{"name":"home page footer"}}%}
+    //
+    //                  openLayout - returns the copy in a record in layouts
+    //                      arguments: name
+    //                      ex: {% openLayout "home page footer" %}
+    //                      ex: {%{"openLayout":{"name":"home page footer"}}%}
+    //
+    //                  open - returns the body contents ofa file in the wwwRoot
+    //                      arguments: name
+    //                      ex: {% open "formLayout.html" %}
+    //                      ex: {%{"open":{"name":"formLayout.html"}}%}
+    //
+    //                  import - returns the contents ofa file in the wwwRoot, adds head content to current head
+    //                      arguments: name
+    //                      ex: {% import "formLayout.html" %}
+    //                      ex: {%{"import":{"name":"formLayout.html"}}%}
+    //
+    //                  user - returns the content from a field in the current user's record
+    //                      arguments: field = the name of any field in people table
+    //                      ex: {% user firstname %}
+    //                      ex: {%{"user":{"field":"firstname"}}%}
+    //
+    //                  site - returns the value of a site property
+    //                      arguments: name
+    //                      ex: {% site "my site property" %}
+    //                      ex: {%{"site":{"name":"my site property"}}%}
+    //
+    //                  set - performs a find and replace on the accumulator
+    //                      ex: { %  {"set" : { "find":"good","replace":"great" }} % }
+    //
+    //                  getInner
+    //                      ex: { % {"getInner" : { "find":".main-nav" }} % }
+    //
+    //                  setInner
+    //                      ex: { % {"setInner" { "find":".left-nav","replace":"Left Navigation" }} % } - replaces the innerHtml of all elements with class "left-nav" with the text "Left Navigation"
+    //
+    //                  getOuter
+    //                      ex: { % {"getOuter" : { "find":".main-nav" }} % } - returns the outerHtml of all elements with the class "main-nav". The outerHtml is everything inside the tag, plus the opening and closing tag.
+    //
+    //                  setOuter
+    //                      ex: { % {"setInner" { "find":".left-nav","replace":"Left Navigation" }} % } - replaces the innerHtml of all elements with class "left-nav" with the text "Left Navigation"
+    //
+    // todo - integrate old docs into newer docs
+    // -- older docs
+    //
+    //   A list of commands that create, modify and return strings
+    //   the start and end with escape sequences contentReplaceEscapeStart/contentReplaceEscapeEnd
+    //       {{ and }} previously
+    //       {% and %} right now
+    //
+    //   format:
+    //       {% commands %}
+    //
+    //    commands
+    //       a single command or a JSON array of commands.
+    //       if a command has arguments, the command should be a JSON object
+    //           openLayout layoutName
+    //
+    //       one command, no arguments -- non JSON
+    //               {% user %}
+    //       one command, one argument -- non JSON
+    //               {% user "firstname" %}
+    //
+    //       one command, no arguments -- JSON command array of one
+    //               {% [ "user" ] %}
+    //               cmdList[0] = "user"
+    //
+    //       two commands, no arguments -- JSON command array
+    //               {% [
+    //                       "user",
+    //                       "user"
+    //                   ] %}
+    //               cmdList[0] = "user"
+    //               cmdList[1] = "user"
+    //
+    //       one command, one argument -- JSON object for command
+    //               {% [
+    //                       {
+    //                           "cmd": "layout",
+    //                           "arg": "mylayout"
+    //                       }
+    //                   ] %}
+    //               cmdList[0].cmd = layout
+    //               cmdList[0].arg = "mylayout"
+    //
+    //       one command, two arguments
+    //               {% [
+    //                       {
+    //                           "cmd": "set",
+    //                           "arg": {
+    //                               "find":"$fpo$",
+    //                               "replace":"Some Content"
+    //                       }
+    //                   ] %}
+    //               cmdList[0].cmd = "replace"
+    //               cmdList[0].arg.find = "$fpo$"
+    //               cmdList[0].arg.replace = "Some Content"
+    //
+    //       two commands, two arguments
+    //               {% [
+    //                       {
+    //                           "cmd": "import",
+    //                           "arg": "myTemplate.html"
+    //                       },
+    //                       {
+    //                           "cmd": "setInner",
+    //                           "arg": {
+    //                               "find":".contentBoxClass",
+    //                               "replace":"{% addon contentBox %}"
+    //                       }
+    //                   ] %}
+    //               cmdList[0].cmd = "import"
+    //               cmdList[0].arg = "myTemplate.html"
+    //               cmdList[1].cmd = "setInner"
+    //               cmdList[0].arg.find = ".contntBoxClass"
+    //               cmdList[0].arg.replace = "{% addon contentBox %}"
+    //
+    //           import htmlFile
+    //           importVirtual htmlFile
+    //           open textFile
+    //           openVirtual webfilename
+    //           addon contentbox( JSON-Object-optionstring-list )
+    //           set find replace
+    //           setInner findLocation replace
+    //           setOuter findLocation replace
+    //           user firstname
+    //           site propertyname
     public class contentCmdController {
         //
-        //private coreClass core;
-        //
-        //====================================================================================================
+        //============================================================================================
         /// <summary>
-        /// constructor
+        /// 
         /// </summary>
         /// <param name="core"></param>
-        /// <remarks></remarks>
-        //public contentCmdController(coreClass core) {
-        //    this.core = core;
-        //}
-        //
-        //=================================================================================
-        //Public Function execute(CsvObject As Object, mainObject As Object, optionString As String, filterInput As String) As String
-        //    Dim returnValue As String = ""
-        //    Try
-        //        Dim src As String
-        //        Dim Context As Integer
-        //        Dim personalizationPeopleId As Integer
-        //        Dim personalizationIsAuthenticated As Boolean
-        //        '
-        //        src = CsvObject.GetAddonOption("data", optionString)
-        //        Context = genericController.EncodeInteger(CsvObject.GetAddonOption("context", optionString))
-        //        personalizationPeopleId = genericController.EncodeInteger(CsvObject.GetAddonOption("personalizationPeopleId", optionString))
-        //        personalizationIsAuthenticated = genericController.EncodeBoolean(CsvObject.GetAddonOption("personalizationIsAuthenticated", optionString))
-        //        '
-        //        ' compatibility with old Contensive
-        //        '
-        //        If (personalizationPeopleId = 0) And (Not (mainObject Is Nothing)) Then
-        //            personalizationPeopleId = mainObject.MemberID
-        //            personalizationIsAuthenticated = mainObject.isAuthenticated
-        //        End If
-        //        If src <> "" Then
-        //            '
-        //            ' test for Contensive processign instruction
-        //            '
-        //            execute = ExecuteCmd(src, Context, personalizationPeopleId, personalizationIsAuthenticated)
-        //        End If
-        //    Catch ex As Exception
-        //        core.handleException(ex);
-        //    End Try
-        //    Return returnValue
-        //End Function
-        //
-        //============================================================================================
-        //
-        //   Content Replacements
-        //
-        //   A list of commands that create, modify and return strings
-        //   the start and end with escape sequences contentReplaceEscapeStart/contentReplaceEscapeEnd
-        //       {{ and }} previously
-        //       {% and %} right now
-        //
-        //   format:
-        //       {% commands %}
-        //
-        //    commands
-        //       a single command or a JSON array of commands.
-        //       if a command has arguments, the command should be a JSON object
-        //           openLayout layoutName
-        //
-        //       one command, no arguments -- non JSON
-        //               {% user %}
-        //       one command, one argument -- non JSON
-        //               {% user "firstname" %}
-        //
-        //       one command, no arguments -- JSON command array of one
-        //               {% [ "user" ] %}
-        //               cmdList[0] = "user"
-        //
-        //       two commands, no arguments -- JSON command array
-        //               {% [
-        //                       "user",
-        //                       "user"
-        //                   ] %}
-        //               cmdList[0] = "user"
-        //               cmdList[1] = "user"
-        //
-        //       one command, one argument -- JSON object for command
-        //               {% [
-        //                       {
-        //                           "cmd": "layout",
-        //                           "arg": "mylayout"
-        //                       }
-        //                   ] %}
-        //               cmdList[0].cmd = layout
-        //               cmdList[0].arg = "mylayout"
-        //
-        //       one command, two arguments
-        //               {% [
-        //                       {
-        //                           "cmd": "set",
-        //                           "arg": {
-        //                               "find":"$fpo$",
-        //                               "replace":"Some Content"
-        //                       }
-        //                   ] %}
-        //               cmdList[0].cmd = "replace"
-        //               cmdList[0].arg.find = "$fpo$"
-        //               cmdList[0].arg.replace = "Some Content"
-        //
-        //       two commands, two arguments
-        //               {% [
-        //                       {
-        //                           "cmd": "import",
-        //                           "arg": "myTemplate.html"
-        //                       },
-        //                       {
-        //                           "cmd": "setInner",
-        //                           "arg": {
-        //                               "find":".contentBoxClass",
-        //                               "replace":"{% addon contentBox %}"
-        //                       }
-        //                   ] %}
-        //               cmdList[0].cmd = "import"
-        //               cmdList[0].arg = "myTemplate.html"
-        //               cmdList[1].cmd = "setInner"
-        //               cmdList[0].arg.find = ".contntBoxClass"
-        //               cmdList[0].arg.replace = "{% addon contentBox %}"
-        //
-        //           import htmlFile
-        //           importVirtual htmlFile
-        //           open textFile
-        //           openVirtual webfilename
-        //           addon contentbox( JSON-Object-optionstring-list )
-        //           set find replace
-        //           setInner findLocation replace
-        //           setOuter findLocation replace
-        //           user firstname
-        //           site propertyname
-        //
-        public static string ExecuteCmd(coreController core,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        /// <param name="src"></param>
+        /// <param name="Context"></param>
+        /// <param name="personalizationPeopleId"></param>
+        /// <param name="personalizationIsAuthenticated"></param>
+        /// <returns></returns>
+        private static string executeContentCommands(coreController core,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 bool badCmd = false;
@@ -269,7 +312,7 @@ namespace Contensive.Core.Controllers {
                         // cmd found, process it and add the results to the dst
                         //
                         Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
-                        cmdResult = ExecuteAllCmdLists_Execute( core,  Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                        cmdResult = executeCommand( core,  Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
                         if (badCmd) {
                             //
                             // the command was bad, put it back in place (?) in case it was not a command
@@ -291,16 +334,16 @@ namespace Contensive.Core.Controllers {
         }
         //
         //=================================================================================================================
-        //   EncodeActiveContent - Execute Content Command Source
-        // refactor -- go through all the parsing sections and setup specific exceptions to help users get the syntax correct
-        //=================================================================================================================
-        //
-        private static string ExecuteAllCmdLists_Execute(coreController core, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        /// <summary>
+        /// convert a single command in the command formats to call the execute
+        /// </summary>
+        private static string executeCommand(coreController core, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 //
                 // accumulator gets the result of each cmd, then is passed to the next command to filter
-                Collection<object> cmdCollection = null;
+                List<object> cmdCollection = null;
+                //Collection<object> cmdCollection = null;
                 Dictionary<string, object> cmdDef = null;
                 Dictionary<string, object> cmdArgDef = new Dictionary<string, object>();
                 //
@@ -346,7 +389,9 @@ namespace Contensive.Core.Controllers {
                     object itemVariant = null;
                     Dictionary<string, object> cmdObject = null;
                     //
-                    cmdCollection = new Collection<object>();
+                    // +++++
+                    cmdCollection = new List<object>();
+                    //cmdCollection = new Collection<object>();
                     if ((cmdSrc.Left( 1) == "{") && (cmdSrc.Substring(cmdSrc.Length - 1) == "}")) {
                         //
                         // JSON is a single command in the form of an object, like:
@@ -375,12 +420,14 @@ namespace Contensive.Core.Controllers {
                                 cmdCollection.Add(cmdObject);
                             }
                         }
-                    } else if ((cmdSrc.Left( 1) == "[") && (cmdSrc.Substring(cmdSrc.Length - 1) == "]")) {
+                    } else if ((cmdSrc.Left(1) == "[") && (cmdSrc.Substring(cmdSrc.Length - 1) == "]")) {
                         //
                         // JSON is a command list in the form of an array, like:
                         //   [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
                         //
-                        cmdCollection = core.json.Deserialize<Collection<object>>(cmdSrc);
+                        cmdCollection = core.json.Deserialize<List<object>>(cmdSrc);
+                        //List<object> testArray = Newtonsoft.Json.JsonConvert.DeserializeObject<List<object>>(cmdSrc);
+                        //cmdCollection = core.json.Deserialize<Collection<object>>(cmdSrc);
                         //If True Then
                         //End If
                         //If (LCase(TypeName(cmdDictionaryOrCollection)) <> "collection") Then
@@ -471,7 +518,8 @@ namespace Contensive.Core.Controllers {
                             }
                             cmdDef = new Dictionary<string, object>();
                             cmdDef.Add(cmdText, cmdDictionaryOrCollection);
-                            cmdCollection = new Collection<object>();
+                            cmdCollection = new List<object>();
+                            //cmdCollection = new Collection<object>();
                             cmdCollection.Add(cmdDef);
                         } else {
                             //
@@ -479,7 +527,8 @@ namespace Contensive.Core.Controllers {
                             //
                             cmdDef = new Dictionary<string, object>();
                             cmdDef.Add(cmdText, cmdArg);
-                            cmdCollection = new Collection<object>();
+                            cmdCollection = new List<object>();
+                            //cmdCollection = new Collection<object>();
                             cmdCollection.Add(cmdDef);
                         }
                     }
@@ -932,7 +981,16 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        //   encode (execute) all {% -- %} commands
+        /// <summary>
+        /// Execute all content commands within a source string
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Source"></param>
+        /// <param name="Context">The context for any addson that might be executed (remote method, page, email, etc)</param>
+        /// <param name="personalizationPeopleId">The id of the user for personalization</param>
+        /// <param name="personalizationIsAuthenticated">if true, the content can contain user private information</param>
+        /// <param name="Return_ErrorMessage"></param>
+        /// <returns></returns>
         //
         public static string executeContentCommands(coreController core, string Source, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated, ref string Return_ErrorMessage) {
             string returnValue = "";
@@ -943,7 +1001,7 @@ namespace Contensive.Core.Controllers {
                 returnValue = Source;
                 LoopPtr = 0;
                 while ((LoopPtr < 10) && ((returnValue.IndexOf(contentReplaceEscapeStart) != -1))) {
-                    returnValue = contentCmdController.ExecuteCmd(core, returnValue, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                    returnValue = contentCmdController.executeContentCommands(core, returnValue, Context, personalizationPeopleId, personalizationIsAuthenticated);
                     LoopPtr = LoopPtr + 1;
                 }
             } catch (Exception ex) {

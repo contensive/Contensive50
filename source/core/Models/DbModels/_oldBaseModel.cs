@@ -503,7 +503,7 @@ namespace Contensive.Core.Models.DbModels {
                 Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(core, primaryContentName);
                 if (CDef == null) {
                     throw new ApplicationException("content [" + primaryContentName + "] could Not be found.");
-                } else if (CDef.Id <= 0) {
+                } else if (CDef.id <= 0) {
                     throw new ApplicationException("content [" + primaryContentName + "] could Not be found.");
                 } else {
                     foreach (PropertyInfo resultProperty in instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {

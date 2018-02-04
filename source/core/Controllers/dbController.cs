@@ -1268,16 +1268,16 @@ namespace Contensive.Core.Controllers {
                     CDef = cdefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw (new ApplicationException("No content found For [" + ContentName + "]"));
-                    } else if (CDef.Id <= 0) {
+                    } else if (CDef.id <= 0) {
                         throw (new ApplicationException("No content found For [" + ContentName + "]"));
                     } else {
                         //
                         //hint = hint & ", 100"
                         iActiveOnly = ((ActiveOnly));
-                        iSortFieldList = genericController.encodeEmptyText(SortFieldList, CDef.DefaultSortMethod);
+                        iSortFieldList = genericController.encodeEmptyText(SortFieldList, CDef.defaultSortMethod);
                         iMemberID = MemberID;
                         iCriteria = genericController.encodeEmptyText(Criteria, "");
-                        iSelectFieldList = genericController.encodeEmptyText(SelectFieldList, CDef.SelectCommaList);
+                        iSelectFieldList = genericController.encodeEmptyText(SelectFieldList, CDef.selectCommaList);
                         //
                         // verify the sortfields are in this table
                         //
@@ -1298,7 +1298,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- fixup the criteria to include the ContentControlID(s) / EditSourceID
                         //
-                        ContentCriteria = CDef.ContentControlCriteria;
+                        ContentCriteria = CDef.contentControlCriteria;
                         if (string.IsNullOrEmpty(ContentCriteria)) {
                             ContentCriteria = "(1=1)";
                         } else {
@@ -1306,7 +1306,7 @@ namespace Contensive.Core.Controllers {
                             // remove tablename from contentcontrolcriteria - if in workflow mode, and authoringtable is different, this would be wrong
                             // also makes sql smaller, and is not necessary
                             //
-                            ContentCriteria = genericController.vbReplace(ContentCriteria, CDef.ContentTableName + ".", "");
+                            ContentCriteria = genericController.vbReplace(ContentCriteria, CDef.contentTableName + ".", "");
                         }
                         if (!string.IsNullOrEmpty(iCriteria)) {
                             ContentCriteria = ContentCriteria + "And(" + iCriteria + ")";
@@ -1344,8 +1344,8 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         //
-                        TableName = CDef.ContentTableName;
-                        DataSourceName = CDef.ContentDataSourceName;
+                        TableName = CDef.contentTableName;
+                        DataSourceName = CDef.contentDataSourceName;
                         //
                         // ----- Check for blank Tablename or DataSource
                         //
@@ -1433,10 +1433,10 @@ namespace Contensive.Core.Controllers {
                     //
                     throw new ArgumentException("csv_ContentSet Is Not Updateable");
                 } else {
-                    ContentID = contentSetStore[CSPointer].CDef.Id;
-                    ContentName = contentSetStore[CSPointer].CDef.Name;
-                    ContentTableName = contentSetStore[CSPointer].CDef.ContentTableName;
-                    ContentDataSourceName = contentSetStore[CSPointer].CDef.ContentDataSourceName;
+                    ContentID = contentSetStore[CSPointer].CDef.id;
+                    ContentName = contentSetStore[CSPointer].CDef.name;
+                    ContentTableName = contentSetStore[CSPointer].CDef.contentTableName;
+                    ContentDataSourceName = contentSetStore[CSPointer].CDef.contentDataSourceName;
                     if (string.IsNullOrEmpty(ContentName)) {
                         throw new ArgumentException("csv_ContentSet Is Not based On a Content Definition");
                     } else {
@@ -1812,7 +1812,7 @@ namespace Contensive.Core.Controllers {
             try {
                 if (csOk(CSPointer)) {
                     if (contentSetStore[CSPointer].Updateable) {
-                        if (!string.IsNullOrEmpty(contentSetStore[CSPointer].CDef.Name)) {
+                        if (!string.IsNullOrEmpty(contentSetStore[CSPointer].CDef.name)) {
                             returnFieldTypeid = contentSetStore[CSPointer].CDef.fields[FieldName.ToLower()].fieldTypeId;
                         }
                     }
@@ -1836,7 +1836,7 @@ namespace Contensive.Core.Controllers {
             try {
                 if (csOk(CSPointer)) {
                     if (contentSetStore[CSPointer].Updateable) {
-                        if (!string.IsNullOrEmpty(contentSetStore[CSPointer].CDef.Name)) {
+                        if (!string.IsNullOrEmpty(contentSetStore[CSPointer].CDef.name)) {
                             returnResult = contentSetStore[CSPointer].CDef.fields[FieldName.ToLower()].caption;
                             if (string.IsNullOrEmpty(returnResult)) {
                                 returnResult = FieldName;
@@ -1968,8 +1968,8 @@ namespace Contensive.Core.Controllers {
                             //
                             // Get tablename from Content Definition
                             //
-                            ContentName = tempVar.CDef.Name;
-                            TableName = tempVar.CDef.ContentTableName;
+                            ContentName = tempVar.CDef.name;
+                            TableName = tempVar.CDef.contentTableName;
                         } else if (!string.IsNullOrEmpty(ContentName)) {
                             //
                             // CS is SQL-based, use the contentname
@@ -2248,7 +2248,7 @@ namespace Contensive.Core.Controllers {
                     CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw new ArgumentException("ContentName [" + ContentName + "] was Not found");
-                    } else if (CDef.Id == 0) {
+                    } else if (CDef.id == 0) {
                         throw new ArgumentException("ContentName [" + ContentName + "] was Not found");
                     } else {
                         //
@@ -2258,7 +2258,7 @@ namespace Contensive.Core.Controllers {
                         List<string> invaldiateObjectList = new List<string>();
                         CSPointer = csOpen(ContentName, Criteria, "", false, MemberID, true, true);
                         while (csOk(CSPointer)) {
-                            invaldiateObjectList.Add(Controllers.cacheController.getCacheKey_Entity(CDef.ContentTableName, "id", csGetInteger(CSPointer, "id").ToString()));
+                            invaldiateObjectList.Add(Controllers.cacheController.getCacheKey_Entity(CDef.contentTableName, "id", csGetInteger(CSPointer, "id").ToString()));
                             csDeleteRecord(CSPointer);
                             csGoNext(CSPointer);
                         }
@@ -2322,7 +2322,7 @@ namespace Contensive.Core.Controllers {
                     CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw new ApplicationException("content [" + ContentName + "] could Not be found.");
-                    } else if (CDef.Id <= 0) {
+                    } else if (CDef.id <= 0) {
                         throw new ApplicationException("content [" + ContentName + "] could Not be found.");
                     } else {
                         if (MemberID == -1) {
@@ -2331,8 +2331,8 @@ namespace Contensive.Core.Controllers {
                         //
                         // no authoring, create default record in Live table
                         //
-                        DataSourceName = CDef.ContentDataSourceName;
-                        TableName = CDef.ContentTableName;
+                        DataSourceName = CDef.contentDataSourceName;
+                        TableName = CDef.contentTableName;
                         if (CDef.fields.Count > 0) {
                             foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in CDef.fields) {
                                 Models.Complex.cdefFieldModel field = keyValuePair.Value;
@@ -2423,7 +2423,7 @@ namespace Contensive.Core.Controllers {
                         //
                         sqlList.add("CREATEKEY", CreateKeyString); // ArrayPointer)
                         sqlList.add("DATEADDED", DateAddedString); // ArrayPointer)
-                        sqlList.add("CONTENTCONTROLID", encodeSQLNumber(CDef.Id)); // ArrayPointer)
+                        sqlList.add("CONTENTCONTROLID", encodeSQLNumber(CDef.id)); // ArrayPointer)
                         sqlList.add("CREATEDBY", encodeSQLNumber(MemberID)); // ArrayPointer)
                                                                              //
                         insertTableRecord(DataSourceName, TableName, sqlList);
@@ -2519,7 +2519,7 @@ namespace Contensive.Core.Controllers {
                     throw new ArgumentException("copyRecord requires the destination dataset to be created from a cs Open or Insert, not a query.");
                 } else {
                     DestCDef = contentSetStore[CSDestination].CDef;
-                    DestContentName = DestCDef.Name;
+                    DestContentName = DestCDef.name;
                     DestRecordID = csGetInteger(CSDestination, "ID");
                     FieldName = cs_getFirstFieldName(CSSource);
                     while (!string.IsNullOrEmpty(FieldName)) {
@@ -2543,7 +2543,7 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // ----- cdn file
                                         //
-                                        SourceFilename = csGetFieldFilename(CSSource, FieldName, "", contentSetStore[CSDestination].CDef.Name, sourceFieldTypeId);
+                                        SourceFilename = csGetFieldFilename(CSSource, FieldName, "", contentSetStore[CSDestination].CDef.name, sourceFieldTypeId);
                                         //SourceFilename = (csv_cs_getText(CSSource, FieldName))
                                         if (!string.IsNullOrEmpty(SourceFilename)) {
                                             DestFilename = csGetFieldFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId);
@@ -2657,7 +2657,7 @@ namespace Contensive.Core.Controllers {
                             try {
                                 fieldValue = genericController.encodeText(cs_getValue(CSPointer, FieldName));
                             } catch (Exception ex) {
-                                throw new ApplicationException("Error [" + ex.Message + "] reading field [" + FieldName.ToLower() + "] In content [" + tempVar.CDef.Name + "] With custom field list [" + tempVar.SelectTableFieldList + "");
+                                throw new ApplicationException("Error [" + ex.Message + "] reading field [" + FieldName.ToLower() + "] In content [" + tempVar.CDef.name + "] With custom field list [" + tempVar.SelectTableFieldList + "");
                             }
                         } else {
                             field = tempVar.CDef.fields[FieldName.ToLower()];
@@ -2857,10 +2857,10 @@ namespace Contensive.Core.Controllers {
                         if (FieldValue == null) {
                             FieldValue = "";
                         }
-                        if (!string.IsNullOrEmpty(tempVar.CDef.Name)) {
+                        if (!string.IsNullOrEmpty(tempVar.CDef.name)) {
                             Models.Complex.cdefFieldModel field = null;
                             if (!tempVar.CDef.fields.ContainsKey(FieldNameLc)) {
-                                throw new ArgumentException("The field [" + FieldName + "] could Not be found In content [" + tempVar.CDef.Name + "]");
+                                throw new ArgumentException("The field [" + FieldName + "] could Not be found In content [" + tempVar.CDef.name + "]");
                             } else {
                                 field = tempVar.CDef.fields[FieldNameLc];
                                 switch (field.fieldTypeId) {
@@ -3153,10 +3153,10 @@ namespace Contensive.Core.Controllers {
                 } else {
                     var tempVar = contentSetStore[CSPointer];
                     //
-                    LiveTableName = tempVar.CDef.ContentTableName;
-                    LiveDataSourceName = tempVar.CDef.ContentDataSourceName;
-                    ContentName = tempVar.CDef.Name;
-                    ContentID = tempVar.CDef.Id;
+                    LiveTableName = tempVar.CDef.contentTableName;
+                    LiveDataSourceName = tempVar.CDef.contentDataSourceName;
+                    ContentName = tempVar.CDef.name;
+                    ContentID = tempVar.CDef.id;
                     //
                     LiveRecordID = csGetInteger(CSPointer, "ID");
                     LiveRecordContentControlID = csGetInteger(CSPointer, "CONTENTCONTROLID");
@@ -3336,7 +3336,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Do the unique check on the content table, if necessary
                     //
                     if (!string.IsNullOrEmpty(SQLCriteriaUnique)) {
-                        string sqlUnique = "SELECT ID FROM " + LiveTableName + " WHERE (ID<>" + LiveRecordID + ")AND(" + SQLCriteriaUnique + ")and(" + tempVar.CDef.ContentControlCriteria + ");";
+                        string sqlUnique = "SELECT ID FROM " + LiveTableName + " WHERE (ID<>" + LiveRecordID + ")AND(" + SQLCriteriaUnique + ")and(" + tempVar.CDef.contentControlCriteria + ");";
                         using (DataTable dt = executeQuery(sqlUnique, LiveDataSourceName)) {
                             //
                             // -- unique violation
@@ -3631,10 +3631,10 @@ namespace Contensive.Core.Controllers {
                     throw new ArgumentException("recordid is not valid");
                 } else {
                     CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
-                    if (CDef.Id == 0) {
+                    if (CDef.id == 0) {
                         throw new ApplicationException("contentname [" + ContentName + "] is not a valid content");
                     } else {
-                        TableName = CDef.ContentTableName;
+                        TableName = CDef.contentTableName;
                         if (string.IsNullOrEmpty(TableName)) {
                             TableName = ContentName;
                         }

@@ -216,6 +216,7 @@
     <Compile Include="Models\DbModels\pageTemplateModel.cs" />
     <Compile Include="Models\DbModels\visitorModel.cs" />
     <Compile Include="Controllers\coreController.cs" />
+    <Compile Include="Models\DbModels\organizationModel.cs" />
     <Compile Include="Views\CPAddonClass.cs" />
     <Compile Include="Views\CPBlockClass.cs" />
     <Compile Include="Views\CPCacheClass.cs" />

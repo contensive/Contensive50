@@ -2089,14 +2089,14 @@ namespace Contensive.Core.Addons.Tools {
                     if (core.db.csOk(CSContent)) {
                         do {
                             CD = Models.Complex.cdefModel.getCdef(core, core.db.csGetInteger(CSContent, "id"));
-                            TableName = CD.ContentTableName;
-                            Stream.Add("Synchronizing Content " + CD.Name + " to table " + TableName + "<br>");
-                            core.db.createSQLTable(CD.ContentDataSourceName, TableName);
+                            TableName = CD.contentTableName;
+                            Stream.Add("Synchronizing Content " + CD.name + " to table " + TableName + "<br>");
+                            core.db.createSQLTable(CD.contentDataSourceName, TableName);
                             if (CD.fields.Count > 0) {
                                 foreach (var keyValuePair in CD.fields) {
                                     Models.Complex.cdefFieldModel field = keyValuePair.Value;
                                     Stream.Add("...Field " + field.nameLc + "<br>");
-                                    core.db.createSQLTableField(CD.ContentDataSourceName, TableName, field.nameLc, field.fieldTypeId);
+                                    core.db.createSQLTableField(CD.contentDataSourceName, TableName, field.nameLc, field.fieldTypeId);
                                 }
                             }
                             core.db.csGoNext(CSContent);
@@ -2833,7 +2833,7 @@ namespace Contensive.Core.Addons.Tools {
                                                         // Create Db field, Field is good but was not before
                                                         //
                                                         core.db.createSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId);
-                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + CDef.ContentTableName + "].</LI>";
+                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + CDef.contentTableName + "].</LI>";
                                                     } else if ((string.IsNullOrEmpty(formFieldName)) || (formFieldTypeId == 0)) {
                                                         //
                                                         // name blank or type=0 - do nothing but tell them
@@ -2853,10 +2853,10 @@ namespace Contensive.Core.Addons.Tools {
                                                         int DataSourceTypeID = core.db.getDataSourceType(DataSourceName);
                                                         switch (DataSourceTypeID) {
                                                             case DataSourceTypeODBCMySQL:
-                                                                SQL = "alter table " + CDef.ContentTableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, fieldType) + ";";
+                                                                SQL = "alter table " + CDef.contentTableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, fieldType) + ";";
                                                                 break;
                                                             default:
-                                                                SQL = "alter table " + CDef.ContentTableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, fieldType) + ";";
+                                                                SQL = "alter table " + CDef.contentTableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, fieldType) + ";";
                                                                 break;
                                                         }
                                                         core.db.executeQuery(SQL, DataSourceName);

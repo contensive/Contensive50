@@ -835,7 +835,7 @@ namespace Contensive.Core.Controllers {
                 Models.Complex.cdefModel CDef = null;
                 //
                 CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
-                ContentID = CDef.Id;
+                ContentID = CDef.id;
                 if (ContentID != 0) {
                     AuthoringCriteria = getAuthoringControlCriteria(ContentName, RecordID);
                     switch (AuthoringControl) {
@@ -906,7 +906,7 @@ namespace Contensive.Core.Controllers {
                     // Get Workflow Locks
                     //
                     CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
-                    ContentID = CDef.Id;
+                    ContentID = CDef.id;
                     if (ContentID > 0) {
                         //If false And core.siteProperties.allowWorkflowAuthoring Then
                         //    '

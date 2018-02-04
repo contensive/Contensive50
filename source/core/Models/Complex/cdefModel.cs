@@ -26,53 +26,134 @@ namespace Contensive.Core.Models.Complex {
         //
         private const string cacheNameInvalidateAll = "cdefInvalidateAll";
         //
-        public int Id { get; set; } // index in content table
-        public string Name { get; set; } // Name of Content
-        public string ContentTableName { get; set; } // the name of the content table
-        public string ContentDataSourceName { get; set; }
-        public bool AllowAdd { get; set; } // Allow adding records
-        public bool AllowDelete { get; set; } // Allow deleting records
-        public string WhereClause { get; set; } // Used to filter records in the admin area
-        public string DefaultSortMethod { get; set; } // FieldName Direction, ....
-        public bool ActiveOnly { get; set; } // When true
-        public bool AdminOnly { get; set; } // Only allow administrators to modify content
-        public bool DeveloperOnly { get; set; } // Only allow developers to modify content
-        public string DropDownFieldList { get; set; } // String used to populate select boxes
-        public string EditorGroupName { get; set; } // Group of members who administer Workflow Authoring
+        // -- index in content table
+        public int id { get; set; }
+        //
+        // -- Name of Content
+        public string name { get; set; }
+        //
+        // -- the name of the content table
+        public string contentTableName { get; set; } 
+        //
+        // -- 
+        public string contentDataSourceName { get; set; }
+        //
+        // -- Allow adding records
+        public bool allowAdd { get; set; }
+        //
+        // -- Allow deleting records
+        public bool allowDelete { get; set; }
+        //
+        // -- Used to filter records in the admin area
+        public string whereClause { get; set; }
+        //
+        // FieldName Direction, ....
+        public string defaultSortMethod { get; set; } 
+        //
+        // -- 
+        public bool activeOnly { get; set; }
+        //
+        // Only allow administrators to modify content
+        public bool adminOnly { get; set; }
+        //
+        // Only allow developers to modify content
+        public bool developerOnly { get; set; }
+        //
+        // String used to populate select boxes
+        public string dropDownFieldList { get; set; }
+        //
+        // Group of members who administer Workflow Authoring
+        public string editorGroupName { get; set; } 
+        //
+        // -- 
         public int dataSourceId { get; set; }
+        //
+        // -- 
         private string _dataSourceName { get; set; } = "";
-        public bool IgnoreContentControl { get; set; } // if true, all records in the source are in this content
-        public string AliasName { get; set; } // Field Name of the required "name" field
-        public string AliasID { get; set; } // Field Name of the required "id" field
-        public bool AllowTopicRules { get; set; } // For admin edit page
-        public bool AllowContentTracking { get; set; } // For admin edit page
-        public bool AllowCalendarEvents { get; set; } // For admin edit page
+        //
+        // -- if true, all records in the source are in this content
+        public bool ignoreContentControl { get; set; }
+        //
+        // -- Field Name of the required "name" field
+        public string aliasName { get; set; }
+        //
+        // -- Field Name of the required "id" field
+        public string aliasID { get; set; }
+        //
+        // For admin edit page
+        public bool allowTopicRules { get; set; }
+        //
+        // For admin edit page
+        public bool allowContentTracking { get; set; }
+        //
+        // For admin edit page
+        public bool allowCalendarEvents { get; set; } 
+        //
+        // -- 
         public bool dataChanged { get; set; }
+        //
+        // -- 
         public bool includesAFieldChange { get; set; } // if any fields().changed, this is set true to
-        public bool Active { get; set; }
-        public bool AllowContentChildTool { get; set; }
-        public bool IsModifiedSinceInstalled { get; set; }
-        public string IconLink { get; set; }
-        public int IconWidth { get; set; }
-        public int IconHeight { get; set; }
-        public int IconSprites { get; set; }
+        //
+        // -- 
+        public bool active { get; set; }
+        //
+        // -- 
+        public bool allowContentChildTool { get; set; }
+        //
+        // -- 
+        public bool isModifiedSinceInstalled { get; set; }
+        //
+        // -- 
+        public string iconLink { get; set; }
+        //
+        // -- 
+        public int iconWidth { get; set; }
+        //
+        // -- 
+        public int iconHeight { get; set; }
+        //
+        // -- 
+        public int iconSprites { get; set; }
+        //
+        // -- 
         public string guid { get; set; }
-        public bool IsBaseContent { get; set; }
+        //
+        // -- 
+        public bool isBaseContent { get; set; }
+        //
+        // -- 
         public string installedByCollectionGuid { get; set; }
-        public int parentID { get; set; } // read from Db, if not IgnoreContentControl, the ID of the parent content
-        public string parentName { get; set; } // read from xml, used to set parentId
-        public string TimeStamp { get; set; } // string that changes if any record in Content Definition changes, in memory only
+        //
+        // read from Db, if not IgnoreContentControl, the ID of the parent content
+        public int parentID { get; set; } 
+        //
+        // read from xml, used to set parentId
+        public string parentName { get; set; } 
+        //
+        // string that changes if any record in Content Definition changes, in memory only
+        public string timeStamp { get; set; } 
+        //
+        // -- 
         public Dictionary<string, Models.Complex.cdefFieldModel> fields { get; set; } = new Dictionary<string, Models.Complex.cdefFieldModel>();
+        //
+        // -- 
         public SortedList<string, CDefAdminColumnClass> adminColumns { get; set; } = new SortedList<string, CDefAdminColumnClass>();
-        public string ContentControlCriteria { get; set; } // String created from ParentIDs used to select records
+        //
+        // -- 
+        public string contentControlCriteria { get; set; } // String created from ParentIDs used to select records
+        //
+        // -- 
         public List<string> selectList { get; set; } = new List<string>();
-        public string SelectCommaList { get; set; } // Field list used in OpenCSContent calls (all active field definitions)
-                                                    //
-                                                    //====================================================================================================
-                                                    //
+        //
+        // -- Field list used in OpenCSContent calls (all active field definitions)
+        public string selectCommaList { get; set; } 
+        //
+        //====================================================================================================
+        //
         public List<int> get_childIdList(coreController core) {
             if (_childIdList == null) {
-                string Sql = "select id from cccontent where parentid=" + Id;
+                string Sql = "select id from cccontent where parentid=" + id;
                 DataTable dt = core.db.executeQuery(Sql);
                 if (dt.Rows.Count == 0) {
                     _childIdList = new List<int>();
@@ -165,30 +246,30 @@ namespace Contensive.Core.Models.Complex {
                         DataRow row = dt.Rows[0];
                         contentName = encodeText(genericController.encodeText(row[1])).Trim(' ');
                         string contentTablename = genericController.encodeText(row[10]);
-                        result.Name = contentName;
-                        result.Id = contentId;
-                        result.AllowAdd = genericController.encodeBoolean(row[3]);
-                        result.DeveloperOnly = genericController.encodeBoolean(row[4]);
-                        result.AdminOnly = genericController.encodeBoolean(row[5]);
-                        result.AllowDelete = genericController.encodeBoolean(row[6]);
+                        result.name = contentName;
+                        result.id = contentId;
+                        result.allowAdd = genericController.encodeBoolean(row[3]);
+                        result.developerOnly = genericController.encodeBoolean(row[4]);
+                        result.adminOnly = genericController.encodeBoolean(row[5]);
+                        result.allowDelete = genericController.encodeBoolean(row[6]);
                         result.parentID = genericController.encodeInteger(row[7]);
-                        result.DropDownFieldList = genericController.vbUCase(genericController.encodeText(row[9]));
-                        result.ContentTableName = genericController.encodeText(contentTablename);
-                        result.ContentDataSourceName = "default";
-                        result.AllowCalendarEvents = genericController.encodeBoolean(row[15]);
-                        result.DefaultSortMethod = genericController.encodeText(row[17]);
-                        if (string.IsNullOrEmpty(result.DefaultSortMethod)) {
-                            result.DefaultSortMethod = "name";
+                        result.dropDownFieldList = genericController.vbUCase(genericController.encodeText(row[9]));
+                        result.contentTableName = genericController.encodeText(contentTablename);
+                        result.contentDataSourceName = "default";
+                        result.allowCalendarEvents = genericController.encodeBoolean(row[15]);
+                        result.defaultSortMethod = genericController.encodeText(row[17]);
+                        if (string.IsNullOrEmpty(result.defaultSortMethod)) {
+                            result.defaultSortMethod = "name";
                         }
-                        result.EditorGroupName = genericController.encodeText(row[18]);
-                        result.AllowContentTracking = genericController.encodeBoolean(row[19]);
-                        result.AllowTopicRules = genericController.encodeBoolean(row[20]);
+                        result.editorGroupName = genericController.encodeText(row[18]);
+                        result.allowContentTracking = genericController.encodeBoolean(row[19]);
+                        result.allowTopicRules = genericController.encodeBoolean(row[20]);
                         // .AllowMetaContent = genericController.EncodeBoolean(row[21])
                         //
-                        result.ActiveOnly = true;
-                        result.AliasID = "ID";
-                        result.AliasName = "NAME";
-                        result.IgnoreContentControl = false;
+                        result.activeOnly = true;
+                        result.aliasID = "ID";
+                        result.aliasName = "NAME";
+                        result.ignoreContentControl = false;
                         //
                         // load parent cdef fields first so we can overlay the current cdef field
                         //
@@ -398,12 +479,12 @@ namespace Contensive.Core.Models.Complex {
                                     }
                                 }
                             }
-                            result.SelectCommaList = string.Join(",", result.selectList);
+                            result.selectCommaList = string.Join(",", result.selectList);
                         }
                         //
                         // ----- Create the ContentControlCriteria
                         //
-                        result.ContentControlCriteria = Models.Complex.cdefModel.getContentControlCriteria(core, result.Id, result.ContentTableName, result.ContentDataSourceName, new List<int>());
+                        result.contentControlCriteria = Models.Complex.cdefModel.getContentControlCriteria(core, result.id, result.contentTableName, result.contentDataSourceName, new List<int>());
                         //
                         getCdef_SetAdminColumns(core, result);
                     }
@@ -424,7 +505,7 @@ namespace Contensive.Core.Models.Complex {
                 int FieldWidthTotal = 0;
                 Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = null;
                 //
-                if (cdef.Id > 0) {
+                if (cdef.id > 0) {
                     int cnt = 0;
                     foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in cdef.fields) {
                         Models.Complex.cdefFieldModel field = keyValuePair.Value;
@@ -794,7 +875,7 @@ namespace Contensive.Core.Models.Complex {
                 //
                 CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                 if (CDef != null) {
-                    returnTableName = CDef.ContentTableName;
+                    returnTableName = CDef.contentTableName;
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -815,7 +896,7 @@ namespace Contensive.Core.Models.Complex {
                 if (CDef == null) {
                     //
                 } else {
-                    returnDataSource = CDef.ContentDataSourceName;
+                    returnDataSource = CDef.contentDataSourceName;
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -836,7 +917,7 @@ namespace Contensive.Core.Models.Complex {
                 //
                 cdef = Models.Complex.cdefModel.getCdef(core, ContentID);
                 if (cdef != null) {
-                    returnName = cdef.Name;
+                    returnName = cdef.name;
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -1600,7 +1681,7 @@ namespace Contensive.Core.Models.Complex {
         //========================================================================
         //
         public static string getContentControlCriteria(coreController core, string ContentName) {
-            return Models.Complex.cdefModel.getCdef(core, ContentName).ContentControlCriteria;
+            return Models.Complex.cdefModel.getCdef(core, ContentName).contentControlCriteria;
         }
         //
         //============================================================================================================
@@ -1733,25 +1814,25 @@ namespace Contensive.Core.Models.Complex {
             Contentdefinition = Models.Complex.cdefModel.getCdef(core, genericController.encodeText(ContentName));
             switch (genericController.vbUCase(genericController.encodeText(PropertyName))) {
                 case "CONTENTCONTROLCRITERIA":
-                    result = Contentdefinition.ContentControlCriteria;
+                    result = Contentdefinition.contentControlCriteria;
                     break;
                 case "ACTIVEONLY":
-                    result = Contentdefinition.ActiveOnly.ToString();
+                    result = Contentdefinition.activeOnly.ToString();
                     break;
                 case "ADMINONLY":
-                    result = Contentdefinition.AdminOnly.ToString();
+                    result = Contentdefinition.adminOnly.ToString();
                     break;
                 case "ALIASID":
-                    result = Contentdefinition.AliasID;
+                    result = Contentdefinition.aliasID;
                     break;
                 case "ALIASNAME":
-                    result = Contentdefinition.AliasName;
+                    result = Contentdefinition.aliasName;
                     break;
                 case "ALLOWADD":
-                    result = Contentdefinition.AllowAdd.ToString();
+                    result = Contentdefinition.allowAdd.ToString();
                     break;
                 case "ALLOWDELETE":
-                    result = Contentdefinition.AllowDelete.ToString();
+                    result = Contentdefinition.allowDelete.ToString();
                     //Case "CHILDIDLIST"
                     //    main_result = Contentdefinition.ChildIDList
                     break;
@@ -1759,10 +1840,10 @@ namespace Contensive.Core.Models.Complex {
                     result = Contentdefinition.dataSourceId.ToString();
                     break;
                 case "DEFAULTSORTMETHOD":
-                    result = Contentdefinition.DefaultSortMethod;
+                    result = Contentdefinition.defaultSortMethod;
                     break;
                 case "DEVELOPERONLY":
-                    result = Contentdefinition.DeveloperOnly.ToString();
+                    result = Contentdefinition.developerOnly.ToString();
                     break;
                 case "FIELDCOUNT":
                     result = Contentdefinition.fields.Count.ToString();
@@ -1770,13 +1851,13 @@ namespace Contensive.Core.Models.Complex {
                     //    main_result = Contentdefinition.FieldPointer
                     break;
                 case "ID":
-                    result = Contentdefinition.Id.ToString();
+                    result = Contentdefinition.id.ToString();
                     break;
                 case "IGNORECONTENTCONTROL":
-                    result = Contentdefinition.IgnoreContentControl.ToString();
+                    result = Contentdefinition.ignoreContentControl.ToString();
                     break;
                 case "NAME":
-                    result = Contentdefinition.Name;
+                    result = Contentdefinition.name;
                     break;
                 case "PARENTID":
                     result = Contentdefinition.parentID.ToString();
@@ -1784,25 +1865,25 @@ namespace Contensive.Core.Models.Complex {
                     //    main_result = Contentdefinition.SingleRecord
                     break;
                 case "CONTENTTABLENAME":
-                    result = Contentdefinition.ContentTableName;
+                    result = Contentdefinition.contentTableName;
                     break;
                 case "CONTENTDATASOURCENAME":
-                    result = Contentdefinition.ContentDataSourceName;
+                    result = Contentdefinition.contentDataSourceName;
                     //Case "AUTHORINGTABLENAME"
                     //    result = Contentdefinition.AuthoringTableName
                     //Case "AUTHORINGDATASOURCENAME"
                     //    result = Contentdefinition.AuthoringDataSourceName
                     break;
                 case "WHERECLAUSE":
-                    result = Contentdefinition.WhereClause;
+                    result = Contentdefinition.whereClause;
                     //Case "ALLOWWORKFLOWAUTHORING"
                     //    result = Contentdefinition.AllowWorkflowAuthoring.ToString
                     break;
                 case "DROPDOWNFIELDLIST":
-                    result = Contentdefinition.DropDownFieldList;
+                    result = Contentdefinition.dropDownFieldList;
                     break;
                 case "SELECTFIELDLIST":
-                    result = Contentdefinition.SelectCommaList;
+                    result = Contentdefinition.selectCommaList;
                     break;
                 default:
                     //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")

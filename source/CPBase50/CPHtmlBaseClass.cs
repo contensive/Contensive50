@@ -45,8 +45,9 @@ namespace Contensive.BaseClasses
 		public abstract string h3(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = ""); 
 		public abstract string h4(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = ""); 
 		public abstract string h5(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = ""); 
-		public abstract string h6(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = ""); 
-		public abstract string RadioBox(string HtmlName, string HtmlValue, string CurrentValue, string HtmlClass = "", string HtmlId = "");
+		public abstract string h6(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "");
+        public abstract string RadioBox(string HtmlName, string HtmlValue, string CurrentValue, string HtmlClass = "", string HtmlId = "");
+        public abstract string RadioBox(string HtmlName, int HtmlValue, int CurrentValue, string HtmlClass = "", string HtmlId = "");
         public abstract string SelectContent(string HtmlName, string HtmlValue, string ContentName, string SQLCriteria = "", string NoneCaption = "", string HtmlClass = "", string HtmlId = "");
         public abstract string SelectList(string HtmlName, string HtmlValue, string OptionList, string NoneCaption = "", string HtmlClass = "", string HtmlId = "");
 		public abstract void ProcessCheckList(string HtmlName, string PrimaryContentName, string PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName);
