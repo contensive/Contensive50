@@ -36,9 +36,6 @@ namespace Contensive.Core.Controllers {
         //          format: <ac type="AGGREGATEFUNCTION" name="(addon's Name)" guid="(addon's guid)" acinstanceid="(guid for this instance)" querystring="(qs formatted addon arguments)">
         //
         // Deprecate all of this:
-        //
-        //       AllowLinkEID    Boolean, if yes, the EID=000... string is added to all links in the content
-        //                       Use this for email so links will include the members longin.
         //   <Ac Type="Date">
         //   <Ac Type="Member" Field="Name">
         //   <Ac Type="Organization" Field="Name">
@@ -87,8 +84,11 @@ namespace Contensive.Core.Controllers {
         /// <param name="addonContext"></param>
         /// <returns></returns>
         public static string renderHtmlForWeb(coreController core, string Source, string ContextContentName = "", int ContextRecordID = 0, int ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
-            return renderHtmlInternal(core, Source, core.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.doc.sessionContext.isAuthenticated, null, core.doc.sessionContext.isEditingAnything());
-            //False, False, True, True, False, True, ""
+            string result = Source;
+            string ignoreLayoutErrors = "";
+            result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, core.doc.sessionContext.user.id, core.doc.sessionContext.visit.VisitAuthenticated);
+            result = renderHtmlInternal(core, result, core.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.doc.sessionContext.isAuthenticated, null, core.doc.sessionContext.isEditingAnything());
+            return result;
         }
         // todo - remove EncodeCachableTags
         //====================================================================================================
@@ -149,7 +149,7 @@ namespace Contensive.Core.Controllers {
                 string IconFilename = null;
                 string reScopeMe_FieldName = null;
                 int Ptr = 0;
-                
+
                 int CSVisitor = 0;
                 int CSVisit = 0;
                 bool CSVisitorSet = false;
@@ -159,7 +159,7 @@ namespace Contensive.Core.Controllers {
                 string ACField = null;
                 string ACName = "";
                 string Copy = null;
-                
+
                 int AttributeCount = 0;
                 int AttributePointer = 0;
                 string Name = null;
@@ -175,8 +175,8 @@ namespace Contensive.Core.Controllers {
                 int ACAttrHSpace = 0;
                 string Filename = "";
                 string ACAttrAlign = null;
-                
-                
+
+
                 string ACLanguageName = null;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string AnchorQuery = "";
@@ -200,7 +200,7 @@ namespace Contensive.Core.Controllers {
                 int FormInputCount = 0;
                 string ACInstanceID = null;
                 string workingContent = null;
-                string NewName = null;
+                //
                 //
                 workingContent = sourceHtmlContent;
                 //
@@ -430,7 +430,207 @@ namespace Contensive.Core.Controllers {
                                         ACType = KmaHTML.ElementAttribute(ElementPointer, "TYPE");
                                         ACInstanceID = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
                                         ACGuid = KmaHTML.ElementAttribute(ElementPointer, "GUID");
-                                        switch (genericController.vbUCase(ACType)) {
+                                        switch (ACType.ToUpper()) {
+                                            case ACTypeAggregateFunction: {
+                                                    //
+                                                    // -- Add-on
+                                                    NotUsedID = 0;
+                                                    AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
+                                                    addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded);
+                                                    if (IsEmailContent) {
+                                                        //
+                                                        // -- Addon for email
+                                                        if (EncodeNonCachableTags) {
+                                                            switch (genericController.vbLCase(ACName)) {
+                                                                case "block text":
+                                                                    //
+                                                                    // -- start block text
+                                                                    Copy = "";
+                                                                    GroupIDList = htmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
+                                                                    if (!core.doc.sessionContext.isMemberOfGroupIdList(core, personalizationPeopleId, true, GroupIDList, true)) {
+                                                                        //
+                                                                        // Block content if not allowed
+                                                                        //
+                                                                        ElementPointer = ElementPointer + 1;
+                                                                        while (ElementPointer < KmaHTML.ElementCount) {
+                                                                            ElementTag = genericController.vbUCase(KmaHTML.TagName(ElementPointer));
+                                                                            if (ElementTag == "AC") {
+                                                                                ACType = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"));
+                                                                                if (ACType == ACTypeAggregateFunction) {
+                                                                                    if (genericController.vbLCase(KmaHTML.ElementAttribute(ElementPointer, "name")) == "block text end") {
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            ElementPointer = ElementPointer + 1;
+                                                                        }
+                                                                    }
+                                                                    break;
+                                                                case "block text end":
+                                                                    //
+                                                                    // -- end block text
+                                                                    Copy = "";
+                                                                    break;
+                                                                default:
+                                                                    //
+                                                                    // -- addons
+                                                                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                                                        addonType = CPUtilsBaseClass.addonContext.ContextEmail,
+                                                                        cssContainerClass = "",
+                                                                        cssContainerId = "",
+                                                                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                                                            contentName = ContextContentName,
+                                                                            fieldName = "",
+                                                                            recordId = ContextRecordID
+                                                                        },
+                                                                        personalizationAuthenticated = personalizationIsAuthenticated,
+                                                                        personalizationPeopleId = personalizationPeopleId,
+                                                                        instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
+                                                                        instanceGuid = ACInstanceID
+                                                                    };
+                                                                    addonModel addon = addonModel.createByName(core, ACName);
+                                                                    Copy = core.addon.execute(addon, executeContext);
+                                                                    break;
+                                                            }
+                                                        }
+                                                    } else {
+                                                        //
+                                                        // Addon - for web
+                                                        //
+
+                                                        if (encodeForWysiwygEditor) {
+                                                            //
+                                                            // Get IconFilename, update the optionstring, and execute optionstring replacement functions
+                                                            //
+                                                            AddonContentName = cnAddons;
+                                                            if (true) {
+                                                                SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid";
+                                                            }
+                                                            if (!string.IsNullOrEmpty(ACGuid)) {
+                                                                Criteria = "ccguid=" + core.db.encodeSQLText(ACGuid);
+                                                            } else {
+                                                                Criteria = "name=" + core.db.encodeSQLText(UCaseACName);
+                                                            }
+                                                            CS = core.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
+                                                            if (core.db.csOk(CS)) {
+                                                                IconFilename = core.db.csGet(CS, "IconFilename");
+                                                                SrcOptionList = core.db.csGet(CS, "ArgumentList");
+                                                                IconWidth = core.db.csGetInteger(CS, "IconWidth");
+                                                                IconHeight = core.db.csGetInteger(CS, "IconHeight");
+                                                                IconSprites = core.db.csGetInteger(CS, "IconSprites");
+                                                                AddonIsInline = core.db.csGetBoolean(CS, "IsInline");
+                                                                ACGuid = core.db.csGetText(CS, "ccGuid");
+                                                                IconAlt = ACName;
+                                                                IconTitle = "Rendered as the Add-on [" + ACName + "]";
+                                                            } else {
+                                                                switch (genericController.vbLCase(ACName)) {
+                                                                    case "block text":
+                                                                        IconFilename = "";
+                                                                        SrcOptionList = AddonOptionConstructor_ForBlockText;
+                                                                        IconWidth = 0;
+                                                                        IconHeight = 0;
+                                                                        IconSprites = 0;
+                                                                        AddonIsInline = true;
+                                                                        ACGuid = "";
+                                                                        break;
+                                                                    case "block text end":
+                                                                        IconFilename = "";
+                                                                        SrcOptionList = "";
+                                                                        IconWidth = 0;
+                                                                        IconHeight = 0;
+                                                                        IconSprites = 0;
+                                                                        AddonIsInline = true;
+                                                                        ACGuid = "";
+                                                                        break;
+                                                                    default:
+                                                                        IconFilename = "";
+                                                                        SrcOptionList = "";
+                                                                        IconWidth = 0;
+                                                                        IconHeight = 0;
+                                                                        IconSprites = 0;
+                                                                        AddonIsInline = false;
+                                                                        IconAlt = "Unknown Add-on [" + ACName + "]";
+                                                                        IconTitle = "Unknown Add-on [" + ACName + "]";
+                                                                        ACGuid = "";
+                                                                        break;
+                                                                }
+                                                            }
+                                                            core.db.csClose(ref CS);
+                                                            //
+                                                            // Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
+                                                            //
+                                                            if (SrcOptionList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) == -1) {
+                                                                if (AddonIsInline) {
+                                                                    SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Inline;
+                                                                } else {
+                                                                    SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Block;
+                                                                }
+                                                            }
+                                                            if (string.IsNullOrEmpty(SrcOptionList)) {
+                                                                ResultOptionListHTMLEncoded = "";
+                                                            } else {
+                                                                ResultOptionListHTMLEncoded = "";
+                                                                SrcOptionList = genericController.vbReplace(SrcOptionList, "\r\n", "\r");
+                                                                SrcOptionList = genericController.vbReplace(SrcOptionList, "\n", "\r");
+                                                                SrcOptions = genericController.stringSplit(SrcOptionList, "\r");
+                                                                for (Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
+                                                                    SrcOptionName = SrcOptions[Ptr];
+                                                                    int LoopPtr2 = 0;
+
+                                                                    while ((SrcOptionName.Length > 1) && (SrcOptionName.Left(1) == "\t") && (LoopPtr2 < 100)) {
+                                                                        SrcOptionName = SrcOptionName.Substring(1);
+                                                                        LoopPtr2 = LoopPtr2 + 1;
+                                                                    }
+                                                                    SrcOptionValueSelector = "";
+                                                                    SrcOptionSelector = "";
+                                                                    Pos = genericController.vbInstr(1, SrcOptionName, "=");
+                                                                    if (Pos > 0) {
+                                                                        SrcOptionValueSelector = SrcOptionName.Substring(Pos);
+                                                                        SrcOptionName = SrcOptionName.Left(Pos - 1);
+                                                                        SrcOptionSelector = "";
+                                                                        Pos = genericController.vbInstr(1, SrcOptionValueSelector, "[");
+                                                                        if (Pos != 0) {
+                                                                            SrcOptionSelector = SrcOptionValueSelector.Substring(Pos - 1);
+                                                                        }
+                                                                    }
+                                                                    // all Src and Instance vars are already encoded correctly
+                                                                    if (!string.IsNullOrEmpty(SrcOptionName)) {
+                                                                        // since AddonOptionString is encoded, InstanceOptionValue will be also
+                                                                        InstanceOptionValue = htmlController.getAddonOptionStringValue(SrcOptionName, addonOptionString);
+                                                                        //InstanceOptionValue = core.csv_GetAddonOption(SrcOptionName, AddonOptionString)
+                                                                        ResultOptionSelector = core.html.getAddonSelector(SrcOptionName, genericController.encodeNvaArgument(InstanceOptionValue), SrcOptionSelector);
+                                                                        //ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
+                                                                        ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded + "&" + ResultOptionSelector;
+                                                                    }
+                                                                }
+                                                                if (!string.IsNullOrEmpty(ResultOptionListHTMLEncoded)) {
+                                                                    ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded.Substring(1);
+                                                                }
+                                                            }
+                                                            ACNameCaption = genericController.vbReplace(ACName, "\"", "");
+                                                            ACNameCaption = genericController.encodeHTML(ACNameCaption);
+                                                            IDControlString = "AC," + ACType + "," + NotUsedID + "," + genericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
+                                                            Copy = genericController.GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0);
+                                                        } else if (EncodeNonCachableTags) {
+                                                            //
+                                                            // Add-on Experiment - move all processing to the Webclient
+                                                            // just pass the name and arguments back in th FPO
+                                                            // HTML encode and quote the name and AddonOptionString
+                                                            //
+                                                            Copy = ""
+                                                            + ""
+                                                            + "<!-- ADDON "
+                                                            + "\"" + ACName + "\""
+                                                            + ",\"" + AddonOptionStringHTMLEncoded + "\""
+                                                            + ",\"" + ACInstanceID + "\""
+                                                            + ",\"" + ACGuid + "\""
+                                                            + " -->"
+                                                            + "";
+                                                        }
+                                                        //
+                                                    }
+                                                    break;
+                                                }
                                             case ACTypeEnd: {
                                                     //
                                                     // End Tag - Personalization
@@ -461,7 +661,7 @@ namespace Contensive.Core.Controllers {
                                                 }
                                             case ACTypeOrganization: {
                                                     string fieldName = KmaHTML.ElementAttribute(ElementPointer, "FIELD").ToLower();
-                                                    if ( string.IsNullOrWhiteSpace(fieldName)) {
+                                                    if (string.IsNullOrWhiteSpace(fieldName)) {
                                                         fieldName = "name";
                                                     }
                                                     if (encodeForWysiwygEditor) {
@@ -470,7 +670,7 @@ namespace Contensive.Core.Controllers {
                                                         Copy = IconImg;
                                                     } else if (EncodeNonCachableTags) {
                                                         if (personalizationPeopleId != 0) {
-                                                            if (!CSOrganizationSet ) {
+                                                            if (!CSOrganizationSet) {
                                                                 if (!CSPeopleSet) {
                                                                     CSPeople = core.db.csOpenRecord("People", personalizationPeopleId);
                                                                     CSPeopleSet = true;
@@ -676,216 +876,6 @@ namespace Contensive.Core.Controllers {
                                                     }
                                                     break;
                                                 }
-                                            case ACTypeAggregateFunction: {
-                                                    //
-                                                    // ----- Add-on
-                                                    //
-                                                    NotUsedID = 0;
-                                                    AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                    addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded);
-                                                    if (IsEmailContent) {
-                                                        //
-                                                        // Addon - for email
-                                                        //
-                                                        if (EncodeNonCachableTags) {
-                                                            //
-                                                            // Only hardcoded Add-ons can run in Emails
-                                                            //
-                                                            switch (genericController.vbLCase(ACName)) {
-                                                                case "block text":
-                                                                    //
-                                                                    // Email is always considered authenticated bc they need their login credentials to get the email.
-                                                                    // Allowed to see the content that follows if you are authenticated, admin, or in the group list
-                                                                    // This must be done out on the page because the csv does not know about authenticated
-                                                                    //
-                                                                    Copy = "";
-                                                                    GroupIDList = htmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
-                                                                    if (!core.doc.sessionContext.isMemberOfGroupIdList(core, personalizationPeopleId, true, GroupIDList, true)) {
-                                                                        //
-                                                                        // Block content if not allowed
-                                                                        //
-                                                                        ElementPointer = ElementPointer + 1;
-                                                                        while (ElementPointer < KmaHTML.ElementCount) {
-                                                                            ElementTag = genericController.vbUCase(KmaHTML.TagName(ElementPointer));
-                                                                            if (ElementTag == "AC") {
-                                                                                ACType = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"));
-                                                                                if (ACType == ACTypeAggregateFunction) {
-                                                                                    if (genericController.vbLCase(KmaHTML.ElementAttribute(ElementPointer, "name")) == "block text end") {
-                                                                                        break;
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                            ElementPointer = ElementPointer + 1;
-                                                                        }
-                                                                    }
-                                                                    break;
-                                                                case "block text end":
-                                                                    //
-                                                                    // always remove end tags because the block text did not remove it
-                                                                    //
-                                                                    Copy = "";
-                                                                    break;
-                                                                default:
-                                                                    //
-                                                                    // all other add-ons, pass out to coreClass to process
-                                                                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                                                                        addonType = CPUtilsBaseClass.addonContext.ContextEmail,
-                                                                        cssContainerClass = "",
-                                                                        cssContainerId = "",
-                                                                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                                                            contentName = ContextContentName,
-                                                                            fieldName = "",
-                                                                            recordId = ContextRecordID
-                                                                        },
-                                                                        personalizationAuthenticated = personalizationIsAuthenticated,
-                                                                        personalizationPeopleId = personalizationPeopleId,
-                                                                        instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
-                                                                        instanceGuid = ACInstanceID
-                                                                    };
-                                                                    addonModel addon = addonModel.createByName(core, ACName);
-                                                                    Copy = core.addon.execute(addon, executeContext);
-                                                                    //Copy = core.addon.execute_legacy6(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
-                                                                    break;
-                                                            }
-                                                        }
-                                                    } else {
-                                                        //
-                                                        // Addon - for web
-                                                        //
-
-                                                        if (encodeForWysiwygEditor) {
-                                                            //
-                                                            // Get IconFilename, update the optionstring, and execute optionstring replacement functions
-                                                            //
-                                                            AddonContentName = cnAddons;
-                                                            if (true) {
-                                                                SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid";
-                                                            }
-                                                            if (!string.IsNullOrEmpty(ACGuid)) {
-                                                                Criteria = "ccguid=" + core.db.encodeSQLText(ACGuid);
-                                                            } else {
-                                                                Criteria = "name=" + core.db.encodeSQLText(UCaseACName);
-                                                            }
-                                                            CS = core.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
-                                                            if (core.db.csOk(CS)) {
-                                                                 IconFilename = core.db.csGet(CS, "IconFilename");
-                                                                SrcOptionList = core.db.csGet(CS, "ArgumentList");
-                                                                IconWidth = core.db.csGetInteger(CS, "IconWidth");
-                                                                IconHeight = core.db.csGetInteger(CS, "IconHeight");
-                                                                IconSprites = core.db.csGetInteger(CS, "IconSprites");
-                                                                AddonIsInline = core.db.csGetBoolean(CS, "IsInline");
-                                                                ACGuid = core.db.csGetText(CS, "ccGuid");
-                                                                IconAlt = ACName;
-                                                                IconTitle = "Rendered as the Add-on [" + ACName + "]";
-                                                            } else {
-                                                                switch (genericController.vbLCase(ACName)) {
-                                                                    case "block text":
-                                                                        IconFilename = "";
-                                                                        SrcOptionList = AddonOptionConstructor_ForBlockText;
-                                                                        IconWidth = 0;
-                                                                        IconHeight = 0;
-                                                                        IconSprites = 0;
-                                                                        AddonIsInline = true;
-                                                                        ACGuid = "";
-                                                                        break;
-                                                                    case "block text end":
-                                                                        IconFilename = "";
-                                                                        SrcOptionList = "";
-                                                                        IconWidth = 0;
-                                                                        IconHeight = 0;
-                                                                        IconSprites = 0;
-                                                                        AddonIsInline = true;
-                                                                        ACGuid = "";
-                                                                        break;
-                                                                    default:
-                                                                        IconFilename = "";
-                                                                        SrcOptionList = "";
-                                                                        IconWidth = 0;
-                                                                        IconHeight = 0;
-                                                                        IconSprites = 0;
-                                                                        AddonIsInline = false;
-                                                                        IconAlt = "Unknown Add-on [" + ACName + "]";
-                                                                        IconTitle = "Unknown Add-on [" + ACName + "]";
-                                                                        ACGuid = "";
-                                                                        break;
-                                                                }
-                                                            }
-                                                            core.db.csClose(ref CS);
-                                                            //
-                                                            // Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
-                                                            //
-                                                            if (SrcOptionList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) == -1) {
-                                                                if (AddonIsInline) {
-                                                                    SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Inline;
-                                                                } else {
-                                                                    SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Block;
-                                                                }
-                                                            }
-                                                            if (string.IsNullOrEmpty(SrcOptionList)) {
-                                                                ResultOptionListHTMLEncoded = "";
-                                                            } else {
-                                                                ResultOptionListHTMLEncoded = "";
-                                                                SrcOptionList = genericController.vbReplace(SrcOptionList, "\r\n", "\r");
-                                                                SrcOptionList = genericController.vbReplace(SrcOptionList, "\n", "\r");
-                                                                SrcOptions = genericController.stringSplit(SrcOptionList, "\r");
-                                                                for (Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
-                                                                    SrcOptionName = SrcOptions[Ptr];
-                                                                    int LoopPtr2 = 0;
-
-                                                                    while ((SrcOptionName.Length > 1) && (SrcOptionName.Left(1) == "\t") && (LoopPtr2 < 100)) {
-                                                                        SrcOptionName = SrcOptionName.Substring(1);
-                                                                        LoopPtr2 = LoopPtr2 + 1;
-                                                                    }
-                                                                    SrcOptionValueSelector = "";
-                                                                    SrcOptionSelector = "";
-                                                                    Pos = genericController.vbInstr(1, SrcOptionName, "=");
-                                                                    if (Pos > 0) {
-                                                                        SrcOptionValueSelector = SrcOptionName.Substring(Pos);
-                                                                        SrcOptionName = SrcOptionName.Left(Pos - 1);
-                                                                        SrcOptionSelector = "";
-                                                                        Pos = genericController.vbInstr(1, SrcOptionValueSelector, "[");
-                                                                        if (Pos != 0) {
-                                                                            SrcOptionSelector = SrcOptionValueSelector.Substring(Pos - 1);
-                                                                        }
-                                                                    }
-                                                                    // all Src and Instance vars are already encoded correctly
-                                                                    if (!string.IsNullOrEmpty(SrcOptionName)) {
-                                                                        // since AddonOptionString is encoded, InstanceOptionValue will be also
-                                                                        InstanceOptionValue = htmlController.getAddonOptionStringValue(SrcOptionName, addonOptionString);
-                                                                        //InstanceOptionValue = core.csv_GetAddonOption(SrcOptionName, AddonOptionString)
-                                                                        ResultOptionSelector = core.html.getAddonSelector(SrcOptionName, genericController.encodeNvaArgument(InstanceOptionValue), SrcOptionSelector);
-                                                                        //ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
-                                                                        ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded + "&" + ResultOptionSelector;
-                                                                    }
-                                                                }
-                                                                if (!string.IsNullOrEmpty(ResultOptionListHTMLEncoded)) {
-                                                                    ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded.Substring(1);
-                                                                }
-                                                            }
-                                                            ACNameCaption = genericController.vbReplace(ACName, "\"", "");
-                                                            ACNameCaption = genericController.encodeHTML(ACNameCaption);
-                                                            IDControlString = "AC," + ACType + "," + NotUsedID + "," + genericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
-                                                            Copy = genericController.GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0);
-                                                        } else if (EncodeNonCachableTags) {
-                                                            //
-                                                            // Add-on Experiment - move all processing to the Webclient
-                                                            // just pass the name and arguments back in th FPO
-                                                            // HTML encode and quote the name and AddonOptionString
-                                                            //
-                                                            Copy = ""
-                                                            + ""
-                                                            + "<!-- ADDON "
-                                                            + "\"" + ACName + "\""
-                                                            + ",\"" + AddonOptionStringHTMLEncoded + "\""
-                                                            + ",\"" + ACInstanceID + "\""
-                                                            + ",\"" + ACGuid + "\""
-                                                            + " -->"
-                                                            + "";
-                                                        }
-                                                        //
-                                                    }
-                                                    break;
-                                                }
                                             case ACTypeImage: {
                                                     //
                                                     // ----- Image Tag, substitute image placeholder with the link from the REsource Library Record
@@ -1036,19 +1026,12 @@ namespace Contensive.Core.Controllers {
                                                     } else if (EncodeNonCachableTags) {
                                                         //
                                                         // Add in the Content Page
-                                                        //
-                                                        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                        //test - encoding changed
-                                                        NewName = htmlController.getAddonOptionStringValue("new", addonOptionString);
-                                                        //NewName =  genericController.DecodeResponseVariable(getSimpleNameValue("new", AddonOptionString, "", "&"))
+                                                        string NewName = htmlController.getAddonOptionStringValue("new", addonOptionString);
                                                         TextName = htmlController.getAddonOptionStringValue("name", addonOptionString);
-                                                        //TextName = getSimpleNameValue("name", AddonOptionString)
                                                         if (string.IsNullOrEmpty(TextName)) {
                                                             TextName = "Default";
                                                         }
                                                         Copy = "{{" + ACTypeTemplateText + "?name=" + genericController.encodeNvaArgument(TextName) + "&new=" + genericController.encodeNvaArgument(NewName) + "}}";
-                                                        // ***** can not add it here, if a web hit, it must be encoded from the web client for aggr objects
-                                                        //Copy = csv_GetContentCopy(TextName, "Copy Content", "", personalizationpeopleId)
                                                     }
                                                     //Case ACTypeDynamicMenu
                                                     //    '
@@ -1875,36 +1858,10 @@ namespace Contensive.Core.Controllers {
         private static string renderHtmlInternal(coreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
             string result = sourceHtmlContent;
             try {
-                //
                 const string StartFlag = "<!-- ADDON";
                 const string EndFlag = " -->";
-                //
                 if (!string.IsNullOrEmpty(sourceHtmlContent)) {
-                    //
-                    bool DoAnotherPass = false;
-                    int ArgCnt = 0;
-                    string AddonGuid = null;
-                    string ACInstanceID = null;
-                    string[] ArgSplit = null;
-                    string AddonName = null;
-                    string addonOptionString = null;
                     int LineStart = 0;
-                    int LineEnd = 0;
-                    string Copy = null;
-                    string[] Wrapper = null;
-                    string[] SegmentSplit = null;
-                    string AcCmd = null;
-                    string SegmentSuffix = null;
-                    string[] AcCmdSplit = null;
-                    string ACType = null;
-                    string[] ContentSplit = null;
-                    int ContentSplitCnt = 0;
-                    string Segment = null;
-                    int Ptr = 0;
-                    string CopyName = null;
-                    string ListName = null;
-                    string SortField = null;
-                    bool SortReverse = false;
                     //
                     if (personalizationPeopleId <= 0) {
                         personalizationPeopleId = core.doc.sessionContext.user.id;
@@ -1922,7 +1879,7 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     // -- resize images
-                    result = optimizeLibraryFileImagesInHtmlContent(core , result);
+                    result = optimizeLibraryFileImagesInHtmlContent(core, result);
                     //
                     // -- Do Active Content Conversion
                     if (addLinkAuthToAllLinks || EncodeActiveFormatting || EncodeActiveImages || EncodeActiveEditIcons) {
@@ -1937,13 +1894,13 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- Process Active Content that must be run here to access webclass objects parse as {{functionname?querystring}}
                     if ((!EncodeActiveEditIcons) && (result.IndexOf("{{") != -1)) {
-                        ContentSplit = genericController.stringSplit(result, "{{");
+                        string[] ContentSplit = genericController.stringSplit(result, "{{");
                         result = "";
-                        ContentSplitCnt = ContentSplit.GetUpperBound(0) + 1;
-                        Ptr = 0;
+                        int ContentSplitCnt = ContentSplit.GetUpperBound(0) + 1;
+                        int Ptr = 0;
                         while (Ptr < ContentSplitCnt) {
                             //hint = hint & ",200"
-                            Segment = ContentSplit[Ptr];
+                            string Segment = ContentSplit[Ptr];
                             if (Ptr == 0) {
                                 //
                                 // Add in the non-command text that is before the first command
@@ -1961,17 +1918,18 @@ namespace Contensive.Core.Controllers {
                                     // isolate the command
                                     //
                                     //hint = hint & ",220"
-                                    SegmentSplit = genericController.stringSplit(Segment, "}}");
-                                    AcCmd = SegmentSplit[0];
+                                    string[] SegmentSplit = genericController.stringSplit(Segment, "}}");
+                                    string AcCmd = SegmentSplit[0];
                                     SegmentSplit[0] = "";
-                                    SegmentSuffix = string.Join("}}", SegmentSplit).Substring(2);
+                                    string SegmentSuffix = string.Join("}}", SegmentSplit).Substring(2);
                                     if (!string.IsNullOrEmpty(AcCmd.Trim(' '))) {
                                         //
                                         // isolate the arguments
                                         //
                                         //hint = hint & ",230"
-                                        AcCmdSplit = AcCmd.Split('?');
-                                        ACType = AcCmdSplit[0].Trim(' ');
+                                        string[] AcCmdSplit = AcCmd.Split('?');
+                                        string ACType = AcCmdSplit[0].Trim(' ');
+                                        string addonOptionString = "";
                                         if (AcCmdSplit.GetUpperBound(0) == 0) {
                                             addonOptionString = "";
                                         } else {
@@ -2006,14 +1964,14 @@ namespace Contensive.Core.Controllers {
                                                 // Child Page List
                                                 //
                                                 //hint = hint & ",320"
-                                                ListName = addonController.getAddonOption("name", addonOptionString);
+                                                string ListName = addonController.getAddonOption("name", addonOptionString);
                                                 result = result + core.doc.getChildPageList(ListName, ContextContentName, ContextRecordID, true);
                                                 break;
                                             case ACTypeTemplateText:
                                                 //
                                                 // Text Box = copied here from gethtmlbody
                                                 //
-                                                CopyName = addonController.getAddonOption("new", addonOptionString);
+                                                string CopyName = addonController.getAddonOption("new", addonOptionString);
                                                 if (string.IsNullOrEmpty(CopyName)) {
                                                     CopyName = addonController.getAddonOption("name", addonOptionString);
                                                     if (string.IsNullOrEmpty(CopyName)) {
@@ -2028,8 +1986,8 @@ namespace Contensive.Core.Controllers {
                                                 //
                                                 //hint = hint & ",330"
                                                 ListName = addonController.getAddonOption("LISTNAME", addonOptionString);
-                                                SortField = addonController.getAddonOption("SORTFIELD", addonOptionString);
-                                                SortReverse = genericController.encodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString));
+                                                string SortField = addonController.getAddonOption("SORTFIELD", addonOptionString);
+                                                bool SortReverse = genericController.encodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString));
                                                 result = result + core.doc.main_GetWatchList(core, ListName, SortField, SortReverse);
                                                 break;
                                             default:
@@ -2065,21 +2023,24 @@ namespace Contensive.Core.Controllers {
                     //    and all add-ons run as processes the same as they run on pages, or as remote methods
                     // (2/16/2010) - if <!-- AC --> has four arguments, the fourth is the addon guid
                     //
+                    // todo - deprecate execute addons based on this comment system "<!-- addon"
                     if (result.IndexOf(StartFlag) != -1) {
+                        int LineEnd = 0;
                         while (result.IndexOf(StartFlag) != -1) {
                             LineStart = genericController.vbInstr(1, result, StartFlag);
                             LineEnd = genericController.vbInstr(LineStart, result, EndFlag);
+                            string Copy = "";
                             if (LineEnd == 0) {
                                 logController.appendLog(core, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly");
                                 break;
                             } else {
-                                AddonName = "";
-                                addonOptionString = "";
-                                ACInstanceID = "";
-                                AddonGuid = "";
+                                string AddonName = "";
+                                string addonOptionString = "";
+                                string ACInstanceID = "";
+                                string AddonGuid = "";
                                 Copy = result.Substring(LineStart + 10, LineEnd - LineStart - 11);
-                                ArgSplit = genericController.SplitDelimited(Copy, ",");
-                                ArgCnt = ArgSplit.GetUpperBound(0) + 1;
+                                string[] ArgSplit = genericController.SplitDelimited(Copy, ",");
+                                int ArgCnt = ArgSplit.GetUpperBound(0) + 1;
                                 if (!string.IsNullOrEmpty(ArgSplit[0])) {
                                     AddonName = ArgSplit[0].Substring(1, ArgSplit[0].Length - 2);
                                     if (ArgCnt > 1) {
@@ -2133,6 +2094,7 @@ namespace Contensive.Core.Controllers {
                     // with the marker, encode content is called with the result, which is just the marker, and this
                     // section will remove it
                     //
+                    bool DoAnotherPass = false;
                     if ((!isEditingAnything) && (result != BlockTextStartMarker)) {
                         DoAnotherPass = true;
                         while ((result.IndexOf(BlockTextStartMarker, System.StringComparison.OrdinalIgnoreCase) != -1) && DoAnotherPass) {
@@ -2140,7 +2102,7 @@ namespace Contensive.Core.Controllers {
                             if (LineStart == 0) {
                                 DoAnotherPass = false;
                             } else {
-                                LineEnd = genericController.vbInstr(LineStart, result, BlockTextEndMarker, 1);
+                                int LineEnd = genericController.vbInstr(LineStart, result, BlockTextEndMarker, 1);
                                 if (LineEnd <= 0) {
                                     DoAnotherPass = false;
                                     result = result.Left(LineStart - 1);
@@ -2170,15 +2132,15 @@ namespace Contensive.Core.Controllers {
                         if (isEditingAnything) {
                             if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
                                 //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
-                                Copy = core.html.getEditWrapper("Aggregate Script", "##MARKER##");
-                                Wrapper = genericController.stringSplit(Copy, "##MARKER##");
+                                string Copy = core.html.getEditWrapper("Aggregate Script", "##MARKER##");
+                                string[] Wrapper = genericController.stringSplit(Copy, "##MARKER##");
                                 result = genericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
                                 result = genericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
                             }
                             if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
                                 //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
-                                Copy = core.html.getEditWrapper("Aggregate Replacement", "##MARKER##");
-                                Wrapper = genericController.stringSplit(Copy, "##MARKER##");
+                                string Copy = core.html.getEditWrapper("Aggregate Replacement", "##MARKER##");
+                                string[] Wrapper = genericController.stringSplit(Copy, "##MARKER##");
                                 result = genericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, 1);
                                 result = genericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, 1);
                             }
@@ -2242,7 +2204,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// for html content, this routine optimizes images referenced in the html if they are from library file
         /// </summary>
-        public static string optimizeLibraryFileImagesInHtmlContent( coreController core, string htmlContent) {
+        public static string optimizeLibraryFileImagesInHtmlContent(coreController core, string htmlContent) {
             string result = htmlContent;
             try {
                 // todo - upgradeActiveContent runs every render, can it be eliminated/minimized
@@ -2568,21 +2530,27 @@ namespace Contensive.Core.Controllers {
         /// Convert an active content field (html data stored with <ac></ac> html tags) to a wysiwyg editor request (html with edit icon <img> for <ac></ac>)
         /// </summary>
         public static string renderHtmlForWysiwygEditor(coreController core, string editorValue) {
-            return renderHtmlInternal(core, editorValue, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, null, false);
+            string result = editorValue;
+            result = renderHtmlInternal(core, result, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, null, false);
+            return result;
         }
         //
         //====================================================================================================
         //
         public static string renderJSONForRemoteMethod(coreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
-            return renderHtmlInternal(core, Source, core.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.doc.sessionContext.isAuthenticated, null, core.doc.sessionContext.isEditingAnything());
-            //False, False, True, True, False, True, ""
+            string result = Source;
+            result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, ContextContactPeopleID, false);
+            result = renderHtmlInternal(core, result, core.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.doc.sessionContext.isAuthenticated, null, core.doc.sessionContext.isEditingAnything());
+            return result;
         }
         //
         //====================================================================================================
         //
-        public static  string renderHtmlForEmail(coreController core, string Source, int personalizationPeopleID, string queryStringForLinkAppend) {
-            return renderHtmlInternal(core, Source, personalizationPeopleID, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
-            //False, False, True, True, False, True, ""
+        public static string renderHtmlForEmail(coreController core, string Source, int personalizationPeopleID, string queryStringForLinkAppend) {
+            string result = Source;
+            result = contentCmdController.executeContentCommands(core, result, CPUtilsClass.addonContext.ContextEmail, personalizationPeopleID, true);
+            result = renderHtmlInternal(core, result, personalizationPeopleID, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
+            return result;
         }
     }
 }

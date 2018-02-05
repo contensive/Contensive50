@@ -4789,7 +4789,7 @@ namespace Contensive.Core.Controllers {
                     RecordID = core.db.csGetInteger(CS, "ID");
                     contactPeopleId = core.db.csGetInteger(CS, "modifiedBy");
                     returnCopy = core.db.csGet(CS, "Copy");
-                    returnCopy = contentCmdController.executeContentCommands(core, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, ref Return_ErrorMessage);
+                    //returnCopy = contentCmdController.executeContentCommands(core, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, ref Return_ErrorMessage);
                     returnCopy = activeContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
                     //
                     if (true) {

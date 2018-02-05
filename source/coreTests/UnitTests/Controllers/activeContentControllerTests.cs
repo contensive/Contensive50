@@ -98,46 +98,6 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 Assert.AreEqual(testOrgName, resultString);
             }
         }
-        //
-        //====================================================================================================
-        //
-        [TestMethod()]
-        public void Controllers_ActiveContent_visit() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
-                // arrange
-                string source = "<ac Type=\"visit\" Field=\"Name\">";
-                // act
-                DateTime dateBefore = DateTime.Now;
-                string resultString = Contensive.Core.Controllers.activeContentController.renderHtmlForWeb(
-                    core: cp.core,
-                    Source: source,
-                    addonContext: BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
-                );
-                // assert
-                // will be deprecated
-                Assert.AreNotEqual(source, resultString);
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        [TestMethod()]
-        public void Controllers_ActiveContent_visitor() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
-                // arrange
-                string source = "<ac Type=\"visitor\" Field=\"Name\">";
-                // act
-                DateTime dateBefore = DateTime.Now;
-                string resultString = Contensive.Core.Controllers.activeContentController.renderHtmlForWeb(
-                    core: cp.core,
-                    Source: source,
-                    addonContext: BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
-                );
-                // assert
-                // will be deprecated, but old content might include it
-                Assert.AreNotEqual(source, resultString);
-            }
-        }
 
 
 

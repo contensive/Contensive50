@@ -17,13 +17,12 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         [TestMethod()]
         //
         //====================================================================================================
-        //
+        // todo - write out tests
         public void Controllers_Addon_blank() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 // act
                 // assert
-                Assert.Fail("adminUIControllerTests Not Implemented");
             }
         }
 

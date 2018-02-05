@@ -349,10 +349,7 @@ namespace Contensive.Core.Controllers {
                             // not editor, encode the content parts of the addon
                             //
                             result = addon.CopyText + addon.Copy;
-                            if (!string.IsNullOrEmpty(result)) {
-                                string ignoreLayoutErrors = "";
-                                result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
-                            }
+                            string ignoreLayoutErrors = "";
                             switch (executeContext.addonType) {
                                 case CPUtilsBaseClass.addonContext.ContextEditor:
                                     result = activeContentController.renderHtmlForWysiwygEditor(core, result);
@@ -370,20 +367,23 @@ namespace Contensive.Core.Controllers {
                                 case CPUtilsBaseClass.addonContext.ContextTemplate:
                                 case CPUtilsBaseClass.addonContext.ContextAdmin:
                                 case CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml:
+                                    //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
                                     result = activeContentController.renderHtmlForWeb(core, result, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                     break;
                                 case CPUtilsBaseClass.addonContext.ContextOnContentChange:
                                 case CPUtilsBaseClass.addonContext.ContextSimple:
+                                    //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
                                     result = activeContentController.renderHtmlForWeb(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                     break;
                                 case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
+                                    //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
                                     result = activeContentController.renderJSONForRemoteMethod(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
                                     break;
                                 default:
+                                    //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
                                     result = activeContentController.renderHtmlForWeb(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                     break;
                             }
-                            //result = core.html.convertActiveContent_internal(result, executeContext.personalizationPeopleId, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, 0, False, False, True, True, False, True, "", "", (executeContext.addonType = CPUtilsBaseClass.addonContext.ContextEmail), executeContext.wrapperID, "", executeContext.addonType, executeContext.personalizationAuthenticated, Nothing, False)
                         }
                         //
                         // -- Scripting code

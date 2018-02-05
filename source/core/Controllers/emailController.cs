@@ -253,18 +253,18 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- personalize subject
                     string personalizedSubject = subject;
-                    personalizedSubject  = contentCmdController.executeContentCommands(core, personalizedSubject, CPUtilsBaseClass.addonContext.ContextEmail, person.id, true, ref returnSendStatus);
+                    //personalizedSubject  = contentCmdController.executeContentCommands(core, personalizedSubject, CPUtilsBaseClass.addonContext.ContextEmail, person.id, true, ref returnSendStatus);
                     personalizedSubject = activeContentController.renderHtmlForEmail(core, personalizedSubject, person.id, queryStringForLinkAppend);
                     //
                     // -- personalize body
                     string personalizedBody = Body;
-                    personalizedBody = contentCmdController.executeContentCommands(core, personalizedBody, CPUtilsBaseClass.addonContext.ContextEmail, person.id, true, ref returnSendStatus);
+                    //personalizedBody = contentCmdController.executeContentCommands(core, personalizedBody, CPUtilsBaseClass.addonContext.ContextEmail, person.id, true, ref returnSendStatus);
                     personalizedBody = activeContentController.renderHtmlForEmail(core, personalizedBody, person.id, queryStringForLinkAppend);
                     //
                     // -- encode template
                     if (!string.IsNullOrWhiteSpace(template)) {
                         string personalizedTemplate = template;
-                        personalizedTemplate = contentCmdController.executeContentCommands(core, personalizedTemplate, CPUtilsBaseClass.addonContext.ContextEmail, person.id, true, ref returnSendStatus);
+                        //personalizedTemplate = contentCmdController.executeContentCommands(core, personalizedTemplate, CPUtilsBaseClass.addonContext.ContextEmail, person.id, true, ref returnSendStatus);
                         personalizedTemplate = activeContentController.renderHtmlForEmail(core, personalizedTemplate, person.id, queryStringForLinkAppend);
                         //
                         // -- merge body into template

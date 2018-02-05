@@ -81,7 +81,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Encode Template
                     //
-                    LocalTemplateBody = contentCmdController.executeContentCommands(core, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
+                    //LocalTemplateBody = contentCmdController.executeContentCommands(core, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
                     returnBody += activeContentController.renderHtmlForWeb(core, LocalTemplateBody, "Page Templates", LocalTemplateID, 0, core.webServer.requestProtocol + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
                     //
                     // If Content was not found, add it to the end
@@ -2196,7 +2196,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Encode the copy
                     //
-                    returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
+                    //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
                     returnHtml = activeContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                     if (core.doc.refreshQueryString != "") {
                         returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + core.doc.refreshQueryString, 1, 99, 1);
@@ -2218,12 +2218,12 @@ namespace Contensive.Core.Controllers {
                             //
                             // Link authoring, workflow rendering -> do encoding, but no tracking
                             //
-                            returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
+                            //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
                             returnHtml = activeContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         } else {
                             //
                             // Live content
-                            returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
+                            //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
                             returnHtml = activeContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             core.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.page.id);
                         }

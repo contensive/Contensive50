@@ -21,7 +21,9 @@ namespace Contensive.Core.Controllers {
     //          format: context switch on {% and %}
     //
     //              commands:
-    //                  commands append their output to an acumulator, and the accumulator is returned at the end of the commands
+    //                  commands append their output to an acumulator
+    //                  the accumulator is passed to each addon
+    //                  the accumulator is returned when all addons are finished.
     //
     //              simple syntax:
     //                  {% user firstname %} - outputs the users firstname
@@ -191,7 +193,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="personalizationPeopleId"></param>
         /// <param name="personalizationIsAuthenticated"></param>
         /// <returns></returns>
-        private static string executeContentCommands(coreController core,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        public static string executeContentCommands(coreController core,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 bool badCmd = false;
@@ -992,7 +994,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="Return_ErrorMessage"></param>
         /// <returns></returns>
         //
-        public static string executeContentCommands(coreController core, string Source, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated, ref string Return_ErrorMessage) {
+        public static string executeContentCommandLooping(coreController core, string Source, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 int LoopPtr = 0;

@@ -29,28 +29,5 @@ namespace Contensive.Core {
             core.siteProperties.setProperty(propertyName, propertyValue);
         }
 
-        // 
-        // ====================================================================================================
-        // 
-        public string EncodeContent9(
-                    object Source, 
-                    int i0, 
-                    string s2, 
-                    int i3, 
-                    int i4, 
-                    bool b5, 
-                    bool b6, 
-                    bool b7, 
-                    bool b8, 
-                    bool b9, 
-                    bool b10, 
-                    string s11, 
-                    string s12, 
-                    bool b13, 
-                    int i14, 
-                    string s15, 
-                    int i16) {
-            return activeContentController.renderHtmlForWysiwygEditor(core, Controllers.genericController.encodeText(Source));
-        }
     }
 }
