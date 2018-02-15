@@ -43,7 +43,6 @@ namespace Contensive.Core {
         /// </summary>
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
-                appendDebugLog(".dispose, dereference main, csv");
                 if (disposing) {
                     //
                     // call .dispose for managed objects
@@ -62,7 +61,7 @@ namespace Contensive.Core {
         //
         public override bool Admin {
             get {
-                return  (cp.core.doc.addonModelStack.Count==0) ? false : cp.core.doc.addonModelStack.Peek().Admin;
+                return cp.core.doc.addonModelStack.Peek().Admin;
             }
         }
         //
@@ -70,7 +69,7 @@ namespace Contensive.Core {
         //
         public override string ArgumentList {
             get {
-                return (cp.core.doc.addonModelStack.Count == 0) ? "" : cp.core.doc.addonModelStack.Peek().ArgumentList;
+                return cp.core.doc.addonModelStack.Peek().ArgumentList;
             }
         }
         //
@@ -78,7 +77,7 @@ namespace Contensive.Core {
         //
         public override bool AsAjax {
             get {
-                return (cp.core.doc.addonModelStack.Count == 0) ? false : cp.core.doc.addonModelStack.Peek().Admin;
+                return cp.core.doc.addonModelStack.Peek().Admin;
             }
         }
         //
@@ -96,7 +95,7 @@ namespace Contensive.Core {
         //
         public override string ccGuid {
             get {
-                return (cp.core.doc.addonModelStack.Count == 0) ? "" : cp.core.doc.addonModelStack.Peek().ccguid;
+                return cp.core.doc.addonModelStack.Peek().ccguid;
             }
         }
         //
@@ -104,7 +103,7 @@ namespace Contensive.Core {
         //
         public override int CollectionID {
             get {
-                return (cp.core.doc.addonModelStack.Count == 0) ? 0 : cp.core.doc.addonModelStack.Peek().CollectionID;
+                return cp.core.doc.addonModelStack.Peek().CollectionID;
             }
         }
         //
@@ -112,7 +111,7 @@ namespace Contensive.Core {
         //
         public override bool Content {
             get {
-                return (cp.core.doc.addonModelStack.Count == 0) ? false : cp.core.doc.addonModelStack.Peek().Content;
+                return cp.core.doc.addonModelStack.Peek().Content;
             }
         }
         //
@@ -120,7 +119,7 @@ namespace Contensive.Core {
         //
         public override string Copy {
             get {
-                return (cp.core.doc.addonModelStack.Count == 0) ? "" : cp.core.doc.addonModelStack.Peek().Copy;
+                return cp.core.doc.addonModelStack.Peek().Copy;
 
             }
         }
@@ -129,12 +128,13 @@ namespace Contensive.Core {
         //
         public override string CopyText {
             get {
-                return (cp.core.doc.addonModelStack.Count == 0) ? "" : cp.core.doc.addonModelStack.Peek().CopyText;
+                return cp.core.doc.addonModelStack.Peek().CopyText;
             }
         }
         //
         //====================================================================================================
         //
+        [Obsolete("This is no longer supported.", true)]
         public override string CustomStyles {
             get {
                 return "";
@@ -143,14 +143,16 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
+        [Obsolete("This is no longer supported.", true)]
         public override string DefaultStyles {
             get {
-                return (cp.core.doc.addonModelStack.Count == 0) ? "" : cp.core.doc.addonModelStack.Peek().StylesFilename.content;
+                return cp.core.doc.addonModelStack.Peek().StylesFilename.content;
             }
         }
         //
         //====================================================================================================
-        // todo deprecate
+        // 
+        [Obsolete("This is no longer supported.", true)]
         public override string Description {
             get {
                 return "";
@@ -161,8 +163,7 @@ namespace Contensive.Core {
         // todo finish the methods -- read from doc addonmodelstack peak
         public override string DotNetClass {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().DotNetClass;
             }
         }
         //
@@ -170,8 +171,7 @@ namespace Contensive.Core {
         //
         public override string FormXML {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().FormXML;
             }
         }
         //
@@ -179,8 +179,7 @@ namespace Contensive.Core {
         //
         public override string Help {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().Help;
             }
         }
         //
@@ -188,8 +187,7 @@ namespace Contensive.Core {
         //
         public override string HelpLink {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().HelpLink;
             }
         }
         //
@@ -197,8 +195,7 @@ namespace Contensive.Core {
         //
         public override string IconFilename {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().IconFilename;
             }
         }
         //
@@ -206,7 +203,7 @@ namespace Contensive.Core {
         //
         public override int IconHeight {
             get {
-                return 0;
+                return cp.core.doc.addonModelStack.Peek().IconHeight;
             }
         }
         //
@@ -214,8 +211,7 @@ namespace Contensive.Core {
         //
         public override int IconSprites {
             get {
-                return 0;
-
+                return cp.core.doc.addonModelStack.Peek().IconSprites;
             }
         }
         //
@@ -223,8 +219,7 @@ namespace Contensive.Core {
         //
         public override int IconWidth {
             get {
-                return 0;
-
+                return cp.core.doc.addonModelStack.Peek().IconWidth;
             }
         }
         //
@@ -232,8 +227,7 @@ namespace Contensive.Core {
         //
         public override int ID {
             get {
-                return 0;
-
+                return cp.core.doc.addonModelStack.Peek().id;
             }
         }
         //
@@ -241,8 +235,7 @@ namespace Contensive.Core {
         //
         public override bool InFrame {
             get {
-
-                return false;
+                return cp.core.doc.addonModelStack.Peek().InFrame;
             }
         }
         //
@@ -250,22 +243,22 @@ namespace Contensive.Core {
         //
         public override bool IsInline {
             get {
-                return false;
-
+                return cp.core.doc.addonModelStack.Peek().IsInline;
             }
         }
         //
         //====================================================================================================
         //
+        [Obsolete("This is no longer supported.", true)]
         public override string JavaScriptBodyEnd {
             get {
-
                 return "";
             }
         }
         //
         //====================================================================================================
         //
+        [Obsolete("This is no longer supported.", true)]
         public override string JavascriptInHead {
             get {
                 return "";
@@ -287,8 +280,7 @@ namespace Contensive.Core {
         //
         public override string Link {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().Link;
             }
         }
         //
@@ -296,8 +288,7 @@ namespace Contensive.Core {
         //
         public override string MetaDescription {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().MetaDescription;
             }
         }
         //
@@ -305,8 +296,7 @@ namespace Contensive.Core {
         //
         public override string MetaKeywordList {
             get {
-
-                return "";
+                return cp.core.doc.addonModelStack.Peek().MetaKeywordList;
             }
         }
         //
@@ -314,8 +304,7 @@ namespace Contensive.Core {
         //
         public override string Name {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().name;
             }
         }
         //
@@ -323,7 +312,22 @@ namespace Contensive.Core {
         //
         public override string NavIconType {
             get {
-                return "";
+                string result = "";
+                switch(cp.core.doc.addonModelStack.Peek().NavTypeID) {
+                    case 2:
+                        result = "Report";
+                        break;
+                    case 3:
+                        result = "Setting";
+                        break;
+                    case 4:
+                        result = "Tool";
+                        break;
+                    default:
+                        result = "Add-on";
+                        break;
+                }
+                return result ;
             }
         }
         //
@@ -331,8 +335,7 @@ namespace Contensive.Core {
         //
         public override string ObjectProgramID {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().ObjectProgramID;
             }
         }
         //
@@ -340,8 +343,7 @@ namespace Contensive.Core {
         //
         public override bool OnBodyEnd {
             get {
-                return false;
-
+                return cp.core.doc.addonModelStack.Peek().OnBodyEnd;
             }
         }
         //
@@ -349,8 +351,7 @@ namespace Contensive.Core {
         //
         public override bool OnBodyStart {
             get {
-                return false;
-
+                return cp.core.doc.addonModelStack.Peek().OnBodyStart;
             }
         }
         //
@@ -358,8 +359,7 @@ namespace Contensive.Core {
         //
         public override bool OnContentEnd {
             get {
-                return false;
-
+                return cp.core.doc.addonModelStack.Peek().OnPageEndEvent;
             }
         }
         //
@@ -367,22 +367,21 @@ namespace Contensive.Core {
         //
         public override bool OnContentStart {
             get {
-                return false;
-
+                return cp.core.doc.addonModelStack.Peek().OnPageStartEvent;
             }
         }
         //
         //====================================================================================================
         //
+        [Obsolete("Deprecated", true)]
         public override bool Open(int AddonId) {
             return false;
-
         }
         //
         //====================================================================================================
         //
+        [Obsolete("Deprecated", true)]
         public override bool Open(string AddonNameOrGuid) {
-
             return false;
         }
         //
@@ -390,8 +389,7 @@ namespace Contensive.Core {
         //
         public override string OtherHeadTags {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().OtherHeadTags;
             }
         }
         //
@@ -399,8 +397,7 @@ namespace Contensive.Core {
         //
         public override string PageTitle {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().PageTitle;
             }
         }
         //
@@ -408,8 +405,7 @@ namespace Contensive.Core {
         //
         public override string ProcessInterval {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().ProcessInterval.ToString();
             }
         }
         //
@@ -417,7 +413,7 @@ namespace Contensive.Core {
         //
         public override DateTime ProcessNextRun {
             get {
-                return Convert.ToDateTime("12:00:00 AM");
+                return cp.core.doc.addonModelStack.Peek().ProcessNextRun;
             }
         }
         //
@@ -425,7 +421,7 @@ namespace Contensive.Core {
         //
         public override bool ProcessRunOnce {
             get {
-                return false;
+                return cp.core.doc.addonModelStack.Peek().ProcessRunOnce;
             }
         }
         //
@@ -433,8 +429,7 @@ namespace Contensive.Core {
         //
         public override string RemoteAssetLink {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().RemoteAssetLink;
             }
         }
         //
@@ -442,7 +437,7 @@ namespace Contensive.Core {
         //
         public override bool RemoteMethod {
             get {
-                return false;
+                return cp.core.doc.addonModelStack.Peek().RemoteMethod;
             }
         }
         //
@@ -450,8 +445,7 @@ namespace Contensive.Core {
         //
         public override string RobotsTxt {
             get {
-                return "";
-
+                return cp.core.doc.addonModelStack.Peek().RobotsTxt;
             }
         }
         //
@@ -459,8 +453,7 @@ namespace Contensive.Core {
         //
         public override string ScriptCode {
             get {
-
-                return "";
+                return cp.core.doc.addonModelStack.Peek().ScriptingCode;
             }
         }
         //
@@ -468,8 +461,7 @@ namespace Contensive.Core {
         //
         public override string ScriptEntryPoint {
             get {
-
-                return "";
+                return cp.core.doc.addonModelStack.Peek().ScriptingEntryPoint;
             }
         }
         //
@@ -477,17 +469,20 @@ namespace Contensive.Core {
         //
         public override string ScriptLanguage {
             get {
-                return "";
-
+                if (cp.core.doc.addonModelStack.Peek().ScriptingLanguageID.Equals(2)) {
+                    return "javascript";
+                } else {
+                    return "vbscript";
+                }
             }
         }
         //
         //====================================================================================================
         //
+        [Obsolete("Deprecated", true)]
         public override string SharedStyles {
             get {
                 return "";
-
             }
         }
         //
@@ -495,48 +490,8 @@ namespace Contensive.Core {
         //
         public override bool Template {
             get {
-                return false;
+                return cp.core.doc.addonModelStack.Peek().Template;
             }
-        }
-        //==========================================================================================
-        /// <summary>
-        /// Install an uploaded collection file from a private folder. Return true if successful, else the issue is in the returnUserError
-        /// </summary>
-        /// <param name="privatePathFilename"></param>
-        /// <param name="returnUserError"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public override bool installCollectionFile(string privatePathFilename, ref string returnUserError) {
-            bool returnOk = false;
-            try {
-                string ignoreReturnedCollectionGuid = "";
-                var tmpList = new List<string> { };
-                returnOk = collectionController.InstallCollectionsFromPrivateFile(cp.core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, ref tmpList);
-            } catch (Exception ex) {
-                cp.core.handleException(ex);
-                if (!cp.core.siteProperties.trapErrors) {
-                    throw;
-                }
-            }
-            return returnOk;
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError) {
-            return false;
-        }
-        //
-        //====================================================================================================
-        //
-        private void appendDebugLog(string copy) {
-            //
-        }
-        //
-        //====================================================================================================
-        //
-        private void tp(string msg) {
-            //
         }
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.

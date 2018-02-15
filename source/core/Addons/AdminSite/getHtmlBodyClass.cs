@@ -5953,7 +5953,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         // rw( "n/a" )
                         Filename = core.db.csGet(CS, tempVar.nameLc);
                         if (!string.IsNullOrEmpty(Filename)) {
-                            Copy = core.cdnFiles.readFile(Filename);
+                            Copy = core.cdnFiles.readFileText(Filename);
                             // 20171103 - dont see why this is being converted, not html
                             //Copy = core.html.convertActiveContent_internal(Copy, core.doc.authContext.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, core.doc.authContext.isAuthenticated, Nothing, core.doc.authContext.isEditingAnything())
                             Stream.Add(Copy);
@@ -13882,7 +13882,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Draw the form
                             //
-                            FeatureList = core.cdnFiles.readFile(InnovaEditorFeaturefilename);
+                            FeatureList = core.cdnFiles.readFileText(InnovaEditorFeaturefilename);
                             //If FeatureList = "" Then
                             //    FeatureList = core.cluster.localClusterFiles.readFile("ccLib\" & "Config\DefaultEditorConfig.txt")
                             //    Call core.privateFiles.saveFile(InnovaEditorFeaturefilename, FeatureList)

@@ -137,7 +137,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         public void LoadFile(string Filename) {
-            Load(core.appRootFiles.readFile(Filename), 0);
+            Load(core.appRootFiles.readFileText(Filename), 0);
         }
         //
         // Get Name

@@ -36,7 +36,7 @@ namespace Contensive.BaseClasses
 		/// </summary>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPCSBaseClass CSNew(); //Implements BaseClasses.CPBaseClass.CSNew
+		public abstract CPCSBaseClass CSNew(); 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -45,7 +45,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract string Version {get;} //Implements BaseClasses.CPBaseClass.Version
+		public abstract string Version {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -54,7 +54,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPGroupBaseClass Group {get;} //Implements BaseClasses.CPBaseClass.Group
+		public abstract CPGroupBaseClass Group {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -63,7 +63,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPRequestBaseClass Request {get;} //Implements BaseClasses.CPBaseClass.Request
+		public abstract CPRequestBaseClass Request {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -72,7 +72,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPResponseBaseClass Response {get;} //Implements BaseClasses.CPBaseClass.Response
+		public abstract CPResponseBaseClass Response {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -81,7 +81,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPUserErrorBaseClass UserError {get;} //Implements BaseClasses.CPBaseClass.UserError
+		public abstract CPUserErrorBaseClass UserError {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -90,7 +90,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPVisitBaseClass Visit {get;} //Implements BaseClasses.CPBaseClass.Visit
+		public abstract CPVisitBaseClass Visit {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -99,7 +99,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPVisitorBaseClass Visitor {get;} //Implements BaseClasses.CPBaseClass.Visitor
+		public abstract CPVisitorBaseClass Visitor {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -108,7 +108,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPUserBaseClass User {get;} //Implements BaseClasses.CPBaseClass.User
+		public abstract CPUserBaseClass User {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -117,7 +117,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPHtmlBaseClass Html {get;} //Implements BaseClasses.CPBaseClass.Html
+		public abstract CPHtmlBaseClass Html {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -126,7 +126,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPCacheBaseClass Cache {get;} //Implements BaseClasses.CPBaseClass.Cache
+		public abstract CPCacheBaseClass Cache {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -135,7 +135,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPDbBaseClass Db {get;} //Implements BaseClasses.CPBaseClass.Db
+		public abstract CPDbBaseClass Db {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -144,7 +144,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPEmailBaseClass Email {get;} //Implements BaseClasses.CPBaseClass.Email
+		public abstract CPEmailBaseClass Email {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -153,7 +153,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPContentBaseClass Content {get;} //Implements BaseClasses.CPBaseClass.Content
+		public abstract CPContentBaseClass Content {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -162,7 +162,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPAddonBaseClass Addon {get;} //Implements BaseClasses.CPBaseClass.Addon
+		public abstract CPAddonBaseClass Addon {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -171,7 +171,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPUtilsBaseClass Utils {get;} //Implements BaseClasses.CPBaseClass.Utils
+		public abstract CPUtilsBaseClass Utils {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -180,7 +180,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPDocBaseClass Doc {get;} //Implements BaseClasses.CPBaseClass.Doc
+		public abstract CPDocBaseClass Doc {get;} 
 		//
 		//====================================================================================================
 		/// <summary>
@@ -189,7 +189,7 @@ namespace Contensive.BaseClasses
 		/// <value></value>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		public abstract CPSiteBaseClass Site {get;} //Implements BaseClasses.CPBaseClass.Site
+		public abstract CPSiteBaseClass Site {get;} 
 		//
 		//====================================================================================================
 		/// <summary>

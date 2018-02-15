@@ -314,7 +314,7 @@ namespace Contensive.Core.Controllers {
                         // cmd found, process it and add the results to the dst
                         //
                         Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
-                        cmdResult = executeCommand( core,  Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                        cmdResult = executeSingleCommand( core,  Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
                         if (badCmd) {
                             //
                             // the command was bad, put it back in place (?) in case it was not a command
@@ -339,7 +339,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// convert a single command in the command formats to call the execute
         /// </summary>
-        private static string executeCommand(coreController core, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        private static string executeSingleCommand(coreController core, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 //
@@ -696,7 +696,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = core.appRootFiles.readFile(ArgName);
+                                        CmdAccumulator = core.appRootFiles.readFileText(ArgName);
                                     }
                                     break;
                                 }
@@ -981,37 +981,7 @@ namespace Contensive.Core.Controllers {
             }
             return returnValue;
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Execute all content commands within a source string
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="Source"></param>
-        /// <param name="Context">The context for any addson that might be executed (remote method, page, email, etc)</param>
-        /// <param name="personalizationPeopleId">The id of the user for personalization</param>
-        /// <param name="personalizationIsAuthenticated">if true, the content can contain user private information</param>
-        /// <param name="Return_ErrorMessage"></param>
-        /// <returns></returns>
-        //
-        public static string executeContentCommandLooping(coreController core, string Source, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
-            string returnValue = "";
-            try {
-                int LoopPtr = 0;
-                //contentCmdController contentCmd = new contentCmdController(core);
-                //
-                returnValue = Source;
-                LoopPtr = 0;
-                while ((LoopPtr < 10) && ((returnValue.IndexOf(contentReplaceEscapeStart) != -1))) {
-                    returnValue = contentCmdController.executeContentCommands(core, returnValue, Context, personalizationPeopleId, personalizationIsAuthenticated);
-                    LoopPtr = LoopPtr + 1;
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-            }
-            return returnValue;
-        }
+
 
     }
 }

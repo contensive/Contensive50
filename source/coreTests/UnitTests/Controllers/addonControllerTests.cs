@@ -18,7 +18,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        public void Controllers_Addon_blank() {
+        public void Controllers_Addon_simpleDoNothingAddon() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 var addon = Core.Models.DbModels.addonModel.add(cp.core);
@@ -49,7 +49,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 Assert.AreEqual(0, cp.core.doc.htmlAssetList.Count);
                 Assert.AreEqual(false, cp.core.doc.htmlDocument);
                 Assert.AreEqual("", cp.core.doc.htmlForEndOfBody);
-                Assert.AreEqual("", cp.core.doc.htmlMetaContent_Description);
+                Assert.AreEqual(0, cp.core.doc.htmlMetaContent_Description.Count);
                 Assert.AreEqual(0, cp.core.doc.htmlMetaContent_KeyWordList.Count);
                 Assert.AreEqual(0, cp.core.doc.htmlMetaContent_OtherTags.Count);
                 Assert.AreEqual(0, cp.core.doc.htmlMetaContent_TitleList.Count);

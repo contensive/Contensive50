@@ -321,6 +321,34 @@ namespace Contensive.Core {
         public override string ThrowEvent(string eventNameIdOrGuid) {
             return core.addon.throwEvent(eventNameIdOrGuid);
         }
+        //==========================================================================================
+        /// <summary>
+        /// Install an uploaded collection file from a private folder. Return true if successful, else the issue is in the returnUserError
+        /// </summary>
+        /// <param name="privatePathFilename"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public override bool installCollectionFile(string privatePathFilename, ref string returnUserError) {
+            bool returnOk = false;
+            try {
+                string ignoreReturnedCollectionGuid = "";
+                var tmpList = new List<string> { };
+                returnOk = collectionController.InstallCollectionsFromPrivateFile(core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, ref tmpList);
+            } catch (Exception ex) {
+                core.handleException(ex);
+                if (!core.siteProperties.trapErrors) {
+                    throw;
+                }
+            }
+            return returnOk;
+        }
+        //
+        //====================================================================================================
+        //
+        public override bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError) {
+            return false;
+        }
         //
         //====================================================================================================
         //

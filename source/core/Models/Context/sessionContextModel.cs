@@ -149,10 +149,6 @@ namespace Contensive.Core.Models.Context {
                     core.handleException(new ApplicationException("authorization context cannot be created without a server configuration."));
                 } else {
                     //
-                    // -- test point message
-                    string msg = "SessionContext.create, enter";
-                    debugController.testPoint(core, msg);
-                    logController.appendLogDebug(core, msg);
                     if (core.appConfig == null) {
                         //
                         // -- no application, this is a server-only call not related to a 
@@ -369,7 +365,7 @@ namespace Contensive.Core.Models.Context {
                                     string botFileContent = core.cache.getObject<string>("DefaultBotNameList");
                                     if (string.IsNullOrEmpty(botFileContent)) {
                                         string Filename = "config\\VisitNameList.txt";
-                                        botFileContent = core.privateFiles.readFile(Filename);
+                                        botFileContent = core.privateFiles.readFileText(Filename);
                                         if (string.IsNullOrEmpty(botFileContent)) {
                                             botFileContent = ""
                                                 + "\r\n//"
@@ -589,10 +585,6 @@ namespace Contensive.Core.Models.Context {
                 throw;
             } finally {
                 //
-                // -- test point message
-                string msg = "SessionContext.create, exit (" + sw.ElapsedMilliseconds.ToString() + "ms)";
-                debugController.testPoint(core, msg);
-                logController.appendLogDebug(core, msg);
             }
             return resultSessionContext;
         }

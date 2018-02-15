@@ -56,7 +56,11 @@ namespace Contensive.Core.Models.Context {
         // -- endpoint for cluster files (not sure how it works, maybe this will be an object taht includes permissions, for now an fpo)
         public bool isLocalFileSystem = true;
         public string localDataDriveLetter = "D";
-        public string cdnFilesRemoteEndpoint;
+        //public string cdnFilesRemoteEndpoint;
+        public string awsAccessKey;
+        public string awsSecretAccessKey;
+        public string awsBucketRegionName;
+        public string awsBucketName;
         //
         // -- configuration of async command listener on render machines (not sure if used still)
         public int serverListenerPort = Port_ContentServerControlDefault;
@@ -64,6 +68,9 @@ namespace Contensive.Core.Models.Context {
         public string username = "";
         public string password = "";
         //
+        // -- used by applications to enable/disable features, like ecommerce batch
+        // todo figure out how to expose this, add it to configuration setup
+        public bool productionEnvironment = true;
         public bool enableLogging = false;
         //
         // -- deprecated
@@ -137,7 +144,7 @@ namespace Contensive.Core.Models.Context {
                 //
                 // ----- read/create serverConfig
                 //
-                JSONTemp = core.programDataFiles.readFile("config.json");
+                JSONTemp = core.programDataFiles.readFileText("config.json");
                 if (string.IsNullOrEmpty(JSONTemp)) {
                     //
                     // for now it fails, maybe later let it autobuild a local cluster

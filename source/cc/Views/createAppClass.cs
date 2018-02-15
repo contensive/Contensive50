@@ -48,7 +48,7 @@ namespace  Contensive.CLI {
                         string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + rightNow.Hour.ToString().PadLeft(2, '0') + rightNow.Minute.ToString().PadLeft(2, '0') + rightNow.Second.ToString().PadLeft(2, '0');
                         appName = cliController.promptForReply("Application Name", appNameDefault).ToLower();
                         appNameOk = !cp.core.serverConfig.apps.ContainsKey(appName.ToLower());
-                        if (!appNameOk) { Console.Write("\n\nThere is already an application with this name. To get the current server configuration, use clib -s"); }
+                        if (!appNameOk) { Console.Write("\n\nThere is already an application with this name. To get the current server configuration, use cc -s"); }
                     } while (!appNameOk);
                     appConfig.name = appName;
                     Console.Write("\n\rApplication Architecture");
@@ -218,14 +218,14 @@ namespace  Contensive.CLI {
                     //
                     // copy in the pattern files 
                     //  - the only pattern is aspx
-                    //  - this is clib running, so they are setting up new application which may or may not have a webrole here.
+                    //  - this is cc running, so they are setting up new application which may or may not have a webrole here.
                     //  - setup a basic webrole just in case this will include one -- maybe later make it an option
                     //
                     cp.core.programFiles.copyFolder("resources\\iisDefaultSite\\", "\\", cp.core.appRootFiles);
                     //
                     // replace "appName" with blank to use iis siteName as appName, or the name of this app in the default document in the apps public folder
                     //
-                    string defaultContent = cp.core.appRootFiles.readFile("web.config");
+                    string defaultContent = cp.core.appRootFiles.readFileText("web.config");
                     defaultContent = defaultContent.Replace("{{appName}}", appName);
                     cp.core.appRootFiles.saveFile("web.config", defaultContent);
                 }

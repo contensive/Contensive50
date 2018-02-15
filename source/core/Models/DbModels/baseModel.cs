@@ -121,7 +121,7 @@ namespace Contensive.Core.Models.DbModels {
                     if (!contentLoaded) {
                         if ((!string.IsNullOrEmpty(filename)) && (internalcore != null)) {
                             contentLoaded = true;
-                            _content = internalcore.cdnFiles.readFile(filename);
+                            _content = internalcore.cdnFiles.readFileText(filename);
                         }
                     }
                     return _content;

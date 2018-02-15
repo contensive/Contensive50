@@ -152,11 +152,11 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override string Read(string pathFilename) {
             if (core.appRootFiles.isinPhysicalPath(pathFilename)) {
-                return core.appRootFiles.readFile(pathFilename);
+                return core.appRootFiles.readFileText(pathFilename);
             } else if (core.privateFiles.isinPhysicalPath(pathFilename)) {
-                return core.privateFiles.readFile(pathFilename);
+                return core.privateFiles.readFileText(pathFilename);
             } else if (core.cdnFiles.isinPhysicalPath(pathFilename)) {
-                return core.cdnFiles.readFile(pathFilename);
+                return core.cdnFiles.readFileText(pathFilename);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFilename + "]"));
             }
@@ -170,7 +170,7 @@ namespace Contensive.Core {
         /// <returns></returns>
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override string ReadVirtual(string pathFilename) {
-            return core.cdnFiles.readFile(pathFilename);
+            return core.cdnFiles.readFileText(pathFilename);
         }
         //
         //==========================================================================================

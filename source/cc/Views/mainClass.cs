@@ -14,7 +14,6 @@ namespace Contensive.CLI {
                 //
                 // create cp for cluster work, with no application
                 //
-                //System.IO.File.WriteAllText("c:\\tmp\\clib.log", String.Join(",",args) );
                 if (args.Length == 0) {
                     Console.WriteLine(helpText); // Check for null array
                 } else {
@@ -55,6 +54,25 @@ namespace Contensive.CLI {
                             string argument = args[argPtr];
                             bool exitArgumentProcessing = false;
                             switch (argument.ToLower()) {
+                                case "--flushcache":
+                                    if (!string.IsNullOrEmpty(appName)) {
+                                        //
+                                        // -- flush this app
+                                        using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
+                                            cpApp.Cache.InvalidateAll();
+                                        }
+                                    } else {
+                                        //
+                                        // -- flush all apps
+                                        foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                            String housekeepAppName = kvp.Key;
+                                            using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(housekeepAppName)) {
+                                                cpApp.Cache.InvalidateAll();
+                                            }
+                                        }
+                                    }
+                                    exitArgumentProcessing = true;
+                                    break;
                                 case "-a":
                                     //
                                     // set application name
@@ -160,7 +178,7 @@ namespace Contensive.CLI {
                                     if (!cp.serverOk) {
                                         //
                                         // -- something went wrong with server initialization
-                                        Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] not found or not valid. Run clib --configure");
+                                        Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] not found or not valid. Run cc --configure");
                                     } else {
                                         Console.WriteLine("Configuration File [c:\\ProgramData\\Contensive\\config.json] found.");
                                         Console.WriteLine("ServerGroup name: " + cp.core.serverConfig.name);
@@ -171,7 +189,11 @@ namespace Contensive.CLI {
                                         Console.WriteLine("    ElastiCacheConfigurationEndpoint: " + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint);
                                         Console.WriteLine("File System:");
                                         Console.WriteLine("    isLocal: " + cp.core.serverConfig.isLocalFileSystem.ToString());
-                                        Console.WriteLine("    cdnFilesRemoteEndpoint: " + cp.core.serverConfig.cdnFilesRemoteEndpoint);
+                                        //Console.WriteLine("    cdnFilesRemoteEndpoint: " + cp.core.serverConfig.cdnFilesRemoteEndpoint);
+                                        Console.WriteLine("    awsBucketRegionName: " + cp.core.serverConfig.awsBucketRegionName);
+                                        Console.WriteLine("    awsBucketName: " + cp.core.serverConfig.awsBucketName);
+                                        Console.WriteLine("    awsAccessKey: " + cp.core.serverConfig.awsAccessKey);
+                                        Console.WriteLine("    awsSecretAccessKey: " + cp.core.serverConfig.awsSecretAccessKey);
                                         Console.WriteLine("Database:");
                                         Console.WriteLine("    defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress.ToString());
                                         Console.WriteLine("    defaultDataSourceType: " + cp.core.serverConfig.defaultDataSourceType.ToString());
@@ -326,28 +348,31 @@ namespace Contensive.CLI {
         }
         //
         const string helpText = ""
-            + "\r\nclib command line"
+            + "\r\ncc command line"
+            + "\r\n"
+            + "\r\n-a appName"
+            + "\r\n    apply the current command to just one application"
             + "\r\n"
             + "\r\n--newapp (-n)"
             + "\r\n    new application wizard"
             + "\r\n"
-            + "\r\n--upgrade appName (-u appname)"
-            + "\r\n    run application upgrade"
+            + "\r\n--upgrade (-u)"
+            + "\r\n    upgrade all applications, or just one if specified with -a"
             + "\r\n"
-            + "\r\n--upgradeall"
-            + "\r\n    run application upgrade on all applications"
+            + "\r\n--housekeep (-h)"
+            + "\r\n    housekeep all appications, or just one if specifid with -a"
             + "\r\n"
-            + "\r\n--housekeep appName (-h appname)"
-            + "\r\n    run application housekeeping"
-            + "\r\n"
-            + "\r\n--housekeepall"
-            + "\r\n    run application housekeeping on all applications"
+            + "\r\n--flushcache"
+            + "\r\n    invalidate cache. Use with -a"
             + "\r\n"
             + "\r\n--version (-v)"
             + "\r\n    display code version"
             + "\r\n"
             + "\r\n--status (-s)"
             + "\r\n    display configuration status"
+            + "\r\n"
+            + "\r\n--configure"
+            + "\r\n    setup or review server configuration (Sql, cache, filesystem, etc)"
             + "\r\n"
             + "\r\n--taskscheduler run"
             + "\r\n    Run the taskscheduler in the console (temporary)"

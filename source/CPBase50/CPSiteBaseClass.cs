@@ -66,17 +66,17 @@ namespace Contensive.BaseClasses
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
         public abstract string PhysicalFilePath {get;}
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
         public abstract string PhysicalInstallPath {get;}
         //
         //====================================================================================================
         //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
         public abstract string PhysicalWWWPath {get;}
 		//
 		//====================================================================================================
@@ -169,13 +169,31 @@ namespace Contensive.BaseClasses
 		//====================================================================================================
 		//
 		public abstract string ThrowEvent(string eventNameIdOrGuid);
-		//
-		//====================================================================================================
-		/// <summary>
-		/// Returns a list of routes used to configure endpoints, always in Unix slash format without a leading slash
-		/// </summary>
-		/// <returns></returns>
-		public abstract Dictionary<string, routeClass> getRouteDictionary();
+        //
+        //====================================================================================================
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="privatePathFilename"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        public abstract bool installCollectionFile(string privatePathFilename, ref string returnUserError);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collectionGuid"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        public abstract bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Returns a list of routes used to configure endpoints, always in Unix slash format without a leading slash
+        /// </summary>
+        /// <returns></returns>
+        public abstract Dictionary<string, routeClass> getRouteDictionary();
 		//
 		//====================================================================================================
 		//

@@ -118,7 +118,7 @@ namespace Contensive.Core.Controllers {
                 Cmd = "IISReset.exe";
                 arg = "/restart >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, arg, true);
-                Copy = core.privateFiles.readFile(LogFilename);
+                Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
                 Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = genericController.vbReplace(Copy, "\r", "\\n");
@@ -144,7 +144,7 @@ namespace Contensive.Core.Controllers {
                 LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger(core)) + ".Log";
                 Cmd = "%comspec% /c IISReset /stop >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, "", true);
-                Copy = core.privateFiles.readFile(LogFilename);
+                Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
                 Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = genericController.vbReplace(Copy, "\r", "\\n");
@@ -170,7 +170,7 @@ namespace Contensive.Core.Controllers {
                 //
                 Cmd = "%comspec% /c IISReset /start >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, "", true);
-                Copy = core.privateFiles.readFile(LogFilename);
+                Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
                 Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = genericController.vbReplace(Copy, "\r", "\\n");

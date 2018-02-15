@@ -138,7 +138,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Iterate through all apps, find addosn that need to run and add them to the task queue
         /// </summary>
-        private void runTasks(coreController cpClusterCore) {
+        private void runTasks(coreController serverCore) {
             try {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
@@ -151,15 +151,16 @@ namespace Contensive.Core.Controllers {
                 string sql = null;
                 string AppName = null;
                 //
-                foreach (KeyValuePair<string, Models.Context.appConfigModel> kvp in cpClusterCore.serverConfig.apps) {
+                foreach (KeyValuePair<string, Models.Context.appConfigModel> kvp in serverCore.serverConfig.apps) {
                     AppName = kvp.Value.name;
                     //
-                    logController.appendLogTasks(cpClusterCore, "runTasks, appname=[" + AppName + "]");
+                    logController.appendLogTasks(serverCore, "runTasks, appname=[" + AppName + "]");
                     //
                     // query tasks that need to be run
                     //
-                    using (CPClass cpSite = new CPClass(AppName)) {
-                        if ((cpSite.core.appConfig.appStatus == appConfigModel.appStatusEnum.OK) && (cpSite.core.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
+                    using (CPClass cpApp = new CPClass(AppName)) {
+                        coreController appCore = cpApp.core;
+                        if ((appCore.appConfig.appStatus == appConfigModel.appStatusEnum.OK) && (appCore.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
                             try {
                                 do {
                                     //
@@ -167,26 +168,26 @@ namespace Contensive.Core.Controllers {
                                     recordsRemaining = false;
                                     sql = ""
                                     + "\r\n BEGIN TRANSACTION"
-                                    + "\r\n update cctasks set cmdRunner=" + cpSite.core.db.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
+                                    + "\r\n update cctasks set cmdRunner=" + appCore.db.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
                                     + "\r\n COMMIT TRANSACTION";
-                                    cpSite.core.db.executeQuery(sql);
-                                    CS = cpSite.core.db.csOpen("tasks", "(cmdRunner=" + cpSite.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id");
-                                    if (cpSite.core.db.csOk(CS)) {
+                                    appCore.db.executeQuery(sql);
+                                    CS = appCore.db.csOpen("tasks", "(cmdRunner=" + appCore.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id");
+                                    if (appCore.db.csOk(CS)) {
                                         //
                                         // -- execute a task
                                         recordsRemaining = true;
-                                        cpSite.core.db.csSet(CS, "datestarted", DateTime.Now);
-                                        cpSite.core.db.csSave2(CS);
+                                        appCore.db.csSet(CS, "datestarted", DateTime.Now);
+                                        appCore.db.csSave2(CS);
                                         //
-                                        command = cpSite.core.db.csGetText(CS, "command");
-                                        cmdDetailText = cpSite.core.db.csGetText(CS, "cmdDetail");
-                                        cmdDetail = cpSite.core.json.Deserialize<cmdDetailClass>(cmdDetailText);
+                                        command = appCore.db.csGetText(CS, "command");
+                                        cmdDetailText = appCore.db.csGetText(CS, "cmdDetail");
+                                        cmdDetail = appCore.json.Deserialize<cmdDetailClass>(cmdDetailText);
                                         //
-                                        logController.appendLogTasks(cpClusterCore, "runTasks, task [" + cpSite.core.db.csGetText(CS, "name") + "], command=[" + command + "], cmdDetailText=[" + cmdDetailText + "]");
+                                        logController.appendLogTasks(appCore, "runTasks, task [" + appCore.db.csGetText(CS, "name") + "], command=[" + command + "], cmdDetailText=[" + cmdDetailText + "]");
                                         //
                                         switch ((command.ToLower())) {
                                             case taskQueueCommandEnumModule.runAddon:
-                                                cpSite.core.addon.execute(Models.DbModels.addonModel.create(cpSite.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                                                appCore.addon.execute(Models.DbModels.addonModel.create(appCore, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                                     backgroundProcess = true,
                                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
                                                     instanceArguments = cmdDetail.docProperties
@@ -194,19 +195,19 @@ namespace Contensive.Core.Controllers {
                                                 //Call cpSite.core.addon.execute_legacy7(cmdDetail.addonId, cmdDetail.docProperties, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple)
                                                 break;
                                         }
-                                        cpSite.core.db.csSet(CS, "datecompleted", DateTime.Now);
+                                        appCore.db.csSet(CS, "datecompleted", DateTime.Now);
                                     }
-                                    cpSite.core.db.csClose(ref CS);
+                                    appCore.db.csClose(ref CS);
                                 } while (recordsRemaining);
                             } catch (Exception ex) {
-                                cpClusterCore.handleException(ex);
+                                appCore.handleException(ex);
                             }
                         }
                     }
                 }
                 Console.WriteLine("runTasks, exit (" + sw.ElapsedMilliseconds + "ms)");
             } catch (Exception ex) {
-                cpClusterCore.handleException(ex);
+                serverCore.handleException(ex);
             }
         }
         #region  IDisposable Support 

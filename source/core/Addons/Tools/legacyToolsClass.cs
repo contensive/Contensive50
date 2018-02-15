@@ -532,7 +532,7 @@ namespace Contensive.Core.Addons.Tools {
                     SQLFilename = "SQLArchive" + core.doc.sessionContext.user.id.ToString("000000000") + ".txt";
                     core.userProperty.setProperty("SQLArchive", SQLFilename);
                 }
-                SQLArchive = core.cdnFiles.readFile(SQLFilename);
+                SQLArchive = core.cdnFiles.readFileText(SQLFilename);
                 //
                 // Read in arguments if available
                 //
@@ -3599,7 +3599,7 @@ namespace Contensive.Core.Addons.Tools {
                     // Return the content of the file
                     //
                     core.webServer.setResponseContentType("text/text");
-                    result = core.appRootFiles.readFile(core.docProperties.getText("SourceFile"));
+                    result = core.appRootFiles.readFileText(core.docProperties.getText("SourceFile"));
                     core.doc.continueProcessing = false;
                 } else {
                     result = result + GetTableStart;

@@ -84,12 +84,12 @@ namespace Contensive.Core {
         //
         //==========================================================================================
         public override string read(string filename) {
-            return fileSystem.readFile(filename);
+            return fileSystem.readFileText(filename);
         }
         //
         //==========================================================================================
         public override byte[] readBinary(string filename) {
-            return fileSystem.ReadBinaryFile(filename);
+            return fileSystem.readFileBinary(filename);
         }
         //
         //==========================================================================================
@@ -99,7 +99,7 @@ namespace Contensive.Core {
         //
         //==========================================================================================
         public override void saveBinary(string filename, byte[] fileContent) {
-            fileSystem.SaveFile(filename, fileContent);
+            fileSystem.saveFile(filename, fileContent);
         }
         //
         //==========================================================================================

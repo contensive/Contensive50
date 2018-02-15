@@ -66,17 +66,18 @@ namespace Contensive.Core.Controllers {
                         result.Add("\r\n<!-- from " + asset.addedByMessage + " -->\r\n");
                     }
                     if (asset.assetType == htmlAssetTypeEnum.scriptOnLoad) {
-                        scriptOnLoad.Add( asset.content + ";" );
-                    } if (!asset.isLink) {
+                        scriptOnLoad.Add(asset.content + ";");
+                    }
+                    if (!asset.isLink) {
                         result.Add("<script Language=\"JavaScript\" type=\"text/javascript\">" + asset.content + "</script>");
                     } else {
                         result.Add("<script type=\"text/javascript\" src=\"" + asset.content + "\"></script>");
                     }
                 }
-                if (scriptOnLoad.Count>0) {
+                if (scriptOnLoad.Count > 0) {
                     result.Add(""
-                        + "\r\n<script Language=\"JavaScript\" type=\"text/javascript\">" 
-                        + "function ready(callback){" 
+                        + "\r\n<script Language=\"JavaScript\" type=\"text/javascript\">"
+                        + "function ready(callback){"
                             + "if (document.readyState!='loading') callback(); "
                             + "else if (document.addEventListener) document.addEventListener('DOMContentLoaded', callback); "
                             + "else document.attachEvent('onreadystatechange', function(){"
@@ -1420,7 +1421,7 @@ namespace Contensive.Core.Controllers {
                                 case FieldTypeIdFileHTML:
                                     FieldValueText = genericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.cdnFiles.readFile(FieldValueText);
+                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
                                     }
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -1435,7 +1436,7 @@ namespace Contensive.Core.Controllers {
                                 case FieldTypeIdFileText:
                                     FieldValueText = genericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.cdnFiles.readFile(FieldValueText);
+                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
                                     }
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -1452,7 +1453,7 @@ namespace Contensive.Core.Controllers {
                                 case FieldTypeIdFileJavascript:
                                     FieldValueText = genericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.cdnFiles.readFile(FieldValueText);
+                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
                                     }
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -4288,12 +4289,12 @@ namespace Contensive.Core.Controllers {
                         LinkPanel.Add("Render " + (Convert.ToSingle(core.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec | ");
                         LinkPanel.Add("</span>");
                         //
-                        DebugPanel +=  "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
+                        DebugPanel += "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                             + cr2 + "<tr>"
                             + cr3 + "<td width=\"100\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100\" height=\"1\" ></td>"
                             + cr3 + "<td width=\"100%\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"1\" ></td>"
                             + cr2 + "</tr>";
-                        DebugPanel +=  "</table>";
+                        DebugPanel += "</table>";
                         //
                         if (ShowLegacyToolsPanel) {
                             //
@@ -4723,10 +4724,12 @@ namespace Contensive.Core.Controllers {
         //
         public void addHeadTag(string HeadTag, string addedByMessage = "") {
             try {
-                core.doc.htmlMetaContent_OtherTags.Add(new htmlMetaClass() {
-                    addedByMessage = addedByMessage,
-                    content = HeadTag
-                });
+                if (!string.IsNullOrWhiteSpace(HeadTag)) {
+                    core.doc.htmlMetaContent_OtherTags.Add(new htmlMetaClass() {
+                        addedByMessage = addedByMessage,
+                        content = HeadTag
+                    });
+                }
             } catch (Exception ex) {
                 core.handleException(ex);
             }

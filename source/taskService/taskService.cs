@@ -11,7 +11,6 @@ using Contensive.Core.Controllers;
 using Contensive.Core;
 
 namespace Contensive.WindowsServices {
-    [System.ComponentModel.DesignerCategory("Code")]
     public partial class taskService : ServiceBase {
         public taskService() {
             InitializeComponent();

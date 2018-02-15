@@ -219,7 +219,7 @@ namespace Contensive.Core.Controllers {
                         string serializedDataObject = null;
                         using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, wrapperKey)) {
                             mutex.WaitOne();
-                            serializedDataObject = core.privateFiles.readFile("appCache\\" + genericController.encodeFilename(wrapperKey + ".txt"));
+                            serializedDataObject = core.privateFiles.readFileText("appCache\\" + genericController.encodeFilename(wrapperKey + ".txt"));
                             mutex.ReleaseMutex();
                         }
                         if (string.IsNullOrEmpty(serializedDataObject)) {

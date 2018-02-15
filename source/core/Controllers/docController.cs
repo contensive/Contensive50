@@ -1046,7 +1046,7 @@ namespace Contensive.Core.Controllers {
                         // if AllowBrief is false, BriefFilename is not loaded
                         //
                         if ((childPage.BriefFilename != "") & (childPage.AllowBrief)) {
-                            string Brief = encodeText(core.cdnFiles.readFile(childPage.BriefFilename)).Trim(' ');
+                            string Brief = encodeText(core.cdnFiles.readFileText(childPage.BriefFilename)).Trim(' ');
                             if (!string.IsNullOrEmpty(Brief)) {
                                 activeList = activeList + "<div class=\"ccListCopy\">" + Brief + "</div>";
                             }
@@ -1888,7 +1888,7 @@ namespace Contensive.Core.Controllers {
                                     FilePath = Filename.Left( Pos);
                                     Filename = Filename.Substring(Pos);
                                 }
-                                core.db.csSet(CS, "filesize", core.appRootFiles.main_GetFileSize(FilePath + Filename));
+                                core.db.csSet(CS, "filesize", core.appRootFiles.getFileSize(FilePath + Filename));
                                 Pos = Filename.LastIndexOf(".") + 1;
                                 if (Pos > 0) {
                                     FilenameExt = Filename.Substring(Pos);

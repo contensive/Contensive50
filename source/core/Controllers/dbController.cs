@@ -2132,7 +2132,7 @@ namespace Contensive.Core.Controllers {
                             core.cdnFiles.saveFile(Filename, Copy);
                             csSet(CSPointer, FieldName, Filename);
                         } else {
-                            string OldCopy = core.cdnFiles.readFile(Filename);
+                            string OldCopy = core.cdnFiles.readFileText(Filename);
                             if (OldCopy != Copy) {
                                 //
                                 // copy changed, mark record changed
@@ -2768,7 +2768,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             //
                                             //
-                                            fieldValue = core.cdnFiles.readFile(genericController.encodeText(FieldValueVariant));
+                                            fieldValue = core.cdnFiles.readFileText(genericController.encodeText(FieldValueVariant));
                                             break;
                                         case FieldTypeIdFileCSS:
                                         case FieldTypeIdFileXML:
@@ -2776,7 +2776,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             //
                                             //
-                                            fieldValue = core.cdnFiles.readFile(genericController.encodeText(FieldValueVariant));
+                                            fieldValue = core.cdnFiles.readFileText(genericController.encodeText(FieldValueVariant));
                                             //NeedsHTMLEncode = False
                                             break;
                                         case FieldTypeIdText:
@@ -3967,9 +3967,7 @@ namespace Contensive.Core.Controllers {
         public int csGetRowCount(int CSPointer) {
             int returnResult = 0;
             try {
-                if (!csOk(CSPointer)) {
-                    throw new ArgumentException("dataset is not valid");
-                } else {
+                if (csOk(CSPointer)) {
                     returnResult = contentSetStore[CSPointer].readCacheRowCnt;
                 }
             } catch (Exception ex) {
@@ -5285,9 +5283,6 @@ namespace Contensive.Core.Controllers {
             string LocalRequestName = null;
             string Filename = null;
             string Path = null;
-            //
-            //If Not (true) Then Exit Sub
-            //
             if (!core.db.csOk(CSPointer)) {
                 throw new ApplicationException("ContentSetPointer is invalid, empty, or end-of-file");
             } else if (string.IsNullOrEmpty(FieldName.Trim(' '))) {
@@ -5300,8 +5295,7 @@ namespace Contensive.Core.Controllers {
                 switch (core.db.cs_getFieldTypeId(CSPointer, FieldName)) {
                     case FieldTypeIdBoolean:
                         //
-                        // Boolean
-                        //
+                        // -- Boolean
                         core.db.csSet(CSPointer, FieldName, core.docProperties.getBoolean(LocalRequestName));
                         break;
                     case FieldTypeIdCurrency:
@@ -5310,34 +5304,30 @@ namespace Contensive.Core.Controllers {
                     case FieldTypeIdLookup:
                     case FieldTypeIdManyToMany:
                         //
-                        // Numbers
-                        //
+                        // -- Numbers
                         core.db.csSet(CSPointer, FieldName, core.docProperties.getNumber(LocalRequestName));
                         break;
                     case FieldTypeIdDate:
                         //
-                        // Date
-                        //
+                        // -- Date
                         core.db.csSet(CSPointer, FieldName, core.docProperties.getDate(LocalRequestName));
                         break;
                     case FieldTypeIdFile:
                     case FieldTypeIdFileImage:
                         //
-                        //
-                        //
+                        // -- upload file
                         Filename = core.docProperties.getText(LocalRequestName);
                         if (!string.IsNullOrEmpty(Filename)) {
                             Path = core.db.csGetFieldFilename(CSPointer, FieldName, Filename, "", core.db.cs_getFieldTypeId(CSPointer, FieldName));
                             core.db.csSet(CSPointer, FieldName, Path);
                             Path = genericController.vbReplace(Path, "\\", "/");
                             Path = genericController.vbReplace(Path, "/" + Filename, "");
-                            core.appRootFiles.upload(LocalRequestName, Path, ref Filename);
+                            core.cdnFiles.upload(LocalRequestName, Path, ref Filename);
                         }
                         break;
                     default:
                         //
-                        // text files
-                        //
+                        // -- text files
                         core.db.csSet(CSPointer, FieldName, core.docProperties.getText(LocalRequestName));
                         break;
                 }

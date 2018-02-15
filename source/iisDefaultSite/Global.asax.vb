@@ -23,6 +23,7 @@ Public Class Global_asax
                 DefaultSite.configurationClass.loadRouteMap(cp)
             End Using
         Catch ex As Exception
+            Contensive.Core.Controllers.logController.appendLogProgramData(getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]")
             Trace.WriteLine(getAppDescription("Application_Start ERROR exit"))
         End Try
     End Sub

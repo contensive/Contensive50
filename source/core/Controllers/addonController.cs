@@ -1018,7 +1018,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            FieldValue = core.cdnFiles.readFile(FieldValue);
+                                                                            FieldValue = core.cdnFiles.readFileText(FieldValue);
                                                                             if (FieldHTML) {
                                                                                 Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
@@ -1134,7 +1134,7 @@ namespace Contensive.Core.Controllers {
                                                             if (core.appRootFiles.fileExists(fieldfilename)) {
                                                                 Copy = FieldDefaultValue;
                                                             } else {
-                                                                Copy = core.cdnFiles.readFile(fieldfilename);
+                                                                Copy = core.cdnFiles.readFileText(fieldfilename);
                                                             }
                                                             if (!FieldReadOnly) {
                                                                 Copy = core.html.inputTextExpandable(FieldName, Copy, 10);
@@ -1613,7 +1613,7 @@ namespace Contensive.Core.Controllers {
                             string tmpName = "";
                             collectionController.GetCollectionConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
                             if (string.IsNullOrEmpty(AddonVersionPath)) {
-                                throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the path could not be determined for collection [" + addonCollection.name + "].");
+                                throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection");
                             } else {
                                 string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
                                 string appAddonPath = core.privateFiles.joinPath(core.privateFiles.rootLocalPath, AddonPath);
@@ -2751,7 +2751,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            FieldValue = core.cdnFiles.readFile(FieldValue);
+                                                                            FieldValue = core.cdnFiles.readFileText(FieldValue);
                                                                             if (FieldHTML) {
                                                                                 Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
@@ -2866,7 +2866,7 @@ namespace Contensive.Core.Controllers {
                                                             if (core.appRootFiles.fileExists(fieldfilename)) {
                                                                 Copy = FieldDefaultValue;
                                                             } else {
-                                                                Copy = core.cdnFiles.readFile(fieldfilename);
+                                                                Copy = core.cdnFiles.readFileText(fieldfilename);
                                                             }
                                                             if (!FieldReadOnly) {
                                                                 Copy = core.html.inputTextExpandable(FieldName, Copy, 10);

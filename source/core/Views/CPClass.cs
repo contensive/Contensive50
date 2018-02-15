@@ -273,10 +273,18 @@ namespace Contensive.Core {
         //
         public override CPAddonBaseClass Addon {
             get {
-                if (_addonObj == null) {
-                    _addonObj = new CPAddonClass(this);
+                if (core.doc.addonModelStack.Count == 0) {
+                    //
+                    // -- if no addon running, return null
+                    return null;
+                } else {
+                    //
+                    // -- return class
+                    if (_addonObj == null) {
+                        _addonObj = new CPAddonClass(this);
+                    }
+                    return _addonObj;
                 }
-                return _addonObj;
             }
         }
         private CPAddonClass _addonObj;
@@ -406,11 +414,7 @@ namespace Contensive.Core {
         //
         public override CPAddonBaseClass MyAddon {
             get {
-                if (_myAddonObj == null) {
-                    _myAddonObj = new CPAddonClass(this);
-                    _myAddonObj.Open(MyAddonID);
-                }
-                return _myAddonObj;
+                return Addon;
             }
         }
         private CPAddonClass _myAddonObj;

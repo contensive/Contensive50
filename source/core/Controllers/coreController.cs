@@ -51,7 +51,7 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// when enable, use MS trace logging. An attempt to stop file append permission issues
         /// </summary>
-        public bool useMicrosoftTraceLogging = false;
+        public bool useNlog = true;
         //
         //===================================================================================================
         /// <summary>
@@ -885,10 +885,6 @@ namespace Contensive.Core.Controllers {
                 handleException(ex);
             } finally {
                 //
-                // -- test point message
-                string msg = "executeRoute exit (" + sw.ElapsedMilliseconds.ToString() + "ms)";
-                debugController.testPoint(this, msg);
-                logController.appendLogDebug(this, msg);
             }
             return result;
         }
@@ -1405,7 +1401,7 @@ namespace Contensive.Core.Controllers {
                         _db = null;
                     }
                     //
-                    if (useMicrosoftTraceLogging) {
+                    if (useNlog) {
                         // flush all the logs used
                         foreach (var kvp in doc.logList) {
                             kvp.Value.Flush();

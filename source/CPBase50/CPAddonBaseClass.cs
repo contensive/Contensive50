@@ -99,33 +99,36 @@ namespace Contensive.BaseClasses
 		/// Addon content is assembled in the following order: TextContent + HTMLContent + IncludeContent + ScriptCallbackContent + FormContent + RemoteAssetContent + ScriptContent + ObjectContent + AssemblyContent.
 		/// </remarks>
 		public abstract string CopyText {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// Styles that are rendered on the page when the addon is executed. Custom styles are editable and are not modified when the add-on is updated.
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract string CustomStyles {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// Styles that are included with the add-on and are updated when the add-on is updated. See BlockdefaultStyles to block these.
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract string DefaultStyles {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// The add-on description is displayed in the addon manager
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract string Description {get;}
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Styles that are rendered on the page when the addon is executed. Custom styles are editable and are not modified when the add-on is updated.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [Obsolete("This is no longer supported. Add a overriding style in another stylesheet instead of modifying", true)]
+        public abstract string CustomStyles {get;}
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Styles that are included with the add-on and are updated when the add-on is updated. See BlockdefaultStyles to block these.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [Obsolete("This is no longer supported. Add a overriding style in another stylesheet instead of modifying", true)]
+        public abstract string DefaultStyles {get;}
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The add-on description is displayed in the addon manager
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [Obsolete("This is no longer supported. Add a overriding style in another stylesheet instead of modifying", true)]
+        public abstract string Description {get;}
 		//
 		//====================================================================================================
 		/// <summary>
@@ -227,24 +230,26 @@ namespace Contensive.BaseClasses
 		/// <returns></returns>
 		/// <remarks></remarks>
 		public abstract bool IsInline {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// Javascript code that will be placed in the document right before the end-body tag. Do not include script tags.
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract string JavaScriptBodyEnd {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// Javascript code that will be placed in the head of the document. Do no include script tags.
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract string JavascriptInHead {get;}
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Javascript code that will be placed in the document right before the end-body tag. Do not include script tags.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [Obsolete("This is no longer supported.", true)]
+        public abstract string JavaScriptBodyEnd {get;}
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Javascript code that will be placed in the head of the document. Do no include script tags.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [Obsolete("This is no longer supported.", true)]
+        public abstract string JavascriptInHead {get;}
 		//
 		//====================================================================================================
 		/// <summary>
@@ -346,24 +351,14 @@ namespace Contensive.BaseClasses
 		/// <returns></returns>
 		/// <remarks></remarks>
 		public abstract bool OnContentStart {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// Open an add-on with it's local id before accessing its properties
-		/// </summary>
-		/// <param name="AddonId"></param>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract bool Open(int AddonId);
-		//
-		//====================================================================================================
-		/// <summary>
-		/// open an add-on with its name or guid before accessing its properties
-		/// </summary>
-		/// <param name="AddonNameOrGuid"></param>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract bool Open(string AddonNameOrGuid);
+        //
+        //====================================================================================================
+        [Obsolete("Deprecated", true)]
+        public abstract bool Open(int AddonId);
+        //
+        //====================================================================================================
+        [Obsolete("Deprecated", true)]
+        public abstract bool Open(string AddonNameOrGuid);
 		//
 		//====================================================================================================
 		/// <summary>
@@ -382,24 +377,21 @@ namespace Contensive.BaseClasses
 		/// <returns></returns>
 		/// <remarks></remarks>
 		public abstract string PageTitle {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// When present, this add-on will be executed stand-alone without a webpage periodically at this interval (in minutes).
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract string ProcessInterval {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// The next time this add-on is scheduled to run as a processs
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract DateTime ProcessNextRun {get;}
+        //
+        //====================================================================================================
+        /// <summary>
+        /// When present, this add-on will be executed stand-alone without a webpage periodically at this interval (in minutes).
+        /// </summary>
+        public abstract string ProcessInterval { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The next time this add-on is scheduled to run as a processs
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract DateTime ProcessNextRun {get;}
 		//
 		//====================================================================================================
 		/// <summary>
@@ -463,15 +455,16 @@ namespace Contensive.BaseClasses
 		/// <returns></returns>
 		/// <remarks></remarks>
 		public abstract string ScriptLanguage {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// A comma delimited list of the local id values of shared style record that will display with this add-on
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public abstract string SharedStyles {get;}
+        //
+        //====================================================================================================
+        /// <summary>
+        /// A comma delimited list of the local id values of shared style record that will display with this add-on
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [Obsolete("Deprecated", true)]
+        public abstract string SharedStyles {get;}
 		//
 		//====================================================================================================
 		/// <summary>
@@ -481,23 +474,5 @@ namespace Contensive.BaseClasses
 		/// <returns></returns>
 		/// <remarks></remarks>
 		public abstract bool Template {get;}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="privatePathFilename"></param>
-		/// <param name="returnUserError"></param>
-		/// <returns></returns>
-		public abstract bool installCollectionFile(string privatePathFilename, ref string returnUserError);
-		//
-		//====================================================================================================
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="collectionGuid"></param>
-		/// <param name="returnUserError"></param>
-		/// <returns></returns>
-		public abstract bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError);
 	}
 }

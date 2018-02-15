@@ -74,9 +74,9 @@ namespace Contensive.WindowsServices {
                 // Get config file defaults
                 //
                 Filename = "config\\MonitorConfig.txt";
-                config = cpCore.appRootFiles.readFile(Filename);
+                config = cpCore.appRootFiles.readFileText(Filename);
                 if (string.IsNullOrEmpty(config)) {
-                    config = cpCore.appRootFiles.readFile("MonitorConfig.txt");
+                    config = cpCore.appRootFiles.readFileText("MonitorConfig.txt");
                     if (!string.IsNullOrEmpty(config)) {
                         cpCore.appRootFiles.saveFile(Filename, config);
                     }

@@ -599,7 +599,7 @@ namespace Contensive.Core.Controllers {
                     ExportFilename = "cdef_export_" + encodeText(genericController.GetRandomInteger(core)) + ".xml";
                     ExportPathPage = "tmp\\" + ExportFilename;
                     exportApplicationCDefXml(core, ExportPathPage, true);
-                    CollectionData = core.privateFiles.readFile(ExportPathPage);
+                    CollectionData = core.privateFiles.readFileText(ExportPathPage);
                     core.privateFiles.deleteFile(ExportPathPage);
                     returnColl = installCollection_LoadXmlToMiniCollection(core, CollectionData, false, false, isNewBuild, new miniCollectionModel());
                 }
@@ -1008,7 +1008,7 @@ namespace Contensive.Core.Controllers {
                                                             logController.appendLogInstall(core, errorPrefix + "Collection [" + Collectionname + "] was Not installed because the Collection File Link does Not point to a valid file [" + CollectionFileLink + "]");
                                                         } else {
                                                             CollectionFilePath = workingPath + CollectionFileLink.Substring(Pos);
-                                                            core.privateFiles.SaveRemoteFile(CollectionFileLink, CollectionFilePath);
+                                                            core.privateFiles.saveHttpRequestToFile(CollectionFileLink, CollectionFilePath);
                                                             // BuildCollectionFolder takes care of the unzipping.
                                                             //If genericController.vbLCase(Right(CollectionFilePath, 4)) = ".zip" Then
                                                             //    Call UnzipAndDeleteFile_AndWait(CollectionFilePath)
@@ -1051,7 +1051,7 @@ namespace Contensive.Core.Controllers {
                                                             UserError = "There was an error processing a collection in the download file [" + Collectionname + "]. The ActiveX filename attribute was empty, and the filename could not be read from the link [" + ResourceLink + "].";
                                                             logController.appendLogInstall(core, errorPrefix + UserError);
                                                         } else {
-                                                            core.privateFiles.SaveRemoteFile(ResourceLink, workingPath + ResourceFilename);
+                                                            core.privateFiles.saveHttpRequestToFile(ResourceLink, workingPath + ResourceFilename);
                                                         }
                                                     }
                                                     break;
@@ -1091,7 +1091,7 @@ namespace Contensive.Core.Controllers {
             bool UpgradeOK = true;
             try {
                 if (string.IsNullOrWhiteSpace(collectionGuid)) {
-                    logController.appendLog(core, "collectionGuid is null", "debug");
+                    logController.appendLog(core, "installCollectionFromRemoteRepo, collectionGuid is null");
                 } else {
                     //
                     // normalize guid
@@ -1498,7 +1498,7 @@ namespace Contensive.Core.Controllers {
                                 CollectionFile = new XmlDocument();
                                 bool loadOk = true;
                                 try {
-                                    CollectionFile.LoadXml(core.privateFiles.readFile(tmpInstallPath + Filename));
+                                    CollectionFile.LoadXml(core.privateFiles.readFileText(tmpInstallPath + Filename));
                                 } catch (Exception ex) {
                                     //
                                     // There was a parse error in this xml file. Set the return message and the flag
@@ -2539,7 +2539,6 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // Add-on Node, do part 1, verify the addon in the table with name and guid
                                                                 string addonName = GetXMLAttribute(core, IsFound, collectionNode, "name", collectionNode.Name);
-                                                                logController.appendLogDebug(core, "install addon [" + collectionNode.Name.ToLower() + "]");
                                                                 if (addonName.ToLower()=="_oninstall") {
                                                                     onInstallAddonGuid = GetXMLAttribute(core, IsFound, collectionNode, "guid", collectionNode.Name);
                                                                 }
@@ -3808,7 +3807,7 @@ namespace Contensive.Core.Controllers {
                 // -- new build
                 // 20171029 -- upgrading should restore base collection fields as a fix to deleted required fields
                 const string baseCollectionFilename = "aoBase5.xml";
-                string baseCollectionXml = core.programFiles.readFile(baseCollectionFilename);
+                string baseCollectionXml = core.programFiles.readFileText(baseCollectionFilename);
                 if (string.IsNullOrEmpty(baseCollectionXml)) {
                     //
                     // -- base collection notfound
@@ -4593,7 +4592,7 @@ namespace Contensive.Core.Controllers {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 if (Collection.styleCnt > 0) {
-                    SiteStyles = core.cdnFiles.readFile("templates/styles.css");
+                    SiteStyles = core.cdnFiles.readFileText("templates/styles.css");
                     if (!string.IsNullOrEmpty(SiteStyles.Trim(' '))) {
                         //
                         // Split with an extra character at the end to guarantee there is an extra split at the end
@@ -4788,38 +4787,33 @@ namespace Contensive.Core.Controllers {
                 DirectoryInfo[] FolderList = null;
                 //
                 collectionFilePathFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
-                returnXml = core.privateFiles.readFile(collectionFilePathFilename);
-                if (string.IsNullOrEmpty(returnXml)) {
+                returnXml = core.privateFiles.readFileText(collectionFilePathFilename);
+                if (string.IsNullOrWhiteSpace(returnXml)) {
                     FolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath());
                     if (FolderList.Length > 0) {
                         foreach (DirectoryInfo folder in FolderList) {
                             FolderName = folder.Name;
-                            Pos = genericController.vbInstr(1, FolderName, "\t");
-                            if (Pos > 1) {
-                                //hint = hint & ",800"
-                                FolderName = FolderName.Left(Pos - 1);
-                                if (FolderName.Length > 34) {
-                                    if (genericController.vbLCase(FolderName.Left(4)) != "temp") {
-                                        CollectionGuid = FolderName.Substring(FolderName.Length - 32);
-                                        Collectionname = FolderName.Left(FolderName.Length - CollectionGuid.Length - 1);
-                                        CollectionGuid = CollectionGuid.Left(8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
-                                        CollectionGuid = "{" + CollectionGuid + "}";
-                                        SubFolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
-                                        if (SubFolderList.Length > 0) {
-                                            SubFolder = SubFolderList[SubFolderList.Length - 1];
-                                            FolderName = FolderName + "\\" + SubFolder.Name;
-                                            LastChangeDate = SubFolder.Name.Substring(4, 2) + "/" + SubFolder.Name.Substring(6, 2) + "/" + SubFolder.Name.Left(4);
-                                            if (!dateController.IsDate(LastChangeDate)) {
-                                                LastChangeDate = "";
-                                            }
+                            if (FolderName.Length > 34) {
+                                if (genericController.vbLCase(FolderName.Left(4)) != "temp") {
+                                    CollectionGuid = FolderName.Substring(FolderName.Length - 32);
+                                    Collectionname = FolderName.Left(FolderName.Length - CollectionGuid.Length - 1);
+                                    CollectionGuid = CollectionGuid.Left(8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
+                                    CollectionGuid = "{" + CollectionGuid + "}";
+                                    SubFolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
+                                    if (SubFolderList.Length > 0) {
+                                        SubFolder = SubFolderList[SubFolderList.Length - 1];
+                                        FolderName = FolderName + "\\" + SubFolder.Name;
+                                        LastChangeDate = SubFolder.Name.Substring(4, 2) + "/" + SubFolder.Name.Substring(6, 2) + "/" + SubFolder.Name.Left(4);
+                                        if (!dateController.IsDate(LastChangeDate)) {
+                                            LastChangeDate = "";
                                         }
-                                        returnXml = returnXml + "\r\n\t<Collection>";
-                                        returnXml = returnXml + "\r\n\t\t<name>" + Collectionname + "</name>";
-                                        returnXml = returnXml + "\r\n\t\t<guid>" + CollectionGuid + "</guid>";
-                                        returnXml = returnXml + "\r\n\t\t<lastchangedate>" + LastChangeDate + "</lastchangedate>";
-                                        returnXml += "\r\n\t\t<path>" + FolderName + "</path>";
-                                        returnXml = returnXml + "\r\n\t</Collection>";
                                     }
+                                    returnXml = returnXml + "\r\n\t<Collection>";
+                                    returnXml = returnXml + "\r\n\t\t<name>" + Collectionname + "</name>";
+                                    returnXml = returnXml + "\r\n\t\t<guid>" + CollectionGuid + "</guid>";
+                                    returnXml = returnXml + "\r\n\t\t<lastchangedate>" + LastChangeDate + "</lastchangedate>";
+                                    returnXml += "\r\n\t\t<path>" + FolderName + "</path>";
+                                    returnXml = returnXml + "\r\n\t</Collection>";
                                 }
                             }
                         }

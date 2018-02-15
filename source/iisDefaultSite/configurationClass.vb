@@ -37,7 +37,10 @@ Public Class configurationClass
         Try
             serverConfig.allowTaskRunnerService = False
             serverConfig.allowTaskSchedulerService = False
-            serverConfig.cdnFilesRemoteEndpoint = ConfigurationManager.AppSettings("ContensiveCdnFilesRemoteEndpoint")
+            serverConfig.awsBucketName = ConfigurationManager.AppSettings("ContensiveAwsBucketName")
+            serverConfig.awsBucketRegionName = ConfigurationManager.AppSettings("ContensiveAwsBucketRegionName")
+            serverConfig.awsAccessKey = ConfigurationManager.AppSettings("ContensiveAwsAccessKey")
+            serverConfig.awsSecretAccessKey = ConfigurationManager.AppSettings("ContensiveAwsSecretAccessKey")
             serverConfig.defaultDataSourceAddress = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceAddress")
             serverConfig.defaultDataSourcePassword = ConfigurationManager.AppSettings("ContensiveDefaultDataSourcePassword")
             serverConfig.defaultDataSourceUsername = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceUsername")

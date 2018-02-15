@@ -1882,29 +1882,52 @@ namespace Contensive.Core.Controllers {
             return tempGetIconSprite + " style=\"" + ImgStyle + "\">";
         }
         //
-        //================================================================================================================
-        //   Separate a URL into its host, path, page parts
-        //================================================================================================================
+        // ====================================================================================================
+        /// <summary>
+        /// return argument for separateUrl
+        /// </summary>
+        public class urlDetailsClass {
+            public string protocol ="";
+            public string host = "";
+            public List<String> pathSegments = new List<String>(); 
+            public string filename = "";
+            public string queryString = "";
+            public string path() { return String.Join("/", pathSegments); }
+        }
         //
-        public static void SeparateURL(string SourceURL, ref string Protocol, ref string Host, ref string Path, ref string Page, ref string QueryString) {
+        // ====================================================================================================
+        /// <summary>
+        /// split a source Url into its components. Url and Uri are always UNIX slashed.
+        /// </summary>
+        /// <param name="sourceUrl"></param>
+        public static urlDetailsClass splitUrl( string sourceUrl ) {
+            var urlDetails = new urlDetailsClass();
+            string path = "";
+            splitUrl(sourceUrl, ref urlDetails.protocol, ref urlDetails.host, ref path, ref urlDetails.filename, ref urlDetails.queryString);
+            foreach( string segment in path.Split('/')) {
+                if (!string.IsNullOrEmpty(segment)) { urlDetails.pathSegments.Add(segment); }
+            }
+            return urlDetails;
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// separate a source Url into its components
+        /// </summary>
+        public static void splitUrl(string SourceURL, ref string Protocol, ref string Host, ref string Path, ref string Page, ref string QueryString) {
             //
-            //   Divide the URL into URLHost, URLPath, and URLPage
-            //
-            string WorkingURL = null;
+            // -- Divide the URL into URLHost, URLPath, and URLPage
+            string WorkingURL = convertToUnixSlash( SourceURL);
             int Position = 0;
             //
-            // Get Protocol (before the first :)
-            //
-            WorkingURL = SourceURL;
+            // -- Get Protocol (before the first :)
             Position = vbInstr(1, WorkingURL, ":");
-            //Position = vbInstr(1, WorkingURL, "://")
             if (Position != 0) {
                 Protocol = WorkingURL.Left( Position + 2);
                 WorkingURL = WorkingURL.Substring(Position + 2);
             }
             //
-            // compatibility fix
-            //
+            // -- compatibility fix
             if (vbInstr(1, WorkingURL, "//") == 1) {
                 if (string.IsNullOrEmpty(Protocol)) {
                     Protocol = "http:";
@@ -1913,46 +1936,38 @@ namespace Contensive.Core.Controllers {
                 WorkingURL = WorkingURL.Substring(2);
             }
             //
-            // Get QueryString
-            //
+            // -- Get QueryString
             Position = vbInstr(1, WorkingURL, "?");
             if (Position > 0) {
                 QueryString = WorkingURL.Substring(Position - 1);
                 WorkingURL = WorkingURL.Left( Position - 1);
             }
             //
-            // separate host from pathpage
-            //
-            //iURLHost = WorkingURL
+            // -- separate host from pathpage
             Position = vbInstr(WorkingURL, "/");
             if ((Position == 0) && (string.IsNullOrEmpty(Protocol))) {
                 //
-                // Page without path or host
-                //
+                // -- Page without path or host
                 Page = WorkingURL;
                 Path = "";
                 Host = "";
             } else if (Position == 0) {
                 //
-                // host, without path or page
-                //
+                // -- host, without path or page
                 Page = "";
                 Path = "/";
                 Host = WorkingURL;
             } else {
                 //
-                // host with a path (at least)
-                //
+                // -- host with a path (at least)
                 Path = WorkingURL.Substring(Position - 1);
                 Host = WorkingURL.Left( Position - 1);
                 //
-                // separate page from path
-                //
+                // -- separate page from path
                 Position = Path.LastIndexOf("/") + 1;
                 if (Position == 0) {
                     //
-                    // no path, just a page
-                    //
+                    // -- no path, just a page
                     Page = Path;
                     Path = "/";
                 } else {
@@ -2909,7 +2924,7 @@ namespace Contensive.Core.Controllers {
                     // quick - not virtual hosted and link starts at Root
                     //
                 } else {
-                    SeparateURL(Link, ref Protocol, ref Host, ref Path, ref Page, ref QueryString);
+                    splitUrl(Link, ref Protocol, ref Host, ref Path, ref Page, ref QueryString);
                     if (VirtualHosted) {
                         //
                         // Virtual hosted site, add VirualPath if it is not there

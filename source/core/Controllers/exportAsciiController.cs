@@ -191,7 +191,7 @@ namespace Contensive.Core.Controllers {
                         }
                         break;
                 }
-                result = core.appRootFiles.readFile(TestFilename);
+                result = core.appRootFiles.readFileText(TestFilename);
                 core.appRootFiles.deleteFile(TestFilename);
             } catch (Exception ex) {
                 core.handleException(ex);

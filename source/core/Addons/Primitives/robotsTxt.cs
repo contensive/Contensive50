@@ -34,7 +34,7 @@ namespace Contensive.Core.Addons.Primitives {
                 // 
                 // set this way because the preferences page needs a filename in a site property (enhance later)
                 core.siteProperties.setProperty("RobotsTxtFilename", Filename);
-                result = core.cdnFiles.readFile(Filename);
+                result = core.cdnFiles.readFileText(Filename);
                 if (string.IsNullOrEmpty(result)) {
                     //
                     // save default robots.txt

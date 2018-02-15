@@ -6,12 +6,12 @@ using System.Linq;
 using System.Text;
 using Contensive.Core;
 using Contensive.Core.Models.DbModels;
+using Amazon;
 
-namespace  Contensive.CLI {
+namespace Contensive.CLI {
     class configureClass {
         public static void configure() {
-            try
-            {
+            try {
                 //
                 // if you get a cluster object from cp with a key, and the key gives you access, you have a cluster object to create an app
                 //
@@ -21,8 +21,7 @@ namespace  Contensive.CLI {
                 String prompt;
                 String defaultValue;
                 //
-                using (CPClass cp = new CPClass())
-                {
+                using (CPClass cp = new CPClass()) {
                     //
                     // -- Warning.
                     Console.WriteLine("This server's configuration will be updated. If this is not correct, use Ctrl-C to exit.");
@@ -33,17 +32,54 @@ namespace  Contensive.CLI {
                     cp.core.serverConfig.name = cliController.promptForReply(prompt, defaultValue);
                     //
                     // -- local or multiserver mode
-                    Console.WriteLine("\n\nSingle-Server or Multi-Server Mode");
-                    Console.WriteLine("Single server installations run applications from a single server and store their data on that machine. Multi-server configurations run on multiple servers and require outside resources to store their data.");
-                    prompt = "Single-Server Application (y/n)?";
+                    Console.WriteLine("\n\nLocal or Remote File System");
+                    Console.WriteLine("Local File System stores content files on the webserver. Remote File System store content in an Amazon AWS S3 bucket, using the webserver to cache files for read and write.");
+                    prompt = "Local File System (y/n)?";
                     if (cp.core.serverConfig.isLocalFileSystem) { defaultValue = "y"; } else { defaultValue = "n"; }
                     cp.core.serverConfig.isLocalFileSystem = Equals(cliController.promptForReply(prompt, defaultValue).ToLower(), "y");
                     //
                     // -- local file location
-                    Console.WriteLine("\n\nData Storage Locations");
+                    Console.WriteLine("\n\nConfigure Local File System");
                     if (string.IsNullOrEmpty(cp.core.serverConfig.localDataDriveLetter)) cp.core.serverConfig.localDataDriveLetter = "d";
                     if (!(new System.IO.DriveInfo(cp.core.serverConfig.localDataDriveLetter).IsReady)) cp.core.serverConfig.localDataDriveLetter = "c";
                     cp.core.serverConfig.localDataDriveLetter = cliController.promptForReply("Enter the Drive letter for data storage (c/d/etc)", cp.core.serverConfig.localDataDriveLetter);
+                    //
+                    // -- aws s3 bucket configure for non-local
+                    if (!cp.core.serverConfig.isLocalFileSystem) {
+                        //
+                        Console.WriteLine("\n\nConfigure Remote File System");
+                        string regionList = "";
+                        foreach ( var region in RegionEndpoint.EnumerableAllRegions) {
+                            regionList += "," + region.SystemName;
+                        }
+                        regionList = regionList.Substring(1);
+                        do {
+                            string selectedRegion = cliController.promptForReply("Enter the AWS bucket region (" + regionList + ")", cp.core.serverConfig.awsBucketRegionName).ToLower();
+                            cp.core.serverConfig.awsBucketRegionName = "";
+                            foreach (var region in RegionEndpoint.EnumerableAllRegions) {
+                                if (selectedRegion==region.SystemName.ToLower()) {
+                                    cp.core.serverConfig.awsBucketRegionName = region.SystemName;
+                                    break;
+                                }
+                            }
+                        } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsBucketRegionName));
+                        //
+                        do {
+                            cp.core.serverConfig.awsBucketName = cliController.promptForReply("Enter the name of the AWS bucket for remote storage", cp.core.serverConfig.awsBucketName);
+                        } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsBucketName));
+                        ////
+                        //do {
+                        //    cp.core.serverConfig.cdnFilesRemoteEndpoint = cliController.promptForReply("Enter the AWS bucket endpoint", cp.core.serverConfig.cdnFilesRemoteEndpoint);
+                        //} while (string.IsNullOrWhiteSpace(cp.core.serverConfig.cdnFilesRemoteEndpoint));
+                        //
+                        do {
+                            cp.core.serverConfig.awsAccessKey = cliController.promptForReply("Enter the AWS Access Key", cp.core.serverConfig.awsAccessKey);
+                        } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsAccessKey));
+                        //
+                        do {
+                            cp.core.serverConfig.awsSecretAccessKey = cliController.promptForReply("Enter the AWS Access Secret", cp.core.serverConfig.awsSecretAccessKey);
+                        } while (string.IsNullOrWhiteSpace(cp.core.serverConfig.awsSecretAccessKey));
+                    }
                     //
                     // -- Sql Server Driver
                     cp.core.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -70,16 +106,14 @@ namespace  Contensive.CLI {
                     cp.core.serverConfig.defaultDataSourcePassword = reply;
                     //
                     // -- cache server local or remote
-                    do
-                    {
+                    do {
                         Console.WriteLine("\n\nThe server requires a caching service. You can choose either the systems local cache or an AWS Elasticache (memCacheD).");
                         Console.Write("Use (l)ocal cache or (m)emcached server?");
                         if (!String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) { Console.Write("(m)"); } else { Console.Write("(l)"); };
                         reply = Console.ReadLine().ToLower();
                         if (String.IsNullOrEmpty(reply)) reply = "l";
                     } while ((reply != "l") && (reply != "m"));
-                    if ((reply == "l"))
-                    {
+                    if ((reply == "l")) {
                         //
                         // -- local memory cache
                         cp.core.serverConfig.enableLocalFileCache = false;
@@ -104,9 +138,7 @@ namespace  Contensive.CLI {
                     // -- save the configuration
                     cp.core.serverConfig.saveObject(cp.core);
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Console.WriteLine("Error: [" + ex.ToString() + "]");
             }
         }

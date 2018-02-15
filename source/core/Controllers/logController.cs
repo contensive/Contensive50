@@ -15,22 +15,20 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
 using System.IO;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
+
 //
 namespace Contensive.Core.Controllers {
     //
     //====================================================================================================
     /// <summary>
     /// static class controller
+    /// nlog: http://nlog-project.org/
+    /// base configuration from: https://brutaldev.com/post/logging-setup-in-5-minutes-with-nlog
     /// </summary>
-    public class logController {
-        //
-        // ----- constants
-        //
-        //Private Const invalidationDaysDefault As Double = 365
-        //
-        // ----- private instance storage
-        //
-        //Private remoteCacheDisabled As Boolean
+    public static class logController {
         //
         public static string LogFileCopyPrep(string Source) {
             string Copy = Source;
@@ -50,53 +48,42 @@ namespace Contensive.Core.Controllers {
         /// <param name="LogNamePrefix"></param>
         /// <param name="allowErrorHandling"></param>
         /// <remarks></remarks>
-        public static void appendLog(coreController core, string LogLine, string LogFolder = "", string LogNamePrefix = "", bool allowErrorHandling = true) {
+        public static void appendLog(coreController core, string LogLine, string LogFolder = "", string LogNamePrefix = "") {
             try {
-                if (core.serverConfig.enableLogging) {
-                    //
-                    // -- logging enabled, write log to consol
-                    Console.WriteLine(LogLine);
-                }
                 if (string.IsNullOrEmpty(LogFolder) || core.serverConfig.enableLogging) {
                     //
                     // -- logging enabled or trace log, append log
-                    int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
-                    string threadName = threadId.ToString("00000000");
-                    string absContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine;
-                    fileController fileSystem = null;
-                    if (core.serverConfig != null) {
-                        if (core.appConfig != null) {
-                            //
-                            // -- use app log space
-                            fileSystem = core.privateFiles;
-                        }
-                    }
-                    if (fileSystem == null) {
+                    string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
+                    if (core.useNlog) {
                         //
-                        // -- no app or no server, use program data files
-                        fileSystem = core.programDataFiles;
-                    }
-                    //
-                    if (core.useMicrosoftTraceLogging) {
-                        string logName;
-                        if (core.appConfig == null) {
-                            // -- no app, log to server
-                            logName = ("server/log/" + LogFolder).ToLower();
-                        } else {
-                            // -- use app log
-                            logName = (core.appConfig.name + "/log/" + LogFolder).ToLower();
-                        }
-                        if (!core.doc.logList.ContainsKey(logName)) {
-                            string logPathFile = fileSystem.rootLocalPath + "logs\\" + LogFolder.ToLower() + "\\" + getDateString(DateTime.Now) + ".log";
-                            if (!fileSystem.fileExists(logPathFile)) {
-                                fileSystem.appendFile(logPathFile, "");
-                            }
-                            core.doc.logList.Add(logName, new TextWriterTraceListener(logPathFile, logName));
-                        }
-                        core.doc.logList[logName].WriteLine(absContent);
+                        string logContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine;
+                        Console.WriteLine(LogLine);
+                        //
+                        // todo: implement this singleton in coreclass so logController can be static
+                        // todo: work log levels into the internal logging system
+                        Log.Instance.Info(LogLine);
                     } else {
                         //
-                        // -- until trace works
+                        string logContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine;
+                        Console.WriteLine(LogLine);
+                        //
+                        fileController fileSystem = null;
+                        if (core.serverConfig != null) {
+                            if (core.appConfig != null) {
+                                //
+                                // -- use app log space
+                                fileSystem = core.privateFiles;
+                            }
+                        }
+                        //
+                        // -- fall-back to simple appending
+                        //
+                        if (fileSystem == null) {
+                            //
+                            // -- no app or no server, use program data files
+                            fileSystem = core.programDataFiles;
+                        }
+                        //
                         try {
                             string FilenameNoExt = getDateString(DateTime.Now);
                             string logPath = LogFolder;
@@ -129,7 +116,7 @@ namespace Contensive.Core.Controllers {
                                 while ((!SaveOK) && (RetryCnt < 10)) {
                                     SaveOK = true;
                                     try {
-                                        fileSystem.appendFile(PathFilenameNoExt + FileSuffix + ".log", absContent + "\r\n");
+                                        fileSystem.appendFile(PathFilenameNoExt + FileSuffix + ".log", logContent + "\r\n");
                                     } catch (IOException) {
                                         //
                                         // permission denied - happens when more then one process are writing at once, go to the next suffix
@@ -178,7 +165,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="LogFolder"></param>
         /// <param name="LogNamePrefix"></param>
         /// <remarks></remarks>
-        public static void appendLogWithLegacyRow(coreController core, string ContensiveAppName, string contextDescription, string processName, string ClassName, string MethodName, int ErrNumber, string ErrSource, string ErrDescription, bool ErrorTrap, bool ResumeNextAfterLogging, string URL, string LogFolder, string LogNamePrefix) {
+        internal static void appendLogWithLegacyRow(coreController core, string ContensiveAppName, string contextDescription, string processName, string ClassName, string MethodName, int ErrNumber, string ErrSource, string ErrDescription, bool ErrorTrap, bool ResumeNextAfterLogging, string URL, string LogFolder, string LogNamePrefix) {
             try {
                 string ErrorMessage = null;
                 string LogLine = null;
@@ -216,7 +203,7 @@ namespace Contensive.Core.Controllers {
         //
         //=====================================================================================================
         //   Insert into the ActivityLog
-        public static void logActivity(coreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
+        internal static void logActivity(coreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
             try {
                 //
                 int CS;
@@ -242,7 +229,7 @@ namespace Contensive.Core.Controllers {
         }
         //
         //
-        public static void logActivity2(coreController core, string Message, int SubjectMemberID, int SubjectOrganizationID) {
+        internal static void logActivity2(coreController core, string Message, int SubjectMemberID, int SubjectOrganizationID) {
             logActivity(core, Message, core.doc.sessionContext.user.id, SubjectMemberID, SubjectOrganizationID, core.webServer.requestUrl, core.doc.sessionContext.visitor.id, core.doc.sessionContext.visit.id);
         }
         //
@@ -348,22 +335,57 @@ namespace Contensive.Core.Controllers {
         //
         public static void housekeepLogFolder(coreController core) {
             try {
+                // -- deprecated, NLog handles housekeeping
                 //
-                DateTime LogDate = default(DateTime);
-                //Dim fs As New fileSystemClass
-                FileInfo[] FileList = null;
-                //
-                LogDate = DateTime.Now.AddDays(-30);
-                FileList = core.privateFiles.getFileList("logs\\");
-                foreach (FileInfo file in FileList) {
-                    if (file.CreationTime < LogDate) {
-                        core.privateFiles.deleteFile("logs\\" + file.Name);
-                    }
-                }
+                //DateTime LogDate = default(DateTime);
+                ////Dim fs As New fileSystemClass
+                //FileInfo[] FileList = null;
+                ////
+                //LogDate = DateTime.Now.AddDays(-30);
+                //FileList = core.privateFiles.getFileList("logs\\");
+                //foreach (FileInfo file in FileList) {
+                //    if (file.CreationTime < LogDate) {
+                //        core.privateFiles.deleteFile("logs\\" + file.Name);
+                //    }
+                //}
                 //
                 return;
                 //
             } catch (Exception) { }
         }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// log to the program data folder. Use only when the application object is not available
+        /// </summary>
+        /// <param name="message"></param>
+        public static void appendLogProgramData(string message) {
+            string programDataPath = fileController.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\";
+            System.IO.File.AppendAllText(programDataPath + getDateString(DateTime.Now) + ".log", message);
+        }
+    }
+    //
+    // ====================================================================================================
+    /// <summary>
+    /// logging class from https://brutaldev.com/post/logging-setup-in-5-minutes-with-nlog
+    /// </summary>
+    internal static class Log {
+        public static Logger Instance { get; private set; }
+        static Log() {
+#if DEBUG
+            // Setup the logging view for Sentinel - http://sentinel.codeplex.com
+            var sentinalTarget = new NLogViewerTarget() {
+                Name = "sentinal",
+                Address = "udp://127.0.0.1:9999",
+                IncludeNLogData = false
+            };
+            var sentinalRule = new LoggingRule("*", LogLevel.Trace, sentinalTarget);
+            LogManager.Configuration.AddTarget("sentinal", sentinalTarget);
+            LogManager.Configuration.LoggingRules.Add(sentinalRule);            
+#endif
+            LogManager.ReconfigExistingLoggers();
+            Instance = LogManager.GetCurrentClassLogger();
+        }
+
     }
 }

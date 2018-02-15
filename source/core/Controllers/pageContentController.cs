@@ -531,7 +531,7 @@ namespace Contensive.Core.Controllers {
                                 // -- ceate new template named Default
                                 core.doc.template = pageTemplateModel.add(core );
                                 core.doc.template.name = defaultTemplateName;
-                                core.doc.template.bodyHTML = core.appRootFiles.readFile(defaultTemplateHomeFilename);
+                                core.doc.template.bodyHTML = core.appRootFiles.readFileText(defaultTemplateHomeFilename);
                                 core.doc.template.save(core);
                             }
                             //
@@ -2100,7 +2100,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // ----- Custom Message
                                 //
-                                returnHtml = core.cdnFiles.readFile(CustomBlockMessageFilename);
+                                returnHtml = core.cdnFiles.readFileText(CustomBlockMessageFilename);
                                 break;
                             }
                         case main_BlockSourceLogin: {

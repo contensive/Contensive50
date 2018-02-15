@@ -41,7 +41,7 @@ namespace Contensive.Core.Controllers {
             //
             if (!core.doc.emailBlockListLocalLoaded) {
                 privatePathFilename = "etc\\SMTPBlockList.txt";
-                core.doc.emailBlockList_Local = core.privateFiles.readFile(privatePathFilename);
+                core.doc.emailBlockList_Local = core.privateFiles.readFileText(privatePathFilename);
                 core.doc.emailBlockListLocalLoaded = true;
             }
             return core.doc.emailBlockList_Local;
@@ -347,7 +347,7 @@ namespace Contensive.Core.Controllers {
                     EmailToConfirmationMemberID = email.TestMemberID;
                     EmailFrom = email.FromAddress;
                     EmailSubjectSource = email.Subject;
-                    EmailBodySource = core.cdnFiles.readFile( email.CopyFilename ) + appendedCopy;
+                    EmailBodySource = core.cdnFiles.readFileText( email.CopyFilename ) + appendedCopy;
                     EmailAllowLinkEID = email.AddLinkEID;
                     BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
                     if (string.IsNullOrEmpty(BounceAddress)) {

@@ -468,7 +468,7 @@ namespace Contensive.Core.Controllers {
                         landingPage.Copyfilename.content = constants.defaultLandingPageHtml;
                         landingPage.save(core);
                         //
-                        defaultTemplate.bodyHTML = core.appRootFiles.readFile(defaultTemplateHomeFilename);
+                        defaultTemplate.bodyHTML = core.appRootFiles.readFileText(defaultTemplateHomeFilename);
                         defaultTemplate.save(core);
                         //
                         if (core.siteProperties.getInteger("LandingPageID", landingPage.id) == 0) {
@@ -1848,7 +1848,7 @@ namespace Contensive.Core.Controllers {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCountries", "Verify Countries");
                 //
-                string list = core.appRootFiles.readFile("cclib\\config\\isoCountryList.txt");
+                string list = core.appRootFiles.readFileText("cclib\\config\\isoCountryList.txt");
                 string[] rows  = genericController.stringSplit(list, "\r\n");
                 foreach( var row in rows) {
                     if (!string.IsNullOrEmpty(row)) {
