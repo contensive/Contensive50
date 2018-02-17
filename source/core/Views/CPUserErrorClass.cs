@@ -65,18 +65,6 @@ namespace Contensive.Core {
         public override bool OK() {
             return !(core.doc.debug_iUserError != "");
         }
-        //
-        //====================================================================================================
-        //
-        private void appendDebugLog(string copy) {
-            logController.appendLogDebug(core, copy);
-        }
-        //
-        //====================================================================================================
-        //
-        private void tp(string msg) {
-            //Call appendDebugLog(msg)
-        }
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).

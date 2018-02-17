@@ -726,7 +726,7 @@ namespace Contensive.Core.Models.Complex {
                 + " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)"
                 + " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)"
                 + " WHERE"
-                    + " (ccMemberRules.MemberID=" + core.doc.sessionContext.user.id + ")"
+                    + " (ccMemberRules.MemberID=" + core.sessionContext.user.id + ")"
                     + " AND(ccGroupRules.Active<>0)"
                     + " AND(ccContent.Active<>0)"
                     + " AND(ccMemberRules.Active<>0)";
@@ -801,11 +801,11 @@ namespace Contensive.Core.Models.Complex {
                         // ----- create child content record, let the csv_ExecuteSQL reload CDef
                         //
                         DataSourceName = "Default";
-                        CSContent = core.db.cs_openContentRecord("Content", ParentContentID);
+                        CSContent = core.db.csOpenContentRecord("Content", ParentContentID);
                         if (!core.db.csOk(CSContent)) {
                             throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] was not found."));
                         } else {
-                            SelectFieldList = core.db.cs_getSelectFieldList(CSContent);
+                            SelectFieldList = core.db.csGetSelectFieldList(CSContent);
                             if (string.IsNullOrEmpty(SelectFieldList)) {
                                 throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] record has not fields."));
                             } else {
@@ -1562,7 +1562,7 @@ namespace Contensive.Core.Models.Complex {
                                     if (!string.IsNullOrEmpty(LookupContentName)) {
                                         LookupContentID = Models.Complex.cdefModel.getContentId(core, LookupContentName);
                                         if (LookupContentID <= 0) {
-                                            logController.appendLog(core, "Could not create lookup field [" + field.nameLc + "] for content definition [" + ContentName + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
+                                            logController.logError(core, "Could not create lookup field [" + field.nameLc + "] for content definition [" + ContentName + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
                                         }
                                     }
                                     sqlList.add("LOOKUPCONTENTID", core.db.encodeSQLNumber(LookupContentID)); // Pointer)
@@ -1575,7 +1575,7 @@ namespace Contensive.Core.Models.Complex {
                                     if (!string.IsNullOrEmpty(ManyToManyContent)) {
                                         int ManyToManyContentID = Models.Complex.cdefModel.getContentId(core, ManyToManyContent);
                                         if (ManyToManyContentID <= 0) {
-                                            logController.appendLog(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
+                                            logController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
                                         }
                                         sqlList.add("MANYTOMANYCONTENTID", core.db.encodeSQLNumber(ManyToManyContentID));
                                     }
@@ -1584,7 +1584,7 @@ namespace Contensive.Core.Models.Complex {
                                     if (!string.IsNullOrEmpty(ManyToManyRuleContent)) {
                                         int ManyToManyRuleContentID = Models.Complex.cdefModel.getContentId(core, ManyToManyRuleContent);
                                         if (ManyToManyRuleContentID <= 0) {
-                                            logController.appendLog(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
+                                            logController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
                                         }
                                         sqlList.add("MANYTOMANYRULECONTENTID", core.db.encodeSQLNumber(ManyToManyRuleContentID));
                                     }
@@ -1597,7 +1597,7 @@ namespace Contensive.Core.Models.Complex {
                                     if (!string.IsNullOrEmpty(RedirectContentName)) {
                                         RedirectContentID = Models.Complex.cdefModel.getContentId(core, RedirectContentName);
                                         if (RedirectContentID <= 0) {
-                                            logController.appendLog(core, "Could not create redirect field [" + field.nameLc + "] for Content Definition [" + ContentName + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
+                                            logController.logError(core, "Could not create redirect field [" + field.nameLc + "] for Content Definition [" + ContentName + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
                                         }
                                     }
                                     sqlList.add("REDIRECTCONTENTID", core.db.encodeSQLNumber(RedirectContentID)); // Pointer)
@@ -1669,7 +1669,7 @@ namespace Contensive.Core.Models.Complex {
             tempgetContentIDByTablename = -1;
             if (!string.IsNullOrEmpty(TableName)) {
                 SQL = "select ContentControlID from " + TableName + " where contentcontrolid is not null order by contentcontrolid;";
-                CS = core.db.csOpenSql_rev("Default", SQL, 1, 1);
+                CS = core.db.csOpenSql(SQL,"Default", 1, 1);
                 if (core.db.csOk(CS)) {
                     tempgetContentIDByTablename = core.db.csGetInteger(CS, "ContentControlID");
                 }
@@ -1705,7 +1705,7 @@ namespace Contensive.Core.Models.Complex {
                 ContentName = getContentNameByID(core, ContentID);
                 CS = core.db.csOpenRecord(ContentName, RecordID, false, false);
                 if (core.db.csOk(CS)) {
-                    HasParentID = core.db.cs_isFieldSupported(CS, "ParentID");
+                    HasParentID = core.db.csIsFieldSupported(CS, "ParentID");
                     RecordContentID = core.db.csGetInteger(CS, "ContentControlID");
                     RecordContentName = getContentNameByID(core, RecordContentID);
                 }

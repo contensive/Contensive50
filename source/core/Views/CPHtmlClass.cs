@@ -353,7 +353,7 @@ namespace Contensive.Core {
         public override string adminHint(string innerHtml) {
             string returnString = innerHtml;
             try {
-                if (core.doc.sessionContext.isEditingAnything() | core.doc.sessionContext.user.Admin) {
+                if (core.sessionContext.isEditingAnything() | core.sessionContext.user.Admin) {
                     returnString = ""
                         + "<div class=\"ccHintWrapper\">"
                             + "<div  class=\"ccHintWrapperContent\">"

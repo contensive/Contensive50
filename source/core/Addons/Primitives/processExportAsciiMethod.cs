@@ -30,7 +30,7 @@ namespace Contensive.Core.Addons.Primitives {
                 coreController core = processor.core;
                 //
                 // -- Should be a remote method in commerce
-                if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Administrator required
                     //

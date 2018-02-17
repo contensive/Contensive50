@@ -343,7 +343,7 @@ namespace Contensive.Core.Controllers {
                         //
                         DateTime cookieDetectDate = new DateTime();
                         int CookieDetectVisitId = 0;
-                        core.security.decodeToken(CookieDetectKey, ref CookieDetectVisitId, ref  cookieDetectDate);
+                        securityController.decodeToken(core,CookieDetectKey, ref CookieDetectVisitId, ref  cookieDetectDate);
                         if (CookieDetectVisitId != 0) {
                             core.db.executeQuery("update ccvisits set CookieSupport=1 where id=" + CookieDetectVisitId);
                             core.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
@@ -817,7 +817,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Do a PageNotFound then redirect
                         //
-                        logController.appendLogPageNotFound(core, requestUrlSource);
+                        logController.addSiteWarning(core, "Page Not Found Redirect", "Page Not Found Redirect", "", 0, "Page Not Found Redirect [" + requestUrlSource + "]", "Page Not Found Redirect", "Page Not Found Redirect");
                         if (!string.IsNullOrEmpty(ShortLink)) {
                             core.db.executeQuery("Update ccContentWatch set link=null where link=" + core.db.encodeSQLText(ShortLink));
                         }
@@ -833,9 +833,6 @@ namespace Contensive.Core.Controllers {
 
                         //
                         // Go ahead and redirect
-                        //
-                        Copy = "\"" + core.doc.profileStartTime.ToString("") + "\",\"" + requestDomain + "\",\"" + requestUrlSource + "\",\"" + NonEncodedLink + "\",\"" + RedirectReason + "\"";
-                        logController.appendLog(core, Copy, "performance", "redirects");
                         //
                         if (allowDebugMessage && core.doc.visitPropertyAllowDebugging) {
                             //
@@ -1158,7 +1155,7 @@ namespace Contensive.Core.Controllers {
                     // If link incorrectly includes the LinkPrefix, take it off first, then add it back
                     //
                     NonEncodedLink = genericController.ConvertShortLinkToLink(NonEncodedLink, LinkPrefix);
-                    if (core.db.cs_isFieldSupported(CSPointer, "Clicks")) {
+                    if (core.db.csIsFieldSupported(CSPointer, "Clicks")) {
                         core.db.csSet(CSPointer, "Clicks", (core.db.csGetNumber(CSPointer, "Clicks")) + 1);
                     }
                     core.webServer.redirect(LinkPrefix + NonEncodedLink, "Call to " + MethodName + ", no reason given.", false, false);

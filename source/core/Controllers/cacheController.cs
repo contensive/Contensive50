@@ -97,7 +97,7 @@ namespace Contensive.Core.Controllers {
                         if (dateCompare >= 0) {
                             //
                             // -- global invalidation
-                            logController.appendLogCache( core,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "] is after the globalInvalidationDate [" + globalInvalidationDate + "]");
+                            logController.logTrace( core,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "] is after the globalInvalidationDate [" + globalInvalidationDate + "]");
                         } else {
                             //
                             // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
@@ -115,7 +115,7 @@ namespace Contensive.Core.Controllers {
                                     dateCompare = dependantObject.saveDate.CompareTo(wrappedContent.saveDate);
                                     if (dateCompare >= 0) {
                                         cacheMiss = true;
-                                        logController.appendLogCache(core, "GetObject(" + key + "), invalidated because the dependantobject [" + dependentKey + "] has a saveDate [" + dependantObject.saveDate.ToString() + "] after the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "]");
+                                        logController.logTrace(core, "GetObject(" + key + "), invalidated because the dependantobject [" + dependentKey + "] has a saveDate [" + dependantObject.saveDate.ToString() + "] after the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "]");
                                         break;
                                     }
                                 }
@@ -199,7 +199,7 @@ namespace Contensive.Core.Controllers {
                         if (result != null) {
                             //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), remoteCache hit");
                         } else {
-                            logController.appendLogCache(core,"getCacheWrapper(" + key + "), remoteCache miss");
+                            logController.logTrace(core,"getCacheWrapper(" + key + "), remoteCache miss");
                         }
                     }
                     if ((result == null) && core.serverConfig.enableLocalMemoryCache) {
@@ -210,7 +210,7 @@ namespace Contensive.Core.Controllers {
                         if (result != null) {
                             //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), memoryCache hit");
                         } else {
-                            logController.appendLogCache(core,"getCacheWrapper(" + key + "), memoryCache miss");
+                            logController.logTrace(core,"getCacheWrapper(" + key + "), memoryCache miss");
                         }
                     }
                     if ((result == null) && core.serverConfig.enableLocalFileCache) {
@@ -223,7 +223,7 @@ namespace Contensive.Core.Controllers {
                             mutex.ReleaseMutex();
                         }
                         if (string.IsNullOrEmpty(serializedDataObject)) {
-                            logController.appendLogCache(core,"getCacheWrapper(" + key + "), file miss");
+                            logController.logTrace(core,"getCacheWrapper(" + key + "), file miss");
                         } else {
                             //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), file hit, write to memory cache");
                             result = Newtonsoft.Json.JsonConvert.DeserializeObject<cacheWrapperClass>(serializedDataObject);
@@ -232,7 +232,7 @@ namespace Contensive.Core.Controllers {
                         if (result != null) {
                             //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), fileCache hit");
                         } else {
-                            logController.appendLogCache(core,"getCacheWrapper(" + key + "), fileCache miss");
+                            logController.logTrace(core,"getCacheWrapper(" + key + "), fileCache miss");
                         }
                     }
                     if (result != null) {
@@ -474,7 +474,7 @@ namespace Contensive.Core.Controllers {
         public void invalidateAllInContent(string ContentName) {
             try {
                 //
-                logController.appendLogCache(core,"invalidateAllObjectsInContent(" + ContentName + ")");
+                logController.logTrace(core,"invalidateAllObjectsInContent(" + ContentName + ")");
                 //
                 // -- save the cache key that represents any record in the content, set as a dependent key for saves
                 invalidate(ContentName);

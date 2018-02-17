@@ -428,7 +428,7 @@ namespace Contensive.WindowsServices {
         //
         //
         private void appendMonitorLog(string message) {
-            logController.appendLog(cpCore, message, "Monitor");
+            logController.logError(cpCore, "Monitor-serverStatus:" + message);
         }
         //
         //

@@ -261,7 +261,7 @@ namespace Contensive.Core.Controllers {
         // Temp log file solution
         //
         private void AppendLog(string Message) {
-            logController.appendLog(core, Message, "menuing");
+            logController.logError(core, "menuTreeController: " + Message);
         }
         //
         //===============================================================================

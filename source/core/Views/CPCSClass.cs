@@ -40,7 +40,7 @@ namespace Contensive.Core {
             cp = cpParent;
             core = cp.core;
             cs = -1;
-            OpeningMemberID = core.doc.sessionContext.user.id;
+            OpeningMemberID = core.sessionContext.user.id;
         }
         //
         // dispose
@@ -172,7 +172,7 @@ namespace Contensive.Core {
                 if (cs != -1) {
                     core.db.csClose(ref cs);
                 }
-                cs = core.db.csOpenSql_rev("default", sql);
+                cs = core.db.csOpenSql(sql,"Default");
                 success = core.db.csOk(cs);
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -258,7 +258,7 @@ namespace Contensive.Core {
         //
         public override bool FieldOK(string FieldName) {
             try {
-                return core.db.cs_isFieldSupported(cs, FieldName);
+                return core.db.csIsFieldSupported(cs, FieldName);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -269,7 +269,7 @@ namespace Contensive.Core {
         //
         public override void GoFirst() {
             try {
-                core.db.cs_goFirst(cs, false);
+                core.db.csGoFirst(cs, false);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -447,7 +447,7 @@ namespace Contensive.Core {
         //
         public override void Save() {
             try {
-                core.db.csSave2(cs);
+                core.db.csSave(cs);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -511,7 +511,7 @@ namespace Contensive.Core {
         //
         public override void SetFormInput(string FieldName, string RequestName = "") {
             try {
-                core.db.cs_setFormInput(core, cs, FieldName, RequestName);
+                dbController.csSetFormInput(core, cs, FieldName, RequestName);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -525,7 +525,7 @@ namespace Contensive.Core {
         /// <param name="fieldName"></param>
         /// <returns></returns>
         public override string GetValue(string fieldName) {
-            return core.db.cs_getValue(cs, fieldName);
+            return core.db.csGetValue(cs, fieldName);
         }
 
         #region  IDisposable Support 

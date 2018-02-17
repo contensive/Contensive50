@@ -619,7 +619,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = core.html.getContentCopy(ArgName, "copy content", core.doc.sessionContext.user.id, true, core.doc.sessionContext.isAuthenticated);
+                                        CmdAccumulator = core.html.getContentCopy(ArgName, "copy content", core.sessionContext.user.id, true, core.sessionContext.isAuthenticated);
                                     }
                                     break;
                                 }
@@ -643,7 +643,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = core.html.getContentCopy(ArgName, "copy content", core.doc.sessionContext.user.id, true, core.doc.sessionContext.isAuthenticated);
+                                        CmdAccumulator = core.html.getContentCopy(ArgName, "copy content", core.sessionContext.user.id, true, core.sessionContext.isAuthenticated);
                                     }
                                     break;
                                 }

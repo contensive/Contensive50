@@ -54,7 +54,7 @@ namespace Contensive.Core {
         public override bool CookieSupport
         {
             get {
-                return core.doc.sessionContext.visit.CookieSupport;
+                return core.sessionContext.visit.CookieSupport;
             }
         }
         //
@@ -72,7 +72,7 @@ namespace Contensive.Core {
         //
         public override int Id {
             get {
-                return core.doc.sessionContext.visit.id;
+                return core.sessionContext.visit.id;
             }
         }
         //
@@ -81,7 +81,7 @@ namespace Contensive.Core {
         public override DateTime LastTime
         {
             get {
-                return core.doc.sessionContext.visit.LastVisitTime;
+                return core.sessionContext.visit.LastVisitTime;
             }
         }
         //
@@ -90,7 +90,7 @@ namespace Contensive.Core {
         public override int LoginAttempts
         {
             get {
-                return core.doc.sessionContext.visit.LoginAttempts;
+                return core.sessionContext.visit.LoginAttempts;
             }
         }
         //
@@ -99,7 +99,7 @@ namespace Contensive.Core {
         public override string Name
         {
             get {
-                return core.doc.sessionContext.visit.name;
+                return core.sessionContext.visit.name;
             }
         }
         //
@@ -108,7 +108,7 @@ namespace Contensive.Core {
         public override int Pages
         {
             get {
-                return core.doc.sessionContext.visit.PageVisits;
+                return core.sessionContext.visit.PageVisits;
             }
         }
         //
@@ -117,7 +117,7 @@ namespace Contensive.Core {
         public override string Referer
         {
             get {
-                return core.doc.sessionContext.visit.HTTP_REFERER;
+                return core.sessionContext.visit.HTTP_REFERER;
             }
         }
         //
@@ -172,14 +172,14 @@ namespace Contensive.Core {
         public override int StartDateValue
         {
             get {
-                return core.doc.sessionContext.visit.StartDateValue;
+                return core.sessionContext.visit.StartDateValue;
             }
         }
 
         public override DateTime StartTime
         {
             get {
-                return core.doc.sessionContext.visit.StartTime;
+                return core.sessionContext.visit.StartTime;
             }
         }
         //

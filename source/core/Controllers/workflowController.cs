@@ -97,7 +97,7 @@ namespace Contensive.Core.Controllers {
                 main_EditLockStatus_Local = false;
                 //
                 main_EditLockStatus_Local = getEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), ref ReturnMemberID, ref ReturnDateExpires);
-                if (main_EditLockStatus_Local && (ReturnMemberID != core.doc.sessionContext.user.id)) {
+                if (main_EditLockStatus_Local && (ReturnMemberID != core.sessionContext.user.id)) {
                     main_EditLockStatus_Local = true;
                     main_EditLockDateExpires_Local = ReturnDateExpires;
                     main_EditLockMemberID_Local = ReturnMemberID;
@@ -125,7 +125,7 @@ namespace Contensive.Core.Controllers {
                 if (main_EditLockStatus_Local) {
                     if (string.IsNullOrEmpty(main_EditLockMemberName_Local)) {
                         if (main_EditLockMemberID_Local != 0) {
-                            CS = core.db.cs_open2("people", main_EditLockMemberID_Local);
+                            CS = core.db.csOpen2("people", main_EditLockMemberID_Local);
                             if (core.db.csOk(CS)) {
                                 main_EditLockMemberName_Local = core.db.csGetText(CS, "name");
                             }
@@ -169,7 +169,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public void SetEditLock(string ContentName, int RecordID) {
-            setEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.doc.sessionContext.user.id);
+            setEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.sessionContext.user.id);
         }
         //
         //========================================================================
@@ -177,7 +177,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public void ClearEditLock(string ContentName, int RecordID) {
-            clearEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.doc.sessionContext.user.id);
+            clearEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.sessionContext.user.id);
         }
         //
         //========================================================================
@@ -758,7 +758,7 @@ namespace Contensive.Core.Controllers {
                 string Criteria = "";
                 int TableID;
                 //
-                TableID = core.db.GetContentTableID(ContentName);
+                TableID = core.db.getContentTableID(ContentName);
                 //
                 // Authoring Control records are referenced by ContentID
                 //

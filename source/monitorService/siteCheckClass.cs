@@ -620,7 +620,7 @@ namespace Contensive.WindowsServices {
                         }
                         Cmd = "%comspec% /c IISReset";
                         try {
-                            executeCommandSync(Cmd);
+                            genericController.executeCommandSync(Cmd);
                         } catch (Exception ex) {
                             appendMonitorLog("IISReset attempt failed, error=" + ex.ToString());
                         }
@@ -629,9 +629,9 @@ namespace Contensive.WindowsServices {
                         // recycle the app
                         //
                         appendMonitorLog("attempting IIS app pool recycle on " + appPoolName + ".");
-                        Cmd = "%comspec% /c %systemroot%\\system32\\inetsrv\\appcmd recycle apppool " + appPoolName;
+                        Cmd = "%comspec% /c %systemroot%\\system32\\inetsrv\\appcmd recycle appPool " + appPoolName;
                         try {
-                            executeCommandSync(Cmd);
+                            genericController.executeCommandSync(Cmd);
                         } catch (Exception ex) {
                             appendMonitorLog("IIS app pool recycle attempt failed, error=" + ex.ToString());
                         }
@@ -647,38 +647,18 @@ namespace Contensive.WindowsServices {
         //
         //
         private void appendMonitorLog(string message) {
-            logController.appendLog(cpCore, message, "Monitor");
+            logController.logError(cpCore, "Monitor-siteCheck:" + message);
         }
-
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="cpCore"></param>
         public siteCheckClass(coreController cpCore) : base() {
             this.cpCore = cpCore;
             version = Assembly.GetEntryAssembly().GetName().Version.ToString();
             processTimer.Elapsed += ProcessTimerTick;
-        }
-        //
-        //
-        //
-        public string executeCommandSync(string command) {
-            string result = "";
-            try {
-                //create the ProcessStartInfo using "cmd" as the program to be run,
-                //and "/c " as the parameters.
-                //Incidentally, /c tells cmd that we want it to execute the command that follows,
-                //and then exit.
-                System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo("%comspec%", "/c " + command);
-                //Dim procStartInfo As System.Diagnostics.ProcessStartInfo = New System.Diagnostics.ProcessStartInfo("cmd", "/c " + command)
-                //The following commands are needed to redirect the standard output.
-                //This means that it will be redirected to the Process.StandardOutput StreamReader.
-                procStartInfo.RedirectStandardOutput = true;
-                procStartInfo.UseShellExecute = false;
-                //Do not create the black window.
-                procStartInfo.CreateNoWindow = true;
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo = procStartInfo;
-                proc.Start();
-                result = proc.StandardOutput.ReadToEnd();
-            } catch (Exception) {}
-            return result;
         }
     }
 }

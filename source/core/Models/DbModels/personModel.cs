@@ -255,7 +255,7 @@ namespace Contensive.Core.Models.DbModels {
                     cs.goNext();
                 } while (cs.ok());
             }
-            cs.Close();
+            cs.close();
             return result;
         }
     }

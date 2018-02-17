@@ -72,7 +72,7 @@ namespace Contensive.Core.Models.DbModels
 			dataSourceModel result = null;
 			try
 			{
-				result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.doc.sessionContext.user.id),ref callersCacheNameList);
+				result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.sessionContext.user.id),ref callersCacheNameList);
 			}
 			catch (Exception ex)
 			{
@@ -235,7 +235,7 @@ namespace Contensive.Core.Models.DbModels
 						core.cache.setAlias(cacheName1, cacheName0);
 					}
 				}
-				cs.Close();
+				cs.close();
 			}
 			catch (Exception ex)
 			{
@@ -262,7 +262,7 @@ namespace Contensive.Core.Models.DbModels
 					if (!cs.open(primaryContentName, "id=" + ID))
 					{
 						ID = 0;
-						cs.Close();
+						cs.close();
 						throw new ApplicationException("Unable to open record in content [" + primaryContentName + "], with id [" + ID + "]");
 					}
 				}
@@ -270,7 +270,7 @@ namespace Contensive.Core.Models.DbModels
 				{
 					if (!cs.insert(primaryContentName))
 					{
-						cs.Close();
+						cs.close();
 						ID = 0;
 						throw new ApplicationException("Unable to insert record in content [" + primaryContentName + "]");
 					}
@@ -302,7 +302,7 @@ namespace Contensive.Core.Models.DbModels
 					cs.setField("Name", normalizeDataSourceName(Name));
 					cs.setField("SortOrder", SortOrder);
 				}
-				cs.Close();
+				cs.close();
 				//
 				// -- invalidate objects
 				// -- no, the primary is invalidated by the cs.save()
@@ -432,7 +432,7 @@ namespace Contensive.Core.Models.DbModels
 						cs.goNext();
 					} while (cs.ok());
 				}
-				cs.Close();
+				cs.close();
 			}
 			catch (Exception ex)
 			{

@@ -31,7 +31,7 @@ namespace Contensive.Core.Addons.Primitives {
                 coreController core = processor.core;
                 //
                 // -- login
-                core.doc.sessionContext.logout(core);
+                core.sessionContext.logout(core);
                 core.doc.continueProcessing = false;
                 Dictionary<string, string> addonArguments = new Dictionary<string, string>();
                 addonArguments.Add("Force Default Login", "false");

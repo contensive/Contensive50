@@ -205,7 +205,7 @@ namespace Contensive.Core.Models.DbModels {
                         core.cache.setAlias(cacheName1, cacheName0);
                     }
                 }
-                cs.Close();
+                cs.close();
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -225,12 +225,12 @@ namespace Contensive.Core.Models.DbModels {
                 if (id > 0) {
                     if (!cs.open(primaryContentName, "id=" + id)) {
                         id = 0;
-                        cs.Close();
+                        cs.close();
                         throw new ApplicationException("Unable to open record in content [" + primaryContentName + "], with id [" + id + "]");
                     }
                 } else {
                     if (!cs.insert(primaryContentName)) {
-                        cs.Close();
+                        cs.close();
                         id = 0;
                         throw new ApplicationException("Unable to insert record in content [" + primaryContentName + "]");
                     }
@@ -282,7 +282,7 @@ namespace Contensive.Core.Models.DbModels {
                     cs.setField("VisitorID", VisitorID.ToString());
                     cs.setField("VisitorNew", VisitorNew.ToString());
                 }
-                cs.Close();
+                cs.close();
                 //
                 // -- object is here, but the cache was invalidated, setting
                 core.cache.setObject(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.id.ToString()), this);
@@ -352,7 +352,7 @@ namespace Contensive.Core.Models.DbModels {
                         cs.goNext();
                     } while (cs.ok());
                 }
-                cs.Close();
+                cs.close();
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;

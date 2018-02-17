@@ -39,13 +39,13 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetCopy(string CopyName, string DefaultContent = "") {
-            return core.html.getContentCopy(CopyName, DefaultContent, core.doc.sessionContext.user.id, true, core.doc.sessionContext.isAuthenticated);
+            return core.html.getContentCopy(CopyName, DefaultContent, core.sessionContext.user.id, true, core.sessionContext.isAuthenticated);
         }
         //
         //====================================================================================================
         //
         public override string GetCopy(string CopyName, string DefaultContent, int personalizationPeopleId) {
-            return core.html.getContentCopy(CopyName, DefaultContent, personalizationPeopleId, true, core.doc.sessionContext.isAuthenticated);
+            return core.html.getContentCopy(CopyName, DefaultContent, personalizationPeopleId, true, core.sessionContext.isAuthenticated);
         }
         //
         //====================================================================================================
@@ -203,7 +203,7 @@ namespace Contensive.Core {
                 if (cs.ok()) {
                     result = cs.getText("layout");
                 }
-                cs.Close();
+                cs.close();
             } catch (Exception ex) {
                 core.handleException(ex); // "Unexpected error in getLayout")
                 throw;
@@ -221,7 +221,7 @@ namespace Contensive.Core {
                     cs.setField("name", recordName);
                     recordId = cs.getInteger("id");
                 }
-                cs.Close();
+                cs.close();
             } catch (Exception ex) {
                 core.handleException(ex); // "Unexpected error in AddRecord")
                 throw;
@@ -242,7 +242,7 @@ namespace Contensive.Core {
                 if (cs.insert(ContentName)) {
                     recordId = cs.getInteger("id");
                 }
-                cs.Close();
+                cs.close();
             } catch (Exception ex) {
                 core.handleException(ex); // "Unexpected error in AddRecord")
                 throw;

@@ -60,7 +60,7 @@ namespace Contensive.Core.Models.DbModels {
         public static oldBaseModel add(coreController core, ref List<string> callersCacheNameList) {
             oldBaseModel result = null;
             try {
-                result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.doc.sessionContext.user.id), ref callersCacheNameList);
+                result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.sessionContext.user.id), ref callersCacheNameList);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -267,13 +267,13 @@ namespace Contensive.Core.Models.DbModels {
                 if (id > 0) {
                     if (!cs.open(primaryContentName, "id=" + id)) {
                         string message = "Unable to open record in content [" + primaryContentName + "], with id [" + id + "]";
-                        cs.Close();
+                        cs.close();
                         id = 0;
                         throw new ApplicationException(message);
                     }
                 } else {
                     if (!cs.insert(primaryContentName)) {
-                        cs.Close();
+                        cs.close();
                         id = 0;
                         throw new ApplicationException("Unable to insert record in content [" + primaryContentName + "]");
                     }
@@ -423,7 +423,7 @@ namespace Contensive.Core.Models.DbModels {
                         cs.goNext();
                     } while (cs.ok());
                 }
-                cs.Close();
+                cs.close();
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;

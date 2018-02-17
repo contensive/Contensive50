@@ -912,7 +912,7 @@ namespace Contensive.Core.Controllers {
                 appName = core.appConfig.name;
                 if (RecordID != 0) {
                     if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + RecordID + ",", 1) != 0) {
-                        logController.appendLog(core, "getMenuNameSpace, Circular reference found in UsedIDString [" + UsedIDString + "] getting ccMenuEntries namespace for recordid [" + RecordID + "]");
+                        logController.logError(core, "getMenuNameSpace, Circular reference found in UsedIDString [" + UsedIDString + "] getting ccMenuEntries namespace for recordid [" + RecordID + "]");
                         tempgetMenuNameSpace = "";
                     } else {
                         UsedIDString = UsedIDString + "," + RecordID;
@@ -935,7 +935,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // circular reference
                                 //
-                                logController.appendLog(core, "getMenuNameSpace, Circular reference found (ParentID=RecordID) getting ccMenuEntries namespace for recordid [" + RecordID + "]");
+                                logController.logError(core, "getMenuNameSpace, Circular reference found (ParentID=RecordID) getting ccMenuEntries namespace for recordid [" + RecordID + "]");
                                 tempgetMenuNameSpace = "";
                             } else {
                                 if (ParentID != 0) {

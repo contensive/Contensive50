@@ -3313,7 +3313,7 @@ namespace Contensive.Core.Controllers {
             string returnResult = "";
             Process p = new Process();
             //
-            logController.appendLog(core, "ccCommonModule.runProcess, cmd=[" + Cmd + "], Arguments=[" + Arguments + "], WaitForReturn=[" + WaitForReturn + "]");
+            logController.logError(core, "ccCommonModule.runProcess, cmd=[" + Cmd + "], Arguments=[" + Arguments + "], WaitForReturn=[" + WaitForReturn + "]");
             //
             p.StartInfo.FileName = Cmd;
             p.StartInfo.Arguments = Arguments;
@@ -4408,125 +4408,143 @@ namespace Contensive.Core.Controllers {
             return returnList;
         }
         //
-        //=============================================================================
-        //   Return just the copy from a content page
-        //=============================================================================
-        //
+        // ====================================================================================================
+        /// <summary>
+        /// descramble a phrase using twoWayDecrypt. If decryption fails, attempt legacy scramble. If no decryption works, return original scrambled source
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Copy"></param>
+        /// <returns></returns>
         public static string TextDeScramble(coreController core, string Copy) {
-            string returnCopy = "";
+            string result = "";
             try {
-                int CPtr = 0;
-                string C = null;
-                int CValue = 0;
-                int crc = 0;
-                string Source = null;
-                int Base = 0;
-                const int CMin = 32;
-                const int CMax = 126;
+                result = securityController.twoWayDecrypt(core, Copy);
+            } catch (Exception) {
                 //
-                // assume this one is not converted
-                //
-                Source = Copy;
-                Base = 50;
-                //
-                // First characger must be _
-                // Second character is the scramble version 'a' is the starting system
-                //
-                if (Source.Left( 2) != "_a") {
-                    returnCopy = Copy;
+                if (!core.siteProperties.allowLegacyDescrambleFallback) {
+                    //
+                    throw;
                 } else {
-                    Source = Source.Substring(2);
                     //
-                    // cycle through all characters
-                    //
-                    for (CPtr = Source.Length - 1; CPtr >= 1; CPtr--) {
-                        C = Source.Substring(CPtr - 1, 1);
-                        CValue = Microsoft.VisualBasic.Strings.Asc(C);
-                        crc = crc + CValue;
-                        if ((CValue < CMin) || (CValue > CMax)) {
-                            //
-                            // if out of ascii bounds, just leave it in place
-                            //
+                    // -- decryption failed, true legacy descramble
+                    try {
+                        int CPtr = 0;
+                        string C = null;
+                        int CValue = 0;
+                        int crc = 0;
+                        string Source = null;
+                        int Base = 0;
+                        const int CMin = 32;
+                        const int CMax = 126;
+                        //
+                        // assume this one is not converted
+                        //
+                        Source = Copy;
+                        Base = 50;
+                        //
+                        // First characger must be _
+                        // Second character is the scramble version 'a' is the starting system
+                        //
+                        if (Source.Left(2) != "_a") {
+                            result = Copy;
                         } else {
-                            CValue = CValue - Base;
-                            if (CValue < CMin) {
-                                CValue = CValue + CMax - CMin + 1;
+                            Source = Source.Substring(2);
+                            //
+                            // cycle through all characters
+                            //
+                            for (CPtr = Source.Length - 1; CPtr >= 1; CPtr--) {
+                                C = Source.Substring(CPtr - 1, 1);
+                                CValue = Microsoft.VisualBasic.Strings.Asc(C);
+                                crc = crc + CValue;
+                                if ((CValue < CMin) || (CValue > CMax)) {
+                                    //
+                                    // if out of ascii bounds, just leave it in place
+                                    //
+                                } else {
+                                    CValue = CValue - Base;
+                                    if (CValue < CMin) {
+                                        CValue = CValue + CMax - CMin + 1;
+                                    }
+                                }
+                                result += Microsoft.VisualBasic.Strings.Chr(CValue);
+                            }
+                            //
+                            // Test mod
+                            //
+                            if ((crc % 9).ToString() != Source.Substring(Source.Length - 1, 1)) {
+                                //
+                                // Nope - set it back to the input
+                                //
+                                result = Copy;
                             }
                         }
-                        returnCopy = returnCopy + Microsoft.VisualBasic.Strings.Chr(CValue);
-                    }
-                    //
-                    // Test mod
-                    //
-                    if ((crc % 9).ToString() != Source.Substring(Source.Length - 1, 1)) {
-                        //
-                        // Nope - set it back to the input
-                        //
-                        returnCopy = Copy;
+                    } catch (Exception ex) {
+                        core.handleException(ex);
+                        throw;
                     }
                 }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
             }
-            return returnCopy;
+            return result;
         }
         //
         //=============================================================================
-        //   Return just the copy from a content page
-        //=============================================================================
-        //
+        // 
         public static string TextScramble(coreController core, string Copy) {
-            string returnCopy = "";
-            try {
-                int CPtr = 0;
-                string C = null;
-                int CValue = 0;
-                int crc = 0;
-                int Base = 0;
-                const int CMin = 32;
-                const int CMax = 126;
-                //
-                // scrambled starts with _
-                //
-                Base = 50;
-                //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(Copy) for every iteration:
-                int tempVar = Copy.Length;
-                for (CPtr = 1; CPtr <= tempVar; CPtr++) {
-                    C = Copy.Substring(CPtr - 1, 1);
-                    CValue = Microsoft.VisualBasic.Strings.Asc(C);
-                    if ((CValue < CMin) || (CValue > CMax)) {
-                        //
-                        // if out of ascii bounds, just leave it in place
-                        //
-                    } else {
-                        CValue = CValue + Base;
-                        if (CValue > CMax) {
-                            CValue = CValue - CMax + CMin - 1;
-                        }
-                    }
-                    //
-                    // CRC is addition of all scrambled characters
-                    //
-                    crc = crc + CValue;
-                    //
-                    // put together backwards
-                    //
-                    returnCopy = Microsoft.VisualBasic.Strings.Chr(CValue) + returnCopy;
-                }
-                //
-                // Ends with the mod of the CRC and 13
-                //
-                returnCopy = "_a" + returnCopy + (crc % 9).ToString();
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-            }
-            return returnCopy;
+            return securityController.twoWayEncrypt(core, Copy);
+            //string returnCopy = "";
+            //try {
+            //    int CPtr = 0;
+            //    string C = null;
+            //    int CValue = 0;
+            //    int crc = 0;
+            //    int Base = 0;
+            //    const int CMin = 32;
+            //    const int CMax = 126;
+            //    //
+            //    // scrambled starts with _
+            //    //
+            //    Base = 50;
+            //    //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(Copy) for every iteration:
+            //    int tempVar = Copy.Length;
+            //    for (CPtr = 1; CPtr <= tempVar; CPtr++) {
+            //        C = Copy.Substring(CPtr - 1, 1);
+            //        CValue = Microsoft.VisualBasic.Strings.Asc(C);
+            //        if ((CValue < CMin) || (CValue > CMax)) {
+            //            //
+            //            // if out of ascii bounds, just leave it in place
+            //            //
+            //        } else {
+            //            CValue = CValue + Base;
+            //            if (CValue > CMax) {
+            //                CValue = CValue - CMax + CMin - 1;
+            //            }
+            //        }
+            //        //
+            //        // CRC is addition of all scrambled characters
+            //        //
+            //        crc = crc + CValue;
+            //        //
+            //        // put together backwards
+            //        //
+            //        returnCopy = Microsoft.VisualBasic.Strings.Chr(CValue) + returnCopy;
+            //    }
+            //    //
+            //    // Ends with the mod of the CRC and 13
+            //    //
+            //    returnCopy = "_a" + returnCopy + (crc % 9).ToString();
+            //} catch (Exception ex) {
+            //    core.handleException(ex);
+            //    throw;
+            //}
+            //return returnCopy;
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// remove html script start and end tags from a string - presumably a javascript string
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public static string removeScriptTag(string source) {
             string result = source;
             int StartPos = genericController.vbInstr(1, result, "<script", 1);
@@ -4542,9 +4560,36 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //
+        // ====================================================================================================
+        /// <summary>
+        /// split a string
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="delimiter"></param>
+        /// <returns></returns>
         public static string[] stringSplit( string src, string delimiter ) {
             return src.Split( new[] { delimiter }, StringSplitOptions.None );
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// Execute an external program synchonously
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static string executeCommandSync(string command) {
+            string result = "";
+            try {
+                System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo("%comspec%", "/c " + command);
+                procStartInfo.RedirectStandardOutput = true;
+                procStartInfo.UseShellExecute = false;
+                procStartInfo.CreateNoWindow = true;
+                System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                proc.StartInfo = procStartInfo;
+                proc.Start();
+                result = proc.StandardOutput.ReadToEnd();
+            } catch (Exception) { }
+            return result;
         }
     }
 }

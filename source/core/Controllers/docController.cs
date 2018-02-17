@@ -167,9 +167,6 @@ namespace Contensive.Core.Controllers {
         public bool visitPropertyAllowDebugging { get; set; } = false; // if true, send main_TestPoint messages to the stream
         //
         // -- todo
-        public Models.Context.sessionContextModel sessionContext;
-        //
-        // -- todo
         internal Stopwatch appStopWatch { get; set; } = Stopwatch.StartNew();
         //
         // -- todo
@@ -447,7 +444,7 @@ namespace Contensive.Core.Controllers {
                         this.core.db.csGoNext(CS);
                     }
                     if (!string.IsNullOrEmpty(result)) {
-                        result = this.core.html.getContentCopy("Watch List Caption: " + ListName, ListName, this.core.doc.sessionContext.user.id, true, this.core.doc.sessionContext.isAuthenticated) + "\r<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r</ul>";
+                        result = this.core.html.getContentCopy("Watch List Caption: " + ListName, ListName, this.core.sessionContext.user.id, true, this.core.sessionContext.isAuthenticated) + "\r<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r</ul>";
                     }
                 }
                 this.core.db.csClose(ref CS);
@@ -538,7 +535,7 @@ namespace Contensive.Core.Controllers {
                 bool tempVar4 = false;
                 getAuthoringPermissions(LiveRecordContentName, page.id, ref AllowInsert, ref AllowCancel, ref allowSave, ref AllowDelete, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref readOnlyField);
                 AllowMarkReviewed = Models.Complex.cdefModel.isContentFieldSupported(core, pageContentModel.contentName, "DateReviewed");
-                OptionsPanelAuthoringStatus = core.doc.sessionContext.main_GetAuthoringStatusMessage(core, false, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
+                OptionsPanelAuthoringStatus = core.sessionContext.getAuthoringStatusMessage(core, false, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
                 //
                 // Set Editing Authoring Control
                 //
@@ -741,9 +738,9 @@ namespace Contensive.Core.Controllers {
             //
             RecordID = (core.docProperties.getInteger("ID"));
             Button = core.docProperties.getText("Button");
-            iIsAdmin = core.doc.sessionContext.isAuthenticatedAdmin(core);
+            iIsAdmin = core.sessionContext.isAuthenticatedAdmin(core);
             //
-            if ((!string.IsNullOrEmpty(Button)) & (RecordID != 0) & (pageContentModel.contentName != "") & (core.doc.sessionContext.isAuthenticatedContentManager(core, pageContentModel.contentName))) {
+            if ((!string.IsNullOrEmpty(Button)) & (RecordID != 0) & (pageContentModel.contentName != "") & (core.sessionContext.isAuthenticatedContentManager(core, pageContentModel.contentName))) {
                 // main_WorkflowSupport = core.siteProperties.allowWorkflowAuthoring And core.workflow.isWorkflowAuthoringCompatible(pageContentModel.contentName)
                 string SubmittedMemberName = "";
                 string ApprovedMemberName = "";
@@ -812,11 +809,11 @@ namespace Contensive.Core.Controllers {
                     if (core.db.csOk(CSBlock)) {
                         core.db.csSet(CSBlock, "active", true);
                         core.db.csSet(CSBlock, "ParentID", RecordID);
-                        core.db.csSet(CSBlock, "contactmemberid", core.doc.sessionContext.user.id);
-                        core.db.csSet(CSBlock, "name", "New Page added " + core.doc.profileStartTime + " by " + core.doc.sessionContext.user.name);
+                        core.db.csSet(CSBlock, "contactmemberid", core.sessionContext.user.id);
+                        core.db.csSet(CSBlock, "name", "New Page added " + core.doc.profileStartTime + " by " + core.sessionContext.user.name);
                         core.db.csSet(CSBlock, "copyFilename", "");
                         RecordID = core.db.csGetInteger(CSBlock, "ID");
-                        core.db.csSave2(CSBlock);
+                        core.db.csSave(CSBlock);
                         //
                         Link = pageContentController.getPageLink(core, RecordID, "", true, false);
                         //Link = main_GetPageLink(RecordID)
@@ -846,11 +843,11 @@ namespace Contensive.Core.Controllers {
                         if (core.db.csOk(CSBlock)) {
                             core.db.csSet(CSBlock, "active", true);
                             core.db.csSet(CSBlock, "ParentID", ParentID);
-                            core.db.csSet(CSBlock, "contactmemberid", core.doc.sessionContext.user.id);
-                            core.db.csSet(CSBlock, "name", "New Page added " + core.doc.profileStartTime + " by " + core.doc.sessionContext.user.name);
+                            core.db.csSet(CSBlock, "contactmemberid", core.sessionContext.user.id);
+                            core.db.csSet(CSBlock, "name", "New Page added " + core.doc.profileStartTime + " by " + core.sessionContext.user.name);
                             core.db.csSet(CSBlock, "copyFilename", "");
                             RecordID = core.db.csGetInteger(CSBlock, "ID");
-                            core.db.csSave2(CSBlock);
+                            core.db.csSave(CSBlock);
                             //
                             Link = pageContentController.getPageLink(core, RecordID, "", true, false);
                             core.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", false, false);
@@ -919,7 +916,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     ContentName = pageContentModel.contentName;
                 }
-                bool isAuthoring = core.doc.sessionContext.isEditing(ContentName);
+                bool isAuthoring = core.sessionContext.isEditing(ContentName);
                 //
                 int ChildListCount = 0;
                 string UcaseRequestedListName = genericController.vbUCase(RequestedListName);
@@ -946,7 +943,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     string pageEditLink = "";
-                    if (core.doc.sessionContext.isEditing(ContentName)) {
+                    if (core.sessionContext.isEditing(ContentName)) {
                         pageEditLink = core.html.getRecordEditLink2(ContentName, childPage.id, true, childPage.name, true);
                     }
                     //
@@ -1099,9 +1096,9 @@ namespace Contensive.Core.Controllers {
                 int CS = 0;
                 string SQL = null;
                 //
-                if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                if (core.sessionContext.isAuthenticatedAdmin(core)) {
                     tempbypassContentBlock = true;
-                } else if (core.doc.sessionContext.isAuthenticatedContentManager(core, Models.Complex.cdefModel.getContentNameByID(core, ContentID))) {
+                } else if (core.sessionContext.isAuthenticatedContentManager(core, Models.Complex.cdefModel.getContentNameByID(core, ContentID))) {
                     tempbypassContentBlock = true;
                 } else {
                     SQL = "SELECT ccMemberRules.MemberID"
@@ -1111,7 +1108,7 @@ namespace Contensive.Core.Controllers {
                         + " AND ((ccgroups.Active)<>0)"
                         + " AND ((ccMemberRules.Active)<>0)"
                         + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + core.db.encodeSQLDate(core.doc.profileStartTime) + ")"
-                        + " AND ((ccMemberRules.MemberID)=" + core.doc.sessionContext.user.id + "));";
+                        + " AND ((ccMemberRules.MemberID)=" + core.sessionContext.user.id + "));";
                     CS = core.db.csOpenSql(SQL);
                     tempbypassContentBlock = core.db.csOk(CS);
                     core.db.csClose(ref CS);
@@ -1184,7 +1181,7 @@ namespace Contensive.Core.Controllers {
                         IDs = result.Split(',');
                         IDCnt = IDs.GetUpperBound(0) + 1;
                         SingleEntry = (IDCnt == 1);
-                        QuickEditing = core.doc.sessionContext.isQuickEditing(core, "page content");
+                        QuickEditing = core.sessionContext.isQuickEditing(core, "page content");
                         for (Ptr = 0; Ptr < IDCnt; Ptr++) {
                             core.db.deleteContentRecord("page content", genericController.encodeInteger(IDs[Ptr]));
                         }
@@ -1420,7 +1417,7 @@ namespace Contensive.Core.Controllers {
                 Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName);
                 Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString());
                 Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", core.doc.profileStartTime.ToString());
-                Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", core.doc.sessionContext.user.name);
+                Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", core.sessionContext.user.name);
                 //
                 emailController.sendGroup(core, core.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
                 //
@@ -1717,7 +1714,7 @@ namespace Contensive.Core.Controllers {
                 if (true) {
                     core.db.csSet(CS, "ccGuid", pageGuid);
                 }
-                core.db.csSave2(CS);
+                core.db.csSave(CS);
                 //   Call core.workflow.publishEdit("Page Content", Id)
             }
             core.db.csClose(ref CS);
@@ -1795,15 +1792,15 @@ namespace Contensive.Core.Controllers {
                     // Log Activity for changes to people and organizattions
                     //
                     //hint = hint & ",110"
-                    CS = core.db.cs_open2("people", RecordID, false, false, "Name,OrganizationID");
+                    CS = core.db.csOpen2("people", RecordID, false, false, "Name,OrganizationID");
                     if (core.db.csOk(CS)) {
                         ActivityLogOrganizationID = core.db.csGetInteger(CS, "OrganizationID");
                     }
                     core.db.csClose(ref CS);
                     if (IsDelete) {
-                        logController.logActivity2(core, "deleting user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
+                        logController.addSiteActivity(core, "deleting user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
                     } else {
-                        logController.logActivity2(core, "saving changes to user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
+                        logController.addSiteActivity(core, "saving changes to user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
                     }
                     break;
                 case "organizations":
@@ -1812,9 +1809,9 @@ namespace Contensive.Core.Controllers {
                     //
                     //hint = hint & ",120"
                     if (IsDelete) {
-                        logController.logActivity2(core, "deleting organization #" + RecordID + " (" + RecordName + ")", 0, RecordID);
+                        logController.addSiteActivity(core, "deleting organization #" + RecordID + " (" + RecordName + ")", 0, RecordID);
                     } else {
-                        logController.logActivity2(core, "saving changes to organization #" + RecordID + " (" + RecordName + ")", 0, RecordID);
+                        logController.addSiteActivity(core, "saving changes to organization #" + RecordID + " (" + RecordName + ")", 0, RecordID);
                     }
                     break;
                 case "ccsetup":
@@ -2047,7 +2044,7 @@ namespace Contensive.Core.Controllers {
                     string TableName = Models.Complex.cdefModel.getContentTablename(core, ContentName);
                     string SQL = "update " + TableName + " set DateReviewed=" + core.db.encodeSQLDate(core.doc.profileStartTime);
                     if (Models.Complex.cdefModel.isContentFieldSupported(core, ContentName, "ReviewedBy")) {
-                        SQL += ",ReviewedBy=" + core.doc.sessionContext.user.id;
+                        SQL += ",ReviewedBy=" + core.sessionContext.user.id;
                     }
                     //
                     // -- Mark the live record

@@ -42,7 +42,7 @@ namespace Contensive.Core.Controllers {
             try {
                 //
                 // -- content extras like tool panel
-                if (core.doc.sessionContext.isAuthenticatedContentManager(core) & (core.doc.sessionContext.user.AllowToolsPanel)) {
+                if (core.sessionContext.isAuthenticatedContentManager(core) & (core.sessionContext.user.AllowToolsPanel)) {
                     if (AllowTools) {
                         result.Add(core.html.getToolsPanel());
                     }
@@ -307,8 +307,8 @@ namespace Contensive.Core.Controllers {
                             //
                             CSPointer = core.db.csOpen(ContentName, Criteria, SortFieldList, false, 0, false, false, SelectFields);
                             if (core.db.csOk(CSPointer)) {
-                                RowsArray = core.db.cs_getRows(CSPointer);
-                                RowFieldArray = core.db.cs_getSelectFieldList(CSPointer).Split(',');
+                                RowsArray = core.db.csGetRows(CSPointer);
+                                RowFieldArray = core.db.csGetSelectFieldList(CSPointer).Split(',');
                                 ColumnMax = RowsArray.GetUpperBound(0);
                                 RowMax = RowsArray.GetUpperBound(1);
                                 //
@@ -365,8 +365,8 @@ namespace Contensive.Core.Controllers {
                                     Criteria = Criteria + "(id=" + genericController.encodeInteger(CurrentValue) + ")";
                                     CSPointer = core.db.csOpen(ContentName, Criteria, SortFieldList, false, 0, false, false, SelectFields);
                                     if (core.db.csOk(CSPointer)) {
-                                        RowsArray = core.db.cs_getRows(CSPointer);
-                                        RowFieldArray = core.db.cs_getSelectFieldList(CSPointer).Split(',');
+                                        RowsArray = core.db.csGetRows(CSPointer);
+                                        RowFieldArray = core.db.csGetSelectFieldList(CSPointer).Split(',');
                                         RowMax = RowsArray.GetUpperBound(1);
                                         ColumnMax = RowsArray.GetUpperBound(0);
                                         RecordID = genericController.encodeInteger(RowsArray[IDFieldPointer, 0]);
@@ -583,8 +583,8 @@ namespace Contensive.Core.Controllers {
                                 + " order by P." + SortFieldList;
                             CSPointer = core.db.csOpenSql(SQL);
                             if (core.db.csOk(CSPointer)) {
-                                string[,] RowsArray = core.db.cs_getRows(CSPointer);
-                                string[] RowFieldArray = core.db.cs_getSelectFieldList(CSPointer).Split(',');
+                                string[,] RowsArray = core.db.csGetRows(CSPointer);
+                                string[] RowFieldArray = core.db.csGetSelectFieldList(CSPointer).Split(',');
                                 RowMax = RowsArray.GetUpperBound(1);
                                 int ColumnMax = RowsArray.GetUpperBound(0);
                                 //
@@ -742,7 +742,7 @@ namespace Contensive.Core.Controllers {
                 if (core.siteProperties.getBoolean("AllowLoginIcon", true)) {
                     result = result + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">";
                     result = result + "<tr><td align=\"right\">";
-                    if (core.doc.sessionContext.isAuthenticatedContentManager(core)) {
+                    if (core.sessionContext.isAuthenticatedContentManager(core)) {
                         result = result + "<a href=\"" + genericController.encodeHTML("/" + core.appConfig.adminRoute) + "\" target=\"_blank\">";
                     } else {
                         Link = core.webServer.requestPage + "?" + core.doc.refreshQueryString;
@@ -803,7 +803,7 @@ namespace Contensive.Core.Controllers {
                 //If Not (true) Then Exit Function
                 //
                 temphtml_GetAdminHintWrapper = "";
-                if ((core.doc.sessionContext.isEditing("") | core.doc.sessionContext.isAuthenticatedAdmin(core))) {
+                if ((core.sessionContext.isEditing("") | core.sessionContext.isAuthenticatedAdmin(core))) {
                     temphtml_GetAdminHintWrapper = temphtml_GetAdminHintWrapper + html_GetLegacySiteStyles();
                     temphtml_GetAdminHintWrapper = temphtml_GetAdminHintWrapper + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccHintWrapper\">"
                             + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccHintWrapperContent\">"
@@ -1296,7 +1296,7 @@ namespace Contensive.Core.Controllers {
                 if (core.db.csOk(CS)) {
                     //SectionName = "";
                     GroupCount = 0;
-                    CanSeeHiddenFields = core.doc.sessionContext.isAuthenticatedDeveloper(core);
+                    CanSeeHiddenFields = core.sessionContext.isAuthenticatedDeveloper(core);
                     while (core.db.csOk(CS)) {
                         GroupName = core.db.csGetText(CS, "GroupName");
                         if ((GroupName.Left(1) != "_") || CanSeeHiddenFields) {
@@ -1390,7 +1390,7 @@ namespace Contensive.Core.Controllers {
                         // main_Get the current value if the record was found
                         //
                         if (core.db.csOk(CSPointer)) {
-                            FieldValueVariant = core.db.cs_getValue(CSPointer, FieldName);
+                            FieldValueVariant = core.db.csGetValue(CSPointer, FieldName);
                         }
                         //
                         if (FieldPassword) {
@@ -1524,7 +1524,7 @@ namespace Contensive.Core.Controllers {
                                         // Lookup into Content
                                         //
                                         if (FieldReadOnly) {
-                                            CSPointer = core.db.cs_open2(FieldLookupContentName, FieldValueInteger);
+                                            CSPointer = core.db.csOpen2(FieldLookupContentName, FieldValueInteger);
                                             if (core.db.csOk(CSLookup)) {
                                                 returnResult = csController.getTextEncoded(core, CSLookup, "name");
                                             }
@@ -2510,7 +2510,7 @@ namespace Contensive.Core.Controllers {
                             }
 
                             if (core.db.csOk(CS)) {
-                                Cell = core.db.cs_getRows(CS);
+                                Cell = core.db.csGetRows(CS);
                                 RowCnt = Cell.GetUpperBound(1) + 1;
                                 for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                     //
@@ -2621,7 +2621,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Read in and save the Member profile values from the tools panel
                 //
-                if (core.doc.sessionContext.user.id > 0) {
+                if (core.sessionContext.user.id > 0) {
                     if (!(core.doc.debug_iUserError != "")) {
                         Button = core.docProperties.getText(legacyFormSn + "mb");
                         switch (Button) {
@@ -2629,7 +2629,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // Logout - This can only come from the Horizonal Tool Bar
                                 //
-                                core.doc.sessionContext.logout(core);
+                                core.sessionContext.logout(core);
                                 break;
                             case ButtonLogin:
                                 //
@@ -2871,9 +2871,9 @@ namespace Contensive.Core.Controllers {
                         //
                         // Find the field, then find the position
                         //
-                        FieldName = core.db.cs_getFirstFieldName(CS);
+                        FieldName = core.db.csGetFirstFieldName(CS);
                         while (!string.IsNullOrEmpty(FieldName)) {
-                            fieldType = core.db.cs_getFieldTypeId(CS, FieldName);
+                            fieldType = core.db.csGetFieldTypeId(CS, FieldName);
                             switch (fieldType) {
                                 case FieldTypeIdLongText:
                                 case FieldTypeIdText:
@@ -2896,7 +2896,7 @@ namespace Contensive.Core.Controllers {
                                     }
                                     break;
                             }
-                            FieldName = core.db.cs_getNextFieldName(CS);
+                            FieldName = core.db.csGetNextFieldName(CS);
                         }
                         ExitLabel1:;
                     }
@@ -3253,7 +3253,7 @@ namespace Contensive.Core.Controllers {
                                 EndDiv = "";
                                 CheckBoxCnt = 0;
                                 DivCheckBoxCnt = 0;
-                                CanSeeHiddenFields = core.doc.sessionContext.isAuthenticatedDeveloper(core);
+                                CanSeeHiddenFields = core.sessionContext.isAuthenticatedDeveloper(core);
                                 DivName = TagName + ".All";
                                 while (core.db.csOk(CS)) {
                                     OptionName = core.db.csGetText(CS, "OptionName");
@@ -3460,7 +3460,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Print an add tag to the iCSPointers Content
                     //
-                    ContentName = core.db.cs_getContentName(iCSPointer);
+                    ContentName = core.db.csGetContentName(iCSPointer);
                     if (string.IsNullOrEmpty(ContentName)) {
                         throw (new ApplicationException("main_cs_getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.")); // handleLegacyError14(MethodName, "")
                     } else {
@@ -3501,7 +3501,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string getRecordAddLink(string ContentName, string PresetNameValueList, bool AllowPaste = false) {
-            return getRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, core.doc.sessionContext.isEditing(ContentName));
+            return getRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, core.sessionContext.isEditing(ContentName));
         }
         //
         //========================================================================
@@ -3719,7 +3719,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Select the Content Record for the Menu Entry selected
                     //
                     ContentRecordFound = false;
-                    if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
                         //
                         // ----- admin member, they have access, main_Get ContentID and set markers true
                         //
@@ -3760,7 +3760,7 @@ namespace Contensive.Core.Controllers {
                             + " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
                             + " AND(ccgroups.active<>0)"
                             + " AND(ccMembers.active<>0)"
-                            + " AND(ccMembers.ID=" + core.doc.sessionContext.user.id + ")"
+                            + " AND(ccMembers.ID=" + core.sessionContext.user.id + ")"
                             + " );";
                         CS = core.db.csOpenSql(SQL);
                         if (core.db.csOk(CS)) {
@@ -4043,7 +4043,7 @@ namespace Contensive.Core.Controllers {
                 bool ShowLegacyToolsPanel = false;
                 string QS = null;
                 //
-                if (core.doc.sessionContext.user.AllowToolsPanel) {
+                if (core.sessionContext.user.AllowToolsPanel) {
                     ShowLegacyToolsPanel = core.siteProperties.getBoolean("AllowLegacyToolsPanel", true);
                     //
                     // --- Link Panel - used for both Legacy Tools Panel, and without it
@@ -4057,7 +4057,7 @@ namespace Contensive.Core.Controllers {
                     LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + genericController.encodeHTML("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
                     LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"" + genericController.encodeHTML("/" + core.appConfig.adminRoute + "?" + RequestNameHardCodedPage + "=" + HardCodedPageMyProfile) + "\">My Profile</A> | ");
                     if (core.siteProperties.getBoolean("AllowMobileTemplates", false)) {
-                        if (core.doc.sessionContext.visit.Mobile) {
+                        if (core.sessionContext.visit.Mobile) {
                             QS = core.doc.refreshQueryString;
                             QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile");
                             LinkPanel.Add("<a class=\"ccAdminLink\" href=\"?" + QS + "\">Non-Mobile Version</A> | ");
@@ -4195,10 +4195,10 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- Create the Login Panel
                         //
-                        if (string.IsNullOrEmpty(core.doc.sessionContext.user.name.Trim(' '))) {
-                            Copy = "You are logged in as member #" + core.doc.sessionContext.user.id + ".";
+                        if (string.IsNullOrEmpty(core.sessionContext.user.name.Trim(' '))) {
+                            Copy = "You are logged in as member #" + core.sessionContext.user.id + ".";
                         } else {
-                            Copy = "You are logged in as " + core.doc.sessionContext.user.name + ".";
+                            Copy = "You are logged in as " + core.sessionContext.user.name + ".";
                         }
                         LoginPanel = LoginPanel + ""
                         + "\r<div class=\"ccAdminSmall\">"
@@ -4235,7 +4235,7 @@ namespace Contensive.Core.Controllers {
                         // Autologin checkbox
                         //
                         if (core.siteProperties.getBoolean("AllowAutoLogin", false)) {
-                            if (core.doc.sessionContext.visit.CookieSupport) {
+                            if (core.sessionContext.visit.CookieSupport) {
                                 TagID = "autologin";
                                 LoginPanel = LoginPanel + ""
                                 + "\r<div class=\"ccAdminSmall\">"
@@ -4740,7 +4740,7 @@ namespace Contensive.Core.Controllers {
         public string getEditWrapper(string Caption, string Content) {
             string result = Content;
             try {
-                if (core.doc.sessionContext.isEditingAnything()) {
+                if (core.sessionContext.isEditingAnything()) {
                     result = html_GetLegacySiteStyles() + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccEditWrapper\">";
                     if (!string.IsNullOrEmpty(Caption)) {
                         result += ""
@@ -4784,7 +4784,7 @@ namespace Contensive.Core.Controllers {
                         RecordID = core.db.csGetInteger(CS, "ID");
                         core.db.csSet(CS, "name", CopyName);
                         core.db.csSet(CS, "copy", genericController.encodeText(DefaultContent));
-                        core.db.csSave2(CS);
+                        core.db.csSave(CS);
                         //   Call core.workflow.publishEdit("copy content", RecordID)
                     }
                 }
@@ -4796,7 +4796,7 @@ namespace Contensive.Core.Controllers {
                     returnCopy = activeContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
                     //
                     if (true) {
-                        if (core.doc.sessionContext.isEditingAnything()) {
+                        if (core.sessionContext.isEditingAnything()) {
                             returnCopy = core.db.csGetRecordEditLink(CS, false) + returnCopy;
                             if (AllowEditWrapper) {
                                 returnCopy = getEditWrapper("copy content", returnCopy);
@@ -5068,7 +5068,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string getRecordEditLink(string ContentName, int RecordID, bool AllowCut = false) {
-            return getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), "", core.doc.sessionContext.isEditing(ContentName));
+            return getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), "", core.sessionContext.isEditing(ContentName));
         }
         //
         //====================================================================================================

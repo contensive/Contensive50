@@ -377,7 +377,7 @@ namespace Contensive.Core.Controllers {
         public void deleteFile(string pathFilename) {
             try {
                 if (!string.IsNullOrEmpty(pathFilename)) {
-                    if (!isLocal) {
+                    if (isLocal) {
                         deleteFile_local(pathFilename);
                     } else {
                         deleteFile_remote(pathFilename);
@@ -397,9 +397,9 @@ namespace Contensive.Core.Controllers {
         public void deleteFile_remote(string pathFilename) {
             try {
                 if (!string.IsNullOrEmpty(pathFilename)) {
-                    string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(core.appConfig.cdnFilesNetprefix, pathFilename));
+                    string remoteDosPathFilename = genericController.convertToDosSlash(joinPath(core.appConfig.cdnFilesNetprefix, pathFilename));
                     verifyPath_remote(getPath(pathFilename));
-                    var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, convertToDosSlash(remoteUnixPathFilename.Substring(1)));
+                    var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, remoteDosPathFilename);
                     if (s3FileInfo.Exists) s3FileInfo.Delete();
                 }
             } catch (Exception ex) {
@@ -1203,11 +1203,24 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
+        /// verify a path exist within the local filesystem
+        /// </summary>
+        private void verifyPath_local(string path) {
+            try {
+                if (!pathExists(path)) {
+                    createPath(path);
+                }
+            } catch (Exception ex) {
+                core.handleException(ex);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
         /// copy a file (object) down from s3. The localDosPath must exist, and the file should NOT exist. If remote file does
         /// not exist
         /// </summary>
-        private bool verifyPath_remote(string path) {
-            bool result = false;
+        private void verifyPath_remote(string path) {
             try {
                 //
                 // -- verify the remote path
@@ -1226,7 +1239,26 @@ namespace Contensive.Core.Controllers {
             } catch (Exception ex) {
                 core.handleException(ex);
             }
-            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// copy a file (object) down from s3. The localDosPath must exist, and the file should NOT exist. If remote file does
+        /// not exist
+        /// </summary>
+        private void verifyPath(string path) {
+            try {
+                if (isLocal) {
+                    // -- files stored locally
+                    verifyPath_local(path);
+                } else {
+                    // -- files transfered through local to remote
+                    verifyPath_local(path);
+                    verifyPath_remote(path);
+                }
+            } catch (Exception ex) {
+                core.handleException(ex);
+            }
         }
         //
         //====================================================================================================

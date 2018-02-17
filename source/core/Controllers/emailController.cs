@@ -30,7 +30,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         private static void appendEmailLog( coreController core, string logCopy ) {
-            logController.appendLog(core, logCopy, "email");
+            logController.logError(core, "emailController:" + logCopy);
         }
         //
         //====================================================================================================

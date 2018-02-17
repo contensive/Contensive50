@@ -28,7 +28,7 @@ namespace Contensive.Core.Addons.Primitives {
             try {
                 CPClass processor = (CPClass)cp;
                 coreController core = processor.core;
-                if (core.doc.sessionContext.isAuthenticated & core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                if (core.sessionContext.isAuthenticated & core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Save the site sites
                     //

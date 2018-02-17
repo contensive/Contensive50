@@ -66,7 +66,7 @@ namespace Contensive.Core.Models.DbModels {
         public static oldPageTemplateModel add(coreController core, ref List<string> callersCacheNameList) {
             oldPageTemplateModel result = null;
             try {
-                result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.doc.sessionContext.user.id), ref callersCacheNameList);
+                result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.sessionContext.user.id), ref callersCacheNameList);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -272,13 +272,13 @@ namespace Contensive.Core.Models.DbModels {
                 if (ID > 0) {
                     if (!cs.open(primaryContentName, "id=" + ID)) {
                         string message = "Unable to open record in content [" + primaryContentName + "], with id [" + ID + "]";
-                        cs.Close();
+                        cs.close();
                         ID = 0;
                         throw new ApplicationException(message);
                     }
                 } else {
                     if (!cs.insert(primaryContentName)) {
-                        cs.Close();
+                        cs.close();
                         ID = 0;
                         throw new ApplicationException("Unable to insert record in content [" + primaryContentName + "]");
                     }
@@ -315,7 +315,7 @@ namespace Contensive.Core.Models.DbModels {
                         ccGuid = Controllers.genericController.getGUID();
                     }
                 }
-                cs.Close();
+                cs.close();
                 //
                 // -- invalidate objects
                 // -- no, the primary is invalidated by the cs.save()
@@ -422,7 +422,7 @@ namespace Contensive.Core.Models.DbModels {
                         cs.goNext();
                     } while (cs.ok());
                 }
-                cs.Close();
+                cs.close();
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;

@@ -94,7 +94,7 @@ namespace Contensive.Core.Controllers {
                 } else {
                     cs.open("Groups", sqlCriteria, "", false, "id");
                     IsAlreadyThere = cs.ok();
-                    cs.Close();
+                    cs.close();
                     if (!IsAlreadyThere) {
                         cs.insert("Groups");
                         if (!cs.ok()) {
@@ -116,7 +116,7 @@ namespace Contensive.Core.Controllers {
                             cs.setField("ccGuid", groupGuid);
                             cs.setField("active", "1");
                         }
-                        cs.Close();
+                        cs.close();
                     }
                 }
             } catch (Exception ex) {
@@ -139,12 +139,12 @@ namespace Contensive.Core.Controllers {
                         throw (new ApplicationException("Could not find or create the group with id [" + groupId + "]"));
                     } else {
                         if (userid == 0) {
-                            userid = core.doc.sessionContext.user.id;
+                            userid = core.sessionContext.user.id;
                         }
                         using (csController cs = new csController(core)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + groupId.ToString() + ")", "", false);
                             if (!cs.ok()) {
-                                cs.Close();
+                                cs.close();
                                 cs.insert("Member Rules");
                             }
                             if (!cs.ok()) {
@@ -160,7 +160,7 @@ namespace Contensive.Core.Controllers {
                                     cs.setField("DateExpires", "");
                                 }
                             }
-                            cs.Close();
+                            cs.close();
                         }
                     }
                 }
@@ -188,12 +188,12 @@ namespace Contensive.Core.Controllers {
                         throw (new ApplicationException("Could not find or create the group [" + groupNameOrGuid + "]"));
                     } else {
                         if (userid == 0) {
-                            userid = core.doc.sessionContext.user.id;
+                            userid = core.sessionContext.user.id;
                         }
                         using (csController cs = new csController(core)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + GroupID.ToString() + ")", "", false);
                             if (!cs.ok()) {
-                                cs.Close();
+                                cs.close();
                                 cs.insert("Member Rules");
                             }
                             if (!cs.ok()) {
@@ -208,7 +208,7 @@ namespace Contensive.Core.Controllers {
                                     cs.setField("DateExpires", "");
                                 }
                             }
-                            cs.Close();
+                            cs.close();
                         }
                     }
                 }
@@ -257,9 +257,9 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- main_Get the Group name
                 //
-                CS = core.db.cs_open2("Groups", iGroupID);
+                CS = core.db.csOpen2("Groups", iGroupID);
                 if (core.db.csOk(CS)) {
-                    tempgroup_GetGroupName = genericController.encodeText(core.db.cs_getValue(CS, "Name"));
+                    tempgroup_GetGroupName = genericController.encodeText(core.db.csGetValue(CS, "Name"));
                 }
                 core.db.csClose(ref CS);
             }
@@ -286,7 +286,7 @@ namespace Contensive.Core.Controllers {
             } else {
                 CS = core.db.csInsertRecord("Groups", SystemMemberID);
                 if (core.db.csOk(CS)) {
-                    tempgroup_Add = genericController.encodeInteger(core.db.cs_getValue(CS, "ID"));
+                    tempgroup_Add = genericController.encodeInteger(core.db.csGetValue(CS, "ID"));
                     core.db.csSet(CS, "name", iGroupName);
                     core.db.csSet(CS, "caption", iGroupCaption);
                     core.db.csSet(CS, "active", true);

@@ -116,7 +116,7 @@ namespace Contensive.Core.Addons.Email {
                         // Mark this email sent and go to the next
                         //
                         core.db.csSet(CSEmail, "sent", true);
-                        core.db.csSave2(CSEmail);
+                        core.db.csSave(CSEmail);
                         //
                         // Create Drop Record
                         //
@@ -148,7 +148,7 @@ namespace Contensive.Core.Addons.Email {
                             + " and (" + SQLTablePeople + ".email<>'')"
                             + " and ((" + SQLTableMemberRules + ".DateExpires is null)or(" + SQLTableMemberRules + ".DateExpires>" + SQLDateNow + "))"
                             + " order by " + SQLTablePeople + ".email," + SQLTablePeople + ".id";
-                        CSPeople = core.db.csOpenSql_rev("default", SQL);
+                        CSPeople = core.db.csOpenSql(SQL,"Default");
                         //
                         // Send the email to all selected people
                         //
@@ -302,12 +302,12 @@ namespace Contensive.Core.Addons.Email {
                         + " AND (" + SQLTablePeople + ".Active <> 0)"
                         + " AND (" + SQLTablePeople + ".AllowBulkEmail <> 0)"
                         + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" + SQLTablePeople + ".ID))";
-                    CSEmailBig = core.db.csOpenSql_rev("Default", SQL);
+                    CSEmailBig = core.db.csOpenSql(SQL,"Default");
                     while (core.db.csOk(CSEmailBig)) {
                         emailID = core.db.csGetInteger(CSEmailBig, "EmailID");
                         EmailMemberID = core.db.csGetInteger(CSEmailBig, "MemberID");
                         EmailDateExpires = core.db.csGetDate(CSEmailBig, "DateExpires");
-                        CSEmail = core.db.cs_openContentRecord("Conditional Email", emailID);
+                        CSEmail = core.db.csOpenContentRecord("Conditional Email", emailID);
                         if (core.db.csOk(CSEmail)) {
                             EmailTemplateID = core.db.csGetInteger(CSEmail, "EmailTemplateID");
                             EmailTemplate = GetEmailTemplate(core, EmailTemplateID);
@@ -359,12 +359,12 @@ namespace Contensive.Core.Addons.Email {
                         + " AND (" + SQLTablePeople + ".Active <> 0)"
                         + " AND (" + SQLTablePeople + ".AllowBulkEmail <> 0)"
                         + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" + SQLTablePeople + ".ID))";
-                    CSEmailBig = core.db.csOpenSql_rev("Default", SQL);
+                    CSEmailBig = core.db.csOpenSql(SQL,"Default");
                     while (core.db.csOk(CSEmailBig)) {
                         emailID = core.db.csGetInteger(CSEmailBig, "EmailID");
                         EmailMemberID = core.db.csGetInteger(CSEmailBig, "MemberID");
                         EmailDateExpires = core.db.csGetDate(CSEmailBig, "DateExpires");
-                        CSEmail = core.db.cs_openContentRecord("Conditional Email", emailID);
+                        CSEmail = core.db.csOpenContentRecord("Conditional Email", emailID);
                         if (core.db.csOk(CSEmail)) {
                             EmailTemplateID = core.db.csGetInteger(CSEmail, "EmailTemplateID");
                             EmailTemplate = GetEmailTemplate(core, EmailTemplateID);
@@ -407,12 +407,12 @@ namespace Contensive.Core.Addons.Email {
                         + " AND (" + SQLTablePeople + ".BirthdayMonth=" + DateTime.Now.Month + ")"
                         + " AND (" + SQLTablePeople + ".BirthdayDay=" + DateTime.Now.Day + ")"
                         + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" + SQLTablePeople + ".ID and ccEmailLog.DateAdded>=" + core.db.encodeSQLDate(DateTime.Now.Date) + "))";
-                    CSEmailBig = core.db.csOpenSql_rev("Default", SQL);
+                    CSEmailBig = core.db.csOpenSql(SQL,"Default");
                     while (core.db.csOk(CSEmailBig)) {
                         emailID = core.db.csGetInteger(CSEmailBig, "EmailID");
                         EmailMemberID = core.db.csGetInteger(CSEmailBig, "MemberID");
                         EmailDateExpires = core.db.csGetDate(CSEmailBig, "DateExpires");
-                        CSEmail = core.db.cs_openContentRecord("Conditional Email", emailID);
+                        CSEmail = core.db.csOpenContentRecord("Conditional Email", emailID);
                         if (core.db.csOk(CSEmail)) {
                             EmailTemplateID = core.db.csGetInteger(CSEmail, "EmailTemplateID");
                             EmailTemplate = GetEmailTemplate(core, EmailTemplateID);
@@ -503,7 +503,7 @@ namespace Contensive.Core.Addons.Email {
                         core.db.csSet(CSLog, "fromaddress", FromAddress);
                         core.db.csSet(CSLog, "Subject", EmailSubject);
                     }
-                    core.db.csSave2(CSLog);
+                    core.db.csSave(CSLog);
                     //
                     // Get the Template
                     //
@@ -511,7 +511,7 @@ namespace Contensive.Core.Addons.Email {
                     //
                     // Get the Member
                     //
-                    CSPeople = core.db.cs_openContentRecord("People", MemberID, 0, false, false, "Email,Name");
+                    CSPeople = core.db.csOpenContentRecord("People", MemberID, 0, false, false, "Email,Name");
                     if (core.db.csOk(CSPeople)) {
                         ToAddress = core.db.csGet(CSPeople, "Email");
                         EmailToName = core.db.csGet(CSPeople, "Name");
@@ -622,7 +622,7 @@ namespace Contensive.Core.Addons.Email {
                         if (true) {
                             core.db.csSet(CSLog, "toaddress", ToAddress);
                         }
-                        core.db.csSave2(CSLog);
+                        core.db.csSave(CSLog);
                     }
                     //Call core.app.closeCS(CSPeople)
                 }
@@ -652,7 +652,7 @@ namespace Contensive.Core.Addons.Email {
                 // Get the Template
                 //
                 if (EmailTemplateID != 0) {
-                    int CS = core.db.cs_openContentRecord("Email Templates", EmailTemplateID, 0, false, false, "BodyHTML");
+                    int CS = core.db.csOpenContentRecord("Email Templates", EmailTemplateID, 0, false, false, "BodyHTML");
                     if (core.db.csOk(CS)) {
                         tempGetEmailTemplate = core.db.csGet(CS, "BodyHTML");
                     }

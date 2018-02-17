@@ -23,13 +23,13 @@ namespace Contensive.Core.Tests.UnitTests.Views {
             //
             // act
             //
-            string token = cp.core.security.encodeToken(testNumber, testDate);
+            string token = Core.Controllers.securityController.encodeToken(cp.core,testNumber, testDate);
             //
             // assert
             //
             int resultNumber = 0;
             DateTime resultDate = DateTime.MinValue;
-            cp.core.security.decodeToken(token, ref resultNumber, ref resultDate);
+            Core.Controllers.securityController.decodeToken(cp.core,token, ref resultNumber, ref resultDate);
             Assert.AreEqual(testNumber, resultNumber);
             Assert.AreEqual(testDate, resultDate);
             //

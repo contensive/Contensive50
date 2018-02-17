@@ -81,7 +81,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Encode Template
                     //
-                    //LocalTemplateBody = contentCmdController.executeContentCommands(core, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
+                    //LocalTemplateBody = contentCmdController.executeContentCommands(core, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
                     returnBody += activeContentController.renderHtmlForWeb(core, LocalTemplateBody, "Page Templates", LocalTemplateID, 0, core.webServer.requestProtocol + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
                     //
                     // If Content was not found, add it to the end
@@ -94,7 +94,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Add tools Panel
                     //
-                    if (!core.doc.sessionContext.isAuthenticated) {
+                    if (!core.sessionContext.isAuthenticated) {
                         //
                         // not logged in
                         //
@@ -102,8 +102,8 @@ namespace Contensive.Core.Controllers {
                         //
                         // Add template editing
                         //
-                        if (core.visitProperty.getBoolean("AllowAdvancedEditor") & core.doc.sessionContext.isEditing("Page Templates")) {
-                            returnBody = core.html.getEditWrapper("Page Template [" + LocalTemplateName + "]", core.html.getRecordEditLink2("Page Templates", LocalTemplateID, false, LocalTemplateName, core.doc.sessionContext.isEditing("Page Templates")) + returnBody);
+                        if (core.visitProperty.getBoolean("AllowAdvancedEditor") & core.sessionContext.isEditing("Page Templates")) {
+                            returnBody = core.html.getEditWrapper("Page Template [" + LocalTemplateName + "]", core.html.getRecordEditLink2("Page Templates", LocalTemplateID, false, LocalTemplateName, core.sessionContext.isEditing("Page Templates")) + returnBody);
                         }
                     }
                     //
@@ -147,7 +147,7 @@ namespace Contensive.Core.Controllers {
                 if (core.doc.domain == null) {
                     //
                     // -- domain not listed, this is now an error
-                    logController.appendLogPageNotFound(core, core.webServer.requestUrlSource);
+                    logController.logError(core, "Domain not recognized:" + core.webServer.requestUrlSource);
                     return "<div style=\"width:300px; margin: 100px auto auto auto;text-align:center;\">The domain name is not configured for this site.</div>";
                 }
                 //
@@ -155,7 +155,7 @@ namespace Contensive.Core.Controllers {
                 if (core.doc.page.id == 0) {
                     //
                     // -- landing page is not valid -- display error
-                    logController.appendLogPageNotFound(core, core.webServer.requestUrlSource);
+                    logController.logInfo(core, "Requested page/document not found:" + core.webServer.requestUrlSource);
                     core.doc.redirectBecausePageNotFound = true;
                     core.doc.redirectReason = "Redirecting because the page selected could not be found.";
                     core.doc.redirectLink = pageContentController.main_ProcessPageNotFound_GetLink(core, core.doc.redirectReason, "", "", PageID, 0);
@@ -255,12 +255,12 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 // -- Add admin warning to the top of the content
-                if (core.doc.sessionContext.isAuthenticatedAdmin(core) & core.doc.adminWarning != "") {
+                if (core.sessionContext.isAuthenticatedAdmin(core) & core.doc.adminWarning != "") {
                     //
                     // Display Admin Warnings with Edits for record errors
                     //
                     if (core.doc.adminWarningPageID != 0) {
-                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + core.html.getRecordEditLink2("Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.doc.sessionContext.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
+                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + core.html.getRecordEditLink2("Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.sessionContext.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
                     }
                     //
@@ -351,7 +351,7 @@ namespace Contensive.Core.Controllers {
                 if (core.db.csOk(CS)) {
                     core.db.csSet(CS, "Name", ContentBlockCopyName);
                     core.db.csSet(CS, "Copy", tempgetDefaultBlockMessage);
-                    core.db.csSave2(CS);
+                    core.db.csSave(CS);
                     //Call core.workflow.publishEdit("Copy Content", genericController.EncodeInteger(core.db.cs_get(CS, "ID")))
                 }
             } catch (Exception ex) {
@@ -373,7 +373,7 @@ namespace Contensive.Core.Controllers {
                 string Copy;
                 //
                 Copy = "";
-                CS = core.db.cs_openContentRecord("People", PeopleID, 0, false, false, "Name,Phone,Email");
+                CS = core.db.csOpenContentRecord("People", PeopleID, 0, false, false, "Name,Phone,Email");
                 if (core.db.csOk(CS)) {
                     ContactName = (core.db.csGetText(CS, "Name"));
                     ContactPhone = (core.db.csGetText(CS, "Phone"));
@@ -687,7 +687,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // Add the Admin Message to the link
                 //
-                if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                if (core.sessionContext.isAuthenticatedAdmin(core)) {
                     if (string.IsNullOrEmpty(PageNotFoundLink)) {
                         PageNotFoundLink = core.webServer.requestUrl;
                     }
@@ -969,8 +969,8 @@ namespace Contensive.Core.Controllers {
                             recordId = core.doc.page.id
                         },
                         isIncludeAddon = false,
-                        personalizationAuthenticated = core.doc.sessionContext.visit.VisitAuthenticated,
-                        personalizationPeopleId = core.doc.sessionContext.user.id
+                        personalizationAuthenticated = core.sessionContext.visit.VisitAuthenticated,
+                        personalizationPeopleId = core.sessionContext.user.id
                     };
 
                     //
@@ -991,9 +991,9 @@ namespace Contensive.Core.Controllers {
                     //
                     // todo move cookie test to htmlDoc controller
                     // -- Add cookie test
-                    bool AllowCookieTest = core.siteProperties.allowVisitTracking && (core.doc.sessionContext.visit.PageVisits == 1);
+                    bool AllowCookieTest = core.siteProperties.allowVisitTracking && (core.sessionContext.visit.PageVisits == 1);
                     if (AllowCookieTest) {
-                        core.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" + core.security.encodeToken(core.doc.sessionContext.visit.id, core.doc.profileStartTime) + "')};", "Cookie Test");
+                        core.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" + securityController.encodeToken( core,core.sessionContext.visit.id, core.doc.profileStartTime) + "')};", "Cookie Test");
                     }
                     //
                     //--------------------------------------------------------------------------
@@ -1016,7 +1016,7 @@ namespace Contensive.Core.Controllers {
                                 }
                             }
                             core.db.csSet(cs, "copy", Copy);
-                            core.db.csSet(cs, "VisitId", core.doc.sessionContext.visit.id);
+                            core.db.csSet(cs, "VisitId", core.sessionContext.visit.id);
                         }
                         core.db.csClose(ref cs);
                     }
@@ -1061,7 +1061,7 @@ namespace Contensive.Core.Controllers {
                     string RecordEID = core.docProperties.getText(RequestNameLibraryFileID);
                     if (!string.IsNullOrEmpty(RecordEID)) {
                         DateTime tokenDate = default(DateTime);
-                        core.security.decodeToken(RecordEID, ref downloadId, ref tokenDate);
+                        securityController.decodeToken(core,RecordEID, ref downloadId, ref tokenDate);
                         if (downloadId != 0) {
                             //
                             // -- lookup record and set clicks
@@ -1075,8 +1075,8 @@ namespace Contensive.Core.Controllers {
                                     libraryFileLogModel log = libraryFileLogModel.add(core);
                                     if (log != null) {
                                         log.FileID = file.id;
-                                        log.VisitID = core.doc.sessionContext.visit.id;
-                                        log.MemberID = core.doc.sessionContext.user.id;
+                                        log.VisitID = core.sessionContext.visit.id;
+                                        log.MemberID = core.sessionContext.user.id;
                                     }
                                     //
                                     // -- and go
@@ -1117,7 +1117,7 @@ namespace Contensive.Core.Controllers {
                         } else if (string.IsNullOrEmpty(ClipBoard)) {
                             // state not working...
                         } else {
-                            if (!core.doc.sessionContext.isAuthenticatedContentManager(core, ClipParentContentName)) {
+                            if (!core.sessionContext.isAuthenticatedContentManager(core, ClipParentContentName)) {
                                 errorController.addUserError(core, "The paste operation failed because you are not a content manager of the Clip Parent");
                             } else {
                                 //
@@ -1152,7 +1152,7 @@ namespace Contensive.Core.Controllers {
                                                     // the parent record is not a child of the child record (circular check)
                                                     //
                                                     ClipChildRecordName = "record " + ClipChildRecordID;
-                                                    CSClip = core.db.cs_open2(ClipChildContentName, ClipChildRecordID, true, true);
+                                                    CSClip = core.db.csOpen2(ClipChildContentName, ClipChildRecordID, true, true);
                                                     if (!core.db.csOk(CSClip)) {
                                                         errorController.addUserError(core, "The paste operation failed because the data record referenced by the clipboard could not found.");
                                                     } else {
@@ -1164,7 +1164,7 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             // Legacy paste - go right to the parent id
                                                             //
-                                                            if (!core.db.cs_isFieldSupported(CSClip, "ParentID")) {
+                                                            if (!core.db.csIsFieldSupported(CSClip, "ParentID")) {
                                                                 errorController.addUserError(core, "The paste operation failed because the record you are pasting does not   support the necessary parenting feature.");
                                                             } else {
                                                                 core.db.csSet(CSClip, "ParentID", ClipParentRecordID);
@@ -1184,7 +1184,7 @@ namespace Contensive.Core.Controllers {
                                                                 if (NameValues.GetUpperBound(0) == 0) {
                                                                     errorController.addUserError(core, "The paste operation failed because the clipboard data Field List is not configured correctly.");
                                                                 } else {
-                                                                    if (!core.db.cs_isFieldSupported(CSClip, encodeText(NameValues[0]))) {
+                                                                    if (!core.db.csIsFieldSupported(CSClip, encodeText(NameValues[0]))) {
                                                                         errorController.addUserError(core, "The paste operation failed because the clipboard data Field [" + encodeText(NameValues[0]) + "] is not supported by the location data.");
                                                                     } else {
                                                                         core.db.csSet(CSClip, encodeText(NameValues[0]), encodeText(NameValues[1]));
@@ -1394,7 +1394,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- do anonymous access blocking
                     //
-                    if (!core.doc.sessionContext.isAuthenticated) {
+                    if (!core.sessionContext.isAuthenticated) {
                         if ((core.webServer.requestPath != "/") & genericController.vbInstr(1, "/" + core.appConfig.adminRoute, core.webServer.requestPath, 1) != 0) {
                             //
                             // admin page is excluded from custom blocking
@@ -1413,7 +1413,7 @@ namespace Contensive.Core.Controllers {
                                     core.doc.continueProcessing = false;
                                     core.doc.setMetaContent(0, 0);
                                     core.html.addScriptCode_onLoad("document.body.style.overflow='scroll'", "Anonymous User Block");
-                                    return core.html.getHtmlDoc('\r' + core.html.getContentCopy("AnonymousUserResponseCopy", "<p style=\"width:250px;margin:100px auto auto auto;\">The site is currently not available for anonymous access.</p>", core.doc.sessionContext.user.id, true, core.doc.sessionContext.isAuthenticated), TemplateDefaultBodyTag, true, true);
+                                    return core.html.getHtmlDoc('\r' + core.html.getContentCopy("AnonymousUserResponseCopy", "<p style=\"width:250px;margin:100px auto auto auto;\">The site is currently not available for anonymous access.</p>", core.sessionContext.user.id, true, core.sessionContext.isAuthenticated), TemplateDefaultBodyTag, true, true);
                             }
                         }
                     }
@@ -1574,11 +1574,11 @@ namespace Contensive.Core.Controllers {
                     //
                     // new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                     //
-                    logController.appendLogPageNotFound(core, core.webServer.requestUrlSource);
+                    logController.addSiteWarning(core, "Page Not Found", "Page Not Found", "", 0, "Page Not Found from [" + core.webServer.requestUrlSource + "]", "Page Not Found", "Page Not Found");
                     core.webServer.setResponseStatus("404 Not Found");
                     core.docProperties.setProperty(rnPageId, getPageNotFoundPageId(core));
                     //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
-                    if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
                         core.doc.adminWarning = PageNotFoundReason;
                         core.doc.adminWarningPageID = 0;
                     }
@@ -1631,11 +1631,11 @@ namespace Contensive.Core.Controllers {
                     // Load the instructions
                     //
                     f = loadFormPageInstructions(core, FormInstructions, Formhtml);
-                    if (f.AuthenticateOnFormProcess & !core.doc.sessionContext.isAuthenticated & core.doc.sessionContext.isRecognized(core)) {
+                    if (f.AuthenticateOnFormProcess & !core.sessionContext.isAuthenticated & core.sessionContext.isRecognized(core)) {
                         //
                         // If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                         //
-                        core.doc.sessionContext.logout(core);
+                        core.sessionContext.logout(core);
                     }
                     CSPeople = -1;
                     Success = true;
@@ -1663,7 +1663,7 @@ namespace Contensive.Core.Controllers {
                                     errorController.addUserError(core, "The field [" + genericController.encodeHTML(tempVar.Caption) + "] is required.");
                                 } else {
                                     if (!core.db.csOk(CSPeople)) {
-                                        CSPeople = core.db.csOpenRecord("people", core.doc.sessionContext.user.id);
+                                        CSPeople = core.db.csOpenRecord("people", core.sessionContext.user.id);
                                     }
                                     if (core.db.csOk(CSPeople)) {
                                         switch (genericController.vbUCase(tempVar.PeopleField)) {
@@ -1703,7 +1703,7 @@ namespace Contensive.Core.Controllers {
                                 // Group main_MemberShip
                                 //
                                 IsInGroup = core.docProperties.getBoolean("Group" + tempVar.GroupName);
-                                WasInGroup = core.doc.sessionContext.IsMemberOfGroup2(core, tempVar.GroupName);
+                                WasInGroup = core.sessionContext.IsMemberOfGroup2(core, tempVar.GroupName);
                                 if (WasInGroup && !IsInGroup) {
                                     groupController.group_DeleteGroupMember(core, tempVar.GroupName);
                                 } else if (IsInGroup && !WasInGroup) {
@@ -1729,13 +1729,13 @@ namespace Contensive.Core.Controllers {
                         // Authenticate
                         //
                         if (f.AuthenticateOnFormProcess) {
-                            core.doc.sessionContext.authenticateById(core, core.doc.sessionContext.user.id, core.doc.sessionContext);
+                            core.sessionContext.authenticateById(core, core.sessionContext.user.id, core.sessionContext);
                         }
                         //
                         // Join Group requested by page that created form
                         //
                         DateTime tokenDate = default(DateTime);
-                        core.security.decodeToken(core.docProperties.getText("SuccessID"), ref GroupIDToJoinOnSuccess, ref tokenDate);
+                        securityController.decodeToken(core,core.docProperties.getText("SuccessID"), ref GroupIDToJoinOnSuccess, ref tokenDate);
                         //GroupIDToJoinOnSuccess = main_DecodeKeyNumber(main_GetStreamText2("SuccessID"))
                         if (GroupIDToJoinOnSuccess != 0) {
                             groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, GroupIDToJoinOnSuccess));
@@ -1906,7 +1906,7 @@ namespace Contensive.Core.Controllers {
                                 CaptionSpan = "<span>";
                             }
                             if (!core.db.csOk(CSPeople)) {
-                                CSPeople = core.db.csOpenRecord("people", core.doc.sessionContext.user.id);
+                                CSPeople = core.db.csOpenRecord("people", core.sessionContext.user.id);
                             }
                             Caption = tempVar.Caption;
                             if (tempVar.REquired | genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
@@ -1924,7 +1924,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // Group main_MemberShip
                             //
-                            GroupValue = core.doc.sessionContext.IsMemberOfGroup2(core, tempVar.GroupName);
+                            GroupValue = core.sessionContext.IsMemberOfGroup2(core, tempVar.GroupName);
                             Body = f.RepeatCell;
                             Body = genericController.vbReplace(Body, "{{CAPTION}}", core.html.inputCheckbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
                             Body = genericController.vbReplace(Body, "{{FIELD}}", tempVar.Caption);
@@ -1943,7 +1943,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 tempgetFormPage = ""
-                + errorController.getUserError(core) + core.html.formStartMultipart() + core.html.inputHidden("ContensiveFormPageID", FormPageID) + core.html.inputHidden("SuccessID", core.security.encodeToken(GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + core.html.formEnd();
+                + errorController.getUserError(core) + core.html.formStartMultipart() + core.html.inputHidden("ContensiveFormPageID", FormPageID) + core.html.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + core.html.formEnd();
                 //
                 return tempgetFormPage;
                 //
@@ -2013,11 +2013,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Content Blocking
                 if (!string.IsNullOrEmpty(BlockedRecordIDList)) {
-                    if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
                         //
                         // Administrators are never blocked
                         //
-                    } else if (!core.doc.sessionContext.isAuthenticated) {
+                    } else if (!core.sessionContext.isAuthenticated) {
                         //
                         // non-authenticated are always blocked
                         //
@@ -2030,7 +2030,7 @@ namespace Contensive.Core.Controllers {
                             + " FROM (ccPageContentBlockRules"
                             + " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)"
                             + " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID"
-                            + " WHERE (((ccMemberRules.MemberID)=" + core.db.encodeSQLNumber(core.doc.sessionContext.user.id) + ")"
+                            + " WHERE (((ccMemberRules.MemberID)=" + core.db.encodeSQLNumber(core.sessionContext.user.id) + ")"
                             + " AND ((ccPageContentBlockRules.RecordID) In (" + BlockedRecordIDList + "))"
                             + " AND ((ccPageContentBlockRules.Active)<>0)"
                             + " AND ((ccgroups.Active)<>0)"
@@ -2059,7 +2059,7 @@ namespace Contensive.Core.Controllers {
                                 + " AND ((ManagementGroups.Active)<>0)"
                                 + " AND ((ManagementMemberRules.Active)<>0)"
                                 + " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" + core.db.encodeSQLDate(core.doc.profileStartTime) + ")"
-                                + " AND ((ManagementMemberRules.MemberID)=" + core.doc.sessionContext.user.id + " ));";
+                                + " AND ((ManagementMemberRules.MemberID)=" + core.sessionContext.user.id + " ));";
                             CS = core.db.csOpenSql(SQL);
                             while (core.db.csOk(CS)) {
                                 BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," + core.db.csGetText(CS, "RecordID"), "");
@@ -2108,8 +2108,8 @@ namespace Contensive.Core.Controllers {
                                 // ----- Login page
                                 //
                                 string BlockForm = "";
-                                if (!core.doc.sessionContext.isAuthenticated) {
-                                    if (!core.doc.sessionContext.isRecognized(core)) {
+                                if (!core.sessionContext.isAuthenticated) {
+                                    if (!core.sessionContext.isRecognized(core)) {
                                         //
                                         // -- not recognized
                                         BlockForm = ""
@@ -2119,14 +2119,14 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // -- recognized, not authenticated
                                         BlockForm = ""
-                                            + "<p>This content has limited access. You were recognized as \"<b>" + core.doc.sessionContext.user.name + "</b>\", but you need to login to continue. To login to this account or another, please use this form.</p>"
+                                            + "<p>This content has limited access. You were recognized as \"<b>" + core.sessionContext.user.name + "</b>\", but you need to login to continue. To login to this account or another, please use this form.</p>"
                                             + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext { addonType = CPUtilsBaseClass.addonContext.ContextPage }) + "";
                                     }
                                 } else {
                                     //
                                     // -- authenticated
                                     BlockForm = ""
-                                        + "<p>You are currently logged in as \"<b>" + core.doc.sessionContext.user.name + "</b>\". If this is not you, please <a href=\"?" + core.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
+                                        + "<p>You are currently logged in as \"<b>" + core.sessionContext.user.name + "</b>\". If this is not you, please <a href=\"?" + core.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
                                         + "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>"
                                         + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext { addonType = CPUtilsBaseClass.addonContext.ContextPage }) + "";
                                 }
@@ -2151,12 +2151,12 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // Register Form
                                     //
-                                    if (!core.doc.sessionContext.isAuthenticated & core.doc.sessionContext.isRecognized(core)) {
+                                    if (!core.sessionContext.isAuthenticated & core.sessionContext.isRecognized(core)) {
                                         //
                                         // -- Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
-                                        core.doc.sessionContext.logout(core);
+                                        core.sessionContext.logout(core);
                                     }
-                                    if (!core.doc.sessionContext.isAuthenticated) {
+                                    if (!core.sessionContext.isAuthenticated) {
                                         //
                                         // -- Not Authenticated
                                         core.doc.verifyRegistrationFormPage(core);
@@ -2169,7 +2169,7 @@ namespace Contensive.Core.Controllers {
                                         // -- Authenticated
                                         core.doc.verifyRegistrationFormPage(core);
                                         BlockCopy = ""
-                                            + "<p>You are currently logged in as \"<b>" + core.doc.sessionContext.user.name + "</b>\". If this is not you, please <a href=\"?" + core.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
+                                            + "<p>You are currently logged in as \"<b>" + core.sessionContext.user.name + "</b>\". If this is not you, please <a href=\"?" + core.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
                                             + "<p>This account does not have access to this content. To view this content, please complete this form.</p>"
                                             + getFormPage(core, "Registration Form", RegistrationGroupID) + "";
                                     }
@@ -2196,7 +2196,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Encode the copy
                     //
-                    //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
+                    //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
                     returnHtml = activeContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                     if (core.doc.refreshQueryString != "") {
                         returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + core.doc.refreshQueryString, 1, 99, 1);
@@ -2214,23 +2214,23 @@ namespace Contensive.Core.Controllers {
                         //
                     } else {
                         pageViewings = core.doc.page.Viewings;
-                        if (core.doc.sessionContext.isEditing(pageContentModel.contentName) | core.visitProperty.getBoolean("AllowWorkflowRendering")) {
+                        if (core.sessionContext.isEditing(pageContentModel.contentName) | core.visitProperty.getBoolean("AllowWorkflowRendering")) {
                             //
                             // Link authoring, workflow rendering -> do encoding, but no tracking
                             //
-                            //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
+                            //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
                             returnHtml = activeContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         } else {
                             //
                             // Live content
-                            //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.doc.sessionContext.user.id, core.doc.sessionContext.isAuthenticated, ref layoutError);
+                            //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
                             returnHtml = activeContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             core.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.page.id);
                         }
                         //
                         // Page Hit Notification
                         //
-                        if ((!core.doc.sessionContext.visit.ExcludeFromAnalytics) & (core.doc.page.ContactMemberID != 0) && (core.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
+                        if ((!core.sessionContext.visit.ExcludeFromAnalytics) & (core.doc.page.ContactMemberID != 0) && (core.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
                             personModel person = personModel.create(core, core.doc.page.ContactMemberID);
                             if ( person != null ) {
                                 if (core.doc.page.AllowHitNotification) {
@@ -2252,15 +2252,15 @@ namespace Contensive.Core.Controllers {
                                     Body = Body + getTableRow("Domain", core.webServer.requestDomain, true);
                                     Body = Body + getTableRow("Link", core.webServer.requestUrl, false);
                                     Body = Body + getTableRow("Page Name", PageName, true);
-                                    Body = Body + getTableRow("Member Name", core.doc.sessionContext.user.name, false);
-                                    Body = Body + getTableRow("Member #", encodeText(core.doc.sessionContext.user.id), true);
-                                    Body = Body + getTableRow("Visit Start Time", encodeText(core.doc.sessionContext.visit.StartTime), false);
-                                    Body = Body + getTableRow("Visit #", encodeText(core.doc.sessionContext.visit.id), true);
+                                    Body = Body + getTableRow("Member Name", core.sessionContext.user.name, false);
+                                    Body = Body + getTableRow("Member #", encodeText(core.sessionContext.user.id), true);
+                                    Body = Body + getTableRow("Visit Start Time", encodeText(core.sessionContext.visit.StartTime), false);
+                                    Body = Body + getTableRow("Visit #", encodeText(core.sessionContext.visit.id), true);
                                     Body = Body + getTableRow("Visit IP", core.webServer.requestRemoteIP, false);
                                     Body = Body + getTableRow("Browser ", core.webServer.requestBrowser, true);
-                                    Body = Body + getTableRow("Visitor #", encodeText(core.doc.sessionContext.visitor.id), false);
-                                    Body = Body + getTableRow("Visit Authenticated", encodeText(core.doc.sessionContext.visit.VisitAuthenticated), true);
-                                    Body = Body + getTableRow("Visit Referrer", core.doc.sessionContext.visit.HTTP_REFERER, false);
+                                    Body = Body + getTableRow("Visitor #", encodeText(core.sessionContext.visitor.id), false);
+                                    Body = Body + getTableRow("Visit Authenticated", encodeText(core.sessionContext.visit.VisitAuthenticated), true);
+                                    Body = Body + getTableRow("Visit Referrer", core.sessionContext.visit.HTTP_REFERER, false);
                                     Body = Body + kmaEndTable;
                                     string queryStringForLinkAppend = "";
                                     string emailStatus = "";
@@ -2281,7 +2281,7 @@ namespace Contensive.Core.Controllers {
                                 // Always
                                 //
                                 if (SystemEMailID != 0) {
-                                    emailController.sendSystem(core, core.db.getRecordName("System Email", SystemEMailID), "", core.doc.sessionContext.user.id);
+                                    emailController.sendSystem(core, core.db.getRecordName("System Email", SystemEMailID), "", core.sessionContext.user.id);
                                 }
                                 if (main_AddGroupID != 0) {
                                     groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, main_AddGroupID));
@@ -2295,9 +2295,9 @@ namespace Contensive.Core.Controllers {
                                 // If in Condition Group
                                 //
                                 if (ConditionGroupID != 0) {
-                                    if (core.doc.sessionContext.IsMemberOfGroup2(core, groupController.group_GetGroupName(core, ConditionGroupID))) {
+                                    if (core.sessionContext.IsMemberOfGroup2(core, groupController.group_GetGroupName(core, ConditionGroupID))) {
                                         if (SystemEMailID != 0) {
-                                            emailController.sendSystem(core, core.db.getRecordName("System Email", SystemEMailID), "", core.doc.sessionContext.user.id);
+                                            emailController.sendSystem(core, core.db.getRecordName("System Email", SystemEMailID), "", core.sessionContext.user.id);
                                         }
                                         if (main_AddGroupID != 0) {
                                             groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, main_AddGroupID));
@@ -2313,7 +2313,7 @@ namespace Contensive.Core.Controllers {
                                 // If not in Condition Group
                                 //
                                 if (ConditionGroupID != 0) {
-                                    if (!core.doc.sessionContext.IsMemberOfGroup2(core, groupController.group_GetGroupName(core, ConditionGroupID))) {
+                                    if (!core.sessionContext.IsMemberOfGroup2(core, groupController.group_GetGroupName(core, ConditionGroupID))) {
                                         if (main_AddGroupID != 0) {
                                             groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, main_AddGroupID));
                                         }
@@ -2321,7 +2321,7 @@ namespace Contensive.Core.Controllers {
                                             groupController.group_DeleteGroupMember(core, groupController.group_GetGroupName(core, RemoveGroupID));
                                         }
                                         if (SystemEMailID != 0) {
-                                            emailController.sendSystem(core, core.db.getRecordName("System Email", SystemEMailID), "", core.doc.sessionContext.user.id);
+                                            emailController.sendSystem(core, core.db.getRecordName("System Email", SystemEMailID), "", core.sessionContext.user.id);
                                         }
                                     }
                                 }
@@ -2405,7 +2405,7 @@ namespace Contensive.Core.Controllers {
                 if (core.doc.adminWarning != "") {
                     //
                     if (core.doc.adminWarningPageID != 0) {
-                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + core.html.getRecordEditLink2("Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.doc.sessionContext.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
+                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + core.html.getRecordEditLink2("Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.sessionContext.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
                     }
                     returnHtml = ""
@@ -2442,12 +2442,12 @@ namespace Contensive.Core.Controllers {
                 //
                 if (core.doc.continueProcessing) {
                     if (core.doc.redirectLink == "") {
-                        isEditing = core.doc.sessionContext.isEditing(pageContentModel.contentName);
+                        isEditing = core.sessionContext.isEditing(pageContentModel.contentName);
                         //
                         // ----- Render the Body
                         LiveBody = getContentBox_content_Body(core, OrderByClause, AllowChildPageList, false, core.doc.pageToRootList.Last().id, AllowReturnLink, pageContentModel.contentName, ArchivePages);
                         bool isRootPage = (core.doc.pageToRootList.Count == 1);
-                        if (core.doc.sessionContext.isAdvancedEditing(core, "")) {
+                        if (core.sessionContext.isAdvancedEditing(core, "")) {
                             result = result + core.html.getRecordEditLink(pageContentModel.contentName, core.doc.page.id, (!isRootPage)) + LiveBody;
                         } else if (isEditing) {
                             result = result + core.html.getEditWrapper("", core.html.getRecordEditLink(pageContentModel.contentName, core.doc.page.id, (!isRootPage)) + LiveBody);
@@ -2504,7 +2504,7 @@ namespace Contensive.Core.Controllers {
                 //
                 if (true) {
                     string IconRow = "";
-                    if ((!core.doc.sessionContext.visit.Bot) & (core.doc.page.AllowPrinterVersion | core.doc.page.AllowEmailPage)) {
+                    if ((!core.sessionContext.visit.Bot) & (core.doc.page.AllowPrinterVersion | core.doc.page.AllowEmailPage)) {
                         //
                         // not a bot, and either print or email allowed
                         //
@@ -2536,7 +2536,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Start Text Search
                 //
                 string Cell = "";
-                if (core.doc.sessionContext.isQuickEditing(core, pageContentModel.contentName)) {
+                if (core.sessionContext.isQuickEditing(core, pageContentModel.contentName)) {
                     Cell = Cell + core.doc.getQuickEditing(rootPageId, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, core.doc.page.ContactMemberID, core.doc.page.ChildListSortMethodID, allowChildListComposite, ArchivePage);
                 } else {
                     //
@@ -2554,7 +2554,7 @@ namespace Contensive.Core.Controllers {
                     if (string.IsNullOrEmpty(bodyCopy)) {
                         //
                         // Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
-                        if (core.doc.sessionContext.isEditing(pageContentModel.contentName)) {
+                        if (core.sessionContext.isEditing(pageContentModel.contentName)) {
                             bodyCopy = "\r<p><!-- Empty Content Placeholder --></p>";
                         }
                     } else {
@@ -2566,7 +2566,7 @@ namespace Contensive.Core.Controllers {
                         + genericController.htmlIndent(bodyCopy) + "\r<!-- ContentBoxBodyEnd -->";
                     //
                     // ----- Child pages
-                    if (allowChildListComposite || core.doc.sessionContext.isEditingAnything()) {
+                    if (allowChildListComposite || core.sessionContext.isEditingAnything()) {
                         if (!allowChildListComposite) {
                             Cell = Cell + core.html.getAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
                         }
@@ -2610,7 +2610,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Last Modified line
                 if ((core.doc.page.modifiedDate != DateTime.MinValue) & core.doc.page.AllowLastModifiedFooter) {
                     result = result + "\r<p>This page was last modified " + core.doc.page.modifiedDate.ToString("G");
-                    if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
                         if (core.doc.page.modifiedBy == 0) {
                             result = result + " (admin only: modified by unknown)";
                         } else {
@@ -2628,7 +2628,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Last Reviewed line
                 if ((core.doc.page.DateReviewed != DateTime.MinValue) & core.doc.page.AllowReviewedFooter) {
                     result = result + "\r<p>This page was last reviewed " + core.doc.page.DateReviewed.ToString("");
-                    if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
                         if (core.doc.page.ReviewedBy == 0) {
                             result = result + " (by unknown)";
                         } else {
@@ -2685,7 +2685,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- Set authoring only for valid ContentName
                         //
-                        IsEditingLocal = core.doc.sessionContext.isEditing(iContentName);
+                        IsEditingLocal = core.sessionContext.isEditing(iContentName);
                     } else {
                         //
                         // ----- if iContentName was bad, maybe they put table in, no authoring
@@ -2703,7 +2703,7 @@ namespace Contensive.Core.Controllers {
                                     SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
                                 }
                                 if (IsEditingLocal) {
-                                    result = result + core.html.getRecordEditLink2("See Also", (core.db.csGetInteger(CS, "ID")), false, "", core.doc.sessionContext.isEditing("See Also"));
+                                    result = result + core.html.getRecordEditLink2("See Also", (core.db.csGetInteger(CS, "ID")), false, "", core.sessionContext.isEditing("See Also"));
                                 }
                                 result = result + "<a href=\"" + genericController.encodeHTML(SeeAlsoLink) + "\" target=\"_blank\">" + (core.db.csGetText(CS, "Name")) + "</A>";
                                 Copy = (core.db.csGetText(CS, "Brief"));
@@ -2841,14 +2841,14 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- From Name
                         //
-                        Copy = core.doc.sessionContext.user.name;
+                        Copy = core.sessionContext.user.name;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Name</p></td>";
                         Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + genericController.encodeHTML(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";
                         //
                         // ----- From Email address
                         //
-                        Copy = core.doc.sessionContext.user.Email;
+                        Copy = core.sessionContext.user.Email;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Email</p></td>";
                         Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + genericController.encodeHTML(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";

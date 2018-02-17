@@ -64,7 +64,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     // it is the next day, remove old log files
                     //
-                    logController.housekeepLogFolder(core);
+                    logController.housekeepLogs(core);
                     //
                     // Download Updates
                     DownloadUpdates(core);
@@ -74,7 +74,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     // Upgrade Local Collections, and all applications that use them
                     string ErrorMessage = "";
-                    AppendClassLog(core, "Updating local collections from library, see Upgrade log for details during this period.");
+                    logHousekeeping(core, "Updating local collections from library, see Upgrade log for details during this period.");
                     string ignoreRefactorText = "";
                     bool ignoreRefactorBoolean = false;
                     List<string> nonCriticalErrorList = new List<string>();
@@ -82,7 +82,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                         if (string.IsNullOrEmpty(ErrorMessage)) {
                             ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
                         }
-                        AppendClassLog(core, "Updating local collections from Library returned an error, " + ErrorMessage);
+                        logHousekeeping(core, "Updating local collections from Library returned an error, " + ErrorMessage);
                     }
                     //
                     // Verify core installation
@@ -99,7 +99,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     string DefaultMemberName = "";
                     int PeopleCID = Models.Complex.cdefModel.getContentId(core, "people");
                     string SQL = "select defaultvalue from ccfields where name='name' and contentid=(" + PeopleCID + ")";
-                    int CS = core.db.csOpenSql_rev("default", SQL);
+                    int CS = core.db.csOpenSql(SQL,"Default");
                     if (core.db.csOk(CS)) {
                         DefaultMemberName = core.db.csGetText(CS, "defaultvalue");
                     }
@@ -144,9 +144,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                             // Move Archived pages from their current parent to their archive parent
                             //
                             bool NeedToClearCache = false;
-                            AppendClassLog(core, "Archive update for pages on [" + core.appConfig.name + "]");
+                            logHousekeeping(core, "Archive update for pages on [" + core.appConfig.name + "]");
                             SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + SQLNow + "))and(active<>0)";
-                            CS = core.db.csOpenSql_rev("default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             while (core.db.csOk(CS)) {
                                 int RecordID = core.db.csGetInteger(CS, "ID");
                                 int ArchiveParentID = core.db.csGetInteger(CS, "ArchiveParentID");
@@ -187,7 +187,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                             // Find missing daily summaries, summarize that date
                             //
                             SQL = core.db.GetSQLSelect("default", "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
-                            CS = core.db.csOpenSql_rev("default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             DateTime datePtr = OldestVisitSummaryWeCareAbout;
                             while (datePtr <= Yesterday) {
                                 if (!core.db.csOk(CS)) {
@@ -266,7 +266,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                             if (true) {
                                 DateTime datePtr = default(DateTime);
                                 SQL = core.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1);
-                                CS = core.db.csOpenSql_rev("default", SQL);
+                                CS = core.db.csOpenSql(SQL,"Default");
                                 if (!core.db.csOk(CS)) {
                                     datePtr = OldestVisitSummaryWeCareAbout;
                                 } else {
@@ -293,12 +293,12 @@ namespace Contensive.Core.Addons.Housekeeping {
                         //sql="select top 1 dateadded from ccvisitsummary where (timeduration=1)and(Dateadded>" & encodeSQLDate(ALittleWhileAgo) & ") order by id desc"
                         SQL = core.db.GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + core.db.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1);
                         //SQL = core.app.csv_GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" & encodeSQLDate(ALittleWhileAgo) & ")", "id Desc", , 1)
-                        CS = core.db.csOpenSql_rev("default", SQL);
+                        CS = core.db.csOpenSql(SQL,"Default");
                         if (core.db.csOk(CS)) {
                             LastTimeSummaryWasRun = core.db.csGetDate(CS, "DateAdded");
-                            AppendClassLog(core, "Update hourly visit summary, last time summary was run was [" + LastTimeSummaryWasRun + "]");
+                            logHousekeeping(core, "Update hourly visit summary, last time summary was run was [" + LastTimeSummaryWasRun + "]");
                         } else {
-                            AppendClassLog(core, "Update hourly visit summary, no hourly summaries were found, set start to [" + LastTimeSummaryWasRun + "]");
+                            logHousekeeping(core, "Update hourly visit summary, no hourly summaries were found, set start to [" + LastTimeSummaryWasRun + "]");
                         }
                         core.db.csClose(ref CS);
                         DateTime NextSummaryStartDate = LastTimeSummaryWasRun;
@@ -315,12 +315,12 @@ namespace Contensive.Core.Addons.Housekeeping {
                         DateTime OldestDateAdded = StartOfHour;
                         SQL = core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + core.db.encodeSQLDate(StartOfHour), "dateadded", "", 1);
                         //SQL = "select top 1 Dateadded from ccvisits where LastVisitTime>" & encodeSQLDate(StartOfHour) & " order by DateAdded"
-                        CS = core.db.csOpenSql_rev("default", SQL);
+                        CS = core.db.csOpenSql(SQL,"Default");
                         if (core.db.csOk(CS)) {
                             OldestDateAdded = core.db.csGetDate(CS, "DateAdded");
                             if (OldestDateAdded < NextSummaryStartDate) {
                                 NextSummaryStartDate = OldestDateAdded;
-                                AppendClassLog(core, "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" + OldestDateAdded + "], before the last summary was run.");
+                                logHousekeeping(core, "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" + OldestDateAdded + "], before the last summary was run.");
                             }
                         }
                         core.db.csClose(ref CS);
@@ -335,7 +335,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                         for (double PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
                             SQL = "select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber";
                             //SQL = "select count(id) as HoursPerDay from ccVisitSummary group by DateNumber having DateNumber=" & CLng(PeriodDatePtr)
-                            CS = core.db.csOpenSql_rev("default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             if (core.db.csOk(CS)) {
                                 HoursPerDay = core.db.csGetInteger(CS, "HoursPerDay");
                             }
@@ -346,13 +346,13 @@ namespace Contensive.Core.Addons.Housekeeping {
                             }
                         }
                         if ((DateofMissingSummary != DateTime.MinValue) && (DateofMissingSummary < NextSummaryStartDate)) {
-                            AppendClassLog(core, "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
+                            logHousekeeping(core, "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
                             NextSummaryStartDate = DateofMissingSummary;
                         }
                         //
                         // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
                         //
-                        AppendClassLog(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
+                        logHousekeeping(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
                         PeriodStep = (double)1 / (double)24;
                         //PeriodStart = (Int(OldestDateAdded * 24) / 24)
                         HouseKeep_VisitSummary(core, NextSummaryStartDate, rightNow, 1, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
@@ -466,7 +466,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     // delete members from the non-cookie visits
                     // legacy records without createdbyvisit will have to be corrected by hand (or upgrade)
                     //
-                    AppendClassLog(core, "Deleting members from visits with no cookie support older than Midnight, Two Days Ago");
+                    logHousekeeping(core, "Deleting members from visits with no cookie support older than Midnight, Two Days Ago");
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
                             SQL = "delete m.*"
@@ -536,7 +536,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     // delete viewings from the non-cookie visits
                     //
-                    AppendClassLog(core, "Deleting viewings from visits with no cookie support older than Midnight, Two Days Ago");
+                    logHousekeeping(core, "Deleting viewings from visits with no cookie support older than Midnight, Two Days Ago");
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
                             SQL = "delete h.*"
@@ -565,7 +565,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     // delete visitors from the non-cookie visits
                     //
-                    AppendClassLog(core, "Deleting visitors from visits with no cookie support older than Midnight, Two Days Ago");
+                    logHousekeeping(core, "Deleting visitors from visits with no cookie support older than Midnight, Two Days Ago");
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
                             SQL = "delete r.*"
@@ -593,30 +593,30 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     // delete visits from the non-cookie visits
                     //
-                    AppendClassLog(core, "Deleting visits with no cookie support older than Midnight, Two Days Ago");
+                    logHousekeeping(core, "Deleting visits with no cookie support older than Midnight, Two Days Ago");
                     core.db.DeleteTableRecordChunks("default", "ccvisits", "(CookieSupport=0)and(LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")", 1000, 10000);
                 }
                 //
                 // Visits with no DateAdded
                 //
-                AppendClassLog(core, "Deleting visits with no DateAdded");
+                logHousekeeping(core, "Deleting visits with no DateAdded");
                 core.db.DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" + core.db.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
                 //
                 // Visits with no visitor
                 //
-                AppendClassLog(core, "Deleting visits with no DateAdded");
+                logHousekeeping(core, "Deleting visits with no DateAdded");
                 core.db.DeleteTableRecordChunks("default", "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000);
                 //
                 // viewings with no visit
                 //
-                AppendClassLog(core, "Deleting viewings with null or invalid VisitID");
+                logHousekeeping(core, "Deleting viewings with null or invalid VisitID");
                 core.db.DeleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000);
                 //
                 // Get Oldest Visit
                 //
                 //SQL = "select top 1 DateAdded from ccVisits where dateadded>0 order by DateAdded"
                 SQL = core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "", "dateadded", "", 1);
-                CS = core.db.csOpenSql_rev("default", SQL);
+                CS = core.db.csOpenSql(SQL,"Default");
                 if (core.db.csOk(CS)) {
                     OldestVisitDate = core.db.csGetDate(CS, "DateAdded").Date;
                 }
@@ -627,9 +627,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //   this is to prevent the entire server from being bogged down for one site change
                 //
                 if (OldestVisitDate == DateTime.MinValue) {
-                    AppendClassLog(core, "No records were removed because no visit records were found while requesting the oldest visit.");
+                    logHousekeeping(core, "No records were removed because no visit records were found while requesting the oldest visit.");
                 } else if (VisitArchiveAgeDays <= 0) {
-                    AppendClassLog(core, "No records were removed because Housekeep ArchiveRecordAgeDays is 0.");
+                    logHousekeeping(core, "No records were removed because Housekeep ArchiveRecordAgeDays is 0.");
                 } else {
                     ArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date;
                     DaystoRemove = encodeInteger(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
@@ -637,9 +637,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                         ArchiveDate = OldestVisitDate.AddDays(30);
                     }
                     if (OldestVisitDate >= ArchiveDate) {
-                        AppendClassLog(core, "No records were removed because Oldest Visit Date [" + OldestVisitDate + "] >= ArchiveDate [" + ArchiveDate + "].");
+                        logHousekeeping(core, "No records were removed because Oldest Visit Date [" + OldestVisitDate + "] >= ArchiveDate [" + ArchiveDate + "].");
                     } else {
-                        AppendClassLog(core, "Removing records from [" + OldestVisitDate + "] to [" + ArchiveDate + "].");
+                        logHousekeeping(core, "Removing records from [" + OldestVisitDate + "] to [" + ArchiveDate + "].");
                         SingleDate = OldestVisitDate;
                         do {
                             HouseKeep_App_Daily_RemoveVisitRecords(core, SingleDate, DataSourceType);
@@ -655,7 +655,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // delete 'guests' Members with one visits but no valid visit record
                 //
-                AppendClassLog(core, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
+                logHousekeeping(core, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete m.*"
@@ -712,7 +712,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // delete 'guests' Members created before ArchivePeopleAgeDays
                 //
-                AppendClassLog(core, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
+                logHousekeeping(core, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete m.*"
@@ -757,7 +757,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // delete email drops older than archive.
                 //
-                AppendClassLog(core, "Deleting email drops older then " + EmailDropArchiveAgeDays + " days");
+                logHousekeeping(core, "Deleting email drops older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
                 //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
                 ////On Error //Resume Next
@@ -772,7 +772,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // delete email log entries not realted to a drop, older than archive.
                 //
-                AppendClassLog(core, "Deleting non-drop email logs older then " + EmailDropArchiveAgeDays + " days");
+                logHousekeeping(core, "Deleting non-drop email logs older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
                 //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
                 ////On Error //Resume Next
@@ -787,7 +787,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // delete email log entries without email drops
                 //
-                AppendClassLog(core, "Deleting drop email log entries for drops without a valid drop record.");
+                logHousekeeping(core, "Deleting drop email log entries for drops without a valid drop record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete l.*"
@@ -828,7 +828,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // block duplicate redirect fields (match contentid+fieldtype+caption)
                 //
-                AppendClassLog(core, "Inactivate duplicate redirect fields");
+                logHousekeeping(core, "Inactivate duplicate redirect fields");
                 CS = core.db.csOpenSql_rev("Default", "Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + FieldTypeIdRedirect + ") Order By ContentID, Caption, ID");
                 FieldLast = "";
                 while (core.db.csOk(CS)) {
@@ -847,7 +847,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // block duplicate non-redirect fields (match contentid+fieldtype+name)
                 //
-                AppendClassLog(core, "Inactivate duplicate non-redirect fields");
+                logHousekeeping(core, "Inactivate duplicate non-redirect fields");
                 CS = core.db.csOpenSql_rev("Default", "Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" + FieldTypeIdRedirect + ") Order By ContentID, Name, Type, ID");
                 FieldLast = "";
                 while (core.db.csOk(CS)) {
@@ -866,7 +866,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Activities with no Member
                 //
-                AppendClassLog(core, "Deleting activities with no member record.");
+                logHousekeeping(core, "Deleting activities with no member record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccactivitylog.*"
@@ -890,7 +890,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Member Properties with no member
                 //
-                AppendClassLog(core, "Deleting member properties with no member record.");
+                logHousekeeping(core, "Deleting member properties with no member record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccProperties.*"
@@ -917,7 +917,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Visit Properties with no visits
                 //
-                AppendClassLog(core, "Deleting visit properties with no visit record.");
+                logHousekeeping(core, "Deleting visit properties with no visit record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccProperties.*"
@@ -944,7 +944,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Visitor Properties with no visitor
                 //
-                AppendClassLog(core, "Deleting visitor properties with no visitor record.");
+                logHousekeeping(core, "Deleting visitor properties with no visitor record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccProperties.*"
@@ -971,7 +971,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // MemberRules with bad MemberID
                 //
-                AppendClassLog(core, "Deleting Member Rules with bad MemberID.");
+                logHousekeeping(core, "Deleting Member Rules with bad MemberID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete " + SQLTableMemberRules + ".*"
@@ -998,7 +998,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // MemberRules with bad GroupID
                 //
-                AppendClassLog(core, "Deleting Member Rules with bad GroupID.");
+                logHousekeeping(core, "Deleting Member Rules with bad GroupID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete " + SQLTableMemberRules + ".*"
@@ -1026,11 +1026,11 @@ namespace Contensive.Core.Addons.Housekeeping {
                 // GroupRules with bad ContentID
                 //   Handled record by record removed to prevent CDEF reload
                 //
-                AppendClassLog(core, "Deleting Group Rules with bad ContentID.");
+                logHousekeeping(core, "Deleting Group Rules with bad ContentID.");
                 SQL = "Select ccGroupRules.ID"
                     + " From ccGroupRules LEFT JOIN ccContent on ccContent.ID=ccGroupRules.ContentID"
                     + " WHERE (ccContent.ID is null)";
-                CS = core.db.csOpenSql_rev("default", SQL);
+                CS = core.db.csOpenSql(SQL,"Default");
                 while (core.db.csOk(CS)) {
                     core.db.deleteContentRecord("Group Rules", core.db.csGetInteger(CS, "ID"));
                     core.db.csGoNext(CS);
@@ -1039,7 +1039,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // GroupRules with bad GroupID
                 //
-                AppendClassLog(core, "Deleting Group Rules with bad GroupID.");
+                logHousekeeping(core, "Deleting Group Rules with bad GroupID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccGroupRules.*"
@@ -1105,11 +1105,11 @@ namespace Contensive.Core.Addons.Housekeeping {
                 // ContentWatch with bad CContentID
                 //     must be deleted manually
                 //
-                AppendClassLog(core, "Deleting Content Watch with bad ContentID.");
+                logHousekeeping(core, "Deleting Content Watch with bad ContentID.");
                 SQL = "Select ccContentWatch.ID"
                     + " From ccContentWatch LEFT JOIN ccContent on ccContent.ID=ccContentWatch.ContentID"
                     + " WHERE (ccContent.ID is null)or(ccContent.Active=0)or(ccContent.Active is null)";
-                CS = core.db.csOpenSql_rev("default", SQL);
+                CS = core.db.csOpenSql(SQL,"Default");
                 while (core.db.csOk(CS)) {
                     core.db.deleteContentRecord("Content Watch", core.db.csGetInteger(CS, "ID"));
                     core.db.csGoNext(CS);
@@ -1118,7 +1118,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // ContentWatchListRules with bad ContentWatchID
                 //
-                AppendClassLog(core, "Deleting ContentWatchList Rules with bad ContentWatchID.");
+                logHousekeeping(core, "Deleting ContentWatchList Rules with bad ContentWatchID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccContentWatchListRules.*"
@@ -1145,7 +1145,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // ContentWatchListRules with bad ContentWatchListID
                 //
-                AppendClassLog(core, "Deleting ContentWatchList Rules with bad ContentWatchListID.");
+                logHousekeeping(core, "Deleting ContentWatchList Rules with bad ContentWatchListID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccContentWatchListRules.*"
@@ -1172,7 +1172,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Field help with no field
                 //
-                AppendClassLog(core, "Deleting field help with no field.");
+                logHousekeeping(core, "Deleting field help with no field.");
                 SQL = ""
                     + "delete from ccfieldhelp where id in ("
                     + " select h.id"
@@ -1183,7 +1183,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Field help duplicates - messy, but I am not sure where they are coming from, and this patchs the edit page performance problem
                 //
-                AppendClassLog(core, "Deleting duplicate field help records.");
+                logHousekeeping(core, "Deleting duplicate field help records.");
                 SQL = ""
                     + "delete from ccfieldhelp where id in ("
                     + " select b.id"
@@ -1201,7 +1201,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // convert FieldTypeLongText + htmlContent to FieldTypeHTML
                 //
-                AppendClassLog(core, "convert FieldTypeLongText + htmlContent to FieldTypeHTML.");
+                logHousekeeping(core, "convert FieldTypeLongText + htmlContent to FieldTypeHTML.");
                 SQL = "update ccfields set type=" + FieldTypeIdHTML + " where type=" + FieldTypeIdLongText + " and ( htmlcontent<>0 )";
                 core.db.executeQuery(SQL);
                 //
@@ -1225,12 +1225,12 @@ namespace Contensive.Core.Addons.Housekeeping {
                 if (genericController.encodeBoolean(core.siteProperties.getText("ArchiveAllowFileClean", "false"))) {
                     //
                     int DSType = core.db.getDataSourceType("");
-                    AppendClassLog(core, "Content TextFile types with no controlling record.");
+                    logHousekeeping(core, "Content TextFile types with no controlling record.");
                     SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName"
                         + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID"
                         + " Where (((ccFields.Type) = 10))"
                         + " ORDER BY ccTables.Name";
-                    CS = core.db.csOpenSql_rev("Default", SQL);
+                    CS = core.db.csOpenSql(SQL,"Default");
                     while (core.db.csOk(CS)) {
                         //
                         // Get all the files in this path, and check that the record exists with this in its field
@@ -1252,7 +1252,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     core.cdnFiles.deleteFile(VirtualFileName);
                                 } else {
                                     SQL = "SELECT ID FROM " + TableName + " WHERE (" + FieldName + "=" + core.db.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + core.db.encodeSQLText(VirtualLink) + ")";
-                                    CSTest = core.db.csOpenSql_rev("default", SQL);
+                                    CSTest = core.db.csOpenSql(SQL,"Default");
                                     if (!core.db.csOk(CSTest)) {
                                         core.cdnFiles.deleteFile(VirtualFileName);
                                     }
@@ -1393,17 +1393,17 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 // Visits older then archive age
                 //
-                AppendClassLog(core, "Deleting visits before [" + DeleteBeforeDateSQL + "]");
+                logHousekeeping(core, "Deleting visits before [" + DeleteBeforeDateSQL + "]");
                 core.db.DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" + DeleteBeforeDateSQL + ")", 1000, 10000);
                 //
                 // Viewings with visits before the first
                 //
-                AppendClassLog(core, "Deleting viewings with visitIDs lower then the lowest ccVisits.ID");
+                logHousekeeping(core, "Deleting viewings with visitIDs lower then the lowest ccVisits.ID");
                 core.db.DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
                 //
                 // Visitors with no visits
                 //
-                AppendClassLog(core, "Deleting visitors with no visits");
+                logHousekeeping(core, "Deleting visitors with no visits");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccVisitors.*"
@@ -1457,7 +1457,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 appName = core.appConfig.name;
                 DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);
                 //
-                AppendClassLog(core, "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");
+                logHousekeeping(core, "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");
                 SQLCriteria = ""
                     + " (LastVisit<" + DeleteBeforeDateSQL + ")"
                     + " and(createdbyvisit=1)"
@@ -1578,7 +1578,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + " and (v.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
-                        CS = core.db.csOpenSql_rev("default", SQL);
+                        CS = core.db.csOpenSql(SQL,"Default");
                         if (core.db.csOk(CS)) {
                             NoCookieVisits = core.db.csGetInteger(CS, "NoCookieVisits");
                         }
@@ -1593,7 +1593,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + " and (v.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
-                        CS = core.db.csOpenSql_rev("default", SQL);
+                        CS = core.db.csOpenSql(SQL,"Default");
                         if (core.db.csOk(CS)) {
                             VisitCnt = core.db.csGetInteger(CS, "VisitCnt");
                             HitCnt = core.db.csGetInteger(CS, "HitCnt");
@@ -1612,7 +1612,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(v.VisitorNew<>0)"
                                 + "";
-                            CS = core.db.csOpenSql_rev("default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             if (core.db.csOk(CS)) {
                                 NewVisitorVisits = core.db.csGetInteger(CS, "NewVisitorVisits");
                             }
@@ -1628,7 +1628,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(v.PageVisits=1)"
                                 + "";
-                            CS = core.db.csOpenSql_rev("default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             if (core.db.csOk(CS)) {
                                 SinglePageVisits = core.db.csGetInteger(CS, "SinglePageVisits");
                             }
@@ -1644,7 +1644,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(PageVisits>1)"
                                 + "";
-                            CS = core.db.csOpenSql_rev("default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             if (core.db.csOk(CS)) {
                                 MultiPageVisitCnt = core.db.csGetInteger(CS, "VisitCnt");
                                 MultiPageHitCnt = core.db.csGetInteger(CS, "HitCnt");
@@ -1662,7 +1662,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(VisitAuthenticated<>0)"
                                 + "";
-                            CS = core.db.csOpenSql_rev("default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             if (core.db.csOk(CS)) {
                                 AuthenticatedVisits = core.db.csGetInteger(CS, "AuthenticatedVisits");
                             }
@@ -1680,7 +1680,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 + " and(Mobile<>0)"
                                 + "";
                             //SQL = "select count(id) as AuthenticatedVisits from ccvisits where (CookieSupport<>0)and(VisitAuthenticated<>0)and(dateadded>=" & encodeSQLDate(DateStart) & ")and(dateadded<" & encodeSQLDate(DateEnd) & ")"
-                            CS = core.db.csOpenSql_rev("default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             if (core.db.csOk(CS)) {
                                 MobileVisits = core.db.csGetInteger(CS, "cnt");
                             }
@@ -1696,7 +1696,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(Bot<>0)"
                                 + "";
-                            CS = core.db.csOpenSql_rev("default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             if (core.db.csOk(CS)) {
                                 BotVisits = core.db.csGetInteger(CS, "cnt");
                             }
@@ -1751,8 +1751,8 @@ namespace Contensive.Core.Addons.Housekeeping {
         //   Log a reported error
         //======================================================================================
         //
-        public void AppendClassLog(coreController core, string LogCopy) {
-            logController.appendLog(core, LogCopy, "housekeeping");
+        public void logHousekeeping(coreController core, string LogCopy) {
+            logController.logError(core, "housekeeping: " + LogCopy);
         }
         //
         //====================================================================================================
@@ -1762,7 +1762,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 FileInfo[] FileList = null;
                 //
-                AppendClassLog(core, "Deleting files from folder [" + FolderName + "] older than " + LastMonth);
+                logHousekeeping(core, "Deleting files from folder [" + FolderName + "] older than " + LastMonth);
                 FileList = core.privateFiles.getFileList(FolderName);
                 foreach (FileInfo file in FileList) {
                     if (file.CreationTime < LastMonth) {
@@ -1899,7 +1899,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))"
                             + "order by recordid";
                         hint = 3;
-                        CSPages = core.db.csOpenSql_rev("default", SQL);
+                        CSPages = core.db.csOpenSql(SQL,"Default");
                         if (!core.db.csOk(CSPages)) {
                             //
                             // no hits found - add or update a single record for this day so we know it has been calculated
@@ -1954,7 +1954,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     + " from ccviewings h left join ccvisits v on h.visitid=v.id"
                                     + " where " + baseCriteria + " and (v.CookieSupport<>0)"
                                     + "";
-                                CS = core.db.csOpenSql_rev("default", SQL);
+                                CS = core.db.csOpenSql(SQL,"Default");
                                 if (core.db.csOk(CS)) {
                                     PageViews = core.db.csGetInteger(CS, "cnt");
                                 }
@@ -1968,7 +1968,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     + " where " + baseCriteria + " and(v.CookieSupport<>0)"
                                     + " and(v.visitAuthenticated<>0)"
                                     + "";
-                                CS = core.db.csOpenSql_rev("default", SQL);
+                                CS = core.db.csOpenSql(SQL,"Default");
                                 if (core.db.csOk(CS)) {
                                     AuthenticatedPageViews = core.db.csGetInteger(CS, "cnt");
                                 }
@@ -1981,7 +1981,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     + " from ccviewings h left join ccvisits v on h.visitid=v.id"
                                     + " where " + baseCriteria + " and((v.CookieSupport=0)or(v.CookieSupport is null))"
                                     + "";
-                                CS = core.db.csOpenSql_rev("default", SQL);
+                                CS = core.db.csOpenSql(SQL,"Default");
                                 if (core.db.csOk(CS)) {
                                     NoCookiePageViews = core.db.csGetInteger(CS, "NoCookiePageViews");
                                 }
@@ -1997,7 +1997,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                         + " where " + baseCriteria + " and(v.CookieSupport<>0)"
                                         + " and(v.mobile<>0)"
                                         + "";
-                                    CS = core.db.csOpenSql_rev("default", SQL);
+                                    CS = core.db.csOpenSql(SQL,"Default");
                                     if (core.db.csOk(CS)) {
                                         MobilePageViews = core.db.csGetInteger(CS, "cnt");
                                     }
@@ -2010,7 +2010,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                         + " where " + baseCriteria + " and(v.CookieSupport<>0)"
                                         + " and(v.bot<>0)"
                                         + "";
-                                    CS = core.db.csOpenSql_rev("default", SQL);
+                                    CS = core.db.csOpenSql(SQL,"Default");
                                     if (core.db.csOk(CS)) {
                                         BotPageViews = core.db.csGetInteger(CS, "cnt");
                                     }
@@ -2089,25 +2089,25 @@ namespace Contensive.Core.Addons.Housekeeping {
                 int Ptr = 0;
                 string collectionFileFilename = null;
                 //
-                AppendClassLog(core, "Entering RegisterAddonFolder");
+                logHousekeeping(core, "Entering RegisterAddonFolder");
                 //
                 bool loadOK = true;
                 try {
                     collectionFileFilename = core.privateFiles.rootLocalPath + core.addon.getPrivateFilesAddonPath() + "Collections.xml";
                     Doc.Load(collectionFileFilename);
                 } catch (Exception) {
-                    AppendClassLog(core, "RegisterAddonFolder, Hint=[" + hint + "], Error loading Collections.xml file.");
+                    logHousekeeping(core, "RegisterAddonFolder, Hint=[" + hint + "], Error loading Collections.xml file.");
                     loadOK = false;
                 }
                 if (loadOK) {
                     //
-                    AppendClassLog(core, "Collection.xml loaded ok");
+                    logHousekeeping(core, "Collection.xml loaded ok");
                     //
                     if (genericController.vbLCase(Doc.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
-                        AppendClassLog(core, "RegisterAddonFolder, Hint=[" + hint + "], The Collections.xml file has an invalid root node, [" + Doc.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.");
+                        logHousekeeping(core, "RegisterAddonFolder, Hint=[" + hint + "], The Collections.xml file has an invalid root node, [" + Doc.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.");
                     } else {
                         //
-                        AppendClassLog(core, "Collection.xml root name ok");
+                        logHousekeeping(core, "Collection.xml root name ok");
                         //
                         if (true) {
                             //If genericController.vbLCase(.name) <> "collectionlist" Then
@@ -2147,14 +2147,14 @@ namespace Contensive.Core.Addons.Housekeeping {
                                         break;
                                 }
                                 //
-                                AppendClassLog(core, "Node[" + NodeCnt + "], LocalName=[" + LocalName + "], LastChangeDate=[" + LastChangeDate + "], CollectionPath=[" + CollectionPath + "], LocalGuid=[" + LocalGuid + "]");
+                                logHousekeeping(core, "Node[" + NodeCnt + "], LocalName=[" + LocalName + "], LastChangeDate=[" + LastChangeDate + "], CollectionPath=[" + CollectionPath + "], LocalGuid=[" + LocalGuid + "]");
                                 //
                                 // Go through all subpaths of the collection path, register the version match, unregister all others
                                 //
                                 //fs = New fileSystemClass
                                 if (string.IsNullOrEmpty(CollectionPath)) {
                                     //
-                                    AppendClassLog(core, "no collection path, skipping");
+                                    logHousekeeping(core, "no collection path, skipping");
                                     //
                                 } else {
                                     CollectionPath = genericController.vbLCase(CollectionPath);
@@ -2162,7 +2162,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     Pos = CollectionRootPath.LastIndexOf("\\") + 1;
                                     if (Pos <= 0) {
                                         //
-                                        AppendClassLog(core, "CollectionPath has no '\\', skipping");
+                                        logHousekeeping(core, "CollectionPath has no '\\', skipping");
                                         //
                                     } else {
                                         CollectionRootPath = CollectionRootPath.Left(Pos - 1);
@@ -2178,7 +2178,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                         }
                                         if (FolderList.Length == 0) {
                                             //
-                                            AppendClassLog(core, "no subfolders found in physical path [" + Path + "], skipping");
+                                            logHousekeeping(core, "no subfolders found in physical path [" + Path + "], skipping");
                                             //
                                         } else {
                                             foreach (DirectoryInfo dir in FolderList) {
@@ -2188,17 +2188,17 @@ namespace Contensive.Core.Addons.Housekeeping {
                                                 //
                                                 if (string.IsNullOrEmpty(dir.Name)) {
                                                     //
-                                                    AppendClassLog(core, "....empty folder [" + dir.Name + "], skipping");
+                                                    logHousekeeping(core, "....empty folder [" + dir.Name + "], skipping");
                                                     //
                                                 } else {
                                                     //
-                                                    AppendClassLog(core, "....Folder [" + dir.Name + "]");
+                                                    logHousekeeping(core, "....Folder [" + dir.Name + "]");
                                                     IsActiveFolder = (CollectionRootPath + "\\" + dir.Name == CollectionPath);
                                                     if (IsActiveFolder && (FolderPtr != (FolderList.Length - 1))) {
                                                         //
                                                         // This one is active, but not the last
                                                         //
-                                                        AppendClassLog(core, "....Active addon is not the most current, this folder is the active folder, but there are more recent folders. This folder will be preserved.");
+                                                        logHousekeeping(core, "....Active addon is not the most current, this folder is the active folder, but there are more recent folders. This folder will be preserved.");
                                                     }
                                                     // 20161005 - no longer need to register activeX
                                                     //FileList = core.app.privateFiles.GetFolderFiles(Path & "\" & dir.Name)
@@ -2229,7 +2229,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                                         //IsActiveFolder = IsActiveFolder;
                                                     } else {
                                                         if (FolderPtr < (FolderList.Length - 3)) {
-                                                            AppendClassLog(core, "....Deleting path because non-active and not one of the newest 2 [" + Path + dir.Name + "]");
+                                                            logHousekeeping(core, "....Deleting path because non-active and not one of the newest 2 [" + Path + dir.Name + "]");
                                                             core.privateFiles.deleteFolder(Path + dir.Name);
                                                         }
                                                     }
@@ -2244,7 +2244,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                                     RegisterPath = RegisterPaths[Ptr].Trim(' ');
                                                     if (!string.IsNullOrEmpty(RegisterPath)) {
                                                         Cmd = "%comspec% /c regsvr32 \"" + RegisterPath + "\" /s";
-                                                        AppendClassLog(core, "....Register DLL [" + Cmd + "]");
+                                                        logHousekeeping(core, "....Register DLL [" + Cmd + "]");
                                                         runProcess(core, Cmd, "", true);
                                                     }
                                                 }
@@ -2274,7 +2274,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     }
                 }
                 //
-                AppendClassLog(core, "Exiting RegisterAddonFolder");
+                logHousekeeping(core, "Exiting RegisterAddonFolder");
             } catch (Exception ex) {
                 throw new ApplicationException("Unexpected Exception", ex);
             }

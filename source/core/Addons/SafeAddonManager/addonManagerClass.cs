@@ -134,7 +134,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                     //
                     addonManager = core.webServer.redirect("/" + core.appConfig.adminRoute, "Addon Manager, Cancel Button Pressed");
                 } else {
-                    if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                         //
                         // ----- Put up error message
                         //
@@ -453,7 +453,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                             // Reinstall core collection
                             //---------------------------------------------------------------------------------------------
                             //
-                            if (core.doc.sessionContext.isAuthenticatedDeveloper(core) & core.docProperties.getBoolean("InstallCore")) {
+                            if (core.sessionContext.isAuthenticatedDeveloper(core) & core.docProperties.getBoolean("InstallCore")) {
                                 UpgradeOK = collectionController.installCollectionFromRemoteRepo(core, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, ref nonCriticalErrorList);
                             }
                             //
@@ -793,7 +793,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 ColSortable[1] = false;
                                 //
                                 DisplaySystem = false;
-                                if (!core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                                if (!core.sessionContext.isAuthenticatedDeveloper(core)) {
                                     //
                                     // non-developers
                                     //
@@ -843,7 +843,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>");
                                 } else {
                                     Body.Add(Adminui.EditTableOpen);
-                                    if (core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                                    if (core.sessionContext.isAuthenticatedDeveloper(core)) {
                                         Body.Add(Adminui.GetEditRow(core.html.inputCheckbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
                                     }
                                     Body.Add(Adminui.GetEditRow(core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
@@ -975,8 +975,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
         //
         //
         private void HandleClassAppendLog(string MethodName, string Context) {
-            logController.appendLogWithLegacyRow(core, core.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", false, true, core.webServer.requestUrl, "", "");
-
+            logController.logTrace(core, "addonManager: " + Context);
         }
         //
         //===========================================================================

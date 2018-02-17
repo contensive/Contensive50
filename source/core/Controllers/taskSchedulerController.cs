@@ -54,7 +54,7 @@ namespace Contensive.Core.Controllers {
             try {
                 processTimer.Enabled = false;
                 using (CPClass cp = new CPClass()) {
-                    logController.appendLogTasks(cp.core,"stopTimerEvents");
+                    logController.logTrace(cp.core,"stopTimerEvents");
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
@@ -83,7 +83,7 @@ namespace Contensive.Core.Controllers {
                     StartServiceInProgress = false;
                 }
                 using (CPClass cp = new CPClass()) {
-                    logController.appendLogTasks(cp.core, "stopTimerEvents");
+                    logController.logTrace(cp.core, "stopTimerEvents");
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
@@ -127,15 +127,15 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- run tasks for each app
                 foreach (KeyValuePair<string, Models.Context.appConfigModel> appKvp in coreServer.serverConfig.apps) {
-                    logController.appendLogTasks(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
+                    logController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
                     using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
                         coreController coreApp = cpApp.core;
                         if (!(coreApp.appConfig.appStatus == appConfigModel.appStatusEnum.OK)) {
                             //
-                            logController.appendLogTasks(coreApp, "scheduleTasks, app status not ok");
+                            logController.logTrace(coreApp, "scheduleTasks, app status not ok");
                         } else if (!(coreApp.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
                             //
-                            logController.appendLogTasks(coreApp, "scheduleTasks, app mode not normal");
+                            logController.logTrace(coreApp, "scheduleTasks, app mode not normal");
                         } else {
                             //
                             // Execute Processes
@@ -162,14 +162,14 @@ namespace Contensive.Core.Controllers {
                                     }
                                     if ((addonProcessNextRun < RightNow) || (addonProcessRunOnce)) {
                                         //
-                                        logController.appendLogTasks(coreApp, "scheduleTasks, addon [" + addonName + "], add task, addonProcessRunOnce [" + addonProcessRunOnce + "], addonProcessNextRun [" + addonProcessNextRun + "]");
+                                        logController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], add task, addonProcessRunOnce [" + addonProcessRunOnce + "], addonProcessNextRun [" + addonProcessNextRun + "]");
                                         //
                                         // -- resolve triggering state
                                         coreApp.db.csSet(CS, "ProcessRunOnce", false);
                                         if (addonProcessNextRun < RightNow) {
                                             coreApp.db.csSet(CS, "ProcessNextRun", nextRun);
                                         }
-                                        coreApp.db.csSave2(CS);
+                                        coreApp.db.csSave(CS);
                                         //
                                         // -- add task to queue for runner
                                         cmdDetailClass cmdDetail = new cmdDetailClass();
@@ -179,25 +179,25 @@ namespace Contensive.Core.Controllers {
                                         addTaskToQueue(coreApp, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                                     } else if (coreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
                                         //
-                                        logController.appendLogTasks(coreApp, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
+                                        logController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
                                         //
                                         // -- Interval is OK but NextRun is 0, just set next run
                                         coreApp.db.csSet(CS, "ProcessNextRun", nextRun);
-                                        coreApp.db.csSave2(CS);
+                                        coreApp.db.csSave(CS);
                                     }
                                     coreApp.db.csGoNext(CS);
                                 }
                                 coreApp.db.csClose(ref CS);
                             } catch (Exception ex) {
                                 //
-                                logController.appendLogTasks(coreApp, "scheduleTasks, exception [" + ex.ToString() + "]");
+                                logController.logTrace(coreApp, "scheduleTasks, exception [" + ex.ToString() + "]");
                                 coreApp.handleException(ex);
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                logController.appendLogTasks(coreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
+                logController.logTrace(coreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
                 coreServer.handleException(ex);
             }
         }
@@ -233,10 +233,10 @@ namespace Contensive.Core.Controllers {
                         cpSiteCore.db.csSet(cs, "cmdDetail", cmdDetailJson);
                     }
                     cpSiteCore.db.csClose(ref cs);
-                    logController.appendLogTasks(cpSiteCore, "addTaskToQueue, command [" + command + "], cmdDetailJson [" + cmdDetailJson + "]");
+                    logController.logTrace(cpSiteCore, "addTaskToQueue, command [" + command + "], cmdDetailJson [" + cmdDetailJson + "]");
                 }
             } catch (Exception ex) {
-                logController.appendLogTasks(cpSiteCore, "addTaskToQueue, exeception [" + ex.ToString() + "]");
+                logController.logTrace(cpSiteCore, "addTaskToQueue, exeception [" + ex.ToString() + "]");
                 cpSiteCore.handleException(ex);
             }
             return returnTaskAdded;

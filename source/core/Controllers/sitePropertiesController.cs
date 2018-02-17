@@ -611,6 +611,22 @@ namespace Contensive.Core.Controllers {
         private string _buildVersion = null;
         //
         //====================================================================================================
+        /// <summary>
+        /// Allow Legacy Scramble Fallback - if true, fields marked as scramble will first be descrambled with TwoWayEncoding. 
+        /// If that fails the legacy descramble will be attempted
+        /// </summary>
+        /// <returns></returns>
+        public bool allowLegacyDescrambleFallback {
+            get {
+                if (_allowLegacyDescrambleFallback == null ) {
+                    _allowLegacyDescrambleFallback = getBoolean("Allow Legacy Descramble Fallback");
+                }
+                return (bool)_allowLegacyDescrambleFallback;
+            }
+        }
+        private bool? _allowLegacyDescrambleFallback = null;
+        //
+        //====================================================================================================
         //
         internal Dictionary<string, string> nameValueDict {
             get {
@@ -631,7 +647,7 @@ namespace Contensive.Core.Controllers {
                                 cs.goNext();
                             } while (cs.ok());
                         }
-                        cs.Close();
+                        cs.close();
                     }
                 }
                 return _nameValueDict;

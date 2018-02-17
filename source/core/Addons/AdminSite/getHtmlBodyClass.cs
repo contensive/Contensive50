@@ -42,8 +42,13 @@ namespace Contensive.Core.Addons.AdminSite {
                 core = this.cp.core;
                 //
                 // -- log request
-                string SaveContent = ""
-                        + DateTime.Now + "\r\nmember.name:" + core.doc.sessionContext.user.name + "\r\nmember.id:" + core.doc.sessionContext.user.id + "\r\nvisit.id:" + core.doc.sessionContext.visit.id + "\r\nurl:" + core.webServer.requestUrl + "\r\nurl source:" + core.webServer.requestUrlSource + "\r\n----------"
+                string SaveContent = "Admin Site Request:"
+                        + "\r\n" + DateTime.Now 
+                        + "\r\nmember.name:" + core.sessionContext.user.name 
+                        + "\r\nmember.id:" + core.sessionContext.user.id 
+                        + "\r\nvisit.id:" + core.sessionContext.visit.id 
+                        + "\r\nurl:" + core.webServer.requestUrl 
+                        + "\r\nurl source:" + core.webServer.requestUrlSource + "\r\n----------"
                         + "\r\nform post:";
                 foreach (string key in core.docProperties.getKeyList()) {
                     docPropertiesClass docProperty = core.docProperties.getProperty(key);
@@ -59,9 +64,9 @@ namespace Contensive.Core.Addons.AdminSite {
                             + "\r\nbinary header:"
                             + "\r\n" + BinaryHeaderString + "\r\n";
                 }
-                logController.appendLog(core, SaveContent, "admin", core.appConfig.name + "-request-");
+                logController.addSiteActivity(core, SaveContent, core.sessionContext.user.id, core.sessionContext.user.OrganizationID );
                 //
-                if (!core.doc.sessionContext.isAuthenticated) {
+                if (!core.sessionContext.isAuthenticated) {
                     //
                     // --- must be authenticated to continue. Force a local login
                     //
@@ -69,7 +74,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         errorCaption = "Login Page",
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                     });
-                } else if (!core.doc.sessionContext.isAuthenticatedContentManager(core)) {
+                } else if (!core.sessionContext.isAuthenticatedContentManager(core)) {
                     //
                     // --- member must have proper access to continue
                     //
@@ -98,15 +103,6 @@ namespace Contensive.Core.Addons.AdminSite {
                     returnHtml = "<div class=\"ccBodyAdmin ccCon\">" + getAdminBody() + "</div>";
                     //returnHtml = core.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False)
                 }
-                //
-                // Log response
-                //
-                SaveContent += ""
-                        + DateTime.Now + "\r\nmember.name:" + core.doc.sessionContext.user.name + "\r\nmember.id:" + core.doc.sessionContext.user.id + "\r\nvisit.id:" + core.doc.sessionContext.visit.id + "\r\nurl:" + core.webServer.requestUrl + "\r\nurl source:" + core.webServer.requestUrlSource + "\r\n----------"
-                        + "\r\nresponse:"
-                        + "\r\n" + returnHtml;
-                DateTime rightNow = DateTime.Now;
-                //logController.appendLog(core, SaveContent, "admin", rightNow.Year + rightNow.Month.ToString("00") + rightNow.Day.ToString("00") + rightNow.Hour.ToString("00") + rightNow.Minute.ToString("00") + rightNow.Second.ToString("00"));
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -916,7 +912,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Cancel just exits with no content
                     //
                     return "";
-                } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //
@@ -987,7 +983,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Cancel just exits with no content
                     //
                     return tempGetForm_MetaKeywordTool;
-                } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //
@@ -1128,7 +1124,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         // Included Addons
                         //
                         SQL = "select IncludedAddonID from ccAddonIncludeRules where AddonID=" + HelpAddonID;
-                        CS = core.db.csOpenSql_rev("default", SQL);
+                        CS = core.db.csOpenSql(SQL,"Default");
                         while (core.db.csOk(CS)) {
                             IncludeID = core.db.csGetInteger(CS, "IncludedAddonID");
                             IncludeHelp = IncludeHelp + GetAddonHelp(IncludeID, HelpAddonID + "," + IncludeID.ToString());
@@ -1419,7 +1415,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (!string.IsNullOrEmpty(list)) {
                         Console.WriteLine("console - adminContent.contentControlCriteria=" + list);
                         ////Debug.WriteLine("debug - adminContent.contentControlCriteria=" + list);
-                        logController.appendLog(core, "appendlog - adminContent.contentControlCriteria=" + list);
+                        logController.logError(core, "appendlog - adminContent.contentControlCriteria=" + list);
                         ListSplit = list.Split('=');
                         Cnt = ListSplit.GetUpperBound(0) + 1;
                         if (Cnt > 0) {
@@ -1458,7 +1454,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 // Where Clause: edited by me
                 //
                 if (IndexConfig.LastEditedByMe) {
-                    return_SQLWhere += "AND(" + adminContent.contentTableName + ".ModifiedBy=" + core.doc.sessionContext.user.id + ")";
+                    return_SQLWhere += "AND(" + adminContent.contentTableName + ".ModifiedBy=" + core.sessionContext.user.id + ")";
                 }
                 //
                 // Where Clause: edited today
@@ -2359,7 +2355,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // No Fields
                     //
                     Stream.Add(GetForm_Error("This content [" + adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminContent.name + "] has no field records."));
-                } else if (adminContent.developerOnly & (!core.doc.sessionContext.isAuthenticatedDeveloper(core))) {
+                } else if (adminContent.developerOnly & (!core.sessionContext.isAuthenticatedDeveloper(core))) {
                     //
                     // Developer Content and not developer
                     //
@@ -2370,7 +2366,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // get access rights
                     //
-                    core.doc.sessionContext.getContentAccessRights(core, adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
+                    core.sessionContext.getContentAccessRights(core, adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
                     //
                     // detemine which subform to disaply
                     //
@@ -2510,7 +2506,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             }
                             SubTitlePart = "";
                             if (IndexConfig.LastEditedByMe) {
-                                SubTitlePart = SubTitlePart + " by " + core.doc.sessionContext.user.name;
+                                SubTitlePart = SubTitlePart + " by " + core.sessionContext.user.name;
                             }
                             if (IndexConfig.LastEditedPast30Days) {
                                 SubTitlePart = SubTitlePart + " in the past 30 days";
@@ -3299,7 +3295,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 SubFilterList = "";
                 if (genericController.vbLCase(TableName) == genericController.vbLCase("ccMembers")) {
                     SQL = core.db.GetSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");
-                    CS = core.db.csOpenSql_rev("default", SQL);
+                    CS = core.db.csOpenSql(SQL,"Default");
                     while (core.db.csOk(CS)) {
                         Name = core.db.csGetText(CS, "Name");
                         Ptr = 0;
@@ -3458,7 +3454,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 // determine user rights to this content
                 //
                 UserAllowContentEdit = true;
-                if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     if (adminContent.id > 0) {
                         UserAllowContentEdit = userHasContentAccess(adminContent.id);
                     }
@@ -3541,14 +3537,14 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 AdminMenuModeID = core.docProperties.getInteger("mm");
                 if (AdminMenuModeID == 0) {
-                    AdminMenuModeID = core.doc.sessionContext.user.AdminMenuModeID;
+                    AdminMenuModeID = core.sessionContext.user.AdminMenuModeID;
                 }
                 if (AdminMenuModeID == 0) {
                     AdminMenuModeID = AdminMenuModeLeft;
                 }
-                if (core.doc.sessionContext.user.AdminMenuModeID != AdminMenuModeID) {
-                    core.doc.sessionContext.user.AdminMenuModeID = AdminMenuModeID;
-                    core.doc.sessionContext.user.save(core);
+                if (core.sessionContext.user.AdminMenuModeID != AdminMenuModeID) {
+                    core.sessionContext.user.AdminMenuModeID = AdminMenuModeID;
+                    core.sessionContext.user.save(core);
                 }
                 //    '
                 //    ' ----- FieldName
@@ -3899,7 +3895,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 if (RowCnt > 0) {
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                         if (core.docProperties.getBoolean("row" + RowPtr)) {
-                                            CSEditRecord = core.db.cs_open2(adminContent.name, core.docProperties.getInteger("rowid" + RowPtr), true, true);
+                                            CSEditRecord = core.db.csOpen2(adminContent.name, core.docProperties.getInteger("rowid" + RowPtr), true, true);
                                             if (core.db.csOk(CSEditRecord)) {
                                                 RecordID = core.db.csGetInteger(CSEditRecord, "ID");
                                                 core.db.csDeleteRecord(CSEditRecord);
@@ -4008,7 +4004,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         AllowDelete = core.docProperties.getBoolean("ContentGroupRuleAllowDelete" + ContentPointer);
                         //
                         RuleFound = false;
-                        core.db.cs_goFirst(CSPointer);
+                        core.db.csGoFirst(CSPointer);
                         if (core.db.csOk(CSPointer)) {
                             while (core.db.csOk(CSPointer)) {
                                 if (core.db.csGetInteger(CSPointer, "ContentID") == ContentID) {
@@ -4151,7 +4147,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         AllowDelete = core.docProperties.getBoolean("GroupRuleAllowDelete" + GroupPointer);
                         //
                         RuleFound = false;
-                        core.db.cs_goFirst(CSPointer);
+                        core.db.csGoFirst(CSPointer);
                         if (core.db.csOk(CSPointer)) {
                             while (core.db.csOk(CSPointer)) {
                                 if (core.db.csGetInteger(CSPointer, "GroupID") == GroupID) {
@@ -4297,7 +4293,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // ----- Set Read Only: if non-developer tries to edit a developer record
                     //
                     if (genericController.vbUCase(adminContent.contentTableName) == genericController.vbUCase("ccMembers")) {
-                        if (!core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                        if (!core.sessionContext.isAuthenticatedDeveloper(core)) {
                             if (editRecord.fieldsLc.ContainsKey("developer")) {
                                 if (genericController.encodeBoolean(editRecord.fieldsLc["developer"].value)) {
                                     editRecord.Read_Only = true;
@@ -4439,12 +4435,12 @@ namespace Contensive.Core.Addons.AdminSite {
                         //    .readonlyfield = True
                         //    .Required = False
                         case "MODIFIEDBY":
-                            editrecord.fieldsLc[field.nameLc].value = core.doc.sessionContext.user.id;
+                            editrecord.fieldsLc[field.nameLc].value = core.sessionContext.user.id;
                             //    .readonlyfield = True
                             //    .Required = False
                             break;
                         case "CREATEDBY":
-                            editrecord.fieldsLc[field.nameLc].value = core.doc.sessionContext.user.id;
+                            editrecord.fieldsLc[field.nameLc].value = core.sessionContext.user.id;
                             //    .readonlyfield = True
                             //    .Required = False
                             //Case "DATEADDED"
@@ -4575,7 +4571,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //   Open Content Sets with the data
                     //
-                    CSEditRecord = core.db.cs_open2(adminContent.name, editrecord.id, true, true);
+                    CSEditRecord = core.db.csOpen2(adminContent.name, editrecord.id, true, true);
                     //
                     //
                     // store fieldvalues in RecordValuesVariant
@@ -4636,7 +4632,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     DBValueVariant = core.db.csGet(CSPointer, adminContentField.nameLc);
                                     break;
                                 default:
-                                    DBValueVariant = core.db.cs_getValue(CSPointer, adminContentField.nameLc);
+                                    DBValueVariant = core.db.csGetValue(CSPointer, adminContentField.nameLc);
                                     break;
                             }
                             //
@@ -4971,12 +4967,12 @@ namespace Contensive.Core.Addons.AdminSite {
                                 // (many to many is handled during save)
                                 //
                                 ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.adminOnly) & (!core.doc.sessionContext.isAuthenticatedAdmin(core))) {
+                            } else if ((field.adminOnly) & (!core.sessionContext.isAuthenticatedAdmin(core))) {
                                 //
                                 // non-admin and admin only field, leave current value
                                 //
                                 ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.developerOnly) & (!core.doc.sessionContext.isAuthenticatedDeveloper(core))) {
+                            } else if ((field.developerOnly) & (!core.sessionContext.isAuthenticatedDeveloper(core))) {
                                 //
                                 // non-developer and developer only field, leave current value
                                 //
@@ -5199,7 +5195,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     //
                                     // ----- Do the unique check for this field
                                     //
-                                    string SQLUnique = "select id from " + adminContent.contentTableName + " where (" + field.nameLc + "=" + core.db.EncodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + cdefModel.getContentControlCriteria(core, adminContent.name) + ")";
+                                    string SQLUnique = "select id from " + adminContent.contentTableName + " where (" + field.nameLc + "=" + core.db.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + cdefModel.getContentControlCriteria(core, adminContent.name) + ")";
                                     if (editRecord.id > 0) {
                                         //
                                         // --editing record
@@ -5403,7 +5399,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                         if (!isDupError) {
                             DupCausesWarning = true;
-                            int CS = core.db.cs_open2(adminContent.name, editRecord.id, true, true);
+                            int CS = core.db.csOpen2(adminContent.name, editRecord.id, true, true);
                             if (core.db.csOk(CS)) {
                                 core.db.csSet(CS, "linkalias", linkAlias);
                             }
@@ -5465,7 +5461,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // -- If There is an error, block the save
                     AdminAction = AdminActionNop;
-                } else if (!core.doc.sessionContext.isAuthenticatedContentManager(core, adminContent.name)) {
+                } else if (!core.sessionContext.isAuthenticatedContentManager(core, adminContent.name)) {
                     //
                     // -- must be content manager
                 } else if (editRecord.Read_Only) {
@@ -5483,7 +5479,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         CSEditRecord = core.db.csInsertRecord(adminContent.name);
                     } else {
                         NewRecord = false;
-                        CSEditRecord = core.db.cs_open2(adminContent.name, editRecord.id, true, true);
+                        CSEditRecord = core.db.csOpen2(adminContent.name, editRecord.id, true, true);
                     }
                     if (!core.db.csOk(CSEditRecord)) {
                         //
@@ -5740,11 +5736,11 @@ namespace Contensive.Core.Addons.AdminSite {
                                                 ActivityLogOrganizationID = person.OrganizationID;
                                             }
                                         }
-                                        logController.logActivity2(core, "modifying field " + FieldName, editRecord.id, ActivityLogOrganizationID);
+                                        logController.addSiteActivity(core, "modifying field " + FieldName, editRecord.id, ActivityLogOrganizationID);
                                         break;
                                     case "organizations":
                                         //
-                                        logController.logActivity2(core, "modifying field " + FieldName, 0, editRecord.id);
+                                        logController.addSiteActivity(core, "modifying field " + FieldName, 0, editRecord.id);
                                         break;
                                     case "cclibraryfiles":
                                         //
@@ -5857,7 +5853,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 ContentName = cdefModel.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(ContentName)) {
-                    returnHas = core.doc.sessionContext.isAuthenticatedContentManager(core, ContentName);
+                    returnHas = core.sessionContext.isAuthenticatedContentManager(core, ContentName);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -6403,7 +6399,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // ----- determine access details
                 //
-                core.doc.sessionContext.getContentAccessRights(core, adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
+                core.sessionContext.getContentAccessRights(core, adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
                 AllowAdd = adminContent.allowAdd && allowCMAdd;
                 AllowDelete = adminContent.allowDelete & allowCMDelete & (editRecord.id != 0);
                 allowSave = allowCMEdit;
@@ -6496,7 +6492,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //				Select Case genericController.vbUCase(adminContent.ContentTableName)
                                 //ORIGINAL LINE: Case genericController.vbUCase("ccMembers")
                 if (genericController.vbUCase(adminContent.contentTableName) == genericController.vbUCase("ccMembers")) {
-                    if (!(core.doc.sessionContext.isAuthenticatedAdmin(core))) {
+                    if (!(core.sessionContext.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
                         //
@@ -6533,7 +6529,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             LastSendTestDate = genericController.encodeDate(editRecord.fieldsLc["lastsendtestdate"].value);
                         }
                     }
-                    if (!(core.doc.sessionContext.isAuthenticatedAdmin(core))) {
+                    if (!(core.sessionContext.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
                         //
@@ -6545,7 +6541,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         EmailSubmitted = false;
                         if (editRecord.id != 0) {
                             if (editRecord.fieldsLc.ContainsKey("testmemberid")) {
-                                editRecord.fieldsLc["testmemberid"].value = core.doc.sessionContext.user.id;
+                                editRecord.fieldsLc["testmemberid"].value = core.sessionContext.user.id;
                             }
                         }
                         EditSectionButtonBar = "";
@@ -6554,7 +6550,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         } else {
                             EditSectionButtonBar += core.html.button(ButtonCancel, "", "", "Return processSubmit(this)");
                         }
-                        if ((AllowDelete) && (core.doc.sessionContext.isAuthenticatedDeveloper(core))) {
+                        if ((AllowDelete) && (core.sessionContext.isAuthenticatedDeveloper(core))) {
                             EditSectionButtonBar += core.html.button(ButtonDeleteEmail, "", "", "If(!DeleteCheck())Return False;");
                         }
                         if ((!EmailSubmitted) && (!EmailSent)) {
@@ -6569,8 +6565,8 @@ namespace Contensive.Core.Addons.AdminSite {
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only & (!core.doc.sessionContext.isAuthenticatedDeveloper(core))), allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only & (!core.doc.sessionContext.isAuthenticatedDeveloper(core))), allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only & (!core.sessionContext.isAuthenticatedDeveloper(core))), allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only & (!core.sessionContext.isAuthenticatedDeveloper(core))), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                         if (allowAdminTabs) {
@@ -6585,7 +6581,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         EmailSubmitted = false;
                         if (editRecord.id != 0) {
                             if (editRecord.fieldsLc.ContainsKey("testmemberid")) {
-                                editRecord.fieldsLc["testmemberid"].value = core.doc.sessionContext.user.id;
+                                editRecord.fieldsLc["testmemberid"].value = core.sessionContext.user.id;
                             }
                             if (editRecord.fieldsLc.ContainsKey("submitted")) {
                                 EmailSubmitted = genericController.encodeBoolean(editRecord.fieldsLc["submitted"].value);
@@ -6639,7 +6635,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         EmailSent = false;
                         if (editRecord.id != 0) {
                             if (editRecord.fieldsLc.ContainsKey("testmemberid")) {
-                                editRecord.fieldsLc["testmemberid"].value = core.doc.sessionContext.user.id;
+                                editRecord.fieldsLc["testmemberid"].value = core.sessionContext.user.id;
                             }
                             if (editRecord.fieldsLc.ContainsKey("submitted")) {
                                 EmailSubmitted = genericController.encodeBoolean(editRecord.fieldsLc["submitted"].value);
@@ -6686,7 +6682,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 }
                 //ORIGINAL LINE: Case "CCCONTENT"
                 else if (genericController.vbUCase(adminContent.contentTableName) == "CCCONTENT") {
-                    if (!(core.doc.sessionContext.isAuthenticatedAdmin(core))) {
+                    if (!(core.sessionContext.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
                         //
@@ -6930,7 +6926,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     return core.webServer.redirect("/" + core.appConfig.adminRoute, "Admin Publish, Cancel Button Pressed");
-                } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     //
                     //
@@ -6969,7 +6965,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //    & " GROUP BY ccAuthoringControls.ID,ccContent.ID, ccContent.Name, ccAuthoringControls.RecordID, ccContentWatch.Link, ccContent.AllowWorkflowAuthoring, ccAuthoringControls.ControlType" _
                     //    & " HAVING (ccAuthoringControls.ControlType>1)" _
                     //    & " order by max(ccAuthoringControls.DateAdded) Desc"
-                    CS = core.db.csOpenSql_rev("Default", SQL);
+                    CS = core.db.csOpenSql(SQL,"Default");
                     //CS = core.app_openCsSql_Rev_Internal("Default", SQL, RecordsPerPage, PageNumber)
                     RecordCount = 0;
                     if (core.db.csOk(CS)) {
@@ -7598,7 +7594,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             LookupContentName = genericController.encodeText(cdefModel.getContentNameByID(core, field.lookupContentID));
                                         }
                                         if (!string.IsNullOrEmpty(LookupContentName)) {
-                                            CSLookup = core.db.cs_open2(LookupContentName, FieldValueInteger, false, false, "Name,ContentControlID");
+                                            CSLookup = core.db.csOpen2(LookupContentName, FieldValueInteger, false, false, "Name,ContentControlID");
                                             if (core.db.csOk(CSLookup)) {
                                                 if (core.db.csGet(CSLookup, "Name") == "") {
                                                     EditorString += ("No Name");
@@ -7873,7 +7869,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                 EditorString += (core.html.selectFromContent(FormFieldLCaseName, FieldValueInteger, LookupContentName, "", "", "", ref IsEmptyList, "select"));
                                             }
                                             if (FieldValueInteger != 0) {
-                                                CSPointer = core.db.cs_open2(LookupContentName, FieldValueInteger, false, false, "ID");
+                                                CSPointer = core.db.csOpen2(LookupContentName, FieldValueInteger, false, false, "ID");
                                                 if (core.db.csOk(CSPointer)) {
                                                     EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?" + RequestNameAdminForm + "=4&cid=" + field.lookupContentID + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">Details</a>]");
                                                 }
@@ -7908,7 +7904,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             EditorString += (core.html.selectUserFromGroup(FormFieldLCaseName, FieldValueInteger, field.memberSelectGroupId_get(core), "", "", "select"));
                                         }
                                         if (FieldValueInteger != 0) {
-                                            CSPointer = core.db.cs_open2("people", FieldValueInteger, false, false, "ID");
+                                            CSPointer = core.db.csOpen2("people", FieldValueInteger, false, false, "ID");
                                             if (core.db.csOk(CSPointer)) {
                                                 EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?" + RequestNameAdminForm + "=4&cid=" + cdefModel.getContentId(core, "people") + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">Details</a>]");
                                             }
@@ -8244,7 +8240,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         // field help
                         //------------------------------------------------------------------------------------------------------------
                         //
-                        if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                        if (core.sessionContext.isAuthenticatedAdmin(core)) {
                             //
                             // Admin view
                             //
@@ -8590,7 +8586,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     Copy = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docore.main_";
                     Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("LandingPageID", 0))));
-                    if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
                         HTMLFieldString = core.html.inputCheckbox("LandingPageID", Checked);
                     } else {
                         HTMLFieldString = "<b>" + genericController.GetYesNo(Checked) + "</b>" + core.html.inputHidden("LandingPageID", Checked);
@@ -8602,7 +8598,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     Copy = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked.";
                     Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("PageNotFoundPageID", 0))));
-                    if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
                         HTMLFieldString = core.html.inputCheckbox("PageNotFound", Checked);
                     } else {
                         HTMLFieldString = "<b>" + genericController.GetYesNo(Checked) + "</b>" + core.html.inputHidden("PageNotFound", Checked);
@@ -8681,7 +8677,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // field is read-only except for developers
                         //
-                        if (core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                        if (core.sessionContext.isAuthenticatedDeveloper(core)) {
                             HTMLFieldString = core.html.inputText("ccguid", HTMLFieldString, -1, -1, "", false, false) + "";
                         } else {
                             HTMLFieldString = core.html.inputText("ccguid", HTMLFieldString, -1, -1, "", false, true) + core.html.inputHidden("ccguid", HTMLFieldString);
@@ -8700,7 +8696,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     } else if (editRecord.id == 0) {
                         HTMLFieldString = "(available after save)";
                     } else {
-                        EID = genericController.encodeText(core.security.encodeToken(editRecord.id, core.doc.profileStartTime));
+                        EID = genericController.encodeText(Core.Controllers.securityController.encodeToken(core, editRecord.id, core.doc.profileStartTime));
                         if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
                             HTMLFieldString = EID;
                             //HTMLFieldString = EID _
@@ -8734,7 +8730,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     //
-                    if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                         HTMLFieldString = HTMLFieldString + core.html.inputHidden("ContentControlID", FieldValueInteger);
                     } else {
                         RecordContentName = editRecord.contentControlId_Name;
@@ -8748,7 +8744,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         if (editRecord.id > 0) {
                             CS = core.db.csOpenRecord(RecordContentName, editRecord.id);
                             if (core.db.csOk(CS)) {
-                                ContentSupportsParentID = core.db.cs_isFieldSupported(CS, "ParentID");
+                                ContentSupportsParentID = core.db.csIsFieldSupported(CS, "ParentID");
                                 if (ContentSupportsParentID) {
                                     ParentID = core.db.csGetInteger(CS, "ParentID");
                                 }
@@ -8773,7 +8769,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             }
 
                         }
-                        if (core.doc.sessionContext.isAuthenticatedAdmin(core) && (LimitContentSelectToThisID == 0)) {
+                        if (core.sessionContext.isAuthenticatedAdmin(core) && (LimitContentSelectToThisID == 0)) {
                             //
                             // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                             //
@@ -8790,7 +8786,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             while (core.db.csOk(CSPointer)) {
                                 ChildCID = core.db.csGetInteger(CSPointer, "ID");
                                 if (cdefModel.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
-                                    if ((core.doc.sessionContext.isAuthenticatedAdmin(core)) | (core.doc.sessionContext.isAuthenticatedContentManager(core, cdefModel.getContentNameByID(core, ChildCID)))) {
+                                    if ((core.sessionContext.isAuthenticatedAdmin(core)) | (core.sessionContext.isAuthenticatedContentManager(core, cdefModel.getContentNameByID(core, ChildCID)))) {
                                         CIDList = CIDList + "," + ChildCID;
                                     }
                                 }
@@ -8821,7 +8817,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (FieldValueInteger == 0) {
                         HTMLFieldString = "unknown";
                     } else {
-                        CSPointer = core.db.cs_open2("people", FieldValueInteger, true);
+                        CSPointer = core.db.csOpen2("people", FieldValueInteger, true);
                         if (!core.db.csOk(CSPointer)) {
                             HTMLFieldString = "unknown";
                         } else {
@@ -8856,7 +8852,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     FieldValueInteger = editRecord.modifiedByMemberID;
                     HTMLFieldString = "unknown";
                     if (FieldValueInteger > 0) {
-                        CSPointer = core.db.cs_open2("people", FieldValueInteger, true, false, "name");
+                        CSPointer = core.db.csOpen2("people", FieldValueInteger, true, false, "name");
                         if (core.db.csOk(CSPointer)) {
                             HTMLFieldString = core.db.csGet(CSPointer, "name");
                         }
@@ -9069,7 +9065,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 // This is really messy -- there must be a better way
                 //
                 addonId = 0;
-                if (core.doc.sessionContext.visit.id == core.docProperties.getInteger(RequestNameDashboardReset)) {
+                if (core.sessionContext.visit.id == core.docProperties.getInteger(RequestNameDashboardReset)) {
                     //$$$$$ cache this
                     CS = core.db.csOpen(cnAddons, "ccguid=" + core.db.encodeSQLText(addonGuidDashboard));
                     if (core.db.csOk(CS)) {
@@ -9146,9 +9142,9 @@ namespace Contensive.Core.Addons.AdminSite {
                     + "\r\n<div><a href=http://www.Contensive.com target=_blank><img style=\"border:1px solid #000;\" src=\"/ccLib/images/ContensiveAdminLogo.GIF\" border=0 ></A></div>"
                     + "\r\n<div><strong>Contensive/" + core.codeVersion() + "</strong></div>"
                     + "\r\n<div style=\"clear:both;height:18px;margin-top:10px\"><div style=\"float:left;width:200px;\">Domain Name</div><div style=\"float:left;\">" + core.webServer.requestDomain + "</div></div>"
-                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Login Member Name</div><div style=\"float:left;\">" + core.doc.sessionContext.user.name + "</div></div>"
+                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Login Member Name</div><div style=\"float:left;\">" + core.sessionContext.user.name + "</div></div>"
                     + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Quick Reports</div><div style=\"float:left;\"><a Href=\"?" + RequestNameAdminForm + "=" + AdminFormQuickStats + "\">Real-Time Activity</A></div></div>"
-                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?" + RequestNameDashboardReset + "=" + core.doc.sessionContext.visit.id + "\">Run Dashboard</A></div></div>"
+                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?" + RequestNameDashboardReset + "=" + core.sessionContext.visit.id + "\">Run Dashboard</A></div></div>"
                     + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?addonguid=" + addonGuidAddonManager + "\">Add-on Manager</A></div></div>";
                     //
                     if (core.doc.debug_iUserError != "") {
@@ -9669,7 +9665,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         SQL = "SELECT Active,GroupID,DateExpires"
                             + " FROM ccMemberRules"
                             + " WHERE MemberID=" + editRecord.id;
-                        CS = core.db.csOpenSql_rev("Default", SQL);
+                        CS = core.db.csOpenSql(SQL,"Default");
                         while (core.db.csOk(CS)) {
                             if (MembershipCount >= MembershipSize) {
                                 MembershipSize = MembershipSize + 10;
@@ -9697,13 +9693,13 @@ namespace Contensive.Core.Addons.AdminSite {
                     //sql &= "" _
                     //    & " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Caption, ccGroups.name, ccGroups.SortOrder" _
                     //    & " ORDER BY ccContent.Name, ccGroups.Caption"
-                    CS = core.db.csOpenSql_rev("Default", SQL);
+                    CS = core.db.csOpenSql(SQL,"Default");
                     //
                     // Output all the groups, with the active and dateexpires from those joined
                     //
                     f.Add(Adminui.EditTableOpen);
                     GroupCount = 0;
-                    CanSeeHiddenGroups = core.doc.sessionContext.isAuthenticatedDeveloper(core);
+                    CanSeeHiddenGroups = core.sessionContext.isAuthenticatedDeveloper(core);
                     while (core.db.csOk(CS)) {
                         GroupName = core.db.csGet(CS, "GroupName");
                         if ((GroupName.Left(1) != "_") || CanSeeHiddenGroups) {
@@ -9964,7 +9960,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     SQL = "SELECT ccGroups.ID AS ID, ccGroupRules.AllowAdd as allowadd, ccGroupRules.AllowDelete as allowdelete"
                         + " FROM ccGroups LEFT JOIN ccGroupRules ON ccGroups.ID = ccGroupRules.GroupID"
                         + " WHERE (((ccGroupRules.ContentID)=" + editRecord.id + ") AND ((ccGroupRules.Active)<>0) AND ((ccGroups.Active)<>0))";
-                    CS = core.db.csOpenSql_rev("Default", SQL);
+                    CS = core.db.csOpenSql(SQL,"Default");
                     if (core.db.csOk(CS)) {
                         if (true) {
                             GroupRulesSize = 100;
@@ -9992,7 +9988,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     + " Where (((ccGroups.Active) <> " + SQLFalse + ") And ((ccContent.Active) <> " + SQLFalse + "))"
                     + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Name, ccGroups.Caption, ccGroups.SortOrder"
                     + " ORDER BY ccContent.Name, ccGroups.Caption, ccGroups.SortOrder";
-                CS = core.db.csOpenSql_rev("Default", SQL);
+                CS = core.db.csOpenSql(SQL,"Default");
                 if (!core.db.csOk(CS)) {
                     FastString.Add("\r\n<tr><td colspan=\"3\">" + SpanClassAdminSmall + "There are no active groups</span></td></tr>");
                 } else {
@@ -10081,7 +10077,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 stringBuilderLegacyController FastString = null;
                 adminUIController Adminui = new adminUIController(core);
                 //
-                if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                if (core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // ----- Open the panel
                     //
@@ -10098,7 +10094,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         SQL = "SELECT ccContent.ID AS ID, ccGroupRules.AllowAdd as allowadd, ccGroupRules.AllowDelete as allowdelete"
                             + " FROM ccContent LEFT JOIN ccGroupRules ON ccContent.ID = ccGroupRules.ContentID"
                             + " WHERE (((ccGroupRules.GroupID)=" + editRecord.id + ") AND ((ccGroupRules.Active)<>0) AND ((ccContent.Active)<>0))";
-                        CS = core.db.csOpenSql_rev("Default", SQL);
+                        CS = core.db.csOpenSql(SQL,"Default");
                         if (core.db.csOk(CS)) {
                             ContentGroupRulesSize = 100;
                             ContentGroupRules = new ContentGroupRuleType[ContentGroupRulesSize + 1];
@@ -10123,7 +10119,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         + " FROM ccContent"
                         + " Where ccContent.Active<>0"
                         + " ORDER BY ccContent.Name";
-                    CS = core.db.csOpenSql_rev("Default", SQL);
+                    CS = core.db.csOpenSql(SQL,"Default");
                     if (!core.db.csOk(CS)) {
                         FastString.Add("\r\n<tr><td colspan=\"3\">" + SpanClassAdminSmall + "There are no active groups</span></td></tr>");
                     } else {
@@ -10403,11 +10399,11 @@ namespace Contensive.Core.Addons.AdminSite {
                     Criteria = Criteria + "AND" + cdefModel.getContentControlCriteria(core, MenuContentName);
                 }
                 iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "");
-                if (core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                if (core.sessionContext.isAuthenticatedDeveloper(core)) {
                     //
                     // ----- Developer
                     //
-                } else if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // ----- Administrator
                     //
@@ -10836,8 +10832,8 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 // field has some kind of restriction
                                 //
-                                if (!core.doc.sessionContext.user.Developer) {
-                                    if (!core.doc.sessionContext.user.Admin) {
+                                if (!core.sessionContext.user.Developer) {
+                                    if (!core.sessionContext.user.Admin) {
                                         //
                                         // you are not admin
                                         //
@@ -11290,7 +11286,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     return core.webServer.redirect("/" + core.appConfig.adminRoute, "Downloads, Cancel Button Pressed");
                 }
                 //
-                if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Must be a developer
                     //
@@ -11445,7 +11441,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     SQL = "select M.Name as CreatedByName, T.* from ccTasks T left join ccMembers M on M.ID=T.CreatedBy where (T.Command='BuildCSV')or(T.Command='BuildXML') order by T.DateAdded Desc";
                     //Call core.main_TestPoint("Selection SQL=" & SQL)
-                    CS = core.db.csOpenSql_rev("default", SQL, PageSize, PageNumber);
+                    CS = core.db.csOpenSql(SQL,"Default", PageSize, PageNumber);
                     RowPointer = 0;
                     if (!core.db.csOk(CS)) {
                         Cells[0, 1] = "There are no download requests";
@@ -11781,7 +11777,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 ButtonListRight = "";
                 SQLFieldName = "SQLQuery";
                 //
-                if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Must be a developer
                     //
@@ -12101,7 +12097,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // ----- Get the baked version
                     //
-                    BakeName = "AdminMenu" + core.doc.sessionContext.user.id.ToString("00000000");
+                    BakeName = "AdminMenu" + core.sessionContext.user.id.ToString("00000000");
                     tempGetMenuTopMode = genericController.encodeText(core.cache.getObject<string>(BakeName));
                     MenuDelimiterPosition = genericController.vbInstr(1, tempGetMenuTopMode, MenuDelimiter, 1);
                     if (MenuDelimiterPosition > 1) {
@@ -12118,7 +12114,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // There are menu items to bake
                             //
-                            IsAdminLocal = core.doc.sessionContext.isAuthenticatedAdmin(core);
+                            IsAdminLocal = core.sessionContext.isAuthenticatedAdmin(core);
                             if (!IsAdminLocal) {
                                 //
                                 // content managers, need the ContentManagementList
@@ -12359,7 +12355,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     return core.webServer.redirect("/" + core.appConfig.adminRoute, "GetContentChildTool, Cancel Button Pressed");
-                } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     //
                     //
@@ -12397,7 +12393,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             Description = Description + "<div>&nbsp;</div>"
                                 + "<div>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]</div>";
-                            cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.doc.sessionContext.user.id);
+                            cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.sessionContext.user.id);
                             ChildContentID = cdefModel.getContentId(core, ChildContentName);
                             //
                             // Create Group and Rule
@@ -12564,7 +12560,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 } else {
                     SQL = "select Name, ID from ccContent where ParentID=" + ParentID + " and (AllowContentChildTool<>0) and not (allowcontentchildtool is null);";
                 }
-                CS = core.db.csOpenSql_rev("Default", SQL);
+                CS = core.db.csOpenSql(SQL,"Default");
                 while (core.db.csOk(CS)) {
                     RecordName = core.db.csGet(CS, "Name");
                     RecordID = core.db.csGetInteger(CS, "ID");
@@ -12647,7 +12643,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     return core.webServer.redirect("/" + core.appConfig.adminRoute, "HouseKeepingControl, Cancel Button Pressed");
-                } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     //
                     //
@@ -12694,7 +12690,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     PagesTotal = 0;
                     SQL = "SELECT Count(ID) as Result FROM ccVisits;";
-                    CSServers = core.db.csOpenSql_rev("Default", SQL);
+                    CSServers = core.db.csOpenSql(SQL,"Default");
                     if (core.db.csOk(CSServers)) {
                         PagesTotal = core.db.csGetInteger(CSServers, "Result");
                     }
@@ -12706,7 +12702,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     Copy = "unknown";
                     AgeInDays = "unknown";
                     SQL = core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "", "ID", "", 1);
-                    CSServers = core.db.csOpenSql_rev("Default", SQL);
+                    CSServers = core.db.csOpenSql(SQL,"Default");
                     //SQL = "SELECT Top 1 DateAdded FROM ccVisits order by ID;"
                     //CSServers = core.app_openCsSql_Rev_Internal("Default", SQL)
                     if (core.db.csOk(CSServers)) {
@@ -12723,7 +12719,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     PagesTotal = 0;
                     SQL = "SELECT Count(ID) as result  FROM ccViewings;";
-                    CSServers = core.db.csOpenSql_rev("Default", SQL);
+                    CSServers = core.db.csOpenSql(SQL,"Default");
                     if (core.db.csOk(CSServers)) {
                         PagesTotal = core.db.csGetInteger(CSServers, "Result");
                     }
@@ -12979,7 +12975,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // get content access rights
                     //
-                    core.doc.sessionContext.getContentAccessRights(core, adminContent.name, ref allowContentEdit, ref allowContentAdd, ref allowContentDelete);
+                    core.sessionContext.getContentAccessRights(core, adminContent.name, ref allowContentEdit, ref allowContentAdd, ref allowContentDelete);
                     if (!allowContentEdit) {
                         //If Not core.doc.authContext.user.main_IsContentManager2(AdminContent.Name) Then
                         //
@@ -13009,7 +13005,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             }
                         }
                         if (string.IsNullOrEmpty(ExportName)) {
-                            ExportName = adminContent.name + " export for " + core.doc.sessionContext.user.name;
+                            ExportName = adminContent.name + " export for " + core.sessionContext.user.name;
                         }
                         //
                         // Get the SQL parts
@@ -13126,7 +13122,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     + cr2 + "<td class=\"exportTblCaption\">Record Limit</td>"
                                     + cr2 + "<td class=\"exportTblInput\">" + core.html.inputText("RecordLimit", RecordLimitText) + "</td>"
                                     + "\r</tr>";
-                                if (core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                                if (core.sessionContext.isAuthenticatedDeveloper(core)) {
                                     Content = Content + "\r<tr>"
                                         + cr2 + "<td class=\"exportTblCaption\">Results SQL</td>"
                                         + cr2 + "<td class=\"exportTblInput\"><div style=\"border:1px dashed #ccc;background-color:#fff;padding:10px;\">" + SQL + "</div></td>"
@@ -13146,7 +13142,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     + "\r</style>"
                                     + Content + core.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 ButtonList = ButtonCancel + "," + ButtonRequestDownload;
-                                if (core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                                if (core.sessionContext.isAuthenticatedDeveloper(core)) {
                                     ButtonList = ButtonList + "," + ButtonRefresh;
                                 }
                             }
@@ -13818,7 +13814,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // From here down will return a form
                     //
-                    if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                         //
                         // Does not have permission
                         //
@@ -13973,7 +13969,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Cancel just exits with no content
                     //
                     return tempGetForm_BuildCollection;
-                } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //

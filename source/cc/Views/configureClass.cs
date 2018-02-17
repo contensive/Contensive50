@@ -31,6 +31,12 @@ namespace Contensive.CLI {
                     defaultValue = cp.core.serverConfig.name;
                     cp.core.serverConfig.name = cliController.promptForReply(prompt, defaultValue);
                     //
+                    // -- production server?
+                    Console.WriteLine("\n\nIs this instance a production server? Non-production server instances may disable or mock some services, like ecommerce billing or email notifications.");
+                    prompt = "Production Server (y/n)?";
+                    if (cp.core.serverConfig.productionEnvironment) { defaultValue = "y"; } else { defaultValue = "n"; }
+                    cp.core.serverConfig.productionEnvironment = Equals(cliController.promptForReply(prompt, defaultValue).ToLower(), "y");
+                    //
                     // -- local or multiserver mode
                     Console.WriteLine("\n\nLocal or Remote File System");
                     Console.WriteLine("Local File System stores content files on the webserver. Remote File System store content in an Amazon AWS S3 bucket, using the webserver to cache files for read and write.");

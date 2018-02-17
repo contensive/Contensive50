@@ -1,24 +1,10 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
-//
 using System.IO;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
-
 //
 namespace Contensive.Core.Controllers {
     //
@@ -30,7 +16,34 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public static class logController {
         //
-        public static string LogFileCopyPrep(string Source) {
+        public enum logLevel {
+            /// <summary>
+            /// Begin method X, end method X etc
+            /// </summary>
+            Trace = 0,
+            /// <summary>
+            /// Executed queries, user authenticated, session expired
+            /// </summary>
+            Debug = 1,
+            /// <summary>
+            /// Normal behavior like mail sent, user updated profile etc.
+            /// </summary>
+            Info = 2,
+            /// <summary>
+            /// Incorrect behavior but the application can continue
+            /// </summary>
+            Warn = 3,
+            /// <summary>
+            /// For example application crashes / exceptions.
+            /// </summary>
+            Error = 4,
+            /// <summary>
+            /// Highest level: important stuff down
+            /// </summary>
+            Fatal = 5
+        }
+        //
+        private static string LogFileCopyPrep(string Source) {
             string Copy = Source;
             Copy = genericController.vbReplace(Copy, "\r\n", " ");
             Copy = genericController.vbReplace(Copy, "\n", " ");
@@ -40,32 +53,137 @@ namespace Contensive.Core.Controllers {
         //
         //=============================================================================
         /// <summary>
-        /// add the log line to a log file with the folder and prefix
+        /// log Executed queries, user authenticated, session expired
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="LogLine"></param>
-        /// <param name="LogFolder"></param>
-        /// <param name="LogNamePrefix"></param>
-        /// <param name="allowErrorHandling"></param>
+        /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void appendLog(coreController core, string LogLine, string LogFolder = "", string LogNamePrefix = "") {
+        public static void logDebug(coreController core, string message) {
+            log(core, message, logLevel.Debug);
+        }
+        //
+        //=============================================================================
+        /// <summary>
+        /// log application crashes / exceptions
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="message"></param>
+        /// <remarks></remarks>
+        public static void logError(coreController core, string message) {
+            log(core, message, logLevel.Error);
+        }
+        //
+        //=============================================================================
+        /// <summary>
+        /// log highest level, most important messages
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="message"></param>
+        /// <remarks></remarks>
+        public static void logFatal(coreController core, string message) {
+            log(core, message, logLevel.Fatal);
+        }
+        //
+        //=============================================================================
+        /// <summary>
+        /// Normal behavior like mail sent, user updated profile etc
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="message"></param>
+        /// <remarks></remarks>
+        public static void logInfo(coreController core, string message) {
+            log(core, message, logLevel.Info);
+        }
+        //
+        //=============================================================================
+        /// <summary>
+        /// log begin method, end method, etc
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="message"></param>
+        /// <remarks></remarks>
+        public static void logTrace(coreController core, string message) {
+            log(core, message, logLevel.Trace);
+        }
+        //
+        //=============================================================================
+        /// <summary>
+        /// log incorrect behavior but the application can continue
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="message"></param>
+        /// <remarks></remarks>
+        public static void logWarn(coreController core, string message) {
+            log(core, message, logLevel.Warn);
+        }
+        //
+        //=============================================================================
+        /// <summary>
+        /// log any level with NLOG without considering configuration. Onle use in extreme cases where the application environment is not stable.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="message"></param>
+        /// <param name="level"></param>
+        public static void logWithoutConfig(string message, logLevel level ) {
             try {
-                if (string.IsNullOrEmpty(LogFolder) || core.serverConfig.enableLogging) {
+                string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
+                string logContent = level.ToString() + "\tthread:" + threadName + "\t" + message;
+                //
+                // decouple NLog types from internal enum
+                switch (level) {
+                    case logLevel.Trace:
+                        Console.WriteLine("Trace:" + message);
+                        NLogController.loggerInstance.Trace(message);
+                        break;
+                    case logLevel.Debug:
+                        Console.WriteLine("Debug:" + message);
+                        NLogController.loggerInstance.Debug(message);
+                        break;
+                    case logLevel.Info:
+                        Console.WriteLine("Info:" + message);
+                        NLogController.loggerInstance.Info(message);
+                        break;
+                    case logLevel.Warn:
+                        Console.WriteLine("Warn:" + message);
+                        NLogController.loggerInstance.Warn(message);
+                        break;
+                    case logLevel.Error:
+                        Console.WriteLine("Error:" + message);
+                        NLogController.loggerInstance.Error(message);
+                        break;
+                    case logLevel.Fatal:
+                        Console.WriteLine("Fatal:" + message);
+                        NLogController.loggerInstance.Fatal(message);
+                        break;
+                }
+            } catch (Exception) {
+                // -- ignore errors in error handling
+            } finally {
+                //
+            }
+        }
+        //
+        //=============================================================================
+        /// <summary>
+        /// Log all levels if configured, else log errors and above
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="message"></param>
+        /// <param name="level"></param>
+        public static void log(coreController core, string message, logLevel level) {
+            try {
+                if ((level >= logLevel.Error) || core.serverConfig.enableLogging) {
                     //
                     // -- logging enabled or trace log, append log
-                    string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
                     if (core.useNlog) {
                         //
-                        string logContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine;
-                        Console.WriteLine(LogLine);
-                        //
-                        // todo: implement this singleton in coreclass so logController can be static
-                        // todo: work log levels into the internal logging system
-                        Log.Instance.Info(LogLine);
+                        // -- log to Nlog
+                        logWithoutConfig(message, level);
                     } else {
+                        string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
+                        string logContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\t" + level.ToString() + "\tthread:" + threadName + "\t" + message;
                         //
-                        string logContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine;
-                        Console.WriteLine(LogLine);
+                        Console.WriteLine(message);
                         //
                         fileController fileSystem = null;
                         if (core.serverConfig != null) {
@@ -85,12 +203,9 @@ namespace Contensive.Core.Controllers {
                         }
                         //
                         try {
-                            string FilenameNoExt = getDateString(DateTime.Now);
-                            string logPath = LogFolder;
-                            if (!string.IsNullOrEmpty(logPath)) {
-                                logPath = logPath + "\\";
-                            }
-                            logPath = "logs\\" + logPath;
+                            DateTime rightNow = DateTime.Now;
+                            string FilenameNoExt = rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0');
+                            string logPath = "logs\\";
                             //
                             // check for serverconfig, then for appConfig, else use programdata folder
                             //
@@ -146,64 +261,19 @@ namespace Contensive.Core.Controllers {
             }
         }
         //
-        //========================================================================
+        //=====================================================================================================
         /// <summary>
-        /// Append log, use the legacy row with tab delimited context
+        /// add activity about a user to the site's activity log for content managers to review
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="ContensiveAppName"></param>
-        /// <param name="contextDescription"></param>
-        /// <param name="processName"></param>
-        /// <param name="ClassName"></param>
-        /// <param name="MethodName"></param>
-        /// <param name="ErrNumber"></param>
-        /// <param name="ErrSource"></param>
-        /// <param name="ErrDescription"></param>
-        /// <param name="ErrorTrap"></param>
-        /// <param name="ResumeNextAfterLogging"></param>
-        /// <param name="URL"></param>
-        /// <param name="LogFolder"></param>
-        /// <param name="LogNamePrefix"></param>
-        /// <remarks></remarks>
-        internal static void appendLogWithLegacyRow(coreController core, string ContensiveAppName, string contextDescription, string processName, string ClassName, string MethodName, int ErrNumber, string ErrSource, string ErrDescription, bool ErrorTrap, bool ResumeNextAfterLogging, string URL, string LogFolder, string LogNamePrefix) {
-            try {
-                string ErrorMessage = null;
-                string LogLine = null;
-                string ResumeMessage = null;
-                //
-                if (ErrorTrap) {
-                    ErrorMessage = "Error Trap";
-                } else {
-                    ErrorMessage = "Log Entry";
-                }
-                //
-                if (ResumeNextAfterLogging) {
-                    ResumeMessage = "Resume after logging";
-                } else {
-                    ResumeMessage = "Abort after logging";
-                }
-                //
-                LogLine = ""
-                    + LogFileCopyPrep(ContensiveAppName) + "\t" + LogFileCopyPrep(processName) + "\t" + LogFileCopyPrep(ClassName) + "\t" + LogFileCopyPrep(MethodName) + "\t" + LogFileCopyPrep(contextDescription) + "\t" + LogFileCopyPrep(ErrorMessage) + "\t" + LogFileCopyPrep(ResumeMessage) + "\t" + LogFileCopyPrep(ErrSource) + "\t" + LogFileCopyPrep(ErrNumber.ToString()) + "\t" + LogFileCopyPrep(ErrDescription) + "\t" + LogFileCopyPrep(URL) + "";
-                //
-                appendLog(core, LogLine, LogFolder, LogNamePrefix);
-            } catch (Exception) {
-
-            }
-        }
-
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Create a string with year, month, date in the form 20151206
-        /// </summary>
-        public static string getDateString(DateTime sourceDate) {
-            return sourceDate.Year + sourceDate.Month.ToString().PadLeft(2, '0') + sourceDate.Day.ToString().PadLeft(2, '0');
-        }
-        //
-        //=====================================================================================================
-        //   Insert into the ActivityLog
-        internal static void logActivity(coreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
+        /// <param name="Message"></param>
+        /// <param name="ByMemberID"></param>
+        /// <param name="SubjectMemberID"></param>
+        /// <param name="SubjectOrganizationID"></param>
+        /// <param name="Link"></param>
+        /// <param name="VisitorID"></param>
+        /// <param name="VisitID"></param>
+        public static void addSiteActivity(coreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
             try {
                 //
                 int CS;
@@ -228,42 +298,53 @@ namespace Contensive.Core.Controllers {
             throw (new Exception("Unexpected exception"));
         }
         //
-        //
-        internal static void logActivity2(coreController core, string Message, int SubjectMemberID, int SubjectOrganizationID) {
-            logActivity(core, Message, core.doc.sessionContext.user.id, SubjectMemberID, SubjectOrganizationID, core.webServer.requestUrl, core.doc.sessionContext.visitor.id, core.doc.sessionContext.visit.id);
-        }
-        //
-        //
-        //
-        internal static void appendLogPageNotFound(coreController core, string PageNotFoundLink) {
-            appendLog(core, "bad link [" + PageNotFoundLink + "], referrer [" + core.webServer.requestReferrer + "]", "BadLink");
+        //=====================================================================================================
+        /// <summary>
+        /// add activity about a user to the site's activity log for content managers to review
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Message"></param>
+        /// <param name="SubjectMemberID"></param>
+        /// <param name="SubjectOrganizationID"></param>
+        public static void addSiteActivity(coreController core, string Message, int SubjectMemberID, int SubjectOrganizationID) {
+            addSiteActivity(core, Message, core.sessionContext.user.id, SubjectMemberID, SubjectOrganizationID, core.webServer.requestUrl, core.sessionContext.visitor.id, core.sessionContext.visit.id);
         }
         //
         //================================================================================================
-        //   Report Warning
-        //       A warning is logged in the site warnings log
-        //           name - a generic description of the warning
-        //               "bad link found on page"
-        //           short description - a <255 character cause
-        //               "bad link http://thisisabadlink.com"
-        //           location - the URL, service or process that caused the problem
-        //               "http://goodpageThankHasBadLink.com"
-        //           pageid - the record id of the bad page.
-        //               "http://goodpageThankHasBadLink.com"
-        //           description - a specific description
-        //               "link to http://www.this.com/pagename was found on http://www.this.com/About-us"
-        //           generalKey - a generic string that describes the warning. the warning report
-        //               will display one line for each generalKey (name matches guid)
-        //               like "bad link"
-        //           specificKey - a string created by the addon logging so it does not continue to log exactly the
-        //               same warning over and over. If there are 100 different link not found warnings,
-        //               there should be 100 entires with the same guid and name, but 100 different keys. If the
-        //               an identical key is found the count increments.
-        //               specifickey is like "link to http://www.this.com/pagename was found on http://www.this.com/About-us"
-        //           count - the number of times the key was attempted to add. "This error was reported 100 times"
-        //================================================================================================
+        /// <summary>
+        /// Add a site Warning: for content managers to make content changes with the site
+        ///   Report Warning
+        ///       A warning is logged in the site warnings log
+        ///           name - a generic description of the warning
+        ///               "bad link found on page"
+        ///           short description - a 255 character cause
+        ///               "bad link http://thisisabadlink.com"
+        ///           location - the URL, service or process that caused the problem
+        ///               "http://goodpageThankHasBadLink.com"
+        ///           pageid - the record id of the bad page.
+        ///               "http://goodpageThankHasBadLink.com"
+        ///           description - a specific description
+        ///               "link to http://www.this.com/pagename was found on http://www.this.com/About-us"
+        ///           generalKey - a generic string that describes the warning. the warning report
+        ///               will display one line for each generalKey (name matches guid)
+        ///               like "bad link"
+        ///           specificKey - a string created by the addon logging so it does not continue to log exactly the
+        ///               same warning over and over. If there are 100 different link not found warnings,
+        ///               there should be 100 entires with the same guid and name, but 100 different keys. If the
+        ///               an identical key is found the count increments.
+        ///               specifickey is like "link to http://www.this.com/pagename was found on http://www.this.com/About-us"
+        ///           count - the number of times the key was attempted to add. "This error was reported 100 times"
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Name"></param>
+        /// <param name="shortDescription"></param>
+        /// <param name="location"></param>
+        /// <param name="PageID"></param>
+        /// <param name="Description"></param>
+        /// <param name="generalKey"></param>
+        /// <param name="specificKey"></param>
         //
-        public static void reportWarning(coreController core, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
+        public static void addSiteWarning(coreController core, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
             string SQL = null;
             int warningId = 0;
             int CS = 0;
@@ -308,60 +389,15 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        //
-        public static void appendLogCache(coreController core, string message) {
-            appendLog(core, message, "cache");
-        }
-        //
-        //====================================================================================================
-        //
-        public static void appendLogDebug(coreController core, string message) {
-            appendLog(core, message, "debug");
-        }
-        //
-        //====================================================================================================
-        //
-        public static void appendLogInstall(coreController core, string message) {
-            appendLog(core, message, "install");
-        }
-        //
-        //====================================================================================================
-        //
-        public static void appendLogTasks(coreController core, string message) {
-            appendLog(core, message, "tasks");
-        }
-        //
-        //====================================================================================================
-        //
-        public static void housekeepLogFolder(coreController core) {
+        /// <summary>
+        /// not implemented, as current logging system does not need to be housekeeped. Keep the hood here for the future
+        /// </summary>
+        /// <param name="core"></param>
+        public static void housekeepLogs(coreController core) {
             try {
                 // -- deprecated, NLog handles housekeeping
-                //
-                //DateTime LogDate = default(DateTime);
-                ////Dim fs As New fileSystemClass
-                //FileInfo[] FileList = null;
-                ////
-                //LogDate = DateTime.Now.AddDays(-30);
-                //FileList = core.privateFiles.getFileList("logs\\");
-                //foreach (FileInfo file in FileList) {
-                //    if (file.CreationTime < LogDate) {
-                //        core.privateFiles.deleteFile("logs\\" + file.Name);
-                //    }
-                //}
-                //
                 return;
-                //
             } catch (Exception) { }
-        }
-        //
-        // ====================================================================================================
-        /// <summary>
-        /// log to the program data folder. Use only when the application object is not available
-        /// </summary>
-        /// <param name="message"></param>
-        public static void appendLogProgramData(string message) {
-            string programDataPath = fileController.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\";
-            System.IO.File.AppendAllText(programDataPath + getDateString(DateTime.Now) + ".log", message);
         }
     }
     //
@@ -369,22 +405,25 @@ namespace Contensive.Core.Controllers {
     /// <summary>
     /// logging class from https://brutaldev.com/post/logging-setup-in-5-minutes-with-nlog
     /// </summary>
-    internal static class Log {
-        public static Logger Instance { get; private set; }
-        static Log() {
+    internal static class NLogController {
+        public static Logger loggerInstance { get; private set; }
+        static NLogController() {
 #if DEBUG
-            // Setup the logging view for Sentinel - http://sentinel.codeplex.com
+            // from example - https://github.com/nlog/nlog/wiki/Configuration-API
+            // and - Setup the logging view for Sentinel - http://sentinel.codeplex.com
+            var config = new LoggingConfiguration();
             var sentinalTarget = new NLogViewerTarget() {
                 Name = "sentinal",
                 Address = "udp://127.0.0.1:9999",
                 IncludeNLogData = false
             };
             var sentinalRule = new LoggingRule("*", LogLevel.Trace, sentinalTarget);
-            LogManager.Configuration.AddTarget("sentinal", sentinalTarget);
-            LogManager.Configuration.LoggingRules.Add(sentinalRule);            
+            config.AddTarget("sentinal", sentinalTarget);
+            config.LoggingRules.Add(sentinalRule);
+            LogManager.Configuration = config;
 #endif
             LogManager.ReconfigExistingLoggers();
-            Instance = LogManager.GetCurrentClassLogger();
+            loggerInstance = LogManager.GetCurrentClassLogger();
         }
 
     }

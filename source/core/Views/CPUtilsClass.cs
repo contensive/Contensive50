@@ -222,9 +222,8 @@ namespace Contensive.Core {
         public override string ExecuteAddonAsProcess(string IdGuidOrName) {
             return CP.core.addon.executeAsync(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar());
         }
-        [Obsolete("Deprecated, use AppendLog")]
-        public override void AppendLogFile(string Text) {
-            logController.appendLog(CP.core, Text);
+        [Obsolete("Deprecated, use AppendLog")] public override void AppendLogFile(string Text) {
+            logController.logError(CP.core, Text);
         }
         //
         // ====================================================================================================
@@ -233,26 +232,18 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <param name="Text"></param>
-        public override void AppendLog(string pathFilename, string Text) {
+        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages")] public override void AppendLog(string pathFilename, string Text) {
             if ((!string.IsNullOrWhiteSpace(pathFilename)) & (!string.IsNullOrWhiteSpace(Text))) {
                 pathFilename = genericController.convertToDosSlash(pathFilename);
                 string[] parts = pathFilename.Split('\\');
-                if (parts.Count() == 1) {
-                    //
-                    // -- use pathFilename as prefix
-                    logController.appendLog( CP.core, Text, "", System.IO.Path.GetFileNameWithoutExtension(pathFilename));
-                } else {
-                    //
-                    // -- use pathFilename[0] as path, filename as prefix
-                    logController.appendLog(CP.core, Text, parts[0], System.IO.Path.GetFileNameWithoutExtension(parts[(parts.Count()-1)]));
-                }
+                logController.logError(CP.core, "legacy logFile: [" + pathFilename + "]" + Text);
             }
         }
         //
         // ====================================================================================================
         //
         public override void AppendLog(string Text) {
-            logController.appendLog(CP.core, Text);
+            logController.logError(CP.core, Text);
         }
         //
         // ====================================================================================================

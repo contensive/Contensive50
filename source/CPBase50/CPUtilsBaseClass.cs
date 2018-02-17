@@ -141,9 +141,8 @@ namespace Contensive.BaseClasses
 		public abstract string ExecuteAddon(string IdGuidOrName, int WrapperId);
 		public abstract string ExecuteAddon(string IdGuidOrName, addonContext context);
 		public abstract string ExecuteAddonAsProcess(string IdGuidOrName);
-		[Obsolete("Deprecated, use AppendLog")]
-		public abstract void AppendLogFile(string Text);
-		public abstract void AppendLog(string pathFilename, string logText);
+		[Obsolete("Deprecated, use AppendLog",false)] public abstract void AppendLogFile(string Text);
+        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", false)] public abstract void AppendLog(string pathFilename, string logText);
 		public abstract void AppendLog(string logText);
 		public abstract string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath);
 		public abstract string ConvertShortLinkToLink(string URL, string PathPagePrefix);

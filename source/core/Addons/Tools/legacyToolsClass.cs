@@ -179,7 +179,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // ----- Check permissions
                 //
-                if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // You must be admin to use this feature
                     //
@@ -529,7 +529,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 SQLFilename = core.userProperty.getText("SQLArchive");
                 if (string.IsNullOrEmpty(SQLFilename)) {
-                    SQLFilename = "SQLArchive" + core.doc.sessionContext.user.id.ToString("000000000") + ".txt";
+                    SQLFilename = "SQLArchive" + core.sessionContext.user.id.ToString("000000000") + ".txt";
                     core.userProperty.setProperty("SQLArchive", SQLFilename);
                 }
                 SQLArchive = core.cdnFiles.readFileText(SQLFilename);
@@ -1553,7 +1553,7 @@ namespace Contensive.Core.Addons.Tools {
                                     + " GROUP BY ccContent.Name, ccContent.Active"
                                     + " Having (((Count(ccContent.ID)) > 1) And ((ccContent.active) <> 0))"
                                     + " ORDER BY Count(ccContent.ID) DESC;";
-                            CSPointer = core.db.csOpenSql_rev("Default", SQL);
+                            CSPointer = core.db.csOpenSql(SQL,"Default");
                             if (core.db.csOk(CSPointer)) {
                                 while (core.db.csOk(CSPointer)) {
                                     DiagProblem = "PROBLEM: There are " + core.db.csGetText(CSPointer, "RecordCount") + " records in the Content table with the name [" + core.db.csGetText(CSPointer, "Name") + "]";
@@ -1561,7 +1561,7 @@ namespace Contensive.Core.Addons.Tools {
                                     DiagActions[0].Name = "Ignore, or handle this issue manually";
                                     DiagActions[0].Command = "";
                                     DiagActions[1].Name = "Mark all duplicate definitions inactive";
-                                    DiagActions[1].Command = DiagActionContentDeDupe.ToString() + "," + core.db.cs_getValue(CSPointer, "name");
+                                    DiagActions[1].Command = DiagActionContentDeDupe.ToString() + "," + core.db.csGetValue(CSPointer, "name");
                                     Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                     core.db.csGoNext(CSPointer);
                                 }
@@ -1577,7 +1577,7 @@ namespace Contensive.Core.Addons.Tools {
                             SQL = "SELECT ccFields.required AS FieldRequired, ccFields.Authorable AS FieldAuthorable, ccFields.Type AS FieldType, ccFields.Name AS FieldName, ccContent.ID AS ContentID, ccContent.Name AS ContentName, ccTables.Name AS TableName, ccDataSources.Name AS DataSourceName"
                                     + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN (ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID) ON ccContent.ContentTableID = ccTables.ID"
                                     + " WHERE (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0)) OR (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0));";
-                            CS = core.db.csOpenSql_rev("Default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             if (!core.db.csOk(CS)) {
                                 DiagProblem = "PROBLEM: No Content entries were found in the content table.";
                                 DiagActions = new DiagActionType[2];
@@ -1704,7 +1704,7 @@ namespace Contensive.Core.Addons.Tools {
                                                         // ----- lookup type, read value and check lookup contentid
                                                         //
                                                         ErrorCount = core.doc.errorCount;
-                                                        bitBucket = core.db.cs_getValue(CSTestRecord, FieldName);
+                                                        bitBucket = core.db.csGetValue(CSTestRecord, FieldName);
                                                         if (ErrorCount != core.doc.errorCount) {
                                                             DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
                                                             DiagActions = new DiagActionType[2];
@@ -1735,7 +1735,7 @@ namespace Contensive.Core.Addons.Tools {
                                                         // ----- check for value in database
                                                         //
                                                         ErrorCount = core.doc.errorCount;
-                                                        bitBucket = core.db.cs_getValue(CSTestRecord, FieldName);
+                                                        bitBucket = core.db.csGetValue(CSTestRecord, FieldName);
                                                         if (ErrorCount != core.doc.errorCount) {
                                                             DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
                                                             DiagActions = new DiagActionType[4];
@@ -1866,7 +1866,7 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         // No columns found, set name as Column 0, active as column 1
                         //
-                        core.db.cs_goFirst(CSPointer);
+                        core.db.csGoFirst(CSPointer);
                         while (core.db.csOk(CSPointer)) {
                             switch (genericController.vbUCase(core.db.csGetText(CSPointer, "name"))) {
                                 case "ACTIVE":
@@ -1887,7 +1887,7 @@ namespace Contensive.Core.Addons.Tools {
                     // ----- Now go back and set a normalized Width value
                     //
                     if (ColumnWidthTotal > 0) {
-                        core.db.cs_goFirst(CSPointer);
+                        core.db.csGoFirst(CSPointer);
                         while (core.db.csOk(CSPointer)) {
                             ColumnWidth = core.db.csGetInteger(CSPointer, "IndexWidth");
                             ColumnWidth = encodeInteger((ColumnWidth * 100) / (double)ColumnWidthTotal);
@@ -1978,7 +1978,7 @@ namespace Contensive.Core.Addons.Tools {
                         // Create Definition
                         //
                         Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]");
-                        Models.Complex.cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.doc.sessionContext.user.id);
+                        Models.Complex.cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.sessionContext.user.id);
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();
@@ -2101,7 +2101,7 @@ namespace Contensive.Core.Addons.Tools {
                             }
                             core.db.csGoNext(CSContent);
                         } while (core.db.csOk(CSContent));
-                        ContentNameArray = core.db.cs_getRows(CSContent);
+                        ContentNameArray = core.db.csGetRows(CSContent);
                         ContentNameCount = ContentNameArray.GetUpperBound(1) + 1;
                     }
                     core.db.csClose(ref CSContent);
@@ -2296,7 +2296,7 @@ namespace Contensive.Core.Addons.Tools {
                         while (core.db.csOk(CS)) {
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                            TestCopy = genericController.encodeText(core.db.cs_getValue(CS, "Name"));
+                            TestCopy = genericController.encodeText(core.db.csGetValue(CS, "Name"));
                             ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
@@ -2332,7 +2332,7 @@ namespace Contensive.Core.Addons.Tools {
                         while (core.db.csOk(CS)) {
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                            TestCopy = genericController.encodeText(core.db.cs_getValue(CS, "Name"));
+                            TestCopy = genericController.encodeText(core.db.csGetValue(CS, "Name"));
                             ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
@@ -2798,7 +2798,7 @@ namespace Contensive.Core.Addons.Tools {
                                                 //
                                                 CSTarget = core.db.csInsertRecord("Content Fields");
                                                 if (core.db.csOk(CSTarget)) {
-                                                    CSSource = core.db.cs_openContentRecord("Content Fields", formFieldId);
+                                                    CSSource = core.db.csOpenContentRecord("Content Fields", formFieldId);
                                                     if (core.db.csOk(CSSource)) {
                                                         core.db.csCopyRecord(CSSource, CSTarget);
                                                     }
@@ -2863,10 +2863,10 @@ namespace Contensive.Core.Addons.Tools {
                                                     }
                                                     SQL = "Update ccFields"
                                                 + " Set name=" + core.db.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + core.db.encodeSQLText(genericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
-                                                    if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                                                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
                                                         SQL += ",adminonly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." + RecordPointer));
                                                     }
-                                                    if (core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                                                    if (core.sessionContext.isAuthenticatedDeveloper(core)) {
                                                         SQL += ",DeveloperOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." + RecordPointer));
                                                     }
                                                     SQL += " where ID=" + formFieldId;
@@ -3195,13 +3195,13 @@ namespace Contensive.Core.Addons.Tools {
                             //
                             // Admin Only
                             //
-                            if (core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                            if (core.sessionContext.isAuthenticatedAdmin(core)) {
                                 streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, genericController.encodeText(fieldsort.field.adminOnly), fieldsort.field.inherited));
                             }
                             //
                             // Developer Only
                             //
-                            if (core.doc.sessionContext.isAuthenticatedDeveloper(core)) {
+                            if (core.sessionContext.isAuthenticatedDeveloper(core)) {
                                 streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, genericController.encodeText(fieldsort.field.developerOnly), fieldsort.field.inherited));
                             }
                             //
@@ -3457,7 +3457,7 @@ namespace Contensive.Core.Addons.Tools {
                 SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName, ccFieldTypes.Name as FieldType"
                         + " FROM ((ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID) LEFT JOIN ccFields ON ccContent.ID = ccFields.ContentID) LEFT JOIN ccFieldTypes ON ccFields.Type = ccFieldTypes.ID"
                         + " ORDER BY ccTables.Name, ccFields.Name;";
-                CS = core.db.csOpenSql_rev("Default", SQL);
+                CS = core.db.csOpenSql(SQL,"Default");
                 TableName = "";
                 while (core.db.csOk(CS)) {
                     if (TableName != core.db.csGetText(CS, "TableName")) {
@@ -3757,7 +3757,7 @@ namespace Contensive.Core.Addons.Tools {
                 ButtonList = ButtonCancel + "," + ButtonRestartContensiveApplication;
                 Stream.Add(GetTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."));
                 //
-                if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     tempGetForm_Restart = "<P>You must be an administrator to use this tool.</P>";
                     //
@@ -3768,7 +3768,7 @@ namespace Contensive.Core.Addons.Tools {
                 } else {
                     //
                     // Restart
-                    logController.appendLogWithLegacyRow(core, core.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " + core.doc.sessionContext.user.name + " (" + core.doc.sessionContext.user.id + ") restarted using the Restart tool", false, true, core.webServer.requestUrl, "", "");
+                    logController.logDebug(core, "Restarting Contensive");
                     core.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
                     //
@@ -4231,7 +4231,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 Button = core.docProperties.getText("button");
                 //
-                IsDeveloper = core.doc.sessionContext.isAuthenticatedDeveloper(core);
+                IsDeveloper = core.sessionContext.isAuthenticatedDeveloper(core);
                 if (Button == ButtonFindAndReplace) {
                     RowCnt = core.docProperties.getInteger("CDefRowCnt");
                     if (RowCnt > 0) {
@@ -4332,8 +4332,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     //
                     //
-                    logController.appendLogWithLegacyRow(core, core.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " + core.doc.sessionContext.user.name + " (" + core.doc.sessionContext.user.id + ") executed an IISReset using the IISReset tool", false, true, core.webServer.requestUrl, "", "");
-                    //runAtServer = New runAtServerClass(core)
+                    logController.logDebug(core, "Restarting IIS");
                     core.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
                     cmdDetailClass cmdDetail = new cmdDetailClass();

@@ -236,19 +236,19 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void LogActivity(string Message, int UserID, int OrganizationID) {
-            logController.logActivity(core, Message, 0, UserID, OrganizationID);
+            logController.addSiteActivity(core, Message, 0, UserID, OrganizationID);
         }
         //
         //====================================================================================================
         //
         public override void LogWarning(string name, string description, string typeOfWarningKey, string instanceKey) {
-            logController.reportWarning(core, name, description, "", 0, description, typeOfWarningKey, instanceKey);
+            logController.addSiteWarning(core, name, description, "", 0, description, typeOfWarningKey, instanceKey);
         }
         //
         //====================================================================================================
         //
         public override void LogAlarm(string cause) {
-            logController.appendLog(core, cause, "Alarm");
+            logController.logFatal(core, "logAlarm: " + cause);
         }
         //
         //====================================================================================================

@@ -20,29 +20,13 @@ using System.Security.Cryptography;
 namespace Contensive.Core.Controllers {
     public class securityController {
         //
-        // privateKey
-        //
-        private string _privateKey = "";
-        private coreController core;
-        //
-        //====================================================================================================
-        /// <summary>
-        /// constructor
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="privateKey"></param>
-        public securityController(coreController core, string privateKey) {
-            this.core = core;
-            _privateKey = privateKey;
-        }
-        //
         //====================================================================================================
         /// <summary>
         /// return an encrypted string. This is a one way so use it passwords, etc.
         /// </summary>
         /// <param name="password"></param>
         /// <returns></returns>
-        public string oneWayEncrypt(string password) {
+        public static  string oneWayEncrypt(coreController core, string password) {
             string returnResult = "";
             try {
                 returnResult = hashEncode.ComputeHash(password, "SHA512", null);
@@ -59,7 +43,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="sourceToTest"></param>
         /// <returns></returns>
-        public bool oneWayVerify(string sourceToTest, string encryptedTaken) {
+        public static bool oneWayVerify(coreController core, string sourceToTest, string encryptedTaken) {
             bool returnResult = false;
             try {
                 returnResult = hashEncode.VerifyHash(sourceToTest, "SHA512", encryptedTaken);
@@ -76,7 +60,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="sourceToEncrypt"></param>
         /// <returns></returns>
-        public string twoWayEncrypt(string sourceToEncrypt) {
+        public static  string twoWayEncrypt(coreController core, string sourceToEncrypt) {
             string returnResult = "";
             try {
                 byte[] Buffer = null;
@@ -84,11 +68,11 @@ namespace Contensive.Core.Controllers {
                 MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
                 ICryptoTransform DESEncrypt = null;
                 //
-                if (string.IsNullOrEmpty(_privateKey)) {
+                if (string.IsNullOrEmpty(core.appConfig.privateKey)) {
                     //
                 } else {
                     // Compute the MD5 hash.
-                    DES.Key = hashMD5.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(_privateKey));
+                    DES.Key = hashMD5.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey));
                     // Set the cipher mode.
                     DES.Mode = CipherMode.ECB;
                     // Create the encryptor.
@@ -108,11 +92,11 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// return an decrypted string. This is a two way so use it for little sister security, not foreign government security
+        /// return an decrypted string. Exception thrown if decryption error. This is a two way so use it for little sister security, not foreign government security
         /// </summary>
         /// <param name="sourceToDecrypt"></param>
         /// <returns></returns>
-        public string twoWayDecrypt(string sourceToDecrypt) {
+        public static  string twoWayDecrypt(coreController core, string sourceToDecrypt) {
             string returnResult = "";
             try {
                 byte[] buffer = null;
@@ -123,7 +107,7 @@ namespace Contensive.Core.Controllers {
                     //
                 } else {
                     // Compute the MD5 hash.
-                    buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(_privateKey);
+                    buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
                     DES.Key = hashMD5.ComputeHash(buffer);
                     // Set the cipher mode.
                     DES.Mode = CipherMode.ECB;
@@ -404,11 +388,11 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //
-        public string encodeToken(int keyInteger, DateTime keyDate) {
+        public static string encodeToken(coreController core, int keyInteger, DateTime keyDate) {
             string returnToken = "";
             try {
                 string sourceText = keyInteger.ToString() + "\t" + keyDate.ToString();
-                returnToken = twoWayEncrypt(sourceText);
+                returnToken = twoWayEncrypt(core,sourceText);
             } catch (Exception ex) {
                 core.handleException(ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + keyDate + "]");
                 returnToken = "";
@@ -421,12 +405,12 @@ namespace Contensive.Core.Controllers {
         //       result is 0 if there was a decode error
         //========================================================================
         //
-        public void decodeToken(string token, ref int returnNumber, ref DateTime returnDate) {
+        public static void decodeToken(coreController core, string token, ref int returnNumber, ref DateTime returnDate) {
             try {
                 string decodedString = "";
                 string[] parts = null;
                 //
-                decodedString = twoWayDecrypt(token);
+                decodedString = twoWayDecrypt(core, token);
                 parts = decodedString.Split(Convert.ToChar("\t"));
                 if (parts.Length == 2) {
                     returnNumber = genericController.encodeInteger(parts[0]);

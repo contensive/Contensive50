@@ -190,7 +190,7 @@ namespace Contensive.Core.Models.DbModels {
                         core.cache.setAlias(cacheName1, cacheName0);
                     }
                 }
-                cs.Close();
+                cs.close();
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -211,12 +211,12 @@ namespace Contensive.Core.Models.DbModels {
                 if (ID > 0) {
                     if (!cs.open(primaryContentName, "id=" + ID)) {
                         ID = 0;
-                        cs.Close();
+                        cs.close();
                         throw new ApplicationException("Unable to open record in content [" + primaryContentName + "], with id [" + ID + "]");
                     }
                 } else {
                     if (!cs.insert(primaryContentName)) {
-                        cs.Close();
+                        cs.close();
                         ID = 0;
                         throw new ApplicationException("Unable to insert record in content [" + primaryContentName + "]");
                     }
@@ -245,7 +245,7 @@ namespace Contensive.Core.Models.DbModels {
                     cs.setField("PublicJoin", PublicJoin.ToString());
                     cs.setField("SortOrder", SortOrder);
                 }
-                cs.Close();
+                cs.close();
                 //
                 // -- invalidate objects
                 // -- no, the primary is invalidated by the cs.save()
@@ -347,7 +347,7 @@ namespace Contensive.Core.Models.DbModels {
                         cs.goNext();
                     } while (cs.ok());
                 }
-                cs.Close();
+                cs.close();
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;

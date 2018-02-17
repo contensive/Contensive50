@@ -184,11 +184,11 @@ namespace Contensive.Core.Models.Context {
                             if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
                                 //
                                 // -- allow Link Login
-                                core.security.decodeToken(MemberLinkinEID, ref MemberLinkLoginID, ref tokenDate);
+                                securityController.decodeToken(core, MemberLinkinEID, ref MemberLinkLoginID, ref tokenDate);
                             } else if (core.siteProperties.getBoolean("AllowLinkRecognize", true)) {
                                 //
                                 // -- allow Link Recognize
-                                core.security.decodeToken(MemberLinkinEID, ref MemberLinkRecognizeID, ref tokenDate);
+                                securityController.decodeToken(core,MemberLinkinEID, ref MemberLinkRecognizeID, ref tokenDate);
                             } else {
                                 //
                                 // -- block link login
@@ -202,7 +202,7 @@ namespace Contensive.Core.Models.Context {
                             if (!string.IsNullOrEmpty(visitCookie)) {
                                 //
                                 // -- visit cookie found
-                                core.security.decodeToken(visitCookie, ref cookieVisitId, ref visitCookieTimestamp);
+                                securityController.decodeToken(core, visitCookie, ref cookieVisitId, ref visitCookieTimestamp);
                                 if (cookieVisitId == 0) {
                                     //
                                     // -- Bad Cookie, clear it so a new one will be written
@@ -286,7 +286,7 @@ namespace Contensive.Core.Models.Context {
                                         //
                                         // -- auto recognize, setup user based on visitor
                                         int cookieVisitorId = 0;
-                                        core.security.decodeToken(CookieVisitor, ref cookieVisitorId, ref tokenDate);
+                                        securityController.decodeToken(core,CookieVisitor, ref cookieVisitorId, ref tokenDate);
                                         if (cookieVisitorId != 0) {
                                             //
                                             // -- visitor cookie good
@@ -323,7 +323,7 @@ namespace Contensive.Core.Models.Context {
                                             if (lastVisit != null) {
                                                 if (lastVisit.VisitAuthenticated && (lastVisit.MemberID == resultSessionContext.visit.id)) {
                                                     if (resultSessionContext.authenticateById(core, resultSessionContext.user.id, resultSessionContext)) {
-                                                        logController.logActivity2(core, "autologin", resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                                        logController.addSiteActivity(core, "autologin", resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                                         visitor_changes = true;
                                                         user_changes = true;
                                                     }
@@ -332,7 +332,7 @@ namespace Contensive.Core.Models.Context {
                                         } else {
                                             //
                                             // -- Recognized, not auto login
-                                            logController.logActivity2(core, "recognized", resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                            logController.addSiteActivity(core, "recognized", resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                         }
                                     }
                                 }
@@ -443,7 +443,7 @@ namespace Contensive.Core.Models.Context {
                                 //
                                 // -- new visit, update the persistant visitor cookie
                                 if (trackVisits) {
-                                    core.webServer.addResponseCookie(main_appNameCookiePrefix + main_cookieNameVisitor, core.security.encodeToken(resultSessionContext.visitor.id, resultSessionContext.visit.StartTime), resultSessionContext.visit.StartTime.AddYears(1), "", requestAppRootPath, false);
+                                    core.webServer.addResponseCookie(main_appNameCookiePrefix + main_cookieNameVisitor, securityController.encodeToken( core,resultSessionContext.visitor.id, resultSessionContext.visit.StartTime), resultSessionContext.visit.StartTime.AddYears(1), "", requestAppRootPath, false);
                                 }
                                 //
                                 // -- OnNewVisit Add-on call
@@ -467,13 +467,13 @@ namespace Contensive.Core.Models.Context {
                                 //
                                 // -- Link Login
                                 if (resultSessionContext.authenticateById(core, MemberLinkLoginID, resultSessionContext)) {
-                                    logController.logActivity2(core, "link login with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                    logController.addSiteActivity(core, "link login with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                 }
                             } else if (MemberLinkRecognizeID != 0) {
                                 //
                                 // -- Link Recognize
                                 resultSessionContext.recognizeById(core, MemberLinkRecognizeID, ref resultSessionContext);
-                                logController.logActivity2(core, "link recognize with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                logController.addSiteActivity(core, "link recognize with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                             }
                             //
                             // -- create guest identity if no identity
@@ -561,7 +561,7 @@ namespace Contensive.Core.Models.Context {
                             if (user_changes) {
                                 resultSessionContext.user.save(core);
                             }
-                            visitCookieNew = core.security.encodeToken(resultSessionContext.visit.id, resultSessionContext.visit.LastVisitTime);
+                            visitCookieNew = securityController.encodeToken( core,resultSessionContext.visit.id, resultSessionContext.visit.LastVisitTime);
                             if (trackVisits && (visitCookie != visitCookieNew)) {
                                 visitCookie = visitCookieNew;
                             }
@@ -576,7 +576,7 @@ namespace Contensive.Core.Models.Context {
                         }
                         //
                         // -- Write Visit Cookie
-                        visitCookie = core.security.encodeToken(resultSessionContext.visit.id, core.doc.profileStartTime);
+                        visitCookie = securityController.encodeToken( core,resultSessionContext.visit.id, core.doc.profileStartTime);
                         core.webServer.addResponseCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit, visitCookie, default(DateTime), "", requestAppRootPath, false);
                     }
                 }
@@ -707,7 +707,7 @@ namespace Contensive.Core.Models.Context {
         //
         public void logout(coreController core) {
             try {
-                logController.logActivity2(core, "logout", user.id, user.OrganizationID);
+                logController.addSiteActivity(core, "logout", user.id, user.OrganizationID);
                 //
                 // Clear MemberID for this page
                 //
@@ -1066,21 +1066,21 @@ namespace Contensive.Core.Models.Context {
         //   See main_GetLoginMemberID and main_LoginMemberByID
         //========================================================================
         //
-        public bool authenticate(coreController core, string loginFieldValue, string password, bool AllowAutoLogin = false) {
+        public bool authenticate(coreController core, string username, string password, bool AllowAutoLogin = false) {
             bool returnREsult = false;
             try {
                 int LocalMemberID = 0;
                 //
                 returnREsult = false;
-                LocalMemberID = authenticateGetId(core, loginFieldValue, password);
+                LocalMemberID = authenticateGetId(core, username, password);
                 if (LocalMemberID != 0) {
                     returnREsult = authenticateById(core, LocalMemberID, this);
                     if (returnREsult) {
-                        logController.logActivity2(core, "successful password login", user.id, user.OrganizationID);
+                        logController.addSiteActivity(core, "successful password login", user.id, user.OrganizationID);
                         //isAuthenticatedAdmin_cache_isLoaded = False
                         //property_user_isMember_isLoaded = False
                     } else {
-                        logController.logActivity2(core, "unsuccessful login (loginField:" + loginFieldValue + "/password:" + password + ")", user.id, user.OrganizationID);
+                        logController.addSiteActivity(core, "unsuccessful login (loginField:" + username + "/password:" + password + ")", user.id, user.OrganizationID);
                     }
                 }
             } catch (Exception ex) {
@@ -1298,7 +1298,7 @@ namespace Contensive.Core.Models.Context {
                                 + " or(m.developer<>0)"
                                 + " )"
                                 + " ";
-                            CS = core.db.csOpenSql_rev("default", SQL);
+                            CS = core.db.csOpenSql(SQL,"Default");
                             returnREsult = core.db.csOk(CS);
                             core.db.csClose(ref CS);
                         }
@@ -1328,7 +1328,7 @@ namespace Contensive.Core.Models.Context {
                             + " from ccmembers m"
                             + " left join ccMemberRules r on r.Memberid=m.id"
                             + " where" + Criteria;
-                        CS = core.db.csOpenSql_rev("default", SQL);
+                        CS = core.db.csOpenSql(SQL,"Default");
                         returnREsult = core.db.csOk(CS);
                         core.db.csClose(ref CS);
                     }
@@ -1484,7 +1484,7 @@ namespace Contensive.Core.Models.Context {
         //   conversion pass 2
         // ================================================================================================
         //
-        public string main_GetAuthoringStatusMessage(coreController core, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
+        public string getAuthoringStatusMessage(coreController core, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
             string result = "";
             //
             string Copy = null;

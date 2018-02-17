@@ -34,6 +34,11 @@ namespace Contensive.Core.Controllers {
         //
         private coreController core;
         //
+        // ====================================================================================================
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="core"></param>
         public addonController(coreController core) : base() {
             this.core = core;
         }
@@ -539,7 +544,7 @@ namespace Contensive.Core.Controllers {
                         // -- Return all other types, Enable Edit Wrapper for Page Content edit mode
                         bool IncludeEditWrapper = (!addon.BlockEditTools) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) & (!executeContext.isIncludeAddon);
                         if (IncludeEditWrapper) {
-                            IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || core.doc.sessionContext.isEditing(executeContext.hostRecord.contentName)));
+                            IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || core.sessionContext.isEditing(executeContext.hostRecord.contentName)));
                             if (IncludeEditWrapper) {
                                 //
                                 // Edit Icon
@@ -678,7 +683,7 @@ namespace Contensive.Core.Controllers {
                     //
                     return_ExitAddonBlankWithResponse = true;
                     return string.Empty;
-                } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //
@@ -827,7 +832,7 @@ namespace Contensive.Core.Controllers {
                                                                 CS = core.db.csOpen("Copy Content", "name=" + core.db.encodeSQLText(FieldName), "ID");
                                                                 if (!core.db.csOk(CS)) {
                                                                     core.db.csClose(ref CS);
-                                                                    CS = core.db.csInsertRecord("Copy Content", core.doc.sessionContext.user.id);
+                                                                    CS = core.db.csInsertRecord("Copy Content", core.sessionContext.user.id);
                                                                 }
                                                                 if (core.db.csOk(CS)) {
                                                                     core.db.csSet(CS, "name", FieldName);
@@ -1087,12 +1092,12 @@ namespace Contensive.Core.Controllers {
                                                             CS = core.db.csOpen("Copy Content", "Name=" + core.db.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
                                                             if (!core.db.csOk(CS)) {
                                                                 core.db.csClose(ref CS);
-                                                                CS = core.db.csInsertRecord("Copy Content", core.doc.sessionContext.user.id);
+                                                                CS = core.db.csInsertRecord("Copy Content", core.sessionContext.user.id);
                                                                 if (core.db.csOk(CS)) {
                                                                     RecordID = core.db.csGetInteger(CS, "ID");
                                                                     core.db.csSet(CS, "name", FieldName);
                                                                     core.db.csSet(CS, "copy", genericController.encodeText(TabNode.InnerText));
-                                                                    core.db.csSave2(CS);
+                                                                    core.db.csSave(CS);
                                                                     // Call core.workflow.publishEdit("Copy Content", RecordID)
                                                                 }
                                                             }
@@ -1469,7 +1474,7 @@ namespace Contensive.Core.Controllers {
                         if (pos > 0) {
                             EntryPoint = EntryPoint.Substring(0, pos);
                         }
-                        logController.appendLog(core, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + EntryPoint + "].");
+                        logController.logError(core, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + EntryPoint + "].");
                         //WorkingCode = EntryPoint + "\n" + WorkingCode;
                     }
                 } else {
@@ -1850,7 +1855,7 @@ namespace Contensive.Core.Controllers {
                 if (addon != null) {
                     //
                     // -- addon found
-                    logController.appendLogWithLegacyRow(core, core.appConfig.name, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "coreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
+                    logController.logTrace(core, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                     //
                     string cmdQueryString = ""
                         + "appname=" + encodeNvaArgument(EncodeRequestVariable(core.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(EncodeRequestVariable(OptionString));
@@ -1860,7 +1865,7 @@ namespace Contensive.Core.Controllers {
                     cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString);
                     taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
-                    logController.appendLogWithLegacyRow(core, core.appConfig.name, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "coreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
+                    logController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]" );
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -1899,8 +1904,8 @@ namespace Contensive.Core.Controllers {
                 int Ptr = 0;
                 int Pos = 0;
                 //
-                if (core.doc.sessionContext.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
-                    if (core.doc.sessionContext.isEditingAnything()) {
+                if (core.sessionContext.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
+                    if (core.sessionContext.isEditingAnything()) {
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
@@ -2143,8 +2148,8 @@ namespace Contensive.Core.Controllers {
                 string BubbleJS = null;
                 //Dim AddonName As String = ""
                 //
-                if (core.doc.sessionContext.isAuthenticated && true) {
-                    if (core.doc.sessionContext.isEditingAnything()) {
+                if (core.sessionContext.isAuthenticated && true) {
+                    if (core.sessionContext.isEditingAnything()) {
                         addonModel addon = addonModel.create(core, addonId);
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
@@ -2213,8 +2218,8 @@ namespace Contensive.Core.Controllers {
             string InnerCopy = null;
             string CollectionCopy = "";
             //
-            if (core.doc.sessionContext.isAuthenticated) {
-                if (core.doc.sessionContext.isEditingAnything()) {
+            if (core.sessionContext.isAuthenticated) {
+                if (core.sessionContext.isEditingAnything()) {
                     StyleSN = genericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
                     //core.html.html_HelpViewerButtonID = "HelpBubble" & doccontroller.htmlDoc_HelpCodeCount
                     InnerCopy = helpCopy;
@@ -2293,8 +2298,8 @@ namespace Contensive.Core.Controllers {
                 int StyleSN = 0;
                 string HTMLViewerBubbleID = null;
                 //
-                if (core.doc.sessionContext.isAuthenticated) {
-                    if (core.doc.sessionContext.isEditingAnything()) {
+                if (core.sessionContext.isAuthenticated) {
+                    if (core.sessionContext.isEditingAnything()) {
                         StyleSN = genericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
                         HTMLViewerBubbleID = "HelpBubble" + core.doc.helpCodes.Count;
                         //
@@ -2407,7 +2412,7 @@ namespace Contensive.Core.Controllers {
                     //
                     return_ExitRequest = true;
                     return string.Empty;
-                } else if (!core.doc.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //
@@ -2824,7 +2829,7 @@ namespace Contensive.Core.Controllers {
                                                                     RecordID = core.db.csGetInteger(CS, "ID");
                                                                     core.db.csSet(CS, "name", FieldName);
                                                                     core.db.csSet(CS, "copy", genericController.encodeText(TabNode.InnerText));
-                                                                    core.db.csSave2(CS);
+                                                                    core.db.csSave(CS);
                                                                     //   Call core.workflow.publishEdit("Copy Content", RecordID)
                                                                 }
                                                             }
@@ -3658,7 +3663,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // create event with Guid and id for name
                         //
-                        cs.Close();
+                        cs.close();
                         cs.insert("add-on Events");
                         cs.setField("ccguid", eventNameIdOrGuid);
                         cs.setField("name", "Event " + cs.getInteger("id").ToString());
@@ -3666,7 +3671,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // create event with name
                         //
-                        cs.Close();
+                        cs.close();
                         cs.insert("add-on Events");
                         cs.setField("name", eventNameIdOrGuid);
                     }
@@ -3682,7 +3687,7 @@ namespace Contensive.Core.Controllers {
                         cs.goNext();
                     }
                 }
-                cs.Close();
+                cs.close();
                 //
             } catch (Exception ex) {
                 core.handleException(ex );

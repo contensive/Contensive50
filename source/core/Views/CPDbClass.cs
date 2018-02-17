@@ -86,7 +86,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override int GetTableID(string TableName) {
-            return cp.core.db.GetTableID(TableName);
+            return cp.core.db.getTableID(TableName);
         }
         //
         //====================================================================================================

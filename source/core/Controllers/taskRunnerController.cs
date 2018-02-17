@@ -120,7 +120,7 @@ namespace Contensive.Core.Controllers {
                     //
                     using (CPClass cpCluster = new CPClass()) {
                         if (!cpCluster.core.serverConfig.allowTaskRunnerService) {
-                            logController.appendLogTasks(cpCluster.core, "taskRunner.processTimerTick, skip -- allowTaskRunnerService false");
+                            logController.logTrace(cpCluster.core, "taskRunner.processTimerTick, skip -- allowTaskRunnerService false");
                         } else {
                             runTasks(cpCluster.core);
                         }
@@ -154,7 +154,7 @@ namespace Contensive.Core.Controllers {
                 foreach (KeyValuePair<string, Models.Context.appConfigModel> kvp in serverCore.serverConfig.apps) {
                     AppName = kvp.Value.name;
                     //
-                    logController.appendLogTasks(serverCore, "runTasks, appname=[" + AppName + "]");
+                    logController.logTrace(serverCore, "runTasks, appname=[" + AppName + "]");
                     //
                     // query tasks that need to be run
                     //
@@ -177,13 +177,13 @@ namespace Contensive.Core.Controllers {
                                         // -- execute a task
                                         recordsRemaining = true;
                                         appCore.db.csSet(CS, "datestarted", DateTime.Now);
-                                        appCore.db.csSave2(CS);
+                                        appCore.db.csSave(CS);
                                         //
                                         command = appCore.db.csGetText(CS, "command");
                                         cmdDetailText = appCore.db.csGetText(CS, "cmdDetail");
                                         cmdDetail = appCore.json.Deserialize<cmdDetailClass>(cmdDetailText);
                                         //
-                                        logController.appendLogTasks(appCore, "runTasks, task [" + appCore.db.csGetText(CS, "name") + "], command=[" + command + "], cmdDetailText=[" + cmdDetailText + "]");
+                                        logController.logTrace(appCore, "runTasks, task [" + appCore.db.csGetText(CS, "name") + "], command=[" + command + "], cmdDetailText=[" + cmdDetailText + "]");
                                         //
                                         switch ((command.ToLower())) {
                                             case taskQueueCommandEnumModule.runAddon:
