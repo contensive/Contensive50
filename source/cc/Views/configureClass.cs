@@ -24,10 +24,10 @@ namespace Contensive.CLI {
                 using (CPClass cp = new CPClass()) {
                     //
                     // -- Warning.
-                    Console.WriteLine("This server's configuration will be updated. If this is not correct, use Ctrl-C to exit.");
+                    Console.WriteLine("\n\nThis server's configuration will be updated. If this is not correct, use Ctrl-C to exit.");
                     //
                     // -- serverGroup name
-                    prompt = "Enter the server group name (alpha-numeric string). For stand-alone servers, this can be the name of the server. For scaling configurations, this is a name for the group of servers:";
+                    prompt = "\nEnter the server group name (alpha-numeric string). For stand-alone servers, this can be the name of the server. For scaling configurations, this is a name for the group of servers:";
                     defaultValue = cp.core.serverConfig.name;
                     cp.core.serverConfig.name = cliController.promptForReply(prompt, defaultValue);
                     //

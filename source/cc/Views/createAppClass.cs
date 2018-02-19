@@ -69,9 +69,9 @@ namespace Contensive.CLI {
                     appConfig.domainList.Add(domainName);
                     appConfig.enabled = true;
                     appConfig.privateKey = Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");
-                    Console.Write("\n\rApplication Architecture");
-                    Console.Write("\n\r\t1 Local Mode, compatible with v4.1, cdn is virtual folder /" + appName + "/files/");
-                    Console.Write("\n\r\t2 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket");
+                    //Console.Write("\n\rApplication Architecture");
+                    //Console.Write("\n\r\t1 Local Mode, compatible with v4.1, cdn is virtual folder /" + appName + "/files/");
+                    //Console.Write("\n\r\t2 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket");
                     //Console.Write("\n\r\t2 Local Mode, cdn is virtual folder /cdn/");
                     //Console.Write("\n\r\t3 Local Mode, cdn as second iis site as cdn." + appName);
                     string appArchitecture = "1";
@@ -84,7 +84,7 @@ namespace Contensive.CLI {
                             //
                             // Local Mode, compatible with v4.1, cdn in appRoot folder as /" + appName + "/files/
                             //
-                            Console.Write("\n\rServer ");
+                            Console.Write("\n\nLocal Mode, scale-up architecture. Files are stored and accessed on the local server.");
                             appConfig.localWwwPath = cliController.promptForReply("app files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\www\\");
                             appConfig.localFilesPath = cliController.promptForReply("cdn files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files\\");
                             appConfig.localPrivatePath = cliController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private\\");
@@ -98,6 +98,7 @@ namespace Contensive.CLI {
                             //
                             // 2 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket"
                             //
+                            Console.Write("\n\nRemote Files, scale-out architecture. Files are stored and accessed on a remote server. A local mirror is used to file transfer.");
                             appConfig.localWwwPath = cliController.promptForReply("app files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\www\\");
                             appConfig.localFilesPath = cliController.promptForReply("cdn files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files\\");
                             appConfig.localPrivatePath = cliController.promptForReply("private files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private\\");

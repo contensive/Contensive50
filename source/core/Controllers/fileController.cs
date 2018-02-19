@@ -384,6 +384,10 @@ namespace Contensive.Core.Controllers {
         /// <param name="pathFilename"></param>
         public void deleteFile_remote(string pathFilename) {
             try {
+
+                asdfasdfasdfasdfasdfasdfasdf
+                // todo - rewrite using lowlevel + transfer, not file io
+                // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
                 if (!string.IsNullOrEmpty(pathFilename)) {
                     string remoteDosPathFilename = genericController.convertToDosSlash(joinPath(remotePathPrefix, pathFilename));
                     verifyPath_remote(getPath(pathFilename));
@@ -423,6 +427,8 @@ namespace Contensive.Core.Controllers {
             try {
                 if (!string.IsNullOrEmpty(PathName)) {
                     if (!isLocal) {
+                        // todo - rewrite using lowlevel + transfer, not file io
+                        // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
                         string unixPathName = convertToUnixSlash(PathName).Trim();
                         if ((unixPathName.Length > 1) & (unixPathName.Substring(0, 1) == "\\")) {
                             unixPathName = unixPathName.Substring(1);
@@ -472,6 +478,8 @@ namespace Contensive.Core.Controllers {
                     srcPathFilename = normalizePathFilename(srcPathFilename);
                     dstPathFilename = normalizePathFilename(dstPathFilename);
                     if (!isLocal) {
+                        // todo - rewrite using lowlevel + transfer, not file io
+                        // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
                         //
                         // remote file copy
                         verifyPath_remote(getPath(srcPathFilename));
@@ -622,6 +630,8 @@ namespace Contensive.Core.Controllers {
         private bool fileExists_remote(string pathFilename) {
             bool returnOK = false;
             try {
+                // todo - rewrite using lowlevel + transfer, not file io
+                // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
                 string path = getPath(pathFilename);
                 verifyPath_remote(path);
                 string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
@@ -1132,6 +1142,8 @@ namespace Contensive.Core.Controllers {
         public bool copyLocalToRemote(string pathFilename) {
             bool result = false;
             try {
+                // todo - rewrite using lowlevel + transfer, not file io
+                // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
                 string localDosPathFilename = genericController.convertToDosSlash(pathFilename);
                 string remoteUnixPathFilename = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
                 verifyPath_remote(getPath(pathFilename));
@@ -1159,6 +1171,8 @@ namespace Contensive.Core.Controllers {
         public bool copyRemoteToLocal(string pathFilename) {
             bool result = false;
             try {
+                // todo - rewrite using lowlevel + transfer, not file io
+                // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
                 string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, pathFilename));
                 verifyPath_remote(getPath( pathFilename ));
                 var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, convertToDosSlash(remoteUnixPathFilename.Substring(1)));
@@ -1211,6 +1225,8 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         private void verifyPath_remote(string path) {
             try {
+                // todo - rewrite using lowlevel + transfer, not file io
+                // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
                 //
                 // -- verify the remote path
                 string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
