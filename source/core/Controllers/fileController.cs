@@ -33,19 +33,6 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class fileController : IDisposable {
         //
-        //====================================================================================================
-        /// <summary>
-        /// 
-        /// </summary>
-        public enum fileSyncModeEnum {
-            // noSync = file is written locally and read locallay
-            noSync = 1,
-            // passiveSync = (slow read, always consistent) FileSave - is written locally and uploaded to s3. FileRead - a check is made for current version and downloaded if neede, then read
-            passiveSync = 2,
-            // activeSync = (fast read, eventual consistency) FileSave - files written locally and uploaded to s3, then automatically downloaded to the other app clients for read. FileRead - read locally
-            activeSync = 3
-        }
-        //
         // ====================================================================================================
         //
         private coreController core;
@@ -57,10 +44,10 @@ namespace Contensive.Core.Controllers {
         // ====================================================================================================
         // path ends in \, folder ends in foldername
         public string rootLocalPath { get; set; }
-        //
-        // ====================================================================================================
-        //
-        private fileSyncModeEnum fileSyncMode { get; set; }
+        /// <summary>
+        /// For remote files, this path is prefixed to the content
+        /// </summary>
+        private string remotePathPrefix { get; set;  }
         //
         // ====================================================================================================
         //
@@ -86,15 +73,15 @@ namespace Contensive.Core.Controllers {
         /// <param name="core"></param>
         /// <param name="isLocal">If true, thie object reads/saves to the local filesystem</param>
         /// <param name="rootLocalPath"></param>
-        /// <param name="remoteFileEndpoint">If not isLocal, this endpoint is used for file sync</param>
-        public fileController(coreController core, bool isLocal, fileSyncModeEnum fileSyncMode, string rootLocalPath) {
+        /// <param name="remotePathPrefix">If not isLocal, this is added to the remote content path. Ex a\ with content b\c.txt = a\b\c.txt</param>
+        public fileController(coreController core, bool isLocal, string rootLocalPath, string remotePathPrefix) {
             if (string.IsNullOrEmpty(rootLocalPath)) {
                 core.handleException(new ArgumentException("Blank file system root path not permitted."));
             } else {
                 this.core = core;
                 this.isLocal = isLocal;
-                this.fileSyncMode = fileSyncMode;
                 this.rootLocalPath = normalizePath(rootLocalPath);
+                this.remotePathPrefix = normalizePath(remotePathPrefix);
             }
         }
         //
@@ -269,7 +256,8 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(PathFilename)) {
                     throw new ArgumentException("appendFile called with blank pathname.");
                 } else {
-                    Task t = Task.Run(() => appendFileBackground(PathFilename, fileContent));
+                    appendFileBackground(PathFilename, fileContent);
+                    //await Task.Run(() => appendFileBackground(PathFilename, fileContent));
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -397,7 +385,7 @@ namespace Contensive.Core.Controllers {
         public void deleteFile_remote(string pathFilename) {
             try {
                 if (!string.IsNullOrEmpty(pathFilename)) {
-                    string remoteDosPathFilename = genericController.convertToDosSlash(joinPath(core.appConfig.cdnFilesNetprefix, pathFilename));
+                    string remoteDosPathFilename = genericController.convertToDosSlash(joinPath(remotePathPrefix, pathFilename));
                     verifyPath_remote(getPath(pathFilename));
                     var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, remoteDosPathFilename);
                     if (s3FileInfo.Exists) s3FileInfo.Delete();
@@ -487,10 +475,10 @@ namespace Contensive.Core.Controllers {
                         //
                         // remote file copy
                         verifyPath_remote(getPath(srcPathFilename));
-                        string srcRemoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(core.appConfig.cdnFilesNetprefix, srcPathFilename));
+                        string srcRemoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, srcPathFilename));
                         var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, convertToDosSlash(srcRemoteUnixPathFilename.Substring(1)));
                         if ( s3FileInfo.Exists ) {
-                            string dstRemoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(core.appConfig.cdnFilesNetprefix, dstPathFilename));
+                            string dstRemoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, dstPathFilename));
                             Amazon.S3.IO.S3DirectoryInfo remoteDirectoryInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, dstRemoteUnixPathFilename);
                             s3FileInfo.CopyTo(remoteDirectoryInfo);
                         }
@@ -636,7 +624,7 @@ namespace Contensive.Core.Controllers {
             try {
                 string path = getPath(pathFilename);
                 verifyPath_remote(path);
-                string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(core.appConfig.cdnFilesNetprefix, path));
+                string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
                 var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, convertToDosSlash(remoteUnixPathFilename.Substring(1)));
                 returnOK = s3FileInfo.Exists;
             } catch (Exception ex) {
@@ -894,24 +882,25 @@ namespace Contensive.Core.Controllers {
                 if ( !isLocal ) {
                     copyRemoteToLocal(pathFilename);
                 }
-                FastZip fastZip = new FastZip();
-                string fileFilter = null;
-                string absPathFilename = null;
+                string absPathFilename = convertToAbsPath(pathFilename);
                 string path = "";
                 string filename = "";
-                //
-                absPathFilename = convertToAbsPath(pathFilename);
                 splitPathFilename(absPathFilename, ref path, ref filename);
+                string fileFilter = null;
+                FastZip fastZip = new FastZip();
                 fastZip.ExtractZip(absPathFilename, path, fileFilter);
                 //
-                // -- copy files back to remote
-                using (var fs = new FileStream(absPathFilename, FileMode.Open, FileAccess.Read)) {
-                    using (var zf = new ZipFile(fs)) {
-                        foreach (ZipEntry ze in zf) {
-                            if (ze.IsDirectory) {
-                                verifyPath_remote( getPath( ze.Name));
-                            } else {
-                                copyLocalToRemote(ze.Name);
+                if (!isLocal) {
+                    //
+                    // -- copy files back to remote
+                    using (var fs = new FileStream(absPathFilename, FileMode.Open, FileAccess.Read)) {
+                        using (var zf = new ZipFile(fs)) {
+                            foreach (ZipEntry ze in zf) {
+                                if (ze.IsDirectory) {
+                                    verifyPath_remote(getPath(ze.Name));
+                                } else {
+                                    copyLocalToRemote(ze.Name);
+                                }
                             }
                         }
                     }
@@ -1144,7 +1133,7 @@ namespace Contensive.Core.Controllers {
             bool result = false;
             try {
                 string localDosPathFilename = genericController.convertToDosSlash(pathFilename);
-                string remoteUnixPathFilename = genericController.convertToUnixSlash(joinPath(core.appConfig.cdnFilesNetprefix, pathFilename));
+                string remoteUnixPathFilename = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
                 verifyPath_remote(getPath(pathFilename));
                 //
                 // -- Setup request for putting an object in S3.
@@ -1170,7 +1159,7 @@ namespace Contensive.Core.Controllers {
         public bool copyRemoteToLocal(string pathFilename) {
             bool result = false;
             try {
-                string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(core.appConfig.cdnFilesNetprefix, pathFilename));
+                string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, pathFilename));
                 verifyPath_remote(getPath( pathFilename ));
                 var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, convertToDosSlash(remoteUnixPathFilename.Substring(1)));
                 if (s3FileInfo.Exists) {
@@ -1224,7 +1213,7 @@ namespace Contensive.Core.Controllers {
             try {
                 //
                 // -- verify the remote path
-                string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(core.appConfig.cdnFilesNetprefix, path));
+                string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
                 var url = genericController.splitUrl(remoteUnixPathFilename);
                 var parentFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, "");
                 string pathFromLeft = "";

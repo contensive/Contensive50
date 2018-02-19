@@ -495,7 +495,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // -- styles
                             if (addon.StylesFilename.filename != "") {
-                                core.html.addStyleLink(core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, addon.StylesFilename.filename), addon.name + " Stylesheet");
+                                core.html.addStyleLink(genericController.getCdnFileLink(core, addon.StylesFilename.filename), addon.name + " Stylesheet");
                             }
                             //
                             // -- link to stylesheet
@@ -3363,7 +3363,7 @@ namespace Contensive.Core.Controllers {
                     //
                     JSFilename = core.db.csGetText(CS, "jsfilename");
                     if (!string.IsNullOrEmpty(JSFilename)) {
-                        JSFilename = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, JSFilename);
+                        JSFilename = genericController.getCdnFileLink(core, JSFilename);
                         core.html.addScriptLinkSrc(JSFilename, SourceComment);
                     }
                     Copy = core.db.csGetText(CS, "stylesfilename");
@@ -3371,7 +3371,7 @@ namespace Contensive.Core.Controllers {
                         if (genericController.vbInstr(1, Copy, "://") != 0) {
                         } else if (Copy.Left( 1) == "/") {
                         } else {
-                            Copy = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, Copy);
+                            Copy = genericController.getCdnFileLink(core, Copy);
                         }
                         core.html.addStyleLink(Copy, SourceComment);
                     }

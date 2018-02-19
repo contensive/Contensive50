@@ -232,15 +232,7 @@ namespace Contensive.Core.Controllers {
                 if (_appRootFiles == null) {
                     if (appConfig != null) {
                         if (appConfig.enabled) {
-                            if (serverConfig.isLocalFileSystem) {
-                                //
-                                // local server -- everything is ephemeral
-                                _appRootFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(appConfig.appRootFilesPath));
-                            } else {
-                                //
-                                // cluster mode - each filesystem is configured accordingly
-                                _appRootFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.activeSync, fileController.normalizePath(appConfig.appRootFilesPath));
-                            }
+                            _appRootFiles = new fileController(this, serverConfig.isLocalFileSystem, appConfig.localWwwPath, appConfig.remoteWwwPath);
                         }
                     }
                 }
@@ -255,7 +247,7 @@ namespace Contensive.Core.Controllers {
                 if (_tmpFiles == null) {
                     //
                     // local server -- everything is ephemeral
-                    _tmpFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(appConfig.tempFilesPath));
+                    _tmpFiles = new fileController(this, true, appConfig.localTempPath,"");
                 }
                 return _tmpFiles;
             }
@@ -268,15 +260,7 @@ namespace Contensive.Core.Controllers {
                 if (_privateFiles == null) {
                     if (appConfig != null) {
                         if (appConfig.enabled) {
-                            if (serverConfig.isLocalFileSystem) {
-                                //
-                                // local server -- everything is ephemeral
-                                _privateFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(appConfig.privateFilesPath));
-                            } else {
-                                //
-                                // cluster mode - each filesystem is configured accordingly
-                                _privateFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.passiveSync, fileController.normalizePath(appConfig.privateFilesPath));
-                            }
+                            _privateFiles = new fileController(this, serverConfig.isLocalFileSystem, appConfig.localPrivatePath, appConfig.remotePrivatePath);
                         }
                     }
                 }
@@ -292,7 +276,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- always local -- must be because this object is used to read serverConfig, before the object is valid
                     string programDataPath = fileController.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\";
-                    _programDataFiles = new fileController(this, true, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(programDataPath));
+                    _programDataFiles = new fileController(this, true, programDataPath, "");
                 }
                 return _programDataFiles;
             }
@@ -305,7 +289,7 @@ namespace Contensive.Core.Controllers {
                 if (_programFiles == null) {
                     //
                     // -- always local
-                    _programFiles = new fileController(this, true, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(serverConfig.programFilesPath));
+                    _programFiles = new fileController(this, true, serverConfig.programFilesPath,"");
                 }
                 return _programFiles;
             }
@@ -318,15 +302,7 @@ namespace Contensive.Core.Controllers {
                 if (_cdnFiles == null) {
                     if (appConfig != null) {
                         if (appConfig.enabled) {
-                            if (serverConfig.isLocalFileSystem) {
-                                //
-                                // local server -- everything is ephemeral
-                                _cdnFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(appConfig.cdnFilesPath));
-                            } else {
-                                //
-                                // cluster mode - each filesystem is configured accordingly
-                                _cdnFiles = new fileController(this, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.passiveSync, fileController.normalizePath(appConfig.cdnFilesPath));
-                            }
+                            _cdnFiles = new fileController(this, serverConfig.isLocalFileSystem, appConfig.localFilesPath,appConfig.remoteFilePath);
                         }
                     }
                 }
@@ -491,7 +467,7 @@ namespace Contensive.Core.Controllers {
             this.serverConfig = serverConfig;
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
             appConfig = appConfigModel.getObject(this, serverConfig, applicationName);
-            appConfig.appStatus = appConfigModel.appStatusEnum.OK;
+            appConfig.appStatus = appConfigModel.appStatusEnum.ok;
             webServer.iisContext = null;
             constructorInitialize(false);
         }
@@ -511,7 +487,7 @@ namespace Contensive.Core.Controllers {
             this.serverConfig = serverConfig;
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
             appConfig = appConfigModel.getObject(this, serverConfig, applicationName);
-            this.appConfig.appStatus = appConfigModel.appStatusEnum.OK;
+            this.appConfig.appStatus = appConfigModel.appStatusEnum.ok;
             webServer.initWebContext(httpContext);
             constructorInitialize(true);
         }
@@ -1170,7 +1146,8 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- server mode, there is no application
                     sessionContext = Models.Context.sessionContextModel.create(this, false);
-                } else if ((appConfig.appMode != appConfigModel.appModeEnum.normal) | (appConfig.appStatus != appConfigModel.appStatusEnum.OK)) {
+                } else if (appConfig.appStatus != appConfigModel.appStatusEnum.ok) {
+                    //} else if ((appConfig.appMode != appConfigModel.appModeEnum.normal) | (appConfig.appStatus != appConfigModel.appStatusEnum.OK)) {
                     //
                     // -- application is not ready, might be error, or in maintainence mode
                     sessionContext = Models.Context.sessionContextModel.create(this, false);
@@ -1267,7 +1244,8 @@ namespace Contensive.Core.Controllers {
                     //
                     if (serverConfig != null) {
                         if (appConfig != null) {
-                            if ((appConfig.appMode == appConfigModel.appModeEnum.normal) && (appConfig.appStatus == appConfigModel.appStatusEnum.OK)) {
+                            if (appConfig.appStatus == appConfigModel.appStatusEnum.ok) {
+                                //if ((appConfig.appMode == appConfigModel.appModeEnum.normal) && (appConfig.appStatus == appConfigModel.appStatusEnum.OK))
                                 if (siteProperties.allowVisitTracking) {
                                     //
                                     // If visit tracking, save the viewing record

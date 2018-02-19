@@ -619,7 +619,7 @@ namespace Contensive.Core.Controllers {
                 saveTransactionLog_InProcess = true;
                 //
                 // -- block before appStatus OK because need site properties
-                if ((core.serverConfig.enableLogging) && (core.appConfig.appStatus == appConfigModel.appStatusEnum.OK)) {
+                if ((core.serverConfig.enableLogging) && (core.appConfig.appStatus == appConfigModel.appStatusEnum.ok)) {
                     if (core.siteProperties.allowTransactionLog) {
                         string LogEntry = ("duration [" + ElapsedMilliseconds + "], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
                         logController.logDebug(core, "dbController: " + LogEntry);

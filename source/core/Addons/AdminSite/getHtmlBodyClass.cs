@@ -1114,7 +1114,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         IconHeight = core.db.csGetInteger(CS, "IconHeight");
                         IconSprites = core.db.csGetInteger(CS, "IconSprites");
                         IconIsInline = core.db.csGetBoolean(CS, "IsInline");
-                        IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, core.appConfig.cdnFilesNetprefix, AddonName, AddonName, "", 0);
+                        IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, core.appConfig.cdnFileUrl, AddonName, AddonName, "", 0);
                         helpLink = core.db.csGet(CS, "helpLink");
                     }
                     core.db.csClose(ref CS);
@@ -11448,7 +11448,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         RowPointer = 1;
                     } else {
                         DataRowCount = core.db.csGetRowCount(CS);
-                        LinkPrefix = "<a href=\"" + core.appConfig.cdnFilesNetprefix;
+                        LinkPrefix = "<a href=\"" + core.appConfig.cdnFileUrl;
                         LinkSuffix = "\" target=_blank>Available</a>";
                         while (core.db.csOk(CS) && (RowPointer < PageSize)) {
                             RecordID = core.db.csGetInteger(CS, "ID");

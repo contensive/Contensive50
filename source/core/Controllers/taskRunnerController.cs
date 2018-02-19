@@ -160,7 +160,8 @@ namespace Contensive.Core.Controllers {
                     //
                     using (CPClass cpApp = new CPClass(AppName)) {
                         coreController appCore = cpApp.core;
-                        if ((appCore.appConfig.appStatus == appConfigModel.appStatusEnum.OK) && (appCore.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
+                        if (appCore.appConfig.appStatus == appConfigModel.appStatusEnum.ok) {
+                            //if ((appCore.appConfig.appStatus == appConfigModel.appStatusEnum.OK) && (appCore.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
                             try {
                                 do {
                                     //

@@ -2074,7 +2074,7 @@ namespace Contensive.Core.Controllers {
                     // AC StartBlockText
                     //
                     IconIDControlString = "AC," + ACTypeAggregateFunction + ",0,Block Text,";
-                    IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0);
+                    IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0);
                     IconImg = genericController.EncodeJavascript(IconImg);
                     Items[ItemsCnt] = "['Block Text','" + IconImg + "']";
                     Index.setPtr("Block Text", ItemsCnt);
@@ -2083,7 +2083,7 @@ namespace Contensive.Core.Controllers {
                     // AC EndBlockText
                     //
                     IconIDControlString = "AC," + ACTypeAggregateFunction + ",0,Block Text End,";
-                    IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0);
+                    IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block End", "End of text block", "", 0);
                     IconImg = genericController.EncodeJavascript(IconImg);
                     Items[ItemsCnt] = "['Block Text End','" + IconImg + "']";
                     Index.setPtr("Block Text", ItemsCnt);
@@ -2100,7 +2100,7 @@ namespace Contensive.Core.Controllers {
                         FieldList = Models.Complex.cdefModel.GetContentProperty(core, "people", "SelectFieldList");
                         FieldList = genericController.vbReplace(FieldList, ",", "|");
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + FieldList + "]";
-                        IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
+                        IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
                         IconImg = genericController.EncodeJavascript(IconImg);
                         Items[ItemsCnt] = "['Personalization','" + IconImg + "']";
                         Index.setPtr("Personalization", ItemsCnt);
@@ -2115,7 +2115,7 @@ namespace Contensive.Core.Controllers {
                             //   Need a more consistant solution later
                             //
                             IconIDControlString = "AC," + ACTypeTemplateContent + ",0,Template Content,";
-                            IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", core.appConfig.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0);
+                            IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
                             IconImg = genericController.EncodeJavascript(IconImg);
                             Items[ItemsCnt] = "['Content Box','" + IconImg + "']";
                             //Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
@@ -2123,7 +2123,7 @@ namespace Contensive.Core.Controllers {
                             ItemsCnt = ItemsCnt + 1;
                             //
                             IconIDControlString = "AC," + ACTypeTemplateText + ",0,Template Text,Name=Default";
-                            IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", core.appConfig.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0);
+                            IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
                             IconImg = genericController.EncodeJavascript(IconImg);
                             Items[ItemsCnt] = "['Template Text','" + IconImg + "']";
                             //Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
@@ -2143,7 +2143,7 @@ namespace Contensive.Core.Controllers {
                                 if (!string.IsNullOrEmpty(FieldName)) {
                                     FieldCaption = "Watch List [" + FieldName + "]";
                                     IconIDControlString = "AC,WATCHLIST,0," + FieldName + ",ListName=" + FieldName + "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]";
-                                    IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFilesNetprefix, FieldCaption, "Rendered as the " + FieldCaption, "", 0);
+                                    IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, FieldCaption, "Rendered as the " + FieldCaption, "", 0);
                                     IconImg = genericController.EncodeJavascript(IconImg);
                                     FieldCaption = genericController.EncodeJavascript(FieldCaption);
                                     Items[ItemsCnt] = "['" + FieldCaption + "','" + IconImg + "']";
@@ -2239,7 +2239,7 @@ namespace Contensive.Core.Controllers {
                                         //
                                         LastAddonName = AddonName;
                                         IconIDControlString = "AC,AGGREGATEFUNCTION,0," + AddonName + "," + DefaultAddonOption_String + "," + AddonGuid;
-                                        IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, core.appConfig.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" + AddonName + "]", "", 0);
+                                        IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, core.appConfig.cdnFileUrl, AddonName, "Rendered as the Add-on [" + AddonName + "]", "", 0);
                                         Items[ItemsCnt] = "['" + genericController.EncodeJavascript(AddonName) + "','" + genericController.EncodeJavascript(IconImg) + "']";
                                         Index.setPtr(AddonName, ItemsCnt);
                                         ItemsCnt = ItemsCnt + 1;

@@ -25,21 +25,81 @@ namespace Contensive.Core.Models.Context {
     //
     [Serializable()]
     public class appConfigModel {
-        //
+        /// <summary>
+        /// name for the app. Must be unique within the server group. Difficulate to change later.
+        /// </summary>
         public string name = "";
-        public appStatusEnum appStatus = appStatusEnum.building;
-        public appModeEnum appMode = appModeEnum.maintainence; // must be set to normal after setup
+        /// <summary>
+        /// status used to signal that the app is ok
+        /// </summary>
+        public appStatusEnum appStatus = appStatusEnum.maintenance;
+        //// <summary>
+        //// Mode enum
+        //// </summary>
+        //public appModeEnum appMode = appModeEnum.maintainence;
+        /// <summary>
+        /// when false, app throws exception
+        /// </summary>
         public bool enabled = false;
-        public string privateKey = ""; // rename hashKey
-        public string appRootFilesPath = ""; // local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
-        public string cdnFilesPath = ""; // local file path to the content files (i.e. d:\inetpub\myApp\files\)
-        public string privateFilesPath = ""; // local file path to the content files (i.e. d:\inetpub\myApp\private\)
-        public string tempFilesPath = ""; // ephemeral storage, files live just during rendering life
-        public string cdnFilesNetprefix = ""; // in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
+        /// <summary>
+        /// key used for all encoding, two=way and one-way encoding. 
+        /// </summary>
+        public string privateKey = "";
+        /// <summary>
+        /// if the privateKey decoding fails and this key is not blank, an attempt is made with this key on reads.
+        /// When changing keys, put the old key here. For two-way encoding, read will use fallback, and written back primary.
+        /// For one-way, if primary fails, attempt secondary.
+        /// </summary>
+        public string privateKeyFallBack = "";
+        /// <summary>
+        /// local abs path to wwwroot. Paths end in slash. (i.e. d:\inetpub\myApp\www\)
+        /// </summary>
+        public string localWwwPath = "";
+        /// <summary>
+        /// local file path to the content files. Paths end in slash. (i.e. d:\inetpub\myApp\files\)
+        /// </summary>
+        public string localFilesPath = "";
+        /// <summary>
+        /// local file path to the content files. Paths end in slash. (i.e. d:\inetpub\myApp\private\)
+        /// </summary>
+        public string localPrivatePath = "";
+        /// <summary>
+        /// temp file storage, files used by just one process, scope just during rendering life. Paths end in slash. (i.e. d:\inetpub\myApp\temp\)
+        /// </summary>
+        public string localTempPath = "";
+        /// <summary>
+        /// path within AWS S3 bucket where www files are stored
+        /// </summary>
+        public string remoteWwwPath = "";
+        /// <summary>
+        /// path within AWS S3 bucket where cdn files are stored.
+        /// in some cases (like legacy), cdnFiles are in an iis virtual folder mapped to appRoot (like /appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
+        /// </summary>
+        public string remoteFilePath = "";
+        /// <summary>
+        /// path within AWS S3 bucket where private files are stored.
+        /// </summary>
+        public string remotePrivatePath = "";
+        /// <summary>
+        /// url for cdn files (for upload files, etc). For local files is can be /appname/files/) for remote cdn, it includes protocol-host
+        /// </summary>
+        public string cdnFileUrl = "";
+        /// <summary>
+        /// set true to be included in server monitor testing
+        /// </summary>
         public bool allowSiteMonitor = false;
-        public List<string> domainList = new List<string>(); // primary domain is the first item in the list
-        public string adminRoute = ""; // The url pathpath that executes the addon site
-        public string defaultPage = "default.aspx"; // when exeecuting iis
+        /// <summary>
+        /// domain(s) for the app. primary domain is the first item in the list
+        /// </summary>
+        public List<string> domainList = new List<string>();
+        /// <summary>
+        /// route to admin site. The url pathpath that executes the addon site
+        /// </summary>
+        public string adminRoute = "";
+        /// <summary>
+        /// when exeecuting iis, this is the default page.
+        /// </summary>
+        public string defaultPage = "default.aspx";
         //
         //====================================================================================================
         /// <summary>
@@ -55,8 +115,8 @@ namespace Contensive.Core.Models.Context {
         /// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
         /// </summary>
         public enum appStatusEnum {
-            OK = 2,
-            building = 3
+            ok = 0,
+            maintenance = 1
         }
         //
         //====================================================================================================

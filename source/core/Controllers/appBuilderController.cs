@@ -294,20 +294,29 @@ namespace Contensive.Core.Controllers {
                     // -- Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods), then other basic system ops work, like site properties
                     VerifyBasicTables(core);
                     //
-                    // -- verify base collection
-                    logController.logInfo(core, "Install base collection");
-                    collectionController.installBaseCollection(core, isNewBuild,ref  nonCriticalErrorList);
-                    //
+                    // 20180217 - move this before base collection because during install it runs addons (like _oninstall)
+                    // if anything is needed that is not there yet, I need to build a list of adds to run after the app goes to app status ok
                     // -- Update server config file
                     logController.logInfo(core, "Update configuration file");
-                    if (!core.appConfig.appStatus.Equals(appConfigModel.appStatusEnum.OK)) {
-                        core.appConfig.appStatus = appConfigModel.appStatusEnum.OK;
+                    if (!core.appConfig.appStatus.Equals(appConfigModel.appStatusEnum.ok)) {
+                        core.appConfig.appStatus = appConfigModel.appStatusEnum.ok;
                         core.serverConfig.saveObject(core);
                     }
                     //
+                    // -- verify base collection
+                    logController.logInfo(core, "Install base collection");
+                    collectionController.installBaseCollection(core, isNewBuild,ref  nonCriticalErrorList);
+                    ////
+                    //// -- Update server config file
+                    //logController.logInfo(core, "Update configuration file");
+                    //if (!core.appConfig.appStatus.Equals(appConfigModel.appStatusEnum.OK)) {
+                    //    core.appConfig.appStatus = appConfigModel.appStatusEnum.OK;
+                    //    core.serverConfig.saveObject(core);
+                    //}
+                    //
                     // -- verify iis configuration
                     logController.logInfo(core, "Verify iis configuration");
-                    Controllers.iisController.verifySite(core, core.appConfig.name, primaryDomain, core.appConfig.appRootFilesPath, "default.aspx");
+                    Controllers.iisController.verifySite(core, core.appConfig.name, primaryDomain, core.appConfig.localWwwPath, "default.aspx");
                     //
                     // -- verify root developer
                     logController.logInfo(core, "verify developer user");

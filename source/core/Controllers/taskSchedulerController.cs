@@ -130,12 +130,12 @@ namespace Contensive.Core.Controllers {
                     logController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
                     using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
                         coreController coreApp = cpApp.core;
-                        if (!(coreApp.appConfig.appStatus == appConfigModel.appStatusEnum.OK)) {
+                        if (!(coreApp.appConfig.appStatus == appConfigModel.appStatusEnum.ok)) {
                             //
                             logController.logTrace(coreApp, "scheduleTasks, app status not ok");
-                        } else if (!(coreApp.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
-                            //
-                            logController.logTrace(coreApp, "scheduleTasks, app mode not normal");
+                        //} else if (!(coreApp.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
+                        //    //
+                        //    logController.logTrace(coreApp, "scheduleTasks, app mode not normal");
                         } else {
                             //
                             // Execute Processes

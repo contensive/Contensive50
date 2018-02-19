@@ -209,11 +209,19 @@ namespace Contensive.CLI {
                                             appConfigModel app = kvp.Value;
                                             Console.WriteLine("    name: " + app.name);
                                             Console.WriteLine("        enabled: " + app.enabled);
-                                            Console.WriteLine("        adminRoute: " + app.adminRoute);
-                                            Console.WriteLine("        appRootPath: " + app.appRootFilesPath);
-                                            Console.WriteLine("        privateFilesPath: " + app.privateFilesPath);
-                                            Console.WriteLine("        cdnFilesPath: " + app.cdnFilesPath);
-                                            Console.WriteLine("        cdnFilesNetprefix: " + app.cdnFilesNetprefix);
+                                            Console.WriteLine("        admin route: " + app.adminRoute);
+                                            Console.WriteLine("        local file storage");
+                                            Console.WriteLine("            app path: " + app.localWwwPath);
+                                            Console.WriteLine("            private path: " + app.localPrivatePath);
+                                            Console.WriteLine("            cdn path: " + app.localFilesPath);
+                                            Console.WriteLine("            temp path: " + app.localTempPath);
+                                            if (!cp.core.serverConfig.isLocalFileSystem) {
+                                                Console.WriteLine("        remote file storage");
+                                                Console.WriteLine("            app path: " + app.remoteWwwPath);
+                                                Console.WriteLine("            private path: " + app.remotePrivatePath);
+                                                Console.WriteLine("            cdn path: " + app.remoteFilePath);
+                                            }
+                                            Console.WriteLine("        cdnFilesNetprefix: " + app.cdnFileUrl);
                                             foreach (string domain in app.domainList) {
                                                 Console.WriteLine("        domain: " + domain);
                                             }

@@ -388,7 +388,7 @@ namespace Contensive.WindowsServices {
                                     //    ' Paused
                                     //    '
                                     //    Call appendMonitorLog(AppName & " paused")
-                                } else if (AppStatus == (int)appConfigModel.appStatusEnum.OK) {
+                                } else if (AppStatus == (int)appConfigModel.appStatusEnum.ok) {
                                     //
                                     // Running
                                     //

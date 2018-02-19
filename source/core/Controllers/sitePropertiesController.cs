@@ -46,7 +46,7 @@ namespace Contensive.Core.Controllers {
         //
         private bool dbNotReady {
             get {
-                return (core.appConfig.appStatus != appConfigModel.appStatusEnum.OK);
+                return (core.appConfig.appStatus != appConfigModel.appStatusEnum.ok);
             }
         }
         //

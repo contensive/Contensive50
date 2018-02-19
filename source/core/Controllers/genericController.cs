@@ -1389,10 +1389,10 @@ namespace Contensive.Core.Controllers {
             string tempGetApplicationStatusMessage = null;
 
             switch (ApplicationStatus) {
-                case appConfigModel.appStatusEnum.OK:
+                case appConfigModel.appStatusEnum.ok:
                     tempGetApplicationStatusMessage = "Application OK";
                     break;
-                case appConfigModel.appStatusEnum.building:
+                case appConfigModel.appStatusEnum.maintenance:
                     tempGetApplicationStatusMessage = "Application building";
                     break;
                 default:
@@ -4262,7 +4262,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // icon is a virtual file, add the serverfilepath
                 //
-                return core.appConfig.cdnFilesNetprefix + returnLink;
+                return core.appConfig.cdnFileUrl + returnLink;
             }
         }
         //

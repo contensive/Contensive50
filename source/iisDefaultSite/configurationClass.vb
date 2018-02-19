@@ -54,12 +54,12 @@ Public Class configurationClass
             Dim appConfig As New appConfigModel
             appConfig.name = getAppName()
             appConfig.adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute")
-            appConfig.appRootFilesPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath")
-            appConfig.cdnFilesNetprefix = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
-            appConfig.cdnFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath")
+            appConfig.localWwwPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath")
+            appConfig.remoteFilePath = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
+            appConfig.localFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath")
             appConfig.domainList.Add(ConfigurationManager.AppSettings("ContensivePrimaryDomain"))
             appConfig.enabled = True
-            appConfig.privateFilesPath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
+            appConfig.localPrivatePath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
             appConfig.privateKey = ConfigurationManager.AppSettings("ContensivePrivateKey")
             serverConfig.apps.Add(appConfig.name.ToLower(), appConfig)
         Catch ex As Exception

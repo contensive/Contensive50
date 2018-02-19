@@ -16,6 +16,12 @@ using Contensive.Core.Models.Complex;
 using System.Linq;
 
 namespace Contensive.Core.Controllers {
+    // todo: rework how adds are installed, this change can be done after weave launch
+    // - current addon folder is called local addon folder and not in shared environment /local/addons
+    // - add a node to the (local) collection.xml with last collection installation datetime (files added after this starts install)
+    // - in private files, new folder with zip files to install /private/collectionInstall
+    // - local server checks the list and runs install on new zips, if remote file system, download and install
+    // - addon manager just copies zip file into the /private/collectionInstall folder
     //
     //====================================================================================================
     /// <summary>
@@ -1977,11 +1983,11 @@ namespace Contensive.Core.Controllers {
                                                             switch (resourceType.ToLower()) {
                                                                 case "www":
                                                                     wwwFileList = wwwFileList + "\r\n" + DstFilePath + filename;
-                                                                    logController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.appRootFilesPath + DstFilePath + "].");
+                                                                    logController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + DstFilePath + "].");
                                                                     //Call logcontroller.appendInstallLog(core, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & core.serverConfig.clusterPath & core.appConfig.appRootFilesPath & DstFilePath & "].")
                                                                     core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, DstFilePath + filename, core.appRootFiles);
                                                                     if (genericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
-                                                                        logController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping www file [" + core.appConfig.appRootFilesPath + DstFilePath + filename + "].");
+                                                                        logController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + DstFilePath + filename + "].");
                                                                         //Call logcontroller.appendInstallLog(core, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & core.serverConfig.clusterPath & core.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
                                                                         core.appRootFiles.UnzipFile(DstFilePath + filename);
                                                                     }

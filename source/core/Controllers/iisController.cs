@@ -286,7 +286,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //--------------------------------------------------------------------------
                 //
-                if (core.appConfig.appStatus != appConfigModel.appStatusEnum.OK) {
+                if (core.appConfig.appStatus != appConfigModel.appStatusEnum.ok) {
                     //
                     // did not initialize correctly
                     //
@@ -971,9 +971,9 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     // -- verify the cdn virtual directory (if configured)
-                    string cdnFilesPrefix = core.appConfig.cdnFilesNetprefix;
+                    string cdnFilesPrefix = core.appConfig.cdnFileUrl;
                     if (cdnFilesPrefix.IndexOf("://") < 0) {
-                        verifyWebsite_VirtualDirectory(core, site, appName, cdnFilesPrefix, core.appConfig.cdnFilesPath);
+                        verifyWebsite_VirtualDirectory(core, site, appName, cdnFilesPrefix, core.appConfig.localFilesPath);
                     }
                     //
                     // -- commit any changes

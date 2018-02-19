@@ -314,7 +314,7 @@ namespace Contensive.WindowsServices {
                                         //        '    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application starting")
                                         //        '    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //        '    ErrorCount = ErrorCount + 1
-                                        case appConfigModel.appStatusEnum.OK:
+                                        case appConfigModel.appStatusEnum.ok:
                                             if (true) {
                                                 //
                                                 // access content server for this application

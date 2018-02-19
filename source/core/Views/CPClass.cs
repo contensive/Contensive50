@@ -117,7 +117,7 @@ namespace Contensive.Core {
                 if (core != null) {
                     if (core.serverConfig != null) {
                         if (core.appConfig != null) {
-                            return (core.appConfig.appStatus == appConfigModel.appStatusEnum.OK);
+                            return (core.appConfig.appStatus == appConfigModel.appStatusEnum.ok);
                         }
                     }
                 }

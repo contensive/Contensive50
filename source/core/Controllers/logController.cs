@@ -276,9 +276,9 @@ namespace Contensive.Core.Controllers {
         public static void addSiteActivity(coreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
             try {
                 //
-                int CS;
-                //
-                CS = core.db.csInsertRecord("Activity Log", ByMemberID);
+                if (Message.Length > 255) Message = Message.Substring(0, 255);
+                if (Link.Length > 255) Message = Link.Substring(0, 255);
+                int CS = core.db.csInsertRecord("Activity Log", ByMemberID);
                 if (core.db.csOk(CS)) {
                     core.db.csSet(CS, "MemberID", SubjectMemberID);
                     core.db.csSet(CS, "OrganizationID", SubjectOrganizationID);

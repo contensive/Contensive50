@@ -203,7 +203,7 @@ namespace Contensive.Core {
         //
         public override string FilePath {
             get {
-                return core.appConfig.cdnFilesNetprefix;
+                return core.appConfig.cdnFileUrl;
             }
         }
         //
