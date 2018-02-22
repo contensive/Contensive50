@@ -43,11 +43,11 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // -- log request
                 string SaveContent = "Admin Site Request:"
-                        + "\r\n" + DateTime.Now 
-                        + "\r\nmember.name:" + core.sessionContext.user.name 
-                        + "\r\nmember.id:" + core.sessionContext.user.id 
-                        + "\r\nvisit.id:" + core.sessionContext.visit.id 
-                        + "\r\nurl:" + core.webServer.requestUrl 
+                        + "\r\n" + DateTime.Now
+                        + "\r\nmember.name:" + core.sessionContext.user.name
+                        + "\r\nmember.id:" + core.sessionContext.user.id
+                        + "\r\nvisit.id:" + core.sessionContext.visit.id
+                        + "\r\nurl:" + core.webServer.requestUrl
                         + "\r\nurl source:" + core.webServer.requestUrlSource + "\r\n----------"
                         + "\r\nform post:";
                 foreach (string key in core.docProperties.getKeyList()) {
@@ -64,7 +64,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             + "\r\nbinary header:"
                             + "\r\n" + BinaryHeaderString + "\r\n";
                 }
-                logController.addSiteActivity(core, SaveContent, core.sessionContext.user.id, core.sessionContext.user.OrganizationID );
+                logController.addSiteActivity(core, SaveContent, core.sessionContext.user.id, core.sessionContext.user.OrganizationID);
                 //
                 if (!core.sessionContext.isAuthenticated) {
                     //
@@ -710,7 +710,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //        '
         //        ' ----- close the panel
         //        '
-        //        GetForm_Edit_RSSFeeds = AdminUI.GetEditPanel( (Not AllowAdminTabs), "RSS Feeds / Podcasts", "Include in RSS Feeds / Podcasts", AdminUI.EditTableOpen & s.Text & AdminUI.EditTableClose)
+        //        GetForm_Edit_RSSFeeds = adminUIController.GetEditPanel(core, (Not AllowAdminTabs), "RSS Feeds / Podcasts", "Include in RSS Feeds / Podcasts", adminUIController.EditTableOpen & s.Text & adminUIController.EditTableClose)
         //        EditSectionPanelCount = EditSectionPanelCount + 1
         //        '
         //        s = Nothing
@@ -902,7 +902,7 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
                 string Button = null;
-                adminUIController Adminui = new adminUIController(core);
+                ////adminUIController Adminui = new adminUIController(core);
                 string Description = null;
                 string ButtonList = null;
                 //
@@ -917,9 +917,9 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Not Admin Error
                     //
                     ButtonList = ButtonCancel;
-                    Content.Add(Adminui.GetFormBodyAdminOnly());
+                    Content.Add(adminUIController.GetFormBodyAdminOnly());
                 } else {
-                    Content.Add(Adminui.EditTableOpen);
+                    Content.Add(adminUIController.EditTableOpen);
                     //
                     // Set defaults
                     //
@@ -948,12 +948,12 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // Close Tables
                     //
-                    Content.Add(Adminui.EditTableClose);
+                    Content.Add(adminUIController.EditTableClose);
                     Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminFormClearCache));
                 }
                 //
                 Description = "Hit Apply or OK to clear all current content caches";
-                returnHtml = Adminui.GetBody("Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                returnHtml = adminUIController.GetBody(core, "Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -972,7 +972,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
                 string Copy = null;
                 string Button = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string Description = null;
                 string ButtonList = null;
                 string KeywordList = null;
@@ -988,9 +988,9 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Not Admin Error
                     //
                     ButtonList = ButtonCancel;
-                    Content.Add(Adminui.GetFormBodyAdminOnly());
+                    Content.Add(adminUIController.GetFormBodyAdminOnly());
                 } else {
-                    Content.Add(Adminui.EditTableOpen);
+                    Content.Add(adminUIController.EditTableOpen);
                     //
                     // Process Requests
                     //
@@ -1038,7 +1038,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     Copy = core.html.inputTextExpandable("KeywordList", "", 10);
                     Copy += "<div>Paste your Meta Keywords into this text box, separated by either commas or enter keys. When you hit Save or OK, Meta Keyword records will be made out of each word. These can then be checked on any content page.</div>";
-                    Content.Add(Adminui.GetEditRow(Copy, "Paste Meta Keywords", "", false, false, ""));
+                    Content.Add(adminUIController.GetEditRow(core, Copy, "Paste Meta Keywords", "", false, false, ""));
                     //
                     // Buttons
                     //
@@ -1046,12 +1046,12 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // Close Tables
                     //
-                    Content.Add(Adminui.EditTableClose);
+                    Content.Add(adminUIController.EditTableClose);
                     Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminFormSecurityControl));
                 }
                 //
                 Description = "Use this tool to enter multiple Meta Keywords";
-                tempGetForm_MetaKeywordTool = Adminui.GetBody("Meta Keyword Entry Tool", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                tempGetForm_MetaKeywordTool = adminUIController.GetBody(core, "Meta Keyword Entry Tool", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
                 //
                 ///Dim th as integer: Exit Function
@@ -1124,7 +1124,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         // Included Addons
                         //
                         SQL = "select IncludedAddonID from ccAddonIncludeRules where AddonID=" + HelpAddonID;
-                        CS = core.db.csOpenSql(SQL,"Default");
+                        CS = core.db.csOpenSql(SQL, "Default");
                         while (core.db.csOk(CS)) {
                             IncludeID = core.db.csGetInteger(CS, "IncludedAddonID");
                             IncludeHelp = IncludeHelp + GetAddonHelp(IncludeID, HelpAddonID + "," + IncludeID.ToString());
@@ -2092,11 +2092,11 @@ namespace Contensive.Core.Addons.AdminSite {
         // Other
         //=============================================================================
         // Count of Buttons in use
-        private int ButtonObjectCount; 
-        private string[,] ImagePreloads = new string[3, 101]; 
+        private int ButtonObjectCount;
+        private string[,] ImagePreloads = new string[3, 101];
         private string JavaScriptString; // Collected string of Javascript functions to print at end
         private string AdminFormBottom; // the HTML needed to complete the Admin Form after contents
-        private bool UserAllowContentEdit; 
+        private bool UserAllowContentEdit;
         private int FormInputCount; // used to generate labels for form input
         private int EditSectionPanelCount;
 
@@ -2105,7 +2105,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //Const OpenLiveWindowTable = "<table ID=""LiveWindowTable"" border=0 cellpadding=0 cellspacing=0 width=""100%""><tr><td>"
         //Const CloseLiveWindowTable = "</td></tr></table>"
         //
-        //Const adminui.EditTableClose = "<tr>" _
+        //Const adminUIController.EditTableClose = "<tr>" _
         //        & "<td width=20%><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
         //        & "<td width=""70%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
         //        & "<td width=""10%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
@@ -2234,7 +2234,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //========================================================================
         //
         public string admin_GetAdminFormBody(string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
-            return (new adminUIController(core)).GetBody(Caption, ButtonListLeft, ButtonListRight, AllowAdd, AllowDelete, Description, ContentSummary, ContentPadding, Content);
+            return adminUIController.GetBody(core, Caption, ButtonListLeft, ButtonListRight, AllowAdd, AllowDelete, Description, ContentSummary, ContentPadding, Content);
         }
         //
         //
@@ -2325,9 +2325,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 int RecordID = 0;
                 string RecordName = null;
-                string LeftButtons = "";
-                string RightButtons = "";
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 Dictionary<string, bool> IsLookupFieldValid = new Dictionary<string, bool>();
                 bool allowCMEdit = false;
                 bool allowCMAdd = false;
@@ -2450,51 +2448,60 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // ----- ButtonBar
                             //
+                            string LeftButtons = "";
+                            string RightButtons = "";
                             AllowAdd = adminContent.allowAdd & (!IsLimitedToSubContent) && (allowCMAdd);
                             if (MenuDepth > 0) {
-                                LeftButtons = LeftButtons + core.html.button(ButtonClose, "", "", "window.close();");
+                                LeftButtons = LeftButtons + adminUIController.getButtonPrimary(ButtonClose, "window.close();");
                             } else {
-                                LeftButtons = LeftButtons + core.html.button(ButtonCancel);
+                                LeftButtons = LeftButtons + adminUIController.getButtonPrimary(ButtonCancel);
                                 //LeftButtons = LeftButtons & core.main_GetFormButton(ButtonCancel, , , "return processSubmit(this)")
                             }
                             if (AllowAdd) {
-                                LeftButtons = LeftButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonAdd + "\">";
+                                LeftButtons += adminUIController.getButtonPrimary(ButtonAdd,"" );
                                 //LeftButtons = LeftButtons & "<input TYPE=SUBMIT NAME=BUTTON VALUE=""" & ButtonAdd & """ onClick=""return processSubmit(this);"">"
                             } else {
-                                LeftButtons = LeftButtons + "<input TYPE=SUBMIT NAME=BUTTON DISABLED VALUE=\"" + ButtonAdd + "\">";
+                                LeftButtons += adminUIController.getButtonPrimary(ButtonAdd, "",true );
+                                //LeftButtons = LeftButtons + "<input TYPE=SUBMIT NAME=BUTTON DISABLED VALUE=\"" + ButtonAdd + "\" class=\"btn btn-primary mr-1 btn-sm\">";
                                 //LeftButtons = LeftButtons & "<input TYPE=SUBMIT NAME=BUTTON DISABLED VALUE=""" & ButtonAdd & """ onClick=""return processSubmit(this);"">"
                             }
                             AllowDelete = (adminContent.allowDelete) && (allowCMDelete);
                             if (AllowDelete) {
-                                LeftButtons = LeftButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonDelete + "\" onClick=\"if(!DeleteCheck())return false;\">";
+                                LeftButtons += adminUIController.getButtonPrimary(ButtonDelete, "if(!DeleteCheck())return false;");
+                                //LeftButtons += "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonDelete + "\" onClick=\"if(!DeleteCheck())return false;\" class=\"btn btn-primary mr-1 btn-sm\">";
                             } else {
-                                LeftButtons = LeftButtons + "<input TYPE=SUBMIT NAME=BUTTON DISABLED VALUE=\"" + ButtonDelete + "\" onClick=\"if(!DeleteCheck())return false;\">";
+                                LeftButtons += adminUIController.getButtonPrimary(ButtonDelete, "", true );
+                                //LeftButtons += "<input TYPE=SUBMIT NAME=BUTTON DISABLED VALUE=\"" + ButtonDelete + "\" onClick=\"if(!DeleteCheck())return false;\" class=\"btn btn-primary mr-1 btn-sm\">";
                             }
                             if (IndexConfig.PageNumber == 1) {
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonFirst + "\" DISABLED>";
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonPrevious + "\" DISABLED>";
+                                RightButtons += adminUIController.getButtonPrimary(ButtonFirst, "", true);
+                                RightButtons += adminUIController.getButtonPrimary(ButtonPrevious, "", true);
+                                //RightButtons += "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonFirst + "\" DISABLED class=\"btn btn-primary mr-1 btn-sm\">";
+                                //RightButtons += "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonPrevious + "\" DISABLED class=\"btn btn-primary mr-1 btn-sm\">";
                             } else {
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonFirst + "\">";
-                                //RightButtons = RightButtons & "<input TYPE=SUBMIT NAME=BUTTON VALUE=""" & ButtonFirst & """ onClick=""return processSubmit(this);"">"
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonPrevious + "\">";
-                                //RightButtons = RightButtons & "<input TYPE=SUBMIT NAME=BUTTON VALUE=""" & ButtonPrevious & """ onClick=""return processSubmit(this);"">"
+                                RightButtons += adminUIController.getButtonPrimary(ButtonFirst);
+                                RightButtons += adminUIController.getButtonPrimary(ButtonPrevious);
+                                //RightButtons += "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonFirst + "\" class=\"btn btn-primary mr-1 btn-sm\">";
+                                //RightButtons += "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonPrevious + "\" class=\"btn btn-primary mr-1 btn-sm\">";
                             }
                             //RightButtons = RightButtons & core.main_GetFormButton(ButtonFirst)
                             //RightButtons = RightButtons & core.main_GetFormButton(ButtonPrevious)
                             if (recordCnt > (IndexConfig.PageNumber * IndexConfig.RecordsPerPage)) {
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonNext + "\">";
+                                RightButtons += adminUIController.getButtonPrimary(ButtonNext);
+                                //RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonNext + "\" class=\"btn btn-primary mr-1 btn-sm\">";
                                 //RightButtons = RightButtons & "<input TYPE=SUBMIT NAME=BUTTON VALUE=""" & ButtonNext & """ onClick=""return processSubmit(this);"">"
                             } else {
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonNext + "\" DISABLED>";
+                                RightButtons += adminUIController.getButtonPrimary(ButtonNext,"",true);
+                                //RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonNext + "\" DISABLED class=\"btn btn-primary mr-1 btn-sm\">";
                             }
-                            RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonRefresh + "\">";
+                            RightButtons += adminUIController.getButtonPrimary(ButtonRefresh);
+                            //RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonRefresh + "\" class=\"btn btn-primary mr-1 btn-sm\">";
                             if (recordCnt <= 1) {
                                 PageCount = 1;
                             } else {
                                 PageCount = encodeInteger(1 + encodeInteger(Math.Floor(encodeNumber((recordCnt - 1) / IndexConfig.RecordsPerPage))));
                             }
-                            string ButtonBar = Adminui.GetButtonBarForIndex(LeftButtons, RightButtons, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, PageCount);
-                            //ButtonBar = AdminUI.GetButtonBar(LeftButtons, RightButtons)
+                            string ButtonBar = adminUIController.GetButtonBarForIndex(core, LeftButtons, RightButtons, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, PageCount);
                             //
                             // ----- TitleBar
                             //
@@ -2947,7 +2954,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 + "\r\n  }"
                                 + "\r\n} "
                                 + "\r\n</script>";
-                            DataTable_FindRow = DataTable_FindRow + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"60\" height=\"1\" ><br>" + core.html.button(ButtonFind, "", "FindButton") + "</td>";
+                            DataTable_FindRow = DataTable_FindRow + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"60\" height=\"1\" ><br>" + adminUIController.getButtonPrimary(ButtonFind, "", false, "", "FindButton") + "</td>";
                             ColumnPointer = 0;
                             foreach (var kvp in IndexConfig.Columns) {
                                 indexConfigColumnClass column = kvp.Value;
@@ -2995,7 +3002,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             // Stream.Add( OpenLiveWindowTable)
                             Stream.Add(core.html.formStart("", "adminForm"));
                             Stream.Add(ButtonBar);
-                            Stream.Add(Adminui.GetTitleBar(TitleBar, HeaderDescription));
+                            Stream.Add(adminUIController.GetTitleBar(core, TitleBar, HeaderDescription));
                             Stream.Add(FilterDataTable);
                             Stream.Add(ButtonBar);
                             Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\", height=\"10\" >"));
@@ -3295,7 +3302,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 SubFilterList = "";
                 if (genericController.vbLCase(TableName) == genericController.vbLCase("ccMembers")) {
                     SQL = core.db.GetSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");
-                    CS = core.db.csOpenSql(SQL,"Default");
+                    CS = core.db.csOpenSql(SQL, "Default");
                     while (core.db.csOk(CS)) {
                         Name = core.db.csGetText(CS, "Name");
                         Ptr = 0;
@@ -3722,7 +3729,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     core.db.deleteTableRecord(adminContent.contentTableName, editRecord.id, adminContent.contentDataSourceName);
                                     core.doc.processAfterSave(true, editRecord.contentControlId_Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink);
                                 }
-                                AdminAction = AdminActionNop; 
+                                AdminAction = AdminActionNop;
                                 break;
                             case AdminActionSave:
                                 //
@@ -4879,7 +4886,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     ResponseFieldIsEmpty = string.IsNullOrEmpty(ResponseFieldValueText);
                     string TabCopy = "";
                     if (field.editTabName != "") {
-                        TabCopy = " In the " + field.editTabName + " tab";
+                        TabCopy = " in the " + field.editTabName + " tab";
                     }
                     //
                     // -- process reserved fields
@@ -5210,18 +5217,18 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             //
                                             //
-                                            errorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique And there Is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference Allow Duplicate Usernames Is Not checked.");
+                                            errorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there Is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Duplicate Usernames' is Not checked.");
                                         } else if (blockDuplicateEmail) {
                                             //
                                             //
                                             //
-                                            errorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique And there Is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference Allow Email Login Is checked.");
+                                            errorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Email Login' is checked.");
                                         } else if (false) {
                                         } else {
                                             //
                                             // non-workflow
                                             //
-                                            errorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique And there Is another record with [" + ResponseFieldValueText + "].");
+                                            errorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "].");
                                         }
                                         ResponseFieldValueIsOKToSave = false;
                                     }
@@ -5986,7 +5993,7 @@ namespace Contensive.Core.Addons.AdminSite {
             string result = "";
             try {
                 //
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 bool IncludeCDefReload = false;
                 bool IsPageContent = false;
                 bool HasChildRecords = false;
@@ -6002,8 +6009,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 IncludeCDefReload = (adminContent.contentTableName.ToLower() == "cccontent") || (adminContent.contentTableName.ToLower() == "ccdatasources") || (adminContent.contentTableName.ToLower() == "cctables") || (adminContent.contentTableName.ToLower() == "ccfields");
                 AllowMarkReviewed = core.db.isSQLTableField("default", adminContent.contentTableName, "DateReviewed");
                 //
-                return Adminui.GetEditButtonBar2(MenuDepth, AllowDelete && editRecord.AllowDelete, editRecord.AllowCancel, (allowSave && editRecord.AllowSave), (SpellCheckSupported & (!SpellCheckRequest)), editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, (AllowAdd && adminContent.allowAdd & editRecord.AllowInsert), IncludeCDefReload, HasChildRecords, IsPageContent, AllowMarkReviewed, AllowRefresh, (allowSave && editRecord.AllowSave & (editRecord.id != 0)));
-                //GetForm_Edit_ButtonBar = AdminUI.GetEditButtonBar2( MenuDepth, iAllowDelete And EditRecord.AllowDelete, EditRecord.AllowCancel, (iAllowSave And EditRecord.AllowSave), (SpellCheckSupported And (Not SpellCheckRequest)), EditRecord.AllowPublish, EditRecord.AllowAbort, EditRecord.AllowSubmit, EditRecord.AllowApprove, (AdminContent.allowAdd And EditRecord.AllowInsert), IncludeCDefReload, HasChildRecords, IsPageContent, AllowMarkReviewed)
+                return adminUIController.GetEditButtonBar2(core, MenuDepth, AllowDelete && editRecord.AllowDelete, editRecord.AllowCancel, (allowSave && editRecord.AllowSave), (SpellCheckSupported & (!SpellCheckRequest)), editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, (AllowAdd && adminContent.allowAdd & editRecord.AllowInsert), IncludeCDefReload, HasChildRecords, IsPageContent, AllowMarkReviewed, AllowRefresh, (allowSave && editRecord.AllowSave & (editRecord.id != 0)));
                 //
                 // ----- Error Trap
                 //
@@ -6067,7 +6073,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int SystemEmailCID = 0;
                 int ConditionalEmailCID = 0;
                 string HeaderDescription = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 bool IsLandingPage = false;
                 bool IsRootPage = false;
                 string CreatedBy = null;
@@ -6501,7 +6507,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd);
                         EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeletePerson);
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
+                        Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(GetForm_Edit_AddTab("Groups", GetForm_Edit_MemberGroups(adminContent, editRecord), allowAdminTabs));
                         //Call Stream.Add(GetForm_Edit_AddTab("Topics", GetForm_Edit_TopicRules, AllowAdminTabs))
@@ -6546,24 +6552,24 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                         EditSectionButtonBar = "";
                         if (MenuDepth > 0) {
-                            EditSectionButtonBar += core.html.button(ButtonClose, "", "", "window.close();");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonClose, "window.close();");
                         } else {
-                            EditSectionButtonBar += core.html.button(ButtonCancel, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCancel, "Return processSubmit(this)");
                         }
                         if ((AllowDelete) && (core.sessionContext.isAuthenticatedDeveloper(core))) {
-                            EditSectionButtonBar += core.html.button(ButtonDeleteEmail, "", "", "If(!DeleteCheck())Return False;");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonDeleteEmail,"If(!DeleteCheck())Return False;");
                         }
                         if ((!EmailSubmitted) && (!EmailSent)) {
-                            EditSectionButtonBar += core.html.button(ButtonSave, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar += core.html.button(ButtonOK, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar += core.html.button(ButtonSendTest, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSave, "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonOK, "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSendTest, "Return processSubmit(this)");
                         } else if (AllowAdd) {
-                            EditSectionButtonBar += core.html.button(ButtonCreateDuplicate, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCreateDuplicate, "Return processSubmit(this)");
                         }
                         EditSectionButtonBar = htmlController.div(EditSectionButtonBar, "", "ccButtonCon");
                         //
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
+                        Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only & (!core.sessionContext.isAuthenticatedDeveloper(core))), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only & (!core.sessionContext.isAuthenticatedDeveloper(core))), allowAdminTabs));
@@ -6589,34 +6595,34 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                         EditSectionButtonBar = "";
                         if (MenuDepth > 0) {
-                            EditSectionButtonBar += core.html.button(ButtonClose, "", "", "window.close();");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonClose, "window.close();");
                         } else {
-                            EditSectionButtonBar += core.html.button(ButtonCancel, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCancel, "Return processSubmit(this)");
                         }
                         if (AllowDelete) {
-                            EditSectionButtonBar += core.html.button(ButtonDeleteEmail, "", "", "If(!DeleteCheck())Return False;");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonDeleteEmail, "If(!DeleteCheck())Return False;");
                         }
                         if (!EmailSubmitted) {
                             //
                             // Not Submitted
                             //
-                            EditSectionButtonBar += core.html.button(ButtonSave, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar += core.html.button(ButtonOK, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar += core.html.button(ButtonActivate, "", "", "Return processSubmit(this)", (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest));
-                            EditSectionButtonBar += core.html.button(ButtonSendTest, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSave, "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonOK,  "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonActivate,  "Return processSubmit(this)", (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest));
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSendTest,  "Return processSubmit(this)");
                         } else {
                             //
                             // Submitted
                             //
                             if (AllowAdd) {
-                                EditSectionButtonBar += core.html.button(ButtonCreateDuplicate, "", "", "Return processSubmit(this)");
+                                EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCreateDuplicate, "Return processSubmit(this)");
                             }
-                            EditSectionButtonBar += core.html.button(ButtonDeactivate, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonDeactivate, "Return processSubmit(this)");
                         }
                         EditSectionButtonBar = htmlController.div(EditSectionButtonBar, "", "ccButtonCon");
                         //
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
+                        Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only || EmailSubmitted, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(GetForm_Edit_AddTab("Condition&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only || EmailSubmitted), allowAdminTabs));
                         //Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(editrecord.read_only Or EmailSubmitted), AllowAdminTabs))
@@ -6646,28 +6652,28 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                         EditSectionButtonBar = "";
                         if (MenuDepth > 0) {
-                            EditSectionButtonBar += core.html.button(ButtonClose, "", "", "window.close();");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonClose,  "window.close();");
                         } else {
-                            EditSectionButtonBar += core.html.button(ButtonCancel, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCancel,  "Return processSubmit(this)");
                         }
                         if (editRecord.id != 0) {
-                            EditSectionButtonBar += core.html.button(ButtonDeleteEmail, "", "", "If(!DeleteCheck())Return False;");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonDeleteEmail, "If(!DeleteCheck())Return False;");
                         }
                         if ((!EmailSubmitted) && (!EmailSent)) {
-                            EditSectionButtonBar += core.html.button(ButtonSave, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar += core.html.button(ButtonOK, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar += core.html.button(ButtonSend, "", "", "Return processSubmit(this)", (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest));
-                            EditSectionButtonBar += core.html.button(ButtonSendTest, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSave,  "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonOK,  "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSend,  "Return processSubmit(this)", (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest));
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSendTest,  "Return processSubmit(this)");
                         } else {
                             //
                             // Submitted
                             //
-                            EditSectionButtonBar += core.html.button(ButtonCreateDuplicate, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCreateDuplicate, "Return processSubmit(this)");
                         }
                         EditSectionButtonBar = htmlController.div(EditSectionButtonBar, "", "ccButtonCon");
                         //
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
+                        Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only | EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only | EmailSubmitted || EmailSent), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only | EmailSubmitted || EmailSent), allowAdminTabs));
@@ -6691,7 +6697,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd);
                         EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord);
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
+                        Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_GroupRules(adminContent, editRecord), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
@@ -6712,7 +6718,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, (!IsLandingPage) && (!IsLandingPageParent) && AllowDelete, allowSave, AllowAdd, true);
                     EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeletePage);
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
+                    Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                     Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingPage || IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     //Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
                     Stream.Add(GetForm_Edit_AddTab("Link Aliases", GetForm_Edit_LinkAliases(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs));
@@ -6732,7 +6738,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //    EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, (Not IsLandingSection) And AllowDelete, allowSave, AllowAdd)
                     //    EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                     //    Call Stream.Add(EditSectionButtonBar)
-                    //    Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
+                    //    Call Stream.Add(adminUIController.GetTitleBar(core,GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                     //    Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingSection, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                     //    Call Stream.Add(GetForm_Edit_AddTab("Select Menus", GetForm_Edit_SectionDynamicMenuRules(adminContent, editRecord), allowAdminTabs))
                     //    Call Stream.Add(GetForm_Edit_AddTab("Section Blocking", GetForm_Edit_SectionBlockRules(adminContent, editRecord), allowAdminTabs))
@@ -6749,7 +6755,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //    EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
                     //    EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                     //    Call Stream.Add(EditSectionButtonBar)
-                    //    Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
+                    //    Call Stream.Add(adminUIController.GetTitleBar(core,GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                     //    Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                     //    Call Stream.Add(GetForm_Edit_AddTab("Select Sections", GetForm_Edit_DynamicMenuSectionRules(adminContent, editRecord), allowAdminTabs))
                     //    Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
@@ -6767,7 +6773,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd);
                     EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord);
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
+                    Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                     Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     Stream.Add(GetForm_Edit_AddTab("Authoring Access", GetForm_Edit_LibraryFolderRules(adminContent, editRecord), allowAdminTabs));
                     Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
@@ -6785,7 +6791,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd);
                     EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord);
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
+                    Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                     Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_ContentGroupRules(adminContent, editRecord), allowAdminTabs));
                     //Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
@@ -6811,7 +6817,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //            EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord,)
                     //            EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                     //            Call Stream.Add(EditSectionButtonBar)
-                    //            Call Stream.Add(Adminui.GetTitleBar( GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
+                    //            Call Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                     //            Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord,FormID, editrecord.read_only, False, False, ContentType, AllowAjaxTabs))
                     //            Call Stream.Add(GetForm_Edit_AddTab("Site Property", GetForm_Edit_SiteProperties(FormID), AllowAdminTabs))
                     //            Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editrecord), AllowAdminTabs))
@@ -6828,7 +6834,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd);
                     EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord);
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
+                    Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                     Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     Stream.Add(GetForm_Edit_AddTab("Reports", GetForm_Edit_LayoutReports(adminContent, editRecord), allowAdminTabs));
                     Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
@@ -6845,7 +6851,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd);
                     EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord);
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
+                    Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                     Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     //Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
                     Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminContent, editRecord), allowAdminTabs));
@@ -6885,7 +6891,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string ModifiedDateString = null;
                 string SubmittedDateString = null;
                 string ApprovedDateString = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string ButtonList = "";
                 string Caption = null;
                 int CS = 0;
@@ -6931,7 +6937,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     ButtonList = ButtonCancel;
-                    Body += Adminui.GetFormBodyAdminOnly();
+                    Body += adminUIController.GetFormBodyAdminOnly();
                 } else {
                     //
                     // ----- Page Body
@@ -6965,7 +6971,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //    & " GROUP BY ccAuthoringControls.ID,ccContent.ID, ccContent.Name, ccAuthoringControls.RecordID, ccContentWatch.Link, ccContent.AllowWorkflowAuthoring, ccAuthoringControls.ControlType" _
                     //    & " HAVING (ccAuthoringControls.ControlType>1)" _
                     //    & " order by max(ccAuthoringControls.DateAdded) Desc"
-                    CS = core.db.csOpenSql(SQL,"Default");
+                    CS = core.db.csOpenSql(SQL, "Default");
                     //CS = core.app_openCsSql_Rev_Internal("Default", SQL, RecordsPerPage, PageNumber)
                     RecordCount = 0;
                     if (core.db.csOk(CS)) {
@@ -7201,7 +7207,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (RecordCount >= 100) {
                     Description = Description + BR + BR + "Only the first 100 record are displayed";
                 }
-                tempGetForm_Publish = Adminui.GetBody(Caption, ButtonList, "", true, true, Description, "", 0, Body);
+                tempGetForm_Publish = adminUIController.GetBody(core, Caption, ButtonList, "", true, true, Description, "", 0, Body);
                 core.html.addTitle("Workflow Publishing");
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -7281,7 +7287,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string MTMRuleField0 = null;
                 string MTMRuleField1 = null;
                 string AlphaSort = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 bool needUniqueEmailMessage = false;
                 //
                 // ----- Open the panel
@@ -8254,16 +8260,28 @@ namespace Contensive.Core.Addons.AdminSite {
                                     + "<div class=\"header\">Custom Help</div>"
                                     + "<div class=\"body\">" + HelpMsgCustom + "</div>"
                                 + "";
+                            string jsUpdate = "updateFieldHelp('" + fieldId + "','" + HelpEditorID + "','" + HelpClosedContentID + "');cj.hide('" + HelpOpenedEditID + "');cj.show('" + HelpClosedID + "');return false";
+                            string jsCancel = "cj.hide('" + HelpOpenedEditID + "');cj.show('" + HelpClosedID + "');return false";
                             HelpMsgOpenedEdit = ""
                                     + "<div class=\"header\">Default Help</div>"
                                     + "<div class=\"body\">" + HelpMsgDefault + "</div>"
                                     + "<div class=\"header\">Custom Help</div>"
                                     + "<div class=\"body\"><textarea id=\"" + HelpEditorID + "\" ROWS=\"10\" style=\"width:100%;\">" + HelpMsgCustom + "</TEXTAREA></div>"
                                     + "<div class=\"\">"
-                                        + "<input type=\"submit\" name=\"button\" value=\"Update\" onClick=\"updateFieldHelp('" + fieldId + "','" + HelpEditorID + "','" + HelpClosedContentID + "');cj.hide('" + HelpOpenedEditID + "');cj.show('" + HelpClosedID + "');return false\">"
-                                        + "<input type=\"submit\" name=\"button\" value=\"Cancel\" onClick=\"cj.hide('" + HelpOpenedEditID + "');cj.show('" + HelpClosedID + "');return false\">"
+                                        + adminUIController.getButtonPrimary("Update", jsUpdate)
+                                        + adminUIController.getButtonPrimary("Cancel", jsCancel)
                                     + "</div>"
                                 + "";
+                            //HelpMsgOpenedEdit = ""
+                            //    + "<div class=\"header\">Default Help</div>"
+                            //    + "<div class=\"body\">" + HelpMsgDefault + "</div>"
+                            //    + "<div class=\"header\">Custom Help</div>"
+                            //    + "<div class=\"body\"><textarea id=\"" + HelpEditorID + "\" ROWS=\"10\" style=\"width:100%;\">" + HelpMsgCustom + "</TEXTAREA></div>"
+                            //    + "<div class=\"\">"
+                            //        + "<input type=\"submit\" name=\"button\" value=\"Update\" onClick=\"updateFieldHelp('" + fieldId + "','" + HelpEditorID + "','" + HelpClosedContentID + "');cj.hide('" + HelpOpenedEditID + "');cj.show('" + HelpClosedID + "');return false\">"
+                            //        + "<input type=\"submit\" name=\"button\" value=\"Cancel\" onClick=\"cj.hide('" + HelpOpenedEditID + "');cj.show('" + HelpClosedID + "');return false\">"
+                            //    + "</div>"
+                            //+ "";
                             if (IsLongHelp) {
                                 //
                                 // Long help, closed gets MoreHelpIcon (opens to HelpMsgOpenedRead) and HelpEditIcon (opens to readonly default copy plus editor with custom copy)
@@ -8364,7 +8382,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         Caption = "Content Fields - " + EditTab;
                     }
                     EditSectionPanelCount = EditSectionPanelCount + 1;
-                    returnHtml = Adminui.GetEditPanel((!allowAdminTabs), Caption, "", Adminui.EditTableOpen + s.Text + Adminui.EditTableClose);
+                    returnHtml = adminUIController.GetEditPanel(core, (!allowAdminTabs), Caption, "", adminUIController.EditTableOpen + s.Text + adminUIController.EditTableClose);
                     EditSectionPanelCount = EditSectionPanelCount + 1;
                     s = null;
                 }
@@ -8390,7 +8408,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int ContentWatchListID = 0;
                 stringBuilderLegacyController FastString = null;
                 string Copy = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 if (adminContent.allowContentTracking) {
                     FastString = new stringBuilderLegacyController();
@@ -8409,7 +8427,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         // ----- Open the panel
                         //
                         //Call core.main_PrintPanelTop("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
-                        //Call FastString.Add(adminui.EditTableOpen)
+                        //Call FastString.Add(adminUIController.EditTableOpen)
                         //Call FastString.Add(vbCrLf & "<tr><td colspan=""3"" class=""ccAdminEditSubHeader"">Content Tracking</td></tr>")
                         //            '
                         //            ' ----- Print matching Content Watch fields
@@ -8439,7 +8457,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 }
                             }
                             //
-                            FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Include in " + core.db.csGet(CSLists, "name"), "When true, this Content Record can be included in the '" + core.db.csGet(CSLists, "name") + "' list", false, false, ""));
+                            FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Include in " + core.db.csGet(CSLists, "name"), "When true, this Content Record can be included in the '" + core.db.csGet(CSLists, "name") + "' list", false, false, ""));
                             core.db.csGoNext(CSLists);
                             RecordCount = RecordCount + 1;
                         }
@@ -8452,7 +8470,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             HTMLFieldString = core.html.inputText("ContentWatchLinkLabel", ContentWatchLinkLabel, 1, core.siteProperties.defaultFormInputWidth);
                             //HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchLinkLabel"" cols=""" & core.app.SiteProperty_DefaultFormInputWidth & """>" & ContentWatchLinkLabel & "</textarea>"
                         }
-                        FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Caption", "This caption is displayed on all Content Watch Lists, linked to the location on the web site where this content is displayed. RSS feeds created from Content Watch Lists will use this caption as the record title if not other field is selected in the Content Definition.", false, true, "ContentWatchLinkLabel"));
+                        FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Caption", "This caption is displayed on all Content Watch Lists, linked to the location on the web site where this content is displayed. RSS feeds created from Content Watch Lists will use this caption as the record title if not other field is selected in the Content Definition.", false, true, "ContentWatchLinkLabel"));
                         //
                         // ----- Whats New Expiration
                         //
@@ -8466,7 +8484,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             HTMLFieldString = core.html.inputDate("ContentWatchExpires", Copy, core.siteProperties.defaultFormInputWidth.ToString());
                             //HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchExpires"" cols=""" & core.app.SiteProperty_DefaultFormInputWidth & """>" & Copy & "</textarea>"
                         }
-                        FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
+                        FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
                         //
                         // ----- Public Link (read only)
                         //
@@ -8474,7 +8492,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         if (string.IsNullOrEmpty(HTMLFieldString)) {
                             HTMLFieldString = "(must first be viewed on public site)";
                         }
-                        FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Location on Site", "The public site URL where this content was last viewed.", false, false, ""));
+                        FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Location on Site", "The public site URL where this content was last viewed.", false, false, ""));
                         //
                         // removed 11/27/07 - RSS clicks not counted, rc/ri method of counting link clicks is not reliable.
                         //            '
@@ -8484,13 +8502,13 @@ namespace Contensive.Core.Addons.AdminSite {
                         //            If HTMLFieldString = "" Then
                         //                HTMLFieldString = 0
                         //                End If
-                        //            Call FastString.Add(AdminUI.GetEditRow( HTMLFieldString, "Clicks", "The number of site users who have clicked this link in what's new lists", False, False, ""))
+                        //            Call FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Clicks", "The number of site users who have clicked this link in what's new lists", False, False, ""))
                         //
                         // ----- close the panel
                         //
                         string s = ""
-                        + Adminui.EditTableOpen + FastString.Text + Adminui.EditTableClose + core.html.inputHidden("WhatsNewResponse", "-1") + core.html.inputHidden("contentwatchrecordid", ContentWatchRecordID.ToString());
-                        tempGetForm_Edit_ContentTracking = Adminui.GetEditPanel((!allowAdminTabs), "Content Tracking", "Include in Content Watch Lists", s);
+                        + adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose + core.html.inputHidden("WhatsNewResponse", "-1") + core.html.inputHidden("contentwatchrecordid", ContentWatchRecordID.ToString());
+                        tempGetForm_Edit_ContentTracking = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Content Tracking", "Include in Content Watch Lists", s);
                         EditSectionPanelCount = EditSectionPanelCount + 1;
                         //
                     }
@@ -8532,7 +8550,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool FieldRequired = false;
                 string FieldHelp = null;
                 string Copy = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 if (string.IsNullOrEmpty(adminContent.name)) {
                     //
@@ -8559,8 +8577,8 @@ namespace Contensive.Core.Addons.AdminSite {
                 //FieldHelp = "In immediate authoring mode, the live site is changed when each record is saved. In Workflow authoring mode, there are several steps to publishing a change. This field displays the current stage of this record."
                 //FieldRequired = False
                 //AuthoringStatusMessage = core.doc.authContext.main_GetAuthoringStatusMessage(core, false, editRecord.EditLock, editRecord.EditLockMemberName, editRecord.EditLockExpires, editRecord.ApproveLock, editRecord.ApprovedName, editRecord.SubmitLock, editRecord.SubmittedName, editRecord.IsDeleted, editRecord.IsInserted, editRecord.IsModified, editRecord.LockModifiedName)
-                //Call FastString.Add(Adminui.GetEditRow(AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
-                //Call FastString.Add(AdminUI.GetEditRow( AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
+                //Call FastString.Add(adminUIController.GetEditRow(core,AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
+                //Call FastString.Add(adminUIController.GetEditRow(core, AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
                 //
                 // ----- RecordID
                 //
@@ -8571,12 +8589,12 @@ namespace Contensive.Core.Addons.AdminSite {
                     HTMLFieldString = genericController.encodeText(editRecord.id);
                 }
                 HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Record Number", FieldHelp, true, false, ""));
+                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Record Number", FieldHelp, true, false, ""));
                 //
                 // -- Active
                 Copy = "When unchecked, add-ons can ignore this record as if it was temporarily deleted.";
                 HTMLFieldString = core.html.inputCheckbox("active", editRecord.active);
-                FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Active", Copy, false, false, ""));
+                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Active", Copy, false, false, ""));
                 //
                 // ----- If Page Content , check if this is the default PageNotFound page
                 //
@@ -8592,7 +8610,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         HTMLFieldString = "<b>" + genericController.GetYesNo(Checked) + "</b>" + core.html.inputHidden("LandingPageID", Checked);
                     }
                     //HTMLFieldString = HTMLFieldString;
-                    FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Set Default Landing Page", Copy, false, false, ""));
+                    FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Set Default Landing Page", Copy, false, false, ""));
                     //
                     // Page Not Found
                     //
@@ -8609,7 +8627,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //                HTMLFieldString = core.main_GetFormInputCheckBox2("PageNotFound", False)
                     //            End If
                     //HTMLFieldString = HTMLFieldString;
-                    FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Set Page Not Found", Copy, false, false, ""));
+                    FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Set Page Not Found", Copy, false, false, ""));
                 }
                 //
                 // ----- Last Known Public Site URL
@@ -8622,7 +8640,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     } else {
                         HTMLFieldString = "<a href=\"" + genericController.encodeHTML(Copy) + "\" target=\"_blank\">" + Copy + "</a>";
                     }
-                    FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Last Known Public URL", FieldHelp, false, false, ""));
+                    FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Last Known Public URL", FieldHelp, false, false, ""));
                 }
                 //
                 // ----- Widget Code
@@ -8639,7 +8657,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         FieldHelp = "If you wish to use this add-on as a widget, enable 'Is Remote Method' on the 'Placement' tab and save the record. The necessary html code, or 'embed code' will be created here for you to cut-and-paste into the website.";
                         HTMLFieldString = "";
                         HTMLFieldString = core.html.inputTextExpandable("ignore", HTMLFieldString, 1, "100%", "", false, true);
-                        FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
+                        FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
                     } else {
                         FieldHelp = "If you wish to use this add-on as a widget, cut and paste the 'Widget Code' into the website content. If any code appears in the 'Widget Head', this will need to be pasted into the head section of the website.";
                         HTMLFieldString = ""
@@ -8657,7 +8675,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //                    & vbCrLf & "<script language=""javascript"" type=""text/javascript"" src=""http://" & core.main_ServerDomain & "/" & EditRecord.Name & "?requestjsform=1""></script>" _
                         //                    & ""
                         HTMLFieldString = core.html.inputTextExpandable("ignore", HTMLFieldString, 8);
-                        FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
+                        FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
                     }
                 }
                 //
@@ -8683,7 +8701,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             HTMLFieldString = core.html.inputText("ccguid", HTMLFieldString, -1, -1, "", false, true) + core.html.inputHidden("ccguid", HTMLFieldString);
                         }
                     }
-                    FastString.Add(Adminui.GetEditRow(HTMLFieldString, "GUID", FieldHelp, false, false, ""));
+                    FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "GUID", FieldHelp, false, false, ""));
                 }
                 //
                 // ----- EID (Encoded ID)
@@ -8711,7 +8729,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         FieldHelp = FieldHelp + " To enable, disable or modify this feature, use the security tab on the Preferences page.";
                     }
                     HTMLFieldString = core.html.inputText("ignore", HTMLFieldString);
-                    FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Member Link Login EID", FieldHelp, true, false, ""));
+                    FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Member Link Login EID", FieldHelp, true, false, ""));
                 }
                 //
                 // ----- Controlling Content
@@ -8805,7 +8823,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     HTMLFieldString = editRecord.contentControlId_Name;
                     //HTMLFieldString = cdefmodel.getContentNameByID(core,EditRecord.ContentID)
                 }
-                FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Controlling Content", FieldHelp, FieldRequired, false, ""));
+                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Controlling Content", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Created By
                 //
@@ -8827,7 +8845,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                 }
                 HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Created By", FieldHelp, FieldRequired, false, ""));
+                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Created By", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Created Date
                 //
@@ -8841,7 +8859,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                 }
                 HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Created Date", FieldHelp, FieldRequired, false, ""));
+                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Created Date", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Modified By
                 //
@@ -8860,7 +8878,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                 }
                 HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Modified By", FieldHelp, FieldRequired, false, ""));
+                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Modified By", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Modified Date
                 //
@@ -8874,10 +8892,10 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                 }
                 HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Modified Date", FieldHelp, false, false, ""));
+                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Modified Date", FieldHelp, false, false, ""));
                 s = ""
-                    + Adminui.EditTableOpen + FastString.Text + Adminui.EditTableClose + hiddenInputs + "";
-                tempGetForm_Edit_Control = Adminui.GetEditPanel((!allowAdminTabs), "Control Information", "", s);
+                    + adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose + hiddenInputs + "";
+                tempGetForm_Edit_Control = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Control Information", "", s);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
                 FastString = null;
             } catch (Exception ex) {
@@ -8907,7 +8925,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string HTMLFieldString = null;
                 stringBuilderLegacyController FastString = null;
                 string Copy = "";
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string SitePropertyName = null;
                 string SitePropertyValue = null;
                 string selector = null;
@@ -9038,8 +9056,8 @@ namespace Contensive.Core.Addons.AdminSite {
 
                     //HTMLFieldString = core.main_GetFormInputText2( genericController.vbLCase(FieldName), VAlue)
                 }
-                FastString.Add(Adminui.GetEditRow(HTMLFieldString, SitePropertyName, "", false, false, ""));
-                tempGetForm_Edit_SiteProperties = Adminui.GetEditPanel((!allowAdminTabs), "Control Information", "", Adminui.EditTableOpen + FastString.Text + Adminui.EditTableClose);
+                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, SitePropertyName, "", false, false, ""));
+                tempGetForm_Edit_SiteProperties = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Control Information", "", adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
                 FastString = null;
                 return tempGetForm_Edit_SiteProperties;
@@ -9377,7 +9395,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //                '
         //                ' ----- Open the panel
         //                '
-        //                Call f.Add(AdminUI.EditTableOpen)
+        //                Call f.Add(adminUIController.EditTableOpen)
         //                SectionName = ""
         //                TopicCount = 0
         //                Do While core.app.csv_IsCSOK(CS)
@@ -9419,11 +9437,11 @@ namespace Contensive.Core.Addons.AdminSite {
         //                    Call core.app.nextCSRecord(CS)
         //                Loop
         //                f.Add( vbCrLf & "<input type=""hidden"" name=""TopicCount"" value=""" & TopicCount & """>"
-        //                f.Add( AdminUI.EditTableClose
+        //                f.Add( adminUIController.EditTableClose
         //                '
         //                ' ----- close the panel
         //                '
-        //                GetForm_Edit_TopicRules = AdminUI.GetEditPanel( (Not AllowAdminTabs), "Topic Rules", "This content is associated with the following topics", f.Text)
+        //                GetForm_Edit_TopicRules = adminUIController.GetEditPanel(core, (Not AllowAdminTabs), "Topic Rules", "This content is associated with the following topics", f.Text)
         //                EditSectionPanelCount = EditSectionPanelCount + 1
         //                '
         //                End If
@@ -9447,7 +9465,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int LinkCnt = 0;
                 string LinkList = "";
                 stringBuilderLegacyController f = new stringBuilderLegacyController();
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string linkAlias = null;
                 string Link = null;
                 int CS = 0;
@@ -9508,10 +9526,10 @@ namespace Contensive.Core.Addons.AdminSite {
                         f.Add(LinkList);
                         f.Add("</span></td></tr>");
                     }
-                    tabContent = Adminui.EditTableOpen + f.Text + Adminui.EditTableClose;
+                    tabContent = adminUIController.EditTableOpen + f.Text + adminUIController.EditTableClose;
                 }
                 //
-                tempGetForm_Edit_LinkAliases = Adminui.GetEditPanel((!allowAdminTabs), "Link Aliases", TabDescription, tabContent);
+                tempGetForm_Edit_LinkAliases = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Link Aliases", TabDescription, tabContent);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -9530,7 +9548,7 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 //
                 stringBuilderLegacyController f = new stringBuilderLegacyController();
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 s = core.html.getCheckList("EmailGroups", "Group Email", editRecord.id, "Groups", "Email Groups", "EmailID", "GroupID", "", "Caption");
                 s = "<tr>"
@@ -9540,8 +9558,8 @@ namespace Contensive.Core.Addons.AdminSite {
                     + "<td class=\"ccAdminEditCaption\">&nbsp;</td>"
                     + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + cdefModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>"
                     + "</tr>";
-                s = Adminui.EditTableOpen + s + Adminui.EditTableClose;
-                s = Adminui.GetEditPanel((!allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
+                s = adminUIController.EditTableOpen + s + adminUIController.EditTableClose;
+                s = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -9559,7 +9577,7 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 //
                 stringBuilderLegacyController f = new stringBuilderLegacyController();
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 s = core.html.getCheckList("EmailTopics", "Group Email", editRecord.id, "Topics", "Email Topics", "EmailID", "TopicID", "", "Name");
                 s = "<tr>"
@@ -9569,8 +9587,8 @@ namespace Contensive.Core.Addons.AdminSite {
                     + "<td class=\"ccAdminEditCaption\">&nbsp;</td>"
                     + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + cdefModel.getContentId(core, "Topics") + " target=_blank>Manage Topics</a>]</span></td>"
                     + "</tr>";
-                s = Adminui.EditTableOpen + s + Adminui.EditTableClose;
-                s = Adminui.GetEditPanel((!allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
+                s = adminUIController.EditTableOpen + s + adminUIController.EditTableClose;
+                s = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -9587,11 +9605,11 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 stringBuilderLegacyController f = new stringBuilderLegacyController();
                 string Copy = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
-                f.Add(Adminui.GetEditRow("<a href=?" + RequestNameAdminForm + "=28 target=_blank>Open in New Window</a>", "Email Control", "The settings in this section can be modified with the Email Control page."));
-                f.Add(Adminui.GetEditRow(core.siteProperties.getText("EmailBounceAddress", ""), "Bounce Email Address", "All bounced emails will be sent to this address automatically. This must be a valid email account, and you should either use Contensive Bounce processing to capture the emails, or manually remove them from the account yourself."));
-                f.Add(Adminui.GetEditRow(genericController.GetYesNo(genericController.encodeBoolean(core.siteProperties.getBoolean("AllowEmailBounceProcessing", false))), "Allow Bounce Email Processing", "If checked, Contensive will periodically retrieve all the email from the POP email account and take action on the membefr account that sent the email."));
+                f.Add(adminUIController.GetEditRow(core, "<a href=?" + RequestNameAdminForm + "=28 target=_blank>Open in New Window</a>", "Email Control", "The settings in this section can be modified with the Email Control page."));
+                f.Add(adminUIController.GetEditRow(core, core.siteProperties.getText("EmailBounceAddress", ""), "Bounce Email Address", "All bounced emails will be sent to this address automatically. This must be a valid email account, and you should either use Contensive Bounce processing to capture the emails, or manually remove them from the account yourself."));
+                f.Add(adminUIController.GetEditRow(core, genericController.GetYesNo(genericController.encodeBoolean(core.siteProperties.getBoolean("AllowEmailBounceProcessing", false))), "Allow Bounce Email Processing", "If checked, Contensive will periodically retrieve all the email from the POP email account and take action on the membefr account that sent the email."));
                 switch (core.siteProperties.getText("EMAILBOUNCEPROCESSACTION", "0")) {
                     case "1":
                         Copy = "Clear the Allow Group Email field for all members with a matching Email address";
@@ -9606,10 +9624,10 @@ namespace Contensive.Core.Addons.AdminSite {
                         Copy = "Do Nothing";
                         break;
                 }
-                f.Add(Adminui.GetEditRow(Copy, "Bounce Email Action", "When an email is determined to be a bounce, this action will taken against member with that email address."));
-                f.Add(Adminui.GetEditRow(core.siteProperties.getText("POPServerStatus"), "Last Email Retrieve Status", "This is the status of the last POP email retrieval attempted."));
+                f.Add(adminUIController.GetEditRow(core, Copy, "Bounce Email Action", "When an email is determined to be a bounce, this action will taken against member with that email address."));
+                f.Add(adminUIController.GetEditRow(core, core.siteProperties.getText("POPServerStatus"), "Last Email Retrieve Status", "This is the status of the last POP email retrieval attempted."));
                 //
-                tempGetForm_Edit_EmailBounceStatus = Adminui.GetEditPanel((!allowAdminTabs), "Bounced Email Handling", "", Adminui.EditTableOpen + f.Text + Adminui.EditTableClose);
+                tempGetForm_Edit_EmailBounceStatus = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Bounced Email Handling", "", adminUIController.EditTableOpen + f.Text + adminUIController.EditTableClose);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -9647,7 +9665,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool[] Active = { };
                 string Caption = null;
                 string ReportLink = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                 //
@@ -9665,7 +9683,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         SQL = "SELECT Active,GroupID,DateExpires"
                             + " FROM ccMemberRules"
                             + " WHERE MemberID=" + editRecord.id;
-                        CS = core.db.csOpenSql(SQL,"Default");
+                        CS = core.db.csOpenSql(SQL, "Default");
                         while (core.db.csOk(CS)) {
                             if (MembershipCount >= MembershipSize) {
                                 MembershipSize = MembershipSize + 10;
@@ -9693,11 +9711,11 @@ namespace Contensive.Core.Addons.AdminSite {
                     //sql &= "" _
                     //    & " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Caption, ccGroups.name, ccGroups.SortOrder" _
                     //    & " ORDER BY ccContent.Name, ccGroups.Caption"
-                    CS = core.db.csOpenSql(SQL,"Default");
+                    CS = core.db.csOpenSql(SQL, "Default");
                     //
                     // Output all the groups, with the active and dateexpires from those joined
                     //
-                    f.Add(Adminui.EditTableOpen);
+                    f.Add(adminUIController.EditTableOpen);
                     GroupCount = 0;
                     CanSeeHiddenGroups = core.sessionContext.isAuthenticatedDeveloper(core);
                     while (core.db.csOk(CS)) {
@@ -9765,7 +9783,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 f.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + cdefModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
                 f.Add("</tr>");
 
-                tempGetForm_Edit_MemberGroups = Adminui.GetEditPanel((!allowAdminTabs), "Group Membership", "This person is a member of these groups", Adminui.EditTableOpen + f.Text + Adminui.EditTableClose);
+                tempGetForm_Edit_MemberGroups = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Group Membership", "This person is a member of these groups", adminUIController.EditTableOpen + f.Text + adminUIController.EditTableClose);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -9782,7 +9800,7 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 //
                 stringBuilderLegacyController FastString = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 FastString = new stringBuilderLegacyController();
                 FastString.Add("<tr>");
@@ -9792,7 +9810,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 FastString.Add("<li class=\"ccListItem\"><a target=\"_blank\" href=\"/preview?layout=" + editRecord.id + "\">Preview this layout</A></LI>");
                 FastString.Add("</ul>");
                 FastString.Add("</span></td></tr>");
-                tempGetForm_Edit_LayoutReports = Adminui.GetEditPanel((!allowAdminTabs), "Contensive Reporting", "", Adminui.EditTableOpen + FastString.Text + Adminui.EditTableClose);
+                tempGetForm_Edit_LayoutReports = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Contensive Reporting", "", adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
                 FastString = null;
             } catch (Exception ex) {
@@ -9810,7 +9828,7 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 //
                 stringBuilderLegacyController FastString = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 FastString = new stringBuilderLegacyController();
                 FastString.Add("<tr>");
@@ -9821,7 +9839,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 FastString.Add("<li class=\"ccListItem\"><a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=13&MemberID=" + editRecord.id + "&DateTo=" + Math.Floor(encodeNumber(core.doc.profileStartTime.ToOADate())) + "&DateFrom=" + Math.Floor(encodeNumber(core.doc.profileStartTime.ToOADate()) - 365) + "\">All orders from this person</A></LI>");
                 FastString.Add("</ul>");
                 FastString.Add("</span></td></tr>");
-                tempGetForm_Edit_MemberReports = Adminui.GetEditPanel((!allowAdminTabs), "Contensive Reporting", "", Adminui.EditTableOpen + FastString.Text + Adminui.EditTableClose);
+                tempGetForm_Edit_MemberReports = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Contensive Reporting", "", adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
                 FastString = null;
             } catch (Exception ex) {
@@ -9846,7 +9864,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int IDEndPtr = 0;
                 int GroupID = 0;
                 string ReportLink = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 GroupList = core.html.getCheckList2("PageContentBlockRules", adminContent.name, editRecord.id, "Groups", "Page Content Block Rules", "RecordID", "GroupID", "", "Caption", false);
                 GroupSplit = GroupList.Split(new[] { "<br>" }, StringSplitOptions.None);
@@ -9866,7 +9884,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                     f.Add("<tr><td>&nbsp;</td><td class=\"ccAdminEditField\" align=left>" + SpanClassAdminNormal + GroupSplit[Ptr] + "</span></td><td class=\"ccAdminEditField\" align=center>" + ReportLink + "</td></tr>");
                 }
-                tempGetForm_Edit_PageContentBlockRules = Adminui.GetEditPanel((!allowAdminTabs), "Content Blocking", "If content is blocked, select groups that have access to this content", Adminui.EditTableOpen + f.Text + Adminui.EditTableClose);
+                tempGetForm_Edit_PageContentBlockRules = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Content Blocking", "If content is blocked, select groups that have access to this content", adminUIController.EditTableOpen + f.Text + adminUIController.EditTableClose);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -9891,7 +9909,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int IDEndPtr = 0;
                 int GroupID = 0;
                 string ReportLink = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 GroupList = core.html.getCheckList2("LibraryFolderRules", adminContent.name, editRecord.id, "Groups", "Library Folder Rules", "FolderID", "GroupID", "", "Caption");
                 GroupSplit = stringSplit(GroupList, "<br>");
@@ -9912,7 +9930,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     f.Add("<tr><td>&nbsp;</td><td class=\"ccAdminEditField\" align=left>" + SpanClassAdminNormal + GroupSplit[Ptr] + "</span></td><td class=\"ccAdminEditField\" align=center>" + ReportLink + "</td></tr>");
                 }
                 Copy = "Select groups who have authoring access within this folder. This means if you are in this group you can upload files, delete files, create folders and delete folders within this folder and any subfolders.";
-                tempGetForm_Edit_LibraryFolderRules = Adminui.GetEditPanel((!allowAdminTabs), "Folder Permissions", Copy, Adminui.EditTableOpen + f.Text + Adminui.EditTableClose);
+                tempGetForm_Edit_LibraryFolderRules = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Folder Permissions", Copy, adminUIController.EditTableOpen + f.Text + adminUIController.EditTableClose);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -9943,14 +9961,14 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool GroupFound = false;
                 GroupRuleType[] GroupRules = { };
                 stringBuilderLegacyController FastString = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 // ----- Open the panel
                 //
                 FastString = new stringBuilderLegacyController();
                 //
                 //Call core.main_PrintPanelTop("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
-                //Call call FastString.Add(adminui.EditTableOpen)
+                //Call call FastString.Add(adminUIController.EditTableOpen)
                 //
                 // ----- Gather all the groups which have authoring rights to the content
                 //
@@ -9960,7 +9978,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     SQL = "SELECT ccGroups.ID AS ID, ccGroupRules.AllowAdd as allowadd, ccGroupRules.AllowDelete as allowdelete"
                         + " FROM ccGroups LEFT JOIN ccGroupRules ON ccGroups.ID = ccGroupRules.GroupID"
                         + " WHERE (((ccGroupRules.ContentID)=" + editRecord.id + ") AND ((ccGroupRules.Active)<>0) AND ((ccGroups.Active)<>0))";
-                    CS = core.db.csOpenSql(SQL,"Default");
+                    CS = core.db.csOpenSql(SQL, "Default");
                     if (core.db.csOk(CS)) {
                         if (true) {
                             GroupRulesSize = 100;
@@ -9988,7 +10006,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     + " Where (((ccGroups.Active) <> " + SQLFalse + ") And ((ccContent.Active) <> " + SQLFalse + "))"
                     + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Name, ccGroups.Caption, ccGroups.SortOrder"
                     + " ORDER BY ccContent.Name, ccGroups.Caption, ccGroups.SortOrder";
-                CS = core.db.csOpenSql(SQL,"Default");
+                CS = core.db.csOpenSql(SQL, "Default");
                 if (!core.db.csOk(CS)) {
                     FastString.Add("\r\n<tr><td colspan=\"3\">" + SpanClassAdminSmall + "There are no active groups</span></td></tr>");
                 } else {
@@ -10045,10 +10063,10 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // ----- close the panel
                 //
-                //Call FastString.Add(adminui.EditTableClose)
+                //Call FastString.Add(adminUIController.EditTableClose)
                 //Call core.main_PrintPanelBottom("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
                 //
-                tempGetForm_Edit_GroupRules = Adminui.GetEditPanel((!allowAdminTabs), "Authoring Permissions", "The following groups can edit this content.", Adminui.EditTableOpen + FastString.Text + Adminui.EditTableClose);
+                tempGetForm_Edit_GroupRules = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Authoring Permissions", "The following groups can edit this content.", adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
                 FastString = null;
             } catch (Exception ex) {
@@ -10075,7 +10093,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool ContentFound = false;
                 ContentGroupRuleType[] ContentGroupRules = { };
                 stringBuilderLegacyController FastString = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 if (core.sessionContext.isAuthenticatedAdmin(core)) {
                     //
@@ -10084,7 +10102,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     FastString = new stringBuilderLegacyController();
                     //
                     //Call core.main_PrintPanelTop("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
-                    //Call call FastString.Add(adminui.EditTableOpen)
+                    //Call call FastString.Add(adminUIController.EditTableOpen)
                     //
                     // ----- Gather all the groups which have authoring rights to the content
                     //
@@ -10094,7 +10112,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         SQL = "SELECT ccContent.ID AS ID, ccGroupRules.AllowAdd as allowadd, ccGroupRules.AllowDelete as allowdelete"
                             + " FROM ccContent LEFT JOIN ccGroupRules ON ccContent.ID = ccGroupRules.ContentID"
                             + " WHERE (((ccGroupRules.GroupID)=" + editRecord.id + ") AND ((ccGroupRules.Active)<>0) AND ((ccContent.Active)<>0))";
-                        CS = core.db.csOpenSql(SQL,"Default");
+                        CS = core.db.csOpenSql(SQL, "Default");
                         if (core.db.csOk(CS)) {
                             ContentGroupRulesSize = 100;
                             ContentGroupRules = new ContentGroupRuleType[ContentGroupRulesSize + 1];
@@ -10119,7 +10137,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         + " FROM ccContent"
                         + " Where ccContent.Active<>0"
                         + " ORDER BY ccContent.Name";
-                    CS = core.db.csOpenSql(SQL,"Default");
+                    CS = core.db.csOpenSql(SQL, "Default");
                     if (!core.db.csOk(CS)) {
                         FastString.Add("\r\n<tr><td colspan=\"3\">" + SpanClassAdminSmall + "There are no active groups</span></td></tr>");
                     } else {
@@ -10161,10 +10179,10 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // ----- close the panel
                     //
-                    //Call FastString.Add(adminui.EditTableClose)
+                    //Call FastString.Add(adminUIController.EditTableClose)
                     //Call core.main_PrintPanelBottom("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
                     //
-                    tempGetForm_Edit_ContentGroupRules = Adminui.GetEditPanel((!allowAdminTabs), "Authoring Permissions", "This group can edit the following content.", Adminui.EditTableOpen + FastString.Text + Adminui.EditTableClose);
+                    tempGetForm_Edit_ContentGroupRules = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Authoring Permissions", "This group can edit the following content.", adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose);
                     EditSectionPanelCount = EditSectionPanelCount + 1;
                     FastString = null;
                 }
@@ -10251,7 +10269,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string LeftSide = null;
                 string RightSide = null;
                 string QS = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 //
                 // create the with-menu version
                 //
@@ -10290,7 +10308,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // Assemble header
                 //
-                Stream.Add(Adminui.GetHeader(LeftSide, RightSide));
+                Stream.Add(adminUIController.GetHeader(core, LeftSide, RightSide));
                 //
                 // Menuing
                 //
@@ -10547,12 +10565,12 @@ namespace Contensive.Core.Addons.AdminSite {
                                 case ButtonCancel:
                                     AdminAction = AdminActionNop;
                                     AdminForm = AdminFormRoot;
-                                    adminContent.id = 0;
+                                    adminContent = new cdefModel();
                                     break;
                                 case ButtonClose:
                                     AdminAction = AdminActionNop;
                                     AdminForm = AdminFormRoot;
-                                    adminContent.id = 0;
+                                    adminContent = new cdefModel();
                                     break;
                                 case ButtonAdd:
                                     AdminAction = AdminActionNop;
@@ -10767,8 +10785,8 @@ namespace Contensive.Core.Addons.AdminSite {
         //========================================================================
         //
         private string GetForm_EditTitleBar(cdefModel adminContent, editRecordClass editRecord) {
-            adminUIController Adminui = new adminUIController(core);
-            return Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), "");
+            //adminUIController Adminui = new adminUIController(core);
+            return adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), "");
         }
         //
         //========================================================================
@@ -10784,6 +10802,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 s = genericController.vbReplace(s, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\">");
                 s = genericController.vbReplace(s, ">", " autocomplete=\"off\">");
                 s = genericController.vbReplace(s, ">", " id=\"adminEditForm\">");
+                s += "\r\n<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
                 s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
                 s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + TitleExtension + "\">";
                 s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + MenuDepth + "\">";
@@ -11098,7 +11117,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //            '
         //            '
         //            ButtonList = ButtonCancel
-        //            Content.Add( AdminUI.GetFormBodyAdminOnly()
+        //            Content.Add( adminUIController.GetFormBodyAdminOnly()
         //        Else
         //            '
         //            ' Process Requests
@@ -11106,7 +11125,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //            SaveAction = (Button = ButtonSave) Or (Button = ButtonOK)
         //            '
         //            ButtonList = ButtonCancel & "," & ButtonSave & "," & ButtonOK
-        //            Content.Add( AdminUI.EditTableOpen)
+        //            Content.Add( adminUIController.EditTableOpen)
         //            '
         //            ' Common email addresses
         //            '
@@ -11114,25 +11133,25 @@ namespace Contensive.Core.Addons.AdminSite {
         //            '
         //            HelpCopy = "This is the Email address displayed throughout the site when a visitor is prompted to contact the site administrator."
         //            Copy = (GetPropertyControl("EmailAdmin", FieldTypeText, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Admin Email Address", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Admin Email Address", HelpCopy, False, False))
         //            '
         //            HelpCopy = "This is the Email address displayed throughout the site when a visitor is prompted to send site comments."
         //            Copy = (GetPropertyControl("EmailComments", FieldTypeText, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Comment Email Address", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Comment Email Address", HelpCopy, False, False))
         //            '
         //            HelpCopy = "This is the Email address used on out-going Emails when no other address is available. For your Email to get to its destination, this Email address must be a valid Email account on a mail server."
         //            Copy = (GetPropertyControl("EmailFromAddress", FieldTypeText, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "General Email From Address", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "General Email From Address", HelpCopy, False, False))
         //            '
         //            Call Content.Add(startTableRow & "<td colspan=""3"" class=""ccPanel3D ccAdminEditSubHeader""><b>Trap Email Handling</b>" & kmaEndTableCell & kmaEndTableRow)
         //            '
         //            HelpCopy = "When checked, all system errors (called traps errors) generate an Email to the Trap Email address."
         //            Copy = (GetPropertyControl("AllowTrapemail", FieldTypeBoolean, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Allow Trap Error Email", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Allow Trap Error Email", HelpCopy, False, False))
         //            '
         //            HelpCopy = "This is the Email address to which all systems errors (called trap errors) are sent when Allow Trap Error Email is checked."
         //            Copy = (GetPropertyControl("TrapEmail", FieldTypeText, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Trap Error Email Address", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Trap Error Email Address", HelpCopy, False, False))
         //            '
         //            ' Email Sending
         //            '
@@ -11140,11 +11159,11 @@ namespace Contensive.Core.Addons.AdminSite {
         //            '
         //            HelpCopy = "This is the domain name or IP address of the SMTP mail server you will use to send. If you are using the MS SMTP in IIS on this machine, use 127.0.0.1."
         //            Copy = (GetPropertyControl("SMTPServer", FieldTypeText, SaveAction, "127.0.0.1"))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "SMTP Email Server", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "SMTP Email Server", HelpCopy, False, False))
         //            '
         //            HelpCopy = "When checked, the login box includes a section for users to enter their Email addresses. When submitted, all username and password matches for that Email address are sent to the Email address."
         //            Copy = (GetPropertyControl("AllowPasswordEmail", FieldTypeBoolean, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Allow Password Email", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Allow Password Email", HelpCopy, False, False))
         //    '
         //    ' read-only - no longer user configurable
         //    '
@@ -11154,11 +11173,11 @@ namespace Contensive.Core.Addons.AdminSite {
         //                HelpCopy = "<br><br>Developer: This text should conform to standards set by both local and federal law, as well as those required by your email server administrator. To create the clickable link, include link tags around your text (&lt%link&gt;click here&lt%/link&gt;). If you omit the link tag, a (click here) will be added to the end."
         //            End If
         //            Copy = (GetPropertyHTMLControl("EmailSpamFooter", SaveAction, DefaultSpamFooter, (Not core.main_IsDeveloper)))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Email SpamFooter", HelpCopy, False, True))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Email SpamFooter", HelpCopy, False, True))
         //            '
         //            HelpCopy = "Group and Conditional Email are delivered from another program that checks in about every minute. This is the time and date of the last check."
         //            Copy = core.main_GetSiteProperty2("EmailServiceLastCheck")
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Last Send Email Status", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Last Send Email Status", HelpCopy, False, False))
         //            '
         //            ' Bounce Email Handling
         //            '
@@ -11166,23 +11185,23 @@ namespace Contensive.Core.Addons.AdminSite {
         //            '
         //            HelpCopy = "If present, all outbound Emails that can not be delivered will be returned to this address. This should be a valid Email address on an Email server."
         //            Copy = (GetPropertyControl("EmailBounceAddress", FieldTypeText, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Bounce Email Address", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Bounce Email Address", HelpCopy, False, False))
         //            '
         //            HelpCopy = "When checked, the system will attempt to retrieve bounced Emails from the following Email account and mark the members according to the processing rules included here."
         //            Copy = (GetPropertyControl("AllowEmailBounceProcessing", FieldTypeBoolean, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Process Bounced Emails", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Process Bounced Emails", HelpCopy, False, False))
         //            '
         //            HelpCopy = "The POP Email server where Emails will be retrieved and processed."
         //            Copy = (GetPropertyControl("POPServer", FieldTypeText, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "POP Email Server", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "POP Email Server", HelpCopy, False, False))
         //            '
         //            HelpCopy = "The account username to retrieve Emails for processing."
         //            Copy = (GetPropertyControl("POPServerUsername", FieldTypeText, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "POP Email Username", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "POP Email Username", HelpCopy, False, False))
         //            '
         //            HelpCopy = "The account password to retrieve Emails for processing."
         //            Copy = (GetPropertyControl("POPServerPassword", FieldTypeText, SaveAction, ""))
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "POP Email Password", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "POP Email Password", HelpCopy, False, False))
         //            '
         //            HelpCopy = "Set the action to be performed when an Email address is identified as invalid by the bounce process."
         //            If Not SaveAction Then
@@ -11198,13 +11217,13 @@ namespace Contensive.Core.Addons.AdminSite {
         //                & "<option value=3>Delete all Members with a matching Email address</option>" _
         //                & "</select>"
         //            Copy = genericController.vbReplace(Copy, "value=" & FieldValue, "selected value=" & FieldValue)
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Bounce Email Action", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Bounce Email Action", HelpCopy, False, False))
         //            '
         //            HelpCopy = "Bounce emails are retrieved about every minute. This is the status of the last check."
         //            Copy = core.main_GetSiteProperty2("POPServerStatus")
-        //            Call Content.Add(AdminUI.GetEditRow( Copy, "Last Receive Email Status", HelpCopy, False, False))
+        //            Call Content.Add(adminUIController.GetEditRow(core, Copy, "Last Receive Email Status", HelpCopy, False, False))
         //            '
-        //            Content.Add( AdminUI.EditTableClose)
+        //            Content.Add( adminUIController.EditTableClose)
         //            '
         //            ' Close form
         //            '
@@ -11216,7 +11235,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //        End If
         //        '
         //        Description = "This tool is used to control the Contensive Email processes."
-        //        GetForm_EmailControl = AdminUI.GetBody( "Email Control", ButtonList, "", True, True, Description, "", 0, Content.Text)
+        //        GetForm_EmailControl = adminUIController.GetBody(core, "Email Control", ButtonList, "", True, True, Description, "", 0, Content.Text)
         //    End If
         //    '
         //    '''Dim th as integer: Exit Function
@@ -11276,7 +11295,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 stringBuilderLegacyController Tab1 = new stringBuilderLegacyController();
                 string Content = "";
                 string Cell = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string SQLFieldName = null;
                 //
                 const int ColumnCnt = 5;
@@ -11292,7 +11311,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     ButtonListLeft = ButtonCancel;
                     ButtonListRight = "";
-                    Content = Content + Adminui.GetFormBodyAdminOnly();
+                    Content = Content + adminUIController.GetFormBodyAdminOnly();
                 } else {
                     ContentID = core.docProperties.getInteger("ContentID");
                     Format = core.docProperties.getText("Format");
@@ -11441,7 +11460,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     SQL = "select M.Name as CreatedByName, T.* from ccTasks T left join ccMembers M on M.ID=T.CreatedBy where (T.Command='BuildCSV')or(T.Command='BuildXML') order by T.DateAdded Desc";
                     //Call core.main_TestPoint("Selection SQL=" & SQL)
-                    CS = core.db.csOpenSql(SQL,"Default", PageSize, PageNumber);
+                    CS = core.db.csOpenSql(SQL, "Default", PageSize, PageNumber);
                     RowPointer = 0;
                     if (!core.db.csOk(CS)) {
                         Cells[0, 1] = "There are no download requests";
@@ -11499,7 +11518,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                     core.db.csClose(ref CS);
                     Tab0.Add(core.html.inputHidden("RowCnt", RowPointer));
-                    Cell = Adminui.GetReport(RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
+                    Cell = adminUIController.GetReport(core, RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
                     Tab0.Add(Cell);
                     //Tab0.Add( "<div style=""height:200px;"">" & Cell & "</div>"
                     //        '
@@ -11544,7 +11563,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     + "<p>The Download Manager holds all downloads requested from anywhere on the website. It also provides tools to request downloads from any Content.</p>"
                     + "<p>To add a new download of any content in Contensive, click Export on the filter tab of the content listing page. To add a new download from a SQL statement, use Custom Reports under Reports on the Navigator.</p>";
                 ContentPadding = 0;
-                tempGetForm_Downloads = Adminui.GetBody(Caption, ButtonListLeft, ButtonListRight, true, true, Description, ContentSummary, ContentPadding, Content);
+                tempGetForm_Downloads = adminUIController.GetBody(core, Caption, ButtonListLeft, ButtonListRight, true, true, Description, ContentSummary, ContentPadding, Content);
                 //
                 core.html.addTitle(Caption);
             } catch (Exception ex) {
@@ -11925,8 +11944,8 @@ namespace Contensive.Core.Addons.AdminSite {
                     core.db.csClose(ref CS);
                     string Cell = null;
                     Tab0.Add(core.html.inputHidden("RowCnt", RowPointer));
-                    adminUIController Adminui = new adminUIController(core);
-                    Cell = Adminui.GetReport(RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
+                    //adminUIController Adminui = new adminUIController(core);
+                    Cell = adminUIController.GetReport(core, RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
                     Tab0.Add("<div>" + Cell + "</div>");
                     //
                     // Build RequestContent Form
@@ -12343,7 +12362,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int GroupID = 0;
                 string NewGroupName = "";
                 string Button = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string Caption = null;
                 string Description = "";
                 string ButtonList = "";
@@ -12360,7 +12379,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     ButtonList = ButtonCancel;
-                    Content.Add(Adminui.GetFormBodyAdminOnly());
+                    Content.Add(adminUIController.GetFormBodyAdminOnly());
                 } else {
                     //
                     if (Button != ButtonOK) {
@@ -12506,26 +12525,26 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Get the form
                     //
                     if (!BlockForm) {
-                        Content.Add(Adminui.EditTableOpen);
+                        Content.Add(adminUIController.EditTableOpen);
                         //
                         FieldValue = "<select size=\"1\" name=\"ParentContentID\" ID=\"\"><option value=\"\">Select One</option>";
                         FieldValue = FieldValue + GetContentChildTool_Options(0, ParentContentID);
                         FieldValue = FieldValue + "</select>";
                         //FieldValue = core.htmldoc.main_GetFormInputSelect2("ParentContentID", CStr(ParentContentID), "Content", "(AllowContentChildTool<>0)")
 
-                        Content.Add(Adminui.GetEditRow(FieldValue, "Parent Content Name", "", false, false, ""));
+                        Content.Add(adminUIController.GetEditRow(core, FieldValue, "Parent Content Name", "", false, false, ""));
                         //
                         FieldValue = core.html.inputText("ChildContentName", ChildContentName, 1, 40);
-                        Content.Add(Adminui.GetEditRow(FieldValue, "New Child Content Name", "", false, false, ""));
+                        Content.Add(adminUIController.GetEditRow(core, FieldValue, "New Child Content Name", "", false, false, ""));
                         //
                         FieldValue = core.html.inputRadio("NewGroup", false.ToString(), NewGroup.ToString()) + core.html.selectFromContent("GroupID", GroupID, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
                             + "<br>" + core.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + core.html.inputText("NewGroupName", NewGroupName) + "(Create a new group)";
-                        Content.Add(Adminui.GetEditRow(FieldValue, "Content Manager Group", "", false, false, ""));
+                        Content.Add(adminUIController.GetEditRow(core, FieldValue, "Content Manager Group", "", false, false, ""));
                         //            '
                         //            FieldValue = core.main_GetFormInputCheckBox2("AddAdminMenuEntry", AddAdminMenuEntry) & "(Add Navigator Entry under Manager Site Content &gt; Advanced)"
-                        //            Call Content.Add(AdminUI.GetEditRow( FieldValue, "Add Menu Entry", "", False, False, ""))
+                        //            Call Content.Add(adminUIController.GetEditRow(core, FieldValue, "Add Menu Entry", "", False, False, ""))
                         //
-                        Content.Add(Adminui.EditTableClose);
+                        Content.Add(adminUIController.EditTableClose);
                         Content.Add("</td></tr>" + kmaEndTable);
                         //
                         ButtonList = ButtonOK + "," + ButtonCancel;
@@ -12535,7 +12554,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 Caption = "Create Content Definition";
                 Description = "<div>This tool is used to create content definitions that help segregate your content into authorable segments.</div>" + Description;
-                result = Adminui.GetBody(Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                result = adminUIController.GetBody(core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -12560,7 +12579,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 } else {
                     SQL = "select Name, ID from ccContent where ParentID=" + ParentID + " and (AllowContentChildTool<>0) and not (allowcontentchildtool is null);";
                 }
-                CS = core.db.csOpenSql(SQL,"Default");
+                CS = core.db.csOpenSql(SQL, "Default");
                 while (core.db.csOk(CS)) {
                     RecordName = core.db.csGet(CS, "Name");
                     RecordID = core.db.csGetInteger(CS, "ID");
@@ -12633,7 +12652,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int ArchiveRecordAgeDays = 0;
                 string ArchiveTimeOfDay = null;
                 bool ArchiveAllowFileClean = false;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string ButtonList = "";
                 string Description = null;
                 //
@@ -12648,10 +12667,10 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     ButtonList = ButtonCancel;
-                    Content.Add(Adminui.GetFormBodyAdminOnly());
+                    Content.Add(adminUIController.GetFormBodyAdminOnly());
                 } else {
                     //
-                    Content.Add(Adminui.EditTableOpen);
+                    Content.Add(adminUIController.EditTableOpen);
                     //
                     // Set defaults
                     //
@@ -12690,19 +12709,19 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     PagesTotal = 0;
                     SQL = "SELECT Count(ID) as Result FROM ccVisits;";
-                    CSServers = core.db.csOpenSql(SQL,"Default");
+                    CSServers = core.db.csOpenSql(SQL, "Default");
                     if (core.db.csOk(CSServers)) {
                         PagesTotal = core.db.csGetInteger(CSServers, "Result");
                     }
                     core.db.csClose(ref CSServers);
-                    Content.Add(Adminui.GetEditRow(SpanClassAdminNormal + PagesTotal, "Visits Found", "", false, false, ""));
+                    Content.Add(adminUIController.GetEditRow(core, SpanClassAdminNormal + PagesTotal, "Visits Found", "", false, false, ""));
                     //
                     // ----- Oldest Visit
                     //
                     Copy = "unknown";
                     AgeInDays = "unknown";
                     SQL = core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "", "ID", "", 1);
-                    CSServers = core.db.csOpenSql(SQL,"Default");
+                    CSServers = core.db.csOpenSql(SQL, "Default");
                     //SQL = "SELECT Top 1 DateAdded FROM ccVisits order by ID;"
                     //CSServers = core.app_openCsSql_Rev_Internal("Default", SQL)
                     if (core.db.csOk(CSServers)) {
@@ -12713,41 +12732,41 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                     }
                     core.db.csClose(ref CSServers);
-                    Content.Add(Adminui.GetEditRow(SpanClassAdminNormal + Copy + " (" + AgeInDays + " days)", "Oldest Visit", "", false, false, ""));
+                    Content.Add(adminUIController.GetEditRow(core, SpanClassAdminNormal + Copy + " (" + AgeInDays + " days)", "Oldest Visit", "", false, false, ""));
                     //
                     // ----- Viewings Found
                     //
                     PagesTotal = 0;
                     SQL = "SELECT Count(ID) as result  FROM ccViewings;";
-                    CSServers = core.db.csOpenSql(SQL,"Default");
+                    CSServers = core.db.csOpenSql(SQL, "Default");
                     if (core.db.csOk(CSServers)) {
                         PagesTotal = core.db.csGetInteger(CSServers, "Result");
                     }
                     core.db.csClose(ref CSServers);
-                    Content.Add(Adminui.GetEditRow(SpanClassAdminNormal + PagesTotal, "Viewings Found", "", false, false, ""));
+                    Content.Add(adminUIController.GetEditRow(core, SpanClassAdminNormal + PagesTotal, "Viewings Found", "", false, false, ""));
                     //
                     Content.Add(genericController.StartTableRow() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Options</b>" + kmaEndTableCell + kmaEndTableRow);
                     //
                     Caption = "Archive Age";
                     Copy = core.html.inputText("ArchiveRecordAgeDays", ArchiveRecordAgeDays.ToString(), -1, 20) + "&nbsp;Number of days to keep visit records. 0 disables housekeeping.";
-                    Content.Add(Adminui.GetEditRow(Copy, Caption));
+                    Content.Add(adminUIController.GetEditRow(core, Copy, Caption));
                     //
                     Caption = "Housekeeping Time";
                     Copy = core.html.inputText("ArchiveTimeOfDay", ArchiveTimeOfDay, -1, 20) + "&nbsp;The time of day when record deleting should start.";
-                    Content.Add(Adminui.GetEditRow(Copy, Caption));
+                    Content.Add(adminUIController.GetEditRow(core, Copy, Caption));
                     //
                     Caption = "Purge Content Files";
                     Copy = core.html.inputCheckbox("ArchiveAllowFileClean", ArchiveAllowFileClean) + "&nbsp;Delete Contensive content files with no associated database record.";
-                    Content.Add(Adminui.GetEditRow(Copy, Caption));
+                    Content.Add(adminUIController.GetEditRow(core, Copy, Caption));
                     //
-                    Content.Add(Adminui.EditTableClose);
+                    Content.Add(adminUIController.EditTableClose);
                     Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminformHousekeepingControl));
                     ButtonList = ButtonCancel + ",Refresh," + ButtonSave + "," + ButtonOK;
                 }
                 //
                 Caption = "Data Housekeeping Control";
                 Description = "This tool is used to control the database record housekeeping process. This process deletes visit history records, so care should be taken before making any changes.";
-                tempGetForm_HouseKeepingControl = Adminui.GetBody(Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                tempGetForm_HouseKeepingControl = adminUIController.GetBody(core, Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
                 //
                 core.html.addTitle(Caption);
             } catch (Exception ex) {
@@ -12836,7 +12855,7 @@ namespace Contensive.Core.Addons.AdminSite {
             //                '
             //                '
             //                ButtonList = ButtonCancel
-            //                Content.Add(Adminui.GetFormBodyAdminOnly())
+            //                Content.Add(adminUIController.GetFormBodyAdminOnly())
             //            Else
             //                'StyleSN = genericController.EncodeInteger(core.main_GetSiteProperty2("StylesheetSerialNumber", false ))
             //                AllowCSSReset = False
@@ -12868,7 +12887,7 @@ namespace Contensive.Core.Addons.AdminSite {
             //                & "<li>Add-on styles, first the default styles, then any custom styles included.</li>" _
             //                & "</ul>" _
             //                & ""
-            //            admin_GetForm_StyleEditor = Adminui.GetBody("Site Styles", ButtonList, "", True, True, Description, "", 0, Content.Text)
+            //            admin_GetForm_StyleEditor = adminUIController.GetBody(core,"Site Styles", ButtonList, "", True, True, Description, "", 0, Content.Text)
             //            '
             //            Call core.html.main_AddPagetitle("Style Editor")
             //            Exit Function
@@ -12933,7 +12952,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool AllowContentAccess = false;
                 string ButtonList = "";
                 string ExportName = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string Description = null;
                 string Content = "";
                 int ExportType = 0;
@@ -13151,7 +13170,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     Description = "<p>This tool creates an export of the current admin list page results. If you would like to download the current results, select a format and press OK. Your search results will be submitted for export. Your download will be ready shortly in the download manager. To exit without requesting an output, hit Cancel.</p>";
                     tempGetForm_Index_Export = ""
-                        + Adminui.GetBody(adminContent.name + " Export", ButtonList, "", false, false, Description, "", 10, Content);
+                        + adminUIController.GetBody(core, adminContent.name + " Export", ButtonList, "", false, false, Description, "", 10, Content);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -13172,7 +13191,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool NeedToReloadCDef = false;
                 string Title = null;
                 string Content = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 int ColumnPtr = 0;
                 int ColumnWidth = 0;
                 string AStart = null;
@@ -13678,18 +13697,18 @@ namespace Contensive.Core.Addons.AdminSite {
 
                 Content = ""
                     + Stream.Text + core.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns) + "";
-                tempGetForm_Index_SetColumns = Adminui.GetBody(Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
+                tempGetForm_Index_SetColumns = adminUIController.GetBody(core, Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
                 //
                 //
-                //    ButtonBar = AdminUI.GetButtonsFromList( ButtonList, True, True, "button")
-                //    ButtonBar = AdminUI.GetButtonBar(ButtonBar, "")
+                //    ButtonBar = adminUIController.GetButtonsFromList( ButtonList, True, True, "button")
+                //    ButtonBar = adminUIController.GetButtonBar(ButtonBar, "")
                 //    Stream = New FastStringClass
                 //
                 //    GetForm_Index_SetColumns = "" _
                 //        & ButtonBar _
-                //        & AdminUI.EditTableOpen _
+                //        & adminUIController.EditTableOpen _
                 //        & Stream.Text _
-                //        & AdminUI.EditTableClose _
+                //        & adminUIController.EditTableClose _
                 //        & ButtonBar _
                 //    '
                 //    '
@@ -13794,7 +13813,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string Button = null;
                 string Copy = null;
                 string ButtonList = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string Description = null;
                 string[] DefaultFeatures = null;
                 string FeatureName = null;
@@ -13819,9 +13838,9 @@ namespace Contensive.Core.Addons.AdminSite {
                         // Does not have permission
                         //
                         ButtonList = ButtonCancel;
-                        Content.Add(Adminui.GetFormBodyAdminOnly());
+                        Content.Add(adminUIController.GetFormBodyAdminOnly());
                         core.html.addTitle("Style Editor");
-                        tempGetForm_EditConfig = Adminui.GetBody("Site Styles", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                        tempGetForm_EditConfig = adminUIController.GetBody(core, "Site Styles", ButtonList, "", true, true, Description, "", 0, Content.Text);
                     } else {
                         //
                         // OK to see and use this form
@@ -13936,7 +13955,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             ButtonList = ButtonCancel + "," + ButtonRefresh + "," + ButtonSave + "," + ButtonOK;
                             Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminFormEditorConfig));
                             core.html.addTitle("Editor Settings");
-                            tempGetForm_EditConfig = Adminui.GetBody("Editor Configuration", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                            tempGetForm_EditConfig = adminUIController.GetBody(core, "Editor Configuration", ButtonList, "", true, true, Description, "", 0, Content.Text);
                         }
                     }
                     //
@@ -13958,7 +13977,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 string Description = null;
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
                 string Button = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string ButtonList = null;
                 bool AllowAutoLogin = false;
                 string Copy = null;
@@ -13974,9 +13993,9 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Not Admin Error
                     //
                     ButtonList = ButtonCancel;
-                    Content.Add(Adminui.GetFormBodyAdminOnly());
+                    Content.Add(adminUIController.GetFormBodyAdminOnly());
                 } else {
-                    Content.Add(Adminui.EditTableOpen);
+                    Content.Add(adminUIController.EditTableOpen);
                     //
                     // Set defaults
                     //
@@ -14007,7 +14026,7 @@ namespace Contensive.Core.Addons.AdminSite {
 
                     Copy = core.html.inputCheckbox("AllowAutoLogin", AllowAutoLogin);
                     Copy += "<div>When checked, returning users are automatically logged-in, without requiring a username or password. This is very convenient, but creates a high security risk. Each time you login, you will be given the option to not allow Auto-Login from that computer.</div>";
-                    Content.Add(Adminui.GetEditRow(Copy, "Allow Auto Login", "", false, false, ""));
+                    Content.Add(adminUIController.GetEditRow(core, Copy, "Allow Auto Login", "", false, false, ""));
                     //
                     // Buttons
                     //
@@ -14015,12 +14034,12 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // Close Tables
                     //
-                    Content.Add(Adminui.EditTableClose);
+                    Content.Add(adminUIController.EditTableClose);
                     Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminFormBuilderCollection));
                 }
                 //
                 Description = "Use this tool to modify the site security settings";
-                tempGetForm_BuildCollection = Adminui.GetBody("Security Settings", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                tempGetForm_BuildCollection = adminUIController.GetBody(core, "Security Settings", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -14911,7 +14930,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int FieldCnt = 0;
                 int FieldSize = 0;
                 int RowPointer = 0;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 string LeftButtons = "";
                 string ButtonBar = null;
                 string Title = null;
@@ -14978,14 +14997,14 @@ namespace Contensive.Core.Addons.AdminSite {
                     // ----- ButtonBar
                     //
                     if (MenuDepth > 0) {
-                        LeftButtons += core.html.button(ButtonClose, "", "", "window.close();");
+                        LeftButtons += adminUIController.getButtonPrimary(ButtonClose, "window.close();");
                     } else {
-                        LeftButtons += core.html.button(ButtonCancel);
+                        LeftButtons += adminUIController.getButtonPrimary(ButtonCancel);
                         //LeftButtons &= core.main_GetFormButton(ButtonCancel, , , "return processSubmit(this)")
                     }
-                    LeftButtons += core.html.button(ButtonSearch);
+                    LeftButtons += adminUIController.getButtonPrimary(ButtonSearch);
                     //LeftButtons &= core.main_GetFormButton(ButtonSearch, , , "return processSubmit(this)")
-                    ButtonBar = Adminui.GetButtonBar(LeftButtons, "");
+                    ButtonBar = adminUIController.GetButtonBar(core, LeftButtons, "");
                     //
                     // ----- TitleBar
                     //
@@ -14995,7 +15014,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     Title = SpanClassAdminNormal + Title + "</span>";
                     //Title = Title & core.main_GetHelpLink(46, "Using the Advanced Search Page", BubbleCopy_AdminIndexPage)
                     TitleDescription = "<div>Enter criteria for each field to identify and select your results. The results of a search will have to have all of the criteria you enter.</div>";
-                    TitleBar = Adminui.GetTitleBar(Title, TitleDescription);
+                    TitleBar = adminUIController.GetTitleBar(core, Title, TitleDescription);
                     //
                     // ----- List out all fields
                     //

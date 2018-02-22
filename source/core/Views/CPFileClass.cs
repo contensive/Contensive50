@@ -104,11 +104,11 @@ namespace Contensive.Core {
         /// <param name="folderPath"></param>
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override void CreateFolder(string folderPath) {
-            if (core.appRootFiles.isinPhysicalPath(folderPath)) {
+            if (core.appRootFiles.isinLocalAbsDosPath(folderPath)) {
                 core.appRootFiles.createPath(folderPath);
-            } else if (core.privateFiles.isinPhysicalPath(folderPath)) {
+            } else if (core.privateFiles.isinLocalAbsDosPath(folderPath)) {
                 core.privateFiles.createPath(folderPath);
-            } else if (core.cdnFiles.isinPhysicalPath(folderPath)) {
+            } else if (core.cdnFiles.isinLocalAbsDosPath(folderPath)) {
                 core.cdnFiles.createPath(folderPath);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + folderPath + "]"));
@@ -122,11 +122,11 @@ namespace Contensive.Core {
         /// <param name="pathFilename"></param>
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override void Delete(string pathFilename) {
-            if (core.appRootFiles.isinPhysicalPath(pathFilename)) {
+            if (core.appRootFiles.isinLocalAbsDosPath(pathFilename)) {
                 core.appRootFiles.deleteFile(pathFilename);
-            } else if (core.privateFiles.isinPhysicalPath(pathFilename)) {
+            } else if (core.privateFiles.isinLocalAbsDosPath(pathFilename)) {
                 core.privateFiles.deleteFile(pathFilename);
-            } else if (core.cdnFiles.isinPhysicalPath(pathFilename)) {
+            } else if (core.cdnFiles.isinLocalAbsDosPath(pathFilename)) {
                 core.cdnFiles.deleteFile(pathFilename);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFilename + "]"));
@@ -151,11 +151,11 @@ namespace Contensive.Core {
         /// <returns></returns>
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override string Read(string pathFilename) {
-            if (core.appRootFiles.isinPhysicalPath(pathFilename)) {
+            if (core.appRootFiles.isinLocalAbsDosPath(pathFilename)) {
                 return core.appRootFiles.readFileText(pathFilename);
-            } else if (core.privateFiles.isinPhysicalPath(pathFilename)) {
+            } else if (core.privateFiles.isinLocalAbsDosPath(pathFilename)) {
                 return core.privateFiles.readFileText(pathFilename);
-            } else if (core.cdnFiles.isinPhysicalPath(pathFilename)) {
+            } else if (core.cdnFiles.isinLocalAbsDosPath(pathFilename)) {
                 return core.cdnFiles.readFileText(pathFilename);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFilename + "]"));
@@ -181,11 +181,11 @@ namespace Contensive.Core {
         /// <param name="fileContent"></param>
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override void Save(string pathFilename, string fileContent) {
-            if (core.appRootFiles.isinPhysicalPath(pathFilename)) {
+            if (core.appRootFiles.isinLocalAbsDosPath(pathFilename)) {
                 core.appRootFiles.saveFile(pathFilename, fileContent);
-            } else if (core.privateFiles.isinPhysicalPath(pathFilename)) {
+            } else if (core.privateFiles.isinLocalAbsDosPath(pathFilename)) {
                 core.privateFiles.saveFile(pathFilename, fileContent);
-            } else if (core.cdnFiles.isinPhysicalPath(pathFilename)) {
+            } else if (core.cdnFiles.isinLocalAbsDosPath(pathFilename)) {
                 core.cdnFiles.saveFile(pathFilename, fileContent);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFilename + "]"));
@@ -212,11 +212,11 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override bool fileExists(string pathFileName) {
             bool result = false;
-            if (core.appRootFiles.isinPhysicalPath(pathFileName)) {
+            if (core.appRootFiles.isinLocalAbsDosPath(pathFileName)) {
                 result = core.appRootFiles.fileExists(pathFileName);
-            } else if (core.privateFiles.isinPhysicalPath(pathFileName)) {
+            } else if (core.privateFiles.isinLocalAbsDosPath(pathFileName)) {
                 result = core.privateFiles.fileExists(pathFileName);
-            } else if (core.cdnFiles.isinPhysicalPath(pathFileName)) {
+            } else if (core.cdnFiles.isinLocalAbsDosPath(pathFileName)) {
                 result = core.cdnFiles.fileExists(pathFileName);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFileName + "]"));
@@ -233,11 +233,11 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override bool folderExists(string pathFolderName) {
             bool result = false;
-            if (core.appRootFiles.isinPhysicalPath(pathFolderName)) {
+            if (core.appRootFiles.isinLocalAbsDosPath(pathFolderName)) {
                 result = core.appRootFiles.pathExists(pathFolderName);
-            } else if (core.privateFiles.isinPhysicalPath(pathFolderName)) {
+            } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
                 result = core.privateFiles.pathExists(pathFolderName);
-            } else if (core.cdnFiles.isinPhysicalPath(pathFolderName)) {
+            } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
                 result = core.cdnFiles.pathExists(pathFolderName);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));
@@ -256,13 +256,13 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override string fileList(string pathFolderName, int pageSize = 0, int pageNumber = 1) {
             string result = "";
-            if (core.appRootFiles.isinPhysicalPath(pathFolderName)) {
+            if (core.appRootFiles.isinLocalAbsDosPath(pathFolderName)) {
                 FileInfo[] fi = core.appRootFiles.getFileList(pathFolderName);
                 result = core.appRootFiles.convertFileINfoArrayToParseString(fi);
-            } else if (core.privateFiles.isinPhysicalPath(pathFolderName)) {
+            } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
                 FileInfo[] fi = core.privateFiles.getFileList(pathFolderName);
                 result = core.privateFiles.convertFileINfoArrayToParseString(fi);
-            } else if (core.cdnFiles.isinPhysicalPath(pathFolderName)) {
+            } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
                 FileInfo[] fi = core.cdnFiles.getFileList(pathFolderName);
                 result = core.cdnFiles.convertFileINfoArrayToParseString(fi);
             } else {
@@ -280,13 +280,13 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override string folderList(string pathFolderName) {
             string result = "";
-            if (core.appRootFiles.isinPhysicalPath(pathFolderName)) {
+            if (core.appRootFiles.isinLocalAbsDosPath(pathFolderName)) {
                 DirectoryInfo[] fi = core.appRootFiles.getFolderList(pathFolderName);
                 result = core.appRootFiles.convertDirectoryInfoArrayToParseString(fi);
-            } else if (core.privateFiles.isinPhysicalPath(pathFolderName)) {
+            } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
                 DirectoryInfo[] fi = core.privateFiles.getFolderList(pathFolderName);
                 result = core.privateFiles.convertDirectoryInfoArrayToParseString(fi);
-            } else if (core.cdnFiles.isinPhysicalPath(pathFolderName)) {
+            } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
                 DirectoryInfo[] fi = core.cdnFiles.getFolderList(pathFolderName);
                 result = core.cdnFiles.convertDirectoryInfoArrayToParseString(fi);
             } else {
@@ -302,11 +302,11 @@ namespace Contensive.Core {
         /// <param name="pathFolderName"></param>
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override void DeleteFolder(string pathFolderName) {
-            if (core.appRootFiles.isinPhysicalPath(pathFolderName)) {
+            if (core.appRootFiles.isinLocalAbsDosPath(pathFolderName)) {
                 core.appRootFiles.deleteFolder(pathFolderName);
-            } else if (core.privateFiles.isinPhysicalPath(pathFolderName)) {
+            } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
                 core.appRootFiles.deleteFolder(pathFolderName);
-            } else if (core.cdnFiles.isinPhysicalPath(pathFolderName)) {
+            } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
                 core.appRootFiles.deleteFolder(pathFolderName);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));

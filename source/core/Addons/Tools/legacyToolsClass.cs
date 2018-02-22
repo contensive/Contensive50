@@ -167,7 +167,6 @@ namespace Contensive.Core.Addons.Tools {
                 int MenuHeaderID = 0;
                 int MenuDirection = 0;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                adminUIController Adminui = new adminUIController(core);
                 //
                 Button = core.docProperties.getText("Button");
                 if (Button == ButtonCancelAll) {
@@ -183,8 +182,8 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // You must be admin to use this feature
                     //
-                    tempGetForm = Adminui.GetFormBodyAdminOnly();
-                    tempGetForm = Adminui.GetBody("Admin Tools", ButtonCancelAll, "", false, false, "<div>Administration Tools</div>", "", 0, tempGetForm);
+                    tempGetForm = adminUIController.GetFormBodyAdminOnly();
+                    tempGetForm = adminUIController.GetBody(core,"Admin Tools", ButtonCancelAll, "", false, false, "<div>Administration Tools</div>", "", 0, tempGetForm);
                 } else {
                     ToolsAction = core.docProperties.getInteger("dta");
                     Button = core.docProperties.getText("Button");
@@ -364,7 +363,8 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 Stream.Add("<tr>");
                 Stream.Add("<TD>&nbsp;</td>");
-                Stream.Add("<TD><INPUT type=\"submit\" value=\"" + ButtonCreateFields + "\" name=\"Button\"></td>");
+                Stream.Add("<TD>" + htmlController.getButton(ButtonCreateFields) + "</td>");
+                //Stream.Add("<TD><INPUT type=\"submit\" value=\"" + ButtonCreateFields + "\" name=\"Button\"></td>");
                 Stream.Add("</tr>");
                 //
                 Stream.Add("<tr>");
@@ -474,15 +474,7 @@ namespace Contensive.Core.Addons.Tools {
         //==================================================================================
         //
         private string GetTitle(string Title, string Description) {
-            string result = "";
-            try {
-                result = ""
-                    + "<p>" + SpanClassAdminNormal + "<a href=\"" + core.webServer.requestPage + "?af=" + AdminFormToolRoot + "\"><b>Tools</b></a>&nbsp;&gt;&nbsp;" + Title + "</p>"
-                    + "<p>" + SpanClassAdminNormal + Description + "</p>";
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            return result;
+            return "<h2>" + Title + "</h2>" + "<p>" + Description + "</p>";
         }
         //
         //=============================================================================
@@ -573,14 +565,12 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Run the SQL
                     //
-                    Stream.Add("<P>" + SpanClassAdminSmall);
-                    Stream.Add(DateTime.Now + " Executing sql [" + SQL + "] on DataSource [" + datasource.Name + "]");
+                    Stream.Add("<p>" + DateTime.Now + " Executing sql [" + SQL + "] on DataSource [" + datasource.Name + "]");
                     try {
                         dt = core.db.executeQuery(SQL, datasource.Name, PageSize * (PageNumber - 1), PageSize);
                     } catch (Exception ex) {
                         //
                         // ----- error
-                        //
                         Stream.Add("<br>" + DateTime.Now + " SQL execution returned the following error");
                         Stream.Add("<br>" + ex.Message);
                     }
@@ -596,17 +586,15 @@ namespace Contensive.Core.Addons.Tools {
                         // ----- print results
                         //
                         Stream.Add("<br>" + DateTime.Now + " The following results were returned");
-                        Stream.Add("<br>");
+                        Stream.Add("<br></p>");
                         //
                         // --- Create the Fields for the new table
                         //
                         FieldCount = dt.Columns.Count;
-                        Stream.Add("<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
-                        Stream.Add("<tr>");
-                        foreach (DataColumn dc in dt.Columns) {
-                            Stream.Add("<TD><B>" + SpanClassAdminSmall + dc.ColumnName + "</b></SPAN></td>");
-                        }
-                        Stream.Add("</tr>");
+                        Stream.Add("<table class=\"table table-bordered table-hover table-sm table-striped\">");
+                        Stream.Add("<thead class=\"thead - inverse\"><tr>");
+                        foreach (DataColumn dc in dt.Columns) Stream.Add("<th>" + dc.ColumnName + "</th>");
+                        Stream.Add("</tr></thead>");
                         //
                         //Dim dtOK As Boolean
                         resultArray = core.db.convertDataTabletoArray(dt);
@@ -615,7 +603,7 @@ namespace Contensive.Core.Addons.Tools {
                         ColumnMax = resultArray.GetUpperBound(0);
                         RowStart = "<tr>";
                         RowEnd = "</tr>";
-                        ColumnStart = "<td class=\"ccadminsmall\">";
+                        ColumnStart = "<td>";
                         ColumnEnd = "</td>";
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             Stream.Add(RowStart);
@@ -640,18 +628,15 @@ namespace Contensive.Core.Addons.Tools {
                             }
                             Stream.Add(RowEnd);
                         }
-                        Stream.Add("</TABLE>");
+                        Stream.Add("</table>");
                     }
-                    Stream.Add("<br>" + DateTime.Now + " Done");
-                    Stream.Add("</P>");
+                    Stream.Add("<p>" + DateTime.Now + " Done</p>");
                     //
                     // End of Run SQL
                     //
                 }
                 //
                 // Display form
-                //
-                //Call Stream.Add(SpanClassAdminNormal & core.main_GetFormStart(""))
                 //
                 int SQLRows = core.docProperties.getInteger("SQLRows");
                 if (SQLRows == 0) {
@@ -661,12 +646,12 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 Stream.Add("<TEXTAREA NAME=\"SQL\" ROWS=\"" + SQLRows + "\" ID=\"SQL\" STYLE=\"width: 800px;\">" + SQL + "</TEXTAREA>");
                 Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
-                Stream.Add("<br><br>Data Source<br>" + core.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
+                Stream.Add("<div class=\"p-1\">Data Source<br>" + core.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default") + "</div>");
                 //
                 SelectFieldWidthLimit = core.siteProperties.getInteger("SelectFieldWidthLimit", 200);
                 if (!string.IsNullOrEmpty(SQLArchive)) {
-                    Stream.Add("<br><br>Previous Queries<br>");
-                    Stream.Add("<select size=\"1\" name=\"SQLList\" ID=\"SQLList\" onChange=\"SQL.value=SQLList.value\">");
+                    Stream.Add("<div class=\"p-1 pt-2\">Previous Queries</div>");
+                    Stream.Add("<div class=\"p-1\"><select size=\"1\" name=\"SQLList\" ID=\"SQLList\" onChange=\"SQL.value=SQLList.value\">");
                     Stream.Add("<option value=\"\">Select One</option>");
                     LineCounter = 0;
                     while ((LineCounter < 10) && (!string.IsNullOrEmpty(SQLArchive))) {
@@ -678,28 +663,27 @@ namespace Contensive.Core.Addons.Tools {
                         }
                         Stream.Add("<option value=\"" + SQLLine + "\">" + SQLName + "</option>");
                     }
-                    Stream.Add("</select><br>");
+                    Stream.Add("</select></div>");
                 }
                 //
                 if (IsNull(PageSize)) {
                     PageSize = 100;
                 }
-                Stream.Add("<br>Page Size:<br>" + core.html.inputText("PageSize", PageSize.ToString()));
+                Stream.Add("<div class=\"p-1\">Page Size:<br>" + core.html.inputText("PageSize", PageSize.ToString()) + "</div>");
                 //
                 if (IsNull(PageNumber)) {
                     PageNumber = 1;
                 }
-                Stream.Add("<br>Page Number:<br>" + core.html.inputText("PageNumber", PageNumber.ToString()));
+                Stream.Add("<div class=\"p-1\">Page Number:<br>" + core.html.inputText("PageNumber", PageNumber.ToString()) + "</div>");
                 //
                 if (IsNull(Timeout)) {
                     Timeout = 30;
                 }
-                Stream.Add("<br>Timeout (sec):<br>" + core.html.inputText("Timeout", Timeout.ToString()));
+                Stream.Add("<div class=\"p-1\">Timeout (sec):<br>" + core.html.inputText("Timeout", Timeout.ToString()) + "</div>");
                 //
-                //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolManualQuery))
-                //Stream.Add( core.main_GetFormEnd & "</SPAN>")
-                //
-                returnHtml = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                returnHtml = Stream.Text;
+                returnHtml = "<div class=\"p-4 bg-light\">" + returnHtml + "</div>";
+                returnHtml = htmlController.legacy_openFormTable(core, ButtonList) + returnHtml + htmlController.legacy_closeFormTable(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -721,7 +705,6 @@ namespace Contensive.Core.Addons.Tools {
                 string ContentName = "";
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = null;
-                adminUIController Adminui = new adminUIController(core);
                 string Description = null;
                 string Caption = null;
                 int NavID = 0;
@@ -791,7 +774,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(core.html.inputText("TableName", TableName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("</SPAN>");
-                result = Adminui.GetBody(Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
+                result = adminUIController.GetBody(core,Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -3573,7 +3556,7 @@ namespace Contensive.Core.Addons.Tools {
                 // StartPath is the root - the top of the directory, it ends in the folder name (no slash)
                 //
                 result = "";
-                StartPath = core.programDataFiles.rootLocalPath + "Logs\\";
+                StartPath = core.programDataFiles.localAbsRootPath + "Logs\\";
                 //
                 // CurrentPath is what is concatinated on to StartPath to get the current folder, it must start with a slash
                 //
@@ -4155,7 +4138,6 @@ namespace Contensive.Core.Addons.Tools {
         private string GetForm_ContentFileManager() {
             string result = "";
             try {
-                adminUIController Adminui = new adminUIController(core);
                 string InstanceOptionString = "AdminLayout=1&filesystem=content files";
                 addonModel addon = addonModel.create(core, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
                 string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
@@ -4166,7 +4148,7 @@ namespace Contensive.Core.Addons.Tools {
                 });
                 string Description = "Manage files and folders within the virtual content file area.";
                 string ButtonList = ButtonApply + "," + ButtonCancel;
-                result = Adminui.GetBody("Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
+                result = adminUIController.GetBody(core,"Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -4180,7 +4162,6 @@ namespace Contensive.Core.Addons.Tools {
         private string GetForm_WebsiteFileManager() {
             string result = "";
             try {
-                adminUIController Adminui = new adminUIController(core);
                 string InstanceOptionString = "AdminLayout=1&filesystem=website files";
                 addonModel addon = addonModel.create(core, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
                 string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
@@ -4191,7 +4172,7 @@ namespace Contensive.Core.Addons.Tools {
                 });
                 string Description = "Manage files and folders within the Website's file area.";
                 string ButtonList = ButtonApply + "," + ButtonCancel;
-                result = Adminui.GetBody("Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
+                result = adminUIController.GetBody(core,"Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
                 core.handleException(ex);
             }

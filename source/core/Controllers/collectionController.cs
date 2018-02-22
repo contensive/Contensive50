@@ -1864,12 +1864,12 @@ namespace Contensive.Core.Controllers {
                                 string CollectionFilename = file.Name;
                                 bool loadOK = true;
                                 try {
-                                    Doc.Load(core.privateFiles.rootLocalPath + CollectionVersionFolder + file.Name);
+                                    Doc.Load(core.privateFiles.localAbsRootPath + CollectionVersionFolder + file.Name);
                                 } catch (Exception) {
                                     //
                                     // error - Need a way to reach the user that submitted the file
                                     //
-                                    logController.logInfo(core, "There was an error reading the Meta data file [" + core.privateFiles.rootLocalPath + CollectionVersionFolder + file.Name + "].");
+                                    logController.logInfo(core, "There was an error reading the Meta data file [" + core.privateFiles.localAbsRootPath + CollectionVersionFolder + file.Name + "].");
                                     result = false;
                                     return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the xml collection file has an error</P>";
                                     loadOK = false;
@@ -2801,7 +2801,7 @@ namespace Contensive.Core.Controllers {
                             //
                             LocalFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
                             //LocalFilename = GetProgramPath & "\Addons\Collections.xml"
-                            Doc.Save(core.privateFiles.rootLocalPath + LocalFilename);
+                            Doc.Save(core.privateFiles.localAbsRootPath + LocalFilename);
                         }
                     }
                 }
@@ -3817,7 +3817,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(baseCollectionXml)) {
                     //
                     // -- base collection notfound
-                    throw new ApplicationException("Cannot load aoBase5.xml [" + core.programFiles.rootLocalPath + "aoBase5.xml]");
+                    throw new ApplicationException("Cannot load aoBase5.xml [" + core.programFiles.localAbsRootPath + "aoBase5.xml]");
                 } else {
                     logController.logInfo(core, "Verify base collection -- new build");
                     miniCollectionModel baseCollection = installCollection_LoadXmlToMiniCollection(core, baseCollectionXml, true, true, isNewBuild, new miniCollectionModel());

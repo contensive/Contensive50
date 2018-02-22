@@ -275,7 +275,7 @@ namespace Contensive.Core.Controllers {
                 if (_programDataFiles == null) {
                     //
                     // -- always local -- must be because this object is used to read serverConfig, before the object is valid
-                    string programDataPath = fileController.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\";
+                    string programDataPath = fileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\";
                     _programDataFiles = new fileController(this, true, programDataPath, "");
                 }
                 return _programDataFiles;

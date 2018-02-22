@@ -290,10 +290,10 @@ namespace Contensive.WindowsServices {
                             if (!string.IsNullOrEmpty(AlarmEmailBody)) {
                                 appendMonitorLog("Monitor detected a problem");
                                 if (string.IsNullOrEmpty(AlarmEmailServer)) {
-                                    appendMonitorLog("Alarm not sent because AlarmEmailServer is not configured in " + cpCore.programDataFiles.rootLocalPath + "config\\MonitorConfig.txt");
+                                    appendMonitorLog("Alarm not sent because AlarmEmailServer is not configured in " + cpCore.programDataFiles.localAbsRootPath + "config\\MonitorConfig.txt");
                                 } else {
                                     if (string.IsNullOrEmpty(AlarmEmailList)) {
-                                        appendMonitorLog("Alarm not sent because AlarmEmailList is not configured in " + cpCore.programDataFiles.rootLocalPath + "config\\MonitorConfig.txt");
+                                        appendMonitorLog("Alarm not sent because AlarmEmailList is not configured in " + cpCore.programDataFiles.localAbsRootPath + "config\\MonitorConfig.txt");
                                     } else {
                                         AlarmEmailBody = ""
                                             + "Errors Found on Server [" + ServerName + "]"

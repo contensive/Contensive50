@@ -116,7 +116,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 string InstallLibCollectionList = "";
                 int TargetCollectionID = 0;
                 string privateFilesInstallPath = null;
-                adminUIController Adminui = new adminUIController(core);
+                //adminUIController Adminui = new adminUIController(core);
                 List<string> nonCriticalErrorList = new List<string>();
                 //
                 // BuildVersion = core.app.dataBuildVersion
@@ -139,7 +139,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                         // ----- Put up error message
                         //
                         ButtonList = constants.ButtonCancel;
-                        Content.Add(Adminui.GetFormBodyAdminOnly());
+                        Content.Add(adminUIController.GetFormBodyAdminOnly());
                     } else {
                         //
                         InstallFolder = "temp\\CollectionUpload" + encodeText(genericController.GetRandomInteger(core));
@@ -765,9 +765,9 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     + ""
                                     + "}"
                                     + "</script>"
-                                    + "<div style=\"width:100%\">" + Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells3, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>"
+                                    + "<div style=\"width:100%\">" + adminUIController.GetReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells3, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>"
                                     + "";
-                                    BodyHTML = Adminui.GetEditPanel(true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
+                                    BodyHTML = adminUIController.GetEditPanel(core,true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
                                     BodyHTML = BodyHTML + core.html.inputHidden("AOCnt", RowPtr);
                                     core.html.addLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
                                 }
@@ -829,8 +829,8 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     RowPtr = RowPtr + 1;
                                 }
                                 core.db.csClose(ref CS);
-                                BodyHTML = "<div style=\"width:100%\">" + Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
-                                BodyHTML = Adminui.GetEditPanel(true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
+                                BodyHTML = "<div style=\"width:100%\">" + adminUIController.GetReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
+                                BodyHTML = adminUIController.GetEditPanel(core,true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
                                 BodyHTML = BodyHTML + core.html.inputHidden("accnt", RowPtr);
                                 core.html.addLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
                                 //
@@ -842,11 +842,11 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 if (!DbUpToDate) {
                                     Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>");
                                 } else {
-                                    Body.Add(Adminui.EditTableOpen);
+                                    Body.Add(adminUIController.EditTableOpen);
                                     if (core.sessionContext.isAuthenticatedDeveloper(core)) {
-                                        Body.Add(Adminui.GetEditRow(core.html.inputCheckbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
+                                        Body.Add(adminUIController.GetEditRow(core,core.html.inputCheckbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
                                     }
-                                    Body.Add(Adminui.GetEditRow(core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
+                                    Body.Add(adminUIController.GetEditRow(core,core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
                                     FormInput = ""
                                         + "<table id=\"UploadInsert\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
                                         + "</table>"
@@ -854,10 +854,10 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         + "<tr><td align=\"left\"><a href=\"#\" onClick=\"InsertUpload(); return false;\">+ Add more files</a></td></tr>"
                                         + "</table>"
                                         + core.html.inputHidden("UploadCount", 1, "UploadCount") + "";
-                                    Body.Add(Adminui.GetEditRow(FormInput, "&nbsp;", "", true, false, ""));
-                                    Body.Add(Adminui.EditTableClose);
+                                    Body.Add(adminUIController.GetEditRow(core,FormInput, "&nbsp;", "", true, false, ""));
+                                    Body.Add(adminUIController.EditTableClose);
                                 }
-                                core.html.addLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
+                                core.html.addLiveTabEntry("Add&nbsp;Manually", adminUIController.GetEditPanel(core,true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Build Page from tabs
@@ -888,7 +888,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                     if (!string.IsNullOrEmpty(status)) {
                         Description = Description + "<div style=\"Margin-left:50px\">" + status + "</div>";
                     }
-                    addonManager = Adminui.GetBody(Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                    addonManager = adminUIController.GetBody(core,Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
                     core.html.addTitle("Add-on Manager");
                 }
             } catch (Exception ex) {

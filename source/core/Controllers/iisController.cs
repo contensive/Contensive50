@@ -165,7 +165,7 @@ namespace Contensive.Core.Controllers {
         public void start() {
             try {
                 string Cmd = null;
-                string LogFilename = core.privateFiles.rootLocalPath + "iisResetPipe.log";
+                string LogFilename = core.privateFiles.localAbsRootPath + "iisResetPipe.log";
                 string Copy = null;
                 //
                 Cmd = "%comspec% /c IISReset /start >> \"" + LogFilename + "\"";
@@ -267,7 +267,7 @@ namespace Contensive.Core.Controllers {
                             prop.IsFile = true;
                             prop.IsForm = true;
                             prop.tempfilename = instanceId + "-" + filePtr.ToString() + ".bin";
-                            file.SaveAs(core.tempFiles.joinPath(core.tempFiles.rootLocalPath, prop.tempfilename));
+                            file.SaveAs(core.tempFiles.joinPath(core.tempFiles.localAbsRootPath, prop.tempfilename));
                             core.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
                             prop.FileSize = encodeInteger(file.ContentLength);
                             core.docProperties.setProperty(formName, prop);
@@ -955,13 +955,12 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     if (!found) {
-                        iisManager.Sites.Add(appName, phyPath, 80);
-                        //iisManager.Sites.Add(appName, "http", "*:80:" + appName, phyPath);
+                        iisManager.Sites.Add(appName, "http", "*:80:" + appName, phyPath);
                     }
                     site = iisManager.Sites[appName];
                     //
-                    // -- verify the bindings
-                    verifyWebsite_Binding(core, site, "*:80:" + appName, "http");
+                    // -- verify the domain binding
+                    //verifyWebsite_Binding(core, site, "*:80:" + appName, "http");
                     verifyWebsite_Binding(core, site, "*:80:" + domainName, "http");
                     //
                     // -- verify the application pool

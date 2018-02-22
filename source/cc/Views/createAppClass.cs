@@ -85,21 +85,21 @@ namespace Contensive.CLI {
                             // Local Mode, compatible with v4.1, cdn in appRoot folder as /" + appName + "/files/
                             //
                             Console.Write("\n\nLocal Mode, scale-up architecture. Files are stored and accessed on the local server.");
-                            appConfig.localWwwPath = cliController.promptForReply("app files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\www\\");
+                            appConfig.localWwwPath = cliController.promptForReply("\napp files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\www\\");
                             appConfig.localFilesPath = cliController.promptForReply("cdn files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files\\");
                             appConfig.localPrivatePath = cliController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private\\");
                             appConfig.localTempPath = cliController.promptForReply("temp files (ephemeral storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\temp\\");
                             appConfig.remoteWwwPath = "";
                             appConfig.remoteFilePath = "";
                             appConfig.remotePrivatePath = "";
-                            appConfig.cdnFileUrl = cliController.promptForReply("files Url (website)", "http://" + domainName + "/" + appName + "/files/");
+                            appConfig.cdnFileUrl = cliController.promptForReply("files Url (typically a virtual path on the application website)", "/" + appName + "/files/");
                             break;
                         case "2":
                             //
                             // 2 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket"
                             //
                             Console.Write("\n\nRemote Files, scale-out architecture. Files are stored and accessed on a remote server. A local mirror is used to file transfer.");
-                            appConfig.localWwwPath = cliController.promptForReply("app files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\www\\");
+                            appConfig.localWwwPath = cliController.promptForReply("\napp files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\www\\");
                             appConfig.localFilesPath = cliController.promptForReply("cdn files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files\\");
                             appConfig.localPrivatePath = cliController.promptForReply("private files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private\\");
                             appConfig.localTempPath = cliController.promptForReply("temp files (local only storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\temp\\");
@@ -107,7 +107,7 @@ namespace Contensive.CLI {
                             appConfig.remoteFilePath = cliController.promptForReply("AWS S3 folder for cdn file storage", "/" + appName + "/files/");
                             appConfig.remotePrivatePath = cliController.promptForReply("AWS S3 folder for private file storage", "/" + appName + "/private/");
                             string cdnDomainName = cliController.promptForReply("domain for CDN", domainName);
-                            appConfig.cdnFileUrl = cliController.promptForReply("files Url (website)", "http://" + cdnDomainName + "/" + appName + "/files/");
+                            appConfig.cdnFileUrl = cliController.promptForReply("files Url (typically a public folder in CDN website)", "http://" + cdnDomainName + "/" + appName + "/files/");
                             break;
                             //case "4":
                             //    //

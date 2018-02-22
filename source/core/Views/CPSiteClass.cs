@@ -124,7 +124,7 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
         public override string PhysicalFilePath {
             get {
-                return core.cdnFiles.rootLocalPath;
+                return core.cdnFiles.localAbsRootPath;
             }
         }
         //
@@ -133,7 +133,7 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
         public override string PhysicalInstallPath {
             get {
-                return core.privateFiles.rootLocalPath;
+                return core.privateFiles.localAbsRootPath;
             }
         }
         //
@@ -142,7 +142,7 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
         public override string PhysicalWWWPath {
             get {
-                return core.appRootFiles.rootLocalPath;
+                return core.appRootFiles.localAbsRootPath;
             }
         }
         //

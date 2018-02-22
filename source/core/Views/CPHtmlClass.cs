@@ -341,11 +341,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string Button(string HtmlName, string HtmlValue = "", string HtmlClass = "", string HtmlId = "") {
-            string tempButton = core.html.button(HtmlValue, HtmlName, HtmlId, "");
-            if (!string.IsNullOrEmpty(HtmlClass)) {
-                tempButton = tempButton.Replace(">", " class=\"" + HtmlClass + "\">");
-            }
-            return tempButton;
+            return htmlController.getButton(HtmlValue, HtmlName, HtmlId,"",false, HtmlClass);
         }
         //
         // ====================================================================================================

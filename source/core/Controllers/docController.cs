@@ -1892,7 +1892,7 @@ namespace Contensive.Core.Controllers {
                                     FilenameNoExt = Filename.Left( Pos - 1);
                                     if (genericController.vbInstr(1, "jpg,gif,png", FilenameExt, 1) != 0) {
                                         sf = new imageEditController();
-                                        if (sf.load(core.appRootFiles.rootLocalPath + FilePath + Filename)) {
+                                        if (sf.load(core.appRootFiles.localAbsRootPath + FilePath + Filename)) {
                                             //
                                             //
                                             //
@@ -1908,7 +1908,7 @@ namespace Contensive.Core.Controllers {
                                                 if (sf.width >= 640) {
                                                     sf.height = encodeInteger(sf.height * (640 / sf.width));
                                                     sf.width = 640;
-                                                    sf.save(core.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-640x" + sf.height + "." + FilenameExt);
+                                                    sf.save(core.appRootFiles.localAbsRootPath + FilePath + FilenameNoExt + "-640x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + "\r\n640x" + sf.height;
                                                 }
                                                 //
@@ -1917,7 +1917,7 @@ namespace Contensive.Core.Controllers {
                                                 if (sf.width >= 320) {
                                                     sf.height = encodeInteger(sf.height * (320 / sf.width));
                                                     sf.width = 320;
-                                                    sf.save(core.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-320x" + sf.height + "." + FilenameExt);
+                                                    sf.save(core.appRootFiles.localAbsRootPath + FilePath + FilenameNoExt + "-320x" + sf.height + "." + FilenameExt);
 
                                                     AltSizeList = AltSizeList + "\r\n320x" + sf.height;
                                                 }
@@ -1927,7 +1927,7 @@ namespace Contensive.Core.Controllers {
                                                 if (sf.width >= 160) {
                                                     sf.height = encodeInteger(sf.height * (160 / sf.width));
                                                     sf.width = 160;
-                                                    sf.save(core.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-160x" + sf.height + "." + FilenameExt);
+                                                    sf.save(core.appRootFiles.localAbsRootPath + FilePath + FilenameNoExt + "-160x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + "\r\n160x" + sf.height;
                                                 }
                                                 //
@@ -1936,7 +1936,7 @@ namespace Contensive.Core.Controllers {
                                                 if (sf.width >= 80) {
                                                     sf.height = encodeInteger(sf.height * (80 / sf.width));
                                                     sf.width = 80;
-                                                    sf.save(core.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt);
+                                                    sf.save(core.appRootFiles.localAbsRootPath + FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + "\r\n80x" + sf.height;
                                                 }
                                                 core.db.csSet(CS, "AltSizeList", AltSizeList);

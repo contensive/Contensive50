@@ -643,7 +643,6 @@ namespace Contensive.Core.Controllers {
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
                 string Copy = null;
                 string Button = null;
-                adminUIController Adminui = new adminUIController(core);
                 string ButtonList = "";
                 string Filename = null;
                 string NonEncodedLink = null;
@@ -688,7 +687,7 @@ namespace Contensive.Core.Controllers {
                     // Not Admin Error
                     //
                     ButtonList = ButtonCancel;
-                    Content.Add(Adminui.GetFormBodyAdminOnly());
+                    Content.Add(adminUIController.GetFormBodyAdminOnly());
                 } else {
                     if (true) {
                         loadOK = true;
@@ -888,7 +887,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // ----- Display Form
                                 //
-                                Content.Add(Adminui.EditTableOpen);
+                                Content.Add(adminUIController.EditTableOpen);
                                 Name = xml_GetAttribute(IsFound, Doc.DocumentElement, "name", "");
                                 foreach (XmlNode SettingNode in Doc.DocumentElement.ChildNodes) {
                                     switch (genericController.vbLCase(SettingNode.Name)) {
@@ -911,7 +910,7 @@ namespace Contensive.Core.Controllers {
                                                         // Heading
                                                         //
                                                         FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-                                                        TabCell.Add(Adminui.GetEditSubheadRow(FieldCaption));
+                                                        TabCell.Add(adminUIController.GetEditSubheadRow(core, FieldCaption));
                                                         break;
                                                     case "siteproperty":
                                                         //
@@ -1072,7 +1071,7 @@ namespace Contensive.Core.Controllers {
                                                                         break;
                                                                 }
                                                             }
-                                                            TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "copycontent":
@@ -1121,7 +1120,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 Copy = core.html.inputTextExpandable(FieldName, FieldValue);
                                                             }
-                                                            TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "filecontent":
@@ -1145,7 +1144,7 @@ namespace Contensive.Core.Controllers {
                                                                 Copy = core.html.inputTextExpandable(FieldName, Copy, 10);
                                                             }
                                                         }
-                                                        TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                     case "dbquery":
                                                     case "querydb":
@@ -1262,11 +1261,11 @@ namespace Contensive.Core.Controllers {
                                                                 }
                                                             }
                                                         }
-                                                        TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                 }
                                             }
-                                            Copy = Adminui.GetEditPanel(true, TabHeading, TabDescription, Adminui.EditTableOpen + TabCell.Text + Adminui.EditTableClose);
+                                            Copy = adminUIController.GetEditPanel(core,true, TabHeading, TabDescription, adminUIController.EditTableOpen + TabCell.Text + adminUIController.EditTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 core.html.addLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
@@ -1296,7 +1295,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 //
-                result = Adminui.GetBody(Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
+                result = adminUIController.GetBody(core,Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
 
             } catch (Exception ex) {
@@ -1575,7 +1574,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- development bypass folder (addonAssemblyBypass)
                 // -- purpose is to provide a path that can be hardcoded in visual studio after-build event to make development easier
-                string commonAssemblyPath = core.programDataFiles.rootLocalPath + "AddonAssemblyBypass\\";
+                string commonAssemblyPath = core.programDataFiles.localAbsRootPath + "AddonAssemblyBypass\\";
                 if (!Directory.Exists(commonAssemblyPath)) {
                     Directory.CreateDirectory(commonAssemblyPath);
                 } else {
@@ -1589,11 +1588,11 @@ namespace Contensive.Core.Controllers {
                     if ( executeContext.backgroundProcess ) {
                         //
                         // -- background - program files installation folder
-                        appPath = core.programFiles.rootLocalPath;
+                        appPath = core.programFiles.localAbsRootPath;
                     } else {
                         //
                         // -- foreground - appRootPath
-                        appPath = core.privateFiles.joinPath(core.appRootFiles.rootLocalPath, "bin\\");
+                        appPath = core.privateFiles.joinPath(core.appRootFiles.localAbsRootPath, "bin\\");
                     }
 
 
@@ -1621,7 +1620,7 @@ namespace Contensive.Core.Controllers {
                                 throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection");
                             } else {
                                 string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
-                                string appAddonPath = core.privateFiles.joinPath(core.privateFiles.rootLocalPath, AddonPath);
+                                string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
                                 result = execute_assembly_byFilePath(addon.id, addon.name, appAddonPath, addon.DotNetClass, false, ref AddonFound);
                                 if (!AddonFound) {
                                     throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");
@@ -2103,7 +2102,7 @@ namespace Contensive.Core.Controllers {
                         return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
                             + core.html.formStartMultipart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                            + "<tr><td class=\"ccButtonCon\">" + core.html.button("Update", "HelpBubbleButton") + "</td></tr>"
+                            + "<tr><td class=\"ccButtonCon\">" + htmlController.getButton("Update", "HelpBubbleButton") + "</td></tr>"
                             + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                             + "</table>"
                             + "</form>"
@@ -2183,7 +2182,7 @@ namespace Contensive.Core.Controllers {
                         Dialog = Dialog + "<div class=\"ccCon helpDialogCon\">"
                             + core.html.formStartMultipart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                            + "<tr><td class=\"ccButtonCon\">" + core.html.button("Update", "HelpBubbleButton") + "</td></tr>"
+                            + "<tr><td class=\"ccButtonCon\">" + htmlController.getButton("Update", "HelpBubbleButton") + "</td></tr>"
                             + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                             + "</table>"
                             + "</form>"
@@ -2373,7 +2372,6 @@ namespace Contensive.Core.Controllers {
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
                 string Copy = null;
                 string Button = null;
-                adminUIController Adminui = new adminUIController(core);
                 string ButtonList = "";
                 string Filename = null;
                 string NonEncodedLink = null;
@@ -2417,7 +2415,7 @@ namespace Contensive.Core.Controllers {
                     // Not Admin Error
                     //
                     ButtonList = ButtonCancel;
-                    Content.Add(Adminui.GetFormBodyAdminOnly());
+                    Content.Add(adminUIController.GetFormBodyAdminOnly());
                 } else {
                     if (true) {
                         bool loadOK = true;
@@ -2619,7 +2617,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // ----- Display Form
                                 //
-                                Content.Add(Adminui.EditTableOpen);
+                                Content.Add(adminUIController.EditTableOpen);
                                 Name = xml_GetAttribute(IsFound, Doc.DocumentElement, "name", "");
                                 foreach (XmlNode SettingNode in Doc.DocumentElement.ChildNodes) {
                                     switch (genericController.vbLCase(SettingNode.Name)) {
@@ -2639,7 +2637,7 @@ namespace Contensive.Core.Controllers {
                                                         // Heading
                                                         //
                                                         FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-                                                        TabCell.Add(Adminui.GetEditSubheadRow(FieldCaption));
+                                                        TabCell.Add(adminUIController.GetEditSubheadRow(core, FieldCaption));
                                                         break;
                                                     case "siteproperty":
                                                         //
@@ -2804,7 +2802,7 @@ namespace Contensive.Core.Controllers {
                                                                         break;
                                                                 }
                                                             }
-                                                            TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "copycontent":
@@ -2853,7 +2851,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 Copy = core.html.inputTextExpandable(FieldName, FieldValue);
                                                             }
-                                                            TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "filecontent":
@@ -2877,7 +2875,7 @@ namespace Contensive.Core.Controllers {
                                                                 Copy = core.html.inputTextExpandable(FieldName, Copy, 10);
                                                             }
                                                         }
-                                                        TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                     case "dbquery":
                                                     case "querydb":
@@ -2990,11 +2988,11 @@ namespace Contensive.Core.Controllers {
                                                                 }
                                                             }
                                                         }
-                                                        TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                 }
                                             }
-                                            Copy = Adminui.GetEditPanel(true, TabHeading, TabDescription, Adminui.EditTableOpen + TabCell.Text + Adminui.EditTableClose);
+                                            Copy = adminUIController.GetEditPanel(core,true, TabHeading, TabDescription, adminUIController.EditTableOpen + TabCell.Text + adminUIController.EditTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 core.html.addLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
@@ -3020,7 +3018,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 //
-                tempgetFormContent = Adminui.GetBody(Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
+                tempgetFormContent = adminUIController.GetBody(core,Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -3048,7 +3046,6 @@ namespace Contensive.Core.Controllers {
                 int Pos = 0;
                 stringBuilderLegacyController FastString = null;
                 string Copy = "";
-                adminUIController Adminui = new adminUIController(core);
                 //
                 FastString = new stringBuilderLegacyController();
                 //

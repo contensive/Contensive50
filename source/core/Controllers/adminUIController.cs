@@ -28,22 +28,15 @@ namespace Contensive.Core {
             SortableSetza = 2,
             SortableNotSet = 3
         }
-        //
-        private coreController core;
-        //
-        //====================================================================================================
+        // ====================================================================================================
         /// <summary>
-        /// constructor
+        /// Title Bar
         /// </summary>
-        /// <param name="cp"></param>
-        /// <remarks></remarks>
-        public adminUIController(coreController core) : base() {
-            this.core = core;
-        }
-        //
-        //===========================================================================
-        //
-        public string GetTitleBar(string Title, string Description) {
+        /// <param name="core"></param>
+        /// <param name="Title"></param>
+        /// <param name="Description"></param>
+        /// <returns></returns>
+        public static string GetTitleBar(coreController core, string Title, string Description) {
             string tempGetTitleBar = null;
             try {
                 //
@@ -61,60 +54,56 @@ namespace Contensive.Core {
                 if (!string.IsNullOrEmpty(Copy)) {
                     tempGetTitleBar = tempGetTitleBar + "<div>&nbsp;</div><div class=\"ccAdminInfoBar ccPanel3DReverse\">" + Copy + "</div>";
                 }
-                return tempGetTitleBar + "</div>";
-                //
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 core.handleException(ex);
             }
-            //ErrorTrap:
-            handleLegacyClassError("GetTitleBar");
-            return tempGetTitleBar;
+            return tempGetTitleBar + "</div>";
         }
-        //
-        //========================================================================
-        // Get the Normal Edit Button Bar String
-        //
-        //   used on Normal Edit and others
-        //========================================================================
-        //
-        public string GetEditButtonBar2(int MenuDepth, bool AllowDelete, bool AllowCancel, bool allowSave, bool AllowSpellCheck, bool ignorefalse, bool ignorefalse2, bool ignorefalse3, bool ignorefalse4, bool AllowAdd, bool ignore_AllowReloadCDef, bool HasChildRecords, bool IsPageContent, bool AllowMarkReviewed, bool AllowRefresh, bool AllowCreateDuplicate) {
-            string tempGetEditButtonBar2 = null;
+        // ====================================================================================================
+        /// <summary>
+        /// Get the Normal Edit Button Bar String, used on Normal Edit and others
+        /// </summary>
+        public static string GetEditButtonBar2(coreController core, int MenuDepth, bool AllowDelete, bool AllowCancel, bool allowSave, bool AllowSpellCheck, bool ignorefalse, bool ignorefalse2, bool ignorefalse3, bool ignorefalse4, bool AllowAdd, bool ignore_AllowReloadCDef, bool HasChildRecords, bool IsPageContent, bool AllowMarkReviewed, bool AllowRefresh, bool AllowCreateDuplicate) {
+            string result = "";
             try {
+                string buttonsLeft = "";
                 //
                 string JSOnClick = null;
                 //
-                tempGetEditButtonBar2 = "";
+                buttonsLeft = "";
                 //
                 if (AllowCancel) {
                     if (MenuDepth == 1) {
                         //
                         // Close if this is the root depth of a popup window
                         //
-                        tempGetEditButtonBar2 = tempGetEditButtonBar2 + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonClose + "\" OnClick=\"window.close();\">";
+                        buttonsLeft += getButtonPrimary(ButtonClose, "window.close();");
+                        //buttonsLeft = buttonsLeft + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonClose + "\" OnClick=\"window.close();\" class=\"btn btn-primary mr-1 btn-sm btn-sm\">";
                     } else {
                         //
                         // Cancel
                         //
-                        tempGetEditButtonBar2 = tempGetEditButtonBar2 + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonCancel + "\" onClick=\"return processSubmit(this);\">";
+                        buttonsLeft += getButtonPrimary(ButtonCancel, "return processSubmit(this);");
+                        //buttonsLeft = buttonsLeft + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonCancel + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
                     }
                 }
                 if (allowSave) {
                     //
                     // Save
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonSave + "\" onClick=\"return processSubmit(this);\">";
+                    buttonsLeft += getButtonPrimary(ButtonSave, "return processSubmit(this);");
+                    //buttonsLeft = buttonsLeft + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonSave + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
                     //
                     // OK
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonOK + "\" onClick=\"return processSubmit(this);\">";
+                    buttonsLeft += getButtonPrimary(ButtonOK, "return processSubmit(this);");
+                    //buttonsLeft = buttonsLeft + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonOK + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
                     if (AllowAdd) {
                         //
                         // OK
                         //
-                        tempGetEditButtonBar2 = tempGetEditButtonBar2 + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonSaveAddNew + "\" onClick=\"return processSubmit(this);\">";
+                        buttonsLeft += getButtonPrimary(ButtonSaveAddNew, "return processSubmit(this);");
+                        //buttonsLeft = buttonsLeft + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonSaveAddNew + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
                     }
                 }
                 if (AllowDelete) {
@@ -128,9 +117,11 @@ namespace Contensive.Core {
                     } else {
                         JSOnClick = "if(!DeleteCheck())return false;";
                     }
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonDelete + "\" onClick=\"" + JSOnClick + "\">";
+                    buttonsLeft += getButtonPrimary(ButtonDelete, JSOnClick );
+                    //buttonsLeft = buttonsLeft + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonDelete + "\" onClick=\"" + JSOnClick + "\" class=\"btn btn-primary mr-1 btn-sm\">";
                 } else {
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + "<input TYPE=SUBMIT NAME=BUTTON disabled=\"disabled\" VALUE=\"" + ButtonDelete + "\">";
+                    buttonsLeft += getButtonPrimary(ButtonDelete, "", true );
+                    //buttonsLeft = buttonsLeft + "<input TYPE=SUBMIT NAME=BUTTON disabled=\"disabled\" VALUE=\"" + ButtonDelete + "\" class=\"btn btn-primary mr-1 btn-sm\">";
                 }
                 //    If AllowSpellCheck Then
                 //        '
@@ -166,49 +157,46 @@ namespace Contensive.Core {
                     //
                     // Reload Content Definitions
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + core.html.button(ButtonSaveandInvalidateCache, RequestNameButton);
+                    buttonsLeft = buttonsLeft + htmlController.getButton(ButtonSaveandInvalidateCache, RequestNameButton);
                 }
                 if (AllowMarkReviewed) {
                     //
                     // Reload Content Definitions
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + core.html.button(ButtonMarkReviewed, RequestNameButton);
+                    buttonsLeft = buttonsLeft + htmlController.getButton(ButtonMarkReviewed, RequestNameButton);
                 }
                 if (AllowRefresh) {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + core.html.button(ButtonRefresh, RequestNameButton);
+                    buttonsLeft = buttonsLeft + htmlController.getButton(ButtonRefresh, RequestNameButton);
                 }
                 if (AllowCreateDuplicate) {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + core.html.button(ButtonCreateDuplicate, RequestNameButton, "", "return processSubmit(this)");
+                    buttonsLeft = buttonsLeft + htmlController.getButton(ButtonCreateDuplicate, RequestNameButton, "", "return processSubmit(this)");
                 }
                 //
-                tempGetEditButtonBar2 = ""
-                    + "\r\n\t" + GetHTMLComment("ButtonBar") + "\r\n\t<div class=\"ccButtonCon\">"
-                    + htmlIndent(tempGetEditButtonBar2) + "\r\n\t</div><!-- ButtonBar End -->"
-                    + "";
-                return tempGetEditButtonBar2;
-                //
-                // ----- Error Trap
-                //
+                result = GetButtonBar( core, buttonsLeft, "");
+                //buttonsLeft = ""
+                //    + "\r\n\t" + GetHTMLComment("ButtonBar") + "\r\n\t<div class=\"ccButtonCon\">"
+                //    + htmlIndent(buttonsLeft) + "\r\n\t</div><!-- ButtonBar End -->"
+                //    + "";
             } catch (Exception ex) {
                 core.handleException(ex);
             }
-            //ErrorTrap:
-            handleLegacyClassError("GetEditButtonBar2");
-            //
-            return tempGetEditButtonBar2;
+            return result;
         }
-        //
-        //========================================================================
-        // Return a panel header with the header message reversed out of the left
-        //========================================================================
-        //
-        public string GetHeader(string HeaderMessage, string RightSideMessage = "") {
+        // ====================================================================================================
+        /// <summary>
+        /// Return a panel header with the header message reversed out of the left
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="HeaderMessage"></param>
+        /// <param name="RightSideMessage"></param>
+        /// <returns></returns>
+        public static string GetHeader(coreController core, string HeaderMessage, string RightSideMessage = "") {
             string s = "";
             try {
                 if (string.IsNullOrEmpty(RightSideMessage)) {
@@ -239,10 +227,9 @@ namespace Contensive.Core {
             }
             return s;
         }
+        // ====================================================================================================
         //
-        //
-        //
-        public string GetButtonsFromList(string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
+        public static string GetButtonsFromList(coreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
             string s = "";
             try {
                 string[] Buttons = null;
@@ -250,91 +237,60 @@ namespace Contensive.Core {
                 if (!string.IsNullOrEmpty(ButtonList.Trim(' '))) {
                     Buttons = ButtonList.Split(',');
                     for (Ptr = 0; Ptr <= Buttons.GetUpperBound(0); Ptr++) {
-                        //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
-                        //						Select Case Trim(Buttons[Ptr])
-                        //ORIGINAL LINE: Case Trim(ButtonDelete)
                         if (Buttons[Ptr].Trim(' ') == encodeText(ButtonDelete).Trim(' ')) {
                             if (AllowDelete) {
-                                s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" VALUE=\"" + Buttons[Ptr] + "\" onClick=\"if(!DeleteCheck())return false;\">";
+                                s += getButtonDanger(Buttons[Ptr], "if(!DeleteCheck()) return false;");
+                                //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" VALUE=\"" + Buttons[Ptr] + "\" onClick=\"if(!DeleteCheck())return false;\" class=\"btn btn-danger mr-1\">";
                             } else {
-                                s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" DISABLED VALUE=\"" + Buttons[Ptr] + "\">";
+                                s += getButtonDanger(Buttons[Ptr], "if(!DeleteCheck()) return false;",true);
+                                //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" DISABLED VALUE=\"" + Buttons[Ptr] + "\" class=\"btn btn-primary mr-1 btn-sm\">";
                             }
                         }
-                        //ORIGINAL LINE: Case Trim(ButtonClose)
                         else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonClose).Trim(' ')) {
-                            s = s + core.html.button(Buttons[Ptr], "", "", "window.close();");
+                            s += getButtonPrimary(Buttons[Ptr], "window.close();");
+                            //s = s + htmlController.button(Buttons[Ptr], "", "", "window.close();");
                         }
-                        //ORIGINAL LINE: Case Trim(ButtonAdd)
                         else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonAdd).Trim(' ')) {
                             if (AllowAdd) {
-                                s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" VALUE=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\">";
+                                s += getButtonPrimary(Buttons[Ptr], "return processSubmit(this);");
+                                //s = s + "<input type=submit name=\"" + ButtonName + "\" value=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
                             } else {
-                                s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" DISABLED VALUE=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\">";
+                                s += getButtonPrimary(Buttons[Ptr], "return processSubmit(this);",true );
+                                //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" DISABLED VALUE=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
                             }
-                        }
-                        //ORIGINAL LINE: Case ""
-                        else if (string.IsNullOrEmpty(Buttons[Ptr].Trim(' '))) {
-                        }
-                        //ORIGINAL LINE: Case Else
-                        else {
-                            s = s + core.html.button(Buttons[Ptr], ButtonName);
+                        } else if (string.IsNullOrEmpty(Buttons[Ptr].Trim(' '))) {
+                            //
+                        } else {
+                            s += getButtonPrimary(Buttons[Ptr]);
+                            //s = s + htmlController.button(Buttons[Ptr], ButtonName);
                         }
                     }
                 }
-
-
-                //
             } catch (Exception ex) {
                 core.handleException(ex);
             }
             return s;
         }
-        //
-        //
-        //
-        public string GetButtonBar(string LeftButtons, string RightButtons) {
-            string tempGetButtonBar = null;
-            try {
+        /// <summary>
+        /// Return a bootstrap button bar
+        /// </summary>
+        /// <param name="LeftButtons"></param>
+        /// <param name="RightButtons"></param>
+        /// <returns></returns>
+        public static string GetButtonBar(coreController core, string LeftButtons, string RightButtons) {
+            if (string.IsNullOrWhiteSpace(LeftButtons + RightButtons)) {
+                return "";
+            } else if (string.IsNullOrWhiteSpace(RightButtons)) {
+                return "<div class=\"border bg-white p-2\">" + LeftButtons + "</div>";
+            } else {
                 //
-                if (string.IsNullOrEmpty(LeftButtons + RightButtons)) {
-                    //
-                    // nothing there
-                    //
-                } else if (string.IsNullOrEmpty(RightButtons)) {
-                    tempGetButtonBar = ""
-                        + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
-                        + cr2 + "<tr>"
-                        + cr3 + "<td align=left  class=\"ccButtonCon\">" + LeftButtons + "</td>"
-                        + cr2 + "</tr>"
-                        + "\r</table>";
-                } else {
-                    tempGetButtonBar = ""
-                        + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
-                        + cr2 + "<tr>"
-                        + cr3 + "<td align=left  class=\"ccButtonCon\">"
-                        + cr4 + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
-                        + cr5 + "<tr>"
-                        + cr6 + "<td width=\"50%\" align=left>" + LeftButtons + "</td>"
-                        + cr6 + "<td width=\"50%\" align=right>" + RightButtons + "</td>"
-                        + cr5 + "</tr>"
-                        + cr4 + "</table>"
-                        + cr3 + "</td>"
-                        + cr2 + "</tr>"
-                        + "\r</table>";
-                }
-                return tempGetButtonBar;
-                //
-            } catch (Exception ex) {
-                core.handleException(ex);
+                return "<div class=\"border bg-white p-2\">" + LeftButtons + "<div class=\"float-right\">" + RightButtons + "</div></div>";
+                //return "<div class=\"container-fluid\"><div class=\"border bg-white p-2 text-right\"><div class=\"row\"><div class=\"col text-left\">" + LeftButtons + "</div><div class=\"col text-right\">" + RightButtons + "</div></div></div></div>";
             }
-            //ErrorTrap:
-            handleLegacyClassError("GetButtonBar");
-            return tempGetButtonBar;
         }
+        // ====================================================================================================
         //
-        //
-        //
-        public string GetButtonBarForIndex(string LeftButtons, string RightButtons, int PageNumber, int RecordsPerPage, int PageCount) {
+        public static string GetButtonBarForIndex(coreController core, string LeftButtons, string RightButtons, int PageNumber, int RecordsPerPage, int PageCount) {
             string tempGetButtonBarForIndex = null;
             try {
                 //
@@ -343,7 +299,7 @@ namespace Contensive.Core {
                 int NavStart = 0;
                 int NavEnd = 0;
                 //
-                tempGetButtonBarForIndex = GetButtonBar(LeftButtons, RightButtons);
+                tempGetButtonBarForIndex = GetButtonBar(core, LeftButtons, RightButtons);
                 NavStart = PageNumber - 9;
                 if (NavStart < 1) {
                     NavStart = 1;
@@ -371,28 +327,14 @@ namespace Contensive.Core {
                     + cr2 + "<ul><li class=\"caption\">Page</li>"
                     + cr3 + Nav + cr2 + "</ul>"
                     + "\r</div>";
-                //    GetButtonBarForIndex = GetButtonBarForIndex _
-                //        & CR & "<script language=""javascript"">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>" _
-                //        & CR & "<div class=""ccJumpCon"">" _
-                //        & cr2 & "<ul>Page&nbsp;" _
-                //        & cr3 & Nav _
-                //        & cr2 & "</ul>" _
-                //        & CR & "</div>"
-                return tempGetButtonBarForIndex;
-                //
             } catch (Exception ex) {
                 core.handleException(ex);
             }
-            //ErrorTrap:
-            handleLegacyClassError("GetButtonBar");
             return tempGetButtonBarForIndex;
         }
+        // ====================================================================================================
         //
-        //========================================================================
-        //
-        //========================================================================
-        //
-        public string GetBody(string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
+        public static string GetBody(coreController core, string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
             string result = "";
             try {
                 string ContentCell = "";
@@ -405,12 +347,12 @@ namespace Contensive.Core {
                 // Build ButtonBar
                 //
                 if (!string.IsNullOrEmpty(ButtonListLeft.Trim(' '))) {
-                    LeftButtons = GetButtonsFromList(ButtonListLeft, AllowDelete, AllowAdd, "Button");
+                    LeftButtons = GetButtonsFromList(core, ButtonListLeft, AllowDelete, AllowAdd, "Button");
                 }
                 if (!string.IsNullOrEmpty(ButtonListRight.Trim(' '))) {
-                    RightButtons = GetButtonsFromList(ButtonListRight, AllowDelete, AllowAdd, "Button");
+                    RightButtons = GetButtonsFromList(core, ButtonListRight, AllowDelete, AllowAdd, "Button");
                 }
-                ButtonBar = GetButtonBar(LeftButtons, RightButtons);
+                ButtonBar = GetButtonBar(core, LeftButtons, RightButtons);
                 if (!string.IsNullOrEmpty(ContentSummary)) {
                     CellContentSummary = ""
                     + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
@@ -420,7 +362,7 @@ namespace Contensive.Core {
                 ContentCell = ""
                 + "\r<div style=\"padding:" + ContentPadding + "px;\">"
                 + htmlIndent(Content) + "\r</div>";
-                result = result + htmlIndent(ButtonBar) + htmlIndent(GetTitleBar(Caption, Description)) + htmlIndent(CellContentSummary) + htmlIndent(ContentCell) + htmlIndent(ButtonBar) + "";
+                result = result + htmlIndent(ButtonBar) + htmlIndent(GetTitleBar(core,Caption, Description)) + htmlIndent(CellContentSummary) + htmlIndent(ContentCell) + htmlIndent(ButtonBar) + "";
 
                 result = '\r' + core.html.formStartMultipart() + htmlIndent(result) + '\r' + core.html.formEnd();
             } catch (Exception ex) {
@@ -428,10 +370,9 @@ namespace Contensive.Core {
             }
             return result;
         }
+        // ====================================================================================================
         //
-        //
-        //
-        public string GetEditRow(string HTMLFieldString, string Caption, string HelpMessage = "", bool FieldRequired = false, bool AllowActiveEdit = false, string ignore0 = "") {
+        public static string GetEditRow(coreController core, string HTMLFieldString, string Caption, string HelpMessage = "", bool FieldRequired = false, bool AllowActiveEdit = false, string ignore0 = "") {
             string tempGetEditRow = null;
             try {
                 //
@@ -462,64 +403,23 @@ namespace Contensive.Core {
                     Copy = "&nbsp;";
                 }
                 Copy = "<div class=\"ccEditorCon\">" + Copy + "</div>";
-                //If HelpMessage <> "" Then
                 Copy += "<div class=\"ccEditorHelpCon\"><div class=\"closed\">" + HelpMessage + "</div></div>";
-                //Copy = Copy & "<div style=""padding:10px;white-space:normal"">" & HelpMessage & "</div>"
-                //End If
-                return tempGetEditRow + "<td class=\"ccEditFieldCon\">" + Copy + "</td></tr>";
-                //GetEditRow = GetEditRow & "<td class=""ccAdminEditField"">" & Copy & "</td></tr>"
-                //
-                //
+                tempGetEditRow += "<td class=\"ccEditFieldCon\">" + Copy + "</td></tr>";
             } catch (Exception ex) {
                 core.handleException(ex);
             }
-            //ErrorTrap:
-            handleLegacyClassError("GetEditRow");
             return tempGetEditRow;
         }
+        // ====================================================================================================
         //
-        //
-        //
-        public string GetEditRowWithHelpEdit(string HTMLFieldString, string Caption, string HelpMessage = "", bool FieldRequired = false, bool AllowActiveEdit = false, string ignore0 = "") {
-            string tempGetEditRowWithHelpEdit = null;
-            try {
-                //
-                stringBuilderLegacyController FastString = new stringBuilderLegacyController();
-                string Copy = null;
-                //
-                Copy = Caption;
-                if (string.IsNullOrEmpty(Copy)) {
-                    Copy = "&nbsp;";
-                }
-                tempGetEditRowWithHelpEdit = "<tr><td class=\"ccAdminEditCaption\"><nobr>" + Copy;
-                if (core.visitProperty.getBoolean("AllowHelpIcon")) {}
-                tempGetEditRowWithHelpEdit = tempGetEditRowWithHelpEdit + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=15 ></nobr></td>";
-                Copy = HTMLFieldString;
-                if (string.IsNullOrEmpty(Copy)) {
-                    Copy = "&nbsp;";
-                }
-                return tempGetEditRowWithHelpEdit + "<td class=\"ccAdminEditField\">" + Copy + "</td></tr>";
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            return tempGetEditRowWithHelpEdit;
-        }
-        //
-        //
-        //
-        public string GetEditSubheadRow(string Caption) {
+        public static string GetEditSubheadRow(coreController core, string Caption) {
             return "<tr><td colspan=2 class=\"ccAdminEditSubHeader\">" + Caption + "</td></tr>";
         }
         //
         //========================================================================
-        // GetEditPanel
+        // GetEditPanel, An edit panel is a section of an admin page, under a subhead. When in tab mode, the subhead is blocked, and the panel is assumed to go in its own tab windows
         //
-        //   An edit panel is a section of an admin page, under a subhead.
-        //   When in tab mode, the subhead is blocked, and the panel is assumed to
-        //   go in its own tab windows
-        //========================================================================
-        //
-        public string GetEditPanel(bool AllowHeading, string PanelHeading, string PanelDescription, string PanelBody) {
+        public static string GetEditPanel(coreController core, bool AllowHeading, string PanelHeading, string PanelDescription, string PanelBody) {
             string result = "";
             try {
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
@@ -547,9 +447,8 @@ namespace Contensive.Core {
         //
         //========================================================================
         // Edit Table Open
-        //========================================================================
         //
-        public string EditTableOpen {
+        public static string EditTableOpen {
             get {
                 return "<table border=0 cellpadding=3 cellspacing=0 width=\"100%\">";
             }
@@ -557,9 +456,8 @@ namespace Contensive.Core {
         //
         //========================================================================
         // Edit Table Close
-        //========================================================================
         //
-        public string EditTableClose {
+        public static string EditTableClose {
             get {
                 string tempEditTableClose = null;
                 tempEditTableClose = "<tr>"
@@ -576,7 +474,7 @@ namespace Contensive.Core {
         //   Report Cell
         //==========================================================================================
         //
-        private string GetReport_Cell(string Copy, string Align, int Columns, int RowPointer) {
+        private static string GetReport_Cell(coreController core, string Copy, string Align, int Columns, int RowPointer) {
             string tempGetReport_Cell = null;
             string iAlign = null;
             string Style = null;
@@ -615,7 +513,7 @@ namespace Contensive.Core {
         //       SortingState
         //==========================================================================================
         //
-        private string GetReport_CellHeader(int ColumnPtr, string Title, string Width, string Align, string ClassStyle, string RefreshQueryString, SortingStateEnum SortingState) {
+        private static string GetReport_CellHeader(coreController core, int ColumnPtr, string Title, string Width, string Align, string ClassStyle, string RefreshQueryString, SortingStateEnum SortingState) {
             string result = "";
             try {
                 string Style = null;
@@ -676,7 +574,7 @@ namespace Contensive.Core {
         //   returns the integer column ptr of the column last selected
         //=============================================================================
         //
-        public int GetReportSortColumnPtr(int DefaultSortColumnPtr) {
+        public static int GetReportSortColumnPtr(coreController core, int DefaultSortColumnPtr) {
             int tempGetReportSortColumnPtr = 0;
             string VarText;
             //
@@ -701,7 +599,7 @@ namespace Contensive.Core {
         //   This call returns a comma delimited list of integers representing the columns to sort
         //=============================================================================
         //
-        public int GetReportSortType() {
+        public static int GetReportSortType(coreController core) {
             int tempGetReportSortType = 0;
             string VarText;
             //
@@ -721,7 +619,7 @@ namespace Contensive.Core {
         //   Translate the old GetReport to the new GetReport2
         //=============================================================================
         //
-        public string GetReport(int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle) {
+        public static string GetReport(coreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle) {
             string result = "";
             try {
                 int ColCnt = Cells.GetUpperBound(1);
@@ -730,13 +628,12 @@ namespace Contensive.Core {
                     ColSortable[Ptr] = false;
                 }
                 //
-                result = GetReport2(RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle, ColSortable, 0);
+                result = GetReport2(core, RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle, ColSortable, 0);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
             return result;
         }
-
         //
         //=============================================================================
         //   Report
@@ -748,7 +645,7 @@ namespace Contensive.Core {
         //
         //=============================================================================
         //
-        public string GetReport2(int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle, bool[] ColSortable, int DefaultSortColumnPtr) {
+        public static string GetReport2(coreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle, bool[] ColSortable, int DefaultSortColumnPtr) {
             string result = "";
             try {
                 string RQS = null;
@@ -788,8 +685,8 @@ namespace Contensive.Core {
                 //End If
                 RQS = core.doc.refreshQueryString;
                 //
-                SortColPtr = GetReportSortColumnPtr(DefaultSortColumnPtr);
-                SortColType = GetReportSortType();
+                SortColPtr = GetReportSortColumnPtr(core, DefaultSortColumnPtr);
+                SortColType = GetReportSortType(core);
                 //
                 // ----- Start the table
                 //
@@ -798,24 +695,24 @@ namespace Contensive.Core {
                 // ----- Header
                 //
                 Content.Add("\r\n<tr>");
-                Content.Add(GetReport_CellHeader(0, "Row", "50", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
+                Content.Add(GetReport_CellHeader(core, 0, "Row", "50", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
                 for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
                     ColumnWidth = ColWidth[ColumnPtr];
                     if (!ColSortable[ColumnPtr]) {
                         //
                         // not sortable column
                         //
-                        Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
+                        Content.Add(GetReport_CellHeader(core, ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
                     } else if (ColumnPtr == SortColPtr) {
                         //
                         // This is the current sort column
                         //
-                        Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, (SortingStateEnum)SortColType));
+                        Content.Add(GetReport_CellHeader(core, ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, (SortingStateEnum)SortColType));
                     } else {
                         //
                         // Column is sortable, but not selected
                         //
-                        Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet));
+                        Content.Add(GetReport_CellHeader(core, ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet));
                     }
 
                     //If ColumnPtr = SortColPtr Then
@@ -833,16 +730,16 @@ namespace Contensive.Core {
                 //
                 if (RowCount == 0) {
                     Content.Add("\r\n<tr>");
-                    Content.Add(GetReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
-                    Content.Add(GetReport_Cell("-- End --", "left", ColumnCount, 0));
+                    Content.Add(GetReport_Cell(core, (RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
+                    Content.Add(GetReport_Cell(core, "-- End --", "left", ColumnCount, 0));
                     Content.Add("\r\n</tr>");
                 } else {
                     RowBAse = (ReportPageSize * (ReportPageNumber - 1)) + 1;
                     for (RowPointer = 0; RowPointer < RowCount; RowPointer++) {
                         Content.Add("\r\n<tr>");
-                        Content.Add(GetReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
+                        Content.Add(GetReport_Cell(core, (RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
                         for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
-                            Content.Add(GetReport_Cell(Cells[RowPointer, ColumnPtr], ColAlign[ColumnPtr], 1, RowPointer));
+                            Content.Add(GetReport_Cell(core, Cells[RowPointer, ColumnPtr], ColAlign[ColumnPtr], 1, RowPointer));
                         }
                         Content.Add("\r\n</tr>");
                     }
@@ -910,64 +807,26 @@ namespace Contensive.Core {
         }
         //
         //========================================================================
-        // Get the Normal Edit Button Bar String
+        // Get the Normal Edit Button Bar String used on Normal Edit and others
         //
-        //   used on Normal Edit and others
-        //========================================================================
-        //
-        public string GetEditButtonBar(int MenuDepth, bool AllowDelete, bool AllowCancel, bool allowSave, bool AllowSpellCheck, bool AllowPublish, bool AllowAbort, bool AllowSubmit, bool AllowApprove) {
-            return GetEditButtonBar2(MenuDepth, AllowDelete, AllowCancel, allowSave, AllowSpellCheck, AllowPublish, AllowAbort, AllowSubmit, AllowApprove, false, false, false, false, false, false, false);
-        }
-        //
-        //========================================================================
-        // Get the Normal Edit Button Bar String
-        //
-        //   used on Normal Edit and others
-        //========================================================================
-        //
-        public string GetFormBodyAdminOnly() {
+        public static string GetFormBodyAdminOnly() {
             return "<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">This page requires administrator permissions.</div>";
         }
         //
-        //========================================================================
-        //   Builds a single entry in the ReportFilter at the bottom of the page
-        //========================================================================
+        // ====================================================================================================
         //
-        public string GetReportFilterRow(string FormInput, string Caption) {
-            string tempGetReportFilterRow = null;
-            //
-            tempGetReportFilterRow = ""
-                + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                + "<tr><td width=\"200\" align=\"right\" class=RowInput>" + FormInput + "</td>"
-                + "<td width=\"100%\" align=\"left\" class=RowCaption>&nbsp;" + Caption + "</td></tr>"
-                + "</table>";
-            //
-            return tempGetReportFilterRow;
-        }
+        public static string getButtonPrimary(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "", string htmlName = "button") {
+            return htmlController.getButton(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
+           // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
+           // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
+       }
         //
-        //=============================================================================
-        //   Builds the panel around the filters at the bottom of the report
-        //=============================================================================
+        // ====================================================================================================
         //
-        public string GetReportFilter(string Title, string Body) {
-            string result = "";
-            result = result + "<div class=\"ccReportFilter\">";
-            result = result + "<div class=\"Title\">" + Title + "</div>";
-            result = result + "<div class=\"Body\">" + Body + "</div>";
-            result = result + "</div>";
-            return result;
-        }
-        //
-        //===========================================================================
-        /// <summary>
-        /// handle legacy errors for this class, v1
-        /// </summary>
-        /// <param name="MethodName"></param>
-        /// <remarks></remarks>
-        private void handleLegacyClassError(string MethodName) {
-            //
-            throw (new Exception("unexpected exception in method [" + MethodName + "]"));
-            //
+        public static string getButtonDanger(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "") {
+            return htmlController.getButton(buttonValue, "button", htmlId, onclick, disabled, "btn btn-danger mr-1 btn-sm");
+            // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
+            // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
         }
     }
 }

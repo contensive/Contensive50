@@ -237,15 +237,15 @@ namespace Contensive.Core.Tests.UnitTests.Views {
             // arrange
             // act
             // assert
-            Assert.AreEqual(fileController.normalizePath(""), "");
-            Assert.AreEqual(fileController.normalizePath("c:\\"), "c:\\");
-            Assert.AreEqual(fileController.normalizePath("c:\\test\\"), "c:\\test\\");
-            Assert.AreEqual(fileController.normalizePath("c:\\test"), "c:\\test\\");
-            Assert.AreEqual(fileController.normalizePath("c:\\test/test"), "c:\\test\\test\\");
-            Assert.AreEqual(fileController.normalizePath("test"), "test\\");
-            Assert.AreEqual(fileController.normalizePath("\\test"), "test\\");
-            Assert.AreEqual(fileController.normalizePath("\\test\\"), "test\\");
-            Assert.AreEqual(fileController.normalizePath("/test/"), "test\\");
+            Assert.AreEqual(fileController.normalizeDosPath(""), "");
+            Assert.AreEqual(fileController.normalizeDosPath("c:\\"), "c:\\");
+            Assert.AreEqual(fileController.normalizeDosPath("c:\\test\\"), "c:\\test\\");
+            Assert.AreEqual(fileController.normalizeDosPath("c:\\test"), "c:\\test\\");
+            Assert.AreEqual(fileController.normalizeDosPath("c:\\test/test"), "c:\\test\\test\\");
+            Assert.AreEqual(fileController.normalizeDosPath("test"), "test\\");
+            Assert.AreEqual(fileController.normalizeDosPath("\\test"), "test\\");
+            Assert.AreEqual(fileController.normalizeDosPath("\\test\\"), "test\\");
+            Assert.AreEqual(fileController.normalizeDosPath("/test/"), "test\\");
         }
         //
         [TestMethod()]

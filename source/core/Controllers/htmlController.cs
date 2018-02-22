@@ -1588,21 +1588,18 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         // Print an HTML Form Button element named BUTTON
         //
-        public string button(string ButtonLabel, string Name = "button", string htmlId = "", string OnClick = "", bool Disabled = false) {
-            string s = null;
-            try {
-                s = "<input TYPE=\"SUBMIT\""
-                    + " NAME=\"" + genericController.encodeEmptyText(Name, "button") + "\""
-                    + " VALUE=\"" + genericController.encodeText(ButtonLabel) + "\""
-                    + " OnClick=\"" + genericController.encodeEmptyText(OnClick, "") + "\""
-                    + " ID=\"" + genericController.encodeEmptyText(htmlId, "") + "\"";
-                if (Disabled) {
-                    s = s + " disabled=\"disabled\"";
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
+        public static string getButton(string ButtonLabel, string Name = "button", string htmlId = "", string OnClick = "", bool Disabled = false, string htmlClass = "") {
+            string s = "<input type=\"submit\""
+                + " name=\"" + genericController.encodeEmptyText(Name, "button") + "\""
+                + " value=\"" + genericController.encodeText(ButtonLabel) + "\""
+                + " onclick=\"" + genericController.encodeEmptyText(OnClick, "") + "\""
+                + " id=\"" + genericController.encodeEmptyText(htmlId, "") + "\""
+                + " class=\"" + htmlClass + "\"";
+            if (Disabled) {
+                s = s + " disabled=\"disabled\"";
             }
-            return s + ">";
+            s += ">";
+            return s;
         }
         //
         //====================================================================================================
@@ -3935,13 +3932,12 @@ namespace Contensive.Core.Controllers {
         public string getPanelHeader(string HeaderMessage, string RightSideMessage = "") {
             string iHeaderMessage = null;
             string iRightSideMessage = null;
-            adminUIController Adminui = new adminUIController(core);
             //
             //If Not (true) Then Exit Function
             //
             iHeaderMessage = genericController.encodeText(HeaderMessage);
             iRightSideMessage = genericController.encodeEmptyText(RightSideMessage, core.doc.profileStartTime.ToString("G"));
-            return Adminui.GetHeader(iHeaderMessage, iRightSideMessage);
+            return adminUIController.GetHeader(core, iHeaderMessage, iRightSideMessage);
         }
 
         //
@@ -4009,8 +4005,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string getPanelButtons(string ButtonValueList, string ButtonName, string PanelWidth = "", string PanelHeightMin = "") {
-            adminUIController Adminui = new adminUIController(core);
-            return Adminui.GetButtonBar(Adminui.GetButtonsFromList(ButtonValueList, true, true, ButtonName), "");
+            return adminUIController.GetButtonBar(core, adminUIController.GetButtonsFromList(core, ButtonValueList, true, true, ButtonName), "");
         }
         //
         //
@@ -4039,7 +4034,6 @@ namespace Contensive.Core.Controllers {
                 string LoginPanel = "";
                 bool iValueBoolean = false;
                 string WorkingQueryString = null;
-                adminUIController Adminui = new adminUIController(core);
                 bool ShowLegacyToolsPanel = false;
                 string QS = null;
                 //
@@ -4188,7 +4182,7 @@ namespace Contensive.Core.Controllers {
                             //
                             OptionsPanel = OptionsPanel + ""
                             + "\r<div class=\"ccButtonCon\">"
-                            + cr2 + "<input type=submit name=mb value=\"" + ButtonApply + "\">"
+                            + cr2 + getButton(ButtonApply, "mb","","",false, "btn btn-primary mr-1 btn-sm")
                             + "\r</div>"
                             + "";
                         }
@@ -4246,7 +4240,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Buttons
                         //
-                        LoginPanel = LoginPanel + Adminui.GetButtonBar(Adminui.GetButtonsFromList(ButtonLogin + "," + ButtonLogout, true, true, "mb"), "");
+                        LoginPanel = LoginPanel + adminUIController.GetButtonBar(core, adminUIController.GetButtonsFromList(core, ButtonLogin + "," + ButtonLogout, true, true, "mb"), "");
                         //
                         // ----- assemble tools panel
                         //
@@ -4387,9 +4381,9 @@ namespace Contensive.Core.Controllers {
         public static string legacy_closeFormTable(coreController core, string ButtonList) {
             string templegacy_closeFormTable = null;
             if (!string.IsNullOrEmpty(ButtonList)) {
-                templegacy_closeFormTable = "</td></tr></TABLE>" + core.html.getPanelButtons(ButtonList, "Button") + "</form>";
+                templegacy_closeFormTable = core.html.getPanelButtons(ButtonList, "Button") + "</form>";
             } else {
-                templegacy_closeFormTable = "</td></tr></TABLE></form>";
+                templegacy_closeFormTable = "</form>";
             }
             return templegacy_closeFormTable;
         }
@@ -4404,11 +4398,11 @@ namespace Contensive.Core.Controllers {
         public static string legacy_openFormTable(coreController core, string ButtonList) {
             string result = "";
             try {
+
                 result = core.html.formStart();
                 if (!string.IsNullOrEmpty(ButtonList)) {
                     result = result + core.html.getPanelButtons(ButtonList, "Button");
                 }
-                result = result + "<table border=\"0\" cellpadding=\"10\" cellspacing=\"0\" width=\"100%\"><tr><TD>";
             } catch (Exception ex) {
                 core.handleException(ex);
             }
