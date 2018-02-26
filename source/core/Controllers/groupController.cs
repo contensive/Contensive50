@@ -139,7 +139,7 @@ namespace Contensive.Core.Controllers {
                         throw (new ApplicationException("Could not find or create the group with id [" + groupId + "]"));
                     } else {
                         if (userid == 0) {
-                            userid = core.sessionContext.user.id;
+                            userid = core.session.user.id;
                         }
                         using (csController cs = new csController(core)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + groupId.ToString() + ")", "", false);
@@ -188,7 +188,7 @@ namespace Contensive.Core.Controllers {
                         throw (new ApplicationException("Could not find or create the group [" + groupNameOrGuid + "]"));
                     } else {
                         if (userid == 0) {
-                            userid = core.sessionContext.user.id;
+                            userid = core.session.user.id;
                         }
                         using (csController cs = new csController(core)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + GroupID.ToString() + ")", "", false);

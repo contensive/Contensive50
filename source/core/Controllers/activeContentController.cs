@@ -74,8 +74,8 @@ namespace Contensive.Core.Controllers {
         /// <returns></returns>
         public static string renderHtmlForWeb(coreController core, string Source, string ContextContentName = "", int ContextRecordID = 0, int ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = Source;
-            result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, core.sessionContext.user.id, core.sessionContext.visit.VisitAuthenticated);
-            result = encode(core, result, core.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.sessionContext.isAuthenticated, null, core.sessionContext.isEditingAnything());
+            result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, core.session.user.id, core.session.visit.VisitAuthenticated);
+            result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.session.isAuthenticated, null, core.session.isEditingAnything());
             return result;
         }
         //
@@ -344,7 +344,7 @@ namespace Contensive.Core.Controllers {
                                                                     // -- start block text
                                                                     Copy = "";
                                                                     string GroupIDList = htmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
-                                                                    if (!core.sessionContext.isMemberOfGroupIdList(core, personalizationPeopleId, true, GroupIDList, true)) {
+                                                                    if (!core.session.isMemberOfGroupIdList(core, personalizationPeopleId, true, GroupIDList, true)) {
                                                                         //
                                                                         // Block content if not allowed
                                                                         //
@@ -1685,7 +1685,7 @@ namespace Contensive.Core.Controllers {
                     int LineStart = 0;
                     //
                     if (personalizationPeopleId <= 0) {
-                        personalizationPeopleId = core.sessionContext.user.id;
+                        personalizationPeopleId = core.session.user.id;
                     }
                     // 20180124 removed, cannot find a use case for this
                     //if (core.siteProperties.getBoolean("ConvertContentCRLF2BR", false) && (!convertHtmlToText)) {
@@ -2361,7 +2361,7 @@ namespace Contensive.Core.Controllers {
         public static string renderJSONForRemoteMethod(coreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
             string result = Source;
             result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, ContextContactPeopleID, false);
-            result = encode(core, result, core.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.sessionContext.isAuthenticated, null, core.sessionContext.isEditingAnything());
+            result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.session.isAuthenticated, null, core.session.isEditingAnything());
             return result;
         }
         //

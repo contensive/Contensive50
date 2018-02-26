@@ -42,7 +42,7 @@ namespace Contensive.Core.Controllers {
             try {
                 //
                 // -- content extras like tool panel
-                if (core.sessionContext.isAuthenticatedContentManager(core) & (core.sessionContext.user.AllowToolsPanel)) {
+                if (core.session.isAuthenticatedContentManager(core) & (core.session.user.AllowToolsPanel)) {
                     if (AllowTools) {
                         result.Add(core.html.getToolsPanel());
                     }
@@ -742,7 +742,7 @@ namespace Contensive.Core.Controllers {
                 if (core.siteProperties.getBoolean("AllowLoginIcon", true)) {
                     result = result + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">";
                     result = result + "<tr><td align=\"right\">";
-                    if (core.sessionContext.isAuthenticatedContentManager(core)) {
+                    if (core.session.isAuthenticatedContentManager(core)) {
                         result = result + "<a href=\"" + genericController.encodeHTML("/" + core.appConfig.adminRoute) + "\" target=\"_blank\">";
                     } else {
                         Link = core.webServer.requestPage + "?" + core.doc.refreshQueryString;
@@ -803,7 +803,7 @@ namespace Contensive.Core.Controllers {
                 //If Not (true) Then Exit Function
                 //
                 temphtml_GetAdminHintWrapper = "";
-                if ((core.sessionContext.isEditing("") | core.sessionContext.isAuthenticatedAdmin(core))) {
+                if ((core.session.isEditing("") | core.session.isAuthenticatedAdmin(core))) {
                     temphtml_GetAdminHintWrapper = temphtml_GetAdminHintWrapper + html_GetLegacySiteStyles();
                     temphtml_GetAdminHintWrapper = temphtml_GetAdminHintWrapper + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccHintWrapper\">"
                             + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccHintWrapperContent\">"
@@ -1296,7 +1296,7 @@ namespace Contensive.Core.Controllers {
                 if (core.db.csOk(CS)) {
                     //SectionName = "";
                     GroupCount = 0;
-                    CanSeeHiddenFields = core.sessionContext.isAuthenticatedDeveloper(core);
+                    CanSeeHiddenFields = core.session.isAuthenticatedDeveloper(core);
                     while (core.db.csOk(CS)) {
                         GroupName = core.db.csGetText(CS, "GroupName");
                         if ((GroupName.Left(1) != "_") || CanSeeHiddenFields) {
@@ -1826,7 +1826,7 @@ namespace Contensive.Core.Controllers {
 
                                 string FieldValuefilename = "";
                                 string FieldValuePath = "";
-                                core.cdnFiles.splitPathFilename(HtmlValue, ref FieldValuePath, ref FieldValuefilename);
+                                core.cdnFiles.splitDosPathFilename(HtmlValue, ref FieldValuePath, ref FieldValuefilename);
                                 result = result + "<a href=\"http://" + genericController.EncodeURL(core.webServer.requestDomain + genericController.getCdnFileLink(core, HtmlValue)) + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + FieldValuefilename + "]</A>";
                                 result = result + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + inputCheckbox(InputName + ".Delete", false);
                                 result = result + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + inputFile(InputName, HtmlId, HtmlClass);
@@ -1855,7 +1855,7 @@ namespace Contensive.Core.Controllers {
                             } else {
                                 string FieldValuefilename = "";
                                 string FieldValuePath = "";
-                                core.cdnFiles.splitPathFilename(HtmlValue, ref FieldValuePath, ref FieldValuefilename);
+                                core.cdnFiles.splitDosPathFilename(HtmlValue, ref FieldValuePath, ref FieldValuefilename);
                                 result = result + "<a href=\"http://" + genericController.EncodeURL(core.webServer.requestDomain + genericController.getCdnFileLink(core, HtmlValue)) + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + FieldValuefilename + "]</A>";
                                 result = result + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + inputCheckbox(InputName + ".Delete", false);
                                 result = result + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + inputFile(InputName, HtmlId, HtmlClass);
@@ -2618,7 +2618,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Read in and save the Member profile values from the tools panel
                 //
-                if (core.sessionContext.user.id > 0) {
+                if (core.session.user.id > 0) {
                     if (!(core.doc.debug_iUserError != "")) {
                         Button = core.docProperties.getText(legacyFormSn + "mb");
                         switch (Button) {
@@ -2626,7 +2626,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // Logout - This can only come from the Horizonal Tool Bar
                                 //
-                                core.sessionContext.logout(core);
+                                core.session.logout(core);
                                 break;
                             case ButtonLogin:
                                 //
@@ -3250,7 +3250,7 @@ namespace Contensive.Core.Controllers {
                                 EndDiv = "";
                                 CheckBoxCnt = 0;
                                 DivCheckBoxCnt = 0;
-                                CanSeeHiddenFields = core.sessionContext.isAuthenticatedDeveloper(core);
+                                CanSeeHiddenFields = core.session.isAuthenticatedDeveloper(core);
                                 DivName = TagName + ".All";
                                 while (core.db.csOk(CS)) {
                                     OptionName = core.db.csGetText(CS, "OptionName");
@@ -3498,7 +3498,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string getRecordAddLink(string ContentName, string PresetNameValueList, bool AllowPaste = false) {
-            return getRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, core.sessionContext.isEditing(ContentName));
+            return getRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, core.session.isEditing(ContentName));
         }
         //
         //========================================================================
@@ -3716,7 +3716,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Select the Content Record for the Menu Entry selected
                     //
                     ContentRecordFound = false;
-                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (core.session.isAuthenticatedAdmin(core)) {
                         //
                         // ----- admin member, they have access, main_Get ContentID and set markers true
                         //
@@ -3757,7 +3757,7 @@ namespace Contensive.Core.Controllers {
                             + " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
                             + " AND(ccgroups.active<>0)"
                             + " AND(ccMembers.active<>0)"
-                            + " AND(ccMembers.ID=" + core.sessionContext.user.id + ")"
+                            + " AND(ccMembers.ID=" + core.session.user.id + ")"
                             + " );";
                         CS = core.db.csOpenSql(SQL);
                         if (core.db.csOk(CS)) {
@@ -4037,7 +4037,7 @@ namespace Contensive.Core.Controllers {
                 bool ShowLegacyToolsPanel = false;
                 string QS = null;
                 //
-                if (core.sessionContext.user.AllowToolsPanel) {
+                if (core.session.user.AllowToolsPanel) {
                     ShowLegacyToolsPanel = core.siteProperties.getBoolean("AllowLegacyToolsPanel", true);
                     //
                     // --- Link Panel - used for both Legacy Tools Panel, and without it
@@ -4051,7 +4051,7 @@ namespace Contensive.Core.Controllers {
                     LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + genericController.encodeHTML("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
                     LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"" + genericController.encodeHTML("/" + core.appConfig.adminRoute + "?" + RequestNameHardCodedPage + "=" + HardCodedPageMyProfile) + "\">My Profile</A> | ");
                     if (core.siteProperties.getBoolean("AllowMobileTemplates", false)) {
-                        if (core.sessionContext.visit.Mobile) {
+                        if (core.session.visit.Mobile) {
                             QS = core.doc.refreshQueryString;
                             QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile");
                             LinkPanel.Add("<a class=\"ccAdminLink\" href=\"?" + QS + "\">Non-Mobile Version</A> | ");
@@ -4189,10 +4189,10 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- Create the Login Panel
                         //
-                        if (string.IsNullOrEmpty(core.sessionContext.user.name.Trim(' '))) {
-                            Copy = "You are logged in as member #" + core.sessionContext.user.id + ".";
+                        if (string.IsNullOrEmpty(core.session.user.name.Trim(' '))) {
+                            Copy = "You are logged in as member #" + core.session.user.id + ".";
                         } else {
-                            Copy = "You are logged in as " + core.sessionContext.user.name + ".";
+                            Copy = "You are logged in as " + core.session.user.name + ".";
                         }
                         LoginPanel = LoginPanel + ""
                         + "\r<div class=\"ccAdminSmall\">"
@@ -4229,7 +4229,7 @@ namespace Contensive.Core.Controllers {
                         // Autologin checkbox
                         //
                         if (core.siteProperties.getBoolean("AllowAutoLogin", false)) {
-                            if (core.sessionContext.visit.CookieSupport) {
+                            if (core.session.visit.CookieSupport) {
                                 TagID = "autologin";
                                 LoginPanel = LoginPanel + ""
                                 + "\r<div class=\"ccAdminSmall\">"
@@ -4734,7 +4734,7 @@ namespace Contensive.Core.Controllers {
         public string getEditWrapper(string Caption, string Content) {
             string result = Content;
             try {
-                if (core.sessionContext.isEditingAnything()) {
+                if (core.session.isEditingAnything()) {
                     result = html_GetLegacySiteStyles() + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccEditWrapper\">";
                     if (!string.IsNullOrEmpty(Caption)) {
                         result += ""
@@ -4766,7 +4766,6 @@ namespace Contensive.Core.Controllers {
                 int CS = 0;
                 int RecordID = 0;
                 int contactPeopleId = 0;
-                string Return_ErrorMessage = "";
                 //
                 // honestly, not sure what to do with 'return_ErrorMessage'
                 //
@@ -4790,7 +4789,7 @@ namespace Contensive.Core.Controllers {
                     returnCopy = activeContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
                     //
                     if (true) {
-                        if (core.sessionContext.isEditingAnything()) {
+                        if (core.session.isEditingAnything()) {
                             returnCopy = core.db.csGetRecordEditLink(CS, false) + returnCopy;
                             if (AllowEditWrapper) {
                                 returnCopy = getEditWrapper("copy content", returnCopy);
@@ -5062,7 +5061,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string getRecordEditLink(string ContentName, int RecordID, bool AllowCut = false) {
-            return getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), "", core.sessionContext.isEditing(ContentName));
+            return getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), "", core.session.isEditing(ContentName));
         }
         //
         //====================================================================================================

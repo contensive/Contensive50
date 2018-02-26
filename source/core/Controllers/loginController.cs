@@ -164,7 +164,7 @@ namespace Contensive.Core.Controllers {
                         + "\r<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
                         + htmlIndent(loginForm) + "\r</table>"
                         + "";
-                    loginForm = loginForm + core.html.inputHidden("Type", FormTypeLogin) + core.html.inputHidden("email", core.sessionContext.user.Email) + core.html.getPanelButtons(ButtonLogin, "Button") + "";
+                    loginForm = loginForm + core.html.inputHidden("Type", FormTypeLogin) + core.html.inputHidden("email", core.session.user.Email) + core.html.getPanelButtons(ButtonLogin, "Button") + "";
                     loginForm = ""
                         + core.html.formStart(QueryString) + htmlIndent(loginForm) + "\r</form>"
                         + "";
@@ -252,7 +252,7 @@ namespace Contensive.Core.Controllers {
                     + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                     + cr2 + "<tr>"
                     + cr3 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + "Email</span></td>"
-                    + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"email\" VALUE=\"" + genericController.encodeHTML(core.sessionContext.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
+                    + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"email\" VALUE=\"" + genericController.encodeHTML(core.session.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
                     + cr2 + "</tr>"
                     + cr2 + "<tr>"
                     + cr3 + "<td colspan=\"2\">&nbsp;</td>"
@@ -318,17 +318,17 @@ namespace Contensive.Core.Controllers {
                 loginForm_Password = core.docProperties.getText("password");
                 loginForm_AutoLogin = core.docProperties.getBoolean("autologin");
                 //
-                if ((core.sessionContext.visit.LoginAttempts < core.siteProperties.maxVisitLoginAttempts) && core.sessionContext.visit.CookieSupport) {
-                    LocalMemberID = core.sessionContext.authenticateGetId(core, loginForm_Username, loginForm_Password);
+                if ((core.session.visit.LoginAttempts < core.siteProperties.maxVisitLoginAttempts) && core.session.visit.CookieSupport) {
+                    LocalMemberID = core.session.getUserIdForCredentials(core, loginForm_Username, loginForm_Password);
                     if (LocalMemberID == 0) {
-                        core.sessionContext.visit.LoginAttempts = core.sessionContext.visit.LoginAttempts + 1;
-                        core.sessionContext.visit.save(core);
+                        core.session.visit.LoginAttempts = core.session.visit.LoginAttempts + 1;
+                        core.session.visit.save(core);
                     } else {
-                        returnREsult = core.sessionContext.authenticateById(core, LocalMemberID, core.sessionContext);
+                        returnREsult = sessionController.authenticateById(core, LocalMemberID, core.session);
                         if (returnREsult) {
-                            logController.addSiteActivity(core, "successful username/password login", core.sessionContext.user.id, core.sessionContext.user.OrganizationID);
+                            logController.addSiteActivity(core, "successful username/password login", core.session.user.id, core.session.user.OrganizationID);
                         } else {
-                            logController.addSiteActivity(core, "bad username/password login", core.sessionContext.user.id, core.sessionContext.user.OrganizationID);
+                            logController.addSiteActivity(core, "bad username/password login", core.session.user.id, core.session.user.OrganizationID);
                         }
                     }
                 }
@@ -402,7 +402,7 @@ namespace Contensive.Core.Controllers {
                         //hint = "140"
                         EMailName = vbMid(workingEmail, 1, atPtr - 1);
                         //
-                        logController.addSiteActivity(core, "password request for email " + workingEmail, core.sessionContext.user.id, core.sessionContext.user.OrganizationID);
+                        logController.addSiteActivity(core, "password request for email " + workingEmail, core.session.user.id, core.session.user.OrganizationID);
                         //
                         allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin", false);
                         recordCnt = 0;
@@ -487,7 +487,7 @@ namespace Contensive.Core.Controllers {
                                         while (!usernameOK && (Ptr < 100)) {
                                             //hint = "240"
                                             Username = EMailName + encodeInteger(Math.Floor(encodeNumber(Microsoft.VisualBasic.VBMath.Rnd() * 9999)));
-                                            usernameOK = !core.sessionContext.isLoginOK(core, Username, "test");
+                                            usernameOK = !core.session.isLoginOK(core, Username, "test");
                                             Ptr = Ptr + 1;
                                         }
                                         //hint = "250"
@@ -569,11 +569,11 @@ namespace Contensive.Core.Controllers {
                 if (!genericController.encodeBoolean(core.siteProperties.getBoolean("AllowMemberJoin", false))) {
                     errorController.addUserError(core, "This site does not accept public main_MemberShip.");
                 } else {
-                    if (!core.sessionContext.isNewLoginOK(core, loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
+                    if (!core.session.isNewCredentialOK(core, loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
                         errorController.addUserError(core, ErrorMessage);
                     } else {
                         if (!(core.doc.debug_iUserError != "")) {
-                            CS = core.db.csOpen("people", "ID=" + core.db.encodeSQLNumber(core.sessionContext.user.id));
+                            CS = core.db.csOpen("people", "ID=" + core.db.encodeSQLNumber(core.session.user.id));
                             if (!core.db.csOk(CS)) {
                                 core.handleException(new Exception("Could not open the current members account to set the username and password."));
                             } else {
@@ -581,7 +581,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // if the current account can be logged into, you can not join 'into' it
                                     //
-                                    core.sessionContext.logout(core);
+                                    core.session.logout(core);
                                 }
                                 FirstName = core.docProperties.getText("firstname");
                                 LastName = core.docProperties.getText("firstname");
@@ -592,7 +592,7 @@ namespace Contensive.Core.Controllers {
                                 core.db.csSet(CS, "Name", FullName);
                                 core.db.csSet(CS, "username", loginForm_Username);
                                 core.db.csSet(CS, "password", loginForm_Password);
-                                core.sessionContext.authenticateById(core, core.sessionContext.user.id, core.sessionContext);
+                                sessionController.authenticateById(core, core.session.user.id, core.session);
                             }
                             core.db.csClose(ref CS);
                         }

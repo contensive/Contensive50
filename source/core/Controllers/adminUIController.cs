@@ -121,68 +121,33 @@ namespace Contensive.Core {
                     //buttonsLeft = buttonsLeft + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonDelete + "\" onClick=\"" + JSOnClick + "\" class=\"btn btn-primary mr-1 btn-sm\">";
                 } else {
                     buttonsLeft += getButtonPrimary(ButtonDelete, "", true );
-                    //buttonsLeft = buttonsLeft + "<input TYPE=SUBMIT NAME=BUTTON disabled=\"disabled\" VALUE=\"" + ButtonDelete + "\" class=\"btn btn-primary mr-1 btn-sm\">";
                 }
-                //    If AllowSpellCheck Then
-                //        '
-                //        ' Spell Check
-                //        '
-                //        GetEditButtonBar2 = GetEditButtonBar2 & "<input TYPE=""SUBMIT"" NAME=""BUTTON"" VALUE=""" & ButtonSpellCheck & """ onClick=""return processSubmit(this);"">"
-                //    End If
-                //If ignorefalse Then
-                //    '
-                //    ' Publish
-                //    '
-                //    GetEditButtonBar2 = GetEditButtonBar2 & core.html.html_GetFormButton(ButtonPublish, RequestNameButton)
-                //End If
-                //If ignorefalse2 Then
-                //    '
-                //    ' Abort
-                //    '
-                //    GetEditButtonBar2 = GetEditButtonBar2 & core.html.html_GetFormButton(ButtonAbortEdit, RequestNameButton)
-                //End If
-                //If ignorefalse3 Then
-                //    '
-                //    ' Submit for Publishing
-                //    '
-                //    GetEditButtonBar2 = GetEditButtonBar2 & core.html.html_GetFormButton(ButtonPublishSubmit, RequestNameButton)
-                //End If
-                //If ignorefalse4 Then
-                //    '
-                //    ' Approve Publishing
-                //    '
-                //    GetEditButtonBar2 = GetEditButtonBar2 & core.html.html_GetFormButton(ButtonPublishApprove, RequestNameButton)
-                //End If
                 if (ignore_AllowReloadCDef) {
                     //
                     // Reload Content Definitions
                     //
-                    buttonsLeft = buttonsLeft + htmlController.getButton(ButtonSaveandInvalidateCache, RequestNameButton);
+                    buttonsLeft = buttonsLeft + getButtonPrimary(ButtonSaveandInvalidateCache);
                 }
                 if (AllowMarkReviewed) {
                     //
                     // Reload Content Definitions
                     //
-                    buttonsLeft = buttonsLeft + htmlController.getButton(ButtonMarkReviewed, RequestNameButton);
+                    buttonsLeft = buttonsLeft + getButtonPrimary(ButtonMarkReviewed);
                 }
                 if (AllowRefresh) {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    buttonsLeft = buttonsLeft + htmlController.getButton(ButtonRefresh, RequestNameButton);
+                    buttonsLeft = buttonsLeft + getButtonPrimary(ButtonRefresh);
                 }
                 if (AllowCreateDuplicate) {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    buttonsLeft = buttonsLeft + htmlController.getButton(ButtonCreateDuplicate, RequestNameButton, "", "return processSubmit(this)");
+                    buttonsLeft = buttonsLeft + getButtonPrimary(ButtonCreateDuplicate, "return processSubmit(this)");
                 }
                 //
                 result = GetButtonBar( core, buttonsLeft, "");
-                //buttonsLeft = ""
-                //    + "\r\n\t" + GetHTMLComment("ButtonBar") + "\r\n\t<div class=\"ccButtonCon\">"
-                //    + htmlIndent(buttonsLeft) + "\r\n\t</div><!-- ButtonBar End -->"
-                //    + "";
             } catch (Exception ex) {
                 core.handleException(ex);
             }

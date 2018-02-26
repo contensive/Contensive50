@@ -12,24 +12,20 @@ using Contensive.Core.Models.Context;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 using Amazon.Runtime;
+using System.Linq;
+using static Contensive.BaseClasses.CPFileSystemBaseClass;
 //
 namespace Contensive.Core.Controllers {
     //
     //==============================================================================================================
     /// <summary>
-    /// Basic file access class for all scaling targets (cden, private, approot, etc)
-    /// modes:
-    ///   ephemeralFiles - local file access
-    ///       Access to the local server relative to the rootLocalFolder
-    ///       If no rootLocalFolder provided, full drive:filepath available
-    ///       
-    ///   passiveSync - local copy is updated only when needed (privateFiles, cdnFiles)
-    ///       save - saves to a local filesystem      mirror, copied to S3 folder without public access
-    ///       read - test s3 source for update, conditionally copied, read from local copy
-    ///       
-    ///   activeSync - local copy is updated on change (appRoot Files)
-    ///       save - saves to a local folder, copied to S3 folder without public access, other webRoles copy changed files
-    ///       read - read from local folder
+    /// Basic file access class for all scaling targets (cden, private, approot, etc).
+    /// set isLocal true and all files are handled on the local server
+    /// set isLocal false:
+    /// - the local filesystem becomes a mirror for the remote system
+    /// - after a transaction is complete (read,write,copy) the local file can be deleted
+    /// - on remote system, ALL filenames will be converted lowercase
+    /// 
     /// </summary>
     public class fileController : IDisposable {
         /// <summary>
@@ -65,6 +61,11 @@ namespace Contensive.Core.Controllers {
             }
         }
         private AmazonS3Client _s3Client { get; set; } = null;
+        /// <summary>
+        /// list of paths verified during the scope of this execution. If a path is deleted, it must be removed from this list
+        /// </summary>
+        private List<string> verifiedRemotePathList = new List<string>();
+        //
         //
         //==============================================================================================================
         /// <summary>
@@ -96,10 +97,11 @@ namespace Contensive.Core.Controllers {
             string returnPath = "";
             try {
                 returnPath = normalizeDosPath(path);
-                pathFilename = normalizePathFilename(pathFilename);
-                if (pathFilename != "\\") {
-                    returnPath = Path.Combine(returnPath, pathFilename);
-                }
+                pathFilename = normalizeDosPathFilename(pathFilename);
+                returnPath = Path.Combine(returnPath, pathFilename);
+                //if (pathFilename != "\\") {
+                //    returnPath = Path.Combine(returnPath, pathFilename);
+                //}
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -114,18 +116,17 @@ namespace Contensive.Core.Controllers {
         /// <param name="pathFilename"></param>
         /// <param name="path"></param>
         /// <param name="filename"></param>
-        public void splitPathFilename(string pathFilename, ref string path, ref string filename) {
+        public void splitDosPathFilename(string pathFilename, ref string path, ref string filename) {
             try {
-                if (string.IsNullOrEmpty(pathFilename)) {
-                    throw new ArgumentException("pathFilename cannot be blank");
-                } else {
-                    pathFilename = normalizePathFilename(pathFilename);
+                path = "";
+                filename = "";
+                if (!string.IsNullOrWhiteSpace(pathFilename)) {
+                    pathFilename = normalizeDosPathFilename(pathFilename);
                     int lastSlashPos = pathFilename.LastIndexOf("\\");
                     if (lastSlashPos >= 0) {
                         path = pathFilename.Left(lastSlashPos + 1);
                         filename = pathFilename.Substring(lastSlashPos + 1);
                     } else {
-                        path = "";
                         filename = pathFilename;
                     }
                 }
@@ -135,6 +136,18 @@ namespace Contensive.Core.Controllers {
             }
         }
         //
+        //==============================================================================================================
+        /// <summary>
+        /// return the path and filename with unix slashes
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="path"></param>
+        /// <param name="filename"></param>
+        public void splitUnixPathFilename(string pathFilename, ref string path, ref string filename) {
+            splitDosPathFilename(pathFilename, ref path, ref filename);
+            path = convertToUnixSlash(path);
+        }
+        //
         // ====================================================================================================
         //   Read in a file from a given PathFilename, return content
         //
@@ -142,11 +155,17 @@ namespace Contensive.Core.Controllers {
             string returnContent = "";
             try {
                 if (!string.IsNullOrEmpty(pathFilename)) {
+                    pathFilename = normalizeDosPathFilename(pathFilename);
                     if (!isLocal) {
+                        //
                         // -- copy remote file to local
-                        copyRemoteToLocal(pathFilename);
+                        if (!copyRemoteToLocal(pathFilename)) {
+                            //
+                            // -- if remote file does not exist, delete local mirror
+                            deleteFile_local(pathFilename);
+                        }
                     }
-                    if (fileExists(pathFilename)) {
+                    if (fileExists_local(pathFilename)) {
                         using (StreamReader sr = File.OpenText(convertToLocalAbsPath(pathFilename))) {
                             returnContent = sr.ReadToEnd();
                         }
@@ -163,19 +182,25 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// reads a binary file and returns a byye array
         /// </summary>
-        /// <param name="PathFilename"></param>
+        /// <param name="pathFilename"></param>
         /// <returns></returns>
-        internal byte[] readFileBinary(string PathFilename) {
+        internal byte[] readFileBinary(string pathFilename) {
             byte[] returnContent = { };
             int bytesRead = 0;
             try {
-                if (!string.IsNullOrEmpty(PathFilename)) {
+                if (!string.IsNullOrEmpty(pathFilename)) {
+                    pathFilename = normalizeDosPathFilename(pathFilename);
                     if (!isLocal) {
+                        //
                         // -- copy remote file to local
-                        copyRemoteToLocal(PathFilename);
+                        if (!copyRemoteToLocal(pathFilename)) {
+                            //
+                            // -- if remote file does not exist, delete local mirror
+                            deleteFile_local(pathFilename);
+                        }
                     }
-                    if (fileExists(PathFilename)) {
-                        using (FileStream sr = File.OpenRead(convertToLocalAbsPath(PathFilename))) {
+                    if (fileExists(pathFilename)) {
+                        using (FileStream sr = File.OpenRead(convertToLocalAbsPath(pathFilename))) {
                             bytesRead = sr.Read(returnContent, 0, 1000000000);
                         }
                     }
@@ -211,59 +236,35 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// save binary or text file
         /// </summary>
-        /// <param name="pathFilename"></param>
+        /// <param name="pathFilename">Path and filename. Path can be empty or start with folder and end in dos or uniz slash.</param>
         /// <param name="textContent"></param>
         /// <param name="binaryContent"></param>
         /// <param name="isBinary"></param>
         private void saveFile_TextBinary(string pathFilename, string textContent, byte[] binaryContent, bool isBinary) {
             try {
+                pathFilename = normalizeDosPathFilename(pathFilename);
+                //
+                // -- write local file
                 string path = "";
                 string filename = "";
-                //
-                pathFilename = normalizePathFilename(pathFilename);
-                if (!isValidDosPathFilename(pathFilename)) {
-                    throw new ArgumentException("PathFilename argument is not valid [" + pathFilename + "]");
-                } else {
-                    //
-                    // -- write local file
-                    splitPathFilename(pathFilename, ref path, ref filename);
-                    if (!pathExists(path)) {
-                        createPath(path);
+                splitDosPathFilename(pathFilename, ref path, ref filename);
+                verifyPath(path);
+                //if (!pathExists(path)) {
+                //    createPath(path);
+                //}
+                try {
+                    if (isBinary) {
+                        File.WriteAllBytes(convertToLocalAbsPath(pathFilename), binaryContent);
+                    } else {
+                        File.WriteAllText(convertToLocalAbsPath(pathFilename), textContent);
                     }
-                    try {
-                        if (isBinary) {
-                            File.WriteAllBytes(convertToLocalAbsPath(pathFilename), binaryContent);
-                        } else {
-                            File.WriteAllText(convertToLocalAbsPath(pathFilename), textContent);
-                        }
-                    } catch (Exception ex) {
-                        core.handleException(ex);
-                        throw;
-                    }
-                    if (!isLocal) {
-                        // copy to remote
-                        copyLocalToRemote(pathFilename);
-                    }
+                } catch (Exception ex) {
+                    core.handleException(ex);
+                    throw;
                 }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-            }
-        }
-        //
-        //==============================================================================================================
-        /// <summary>
-        /// append file async
-        /// </summary>
-        /// <param name="PathFilename"></param>
-        /// <param name="fileContent"></param>
-        public void appendFile(string PathFilename, string fileContent) {
-            try {
-                if (string.IsNullOrEmpty(PathFilename)) {
-                    throw new ArgumentException("appendFile called with blank pathname.");
-                } else {
-                    appendFileBackground(PathFilename, fileContent);
-                    //await Task.Run(() => appendFileBackground(PathFilename, fileContent));
+                if (!isLocal) {
+                    // copy to remote
+                    copyLocalToRemote(pathFilename);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -275,37 +276,44 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// background task to append files
         /// </summary>
-        /// <param name="PathFilename"></param>
+        /// <param name="pathFilename"></param>
         /// <param name="fileContent"></param>
-        private void appendFileBackground(string PathFilename, string fileContent) {
+        public void appendFile(string pathFilename, string fileContent) {
             try {
-                //
-                // -- verify local path
-                string absFilename = convertToLocalAbsPath(PathFilename);
-                string path = "";
-                string filename = "";
-                splitPathFilename(PathFilename, ref path, ref filename);
-                if (!pathExists(path)) {
-                    createPath(path);
-                }
-                if (!isLocal) {
+                if (string.IsNullOrWhiteSpace(pathFilename)) {
+                    throw new ArgumentException("appendFile called with blank pathname.");
+                } else if (!string.IsNullOrEmpty(fileContent)) {
                     //
-                    // -- non-local, copy remote file to local
-                    copyRemoteToLocal(PathFilename);
-                }
-                if (!File.Exists(absFilename)) {
-                    using (StreamWriter sw = File.CreateText(absFilename)) {
-                        sw.Write(fileContent);
+                    // -- verify local path
+                    string absFilename = convertToLocalAbsPath(pathFilename);
+                    string path = "";
+                    string filename = "";
+                    splitDosPathFilename(pathFilename, ref path, ref filename);
+                    verifyPath(path);
+                    //if (!pathExists(path)) {
+                    //    createPath(path);
+                    //}
+                    if (!isLocal) {
+                        //
+                        // -- non-local, copy remote file to local
+                        if (!copyRemoteToLocal(pathFilename)) {
+                            deleteFile_local(pathFilename);
+                        }
                     }
-                } else {
-                    using (StreamWriter sw = File.AppendText(absFilename)) {
-                        sw.Write(fileContent);
+                    if (!File.Exists(absFilename)) {
+                        using (StreamWriter sw = File.CreateText(absFilename)) {
+                            sw.Write(fileContent);
+                        }
+                    } else {
+                        using (StreamWriter sw = File.AppendText(absFilename)) {
+                            sw.Write(fileContent);
+                        }
                     }
-                }
-                if (!isLocal) {
-                    //
-                    // -- non-local, copy local file to remote
-                    copyLocalToRemote(PathFilename);
+                    if (!isLocal) {
+                        //
+                        // -- non-local, copy local file to remote
+                        copyLocalToRemote(pathFilename);
+                    }
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -316,8 +324,17 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Creates a file folder if it does not exist
         /// </summary>
-        /// <param name="absPath"></param>
-        private void createPath_local(string absPath) {
+        /// <param name="path"></param>
+        private void createPath_local(string path) {
+            createPathAbs_local(convertToLocalAbsPath(path));
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// Creates a file folder if it does not exist
+        /// </summary>
+        /// <param name="path"></param>
+        private void createPathAbs_local(string absPath) {
             try {
                 string PartialPath = null;
                 int Position = 0;
@@ -343,6 +360,7 @@ namespace Contensive.Core.Controllers {
                 throw;
             }
         }
+
         //
         //==============================================================================================================
         /// <summary>
@@ -352,8 +370,7 @@ namespace Contensive.Core.Controllers {
         public void createPath(string path) {
             try {
                 if (isLocal) {
-                    string absPath = convertToLocalAbsPath(path);
-                    createPath_local(absPath);
+                    createPath_local(path);
                 } else {
                     verifyPath_remote(path);
                 }
@@ -392,9 +409,10 @@ namespace Contensive.Core.Controllers {
             try {
                 // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
                 // https://docs.aws.amazon.com/sdk-for-net/v2/developer-guide/s3-apis-intro.html
+                pathFilename = normalizeDosPathFilename(pathFilename);
                 if (!string.IsNullOrWhiteSpace(pathFilename)) {
                     string remoteUnixPathFilename = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
-                    if ( fileExists_remote( remoteUnixPathFilename )) {
+                    if ( fileExists_remote(pathFilename)) {
                         DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest {
                             BucketName = core.serverConfig.awsBucketName,
                             Key = remoteUnixPathFilename
@@ -415,6 +433,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="pathFilename"></param>
         private void deleteFile_local(string pathFilename) {
             try {
+                pathFilename = normalizeDosPathFilename(pathFilename);
                 if (!string.IsNullOrEmpty(pathFilename)) {
                     if (fileExists_local(pathFilename)) {
                         File.Delete(convertToLocalAbsPath(pathFilename));
@@ -430,14 +449,15 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Delete a folder recursively
         /// </summary>
-        /// <param name="PathName"></param>
-        public void deleteFolder(string PathName) {
+        /// <param name="path"></param>
+        public void deleteFolder(string path) {
             try {
-                if (!string.IsNullOrEmpty(PathName)) {
+                path = normalizeDosPath(path);
+                if (!string.IsNullOrEmpty(path)) {
                     if (!isLocal) {
                         // todo - rewrite using lowlevel + transfer, not file io
                         // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
-                        string unixPathName = convertToUnixSlash(PathName).Trim();
+                        string unixPathName = convertToUnixSlash(path).Trim();
                         if ((unixPathName.Length > 1) & (unixPathName.Substring(0, 1) == "\\")) {
                             unixPathName = unixPathName.Substring(1);
                         }
@@ -446,11 +466,11 @@ namespace Contensive.Core.Controllers {
                             parentFolderInfo.Delete(true);
                         }
                     } else {
-                        string localPath = joinPath(localAbsRootPath, PathName);
+                        string localPath = joinPath(localAbsRootPath, path);
                         if (localPath.Substring(localPath.Length - 1) == "\\") {
                             localPath = localPath.Left(localPath.Length - 1);
                         }
-                        if (pathExists(PathName)) {
+                        if (pathExists_local(path)) {
                             Directory.Delete(localPath, true);
                         }
                     }
@@ -470,11 +490,6 @@ namespace Contensive.Core.Controllers {
         /// <param name="dstFileSystem"></param>
         public void copyFile(string srcPathFilename, string dstPathFilename, fileController dstFileSystem = null) {
             try {
-                string dstPath = "";
-                string dstFilename = "";
-                string srcFullPathFilename = null;
-                string DstFullPathFilename = null;
-                //
                 if (dstFileSystem == null) {
                     dstFileSystem = this;
                 }
@@ -483,35 +498,66 @@ namespace Contensive.Core.Controllers {
                 } else if (string.IsNullOrEmpty(dstPathFilename)) {
                     throw new ArgumentException("Invalid destination file.");
                 } else {
-                    srcPathFilename = normalizePathFilename(srcPathFilename);
-                    dstPathFilename = normalizePathFilename(dstPathFilename);
+                    srcPathFilename = normalizeDosPathFilename(srcPathFilename);
+                    dstPathFilename = normalizeDosPathFilename(dstPathFilename);
                     if (!isLocal) {
-                        // todo - rewrite using lowlevel + transfer, not file io
-                        // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
                         //
-                        // remote file copy
-                        verifyPath_remote(getPath(srcPathFilename));
-                        string srcRemoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, srcPathFilename));
-                        var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, convertToDosSlash(srcRemoteUnixPathFilename.Substring(1)));
-                        if ( s3FileInfo.Exists ) {
-                            string dstRemoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, dstPathFilename));
-                            Amazon.S3.IO.S3DirectoryInfo remoteDirectoryInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, dstRemoteUnixPathFilename);
-                            s3FileInfo.CopyTo(remoteDirectoryInfo);
-                        }
-                    } else {
-                        //
-                        // -- local file copy
-                        if (fileExists(srcPathFilename)) {
-                            splitPathFilename(dstPathFilename, ref dstPath, ref dstFilename);
-                            if (!dstFileSystem.pathExists(dstPath)) {
-                                dstFileSystem.createPath(dstPath);
+                        // src is remote file - copy file to local mirror
+                        if (fileExists_remote(srcPathFilename)) {
+                            verifyPath_remote(getPath(srcPathFilename));
+                            copyRemoteToLocal(srcPathFilename);
+                            //
+                            // -- copy src to dst on local mirror
+                            string dstPath = "";
+                            string dstFilename = "";
+                            splitDosPathFilename(dstPathFilename, ref dstPath, ref dstFilename);
+                            if (!dstFileSystem.pathExists_local(dstPath)) {
+                                dstFileSystem.createPath_local(dstPath);
                             }
-                            srcFullPathFilename = joinPath(localAbsRootPath, srcPathFilename);
-                            DstFullPathFilename = joinPath(dstFileSystem.localAbsRootPath, dstPathFilename);
+                            string srcFullPathFilename = joinPath(localAbsRootPath, srcPathFilename);
+                            string DstFullPathFilename = joinPath(dstFileSystem.localAbsRootPath, dstPathFilename);
                             if (dstFileSystem.fileExists(dstPathFilename)) {
                                 dstFileSystem.deleteFile(dstPathFilename);
                             }
                             File.Copy(srcFullPathFilename, DstFullPathFilename);
+                            if (!dstFileSystem.isLocal) {
+                                //
+                                // -- dst is remote, copy file to remote source
+                                dstFileSystem.copyLocalToRemote(dstPathFilename);
+                            }
+                        }
+                        //string srcRemoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, srcPathFilename));
+                        //var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, convertToDosSlash(srcRemoteUnixPathFilename.Substring(1)));
+                        //if ( s3FileInfo.Exists ) {
+                        //    string dstRemoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, dstPathFilename));
+                        //    string dstRemoteUnixPath = "";
+                        //    string dstRemoteUnixFilename = "";
+                        //    splitUnixPathFilename(dstPathFilename, ref dstRemoteUnixPath, ref dstRemoteUnixFilename);
+                        //    verifyPath_remote(dstRemoteUnixPath);
+                        //    Amazon.S3.IO.S3DirectoryInfo remoteDirectoryInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, dstRemoteUnixPathFilename);
+                        //    s3FileInfo.CopyTo(remoteDirectoryInfo);
+                        //}
+                    } else {
+                        //
+                        // -- src is local file, copy to dst local
+                        if (fileExists_local(srcPathFilename)) {
+                            string dstPath = "";
+                            string dstFilename = "";
+                            splitDosPathFilename(dstPathFilename, ref dstPath, ref dstFilename);
+                            if (!dstFileSystem.pathExists_local(dstPath)) {
+                                dstFileSystem.createPath_local(dstPath);
+                            }
+                            string srcFullPathFilename = joinPath(localAbsRootPath, srcPathFilename);
+                            string DstFullPathFilename = joinPath(dstFileSystem.localAbsRootPath, dstPathFilename);
+                            if (dstFileSystem.fileExists(dstPathFilename)) {
+                                dstFileSystem.deleteFile(dstPathFilename);
+                            }
+                            File.Copy(srcFullPathFilename, DstFullPathFilename);
+                            if (!dstFileSystem.isLocal) {
+                                //
+                                // -- dst is remote, copy file to remote source
+                                dstFileSystem.copyLocalToRemote(dstPathFilename);
+                            }
                         }
                     }
                 }
@@ -525,43 +571,88 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// list of files, each row is delimited by a comma
         /// </summary>
-        /// <param name="FolderPath"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public FileInfo[] getFileList(string FolderPath) {
-            FileInfo[] returnFileInfoList = { };
+        public List<BaseClasses.CPFileSystemBaseClass.FileDetail> getFileList(string path) {
+            var returnFileList = new List<FileDetail>();
             try {
+                path = normalizeDosPath(path);
                 if (!isLocal) {
-                    // todo implement remote getFileList
-                    throw new NotImplementedException("remote getFileList not implemented");
+                    ListObjectsRequest request = new ListObjectsRequest {
+                        BucketName = core.serverConfig.awsBucketName,
+                        Prefix = convertToUnixSlash( joinPath(remotePathPrefix, path))
+                    };
+                    // Build your call out to S3 and store the response
+                    ListObjectsResponse response = s3Client.ListObjects(request);
+
+                    IEnumerable<S3Object> fileList = response.S3Objects.Where(x => !x.Key.EndsWith(@"/") );
+                    foreach (var file in fileList) {
+                        //
+                        // -- create a fileDetail for each file found
+                        string fileName = file.Key;
+                        int pos = fileName.LastIndexOf("/");
+                        if (pos > -1) {
+                            fileName = fileName.Substring(pos + 1);
+                        }
+                        returnFileList.Add(new FileDetail() {
+                            Attributes = 0,
+                            Type = "",
+                            DateCreated = file.LastModified,
+                            DateLastAccessed = file.LastModified,
+                            DateLastModified = file.LastModified,
+                            Name = fileName,
+                            Size = file.Size
+                        });
+                    };
+
+
                 } else {
-                    if (pathExists(FolderPath)) {
-                        string localPath = convertToLocalAbsPath(FolderPath);
+                    if (pathExists_local(path)) {
+                        string localPath = convertToLocalAbsPath(path);
                         DirectoryInfo di = new DirectoryInfo(localPath);
-                        returnFileInfoList = di.GetFiles();
+                        foreach(var file in di.GetFiles()) {
+                            //
+                            // -- create a fileDetail for each file found
+                            returnFileList.Add(new FileDetail() {
+                                Attributes = (int)file.Attributes,
+                                DateCreated = file.CreationTime,
+                                DateLastAccessed = file.LastAccessTime,
+                                DateLastModified = file.LastWriteTime,
+                                Name = file.Name,
+                                Size = file.Length,
+                                Type = ""
+                            });
+                        }
                     }
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
             }
-            return returnFileInfoList;
+            return returnFileList;
         }
         //
         //==============================================================================================================
         /// <summary>
         /// Returns a list of folders in a path, comma delimited
         /// </summary>
-        /// <param name="FolderPath"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public string getFolderNameList(string FolderPath) {
+        public string getFolderNameList(string path) {
             string returnList = "";
             try {
-                System.IO.DirectoryInfo[] di = getFolderList(FolderPath);
-                foreach (System.IO.DirectoryInfo d in di) {
-                    returnList += "," + d.Name;
-                }
-                if (!string.IsNullOrEmpty(returnList)) {
-                    returnList = returnList.Substring(1);
+                path = normalizeDosPath(path);
+                if (!isLocal) {
+                    // todo implement remote
+                    throw new NotImplementedException("remote mode not implemented");
+                } else {
+                    List<FolderDetail> di = getFolderList(path);
+                    foreach (FolderDetail d in di) {
+                        returnList += "," + d.Name;
+                    }
+                    if (!string.IsNullOrEmpty(returnList)) {
+                        returnList = returnList.Substring(1);
+                    }
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -572,18 +663,43 @@ namespace Contensive.Core.Controllers {
         //
         //==============================================================================================================
         //
-        public DirectoryInfo[] getFolderList(string FolderPath) {
-            DirectoryInfo[] returnFolders = { };
+        public List<BaseClasses.CPFileSystemBaseClass.FolderDetail> getFolderList(string path) {
+            var returnFolders = new List<FolderDetail>();
             try {
+                path = normalizeDosPath(path);
                 if (!isLocal) {
-                    returnFolders = new DirectoryInfo[0];
+                    //var DirectoryList = new List<DirectoryInfo>();
+                    ListObjectsRequest request = new ListObjectsRequest {
+                        BucketName = core.serverConfig.awsBucketName,
+                        Prefix = convertToUnixSlash(path)
+                    };
+                    // Build your call out to S3 and store the response
+                    ListObjectsResponse response = s3Client.ListObjects(request);
+                    IEnumerable<S3Object> folderList = response.S3Objects.Where(x =>x.Key.EndsWith(@"/") && x.Size == 0);
+                    foreach (var folder in folderList) {
+                        returnFolders.Add(new FolderDetail() {
+                            Attributes = 0,
+                            Type = "",
+                            DateCreated = folder.LastModified,
+                            DateLastAccessed = folder.LastModified,
+                            DateLastModified = folder.LastModified,
+                            Name = folder.Key
+                        });
+                    };
                 } else {
-                    if (!pathExists(FolderPath)) {
-                        returnFolders = new DirectoryInfo[0];
-                    } else {
-                        string localPath = convertToLocalAbsPath(FolderPath);
+                    if (pathExists_local(path)) {
+                        string localPath = convertToLocalAbsPath(path);
                         DirectoryInfo di = new DirectoryInfo(localPath);
-                        returnFolders = di.GetDirectories();
+                        foreach( var folder in di.GetDirectories()) {
+                            returnFolders.Add(new FolderDetail() {
+                                Attributes = (int)folder.Attributes,
+                                Type = "",
+                                DateCreated = folder.CreationTime,
+                                DateLastAccessed = folder.LastWriteTime,
+                                DateLastModified = folder.LastWriteTime,
+                                Name = folder.Name
+                            });
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -601,6 +717,7 @@ namespace Contensive.Core.Controllers {
         public bool fileExists(string pathFilename) {
             bool returnOK = false;
             try {
+                pathFilename = normalizeDosPathFilename(pathFilename);
                 if (!isLocal) {
                     returnOK = fileExists_remote(pathFilename);
                 } else {
@@ -617,12 +734,12 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// internal method, true if the file exists in the local file system
         /// </summary>
-        /// <param name="pathFilename"></param>
-        private bool fileExists_local(string pathFilename) {
+        /// <param name="dosPathFilename"></param>
+        private bool fileExists_local(string dosPathFilename) {
             bool returnOK = false;
             try {
-                string absPathFilename = convertToLocalAbsPath(pathFilename);
-                returnOK = File.Exists(absPathFilename);
+                string absDosPathFilename = convertToLocalAbsPath(dosPathFilename);
+                returnOK = File.Exists(absDosPathFilename);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -634,15 +751,25 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// internal method, true if the file exists in the remote file system
         /// </summary>
-        /// <param name="remoteUnixPathFilename"></param>
-        private bool fileExists_remote(string remoteUnixPathFilename) {
+        /// <param name="pathFilename"></param>
+        private bool fileExists_remote(string pathFilename) {
             try {
-                GetObjectMetadataResponse response = s3Client.GetObjectMetadata(core.serverConfig.awsBucketName, remoteUnixPathFilename);
-                return true;
+                string unixAbsPathFilename = convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
+                string pathLowercase = "";
+                string filenameLowercase = "";
+                splitUnixPathFilename(unixAbsPathFilename.ToLower(), ref pathLowercase, ref filenameLowercase);
+                string s3Key = convertToDosSlash(pathLowercase);
+                Amazon.S3.IO.S3DirectoryInfo s3DirectoryInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, s3Key);
+                return s3DirectoryInfo.GetFiles(filenameLowercase).Any();
             } catch (Amazon.S3.AmazonS3Exception ex) {
-                if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+                //
+                // -- support this unwillingly
+                if (ex.StatusCode == System.Net.HttpStatusCode.NotFound) {
                     return false;
-                //status wasn't not found, so throw the exception
+                }
+                throw;
+            } catch (Exception ex ) {
+                core.handleException(ex);
                 throw;
             }
         }
@@ -654,61 +781,108 @@ namespace Contensive.Core.Controllers {
         /// <param name="path"></param>
         /// <returns></returns>
         public bool pathExists(string path) {
-            bool returnOK = false;
             try {
                 if (!isLocal) {
-                    throw new NotImplementedException();
+                    //
+                    // -- remote
+                    return pathExists_remote(path);
                 } else {
-                    string absPath = convertToLocalAbsPath(path);
-                    returnOK = Directory.Exists(absPath);
+                    //
+                    // -- local
+                    return pathExists_local(path);
                 }
+            } catch (Exception ex) {
+                core.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// Returns true if the local folder exists
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private bool pathExists_local(string path) {
+            bool returnOk = false; 
+            try {
+                string absPath = convertToLocalAbsPath(path);
+                returnOk = Directory.Exists(absPath);
+            } catch (Exception ex) {
+                core.handleException(ex);
+                throw;
+            }
+            return returnOk;
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// Returns true if the remote folder exists
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private bool pathExists_remote(string path) {
+            bool returnOK = false;
+            try {
+                //
+                // -- remote
+                path = normalizeDosPath(path);
+                string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
+                var url = genericController.splitUrl(remoteUnixPathFilename);
+                var parentFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, "");
+                string dosPathFromLeft = "";
+                foreach (string segment in url.pathSegments) {
+                    dosPathFromLeft += segment + "\\";
+                    var subFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, dosPathFromLeft.Substring(0, (dosPathFromLeft.Length - 1)));
+                    if (!subFolderInfo.Exists) {
+                        return false;
+                    }
+                    parentFolderInfo = subFolderInfo;
+                }
+                return true;
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
             }
             return returnOK;
         }
+
+
         //
         //==============================================================================================================
         /// <summary>
         /// Rename a file
         /// </summary>
-        /// <param name="SourcePathFilename"></param>
-        /// <param name="DestinationFilename"></param>
-        public void renameFile(string SourcePathFilename, string DestinationFilename) {
+        /// <param name="srcPathFilename"></param>
+        /// <param name="dstFilename"></param>
+        public void renameFile(string srcPathFilename, string dstFilename) {
             try {
-                if (!isLocal) {
-                    // todo remote file case
-                    throw new NotImplementedException();
+                srcPathFilename = normalizeDosPathFilename(srcPathFilename);
+                if (string.IsNullOrEmpty(srcPathFilename)) {
+                    throw new ApplicationException("Invalid source file");
                 } else {
-                    int Pos = 0;
-                    string sourceFullPath = "";
-                    string srcFullPathFilename = null;
-                    //
-                    if (string.IsNullOrEmpty(SourcePathFilename)) {
-                        throw new ApplicationException("Invalid source file");
+                    if (!isLocal) {
+                        // todo remote file case
+                        throw new NotImplementedException("remote rename file not implemented yet");
                     } else {
-                        if (!isLocal) {
+                        string srcFullPathFilename = joinPath(localAbsRootPath, srcPathFilename);
+                        int Pos = srcPathFilename.LastIndexOf("\\") + 1;
+                        string sourceFullPath = "";
+                        if (Pos >= 0) {
+                            sourceFullPath = srcPathFilename.Left(Pos);
+                        }
+                        if (string.IsNullOrEmpty(dstFilename)) {
+                            throw new ApplicationException("Invalid destination file []");
+                        } else if (dstFilename.IndexOf("\\") != -1) {
+                            throw new ApplicationException("Invalid '\\' character in destination filename [" + dstFilename + "]");
+                        } else if (dstFilename.IndexOf("/") != -1) {
+                            throw new ApplicationException("Invalid '/' character in destination filename [" + dstFilename + "]");
+                        } else if (!fileExists(srcPathFilename)) {
+                            //
+                            // not an error, to minimize file use, empty files are not created, so missing files are just empty
+                            //
                         } else {
-                            SourcePathFilename = normalizePathFilename(SourcePathFilename);
-                            srcFullPathFilename = joinPath(localAbsRootPath, SourcePathFilename);
-                            Pos = SourcePathFilename.LastIndexOf("\\") + 1;
-                            if (Pos >= 0) {
-                                sourceFullPath = SourcePathFilename.Left(Pos);
-                            }
-                            if (string.IsNullOrEmpty(DestinationFilename)) {
-                                throw new ApplicationException("Invalid destination file []");
-                            } else if (DestinationFilename.IndexOf("\\") != -1) {
-                                throw new ApplicationException("Invalid '\\' character in destination filename [" + DestinationFilename + "]");
-                            } else if (DestinationFilename.IndexOf("/") != -1) {
-                                throw new ApplicationException("Invalid '/' character in destination filename [" + DestinationFilename + "]");
-                            } else if (!fileExists(SourcePathFilename)) {
-                                //
-                                // not an error, to minimize file use, empty files are not created, so missing files are just empty
-                                //
-                            } else {
-                                File.Move(srcFullPathFilename, joinPath(sourceFullPath, DestinationFilename));
-                            }
+                            File.Move(srcFullPathFilename, joinPath(sourceFullPath, dstFilename));
                         }
                     }
                 }
@@ -751,32 +925,39 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// copy one folder to another, include subfolders
         /// </summary>
-        /// <param name="absSrcFolder"></param>
+        /// <param name="srcAbsDosPath"></param>
         /// <param name="absDstFolder"></param>
-        private void copyFolder_local(string absSrcFolder, string absDstFolder) {
+        private void copyFolder_local(string srcAbsDosPath, string dstDosPath, fileController dstFileSystem = null) {
             try {
-                if (Directory.Exists(absSrcFolder)) {
+                if (Directory.Exists(srcAbsDosPath)) {
+                    if (dstFileSystem == null ) {
+                        dstFileSystem = this;
+                    }
+                    string dstAbsDstPath = joinPath(dstFileSystem.localAbsRootPath, dstDosPath);
                     //
                     // -- create destination folder
-                    if (!Directory.Exists(absDstFolder)) {
-                        createPath_local(absDstFolder);
+                    if (!Directory.Exists(dstAbsDstPath)) {
+                        createPathAbs_local(dstAbsDstPath);
                     }
+                    DirectoryInfo srcDirectoryInfo = new DirectoryInfo(srcAbsDosPath);
+                    DirectoryInfo dstDiretoryInfo = new DirectoryInfo(dstAbsDstPath);
                     //
-                    DirectoryInfo srcDirectoryInfo = new DirectoryInfo(absSrcFolder);
-                    DirectoryInfo dstDiretoryInfo = new DirectoryInfo(absDstFolder);
-                    DirectoryInfo dstCopy = null;
-                    //
-                    // copy each file into destination
-                    //
+                    // -- copy each file
                     foreach (FileInfo srcFile in srcDirectoryInfo.GetFiles()) {
                         srcFile.CopyTo(joinPath(dstDiretoryInfo.ToString(), srcFile.Name), true);
+                        if (!dstFileSystem.isLocal) {
+                            //
+                            // -- now copy the dst file to the remote
+                            dstFileSystem.copyLocalToRemote(joinPath(dstDosPath, srcFile.Name));
+                        }
                     }
                     //
-                    // recurse through folders
-                    //
-                    foreach (DirectoryInfo srcCopy in srcDirectoryInfo.GetDirectories()) {
-                        dstCopy = dstDiretoryInfo.CreateSubdirectory(srcCopy.Name);
-                        copyFolder_local(srcCopy.FullName, dstCopy.FullName);
+                    // -- copy each folder
+                    foreach (DirectoryInfo srcSubDirectory in srcDirectoryInfo.GetDirectories()) {
+                        string dstFolder = srcSubDirectory.Name;
+                        string dstSubPath = dstDosPath + dstFolder + "\\";
+                        DirectoryInfo dstSubDirectory = dstDiretoryInfo.CreateSubdirectory(dstFolder);
+                        copyFolder_local(srcSubDirectory.FullName, dstSubPath, dstFileSystem);
                     }
                 }
             } catch (Exception ex) {
@@ -794,20 +975,17 @@ namespace Contensive.Core.Controllers {
         /// <param name="dstFileSystem"></param>
         public void copyFolder(string srcPath, string dstPath, fileController dstFileSystem = null) {
             try {
+                srcPath = normalizeDosPath(srcPath);
+                dstPath = normalizeDosPath(dstPath);
                 if (!isLocal) {
                     //
                     // -- remote src filesystem
                     // todo - implement remote copyFolder
-                    throw new NotImplementedException("remote copyFolder not implemented");
+                    throw new NotImplementedException("remote copyFolder not yet implemented");
                 } else {
                     //
-                    // -- create destination folder
-                    if (dstFileSystem == null) {
-                        dstFileSystem = this;
-                    }
-                    //
                     // -- copy files
-                    copyFolder_local(joinPath(localAbsRootPath, srcPath), joinPath(dstFileSystem.localAbsRootPath, dstPath));
+                    copyFolder_local(joinPath(localAbsRootPath, srcPath), dstPath, dstFileSystem);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -817,35 +995,18 @@ namespace Contensive.Core.Controllers {
         //
         //==============================================================================================================
         /// <summary>
-        /// return true if pathFilename is a valid DOS local path
-        /// </summary>
-        /// <param name="pathFilename"></param>
-        /// <returns></returns>
-        private bool isValidDosPathFilename(string pathFilename) {
-            bool returnValid = true;
-            if (string.IsNullOrEmpty(pathFilename)) {
-                returnValid = false;
-            } else if (pathFilename.IndexOf("/") >= 0) {
-                returnValid = false;
-            }
-            return returnValid;
-        }
-        //
-        //==============================================================================================================
-        /// <summary>
         /// convert fileInfo array to parsable string [filename-attributes-creationTime-lastAccessTime-lastWriteTime-length-entension]
         /// </summary>
         /// <param name="FileInfo"></param>
         /// <returns></returns>
-        public string convertFileINfoArrayToParseString(FileInfo[] FileInfo) {
-            string returnString = "";
-            if (FileInfo.Length > 0) {
-                foreach (FileInfo fi in FileInfo) {
-                    returnString += "\r\n" + fi.Name + "\t" + (int)fi.Attributes + "\t" + fi.CreationTime + "\t" + fi.LastAccessTime + "\t" + fi.LastWriteTime + "\t" + fi.Length + "\t" + fi.Extension;
+        public string convertFileInfoArrayToParseString( List<FileDetail> FileInfo) {
+            var result = new System.Text.StringBuilder();
+            if (FileInfo.Count > 0) {
+                foreach (FileDetail fi in FileInfo) {
+                    result.Append("\r\n" + fi.Name + "\t" + fi.Attributes + "\t" + fi.DateCreated + "\t" + fi.DateLastAccessed + "\t" + fi.DateLastModified + "\t" + fi.Size + "\t" + fi.Extension);
                 }
-                returnString = returnString.Substring(2);
             }
-            return returnString;
+            return result.ToString();
         }
         //
         //==============================================================================================================
@@ -854,15 +1015,14 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="DirectoryInfo"></param>
         /// <returns></returns>
-        public string convertDirectoryInfoArrayToParseString(DirectoryInfo[] DirectoryInfo) {
-            string returnString = "";
-            if (DirectoryInfo.Length > 0) {
-                foreach (DirectoryInfo di in DirectoryInfo) {
-                    returnString += "\r\n" + di.Name + "\t" + (int)di.Attributes + "\t" + di.CreationTime + "\t" + di.LastAccessTime + "\t" + di.LastWriteTime + "\t0\t" + di.Extension;
+        public string convertDirectoryInfoArrayToParseString(List<FolderDetail> DirectoryInfo) {
+            var result = new System.Text.StringBuilder();
+            if (DirectoryInfo.Count > 0) {
+                foreach (FolderDetail di in DirectoryInfo) {
+                    result.Append( "\r\n" + di.Name + "\t" + (int)di.Attributes + "\t" + di.DateCreated + "\t" + di.DateLastAccessed + "\t" + di.DateLastModified + "\t0\t");
                 }
-                returnString = returnString.Substring(2);
             }
-            return returnString;
+            return result.ToString();
         }
         //
         //=========================================================================================================
@@ -873,13 +1033,10 @@ namespace Contensive.Core.Controllers {
         /// <param name="pathFilename"></param>
         public void saveHttpRequestToFile(string Link, string pathFilename) {
             try {
-                //
-                httpRequestController HTTP = new httpRequestController();
-                string URLLink = null;
-                //
+                pathFilename = normalizeDosPathFilename(pathFilename);
                 if ((!string.IsNullOrEmpty(pathFilename)) & (!string.IsNullOrEmpty(Link))) {
-                    pathFilename = normalizePathFilename(pathFilename);
-                    URLLink = genericController.vbReplace(Link, " ", "%20");
+                    string URLLink = genericController.vbReplace(Link, " ", "%20");
+                    httpRequestController HTTP = new httpRequestController();
                     HTTP.timeout = 600;
                     HTTP.getUrlToFile(encodeText(URLLink), convertToLocalAbsPath(pathFilename));
                     //
@@ -900,27 +1057,34 @@ namespace Contensive.Core.Controllers {
         /// <param name="pathFilename"></param>
         public void UnzipFile(string pathFilename) {
             try {
+                pathFilename = normalizeDosPathFilename(pathFilename);
+                bool processLocalFile = true;
                 if ( !isLocal ) {
-                    copyRemoteToLocal(pathFilename);
+                    if (!copyRemoteToLocal(pathFilename)) {
+                        processLocalFile = false;
+                        deleteFile_local(pathFilename);
+                    }
                 }
-                string absPathFilename = convertToLocalAbsPath(pathFilename);
-                string path = "";
-                string filename = "";
-                splitPathFilename(absPathFilename, ref path, ref filename);
-                string fileFilter = null;
-                FastZip fastZip = new FastZip();
-                fastZip.ExtractZip(absPathFilename, path, fileFilter);
-                //
-                if (!isLocal) {
+                if (processLocalFile) {
+                    string absPathFilename = convertToLocalAbsPath(pathFilename);
+                    string path = "";
+                    string filename = "";
+                    splitDosPathFilename(absPathFilename, ref path, ref filename);
+                    string fileFilter = null;
+                    FastZip fastZip = new FastZip();
+                    fastZip.ExtractZip(absPathFilename, path, fileFilter);
                     //
-                    // -- copy files back to remote
-                    using (var fs = new FileStream(absPathFilename, FileMode.Open, FileAccess.Read)) {
-                        using (var zf = new ZipFile(fs)) {
-                            foreach (ZipEntry ze in zf) {
-                                if (ze.IsDirectory) {
-                                    verifyPath_remote(getPath(ze.Name));
-                                } else {
-                                    copyLocalToRemote(ze.Name);
+                    if (!isLocal) {
+                        //
+                        // -- copy files back to remote
+                        using (var fs = new FileStream(absPathFilename, FileMode.Open, FileAccess.Read)) {
+                            using (var zf = new ZipFile(fs)) {
+                                foreach (ZipEntry ze in zf) {
+                                    if (ze.IsDirectory) {
+                                        verifyPath_remote(getPath(ze.Name));
+                                    } else {
+                                        copyLocalToRemote(ze.Name);
+                                    }
                                 }
                             }
                         }
@@ -936,14 +1100,15 @@ namespace Contensive.Core.Controllers {
         //
         public void zipFile(string archivePathFilename, string addPathFilename) {
             try {
+                archivePathFilename = normalizeDosPathFilename(archivePathFilename);
+                addPathFilename = normalizeDosPathFilename(addPathFilename);
                 //
+                string archivepath = "";
+                string archiveFilename = "";
+                splitDosPathFilename(archivePathFilename, ref archivepath, ref archiveFilename);
                 FastZip fastZip = new FastZip();
                 string fileFilter = null;
                 bool recurse = true;
-                string archivepath = "";
-                string archiveFilename = "";
-                //
-                splitPathFilename(archivePathFilename, ref archivepath, ref archiveFilename);
                 fastZip.CreateZip(convertToLocalAbsPath(archivePathFilename), convertToLocalAbsPath(addPathFilename), recurse, fileFilter);
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -960,7 +1125,7 @@ namespace Contensive.Core.Controllers {
         private string convertToLocalAbsPath(string pathFilename) {
             string result = pathFilename;
             try {
-                string normalizedPathFilename = normalizePathFilename(pathFilename);
+                string normalizedPathFilename = normalizeDosPathFilename(pathFilename);
                 if (string.IsNullOrEmpty(normalizedPathFilename)) {
                     result = localAbsRootPath;
                 } else if (isinLocalAbsDosPath(normalizedPathFilename)) {
@@ -979,43 +1144,53 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Argument can be a path (myPath/), a filename (myfile.bin), or a pathFilename (myPath/myFile.bin)
+        /// Result dos-slashed, lowercase, can be empty (), a path (mypath\), a filename (myfile.bin), or a pathFilename (mypath\myFile.bin)
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <returns></returns>
-        public static string normalizePathFilename(string path) {
-            if (string.IsNullOrEmpty(path)) {
-                return string.Empty;
-            } else {
-                string returnPath = path;
-                returnPath = returnPath.Replace("/", "\\");
-                while (returnPath.IndexOf("\\\\") >= 0) {
-                    returnPath = returnPath.Replace("\\\\", "\\");
-                }
-                return returnPath;
+        public static string normalizeDosPathFilename(string path) {
+            //
+            // -- convert to dos slash and lowercase()
+            string returnPath = path.Replace("/", "\\").ToLower();
+            //
+            // -- remove accidental double slashes
+            while (returnPath.IndexOf("\\\\") >= 0) {
+                returnPath = returnPath.Replace("\\\\", "\\");
             }
+            if (string.IsNullOrEmpty(returnPath) | (returnPath == "\\")) {
+                //
+                // -- return empty if result is empty or just a slash
+                return string.Empty;
+            } else if (returnPath.Substring(0, 1) == "\\") {
+                //
+                // -- if path starts with a slash, return string without slash
+                return returnPath.Substring(1);
+            };
+            return returnPath;
         }
         //
         //====================================================================================================
         /// <summary>
-        /// Ensures a path uses the correct file delimiter "\", and ends in a "\"
+        /// Result dos-slashed, lowercase, can be empty (), a path that starts with a foldername and ends with a slash (mypath\) (mypath\another\)
         /// </summary>
         /// <param name="dosPath"></param>
         /// <returns></returns>
         public static string normalizeDosPath(string dosPath) {
-            if (string.IsNullOrEmpty(dosPath)) {
-                return string.Empty;
-            } else {
-                dosPath = normalizePathFilename(dosPath);
-                if (dosPath.Left(1) == "\\") {
-                    dosPath = dosPath.Substring(1);
-                }
-                if (dosPath.Substring(dosPath.Length - 1, 1) != "\\") {
-                    return dosPath + "\\";
-                } else {
-                    return dosPath;
+            if (!string.IsNullOrWhiteSpace(dosPath)) {
+                //
+                // -- normalize, allowing for a trailing filename
+                dosPath = normalizeDosPathFilename(dosPath);
+                if (!string.IsNullOrWhiteSpace(dosPath)) {
+                    //
+                    // -- verify the trailing string is a path, not a file
+                    if (dosPath.Substring(dosPath.Length - 1, 1) != "\\") {
+                        return dosPath + "\\";
+                    } else {
+                        return dosPath;
+                    }
                 }
             }
+            return string.Empty;
         }
         //
         //====================================================================================================
@@ -1030,7 +1205,7 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// save an uploaded file to a path, and return the uploaded filename
+        /// save a file uploaded to the website. Path is where to store it, returnFilename is the resulting file
         /// </summary>
         /// <param name="TagName"></param>
         /// <param name="files"></param>
@@ -1039,9 +1214,8 @@ namespace Contensive.Core.Controllers {
         /// <returns></returns>
         public bool upload(string htmlTagName, string path, ref string returnFilename) {
             bool success = false;
+            returnFilename = "";
             try {
-                returnFilename = "";
-                //
                 string key = htmlTagName.ToLower();
                 if (core.docProperties.containsKey(key)) {
                     var docProperty = core.docProperties.getProperty(key);
@@ -1072,53 +1246,53 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //
-        public static string getVirtualTableFieldPath(string TableName, string FieldName) {
-            string result = TableName + "/" + FieldName + "/";
+        public static string getVirtualTableFieldUnixPath(string tableName, string fieldName) {
+            string result = tableName + "/" + fieldName + "/";
             return result.Replace(" ", "_").Replace(".", "_");
         }
         //
         //========================================================================
         //
-        public static string getVirtualTableFieldIdPath(string TableName, string FieldName, int RecordID) {
-            return getVirtualTableFieldPath(TableName, FieldName) + RecordID.ToString().PadLeft(12, '0') + "/";
+        public static string getVirtualTableFieldIdUnixPath(string tableName, string fieldName, int recordID) {
+            return getVirtualTableFieldUnixPath(tableName, fieldName) + recordID.ToString().PadLeft(12, '0') + "/";
         }
         //
         //========================================================================
         /// <summary>
         /// Create a filename for the Virtual Directory for a fieldtypeFile or Image (an uploaded file)
         /// </summary>
-        public static string getVirtualRecordPathFilename(string TableName, string FieldName, int RecordID, string OriginalFilename) {
-            string iOriginalFilename = OriginalFilename.Replace(" ", "_").Replace(".", "_");
-            return getVirtualTableFieldIdPath(TableName, FieldName, RecordID) + OriginalFilename;
+        public static string getVirtualRecordUnixPathFilename(string tableName, string fieldName, int recordID, string originalFilename) {
+            string iOriginalFilename = originalFilename.Replace(" ", "_").Replace(".", "_");
+            return getVirtualTableFieldIdUnixPath(tableName, fieldName, recordID) + originalFilename;
         }
         //
         //========================================================================
         /// <summary>
         /// Create a filename for the virtual directory for field types not associated to upload files
         /// </summary>
-        public static string getVirtualRecordPathFilename(string TableName, string FieldName, int RecordID, int fieldType) {
+        public static string getVirtualRecordUnixPathFilename(string tableName, string fieldName, int recordID, int fieldType) {
             string result = "";
-            string IdFilename = RecordID.ToString();
-            if (RecordID == 0) {
-                IdFilename = getGUID().Replace("{", "").Replace("}", "").Replace("-", "");
+            string idFilename = recordID.ToString();
+            if (recordID == 0) {
+                idFilename = getGUID().Replace("{", "").Replace("}", "").Replace("-", "");
             } else {
-                IdFilename = RecordID.ToString().PadLeft(12, '0');
+                idFilename = recordID.ToString().PadLeft(12, '0');
             }
             switch (fieldType) {
                 case FieldTypeIdFileCSS:
-                    result = getVirtualTableFieldPath(TableName, FieldName) + IdFilename + ".css";
+                    result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".css";
                     break;
                 case FieldTypeIdFileXML:
-                    result = getVirtualTableFieldPath(TableName, FieldName) + IdFilename + ".xml";
+                    result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".xml";
                     break;
                 case FieldTypeIdFileJavascript:
-                    result = getVirtualTableFieldPath(TableName, FieldName) + IdFilename + ".js";
+                    result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".js";
                     break;
                 case FieldTypeIdFileHTML:
-                    result = getVirtualTableFieldPath(TableName, FieldName) + IdFilename + ".html";
+                    result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".html";
                     break;
                 default:
-                    result = getVirtualTableFieldPath(TableName, FieldName) + IdFilename + ".txt";
+                    result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".txt";
                     break;
             }
             return result;
@@ -1129,12 +1303,15 @@ namespace Contensive.Core.Controllers {
         public int getFileSize(string pathFilename) {
             int fileSize = 0;
             try {
+                pathFilename = normalizeDosPathFilename(pathFilename);
                 if (!isLocal) {
                     // todo implement remote getFileList
                     throw new NotImplementedException("remote getFileSize not implemented");
                 } else {
-                    FileInfo[] files = getFileList(pathFilename);
-                    fileSize = (int)(files[0].Length);
+                    List<FileDetail> files = getFileList(pathFilename);
+                    if (files.Count>0) {
+                        fileSize = (int)(files[0].Size);
+                    }
                 }
             } catch (Exception ex ) {
                 core.handleException(ex);
@@ -1144,7 +1321,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// copy a file (object) up to s3
+        /// copy a file (object) up to s3. Returns false if the local file does not exist.
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <param name="dstS3UnixPathFilename"></param>
@@ -1152,19 +1329,26 @@ namespace Contensive.Core.Controllers {
         public bool copyLocalToRemote(string pathFilename) {
             bool result = false;
             try {
-                string localDosPathFilename = genericController.convertToDosSlash(pathFilename);
-                string remoteUnixPathFilename = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
-                verifyPath_remote(getPath(pathFilename));
-                //
-                // -- Setup request for putting an object in S3.
-                PutObjectRequest request = new PutObjectRequest();
-                request.BucketName = core.serverConfig.awsBucketName;
-                request.Key = remoteUnixPathFilename;
-                request.FilePath = joinPath(localAbsRootPath, localDosPathFilename);
-                //
-                // -- Make service call and get back the response.
-                PutObjectResponse response = s3Client.PutObject(request);
-                result = true;
+                pathFilename = normalizeDosPathFilename(pathFilename);
+                if (isLocal) {
+                    throw new ApplicationException("copyLocalToRemote is not valid in a local File system [" + localAbsRootPath + "]");
+                } else {
+                    if (fileExists_local(pathFilename)) {
+                        string localDosPathFilename = genericController.convertToDosSlash(pathFilename);
+                        string remoteUnixPathFilenameLowercase = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename)).ToLower();
+                        verifyPath_remote(getPath(pathFilename));
+                        //
+                        // -- Setup request for putting an object in S3.
+                        PutObjectRequest request = new PutObjectRequest();
+                        request.BucketName = core.serverConfig.awsBucketName;
+                        request.Key = remoteUnixPathFilenameLowercase;
+                        request.FilePath = joinPath(localAbsRootPath, localDosPathFilename);
+                        //
+                        // -- Make service call and get back the response.
+                        PutObjectResponse response = s3Client.PutObject(request);
+                        result = true;
+                    }
+                }
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -1173,37 +1357,33 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// copy a file (object) down from s3. The localDosPath must exist, and the file should NOT exist. If remote file does
+        /// copy a file (object) from remote to local. Returns false if the remote file does not exist. The localDosPath must exist.
         /// not exist
         /// </summary>
         public bool copyRemoteToLocal(string pathFilename) {
             bool result = false;
             try {
-                // todo - rewrite using lowlevel + transfer, not file io
-                // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
-                string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, pathFilename));
-                verifyPath_remote(getPath( pathFilename ));
-                var s3FileInfo = new Amazon.S3.IO.S3FileInfo(s3Client, core.serverConfig.awsBucketName, convertToDosSlash(remoteUnixPathFilename.Substring(1)));
-                if (s3FileInfo.Exists) {
+                pathFilename = normalizeDosPathFilename(pathFilename);
+                if (isLocal) {
+                    throw new ApplicationException("copyRemoteToLocal is not valid in a local File system [" + localAbsRootPath + "]");
+                } else {
+                    verifyPath_remote(getPath(pathFilename));
+                    string remoteUnixAbsPathFilename = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
                     string localDosPathFilename = genericController.convertToDosSlash(pathFilename);
                     //
-                    // -- remote file exists, delete local version and copy remote to local
-                    if (fileExists(localDosPathFilename)) {
+                    // -- delete local file (for both cases, remote exists and remote does not)
+                    deleteFile_local(localDosPathFilename);
+                    if (fileExists_remote(pathFilename)) {
                         //
-                        // -- local file exists, delete it first
-                        deleteFile(localDosPathFilename);
-                    }
-                    GetObjectRequest request = new GetObjectRequest {
-                        BucketName = core.serverConfig.awsBucketName,
-                        Key = remoteUnixPathFilename.Substring(1)
-                    };
-                    try {
+                        // -- remote file exists, delete local version and copy remote to local
+                        GetObjectRequest request = new GetObjectRequest {
+                            BucketName = core.serverConfig.awsBucketName,
+                            Key = remoteUnixAbsPathFilename
+                        };
                         using (GetObjectResponse response = s3Client.GetObject(request)) {
                             response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
                         }
-                    } catch (Exception) {
-
-                        throw;
+                        result = true;
                     }
                 }
             } catch (Exception ex) {
@@ -1218,8 +1398,9 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         private void verifyPath_local(string path) {
             try {
-                if (!pathExists(path)) {
-                    createPath(path);
+                path = normalizeDosPath(path);
+                if (!pathExists_local(path)) {
+                    createPath_local(path);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -1232,17 +1413,24 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         private void verifyPath_remote(string path) {
             try {
-                string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
-                var url = genericController.splitUrl(remoteUnixPathFilename);
-                var parentFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, "");
-                string pathFromLeft = "";
-                foreach (string segment in url.pathSegments) {
-                    pathFromLeft += "/" + segment;
-                    var subFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, pathFromLeft.Substring(1));
-                    if (!subFolderInfo.Exists) {
-                        parentFolderInfo.CreateSubdirectory(segment);
+                path = normalizeDosPath(path);
+                string remoteUnixPathLowercase = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
+                if ( !verifiedRemotePathList.Contains(remoteUnixPathLowercase)) {
+                    var urlLowercase = genericController.splitUrl(remoteUnixPathLowercase);
+                    var parentFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, "");
+                    string bucketKeyLowercase = "";
+                    foreach (string subPathLowercase in urlLowercase.pathSegments) {
+                        bucketKeyLowercase += subPathLowercase + "\\";
+                        string verifiedRemotePath = "/" + convertToUnixSlash(bucketKeyLowercase);
+                        var subFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, bucketKeyLowercase.Substring(0, (bucketKeyLowercase.Length - 1)));
+                        if (!verifiedRemotePathList.Contains(verifiedRemotePath)) {
+                            if (!subFolderInfo.Exists) {
+                                parentFolderInfo.CreateSubdirectory(subPathLowercase);
+                            }
+                            verifiedRemotePathList.Add(verifiedRemotePath);
+                        }
+                        parentFolderInfo = subFolderInfo;
                     }
-                    parentFolderInfo = subFolderInfo;
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -1251,11 +1439,11 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// copy a file (object) down from s3. The localDosPath must exist, and the file should NOT exist. If remote file does
-        /// not exist
+        /// verify the path exists. If it does not it is created
         /// </summary>
-        private void verifyPath(string path) {
+        public void verifyPath(string path) {
             try {
+                path = normalizeDosPath(path);
                 if (isLocal) {
                     // -- files stored locally
                     verifyPath_local(path);

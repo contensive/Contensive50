@@ -65,7 +65,7 @@ namespace Contensive.Core {
         [Obsolete]
         public override bool BrowserIsIE {
             get {
-                return core.sessionContext.visit_browserIsIE;
+                return core.session.visit_browserIsIE;
             }
         }
         //
@@ -73,14 +73,14 @@ namespace Contensive.Core {
         [Obsolete]
         public override bool BrowserIsMac {
             get {
-                return core.sessionContext.visit_browserIsMac;
+                return core.session.visit_browserIsMac;
             }
         }
         //
         //====================================================================================================
         public override bool BrowserIsMobile {
             get {
-                return core.sessionContext.visit.Mobile;
+                return core.session.visit.Mobile;
             }
         }
         //
@@ -88,14 +88,14 @@ namespace Contensive.Core {
         [Obsolete]
         public override bool BrowserIsWindows {
             get {
-                return core.sessionContext.visit_browserIsWindows;
+                return core.session.visit_browserIsWindows;
             }
         }
         //
         //====================================================================================================
         [Obsolete] public override string BrowserVersion {
             get {
-                return core.sessionContext.visit_browserVersion;
+                return core.session.visit_browserVersion;
             }
         }
         //
@@ -199,10 +199,10 @@ namespace Contensive.Core {
         //====================================================================================================
         public override string Language {
             get {
-                if (core.sessionContext.userLanguage == null) {
+                if (core.session.userLanguage == null) {
                     return "";
                 }
-                languageModel userLanguage = languageModel.create(core, core.sessionContext.user.LanguageID);
+                languageModel userLanguage = languageModel.create(core, core.session.user.LanguageID);
                 if (userLanguage != null) {
                     return userLanguage.name;
                 }

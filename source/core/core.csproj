@@ -257,7 +257,7 @@
     <Compile Include="Models\Complex\cdefModel.cs" />
     <Compile Include="Models\Complex\routeDictionaryModel.cs" />
     <Compile Include="Models\Complex\tableSchemeModel.cs" />
-    <Compile Include="Models\Context\sessionContextModel.cs" />
+    <Compile Include="Controllers\sessionController.cs" />
     <Compile Include="Models\Complex\miniCollectionModel.cs" />
     <Compile Include="Models\Context\propertyModel.cs" />
     <Compile Include="Models\Context\stylesheetContextModel.cs" />
@@ -320,6 +320,9 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

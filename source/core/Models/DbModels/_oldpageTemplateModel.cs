@@ -66,7 +66,7 @@ namespace Contensive.Core.Models.DbModels {
         public static oldPageTemplateModel add(coreController core, ref List<string> callersCacheNameList) {
             oldPageTemplateModel result = null;
             try {
-                result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.sessionContext.user.id), ref callersCacheNameList);
+                result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.session.user.id), ref callersCacheNameList);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;

@@ -354,7 +354,6 @@ namespace Contensive.Core.Controllers {
                             // not editor, encode the content parts of the addon
                             //
                             result = addon.CopyText + addon.Copy;
-                            string ignoreLayoutErrors = "";
                             switch (executeContext.addonType) {
                                 case CPUtilsBaseClass.addonContext.ContextEditor:
                                     result = activeContentController.renderHtmlForWysiwygEditor(core, result);
@@ -544,7 +543,7 @@ namespace Contensive.Core.Controllers {
                         // -- Return all other types, Enable Edit Wrapper for Page Content edit mode
                         bool IncludeEditWrapper = (!addon.BlockEditTools) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) & (!executeContext.isIncludeAddon);
                         if (IncludeEditWrapper) {
-                            IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || core.sessionContext.isEditing(executeContext.hostRecord.contentName)));
+                            IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || core.session.isEditing(executeContext.hostRecord.contentName)));
                             if (IncludeEditWrapper) {
                                 //
                                 // Edit Icon
@@ -682,7 +681,7 @@ namespace Contensive.Core.Controllers {
                     //
                     return_ExitAddonBlankWithResponse = true;
                     return string.Empty;
-                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //
@@ -831,7 +830,7 @@ namespace Contensive.Core.Controllers {
                                                                 CS = core.db.csOpen("Copy Content", "name=" + core.db.encodeSQLText(FieldName), "ID");
                                                                 if (!core.db.csOk(CS)) {
                                                                     core.db.csClose(ref CS);
-                                                                    CS = core.db.csInsertRecord("Copy Content", core.sessionContext.user.id);
+                                                                    CS = core.db.csInsertRecord("Copy Content", core.session.user.id);
                                                                 }
                                                                 if (core.db.csOk(CS)) {
                                                                     core.db.csSet(CS, "name", FieldName);
@@ -998,7 +997,7 @@ namespace Contensive.Core.Controllers {
                                                                                 EncodedLink = EncodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
-                                                                                core.privateFiles.splitPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
+                                                                                core.privateFiles.splitDosPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
                                                                                 Copy = ""
                                                                                 + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
                                                                                 + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FieldName);
@@ -1091,7 +1090,7 @@ namespace Contensive.Core.Controllers {
                                                             CS = core.db.csOpen("Copy Content", "Name=" + core.db.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
                                                             if (!core.db.csOk(CS)) {
                                                                 core.db.csClose(ref CS);
-                                                                CS = core.db.csInsertRecord("Copy Content", core.sessionContext.user.id);
+                                                                CS = core.db.csInsertRecord("Copy Content", core.session.user.id);
                                                                 if (core.db.csOk(CS)) {
                                                                     RecordID = core.db.csGetInteger(CS, "ID");
                                                                     core.db.csSet(CS, "name", FieldName);
@@ -1903,8 +1902,8 @@ namespace Contensive.Core.Controllers {
                 int Ptr = 0;
                 int Pos = 0;
                 //
-                if (core.sessionContext.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
-                    if (core.sessionContext.isEditingAnything()) {
+                if (core.session.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
+                    if (core.session.isEditingAnything()) {
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
@@ -2147,8 +2146,8 @@ namespace Contensive.Core.Controllers {
                 string BubbleJS = null;
                 //Dim AddonName As String = ""
                 //
-                if (core.sessionContext.isAuthenticated && true) {
-                    if (core.sessionContext.isEditingAnything()) {
+                if (core.session.isAuthenticated && true) {
+                    if (core.session.isEditingAnything()) {
                         addonModel addon = addonModel.create(core, addonId);
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
@@ -2217,8 +2216,8 @@ namespace Contensive.Core.Controllers {
             string InnerCopy = null;
             string CollectionCopy = "";
             //
-            if (core.sessionContext.isAuthenticated) {
-                if (core.sessionContext.isEditingAnything()) {
+            if (core.session.isAuthenticated) {
+                if (core.session.isEditingAnything()) {
                     StyleSN = genericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
                     //core.html.html_HelpViewerButtonID = "HelpBubble" & doccontroller.htmlDoc_HelpCodeCount
                     InnerCopy = helpCopy;
@@ -2297,8 +2296,8 @@ namespace Contensive.Core.Controllers {
                 int StyleSN = 0;
                 string HTMLViewerBubbleID = null;
                 //
-                if (core.sessionContext.isAuthenticated) {
-                    if (core.sessionContext.isEditingAnything()) {
+                if (core.session.isAuthenticated) {
+                    if (core.session.isEditingAnything()) {
                         StyleSN = genericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
                         HTMLViewerBubbleID = "HelpBubble" + core.doc.helpCodes.Count;
                         //
@@ -2410,7 +2409,7 @@ namespace Contensive.Core.Controllers {
                     //
                     return_ExitRequest = true;
                     return string.Empty;
-                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //
@@ -2730,7 +2729,7 @@ namespace Contensive.Core.Controllers {
                                                                                 EncodedLink = EncodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
-                                                                                core.privateFiles.splitPathFilename(FieldValue,  ref FieldValuePath, ref FieldValuefilename);
+                                                                                core.privateFiles.splitDosPathFilename(FieldValue,  ref FieldValuePath, ref FieldValuefilename);
                                                                                 Copy = ""
                                                                                 + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
                                                                                 + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FieldName);

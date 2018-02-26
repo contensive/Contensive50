@@ -97,7 +97,7 @@ namespace Contensive.Core.Controllers {
                 main_EditLockStatus_Local = false;
                 //
                 main_EditLockStatus_Local = getEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), ref ReturnMemberID, ref ReturnDateExpires);
-                if (main_EditLockStatus_Local && (ReturnMemberID != core.sessionContext.user.id)) {
+                if (main_EditLockStatus_Local && (ReturnMemberID != core.session.user.id)) {
                     main_EditLockStatus_Local = true;
                     main_EditLockDateExpires_Local = ReturnDateExpires;
                     main_EditLockMemberID_Local = ReturnMemberID;
@@ -169,7 +169,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public void SetEditLock(string ContentName, int RecordID) {
-            setEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.sessionContext.user.id);
+            setEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.session.user.id);
         }
         //
         //========================================================================
@@ -177,7 +177,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public void ClearEditLock(string ContentName, int RecordID) {
-            clearEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.sessionContext.user.id);
+            clearEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.session.user.id);
         }
         //
         //========================================================================

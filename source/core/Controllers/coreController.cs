@@ -32,8 +32,10 @@ namespace Contensive.Core.Controllers {
         public serverConfigModel serverConfig { get; set; }
         //
         //===================================================================================================
-        // -- todo
-        public Models.Context.sessionContextModel sessionContext;
+        /// <summary>
+        /// An instance of the sessionController, populated for the current session (user state, visit state, etc)
+        /// </summary>
+        public sessionController session;
         //
         //===================================================================================================
         // todo - this should be a pointer into the serverConfig
@@ -423,7 +425,7 @@ namespace Contensive.Core.Controllers {
             cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
-            sessionContext = new sessionContextModel(this);
+            session = new sessionController(this);
             //
             serverConfig = Models.Context.serverConfigModel.getObject(this);
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -441,7 +443,7 @@ namespace Contensive.Core.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
-            sessionContext = new sessionContextModel(this);
+            session = new sessionController(this);
             //
             serverConfig = serverConfigModel.getObject(this);
             serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -462,7 +464,7 @@ namespace Contensive.Core.Controllers {
             cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
-            sessionContext = new sessionContextModel(this);
+            session = new sessionController(this);
             //
             this.serverConfig = serverConfig;
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -482,7 +484,7 @@ namespace Contensive.Core.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
-            sessionContext = new sessionContextModel(this);
+            session = new sessionController(this);
             //
             this.serverConfig = serverConfig;
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -499,7 +501,7 @@ namespace Contensive.Core.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
-            sessionContext = new sessionContextModel(this);
+            session = new sessionController(this);
             //
             serverConfig = serverConfigModel.getObject(this);
             serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -772,8 +774,8 @@ namespace Contensive.Core.Controllers {
                                                 fieldName = "",
                                                 recordId = docProperties.getInteger("HostRecordID")
                                             },
-                                            personalizationAuthenticated = sessionContext.isAuthenticated,
-                                            personalizationPeopleId = sessionContext.user.id
+                                            personalizationAuthenticated = session.isAuthenticated,
+                                            personalizationPeopleId = session.user.id
                                         };
                                         return this.addon.execute(addon, executeContext);
                                     }
@@ -840,8 +842,8 @@ namespace Contensive.Core.Controllers {
                                 fieldName = "",
                                 recordId = 0
                             },
-                            personalizationAuthenticated = sessionContext.visit.VisitAuthenticated,
-                            personalizationPeopleId = sessionContext.user.id
+                            personalizationAuthenticated = session.visit.VisitAuthenticated,
+                            personalizationPeopleId = session.user.id
                         };
                         return this.addon.execute(Models.DbModels.addonModel.create(this, defaultAddonId), executeContext);
                     }
@@ -1145,14 +1147,14 @@ namespace Contensive.Core.Controllers {
                 if (appConfig == null) {
                     //
                     // -- server mode, there is no application
-                    sessionContext = Models.Context.sessionContextModel.create(this, false);
+                    session = sessionController.create(this, false);
                 } else if (appConfig.appStatus != appConfigModel.appStatusEnum.ok) {
                     //} else if ((appConfig.appMode != appConfigModel.appModeEnum.normal) | (appConfig.appStatus != appConfigModel.appStatusEnum.OK)) {
                     //
                     // -- application is not ready, might be error, or in maintainence mode
-                    sessionContext = Models.Context.sessionContextModel.create(this, false);
+                    session = sessionController.create(this, false);
                 } else {
-                    sessionContext = Models.Context.sessionContextModel.create(this, allowVisit && siteProperties.allowVisitTracking);
+                    session = sessionController.create(this, allowVisit && siteProperties.allowVisitTracking);
                     //
                     // -- debug printed defaults on, so if not on, set it off and clear what was collected
                     doc.visitPropertyAllowDebugging = visitProperty.getBoolean("AllowDebugging");
@@ -1250,7 +1252,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // If visit tracking, save the viewing record
                                     //
-                                    string ViewingName = ((string)(sessionContext.visit.id + "." + sessionContext.visit.PageVisits)).Left(10);
+                                    string ViewingName = ((string)(session.visit.id + "." + session.visit.PageVisits)).Left(10);
                                     int PageID = 0;
                                     if (_doc != null) {
                                         if (doc.page != null) {
@@ -1267,7 +1269,7 @@ namespace Contensive.Core.Controllers {
                                     string SQL = "insert into ccviewings ("
                                         + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID,ExcludeFromAnalytics,pagetitle"
                                         + ")values("
-                                        + " " + db.encodeSQLText(ViewingName) + "," + db.encodeSQLNumber(sessionContext.visit.id) + "," + db.encodeSQLNumber(sessionContext.user.id) + "," + db.encodeSQLText(webServer.requestDomain) + "," + db.encodeSQLText(webServer.requestPath) + "," + db.encodeSQLText(webServer.requestPage) + "," + db.encodeSQLText(webServer.requestQueryString.Left(255)) + "," + db.encodeSQLText(requestFormSerialized.Left(255)) + "," + db.encodeSQLText(webServer.requestReferrer.Left(255)) + "," + db.encodeSQLDate(doc.profileStartTime) + "," + db.encodeSQLBoolean(sessionContext.visit_stateOK) + "," + db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(this, "Viewings")) + "," + db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) + ",1"
+                                        + " " + db.encodeSQLText(ViewingName) + "," + db.encodeSQLNumber(session.visit.id) + "," + db.encodeSQLNumber(session.user.id) + "," + db.encodeSQLText(webServer.requestDomain) + "," + db.encodeSQLText(webServer.requestPath) + "," + db.encodeSQLText(webServer.requestPage) + "," + db.encodeSQLText(webServer.requestQueryString.Left(255)) + "," + db.encodeSQLText(requestFormSerialized.Left(255)) + "," + db.encodeSQLText(webServer.requestReferrer.Left(255)) + "," + db.encodeSQLDate(doc.profileStartTime) + "," + db.encodeSQLBoolean(session.visit_stateOK) + "," + db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(this, "Viewings")) + "," + db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) + ",1"
                                         + "," + db.encodeSQLNumber(0) + "," + db.encodeSQLNumber(PageID);
                                     SQL += "," + db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics);
                                     SQL += "," + db.encodeSQLText(pagetitle);

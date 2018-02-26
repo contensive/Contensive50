@@ -15,6 +15,7 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
 using System.IO;
+using static Contensive.BaseClasses.CPFileSystemBaseClass;
 //
 namespace Contensive.Core {
     //
@@ -257,14 +258,14 @@ namespace Contensive.Core {
         public override string fileList(string pathFolderName, int pageSize = 0, int pageNumber = 1) {
             string result = "";
             if (core.appRootFiles.isinLocalAbsDosPath(pathFolderName)) {
-                FileInfo[] fi = core.appRootFiles.getFileList(pathFolderName);
-                result = core.appRootFiles.convertFileINfoArrayToParseString(fi);
+                List<FileDetail> fi = core.appRootFiles.getFileList(pathFolderName);
+                result = core.appRootFiles.convertFileInfoArrayToParseString(fi);
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
-                FileInfo[] fi = core.privateFiles.getFileList(pathFolderName);
-                result = core.privateFiles.convertFileINfoArrayToParseString(fi);
+                List<FileDetail> fi = core.privateFiles.getFileList(pathFolderName);
+                result = core.privateFiles.convertFileInfoArrayToParseString(fi);
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
-                FileInfo[] fi = core.cdnFiles.getFileList(pathFolderName);
-                result = core.cdnFiles.convertFileINfoArrayToParseString(fi);
+                List<FileDetail> fi = core.cdnFiles.getFileList(pathFolderName);
+                result = core.cdnFiles.convertFileInfoArrayToParseString(fi);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));
             }
@@ -281,13 +282,13 @@ namespace Contensive.Core {
         public override string folderList(string pathFolderName) {
             string result = "";
             if (core.appRootFiles.isinLocalAbsDosPath(pathFolderName)) {
-                DirectoryInfo[] fi = core.appRootFiles.getFolderList(pathFolderName);
+                List<FolderDetail> fi = core.appRootFiles.getFolderList(pathFolderName);
                 result = core.appRootFiles.convertDirectoryInfoArrayToParseString(fi);
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
-                DirectoryInfo[] fi = core.privateFiles.getFolderList(pathFolderName);
+                List<FolderDetail> fi = core.privateFiles.getFolderList(pathFolderName);
                 result = core.privateFiles.convertDirectoryInfoArrayToParseString(fi);
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
-                DirectoryInfo[] fi = core.cdnFiles.getFolderList(pathFolderName);
+                List<FolderDetail> fi = core.cdnFiles.getFolderList(pathFolderName);
                 result = core.cdnFiles.convertDirectoryInfoArrayToParseString(fi);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));

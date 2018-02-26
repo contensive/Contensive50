@@ -39,13 +39,13 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetCopy(string CopyName, string DefaultContent = "") {
-            return core.html.getContentCopy(CopyName, DefaultContent, core.sessionContext.user.id, true, core.sessionContext.isAuthenticated);
+            return core.html.getContentCopy(CopyName, DefaultContent, core.session.user.id, true, core.session.isAuthenticated);
         }
         //
         //====================================================================================================
         //
         public override string GetCopy(string CopyName, string DefaultContent, int personalizationPeopleId) {
-            return core.html.getContentCopy(CopyName, DefaultContent, personalizationPeopleId, true, core.sessionContext.isAuthenticated);
+            return core.html.getContentCopy(CopyName, DefaultContent, personalizationPeopleId, true, core.session.isAuthenticated);
         }
         //
         //====================================================================================================

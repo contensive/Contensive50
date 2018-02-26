@@ -72,7 +72,7 @@ namespace Contensive.Core.Models.DbModels
 			dataSourceModel result = null;
 			try
 			{
-				result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.sessionContext.user.id),ref callersCacheNameList);
+				result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.session.user.id),ref callersCacheNameList);
 			}
 			catch (Exception ex)
 			{

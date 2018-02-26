@@ -126,34 +126,39 @@ namespace Contensive.Core.Controllers {
         /// <param name="level"></param>
         public static void logWithoutConfig(string message, logLevel level ) {
             try {
+                //FileTarget target = LogManager.Configuration.FindTargetByName<FileTarget>("LogFile");
+                //target.FileName = filename;
                 string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
                 string logContent = level.ToString() + "\tthread:" + threadName + "\t" + message;
+                Logger nlogLogger = LogManager.GetCurrentClassLogger();
+                //Logger nlogLogger = LogManager.GetLogger("loggerName"); //??? throws error
+                //logger.Info("nlog test");
                 //
                 // decouple NLog types from internal enum
                 switch (level) {
                     case logLevel.Trace:
                         Console.WriteLine("Trace:" + message);
-                        NLogController.loggerInstance.Trace(message);
+                        nlogLogger.Trace(message);
                         break;
                     case logLevel.Debug:
                         Console.WriteLine("Debug:" + message);
-                        NLogController.loggerInstance.Debug(message);
+                        nlogLogger.Debug(message);
                         break;
                     case logLevel.Info:
                         Console.WriteLine("Info:" + message);
-                        NLogController.loggerInstance.Info(message);
+                        nlogLogger.Info(message);
                         break;
                     case logLevel.Warn:
                         Console.WriteLine("Warn:" + message);
-                        NLogController.loggerInstance.Warn(message);
+                        nlogLogger.Warn(message);
                         break;
                     case logLevel.Error:
                         Console.WriteLine("Error:" + message);
-                        NLogController.loggerInstance.Error(message);
+                        nlogLogger.Error(message);
                         break;
                     case logLevel.Fatal:
                         Console.WriteLine("Fatal:" + message);
-                        NLogController.loggerInstance.Fatal(message);
+                        nlogLogger.Fatal(message);
                         break;
                 }
             } catch (Exception) {
@@ -307,7 +312,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="SubjectMemberID"></param>
         /// <param name="SubjectOrganizationID"></param>
         public static void addSiteActivity(coreController core, string Message, int SubjectMemberID, int SubjectOrganizationID) {
-            addSiteActivity(core, Message, core.sessionContext.user.id, SubjectMemberID, SubjectOrganizationID, core.webServer.requestUrl, core.sessionContext.visitor.id, core.sessionContext.visit.id);
+            addSiteActivity(core, Message, core.session.user.id, SubjectMemberID, SubjectOrganizationID, core.webServer.requestUrl, core.session.visitor.id, core.session.visit.id);
         }
         //
         //================================================================================================
@@ -400,31 +405,31 @@ namespace Contensive.Core.Controllers {
             } catch (Exception) { }
         }
     }
-    //
-    // ====================================================================================================
-    /// <summary>
-    /// logging class from https://brutaldev.com/post/logging-setup-in-5-minutes-with-nlog
-    /// </summary>
-    internal static class NLogController {
-        public static Logger loggerInstance { get; private set; }
-        static NLogController() {
-#if DEBUG
-            // from example - https://github.com/nlog/nlog/wiki/Configuration-API
-            // and - Setup the logging view for Sentinel - http://sentinel.codeplex.com
-            var config = new LoggingConfiguration();
-            var sentinalTarget = new NLogViewerTarget() {
-                Name = "sentinal",
-                Address = "udp://127.0.0.1:9999",
-                IncludeNLogData = false
-            };
-            var sentinalRule = new LoggingRule("*", LogLevel.Trace, sentinalTarget);
-            config.AddTarget("sentinal", sentinalTarget);
-            config.LoggingRules.Add(sentinalRule);
-            LogManager.Configuration = config;
-#endif
-            LogManager.ReconfigExistingLoggers();
-            loggerInstance = LogManager.GetCurrentClassLogger();
-        }
+//    //
+//    // ====================================================================================================
+//    /// <summary>
+//    /// logging class from https://brutaldev.com/post/logging-setup-in-5-minutes-with-nlog
+//    /// </summary>
+//    internal static class NLogController {
+//        public static Logger loggerInstance { get; private set; }
+//        static NLogController() {
+//// #if DEBUG
+//            // from example - https://github.com/nlog/nlog/wiki/Configuration-API
+//            // and - Setup the logging view for Sentinel - http://sentinel.codeplex.com
+//            var config = new LoggingConfiguration();
+//            var sentinalTarget = new NLogViewerTarget() {
+//                Name = "sentinal",
+//                Address = "udp://127.0.0.1:9999",
+//                IncludeNLogData = false
+//            };
+//            var sentinalRule = new LoggingRule("*", LogLevel.Trace, sentinalTarget);
+//            config.AddTarget("sentinal", sentinalTarget);
+//            config.LoggingRules.Add(sentinalRule);
+//            LogManager.Configuration = config;
+//// #endif
+//            LogManager.ReconfigExistingLoggers();
+//            loggerInstance = LogManager.GetCurrentClassLogger();
+//        }
 
-    }
+//    }
 }

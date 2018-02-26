@@ -40,7 +40,7 @@ namespace Contensive.Core {
             cp = cpParent;
             core = cp.core;
             cs = -1;
-            OpeningMemberID = core.sessionContext.user.id;
+            OpeningMemberID = core.session.user.id;
         }
         //
         // dispose

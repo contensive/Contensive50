@@ -465,31 +465,21 @@ namespace Contensive.Core.Addons.Email {
             int CSPeople = 0;
             int CSLog = 0;
             try {
-                //
-                //Dim CS as integer
-                //Dim EmailFrom As String
-                //Dim HTMLHead As String
                 string ServerPageDefault = null;
                 string EmailToName = null;
                 string ClickFlagQuery = null;
                 string EmailStatus = null;
-                //Dim FieldList As String
-                //Dim InlineStyles As String
                 string emailWorkingStyles = null;
                 string RootURL = null;
                 string protocolHostLink = null;
                 string ToAddress = null;
-                //Dim ToAddressName As String
                 string EmailBodyEncoded = null;
                 string EmailSubjectEncoded = null;
-                //
-                string errorMessage = "";
                 string EmailTemplateEncoded = "";
                 string OpenTriggerCode = "";
                 //
                 EmailBodyEncoded = EmailBody;
                 EmailSubjectEncoded = EmailSubject;
-                //buildversion = core.app.dataBuildVersion
                 CSLog = core.db.csInsertRecord("Email Log", 0);
                 if (core.db.csOk(CSLog)) {
                     core.db.csSet(CSLog, "Name", "Sent " + encodeText(DateTime.Now));

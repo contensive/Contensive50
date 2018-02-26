@@ -26,7 +26,6 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 addon.save(cp.core);
                 string cmd = "<div>{% \"" + addon.name + "\" %}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
-                string errorMessage = "";
                 // act
                 string result = Contensive.Core.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
@@ -53,7 +52,6 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 addonBar.save(cp.core);
                 string cmd = "<div>{% \"" + addonFoo.name + "\" %}{% \"" + addonBar.name + "\" %}+{% \"" + addonFoo.name + "\" %}\n{% \"" + addonBar.name + "\" %}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
-                string errorMessage = "";
                 // act
                 string result = Contensive.Core.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
@@ -79,7 +77,6 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 addonBar.save(cp.core);
                 string cmd = "<div>{%[{\"" + addonFoo.name + "\":\"commandArgument\"}]%}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
-                string errorMessage = "";
                 // act
                 string result = Contensive.Core.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
@@ -106,7 +103,6 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 addonBar.save(cp.core);
                 string cmd = "<div>{%[{\"" + addonFoo.name + "\":\"commandArgument\"},{\"" + addonBar.name + "\":\"commandArgument\"}]%}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
-                string errorMessage = "";
                 // act
                 string result = Contensive.Core.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
@@ -127,7 +123,6 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 addonFoo.save(cp.core);
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addonFoo.name + "\"}} %}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
-                string errorMessage = "";
                 // act
                 string result = Contensive.Core.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
@@ -148,7 +143,6 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 addonFoo.save(cp.core);
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addonFoo.name + "\",\"ReplaceMe\":\"BAR\"}} %}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
-                string errorMessage = "";
                 // act
                 string result = Contensive.Core.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
@@ -169,7 +163,6 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 addon.save(cp.core);
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addon.name + "\",\"insert\":\"bar\"}} %}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
-                string errorMessage = "";
                 // act
                 string result = Contensive.Core.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert

@@ -14,7 +14,7 @@ using Contensive.Core.Models.Context;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 using static Contensive.WindowsServices.constants;
-
+using static Contensive.BaseClasses.CPFileSystemBaseClass;
 
 namespace Contensive.WindowsServices {
     public class statusServerClass {
@@ -78,9 +78,6 @@ namespace Contensive.WindowsServices {
         private string GetStatusPage(string RequestPath, string RequestQuery, string remoteHost) {
             string returnHtml = "";
             try {
-                //
-                System.IO.FileInfo[] LogFileStruct = null;
-
                 string Content = "";
                 double FreeSpace = 0;
                 int AppLogPtr = 0;
@@ -202,12 +199,12 @@ namespace Contensive.WindowsServices {
                         //
                         Content = Content + StatusLine(0, "");
                         Content = Content + StatusLine(0, "Log Check");
-                        LogFileStruct = cpCore.appRootFiles.getFileList(cp.core.serverConfig.programFilesPath + "logs");
-                        foreach (System.IO.FileInfo logFile in LogFileStruct) {
-                            if (logFile.Length > LargestLogSize) {
-                                LargestLogSize = genericController.encodeInteger(logFile.Length);
+                        List<FileDetail> LogFileStruct = cpCore.appRootFiles.getFileList(cp.core.serverConfig.programFilesPath + "logs");
+                        foreach (FileDetail logFile in LogFileStruct) {
+                            if (logFile.Size > LargestLogSize) {
+                                LargestLogSize = genericController.encodeInteger(logFile.Size);
                             }
-                            if (logFile.Length > monitorConfig.LogFileSizeMax) {
+                            if (logFile.Size > monitorConfig.LogFileSizeMax) {
                                 Array.Resize(ref errors, ErrorCount + 1);
                                 errors[ErrorCount] = "ERROR - A log file exceeds the limit of " + monitorConfig.LogFileSizeMax + " bytes.";
                                 Content = Content + StatusLine(1, errors[ErrorCount]);

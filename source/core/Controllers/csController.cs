@@ -24,7 +24,7 @@ namespace Contensive.Core {
         /// <param name="core"></param>
         public csController(coreController core) {
             this.core = core;
-            openingMemberID = core.sessionContext.user.id;
+            openingMemberID = core.session.user.id;
         }
         //
         //====================================================================================================
@@ -232,7 +232,7 @@ namespace Contensive.Core {
                 ContentName = Models.Complex.cdefModel.getContentNameByID(core, core.db.csGetInteger(CSPointer, "contentcontrolId"));
             }
             string source = core.db.csGet(CSPointer, FieldName);
-            return activeContentController.renderHtmlForWeb(core, source, ContentName, RecordID, core.sessionContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
+            return activeContentController.renderHtmlForWeb(core, source, ContentName, RecordID, core.session.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
         }
         //
         //========================================================================

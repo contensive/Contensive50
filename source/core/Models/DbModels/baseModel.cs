@@ -237,7 +237,7 @@ namespace Contensive.Core.Models.DbModels {
                 } else {
                     Type instanceType = typeof(T);
                     string contentName = derivedContentName(instanceType);
-                    result = create<T>(core, core.db.insertContentRecordGetID(contentName, core.sessionContext.user.id), ref callersCacheNameList);
+                    result = create<T>(core, core.db.insertContentRecordGetID(contentName, core.session.user.id), ref callersCacheNameList);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -673,7 +673,7 @@ namespace Contensive.Core.Models.DbModels {
                                                 //
                                                 // -- save content
                                                 if (string.IsNullOrEmpty(filename)) {
-                                                    filename = fileController.getVirtualRecordPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, fieldTypeId);
+                                                    filename = fileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, fieldTypeId);
                                                 }
                                                 core.cdnFiles.saveFile(filename, content);
                                                 cs.setFieldFilename(instanceProperty.Name, filename);

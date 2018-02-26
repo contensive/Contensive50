@@ -44,9 +44,9 @@ namespace Contensive.Core.Addons.AdminSite {
                 // -- log request
                 string SaveContent = "Admin Site Request:"
                         + "\r\n" + DateTime.Now
-                        + "\r\nmember.name:" + core.sessionContext.user.name
-                        + "\r\nmember.id:" + core.sessionContext.user.id
-                        + "\r\nvisit.id:" + core.sessionContext.visit.id
+                        + "\r\nmember.name:" + core.session.user.name
+                        + "\r\nmember.id:" + core.session.user.id
+                        + "\r\nvisit.id:" + core.session.visit.id
                         + "\r\nurl:" + core.webServer.requestUrl
                         + "\r\nurl source:" + core.webServer.requestUrlSource + "\r\n----------"
                         + "\r\nform post:";
@@ -64,9 +64,9 @@ namespace Contensive.Core.Addons.AdminSite {
                             + "\r\nbinary header:"
                             + "\r\n" + BinaryHeaderString + "\r\n";
                 }
-                logController.addSiteActivity(core, SaveContent, core.sessionContext.user.id, core.sessionContext.user.OrganizationID);
+                logController.addSiteActivity(core, SaveContent, core.session.user.id, core.session.user.OrganizationID);
                 //
-                if (!core.sessionContext.isAuthenticated) {
+                if (!core.session.isAuthenticated) {
                     //
                     // --- must be authenticated to continue. Force a local login
                     //
@@ -74,7 +74,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         errorCaption = "Login Page",
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                     });
-                } else if (!core.sessionContext.isAuthenticatedContentManager(core)) {
+                } else if (!core.session.isAuthenticatedContentManager(core)) {
                     //
                     // --- member must have proper access to continue
                     //
@@ -912,7 +912,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Cancel just exits with no content
                     //
                     return "";
-                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //
@@ -983,7 +983,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Cancel just exits with no content
                     //
                     return tempGetForm_MetaKeywordTool;
-                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //
@@ -1454,7 +1454,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 // Where Clause: edited by me
                 //
                 if (IndexConfig.LastEditedByMe) {
-                    return_SQLWhere += "AND(" + adminContent.contentTableName + ".ModifiedBy=" + core.sessionContext.user.id + ")";
+                    return_SQLWhere += "AND(" + adminContent.contentTableName + ".ModifiedBy=" + core.session.user.id + ")";
                 }
                 //
                 // Where Clause: edited today
@@ -2353,7 +2353,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // No Fields
                     //
                     Stream.Add(GetForm_Error("This content [" + adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminContent.name + "] has no field records."));
-                } else if (adminContent.developerOnly & (!core.sessionContext.isAuthenticatedDeveloper(core))) {
+                } else if (adminContent.developerOnly & (!core.session.isAuthenticatedDeveloper(core))) {
                     //
                     // Developer Content and not developer
                     //
@@ -2364,7 +2364,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // get access rights
                     //
-                    core.sessionContext.getContentAccessRights(core, adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
+                    core.session.getContentAccessRights(core, adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
                     //
                     // detemine which subform to disaply
                     //
@@ -2513,7 +2513,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             }
                             SubTitlePart = "";
                             if (IndexConfig.LastEditedByMe) {
-                                SubTitlePart = SubTitlePart + " by " + core.sessionContext.user.name;
+                                SubTitlePart = SubTitlePart + " by " + core.session.user.name;
                             }
                             if (IndexConfig.LastEditedPast30Days) {
                                 SubTitlePart = SubTitlePart + " in the past 30 days";
@@ -3461,7 +3461,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 // determine user rights to this content
                 //
                 UserAllowContentEdit = true;
-                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.session.isAuthenticatedAdmin(core)) {
                     if (adminContent.id > 0) {
                         UserAllowContentEdit = userHasContentAccess(adminContent.id);
                     }
@@ -3544,14 +3544,14 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 AdminMenuModeID = core.docProperties.getInteger("mm");
                 if (AdminMenuModeID == 0) {
-                    AdminMenuModeID = core.sessionContext.user.AdminMenuModeID;
+                    AdminMenuModeID = core.session.user.AdminMenuModeID;
                 }
                 if (AdminMenuModeID == 0) {
                     AdminMenuModeID = AdminMenuModeLeft;
                 }
-                if (core.sessionContext.user.AdminMenuModeID != AdminMenuModeID) {
-                    core.sessionContext.user.AdminMenuModeID = AdminMenuModeID;
-                    core.sessionContext.user.save(core);
+                if (core.session.user.AdminMenuModeID != AdminMenuModeID) {
+                    core.session.user.AdminMenuModeID = AdminMenuModeID;
+                    core.session.user.save(core);
                 }
                 //    '
                 //    ' ----- FieldName
@@ -4300,7 +4300,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // ----- Set Read Only: if non-developer tries to edit a developer record
                     //
                     if (genericController.vbUCase(adminContent.contentTableName) == genericController.vbUCase("ccMembers")) {
-                        if (!core.sessionContext.isAuthenticatedDeveloper(core)) {
+                        if (!core.session.isAuthenticatedDeveloper(core)) {
                             if (editRecord.fieldsLc.ContainsKey("developer")) {
                                 if (genericController.encodeBoolean(editRecord.fieldsLc["developer"].value)) {
                                     editRecord.Read_Only = true;
@@ -4442,12 +4442,12 @@ namespace Contensive.Core.Addons.AdminSite {
                         //    .readonlyfield = True
                         //    .Required = False
                         case "MODIFIEDBY":
-                            editrecord.fieldsLc[field.nameLc].value = core.sessionContext.user.id;
+                            editrecord.fieldsLc[field.nameLc].value = core.session.user.id;
                             //    .readonlyfield = True
                             //    .Required = False
                             break;
                         case "CREATEDBY":
-                            editrecord.fieldsLc[field.nameLc].value = core.sessionContext.user.id;
+                            editrecord.fieldsLc[field.nameLc].value = core.session.user.id;
                             //    .readonlyfield = True
                             //    .Required = False
                             //Case "DATEADDED"
@@ -4974,12 +4974,12 @@ namespace Contensive.Core.Addons.AdminSite {
                                 // (many to many is handled during save)
                                 //
                                 ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.adminOnly) & (!core.sessionContext.isAuthenticatedAdmin(core))) {
+                            } else if ((field.adminOnly) & (!core.session.isAuthenticatedAdmin(core))) {
                                 //
                                 // non-admin and admin only field, leave current value
                                 //
                                 ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.developerOnly) & (!core.sessionContext.isAuthenticatedDeveloper(core))) {
+                            } else if ((field.developerOnly) & (!core.session.isAuthenticatedDeveloper(core))) {
                                 //
                                 // non-developer and developer only field, leave current value
                                 //
@@ -5468,7 +5468,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // -- If There is an error, block the save
                     AdminAction = AdminActionNop;
-                } else if (!core.sessionContext.isAuthenticatedContentManager(core, adminContent.name)) {
+                } else if (!core.session.isAuthenticatedContentManager(core, adminContent.name)) {
                     //
                     // -- must be content manager
                 } else if (editRecord.Read_Only) {
@@ -5860,7 +5860,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 ContentName = cdefModel.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(ContentName)) {
-                    returnHas = core.sessionContext.isAuthenticatedContentManager(core, ContentName);
+                    returnHas = core.session.isAuthenticatedContentManager(core, ContentName);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -6405,7 +6405,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // ----- determine access details
                 //
-                core.sessionContext.getContentAccessRights(core, adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
+                core.session.getContentAccessRights(core, adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
                 AllowAdd = adminContent.allowAdd && allowCMAdd;
                 AllowDelete = adminContent.allowDelete & allowCMDelete & (editRecord.id != 0);
                 allowSave = allowCMEdit;
@@ -6498,7 +6498,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //				Select Case genericController.vbUCase(adminContent.ContentTableName)
                                 //ORIGINAL LINE: Case genericController.vbUCase("ccMembers")
                 if (genericController.vbUCase(adminContent.contentTableName) == genericController.vbUCase("ccMembers")) {
-                    if (!(core.sessionContext.isAuthenticatedAdmin(core))) {
+                    if (!(core.session.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
                         //
@@ -6535,7 +6535,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             LastSendTestDate = genericController.encodeDate(editRecord.fieldsLc["lastsendtestdate"].value);
                         }
                     }
-                    if (!(core.sessionContext.isAuthenticatedAdmin(core))) {
+                    if (!(core.session.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
                         //
@@ -6547,7 +6547,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         EmailSubmitted = false;
                         if (editRecord.id != 0) {
                             if (editRecord.fieldsLc.ContainsKey("testmemberid")) {
-                                editRecord.fieldsLc["testmemberid"].value = core.sessionContext.user.id;
+                                editRecord.fieldsLc["testmemberid"].value = core.session.user.id;
                             }
                         }
                         EditSectionButtonBar = "";
@@ -6556,7 +6556,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         } else {
                             EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCancel, "Return processSubmit(this)");
                         }
-                        if ((AllowDelete) && (core.sessionContext.isAuthenticatedDeveloper(core))) {
+                        if ((AllowDelete) && (core.session.isAuthenticatedDeveloper(core))) {
                             EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonDeleteEmail,"If(!DeleteCheck())Return False;");
                         }
                         if ((!EmailSubmitted) && (!EmailSent)) {
@@ -6571,8 +6571,8 @@ namespace Contensive.Core.Addons.AdminSite {
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only & (!core.sessionContext.isAuthenticatedDeveloper(core))), allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only & (!core.sessionContext.isAuthenticatedDeveloper(core))), allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only & (!core.session.isAuthenticatedDeveloper(core))), allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only & (!core.session.isAuthenticatedDeveloper(core))), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                         if (allowAdminTabs) {
@@ -6587,7 +6587,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         EmailSubmitted = false;
                         if (editRecord.id != 0) {
                             if (editRecord.fieldsLc.ContainsKey("testmemberid")) {
-                                editRecord.fieldsLc["testmemberid"].value = core.sessionContext.user.id;
+                                editRecord.fieldsLc["testmemberid"].value = core.session.user.id;
                             }
                             if (editRecord.fieldsLc.ContainsKey("submitted")) {
                                 EmailSubmitted = genericController.encodeBoolean(editRecord.fieldsLc["submitted"].value);
@@ -6641,7 +6641,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         EmailSent = false;
                         if (editRecord.id != 0) {
                             if (editRecord.fieldsLc.ContainsKey("testmemberid")) {
-                                editRecord.fieldsLc["testmemberid"].value = core.sessionContext.user.id;
+                                editRecord.fieldsLc["testmemberid"].value = core.session.user.id;
                             }
                             if (editRecord.fieldsLc.ContainsKey("submitted")) {
                                 EmailSubmitted = genericController.encodeBoolean(editRecord.fieldsLc["submitted"].value);
@@ -6688,7 +6688,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 }
                 //ORIGINAL LINE: Case "CCCONTENT"
                 else if (genericController.vbUCase(adminContent.contentTableName) == "CCCONTENT") {
-                    if (!(core.sessionContext.isAuthenticatedAdmin(core))) {
+                    if (!(core.session.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
                         //
@@ -6932,7 +6932,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     return core.webServer.redirect("/" + core.appConfig.adminRoute, "Admin Publish, Cancel Button Pressed");
-                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     //
                     //
@@ -7581,7 +7581,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         } else {
                                             string filename = "";
                                             string path = "";
-                                            core.cdnFiles.splitPathFilename(FieldValueText, ref path, ref filename);
+                                            core.cdnFiles.splitDosPathFilename(FieldValueText, ref path, ref filename);
                                             EditorString += ("&nbsp;<a href=\"http://" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
                                         }
                                         EditorString += WhyReadOnlyMsg;
@@ -7851,7 +7851,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             EncodedLink = genericController.encodeHTML(NonEncodedLink);
                                             string filename = "";
                                             string path = "";
-                                            core.cdnFiles.splitPathFilename(FieldValueText, ref path, ref filename);
+                                            core.cdnFiles.splitDosPathFilename(FieldValueText, ref path, ref filename);
                                             EditorString += ("&nbsp;<a href=\"http://" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
                                             EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(FormFieldLCaseName + ".DeleteFlag", false));
                                             EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FormFieldLCaseName, "", "file"));
@@ -8246,7 +8246,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         // field help
                         //------------------------------------------------------------------------------------------------------------
                         //
-                        if (core.sessionContext.isAuthenticatedAdmin(core)) {
+                        if (core.session.isAuthenticatedAdmin(core)) {
                             //
                             // Admin view
                             //
@@ -8604,7 +8604,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     Copy = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docore.main_";
                     Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("LandingPageID", 0))));
-                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (core.session.isAuthenticatedAdmin(core)) {
                         HTMLFieldString = core.html.inputCheckbox("LandingPageID", Checked);
                     } else {
                         HTMLFieldString = "<b>" + genericController.GetYesNo(Checked) + "</b>" + core.html.inputHidden("LandingPageID", Checked);
@@ -8616,7 +8616,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     Copy = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked.";
                     Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("PageNotFoundPageID", 0))));
-                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (core.session.isAuthenticatedAdmin(core)) {
                         HTMLFieldString = core.html.inputCheckbox("PageNotFound", Checked);
                     } else {
                         HTMLFieldString = "<b>" + genericController.GetYesNo(Checked) + "</b>" + core.html.inputHidden("PageNotFound", Checked);
@@ -8695,7 +8695,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // field is read-only except for developers
                         //
-                        if (core.sessionContext.isAuthenticatedDeveloper(core)) {
+                        if (core.session.isAuthenticatedDeveloper(core)) {
                             HTMLFieldString = core.html.inputText("ccguid", HTMLFieldString, -1, -1, "", false, false) + "";
                         } else {
                             HTMLFieldString = core.html.inputText("ccguid", HTMLFieldString, -1, -1, "", false, true) + core.html.inputHidden("ccguid", HTMLFieldString);
@@ -8748,7 +8748,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     //
-                    if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (!core.session.isAuthenticatedAdmin(core)) {
                         HTMLFieldString = HTMLFieldString + core.html.inputHidden("ContentControlID", FieldValueInteger);
                     } else {
                         RecordContentName = editRecord.contentControlId_Name;
@@ -8787,7 +8787,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             }
 
                         }
-                        if (core.sessionContext.isAuthenticatedAdmin(core) && (LimitContentSelectToThisID == 0)) {
+                        if (core.session.isAuthenticatedAdmin(core) && (LimitContentSelectToThisID == 0)) {
                             //
                             // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                             //
@@ -8804,7 +8804,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             while (core.db.csOk(CSPointer)) {
                                 ChildCID = core.db.csGetInteger(CSPointer, "ID");
                                 if (cdefModel.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
-                                    if ((core.sessionContext.isAuthenticatedAdmin(core)) | (core.sessionContext.isAuthenticatedContentManager(core, cdefModel.getContentNameByID(core, ChildCID)))) {
+                                    if ((core.session.isAuthenticatedAdmin(core)) | (core.session.isAuthenticatedContentManager(core, cdefModel.getContentNameByID(core, ChildCID)))) {
                                         CIDList = CIDList + "," + ChildCID;
                                     }
                                 }
@@ -9083,7 +9083,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 // This is really messy -- there must be a better way
                 //
                 addonId = 0;
-                if (core.sessionContext.visit.id == core.docProperties.getInteger(RequestNameDashboardReset)) {
+                if (core.session.visit.id == core.docProperties.getInteger(RequestNameDashboardReset)) {
                     //$$$$$ cache this
                     CS = core.db.csOpen(cnAddons, "ccguid=" + core.db.encodeSQLText(addonGuidDashboard));
                     if (core.db.csOk(CS)) {
@@ -9160,9 +9160,9 @@ namespace Contensive.Core.Addons.AdminSite {
                     + "\r\n<div><a href=http://www.Contensive.com target=_blank><img style=\"border:1px solid #000;\" src=\"/ccLib/images/ContensiveAdminLogo.GIF\" border=0 ></A></div>"
                     + "\r\n<div><strong>Contensive/" + core.codeVersion() + "</strong></div>"
                     + "\r\n<div style=\"clear:both;height:18px;margin-top:10px\"><div style=\"float:left;width:200px;\">Domain Name</div><div style=\"float:left;\">" + core.webServer.requestDomain + "</div></div>"
-                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Login Member Name</div><div style=\"float:left;\">" + core.sessionContext.user.name + "</div></div>"
+                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Login Member Name</div><div style=\"float:left;\">" + core.session.user.name + "</div></div>"
                     + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Quick Reports</div><div style=\"float:left;\"><a Href=\"?" + RequestNameAdminForm + "=" + AdminFormQuickStats + "\">Real-Time Activity</A></div></div>"
-                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?" + RequestNameDashboardReset + "=" + core.sessionContext.visit.id + "\">Run Dashboard</A></div></div>"
+                    + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?" + RequestNameDashboardReset + "=" + core.session.visit.id + "\">Run Dashboard</A></div></div>"
                     + "\r\n<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\"><a Href=\"?addonguid=" + addonGuidAddonManager + "\">Add-on Manager</A></div></div>";
                     //
                     if (core.doc.debug_iUserError != "") {
@@ -9717,7 +9717,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     f.Add(adminUIController.EditTableOpen);
                     GroupCount = 0;
-                    CanSeeHiddenGroups = core.sessionContext.isAuthenticatedDeveloper(core);
+                    CanSeeHiddenGroups = core.session.isAuthenticatedDeveloper(core);
                     while (core.db.csOk(CS)) {
                         GroupName = core.db.csGet(CS, "GroupName");
                         if ((GroupName.Left(1) != "_") || CanSeeHiddenGroups) {
@@ -10095,7 +10095,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 stringBuilderLegacyController FastString = null;
                 //adminUIController Adminui = new adminUIController(core);
                 //
-                if (core.sessionContext.isAuthenticatedAdmin(core)) {
+                if (core.session.isAuthenticatedAdmin(core)) {
                     //
                     // ----- Open the panel
                     //
@@ -10417,11 +10417,11 @@ namespace Contensive.Core.Addons.AdminSite {
                     Criteria = Criteria + "AND" + cdefModel.getContentControlCriteria(core, MenuContentName);
                 }
                 iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "");
-                if (core.sessionContext.isAuthenticatedDeveloper(core)) {
+                if (core.session.isAuthenticatedDeveloper(core)) {
                     //
                     // ----- Developer
                     //
-                } else if (core.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (core.session.isAuthenticatedAdmin(core)) {
                     //
                     // ----- Administrator
                     //
@@ -10851,8 +10851,8 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 // field has some kind of restriction
                                 //
-                                if (!core.sessionContext.user.Developer) {
-                                    if (!core.sessionContext.user.Admin) {
+                                if (!core.session.user.Developer) {
+                                    if (!core.session.user.Admin) {
                                         //
                                         // you are not admin
                                         //
@@ -11305,7 +11305,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     return core.webServer.redirect("/" + core.appConfig.adminRoute, "Downloads, Cancel Button Pressed");
                 }
                 //
-                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     // Must be a developer
                     //
@@ -11796,7 +11796,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 ButtonListRight = "";
                 SQLFieldName = "SQLQuery";
                 //
-                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     // Must be a developer
                     //
@@ -12116,7 +12116,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // ----- Get the baked version
                     //
-                    BakeName = "AdminMenu" + core.sessionContext.user.id.ToString("00000000");
+                    BakeName = "AdminMenu" + core.session.user.id.ToString("00000000");
                     tempGetMenuTopMode = genericController.encodeText(core.cache.getObject<string>(BakeName));
                     MenuDelimiterPosition = genericController.vbInstr(1, tempGetMenuTopMode, MenuDelimiter, 1);
                     if (MenuDelimiterPosition > 1) {
@@ -12133,7 +12133,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // There are menu items to bake
                             //
-                            IsAdminLocal = core.sessionContext.isAuthenticatedAdmin(core);
+                            IsAdminLocal = core.session.isAuthenticatedAdmin(core);
                             if (!IsAdminLocal) {
                                 //
                                 // content managers, need the ContentManagementList
@@ -12374,7 +12374,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     return core.webServer.redirect("/" + core.appConfig.adminRoute, "GetContentChildTool, Cancel Button Pressed");
-                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     //
                     //
@@ -12412,7 +12412,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             Description = Description + "<div>&nbsp;</div>"
                                 + "<div>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]</div>";
-                            cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.sessionContext.user.id);
+                            cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
                             ChildContentID = cdefModel.getContentId(core, ChildContentName);
                             //
                             // Create Group and Rule
@@ -12662,7 +12662,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     return core.webServer.redirect("/" + core.appConfig.adminRoute, "HouseKeepingControl, Cancel Button Pressed");
-                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     //
                     //
@@ -12994,7 +12994,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // get content access rights
                     //
-                    core.sessionContext.getContentAccessRights(core, adminContent.name, ref allowContentEdit, ref allowContentAdd, ref allowContentDelete);
+                    core.session.getContentAccessRights(core, adminContent.name, ref allowContentEdit, ref allowContentAdd, ref allowContentDelete);
                     if (!allowContentEdit) {
                         //If Not core.doc.authContext.user.main_IsContentManager2(AdminContent.Name) Then
                         //
@@ -13024,7 +13024,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             }
                         }
                         if (string.IsNullOrEmpty(ExportName)) {
-                            ExportName = adminContent.name + " export for " + core.sessionContext.user.name;
+                            ExportName = adminContent.name + " export for " + core.session.user.name;
                         }
                         //
                         // Get the SQL parts
@@ -13141,7 +13141,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     + cr2 + "<td class=\"exportTblCaption\">Record Limit</td>"
                                     + cr2 + "<td class=\"exportTblInput\">" + core.html.inputText("RecordLimit", RecordLimitText) + "</td>"
                                     + "\r</tr>";
-                                if (core.sessionContext.isAuthenticatedDeveloper(core)) {
+                                if (core.session.isAuthenticatedDeveloper(core)) {
                                     Content = Content + "\r<tr>"
                                         + cr2 + "<td class=\"exportTblCaption\">Results SQL</td>"
                                         + cr2 + "<td class=\"exportTblInput\"><div style=\"border:1px dashed #ccc;background-color:#fff;padding:10px;\">" + SQL + "</div></td>"
@@ -13161,7 +13161,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     + "\r</style>"
                                     + Content + core.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 ButtonList = ButtonCancel + "," + ButtonRequestDownload;
-                                if (core.sessionContext.isAuthenticatedDeveloper(core)) {
+                                if (core.session.isAuthenticatedDeveloper(core)) {
                                     ButtonList = ButtonList + "," + ButtonRefresh;
                                 }
                             }
@@ -13833,7 +13833,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // From here down will return a form
                     //
-                    if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                    if (!core.session.isAuthenticatedAdmin(core)) {
                         //
                         // Does not have permission
                         //
@@ -13988,7 +13988,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Cancel just exits with no content
                     //
                     return tempGetForm_BuildCollection;
-                } else if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                } else if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     // Not Admin Error
                     //

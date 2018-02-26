@@ -726,7 +726,7 @@ namespace Contensive.Core.Models.Complex {
                 + " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)"
                 + " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)"
                 + " WHERE"
-                    + " (ccMemberRules.MemberID=" + core.sessionContext.user.id + ")"
+                    + " (ccMemberRules.MemberID=" + core.session.user.id + ")"
                     + " AND(ccGroupRules.Active<>0)"
                     + " AND(ccContent.Active<>0)"
                     + " AND(ccMemberRules.Active<>0)";

@@ -280,6 +280,9 @@
     <None Include="aspnetAppPatternDataSet.xss">
       <DependentUpon>aspnetAppPatternDataSet.xsd</DependentUpon>
     </None>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">

@@ -417,7 +417,6 @@ namespace Contensive.Core {
                 return Addon;
             }
         }
-        private CPAddonClass _myAddonObj;
         //
         //====================================================================================================
         //
@@ -579,9 +578,9 @@ namespace Contensive.Core {
                     if (_htmlObj != null) {
                         _htmlObj.Dispose();
                     }
-                    if (_myAddonObj != null) {
-                        _myAddonObj.Dispose();
-                    }
+                    //if (_myAddonObj != null) {
+                    //    _myAddonObj.Dispose();
+                    //}
                     if (_requestObj != null) {
                         _requestObj.Dispose();
                     }

@@ -1892,7 +1892,8 @@ namespace Contensive.Core.Controllers {
             public List<String> pathSegments = new List<String>(); 
             public string filename = "";
             public string queryString = "";
-            public string path() { return String.Join("/", pathSegments); }
+            public string unixPath() { return String.Join("/", pathSegments); }
+            public string dosPath() { return String.Join("\\", pathSegments); }
         }
         //
         // ====================================================================================================
@@ -1918,10 +1919,9 @@ namespace Contensive.Core.Controllers {
             //
             // -- Divide the URL into URLHost, URLPath, and URLPage
             string WorkingURL = convertToUnixSlash( SourceURL);
-            int Position = 0;
             //
             // -- Get Protocol (before the first :)
-            Position = vbInstr(1, WorkingURL, ":");
+            int Position = vbInstr(1, WorkingURL, ":");
             if (Position != 0) {
                 Protocol = WorkingURL.Left( Position + 2);
                 WorkingURL = WorkingURL.Substring(Position + 2);
@@ -4339,16 +4339,35 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        //
-        public static string getPath(string PathFilename) {
-            string result = PathFilename;
-            if (!string.IsNullOrEmpty(result)) {
-                int slashpos = PathFilename.Replace("/", "\\").LastIndexOf("\\");
-                if ((slashpos >= 0) && (slashpos < PathFilename.Length)) {
-                    result = PathFilename.Left( slashpos + 1);
+        /// <summary>
+        /// return the path of a pathFilename.
+        /// myfilename.txt returns empty
+        /// mypath\ returns mypath\
+        /// mypath\myfilename returns mypath
+        /// mypath\more\myfilename returns mypath\more\
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public static string getPath(string pathFilename) {
+            string result = pathFilename;
+            if (string.IsNullOrEmpty(result)) {
+                return "";
+            } else {
+                int slashpos = convertToDosSlash(pathFilename).LastIndexOf("\\");
+                if (slashpos<0) {
+                    //
+                    // -- pathFilename is all filename
+                    return "";
+                } if (slashpos == pathFilename.Length) {
+                    //
+                    // -- pathfilename is all path
+                    return pathFilename;
+                } else { 
+                    //
+                    // -- divide path and filename and return just path
+                    return pathFilename.Left( slashpos + 1);
                 }
             }
-            return result;
         }
         //
         //========================================================================

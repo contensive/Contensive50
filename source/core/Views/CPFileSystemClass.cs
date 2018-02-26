@@ -17,6 +17,7 @@ using static Contensive.Core.constants;
 using Contensive.BaseClasses;
 using System.Runtime.InteropServices;
 using System.IO;
+using static Contensive.Core.Controllers.fileController;
 //
 namespace Contensive.Core {
     public class CPFileSystemClass : BaseClasses.CPFileSystemBaseClass, IDisposable {
@@ -113,12 +114,12 @@ namespace Contensive.Core {
         }
         //
         //==========================================================================================
-        public override FileInfo[] fileList(string folderName, int pageSize = 0, int pageNumber = 1) {
+        public override List<FileDetail> fileList(string folderName, int pageSize = 0, int pageNumber = 1) {
             return fileSystem.getFileList(folderName);
         }
         //
         //==========================================================================================
-        public override DirectoryInfo[] folderList(string folderName) {
+        public override List<FolderDetail> folderList(string folderName) {
             return fileSystem.getFolderList(folderName);
         }
         //

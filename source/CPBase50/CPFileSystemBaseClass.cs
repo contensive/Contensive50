@@ -18,8 +18,44 @@ namespace Contensive.BaseClasses
 {
 	public abstract class CPFileSystemBaseClass
 	{
-		//
-		public abstract void append(string Filename, string FileContent);
+        /// <summary>
+        /// argument details for file and folder methods
+        /// </summary>
+        public class FileDetail {
+            public string Name;
+            public int Attributes;
+            public DateTime DateCreated;
+            public DateTime DateLastAccessed;
+            public DateTime DateLastModified;
+            public long Size;
+            public string Type;
+            public string Extension {
+                get {
+                    if (string.IsNullOrEmpty(_extension)) {
+                        if (!string.IsNullOrEmpty(Name)) {
+                            int pos = Name.LastIndexOf(".");
+                            if ((pos >= 0) & (pos < Name.Length)) {
+                                _extension = Name.Substring(pos);
+                            }
+                        }
+                    }
+                    return _extension;
+                }
+            } string _extension = "";
+        }
+        /// <summary>
+        /// argument details for file and folder methods
+        /// </summary>
+        public class FolderDetail {
+            public string Name;
+            public int Attributes;
+            public DateTime DateCreated;
+            public DateTime DateLastAccessed;
+            public DateTime DateLastModified;
+            public string Type;
+        }
+        //
+        public abstract void append(string Filename, string FileContent);
 		public abstract void copy(string SourceFilename, string DestinationFilename);
 		public abstract void createFolder(string FolderPath);
 		public abstract void deleteFile(string Filename);
@@ -28,8 +64,8 @@ namespace Contensive.BaseClasses
 		public abstract byte[] readBinary(string Filename);
 		public abstract void save(string Filename, string FileContent);
 		public abstract void saveBinary(string Filename, byte[] FileContent);
-		public abstract System.IO.FileInfo[] fileList(string folderName, int pageSize = 0, int pageNumber = 1);
-		public abstract System.IO.DirectoryInfo[] folderList(string folderName);
+		public abstract List<FileDetail> fileList(string folderName, int pageSize = 0, int pageNumber = 1);
+		public abstract List<FolderDetail> folderList(string folderName);
 		public abstract bool fileExists(string pathFileName);
 		public abstract bool folderExists(string folderName);
 		public abstract bool saveUpload(string htmlformName, ref string returnFilename);

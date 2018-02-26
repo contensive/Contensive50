@@ -766,7 +766,6 @@ namespace Contensive.Core.Controllers {
             try {
                 const string rnRedirectCycleFlag = "cycleFlag";
                 string EncodedLink = null;
-                string Copy = null;
                 string ShortLink = "";
                 string FullLink = null;
                 int redirectCycles = 0;

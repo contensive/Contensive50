@@ -299,7 +299,7 @@ namespace Contensive.Core {
         public override string GetFilename(string PathFilename) {
             string filename = "";
             string path = "";
-            CP.core.privateFiles.splitPathFilename(PathFilename, ref path, ref filename);
+            CP.core.privateFiles.splitDosPathFilename(PathFilename, ref path, ref filename);
             return filename;
         }
         //

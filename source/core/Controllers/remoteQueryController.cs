@@ -44,7 +44,7 @@ namespace Contensive.Core.Controllers {
                 core.db.csSet(CS, "maxRows", maxRows);
                 core.db.csSet(CS, "dateexpires", core.db.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
                 core.db.csSet(CS, "QueryTypeID", QueryTypeSQL);
-                core.db.csSet(CS, "VisitId", core.sessionContext.visit.id);
+                core.db.csSet(CS, "VisitId", core.session.visit.id);
             }
             core.db.csClose(ref CS);
             //

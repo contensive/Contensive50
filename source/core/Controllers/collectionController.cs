@@ -14,6 +14,7 @@ using System.Data;
 using System.Threading;
 using Contensive.Core.Models.Complex;
 using System.Linq;
+using static Contensive.BaseClasses.CPFileSystemBaseClass;
 
 namespace Contensive.Core.Controllers {
     // todo: rework how adds are installed, this change can be done after weave launch
@@ -1409,8 +1410,8 @@ namespace Contensive.Core.Controllers {
             try {
                 if (core.privateFiles.pathExists(sourcePrivateFolderPath)) {
                     logController.logInfo(core, "BuildLocalCollectionFolder, processing files in private folder [" + sourcePrivateFolderPath + "]");
-                    FileInfo[] SrcFileNamelist = core.privateFiles.getFileList(sourcePrivateFolderPath);
-                    foreach (FileInfo file in SrcFileNamelist) {
+                    List<CPFileSystemClass.FileDetail> SrcFileNamelist = core.privateFiles.getFileList(sourcePrivateFolderPath);
+                    foreach (CPFileSystemClass.FileDetail file in SrcFileNamelist) {
                         if ((file.Extension == ".zip") || (file.Extension == ".xml")) {
                             string collectionGuid = "";
                             success = buildLocalCollectionRepoFromFile(core, sourcePrivateFolderPath + file.Name, CollectionLastChangeDate, ref collectionGuid, ref return_ErrorMessage, allowLogging);
@@ -1441,7 +1442,6 @@ namespace Contensive.Core.Controllers {
                 string Collectionname = "";
                 DateTime NowTime = default(DateTime);
                 int NowPart = 0;
-                FileInfo[] SrcFileNamelist = null;
                 string TimeStamp = null;
                 int Pos = 0;
                 string CollectionFolder = null;
@@ -1464,7 +1464,7 @@ namespace Contensive.Core.Controllers {
                     logController.logError(core, "BuildLocalCollectionFolder(), Enter");
                 }
                 //
-                core.privateFiles.splitPathFilename(collectionPathFilename, ref collectionPath, ref collectionFilename);
+                core.privateFiles.splitDosPathFilename(collectionPathFilename, ref collectionPath, ref collectionFilename);
                 if (!core.privateFiles.pathExists(collectionPath)) {
                     //
                     // The working folder is not there
@@ -1489,12 +1489,12 @@ namespace Contensive.Core.Controllers {
                     //
                     // install the individual files
                     //
-                    SrcFileNamelist = core.privateFiles.getFileList(tmpInstallPath);
+                    List<FileDetail> SrcFileNamelist = core.privateFiles.getFileList(tmpInstallPath);
                     if (true) {
                         //
                         // Process all non-zip files
                         //
-                        foreach (FileInfo file in SrcFileNamelist) {
+                        foreach (FileDetail file in SrcFileNamelist) {
                             Filename = file.Name;
                             logController.logInfo(core, "BuildLocalCollectionFolder, processing files, filename=[" + Filename + "]");
                             if (genericController.vbLCase(Filename.Substring(Filename.Length - 4)) == ".xml") {
@@ -1575,13 +1575,14 @@ namespace Contensive.Core.Controllers {
                                                 CollectionFolderName = Collectionname + "_" + CollectionFolderName;
                                             }
                                             CollectionFolder = core.addon.getPrivateFilesAddonPath() + CollectionFolderName + "\\";
-                                            if (!core.privateFiles.pathExists(CollectionFolder)) {
-                                                //
-                                                // Create collection folder
-                                                //
-                                                //hint = hint & ",470"
-                                                core.privateFiles.createPath(CollectionFolder);
-                                            }
+                                            core.privateFiles.verifyPath(CollectionFolder);
+                                            //if (!core.privateFiles.pathExists(CollectionFolder)) {
+                                            //    //
+                                            //    // Create collection folder
+                                            //    //
+                                            //    //hint = hint & ",470"
+                                            //    core.privateFiles.createPath(CollectionFolder);
+                                            //}
                                             //
                                             // create a collection 'version' folder for these new files
                                             //
@@ -1837,15 +1838,15 @@ namespace Contensive.Core.Controllers {
                     // Search Local Collection Folder for collection config file (xml file)
                     //
                     string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName + "\\";
-                    FileInfo[] srcFileInfoArray = core.privateFiles.getFileList(CollectionVersionFolder);
-                    if (srcFileInfoArray.Length == 0) {
+                    List<FileDetail> srcFileInfoArray = core.privateFiles.getFileList(CollectionVersionFolder);
+                    if (srcFileInfoArray.Count == 0) {
                         result = false;
                         return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>";
                     } else {
                         //
                         // collect list of DLL files and add them to the exec files if they were missed
                         List<string> assembliesInZip = new List<string>();
-                        foreach (FileInfo file in srcFileInfoArray) {
+                        foreach (FileDetail file in srcFileInfoArray) {
                             if (file.Extension.ToLower() == "dll") {
                                 if (!assembliesInZip.Contains(file.Name.ToLower())) {
                                     assembliesInZip.Add(file.Name.ToLower());
@@ -1856,7 +1857,7 @@ namespace Contensive.Core.Controllers {
                         // -- Process the other files
                         //todo  NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
                         bool CollectionblockNavigatorNode_fileValueOK = false;
-                        foreach (FileInfo file in srcFileInfoArray) {
+                        foreach (FileDetail file in srcFileInfoArray) {
                             if (genericController.vbLCase(file.Name.Substring(file.Name.Length - 4)) == ".xml") {
                                 //
                                 // -- XML file -- open it to figure out if it is one we can use
@@ -2992,8 +2993,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         private static void copyInstallPathToDstPath(coreController core, string SrcPath, string DstPath, string BlockFileList, string BlockFolderList) {
             try {
-                FileInfo[] FileInfoArray = null;
-                DirectoryInfo[] FolderInfoArray = null;
+                
                 string SrcFolder = null;
                 string DstFolder = null;
                 //
@@ -3008,8 +3008,8 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 if (core.privateFiles.pathExists(SrcFolder)) {
-                    FileInfoArray = core.privateFiles.getFileList(SrcFolder);
-                    foreach (FileInfo file in FileInfoArray) {
+                    List< FileDetail> FileInfoArray = core.privateFiles.getFileList(SrcFolder);
+                    foreach (FileDetail file in FileInfoArray) {
                         if ((file.Extension == "dll") || (file.Extension == "exe") || (file.Extension == "zip")) {
                             //
                             // can not copy dll or exe
@@ -3030,8 +3030,8 @@ namespace Contensive.Core.Controllers {
                     //
                     // copy folders to dst
                     //
-                    FolderInfoArray = core.privateFiles.getFolderList(SrcFolder);
-                    foreach (DirectoryInfo folder in FolderInfoArray) {
+                    List<FolderDetail> FolderInfoArray = core.privateFiles.getFolderList(SrcFolder);
+                    foreach (FolderDetail folder in FolderInfoArray) {
                         if (("," + BlockFolderList + ",").IndexOf("," + folder.Name + ",", System.StringComparison.OrdinalIgnoreCase)  == -1) {
                             copyInstallPathToDstPath(core, SrcPath + folder.Name + "\\", DstPath + folder.Name + "\\", BlockFileList, "");
                         }
@@ -3048,8 +3048,6 @@ namespace Contensive.Core.Controllers {
         private static string GetCollectionFileList(coreController core, string SrcPath, string SubFolder, string ExcludeFileList) {
             string result = "";
             try {
-                FileInfo[] FileInfoArray = null;
-                DirectoryInfo[] FolderInfoArray = null;
                 string SrcFolder;
                 //
                 SrcFolder = SrcPath + SubFolder;
@@ -3058,8 +3056,8 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 if (core.privateFiles.pathExists(SrcFolder)) {
-                    FileInfoArray = core.privateFiles.getFileList(SrcFolder);
-                    foreach (FileInfo file in FileInfoArray) {
+                    List<FileDetail> FileInfoArray = core.privateFiles.getFileList(SrcFolder);
+                    foreach (FileDetail file in FileInfoArray) {
                         if (("," + ExcludeFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase)  != -1) {
                             //
                             // can not copy the current collection file
@@ -3080,8 +3078,8 @@ namespace Contensive.Core.Controllers {
                     //
                     // copy folders to dst
                     //
-                    FolderInfoArray = core.privateFiles.getFolderList(SrcFolder);
-                    foreach (DirectoryInfo folder in FolderInfoArray) {
+                    List<FolderDetail> FolderInfoArray = core.privateFiles.getFolderList(SrcFolder);
+                    foreach (FolderDetail folder in FolderInfoArray) {
                         result = result + GetCollectionFileList(core, SrcPath, SubFolder + folder.Name + "\\", ExcludeFileList);
                     }
                 }
@@ -4783,21 +4781,17 @@ namespace Contensive.Core.Controllers {
             string returnXml = "";
             try {
                 string LastChangeDate = "";
-                DirectoryInfo SubFolder = null;
-                DirectoryInfo[] SubFolderList = null;
                 string FolderName = null;
                 string collectionFilePathFilename = null;
                 string CollectionGuid = null;
                 string Collectionname = null;
-                int Pos = 0;
-                DirectoryInfo[] FolderList = null;
                 //
                 collectionFilePathFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
                 returnXml = core.privateFiles.readFileText(collectionFilePathFilename);
                 if (string.IsNullOrWhiteSpace(returnXml)) {
-                    FolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath());
-                    if (FolderList.Length > 0) {
-                        foreach (DirectoryInfo folder in FolderList) {
+                    List<FolderDetail> FolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath());
+                    if (FolderList.Count > 0) {
+                        foreach (FolderDetail folder in FolderList) {
                             FolderName = folder.Name;
                             if (FolderName.Length > 34) {
                                 if (genericController.vbLCase(FolderName.Left(4)) != "temp") {
@@ -4805,11 +4799,11 @@ namespace Contensive.Core.Controllers {
                                     Collectionname = FolderName.Left(FolderName.Length - CollectionGuid.Length - 1);
                                     CollectionGuid = CollectionGuid.Left(8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
                                     CollectionGuid = "{" + CollectionGuid + "}";
-                                    SubFolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
-                                    if (SubFolderList.Length > 0) {
-                                        SubFolder = SubFolderList[SubFolderList.Length - 1];
-                                        FolderName = FolderName + "\\" + SubFolder.Name;
-                                        LastChangeDate = SubFolder.Name.Substring(4, 2) + "/" + SubFolder.Name.Substring(6, 2) + "/" + SubFolder.Name.Left(4);
+                                    List<FolderDetail> SubFolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
+                                    if (SubFolderList.Count>0) {
+                                        FolderDetail lastSubFolder = SubFolderList.Last<FolderDetail>();
+                                        FolderName = FolderName + "\\" + lastSubFolder.Name;
+                                        LastChangeDate = lastSubFolder.Name.Substring(4, 2) + "/" + lastSubFolder.Name.Substring(6, 2) + "/" + lastSubFolder.Name.Left(4);
                                         if (!dateController.IsDate(LastChangeDate)) {
                                             LastChangeDate = "";
                                         }

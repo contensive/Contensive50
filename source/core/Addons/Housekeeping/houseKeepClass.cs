@@ -16,6 +16,7 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
 using System.IO;
+using static Contensive.BaseClasses.CPFileSystemBaseClass;
 //
 namespace Contensive.Core.Addons.Housekeeping {
     //
@@ -409,7 +410,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 DateTime ArchiveEmailDropDate = default(DateTime);
                 string VirtualFileName = null;
                 string VirtualLink = null;
-                FileInfo[] FileList = null;
+                List<CPFileSystemBaseClass.FileDetail> FileList = null;
                 long FileSize = 0;
                 int DaystoRemove = 0;
                 int fieldType = 0;
@@ -1239,13 +1240,13 @@ namespace Contensive.Core.Addons.Housekeeping {
                         TableName = core.db.csGetText(CS, "TableName");
                         PathName = TableName + "\\" + FieldName;
                         FileList = core.cdnFiles.getFileList(PathName);
-                        if (FileList.Length > 0) {
+                        if (FileList.Count > 0) {
                             core.db.executeQuery("CREATE INDEX temp" + FieldName + " ON " + TableName + " (" + FieldName + ")");
-                            foreach (FileInfo file in FileList) {
+                            foreach (CPFileSystemBaseClass.FileDetail file in FileList) {
                                 Filename = file.Name;
                                 VirtualFileName = PathName + "\\" + Filename;
                                 VirtualLink = genericController.vbReplace(VirtualFileName, "\\", "/");
-                                FileSize = file.Length;
+                                FileSize = file.Size;
                                 if (FileSize == 0) {
                                     SQL = "update " + TableName + " set " + FieldName + "=null where (" + FieldName + "=" + core.db.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + core.db.encodeSQLText(VirtualLink) + ")";
                                     core.db.executeQuery(SQL);
@@ -1759,13 +1760,10 @@ namespace Contensive.Core.Addons.Housekeeping {
         //
         private void HouseKeep_App_Daily_LogFolder(coreController core, string FolderName, DateTime LastMonth) {
             try {
-                //
-                FileInfo[] FileList = null;
-                //
                 logHousekeeping(core, "Deleting files from folder [" + FolderName + "] older than " + LastMonth);
-                FileList = core.privateFiles.getFileList(FolderName);
-                foreach (FileInfo file in FileList) {
-                    if (file.CreationTime < LastMonth) {
+                List<CPFileSystemBaseClass.FileDetail> FileList = core.privateFiles.getFileList(FolderName);
+                foreach (CPFileSystemBaseClass.FileDetail file in FileList) {
+                    if (file.DateCreated < LastMonth) {
                         core.privateFiles.deleteFile(FolderName + "/" + file.Name);
                     }
                 }
@@ -2078,7 +2076,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                 string Cmd = null;
                 string CollectionRootPath = null;
                 int Pos = 0;
-                DirectoryInfo[] FolderList = null;
                 string LocalGuid = null;
                 XmlDocument Doc = new XmlDocument();
                 int FolderPtr = 0;
@@ -2167,21 +2164,16 @@ namespace Contensive.Core.Addons.Housekeeping {
                                     } else {
                                         CollectionRootPath = CollectionRootPath.Left(Pos - 1);
                                         Path = core.addon.getPrivateFilesAddonPath() + "\\" + CollectionRootPath + "\\";
-                                        FolderList = new DirectoryInfo[0];
+                                        List<FolderDetail> FolderList = new List<FolderDetail>();
                                         if (core.privateFiles.pathExists(Path)) {
                                             FolderList = core.privateFiles.getFolderList(Path);
-                                            //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                            if (0 != 0) {
-                                                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                //Microsoft.VisualBasic.Information.Err().Clear();
-                                            }
                                         }
-                                        if (FolderList.Length == 0) {
+                                        if (FolderList.Count == 0) {
                                             //
                                             logHousekeeping(core, "no subfolders found in physical path [" + Path + "], skipping");
                                             //
                                         } else {
-                                            foreach (DirectoryInfo dir in FolderList) {
+                                            foreach (FolderDetail dir in FolderList) {
                                                 IsActiveFolder = false;
                                                 //
                                                 // register or unregister all files in this folder
@@ -2194,7 +2186,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                                     //
                                                     logHousekeeping(core, "....Folder [" + dir.Name + "]");
                                                     IsActiveFolder = (CollectionRootPath + "\\" + dir.Name == CollectionPath);
-                                                    if (IsActiveFolder && (FolderPtr != (FolderList.Length - 1))) {
+                                                    if (IsActiveFolder && (FolderPtr != (FolderList.Count - 1))) {
                                                         //
                                                         // This one is active, but not the last
                                                         //
@@ -2228,7 +2220,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                                     if (IsActiveFolder) {
                                                         //IsActiveFolder = IsActiveFolder;
                                                     } else {
-                                                        if (FolderPtr < (FolderList.Length - 3)) {
+                                                        if (FolderPtr < (FolderList.Count - 3)) {
                                                             logHousekeeping(core, "....Deleting path because non-active and not one of the newest 2 [" + Path + dir.Name + "]");
                                                             core.privateFiles.deleteFolder(Path + dir.Name);
                                                         }

@@ -1571,7 +1571,7 @@ namespace Contensive.Core.Controllers {
         public int csOpenSql(string sql, string dataSourceName = "", int pageSize = 9999, int pageNumber = 1) {
             int returnCs = -1;
             try {
-                returnCs = csInit(core.sessionContext.user.id);
+                returnCs = csInit(core.session.user.id);
                 {
                     Contensive.Core.Controllers.dbController.ContentSetClass contentSet = contentSetStore[returnCs];
                     contentSet.Updateable = false;
@@ -2046,9 +2046,9 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         if (string.IsNullOrEmpty(OriginalFilename)) {
-                            returnFilename = fileController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, fieldTypeId);
+                            returnFilename = fileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, fieldTypeId);
                         } else {
-                            returnFilename = fileController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, OriginalFilename);
+                            returnFilename = fileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, OriginalFilename);
                         }
                     }
                 }
@@ -2339,7 +2339,7 @@ namespace Contensive.Core.Controllers {
                         throw new ApplicationException("content [" + ContentName + "] could Not be found.");
                     } else {
                         if (MemberID == -1) {
-                            MemberID = core.sessionContext.user.id;
+                            MemberID = core.session.user.id;
                         }
                         //
                         // no authoring, create default record in Live table
@@ -3581,9 +3581,9 @@ namespace Contensive.Core.Controllers {
                         fieldTypeId = CDef.fields[FieldName.ToLower()].fieldTypeId;
                         //
                         if (string.IsNullOrEmpty(OriginalFilename)) {
-                            returnResult = fileController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, fieldTypeId);
+                            returnResult = fileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, fieldTypeId);
                         } else {
-                            returnResult = fileController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, OriginalFilename);
+                            returnResult = fileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, OriginalFilename);
                         }
                     }
                 }
@@ -4237,7 +4237,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // --- no records were found, add a blank if we can
                     //
-                    dt = core.db.insertTableRecordGetDataTable(DataSource.Name, TableName, core.sessionContext.user.id);
+                    dt = core.db.insertTableRecordGetDataTable(DataSource.Name, TableName, core.session.user.id);
                     if (dt.Rows.Count > 0) {
                         RecordID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                         core.db.executeQuery("Update " + TableName + " Set active=0 where id=" + RecordID + ";", DataSource.Name);
@@ -4814,13 +4814,13 @@ namespace Contensive.Core.Controllers {
         //       The rest are the archive records.
         //
         public int csOpenRecord(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(genericController.encodeText(ContentName), "(ID=" + core.db.encodeSQLNumber(RecordID) + ")", "", false, core.sessionContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(genericController.encodeText(ContentName), "(ID=" + core.db.encodeSQLNumber(RecordID) + ")", "", false, core.session.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         // ====================================================================================================
         //
         public int csOpen2(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(ContentName, "(ID=" + core.db.encodeSQLNumber(RecordID) + ")", "", false, core.sessionContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(ContentName, "(ID=" + core.db.encodeSQLNumber(RecordID) + ")", "", false, core.session.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         // ====================================================================================================
@@ -4875,7 +4875,7 @@ namespace Contensive.Core.Controllers {
                     ContentControlID = (core.db.csGetInteger(iCSPointer, "contentcontrolid"));
                     ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentControlID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        result = core.html.getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.sessionContext.isEditing(ContentName));
+                        result = core.html.getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
                     }
                 }
             }

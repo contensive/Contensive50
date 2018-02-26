@@ -96,7 +96,7 @@ namespace Contensive.BaseClasses
 		public abstract void SaveVirtual(string Filename, string FileContent);
 		/// <summary>
 		/// Get a crlf delimited list of files in a given path. Each row is a tab delimited list of attributes for each file. The attributes are:
-		/// FileName
+		/// Name
 		/// Attributes
 		/// DateCreated
 		/// DateLastAccessed

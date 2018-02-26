@@ -54,7 +54,7 @@ namespace Contensive.Core {
         public override bool ForceBrowserMobile
         {
             get {
-                return genericController.encodeBoolean(core.sessionContext.visitor.ForceBrowserMobile);
+                return genericController.encodeBoolean(core.session.visitor.ForceBrowserMobile);
             }
         }
 
@@ -109,14 +109,14 @@ namespace Contensive.Core {
         public override int Id
         {
             get {
-                return core.sessionContext.visitor.id;
+                return core.session.visitor.id;
             }
         }
 
         public override bool IsNew //Inherits BaseClasses.CPVisitorBaseClass.IsNew
         {
             get {
-                return core.sessionContext.visit.VisitorNew;
+                return core.session.visit.VisitorNew;
             }
         }
 
@@ -131,7 +131,7 @@ namespace Contensive.Core {
 
         public override int UserId {
             get {
-                return core.sessionContext.visitor.MemberID;
+                return core.session.visitor.MemberID;
             }
         }
         //

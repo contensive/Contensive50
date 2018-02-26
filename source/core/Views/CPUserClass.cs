@@ -59,14 +59,14 @@ namespace Contensive.Core {
         public override string Email
         {
             get {
-                return CP.core.sessionContext.user.Email;
+                return CP.core.session.user.Email;
             }
         }
         //
         //====================================================================================================
         //
         public override int GetIdByLogin(string Username, string Password) {
-            return CP.core.sessionContext.authenticateGetId(core, Username, Password);
+            return CP.core.session.getUserIdForCredentials(core, Username, Password);
         }
         //
         //====================================================================================================
@@ -76,10 +76,10 @@ namespace Contensive.Core {
         /// </summary>
         public override int Id {
             get {
-                int localId = CP.core.sessionContext.user.id;
+                int localId = CP.core.session.user.id;
                 if (localId == 0) {
                     localId = CP.core.db.insertContentRecordGetID("people", 0);
-                    CP.core.sessionContext.recognizeById(core, localId, ref CP.core.sessionContext);
+                    sessionController.recognizeById(core, localId, ref CP.core.session);
                 }
                 return localId;
             }
@@ -89,55 +89,55 @@ namespace Contensive.Core {
         //
         public override bool IsAdmin {
             get {
-                return CP.core.sessionContext.isAuthenticatedAdmin(core);
+                return CP.core.session.isAuthenticatedAdmin(core);
             }
         }
         //
         //====================================================================================================
         //
         public override bool IsAdvancedEditing(string ContentName) {
-            return CP.core.sessionContext.isAdvancedEditing(core, ContentName);
+            return CP.core.session.isAdvancedEditing(core, ContentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsAuthenticated {
             get {
-                return (CP.core.sessionContext.isAuthenticated);
+                return (CP.core.session.isAuthenticated);
             }
         }
         //
         //====================================================================================================
         //
         public override bool IsAuthoring(string ContentName) {
-            return CP.core.sessionContext.isEditing(ContentName);
+            return CP.core.session.isEditing(ContentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsContentManager(string ContentName = "Page Content") {
-            return CP.core.sessionContext.isAuthenticatedContentManager(core, ContentName);
+            return CP.core.session.isAuthenticatedContentManager(core, ContentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsDeveloper {
             get {
-                return CP.core.sessionContext.isAuthenticatedDeveloper(core);
+                return CP.core.session.isAuthenticatedDeveloper(core);
             }
         }
         //
         //====================================================================================================
         //
         public override bool IsEditing(string ContentName) {
-            return CP.core.sessionContext.isEditing(ContentName);
+            return CP.core.session.isEditing(ContentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsEditingAnything {
             get {
-                return CP.core.sessionContext.isEditingAnything();
+                return CP.core.session.isEditingAnything();
             }
         }
         //
@@ -145,7 +145,7 @@ namespace Contensive.Core {
         //
         public override bool IsGuest {
             get {
-                return CP.core.sessionContext.isGuest(core);
+                return CP.core.session.isGuest(core);
             }
         }
         //
@@ -182,7 +182,7 @@ namespace Contensive.Core {
                 if (userId == 0) {
                     userId = Id;
                 }
-                result = CP.core.sessionContext.isMemberOfGroupIdList(core, userId, IsAuthenticated, GroupIDList, false);
+                result = CP.core.session.isMemberOfGroupIdList(core, userId, IsAuthenticated, GroupIDList, false);
             } catch (Exception ex) {
                 CP.core.handleException(ex);
                 result = false;
@@ -195,21 +195,21 @@ namespace Contensive.Core {
         //
         public override bool IsMember {
             get {
-                return CP.core.sessionContext.isAuthenticatedMember(core);
+                return CP.core.session.isAuthenticatedMember(core);
             }
         }
         //
         //====================================================================================================
         //
         public override bool IsQuickEditing(string ContentName) {
-            return CP.core.sessionContext.isQuickEditing(core, ContentName);
+            return CP.core.session.isQuickEditing(core, ContentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsRecognized {
             get {
-                return CP.core.sessionContext.isRecognized(core);
+                return CP.core.session.isRecognized(core);
             }
         }
         //
@@ -217,7 +217,7 @@ namespace Contensive.Core {
         //
         public override bool IsWorkflowRendering {
             get {
-                return CP.core.sessionContext.isWorkflowRendering();
+                return CP.core.session.isWorkflowRendering();
             }
         }
         //
@@ -225,8 +225,8 @@ namespace Contensive.Core {
         //
         public override string Language {
             get {
-                if (CP.core.sessionContext.userLanguage != null) {
-                    return CP.core.sessionContext.userLanguage.name;
+                if (CP.core.session.userLanguage != null) {
+                    return CP.core.session.userLanguage.name;
                 }
                 return string.Empty;
             }
@@ -236,36 +236,36 @@ namespace Contensive.Core {
         //
         public override int LanguageID {
             get {
-                return CP.core.sessionContext.user.LanguageID;
+                return CP.core.session.user.LanguageID;
             }
         }
         //
         //====================================================================================================
         //
         public override bool Login(string UsernameOrEmail, string Password, bool SetAutoLogin = false) {
-            return CP.core.sessionContext.authenticate(core, UsernameOrEmail, Password, SetAutoLogin);
+            return CP.core.session.authenticate(core, UsernameOrEmail, Password, SetAutoLogin);
         }
         //
         //====================================================================================================
         //
         [Obsolete("Use LoginById(integer) instead", false)]
         public override bool LoginByID(string RecordID, bool SetAutoLogin = false) {
-            return CP.core.sessionContext.authenticateById(core, encodeInteger(RecordID), CP.core.sessionContext);
+            return sessionController.authenticateById(core, encodeInteger(RecordID), CP.core.session);
         }
         //
         //====================================================================================================
         //
         public override bool LoginByID(int RecordID) {
-            return CP.core.sessionContext.authenticateById(core, RecordID, CP.core.sessionContext);
+            return sessionController.authenticateById(core, RecordID, CP.core.session);
         }
         //
         //====================================================================================================
         //
         public override bool LoginByID(int RecordID, bool SetAutoLogin) {
-            bool result = CP.core.sessionContext.authenticateById(core, RecordID, CP.core.sessionContext);
+            bool result = sessionController.authenticateById(core, RecordID, CP.core.session);
             if (result) {
-                CP.core.sessionContext.user.AutoLogin = SetAutoLogin;
-                CP.core.sessionContext.user.save(core);
+                CP.core.session.user.AutoLogin = SetAutoLogin;
+                CP.core.session.user.save(core);
             }
             return result;
         }
@@ -273,20 +273,20 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override bool LoginIsOK(string UsernameOrEmail, string Password) {
-            return CP.core.sessionContext.isLoginOK(core, UsernameOrEmail, Password);
+            return CP.core.session.isLoginOK(core, UsernameOrEmail, Password);
         }
         //
         //====================================================================================================
         //
         public override void Logout() {
-            CP.core.sessionContext.logout(core);
+            CP.core.session.logout(core);
         }
         //
         //====================================================================================================
         //
         public override string Name {
             get {
-                return CP.core.sessionContext.user.name;
+                return CP.core.session.user.name;
             }
         }
         //
@@ -294,7 +294,7 @@ namespace Contensive.Core {
         //
         public override bool IsNew {
             get {
-                return CP.core.sessionContext.visit.MemberNew;
+                return CP.core.session.visit.MemberNew;
             }
         }
         //
@@ -303,14 +303,14 @@ namespace Contensive.Core {
         public override bool IsNewLoginOK(string Username, string Password) {
             string errorMessage = "";
             int errorCode = 0;
-            return CP.core.sessionContext.isNewLoginOK(core, Username, Password, ref errorMessage, ref errorCode);
+            return CP.core.session.isNewCredentialOK(core, Username, Password, ref errorMessage, ref errorCode);
         }
         //
         //====================================================================================================
         //
         public override int OrganizationID {
             get {
-                return CP.core.sessionContext.user.OrganizationID;
+                return CP.core.session.user.OrganizationID;
             }
         }
         //
@@ -318,22 +318,21 @@ namespace Contensive.Core {
         //
         public override string Password {
             get {
-                return CP.core.sessionContext.user.Password;
+                return CP.core.session.user.Password;
             }
         }
         //
         //====================================================================================================
         //
         public override bool Recognize(int UserID) {
-            sessionContextModel authContext = CP.core.sessionContext;
-            return CP.core.sessionContext.recognizeById(core, UserID, ref authContext);
+            return sessionController.recognizeById(core, UserID, ref CP.core.session);
         }
         //
         //====================================================================================================
         //
         public override string Username {
             get {
-                return CP.core.sessionContext.user.Username;
+                return CP.core.session.user.Username;
             }
         }
         //

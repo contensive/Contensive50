@@ -178,7 +178,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // ----- Check permissions
                 //
-                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     // You must be admin to use this feature
                     //
@@ -521,7 +521,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 SQLFilename = core.userProperty.getText("SQLArchive");
                 if (string.IsNullOrEmpty(SQLFilename)) {
-                    SQLFilename = "SQLArchive" + core.sessionContext.user.id.ToString("000000000") + ".txt";
+                    SQLFilename = "SQLArchive" + core.session.user.id.ToString("000000000") + ".txt";
                     core.userProperty.setProperty("SQLArchive", SQLFilename);
                 }
                 SQLArchive = core.cdnFiles.readFileText(SQLFilename);
@@ -1961,7 +1961,7 @@ namespace Contensive.Core.Addons.Tools {
                         // Create Definition
                         //
                         Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]");
-                        Models.Complex.cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.sessionContext.user.id);
+                        Models.Complex.cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();
@@ -2846,10 +2846,10 @@ namespace Contensive.Core.Addons.Tools {
                                                     }
                                                     SQL = "Update ccFields"
                                                 + " Set name=" + core.db.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + core.db.encodeSQLText(genericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
-                                                    if (core.sessionContext.isAuthenticatedAdmin(core)) {
+                                                    if (core.session.isAuthenticatedAdmin(core)) {
                                                         SQL += ",adminonly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." + RecordPointer));
                                                     }
-                                                    if (core.sessionContext.isAuthenticatedDeveloper(core)) {
+                                                    if (core.session.isAuthenticatedDeveloper(core)) {
                                                         SQL += ",DeveloperOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." + RecordPointer));
                                                     }
                                                     SQL += " where ID=" + formFieldId;
@@ -3178,13 +3178,13 @@ namespace Contensive.Core.Addons.Tools {
                             //
                             // Admin Only
                             //
-                            if (core.sessionContext.isAuthenticatedAdmin(core)) {
+                            if (core.session.isAuthenticatedAdmin(core)) {
                                 streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, genericController.encodeText(fieldsort.field.adminOnly), fieldsort.field.inherited));
                             }
                             //
                             // Developer Only
                             //
-                            if (core.sessionContext.isAuthenticatedDeveloper(core)) {
+                            if (core.session.isAuthenticatedDeveloper(core)) {
                                 streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, genericController.encodeText(fieldsort.field.developerOnly), fieldsort.field.inherited));
                             }
                             //
@@ -3616,7 +3616,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Files
                     //
-                    SourceFolders = core.appRootFiles.convertFileINfoArrayToParseString(core.appRootFiles.getFileList(StartPath + CurrentPath));
+                    SourceFolders = core.appRootFiles.convertFileInfoArrayToParseString(core.appRootFiles.getFileList(StartPath + CurrentPath));
                     if (string.IsNullOrEmpty(SourceFolders)) {
                         FileSize = "";
                         FileDate = "";
@@ -3740,7 +3740,7 @@ namespace Contensive.Core.Addons.Tools {
                 ButtonList = ButtonCancel + "," + ButtonRestartContensiveApplication;
                 Stream.Add(GetTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."));
                 //
-                if (!core.sessionContext.isAuthenticatedAdmin(core)) {
+                if (!core.session.isAuthenticatedAdmin(core)) {
                     //
                     tempGetForm_Restart = "<P>You must be an administrator to use this tool.</P>";
                     //
@@ -4212,7 +4212,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 Button = core.docProperties.getText("button");
                 //
-                IsDeveloper = core.sessionContext.isAuthenticatedDeveloper(core);
+                IsDeveloper = core.session.isAuthenticatedDeveloper(core);
                 if (Button == ButtonFindAndReplace) {
                     RowCnt = core.docProperties.getInteger("CDefRowCnt");
                     if (RowCnt > 0) {
