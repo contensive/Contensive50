@@ -381,7 +381,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 errorCaption = "Content Spider Control"
                             });
                         } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormResourceLibrary) {
-                            ContentCell = core.html.getResourceLibrary2("", false, "", "", true);
+                            ContentCell = core.html.getResourceLibrary("", false, "", "", true);
                         } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormQuickStats) {
                             ContentCell = (GetForm_QuickStats());
                         } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormIndex) {
@@ -2954,7 +2954,8 @@ namespace Contensive.Core.Addons.AdminSite {
                                 + "\r\n  }"
                                 + "\r\n} "
                                 + "\r\n</script>";
-                            DataTable_FindRow = DataTable_FindRow + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"60\" height=\"1\" ><br>" + adminUIController.getButtonPrimary(ButtonFind, "", false, "", "FindButton") + "</td>";
+                            DataTable_FindRow = DataTable_FindRow + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"60\" height=\"1\" ><br>" + adminUIController.getButtonPrimary(ButtonFind) + "</td>";
+                            //DataTable_FindRow = DataTable_FindRow + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"60\" height=\"1\" ><br>" + adminUIController.getButtonPrimary(ButtonFind, "", false, "", "FindButton") + "</td>";
                             ColumnPointer = 0;
                             foreach (var kvp in IndexConfig.Columns) {
                                 indexConfigColumnClass column = kvp.Value;
@@ -6515,7 +6516,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         Stream.Add(GetForm_Edit_AddTab("Reports", GetForm_Edit_MemberReports(adminContent, editRecord), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                         if (allowAdminTabs) {
-                            Stream.Add(core.html.getComboTabs());
+                            Stream.Add(core.doc.menuComboTab.GetTabs(core));
                         }
                         Stream.Add(EditSectionButtonBar);
                     }
@@ -6576,7 +6577,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                         if (allowAdminTabs) {
-                            Stream.Add(core.html.getComboTabs());
+                            Stream.Add(core.doc.menuComboTab.GetTabs(core));
                             //Call Stream.Add("<div Class=""ccPanelBackground"">" & core.main_GetComboTabs() & "</div>")
                         }
                         Stream.Add(EditSectionButtonBar);
@@ -6629,7 +6630,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                         if (allowAdminTabs) {
-                            Stream.Add(core.html.getComboTabs());
+                            Stream.Add(core.doc.menuComboTab.GetTabs(core));
                             //Call Stream.Add("<div Class=""ccPanelBackground"">" & core.main_GetComboTabs() & "</div>")
                         }
                         Stream.Add(EditSectionButtonBar);
@@ -6680,7 +6681,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                         if (allowAdminTabs) {
-                            Stream.Add(core.html.getComboTabs());
+                            Stream.Add(core.doc.menuComboTab.GetTabs(core));
                             //Call Stream.Add("<div Class=""ccPanelBackground"">" & core.main_GetComboTabs() & "</div>")
                         }
                         Stream.Add(EditSectionButtonBar);
@@ -6702,7 +6703,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_GroupRules(adminContent, editRecord), allowAdminTabs));
                         Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                         if (allowAdminTabs) {
-                            Stream.Add(core.html.getComboTabs());
+                            Stream.Add(core.doc.menuComboTab.GetTabs(core));
                             //Call Stream.Add("<div class=""ccPanelBackground"">" & core.main_GetComboTabs() & "</div>")
                         }
                         Stream.Add(EditSectionButtonBar);
@@ -6728,7 +6729,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                     Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                     if (allowAdminTabs) {
-                        Stream.Add(core.html.getComboTabs());
+                        Stream.Add(core.doc.menuComboTab.GetTabs(core));
                     }
                     Stream.Add(EditSectionButtonBar);
                     //Case "CCSECTIONS"
@@ -6778,7 +6779,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     Stream.Add(GetForm_Edit_AddTab("Authoring Access", GetForm_Edit_LibraryFolderRules(adminContent, editRecord), allowAdminTabs));
                     Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                     if (allowAdminTabs) {
-                        Stream.Add(core.html.getComboTabs());
+                        Stream.Add(core.doc.menuComboTab.GetTabs(core));
                     }
                     Stream.Add(EditSectionButtonBar);
                 }
@@ -6800,7 +6801,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                     Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                     if (allowAdminTabs) {
-                        Stream.Add(core.html.getComboTabs());
+                        Stream.Add(core.doc.menuComboTab.GetTabs(core));
                     }
                     Stream.Add(EditSectionButtonBar);
                     //
@@ -6839,7 +6840,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     Stream.Add(GetForm_Edit_AddTab("Reports", GetForm_Edit_LayoutReports(adminContent, editRecord), allowAdminTabs));
                     Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                     if (allowAdminTabs) {
-                        Stream.Add(core.html.getComboTabs());
+                        Stream.Add(core.doc.menuComboTab.GetTabs(core));
                     }
                     Stream.Add(EditSectionButtonBar);
                 }
@@ -6857,7 +6858,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminContent, editRecord), allowAdminTabs));
                     Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs));
                     if (allowAdminTabs) {
-                        Stream.Add(core.html.getComboTabs());
+                        Stream.Add(core.doc.menuComboTab.GetTabs(core));
                     }
                     Stream.Add(EditSectionButtonBar);
                 }
@@ -7573,7 +7574,8 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         return_NewFieldList = return_NewFieldList + "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
-                                        NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValueText);
+                                        NonEncodedLink = genericController.getCdnFileLink(core, FieldValueText);
+                                        //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValueText);
                                         EncodedLink = genericController.EncodeURL(NonEncodedLink);
                                         EditorString += (core.html.inputHidden(FormFieldLCaseName, ""));
                                         if (string.IsNullOrEmpty(FieldValueText)) {
@@ -7605,7 +7607,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                 if (core.db.csGet(CSLookup, "Name") == "") {
                                                     EditorString += ("No Name");
                                                 } else {
-                                                    EditorString += (core.html.encodeHTML(core.db.csGet(CSLookup, "Name")));
+                                                    EditorString += (encodeHTML(core.db.csGet(CSLookup, "Name")));
                                                 }
                                                 EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?" + RequestNameAdminForm + "=4&cid=" + field.lookupContentID + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                                             } else {
@@ -7640,7 +7642,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             if (string.IsNullOrEmpty(RecordName)) {
                                                 EditorString += ("No Name");
                                             } else {
-                                                EditorString += (core.html.encodeHTML(RecordName));
+                                                EditorString += (encodeHTML(RecordName));
                                             }
                                             EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + cdefModel.getContentId(core, "people") + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                                         }
@@ -7847,12 +7849,13 @@ namespace Contensive.Core.Addons.AdminSite {
                                         if (string.IsNullOrEmpty(FieldValueText)) {
                                             EditorString += (core.html.inputFile(FormFieldLCaseName, "", "file"));
                                         } else {
-                                            NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValueText);
+                                            NonEncodedLink = genericController.getCdnFileLink(core, FieldValueText);
+                                            //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValueText);
                                             EncodedLink = genericController.encodeHTML(NonEncodedLink);
                                             string filename = "";
                                             string path = "";
                                             core.cdnFiles.splitDosPathFilename(FieldValueText, ref path, ref filename);
-                                            EditorString += ("&nbsp;<a href=\"http://" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
+                                            EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
                                             EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(FormFieldLCaseName + ".DeleteFlag", false));
                                             EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FormFieldLCaseName, "", "file"));
                                         }
@@ -8465,7 +8468,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         // ----- Whats New Headline (editable)
                         //
                         if (editRecord.Read_Only) {
-                            HTMLFieldString = core.html.encodeHTML(ContentWatchLinkLabel);
+                            HTMLFieldString = encodeHTML(ContentWatchLinkLabel);
                         } else {
                             HTMLFieldString = core.html.inputText("ContentWatchLinkLabel", ContentWatchLinkLabel, 1, core.siteProperties.defaultFormInputWidth);
                             //HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchLinkLabel"" cols=""" & core.app.SiteProperty_DefaultFormInputWidth & """>" & ContentWatchLinkLabel & "</textarea>"
@@ -8479,7 +8482,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             Copy = "";
                         }
                         if (editRecord.Read_Only) {
-                            HTMLFieldString = core.html.encodeHTML(Copy);
+                            HTMLFieldString = encodeHTML(Copy);
                         } else {
                             HTMLFieldString = core.html.inputDate("ContentWatchExpires", Copy, core.siteProperties.defaultFormInputWidth.ToString());
                             //HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchExpires"" cols=""" & core.app.SiteProperty_DefaultFormInputWidth & """>" & Copy & "</textarea>"
@@ -11584,7 +11587,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (!AllowAdminTabs) {
                         tempGetForm_Edit_AddTab = Content;
                     } else {
-                        core.html.addComboTabEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
+                        core.doc.menuComboTab.AddEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
                         //Call core.htmldoc.main_AddLiveTabEntry(Replace(Caption, " ", "&nbsp;"), Content, "ccAdminTab")
                     }
                 }
@@ -11611,12 +11614,12 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // Ajax Tab
                     //
-                    core.html.addComboTabEntry(Caption.Replace(" ", "&nbsp;"), "", AjaxLink, "", false, "ccAdminTab");
+                    core.doc.menuComboTab.AddEntry(Caption.Replace(" ", "&nbsp;"), "", AjaxLink, "", false, "ccAdminTab");
                 } else {
                     //
                     // Live Tab
                     //
-                    core.html.addComboTabEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
+                    core.doc.menuComboTab.AddEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -11968,9 +11971,9 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // Build and add tabs
                     //
-                    core.html.addLiveTabEntry("Custom&nbsp;Reports", Tab0.Text, "ccAdminTab");
-                    core.html.addLiveTabEntry("Request&nbsp;New&nbsp;Report", Tab1.Text, "ccAdminTab");
-                    Content = core.html.getLiveTabs();
+                    core.doc.menuLiveTab.AddEntry("Custom&nbsp;Reports", Tab0.Text, "ccAdminTab");
+                    core.doc.menuLiveTab.AddEntry("Request&nbsp;New&nbsp;Report", Tab1.Text, "ccAdminTab");
+                    Content = core.doc.menuLiveTab.GetTabs(core);
                     //
                 }
                 //

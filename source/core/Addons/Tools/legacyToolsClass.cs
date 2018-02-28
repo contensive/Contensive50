@@ -389,7 +389,7 @@ namespace Contensive.Core.Addons.Tools {
                         }
                     }
                 }
-                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -436,7 +436,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminFormToolRestart, "Contensive Application Restart", "Restart the Contensive Applicaiton. This will stop your site on the server for a short period."));
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminformToolCreateGUID, "Create GUID", "Use this tool to create a new GUID. This is useful when creating a new core.addon."));
                 Stream.Add("</table>");
-                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -683,7 +683,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 returnHtml = Stream.Text;
                 returnHtml = "<div class=\"p-4 bg-light\">" + returnHtml + "</div>";
-                returnHtml = htmlController.legacy_openFormTable(core, ButtonList) + returnHtml + htmlController.legacy_closeFormTable(core, ButtonList);
+                returnHtml = htmlController.openFormTableLegacy(core, ButtonList) + returnHtml + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -1371,7 +1371,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 core.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
                 Stream.Add(core.html.inputHidden("ReloadCDef", ReloadCDef));
-                result =  htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result =  htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -1796,7 +1796,7 @@ namespace Contensive.Core.Addons.Tools {
                     ButtonList = ButtonList + "," + ButtonFix;
                     ButtonList = ButtonList + "," + ButtonFixAndRun;
                 }
-                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -2005,7 +2005,7 @@ namespace Contensive.Core.Addons.Tools {
                 //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
                 Stream.Add("</SPAN>");
                 //
-                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -2036,7 +2036,7 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add("<br>Content Watch Link field cleared.");
                 }
                 Stream.Add("</span>");
-                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -2090,7 +2090,7 @@ namespace Contensive.Core.Addons.Tools {
                     core.db.csClose(ref CSContent);
                 }
                 //
-                returnValue = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                returnValue = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -2337,7 +2337,7 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 //
                 // Print Start Button
-                result =  htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result =  htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -2681,7 +2681,7 @@ namespace Contensive.Core.Addons.Tools {
                 //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
                 Stream.Add("</SPAN>");
                 //
-                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -3231,7 +3231,7 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 //
                 Stream.Add(core.html.inputHidden("ReloadCDef", ReloadCDef));
-                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -3410,7 +3410,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Buttons
                 //
-                result = htmlController.legacy_openFormTable(core, ButtonList) + result + htmlController.legacy_closeFormTable(core, ButtonList);
+                result = htmlController.openFormTableLegacy(core, ButtonList) + result + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -3481,7 +3481,7 @@ namespace Contensive.Core.Addons.Tools {
                 result = result + kmaEndTable;
                 //
                 //GetForm_ContentDbSchema = GetForm_ContentDbSchema & core.main_GetFormInputHidden("af", AdminFormToolContentDbSchema)
-                result =  (htmlController.legacy_openFormTable(core, ButtonList)) + result + (htmlController.legacy_closeFormTable(core, ButtonList));
+                result =  (htmlController.openFormTableLegacy(core, ButtonList)) + result + (htmlController.closeFormTableLegacy(core, ButtonList));
                 //
                 //
                 // ----- Error Trap
@@ -3507,7 +3507,7 @@ namespace Contensive.Core.Addons.Tools {
                 string QueryNew = genericController.ModifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
                 tempGetForm_LogFiles = tempGetForm_LogFiles + genericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
                 //
-                tempGetForm_LogFiles = htmlController.legacy_openFormTable(core, ButtonList) + tempGetForm_LogFiles + (htmlController.legacy_closeFormTable(core, ButtonList));
+                tempGetForm_LogFiles = htmlController.openFormTableLegacy(core, ButtonList) + tempGetForm_LogFiles + (htmlController.closeFormTableLegacy(core, ButtonList));
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -3717,7 +3717,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("<br>");
                 Stream.Add("</span>");
                 //
-                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -3768,7 +3768,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("<br>");
                 Stream.Add("</SPAN>");
                 //
-                tempGetForm_Restart =  htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                tempGetForm_Restart =  htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -3854,7 +3854,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("</SPAN>");
                 //
                 ButtonList = ButtonCancel + "," + ButtonImportTemplates;
-                result = htmlController.legacy_openFormTable(core, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonList);
+                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -4286,7 +4286,7 @@ namespace Contensive.Core.Addons.Tools {
                 core.db.csClose(ref CS);
                 Stream.Add(TopHalf + BottomHalf + core.html.inputHidden("CDefRowCnt", RowPtr));
                 //
-                result = htmlController.legacy_openFormTable(core, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + htmlController.legacy_closeFormTable(core, ButtonCancel + "," + ButtonFindAndReplace);
+                result = htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -4325,7 +4325,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Display form
                 //
-                result = htmlController.legacy_openFormTable(core, ButtonCancel + "," + ButtonIISReset) + s.Text + htmlController.legacy_closeFormTable(core, ButtonCancel + "," + ButtonIISReset);
+                result = htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonIISReset) + s.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -4350,7 +4350,7 @@ namespace Contensive.Core.Addons.Tools {
                 s.Add(core.html.inputText("GUID", Guid.NewGuid().ToString(), 1, 80));
                 //
                 // Display form
-                result= htmlController.legacy_openFormTable(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + htmlController.legacy_closeFormTable(core, ButtonCancel + "," + ButtonCreateGUID);
+                result= htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonCreateGUID);
             } catch (Exception ex) {
                 core.handleException(ex);
             }

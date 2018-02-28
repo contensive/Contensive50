@@ -17,9 +17,7 @@ using static Contensive.Core.constants;
 using System.Drawing;
 //
 namespace Contensive.Core.Controllers {
-
     public class imageEditController : IDisposable {
-        //
         private bool loaded = false;
         private string src = "";
         private System.Drawing.Image srcImage;
@@ -27,7 +25,6 @@ namespace Contensive.Core.Controllers {
         private int setHeight = 0;
         //
         // dispose
-        //
         protected bool disposed = false;
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
@@ -49,12 +46,12 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public bool load(string physicalFilePath) //Implements IimageClass.load
-        {
+        public bool load(string pathFilename, fileController fileSystem) {
             bool returnOk = false;
             try {
-                if (System.IO.File.Exists(physicalFilePath)) {
-                    src = physicalFilePath;
+                fileSystem.copyRemoteToLocal(pathFilename);
+                if (System.IO.File.Exists(fileSystem.localAbsRootPath + pathFilename)) {
+                    src = pathFilename;
                     srcImage = System.Drawing.Image.FromFile(src);
                     setWidth = srcImage.Width;
                     setHeight = srcImage.Height;
@@ -68,18 +65,19 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public bool save(string physicalFilePath) {
+        public bool save(string pathFilename, fileController fileSystem) {
             bool returnOk = false;
             try {
                 if (loaded) {
-                    if (src == physicalFilePath) {
-                        if (System.IO.File.Exists(src)) {
-                            System.IO.File.Delete(src);
+                    if (src == pathFilename) {
+                        if (fileSystem.fileExists(src)) {
+                            fileSystem.deleteFile(src);
                         }
                     }
                     Bitmap imgOutput = new Bitmap(srcImage, setWidth, setHeight);
                     System.Drawing.Imaging.ImageFormat imgFormat = srcImage.RawFormat;
-                    imgOutput.Save(physicalFilePath, imgFormat);
+                    imgOutput.Save(fileSystem.localAbsRootPath + pathFilename, imgFormat);
+                    fileSystem.copyLocalToRemote(pathFilename);
                     imgOutput.Dispose();
                     returnOk = true;
                 }

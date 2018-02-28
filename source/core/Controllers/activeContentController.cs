@@ -1452,7 +1452,7 @@ namespace Contensive.Core.Controllers {
                                                                                     //
                                                                                     if (RecordWidth == 0 || RecordHeight == 0) {
                                                                                         sf = new imageEditController();
-                                                                                        if (sf.load(genericController.convertCdnUrlToCdnPathFilename(ImageVirtualFilename))) {
+                                                                                        if (sf.load(ImageVirtualFilename,core.cdnFiles)) {
                                                                                             file.pxWidth = sf.width;
                                                                                             file.pxHeight = sf.height;
                                                                                             file.save(core);
@@ -1483,7 +1483,7 @@ namespace Contensive.Core.Controllers {
                                                                                             // This happens when you hit 'reset' on the image properties dialog
                                                                                             //
                                                                                             sf = new imageEditController();
-                                                                                            if (sf.load(genericController.convertCdnUrlToCdnPathFilename(ImageVirtualFilename))) {
+                                                                                            if (sf.load(ImageVirtualFilename, core.cdnFiles)) {
                                                                                                 ImageWidth = sf.width;
                                                                                                 ImageHeight = sf.height;
                                                                                             }
@@ -1553,7 +1553,7 @@ namespace Contensive.Core.Controllers {
                                                                                                     // Alt image has not been built
                                                                                                     //
                                                                                                     sf = new imageEditController();
-                                                                                                    if (!sf.load(genericController.convertCdnUrlToCdnPathFilename(RecordVirtualFilename))) {
+                                                                                                    if (!sf.load(RecordVirtualFilename, core.cdnFiles)) {
                                                                                                         //
                                                                                                         // image load failed, use raw filename
                                                                                                         //
@@ -1609,7 +1609,7 @@ namespace Contensive.Core.Controllers {
                                                                                                         // Save new file
                                                                                                         //
                                                                                                         NewImageFilename = RecordFilenameNoExt + "-" + ImageAltSize + "." + RecordFilenameExt;
-                                                                                                        sf.save(genericController.convertCdnUrlToCdnPathFilename(ImageVirtualFilePath + NewImageFilename));
+                                                                                                        sf.save(ImageVirtualFilePath + NewImageFilename, core.cdnFiles);
                                                                                                         //
                                                                                                         // Update image record
                                                                                                         //

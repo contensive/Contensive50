@@ -472,7 +472,8 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- js head code
                         if (addon.JSFilename.filename != "") {
-                            string scriptFilename = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, addon.JSFilename.filename);
+                            string scriptFilename = genericController.getCdnFileLink(core, addon.JSFilename.filename);
+                            //string scriptFilename = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, addon.JSFilename.filename);
                             core.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead),addon.id);
                         }
                         //
@@ -993,7 +994,8 @@ namespace Contensive.Core.Controllers {
                                                                             if (string.IsNullOrEmpty(FieldValue)) {
                                                                                 Copy = core.html.inputFile(FieldName);
                                                                             } else {
-                                                                                NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
+                                                                                NonEncodedLink = genericController.getCdnFileLink(core, FieldValue);
+                                                                                //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
                                                                                 EncodedLink = EncodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
@@ -1266,7 +1268,7 @@ namespace Contensive.Core.Controllers {
                                             }
                                             Copy = adminUIController.GetEditPanel(core,true, TabHeading, TabDescription, adminUIController.EditTableOpen + TabCell.Text + adminUIController.EditTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
-                                                core.html.addLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
+                                                core.doc.menuLiveTab.AddEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
                                             //Content.Add( GetForm_Edit_AddTab(TabName, Copy, True))
                                             TabCell = null;
@@ -1287,7 +1289,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 //
                                 if (TabCnt > 0) {
-                                    Content.Add(core.html.getLiveTabs());
+                                    Content.Add(core.doc.menuLiveTab.GetTabs(core));
                                 }
                             }
                         }
@@ -2725,7 +2727,8 @@ namespace Contensive.Core.Controllers {
                                                                             if (string.IsNullOrEmpty(FieldValue)) {
                                                                                 Copy = core.html.inputFile(FieldName);
                                                                             } else {
-                                                                                NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
+                                                                                NonEncodedLink = genericController.getCdnFileLink(core, FieldValue);
+                                                                                //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
                                                                                 EncodedLink = EncodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
@@ -2993,9 +2996,8 @@ namespace Contensive.Core.Controllers {
                                             }
                                             Copy = adminUIController.GetEditPanel(core,true, TabHeading, TabDescription, adminUIController.EditTableOpen + TabCell.Text + adminUIController.EditTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
-                                                core.html.addLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
+                                                core.doc.menuLiveTab.AddEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
-                                            //Content.Add( core.main_GetForm_Edit_AddTab(TabName, Copy, True))
                                             TabCell = null;
                                             break;
                                         default:
@@ -3010,7 +3012,7 @@ namespace Contensive.Core.Controllers {
                                 // Close Tables
                                 //
                                 if (TabCnt > 0) {
-                                    Content.Add(core.html.getLiveTabs());
+                                    Content.Add(core.doc.menuLiveTab.GetTabs(core));
                                 }
                             }
                         }

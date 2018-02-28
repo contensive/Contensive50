@@ -115,10 +115,7 @@ namespace Contensive.Core.Controllers {
                         //AddonReturn = core.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", False, Nothing)
                         returnBody = core.doc.docBodyFilter + AddonReturn;
                     }
-                    //
-                    // -- Make it pretty for those who care
-                    returnBody = htmlReflowController.reflow(core, returnBody);
-                }
+               }
                 //
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -1079,7 +1076,8 @@ namespace Contensive.Core.Controllers {
                                     }
                                     //
                                     // -- and go
-                                    string link = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, file.Filename);
+                                    string link = genericController.getCdnFileLink(core, file.Filename);
+                                    //string link = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, file.Filename);
                                     return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.");
                                 }
                             }
@@ -2541,7 +2539,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Headline
                     //
                     if (core.doc.page.Headline != "") {
-                        string headline = core.html.encodeHTML(core.doc.page.Headline);
+                        string headline = encodeHTML(core.doc.page.Headline);
                         Cell = Cell + "\r<h1>" + headline + "</h1>";
                         //
                         // Add AC end here to force the end of any left over AC tags (like language)

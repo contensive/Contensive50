@@ -392,6 +392,7 @@ namespace Contensive.Core.Controllers {
                         deleteFile_local(pathFilename);
                     } else {
                         deleteFile_remote(pathFilename);
+                        deleteFile_local(pathFilename);
                     }
                 }
             } catch (Exception ex) {
@@ -457,7 +458,7 @@ namespace Contensive.Core.Controllers {
                     if (!isLocal) {
                         // todo - rewrite using lowlevel + transfer, not file io
                         // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
-                        string unixPathName = convertToUnixSlash(path).Trim();
+                        string unixPathName = joinPath(remotePathPrefix , path).Trim();
                         if ((unixPathName.Length > 1) & (unixPathName.Substring(0, 1) == "\\")) {
                             unixPathName = unixPathName.Substring(1);
                         }
@@ -466,13 +467,13 @@ namespace Contensive.Core.Controllers {
                             parentFolderInfo.Delete(true);
                         }
                     } else {
-                        string localPath = joinPath(localAbsRootPath, path);
-                        if (localPath.Substring(localPath.Length - 1) == "\\") {
-                            localPath = localPath.Left(localPath.Length - 1);
-                        }
-                        if (pathExists_local(path)) {
-                            Directory.Delete(localPath, true);
-                        }
+                    }
+                    string localPath = joinPath(localAbsRootPath, path);
+                    if (localPath.Substring(localPath.Length - 1) == "\\") {
+                        localPath = localPath.Left(localPath.Length - 1);
+                    }
+                    if (pathExists_local(path)) {
+                        Directory.Delete(localPath, true);
                     }
                 }
             } catch (Exception ex) {
@@ -577,10 +578,11 @@ namespace Contensive.Core.Controllers {
             var returnFileList = new List<FileDetail>();
             try {
                 path = normalizeDosPath(path);
+                string unixPath = convertToUnixSlash(joinPath(remotePathPrefix, path));
                 if (!isLocal) {
                     ListObjectsRequest request = new ListObjectsRequest {
                         BucketName = core.serverConfig.awsBucketName,
-                        Prefix = convertToUnixSlash( joinPath(remotePathPrefix, path))
+                        Prefix = unixPath
                     };
                     // Build your call out to S3 and store the response
                     ListObjectsResponse response = s3Client.ListObjects(request);
@@ -590,10 +592,13 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- create a fileDetail for each file found
                         string fileName = file.Key;
+                        string keyPath = "";
                         int pos = fileName.LastIndexOf("/");
                         if (pos > -1) {
+                            keyPath = fileName.Substring(0, pos+1);
                             fileName = fileName.Substring(pos + 1);
                         }
+                        if ( unixPath.Equals(keyPath)) {
                         returnFileList.Add(new FileDetail() {
                             Attributes = 0,
                             Type = "",
@@ -603,6 +608,8 @@ namespace Contensive.Core.Controllers {
                             Name = fileName,
                             Size = file.Size
                         });
+
+                        }
                     };
 
 
@@ -755,12 +762,14 @@ namespace Contensive.Core.Controllers {
         private bool fileExists_remote(string pathFilename) {
             try {
                 string unixAbsPathFilename = convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
-                string pathLowercase = "";
-                string filenameLowercase = "";
-                splitUnixPathFilename(unixAbsPathFilename.ToLower(), ref pathLowercase, ref filenameLowercase);
-                string s3Key = convertToDosSlash(pathLowercase);
+                string path = "";
+                string filename = "";
+                // no, cannot change case here. paths should be lcase before the call, file case should be preserved.
+                splitUnixPathFilename(unixAbsPathFilename, ref path, ref filename);
+                //splitUnixPathFilename(unixAbsPathFilename.ToLower(), ref pathLowercase, ref filenameLowercase);
+                string s3Key = convertToDosSlash(path);
                 Amazon.S3.IO.S3DirectoryInfo s3DirectoryInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, s3Key);
-                return s3DirectoryInfo.GetFiles(filenameLowercase).Any();
+                return s3DirectoryInfo.GetFiles(filename).Any();
             } catch (Amazon.S3.AmazonS3Exception ex) {
                 //
                 // -- support this unwillingly
@@ -927,7 +936,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="srcAbsDosPath"></param>
         /// <param name="absDstFolder"></param>
-        private void copyFolder_local(string srcAbsDosPath, string dstDosPath, fileController dstFileSystem = null) {
+        private void copyFolder_srcLocal(string srcAbsDosPath, string dstDosPath, fileController dstFileSystem = null) {
             try {
                 if (Directory.Exists(srcAbsDosPath)) {
                     if (dstFileSystem == null ) {
@@ -957,7 +966,52 @@ namespace Contensive.Core.Controllers {
                         string dstFolder = srcSubDirectory.Name;
                         string dstSubPath = dstDosPath + dstFolder + "\\";
                         DirectoryInfo dstSubDirectory = dstDiretoryInfo.CreateSubdirectory(dstFolder);
-                        copyFolder_local(srcSubDirectory.FullName, dstSubPath, dstFileSystem);
+                        copyFolder_srcLocal(srcSubDirectory.FullName, dstSubPath, dstFileSystem);
+                    }
+                }
+            } catch (Exception ex) {
+                core.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// copy one folder to another, include subfolders
+        /// </summary>
+        /// <param name="srcAbsDosPath"></param>
+        /// <param name="absDstFolder"></param>
+        private void copyFolder_srcRemote(string srcAbsDosPath, string dstDosPath, fileController dstFileSystem = null) {
+            try {
+                if (Directory.Exists(srcAbsDosPath)) {
+                    if (dstFileSystem == null) {
+                        dstFileSystem = this;
+                    }
+                    string dstAbsDstPath = joinPath(dstFileSystem.localAbsRootPath, dstDosPath);
+                    //
+                    // -- create destination folder
+                    if (!Directory.Exists(dstAbsDstPath)) {
+                        createPathAbs_local(dstAbsDstPath);
+                    }
+                    DirectoryInfo srcDirectoryInfo = new DirectoryInfo(srcAbsDosPath);
+                    DirectoryInfo dstDiretoryInfo = new DirectoryInfo(dstAbsDstPath);
+                    //
+                    // -- copy each file
+                    foreach (FileInfo srcFile in srcDirectoryInfo.GetFiles()) {
+                        srcFile.CopyTo(joinPath(dstDiretoryInfo.ToString(), srcFile.Name), true);
+                        if (!dstFileSystem.isLocal) {
+                            //
+                            // -- now copy the dst file to the remote
+                            dstFileSystem.copyLocalToRemote(joinPath(dstDosPath, srcFile.Name));
+                        }
+                    }
+                    //
+                    // -- copy each folder
+                    foreach (DirectoryInfo srcSubDirectory in srcDirectoryInfo.GetDirectories()) {
+                        string dstFolder = srcSubDirectory.Name;
+                        string dstSubPath = dstDosPath + dstFolder + "\\";
+                        DirectoryInfo dstSubDirectory = dstDiretoryInfo.CreateSubdirectory(dstFolder);
+                        copyFolder_srcLocal(srcSubDirectory.FullName, dstSubPath, dstFileSystem);
                     }
                 }
             } catch (Exception ex) {
@@ -979,13 +1033,12 @@ namespace Contensive.Core.Controllers {
                 dstPath = normalizeDosPath(dstPath);
                 if (!isLocal) {
                     //
-                    // -- remote src filesystem
-                    // todo - implement remote copyFolder
-                    throw new NotImplementedException("remote copyFolder not yet implemented");
+                    // -- src remote
+                    copyFolder_srcRemote(joinPath(localAbsRootPath, srcPath), dstPath, dstFileSystem);
                 } else {
                     //
-                    // -- copy files
-                    copyFolder_local(joinPath(localAbsRootPath, srcPath), dstPath, dstFileSystem);
+                    // -- src local
+                    copyFolder_srcLocal(joinPath(localAbsRootPath, srcPath), dstPath, dstFileSystem);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -1066,13 +1119,15 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 if (processLocalFile) {
-                    string absPathFilename = convertToLocalAbsPath(pathFilename);
                     string path = "";
                     string filename = "";
-                    splitDosPathFilename(absPathFilename, ref path, ref filename);
+                    splitDosPathFilename(pathFilename, ref path, ref filename);
+                    string absPathFilename = convertToLocalAbsPath(pathFilename);
+                    string absPath = "";
+                    splitDosPathFilename(absPathFilename, ref absPath, ref filename);
                     string fileFilter = null;
                     FastZip fastZip = new FastZip();
-                    fastZip.ExtractZip(absPathFilename, path, fileFilter);
+                    fastZip.ExtractZip(absPathFilename, absPath, fileFilter);
                     //
                     if (!isLocal) {
                         //
@@ -1081,9 +1136,9 @@ namespace Contensive.Core.Controllers {
                             using (var zf = new ZipFile(fs)) {
                                 foreach (ZipEntry ze in zf) {
                                     if (ze.IsDirectory) {
-                                        verifyPath_remote(getPath(ze.Name));
+                                        verifyPath_remote(getPath( joinPath(path, ze.Name)));
                                     } else {
-                                        copyLocalToRemote(ze.Name);
+                                        copyLocalToRemote(joinPath(path, ze.Name));
                                     }
                                 }
                             }
@@ -1144,34 +1199,36 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Result dos-slashed, lowercase, can be empty (), a path (mypath\), a filename (myfile.bin), or a pathFilename (mypath\myFile.bin)
+        /// Result dos-slashed, can be empty (), a path (mypath\), a filename (myfile.bin), or a pathFilename (mypath\myFile.bin)
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <returns></returns>
-        public static string normalizeDosPathFilename(string path) {
+        public static string normalizeDosPathFilename(string pathFilename) {
             //
             // -- convert to dos slash and lowercase()
-            string returnPath = path.Replace("/", "\\").ToLower();
+            // no, should not lowercase the filenames, just the path. An uploaded image to S3 must match the link saved for it so any case change must happen before call to fileController.
+            string returnPathFilename = pathFilename.Replace("/", "\\");
+            //string returnPath = path.Replace("/", "\\").ToLower();
             //
             // -- remove accidental double slashes
-            while (returnPath.IndexOf("\\\\") >= 0) {
-                returnPath = returnPath.Replace("\\\\", "\\");
+            while (returnPathFilename.IndexOf("\\\\") >= 0) {
+                returnPathFilename = returnPathFilename.Replace("\\\\", "\\");
             }
-            if (string.IsNullOrEmpty(returnPath) | (returnPath == "\\")) {
+            if (string.IsNullOrEmpty(returnPathFilename) | (returnPathFilename == "\\")) {
                 //
                 // -- return empty if result is empty or just a slash
                 return string.Empty;
-            } else if (returnPath.Substring(0, 1) == "\\") {
+            } else if (returnPathFilename.Substring(0, 1) == "\\") {
                 //
                 // -- if path starts with a slash, return string without slash
-                return returnPath.Substring(1);
+                return returnPathFilename.Substring(1);
             };
-            return returnPath;
+            return returnPathFilename;
         }
         //
         //====================================================================================================
         /// <summary>
-        /// Result dos-slashed, lowercase, can be empty (), a path that starts with a foldername and ends with a slash (mypath\) (mypath\another\)
+        /// Result dos-slashed, can be empty (), a path that starts with a foldername and ends with a slash (mypath\) (mypath\another\)
         /// </summary>
         /// <param name="dosPath"></param>
         /// <returns></returns>
@@ -1245,10 +1302,15 @@ namespace Contensive.Core.Controllers {
         }
         //
         //========================================================================
-        //
+        /// <summary>
+        /// return the standard tablename fieldname path -- always lowercase.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
         public static string getVirtualTableFieldUnixPath(string tableName, string fieldName) {
             string result = tableName + "/" + fieldName + "/";
-            return result.Replace(" ", "_").Replace(".", "_");
+            return result.ToLower().Replace(" ", "_").Replace(".", "_");
         }
         //
         //========================================================================
@@ -1331,11 +1393,13 @@ namespace Contensive.Core.Controllers {
             try {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 if (isLocal) {
-                    throw new ApplicationException("copyLocalToRemote is not valid in a local File system [" + localAbsRootPath + "]");
+                    // not exception, can be used regardless of isLocal //throw new ApplicationException("copyLocalToRemote is not valid in a local File system [" + localAbsRootPath + "]");
                 } else {
                     if (fileExists_local(pathFilename)) {
                         string localDosPathFilename = genericController.convertToDosSlash(pathFilename);
-                        string remoteUnixPathFilenameLowercase = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename)).ToLower();
+                        // no, cannot change the case here
+                        string remoteUnixPathFilenameLowercase = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
+                        //string remoteUnixPathFilenameLowercase = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename)).ToLower();
                         verifyPath_remote(getPath(pathFilename));
                         //
                         // -- Setup request for putting an object in S3.
@@ -1365,7 +1429,7 @@ namespace Contensive.Core.Controllers {
             try {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 if (isLocal) {
-                    throw new ApplicationException("copyRemoteToLocal is not valid in a local File system [" + localAbsRootPath + "]");
+                    // not exception, can be used regardless of isLocal //throw new ApplicationException("copyRemoteToLocal is not valid in a local File system [" + localAbsRootPath + "]");
                 } else {
                     verifyPath_remote(getPath(pathFilename));
                     string remoteUnixAbsPathFilename = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
@@ -1456,6 +1520,25 @@ namespace Contensive.Core.Controllers {
                 core.handleException(ex);
             }
         }
+        //
+        // ========================================================================================================================
+        /// <summary>
+        /// return the actual filename, or blank if the file is not found
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public string correctFilenameCase( string pathFilename ) {
+            string path = "";
+            string filename = "";
+            splitDosPathFilename(pathFilename, ref path, ref filename);
+            filename = filename.ToLower();
+            FileDetail resultFile = getFileList(path).Find( x => x.Name.ToLower() == filename );
+            if ( resultFile != null) {
+                filename = resultFile.Name;
+            }
+            return filename;
+        }
+
         //
         //====================================================================================================
         // dispose

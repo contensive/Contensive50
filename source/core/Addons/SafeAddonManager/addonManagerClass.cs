@@ -769,7 +769,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     + "";
                                     BodyHTML = adminUIController.GetEditPanel(core,true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
                                     BodyHTML = BodyHTML + core.html.inputHidden("AOCnt", RowPtr);
-                                    core.html.addLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
+                                    core.doc.menuLiveTab.AddEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
                                 }
                                 //
                                 // --------------------------------------------------------------------------------
@@ -832,7 +832,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 BodyHTML = "<div style=\"width:100%\">" + adminUIController.GetReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
                                 BodyHTML = adminUIController.GetEditPanel(core,true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
                                 BodyHTML = BodyHTML + core.html.inputHidden("accnt", RowPtr);
-                                core.html.addLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
+                                core.doc.menuLiveTab.AddEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Get the Upload Add-ons tab
@@ -857,13 +857,13 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     Body.Add(adminUIController.GetEditRow(core,FormInput, "&nbsp;", "", true, false, ""));
                                     Body.Add(adminUIController.EditTableClose);
                                 }
-                                core.html.addLiveTabEntry("Add&nbsp;Manually", adminUIController.GetEditPanel(core,true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
+                                core.doc.menuLiveTab.AddEntry("Add&nbsp;Manually", adminUIController.GetEditPanel(core,true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Build Page from tabs
                                 // --------------------------------------------------------------------------------
                                 //
-                                Content.Add(core.html.getLiveTabs());
+                                Content.Add(core.doc.menuLiveTab.GetTabs(core));
                                 //
                                 ButtonList = ButtonCancel + "," + ButtonOK;
                                 Content.Add(core.html.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));

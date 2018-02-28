@@ -4510,52 +4510,6 @@ namespace Contensive.Core.Controllers {
         // 
         public static string TextScramble(coreController core, string Copy) {
             return securityController.twoWayEncrypt(core, Copy);
-            //string returnCopy = "";
-            //try {
-            //    int CPtr = 0;
-            //    string C = null;
-            //    int CValue = 0;
-            //    int crc = 0;
-            //    int Base = 0;
-            //    const int CMin = 32;
-            //    const int CMax = 126;
-            //    //
-            //    // scrambled starts with _
-            //    //
-            //    Base = 50;
-            //    //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(Copy) for every iteration:
-            //    int tempVar = Copy.Length;
-            //    for (CPtr = 1; CPtr <= tempVar; CPtr++) {
-            //        C = Copy.Substring(CPtr - 1, 1);
-            //        CValue = Microsoft.VisualBasic.Strings.Asc(C);
-            //        if ((CValue < CMin) || (CValue > CMax)) {
-            //            //
-            //            // if out of ascii bounds, just leave it in place
-            //            //
-            //        } else {
-            //            CValue = CValue + Base;
-            //            if (CValue > CMax) {
-            //                CValue = CValue - CMax + CMin - 1;
-            //            }
-            //        }
-            //        //
-            //        // CRC is addition of all scrambled characters
-            //        //
-            //        crc = crc + CValue;
-            //        //
-            //        // put together backwards
-            //        //
-            //        returnCopy = Microsoft.VisualBasic.Strings.Chr(CValue) + returnCopy;
-            //    }
-            //    //
-            //    // Ends with the mod of the CRC and 13
-            //    //
-            //    returnCopy = "_a" + returnCopy + (crc % 9).ToString();
-            //} catch (Exception ex) {
-            //    core.handleException(ex);
-            //    throw;
-            //}
-            //return returnCopy;
         }
         //
         //====================================================================================================
@@ -4610,5 +4564,21 @@ namespace Contensive.Core.Controllers {
             } catch (Exception) { }
             return result;
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return true if strings match and neither is null
+        /// </summary>
+        /// <param name="source1"></param>
+        /// <param name="source2"></param>
+        /// <returns></returns>
+        public static bool textMatch(string source1, string source2) {
+            if ((source1 == null) || (source2 == null)) {
+                return false;
+            } else {
+                return (source1.ToLower() == source2.ToLower());
+            }
+        }
+
     }
 }

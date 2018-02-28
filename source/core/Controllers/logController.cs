@@ -137,27 +137,27 @@ namespace Contensive.Core.Controllers {
                 // decouple NLog types from internal enum
                 switch (level) {
                     case logLevel.Trace:
-                        Console.WriteLine("Trace:" + message);
+                        //Console.WriteLine("Trace:" + message);
                         nlogLogger.Trace(message);
                         break;
                     case logLevel.Debug:
-                        Console.WriteLine("Debug:" + message);
+                        //Console.WriteLine("Debug:" + message);
                         nlogLogger.Debug(message);
                         break;
                     case logLevel.Info:
-                        Console.WriteLine("Info:" + message);
+                        //Console.WriteLine("Info:" + message);
                         nlogLogger.Info(message);
                         break;
                     case logLevel.Warn:
-                        Console.WriteLine("Warn:" + message);
+                        //Console.WriteLine("Warn:" + message);
                         nlogLogger.Warn(message);
                         break;
                     case logLevel.Error:
-                        Console.WriteLine("Error:" + message);
+                        //Console.WriteLine("Error:" + message);
                         nlogLogger.Error(message);
                         break;
                     case logLevel.Fatal:
-                        Console.WriteLine("Fatal:" + message);
+                        //Console.WriteLine("Fatal:" + message);
                         nlogLogger.Fatal(message);
                         break;
                 }

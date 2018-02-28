@@ -411,7 +411,7 @@ namespace Contensive.Core {
             string ignoreUserMessage = "";
             string ignoreGuid = "";
             var ignoreList = new List<string> { };
-            collectionController.InstallCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, ref ignoreList);
+            collectionController.installCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, ref ignoreList);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status

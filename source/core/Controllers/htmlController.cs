@@ -103,7 +103,6 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        // main_Get a string with a Drop Down Select Box, see PrintFormInputSelect
         //
         public string selectFromContent(string MenuName, int CurrentValue, string ContentName, string Criteria = "", string NoneCaption = "", string htmlId = "") {
             bool tempVar = false;
@@ -417,12 +416,6 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        ////
-        ////====================================================================================================
-        ////
-        //public string selectUserFromGroup(string MenuName, int CurrentValue, int GroupID, string ignore = "", string NoneCaption = "", string htmlId = "") {
-        //    return selectUserFromGroup(MenuName, CurrentValue, GroupID, "", NoneCaption, htmlId);
-        //}
         //
         //====================================================================================================
         //
@@ -670,8 +663,16 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        //   Create a select list from a comma separated list, returns an index into the list list, starting at 1, if an element is blank (,) no option is created
-        //
+        /// <summary>
+        /// Create a select list from a comma separated list, returns an index into the list list, starting at 1, if an element is blank (,) no option is created
+        /// </summary>
+        /// <param name="MenuName"></param>
+        /// <param name="CurrentValue"></param>
+        /// <param name="SelectList"></param>
+        /// <param name="NoneCaption"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="HtmlClass"></param>
+        /// <returns></returns>
         public string selectFromList(string MenuName, int CurrentValue, string SelectList, string NoneCaption, string htmlId, string HtmlClass = "") {
             string result = "";
             try {
@@ -728,8 +729,10 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        //   Display an icon with a link to the login form/cclib.net/admin area
-        //
+        /// <summary>
+        /// Display an icon with a link to the login form/cclib.net/admin area
+        /// </summary>
+        /// <returns></returns>
         public string getLoginLink() {
             string result = "";
             try {
@@ -794,8 +797,11 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        //   Wrap the content in a common wrapper if authoring is enabled
-        //
+        /// <summary>
+        /// Wrap the content in a common wrapper if authoring is enabled
+        /// </summary>
+        /// <param name="Content"></param>
+        /// <returns></returns>
         public string getAdminHintWrapper(string Content) {
             string temphtml_GetAdminHintWrapper = null;
             try {
@@ -844,8 +850,11 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        // Starts an HTML form for uploads, Should be closed with main_GetUploadFormEnd
-        //
+        /// <summary>
+        /// Starts an HTML form for uploads, Should be closed with main_GetUploadFormEnd
+        /// </summary>
+        /// <param name="ActionQueryString"></param>
+        /// <returns></returns>
         public string formStartMultipart(string ActionQueryString = null) {
             string result = "";
             try {
@@ -859,11 +868,16 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-
         //
         //====================================================================================================
-        // Starts an HTML form, Should be closed with PrintFormEnd
-        //
+        /// <summary>
+        /// Starts an HTML form, Should be closed with PrintFormEnd
+        /// </summary>
+        /// <param name="ActionQueryString"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="htmlMethod"></param>
+        /// <returns></returns>
         public string formStart(string ActionQueryString = null, string htmlName = "", string htmlId = "", string htmlMethod = "") {
             string temphtml_GetFormStart = null;
             try {
@@ -934,7 +948,10 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        // Ends an HTML form
+        /// <summary>
+        /// Ends an HTML form
+        /// </summary>
+        /// <returns></returns>
         //
         public string formEnd() {
             return "</form>";
@@ -948,74 +965,59 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string inputText(string htmlName, string DefaultValue, int Height, int Width, string HtmlId = "", bool PasswordField = false, bool Disabled = false, string HtmlClass = "") {
-            string temphtml_GetFormInputText2 = null;
+        public string inputText(string htmlName, string defaultValue, int height, int width, string htmlId = "", bool passwordField = false, bool disabled = false, string htmlClass = "") {
+            string result = "";
             try {
-                //
-                string iDefaultValue = null;
-                int iWidth = 0;
-                int iHeight = 0;
-                string TagID = null;
-                string TagDisabled = "";
-                //
-                if (true) {
-                    TagID = "";
-                    //
-                    iDefaultValue = genericController.encodeHTML(DefaultValue);
-                    if (!string.IsNullOrEmpty(HtmlId)) {
-                        TagID = TagID + " id=\"" + genericController.encodeEmptyText(HtmlId, "") + "\"";
-                    }
-                    //
-                    if (!string.IsNullOrEmpty(HtmlClass)) {
-                        TagID = TagID + " class=\"" + HtmlClass + "\"";
-                    }
-                    //
-                    iWidth = Width;
-                    if (iWidth <= 0) {
-                        iWidth = core.siteProperties.defaultFormInputWidth;
-                    }
-                    //
-                    iHeight = Height;
-                    if (iHeight <= 0) {
-                        iHeight = core.siteProperties.defaultFormInputTextHeight;
-                    }
-                    //
-                    if (Disabled) {
-                        TagDisabled = " disabled=\"disabled\"";
-                    }
-                    //
-                    if (PasswordField) {
-                        temphtml_GetFormInputText2 = "<input TYPE=\"password\" NAME=\"" + htmlName + "\" SIZE=\"" + iWidth + "\" VALUE=\"" + iDefaultValue + "\"" + TagID + TagDisabled + ">";
-                    } else if ((iHeight == 1) && (iDefaultValue.IndexOf("\"") == -1)) {
-                        temphtml_GetFormInputText2 = "<input TYPE=\"Text\" NAME=\"" + htmlName + "\" SIZE=\"" + iWidth.ToString() + "\" VALUE=\"" + iDefaultValue + "\"" + TagID + TagDisabled + ">";
-                    } else {
-                        temphtml_GetFormInputText2 = "<textarea NAME=\"" + htmlName + "\" ROWS=\"" + iHeight.ToString() + "\" COLS=\"" + iWidth.ToString() + "\"" + TagID + TagDisabled + ">" + iDefaultValue + "</TEXTAREA>";
-                    }
-                    core.doc.formInputTextCnt = core.doc.formInputTextCnt + 1;
+                defaultValue = genericController.encodeHTML(defaultValue);
+                string TagID = "";
+                if (!string.IsNullOrEmpty(htmlId)) {
+                    TagID = TagID + " id=\"" + genericController.encodeEmptyText(htmlId, "") + "\"";
                 }
                 //
-                return temphtml_GetFormInputText2;
+                if (!string.IsNullOrEmpty(htmlClass)) {
+                    TagID = TagID + " class=\"" + htmlClass + "\"";
+                }
+                //
+                if (width <= 0) {
+                    width = core.siteProperties.defaultFormInputWidth;
+                }
+                //
+                if (height <= 0) {
+                    height = core.siteProperties.defaultFormInputTextHeight;
+                }
+                //
+                string TagDisabled = "";
+                if (disabled) {
+                    TagDisabled = " disabled=\"disabled\"";
+                }
+                //
+                if (passwordField) {
+                    result = "<input TYPE=\"password\" NAME=\"" + htmlName + "\" SIZE=\"" + width + "\" VALUE=\"" + defaultValue + "\"" + TagID + TagDisabled + ">";
+                } else if (height == 1) {
+                    result = "<input TYPE=\"Text\" NAME=\"" + htmlName + "\" SIZE=\"" + width.ToString() + "\" VALUE=\"" + defaultValue + "\"" + TagID + TagDisabled + ">";
+                } else {
+                    result = "<textarea NAME=\"" + htmlName + "\" ROWS=\"" + height.ToString() + "\" COLS=\"" + width.ToString() + "\"" + TagID + TagDisabled + ">" + defaultValue + "</TEXTAREA>";
+                }
+                core.doc.formInputTextCnt = core.doc.formInputTextCnt + 1;
             } catch (Exception ex) {
                 core.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_GetFormInputText2")
-            return temphtml_GetFormInputText2;
+            return result;
         }
-        ////
-        ////====================================================================================================
-        //// main_Get an HTML Form text input (or text area)
-        ////
-        //public string inputTextExpandable(string TagName, string Value = "", int Rows = 0, string styleWidth = "100%", string Id = "", bool PasswordField = false) {
-        //    if (Rows == 0) {
-        //        Rows = core.siteProperties.defaultFormInputTextHeight;
-        //    }
-        //    return html_GetFormInputTextExpandable2(TagName, Value, Rows, styleWidth, Id, PasswordField, false, "");
-        //}
         //
         //====================================================================================================
-        // main_Get an HTML Form text input (or text area), added disabled case
-        //
+        /// <summary>
+        /// HTML Form text input (or text area), added disabled case
+        /// </summary>
+        /// <param name="TagName"></param>
+        /// <param name="Value"></param>
+        /// <param name="Rows"></param>
+        /// <param name="styleWidth"></param>
+        /// <param name="Id"></param>
+        /// <param name="PasswordField"></param>
+        /// <param name="Disabled"></param>
+        /// <param name="HtmlClass"></param>
+        /// <returns></returns>
         public string inputTextExpandable(string TagName, string Value = "", int Rows = 0, string styleWidth = "100%", string Id = "", bool PasswordField = false, bool Disabled = false, string HtmlClass = "") {
             string temphtml_GetFormInputTextExpandable2 = null;
             try {
@@ -1150,25 +1152,20 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        // main_Get an HTML Form file upload input
-        //
+        /// <summary>
+        /// HTML Form file upload input
+        /// </summary>
+        /// <param name="TagName"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="HtmlClass"></param>
+        /// <returns></returns>
         public string inputFile(string TagName, string htmlId = "", string HtmlClass = "") {
             //
             return "<input TYPE=\"file\" name=\"" + TagName + "\" id=\"" + htmlId + "\" class=\"" + HtmlClass + "\">";
             //
         }
-        ////
-        ////====================================================================================================
-        //// main_Get an HTML Form file upload input
-        ////
-        //public string inputFile(string TagName, string htmlId = "") {
-        //    //
-        //    return inputFile(TagName, htmlId);
-        //    //
-        //}
         //
         //====================================================================================================
-        // main_Get an HTML Form input
         //
         public string inputRadio(string TagName, string TagValue, string CurrentValue, string htmlId = "") {
             string temphtml_GetFormInputRadioBox = null;
@@ -1240,107 +1237,6 @@ namespace Contensive.Core.Controllers {
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_GetFormInputCheckBox2")
             return temphtml_GetFormInputCheckBox2;
-        }
-        //
-        //====================================================================================================
-        //   Create a List of Checkboxes based on a contentname and a list of IDs that should be checked
-        //      For instance, list out a checklist of all public groups, with the ones checked that this member belongs to
-        //       PrimaryContentName = "People"
-        //       PrimaryRecordID = MemberID
-        //       SecondaryContentName = "Groups"
-        //       SecondaryContentSelectCriteria = "ccGroups.PublicJoin<>0"
-        //       RulesContentName = "Member Rules"
-        //       RulesPrimaryFieldName = "MemberID"
-        //       RulesSecondaryFieldName = "GroupID"
-        //========================================================================
-        //
-        public string html_GetFormInputCheckListByIDList(string TagName, string SecondaryContentName, string CheckedIDList, string CaptionFieldName = "", bool readOnlyField = false) {
-            string Result = "";
-            try {
-                string SQL = null;
-                int CS = 0;
-                int GroupCount = 0;
-                string SecondaryTablename = null;
-                int SecondaryContentID = 0;
-                string iCaptionFieldName = null;
-                string GroupName = null;
-                string GroupCaption = null;
-                bool CanSeeHiddenFields = false;
-                Models.Complex.cdefModel SecondaryCDef = null;
-                string ContentIDList = "";
-                bool Found = false;
-                int RecordID = 0;
-                string SingularPrefix = null;
-                //
-                iCaptionFieldName = genericController.encodeEmptyText(CaptionFieldName, "name");
-                //
-                // ----- Gather all the SecondaryContent that associates to the PrimaryContent
-                //
-                SecondaryCDef = Models.Complex.cdefModel.getCdef(core, SecondaryContentName);
-                SecondaryTablename = SecondaryCDef.contentTableName;
-                SecondaryContentID = SecondaryCDef.id;
-                SecondaryCDef.get_childIdList(core).Add(SecondaryContentID);
-                SingularPrefix = genericController.GetSingular(SecondaryContentName) + "&nbsp;";
-                //
-                // ----- Gather all the records, sorted by ContentName
-                //
-                SQL = "SELECT " + SecondaryTablename + ".ID AS ID, ccContent.Name AS SectionName, " + SecondaryTablename + "." + iCaptionFieldName + " AS GroupCaption, " + SecondaryTablename + ".name AS GroupName, " + SecondaryTablename + ".SortOrder"
-                + " FROM " + SecondaryTablename + " LEFT JOIN ccContent ON " + SecondaryTablename + ".ContentControlID = ccContent.ID"
-                + " Where (" + SecondaryTablename + ".Active<>" + SQLFalse + ")"
-                + " And (ccContent.Active<>" + SQLFalse + ")"
-                + " And (" + SecondaryTablename + ".ContentControlID IN (" + ContentIDList + "))";
-                SQL += ""
-                    + " GROUP BY " + SecondaryTablename + ".ID, ccContent.Name, " + SecondaryTablename + "." + iCaptionFieldName + ", " + SecondaryTablename + ".name, " + SecondaryTablename + ".SortOrder"
-                    + " ORDER BY ccContent.Name, " + SecondaryTablename + "." + iCaptionFieldName;
-                CS = core.db.csOpenSql(SQL);
-                if (core.db.csOk(CS)) {
-                    //SectionName = "";
-                    GroupCount = 0;
-                    CanSeeHiddenFields = core.session.isAuthenticatedDeveloper(core);
-                    while (core.db.csOk(CS)) {
-                        GroupName = core.db.csGetText(CS, "GroupName");
-                        if ((GroupName.Left(1) != "_") || CanSeeHiddenFields) {
-                            RecordID = core.db.csGetInteger(CS, "ID");
-                            GroupCaption = core.db.csGetText(CS, "GroupCaption");
-                            if (string.IsNullOrEmpty(GroupCaption)) {
-                                GroupCaption = GroupName;
-                            }
-                            if (string.IsNullOrEmpty(GroupCaption)) {
-                                GroupCaption = SingularPrefix + RecordID;
-                            }
-                            if (GroupCount != 0) {
-                                // leave this between checkboxes - it is searched in the admin page
-                                Result = Result + "<br>\r\n";
-                            }
-                            if (genericController.IsInDelimitedString(CheckedIDList, RecordID.ToString(), ",")) {
-                                Found = true;
-                            } else {
-                                Found = false;
-                            }
-                            // must leave the first hidden with the value in this form - it is searched in the admin pge
-                            Result = Result + "<input type=hidden name=\"" + TagName + "." + GroupCount + ".ID\" value=" + RecordID + ">";
-                            if (readOnlyField && !Found) {
-                                Result = Result + "<input type=checkbox disabled>";
-                            } else if (readOnlyField) {
-                                Result = Result + "<input type=checkbox disabled checked>";
-                                Result = Result + "<input type=\"hidden\" name=\"" + TagName + "." + GroupCount + ".ID\" value=" + RecordID + ">";
-                            } else if (Found) {
-                                Result = Result + "<input type=checkbox name=\"" + TagName + "." + GroupCount + "\" checked>";
-                            } else {
-                                Result = Result + "<input type=checkbox name=\"" + TagName + "." + GroupCount + "\">";
-                            }
-                            Result = Result + SpanClassAdminNormal + GroupCaption;
-                            GroupCount = GroupCount + 1;
-                        }
-                        core.db.csGoNext(CS);
-                    }
-                    Result = Result + "<input type=\"hidden\" name=\"" + TagName + ".RowCount\" value=\"" + GroupCount + "\">\r\n";
-                }
-                core.db.csClose(ref CS);
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            return Result;
         }
         //
         //====================================================================================================
@@ -1577,16 +1473,8 @@ namespace Contensive.Core.Controllers {
             }
             return returnResult;
         }
-        ////
-        ////====================================================================================================
-        //// Print an HTML Form Button element named BUTTON
-        ////
-        //public string inputButton(string ButtonLabel, string Name = "", string htmlId = "", string OnClick = "") {
-        //    return inputButton(ButtonLabel, Name, htmlId, OnClick, false);
-        //}
         //
         //====================================================================================================
-        // Print an HTML Form Button element named BUTTON
         //
         public static string getButton(string ButtonLabel, string Name = "button", string htmlId = "", string OnClick = "", bool Disabled = false, string htmlClass = "") {
             string s = "<input type=\"submit\""
@@ -1603,7 +1491,6 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        // main_Gets a value in a hidden form field, Handles name and value encoding
         //
         public string inputHidden(string TagName, string TagValue, string htmlId = "") {
             string result = "";
@@ -1640,104 +1527,6 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        // Popup a separate window with the contents of a file
-        //
-        public string javascriptOpenWindow(string URI, string WindowWidth = "", string WindowHeight = "", string WindowScrollBars = "", bool WindowResizable = true, string WindowName = "_blank") {
-            string temphtml_GetWindowOpenJScript = null;
-            try {
-                //
-                //If Not (true) Then Exit Function
-                //
-                string Delimiter = null;
-                //
-                temphtml_GetWindowOpenJScript = "";
-                WindowName = genericController.encodeEmptyText(WindowName, "_blank");
-                //
-                // Added addl options from huhcorp.com sample
-                //
-                temphtml_GetWindowOpenJScript = temphtml_GetWindowOpenJScript + "window.open('" + URI + "', '" + WindowName + "'";
-                temphtml_GetWindowOpenJScript = temphtml_GetWindowOpenJScript + ",'menubar=no,toolbar=no,location=no,status=no";
-                Delimiter = ",";
-                if (!genericController.isMissing(WindowWidth)) {
-                    if (!string.IsNullOrEmpty(WindowWidth)) {
-                        temphtml_GetWindowOpenJScript = temphtml_GetWindowOpenJScript + Delimiter + "width=" + WindowWidth;
-                        Delimiter = ",";
-                    }
-                }
-                if (!genericController.isMissing(WindowHeight)) {
-                    if (!string.IsNullOrEmpty(WindowHeight)) {
-                        temphtml_GetWindowOpenJScript = temphtml_GetWindowOpenJScript + Delimiter + "height=" + WindowHeight;
-                        Delimiter = ",";
-                    }
-                }
-                if (!genericController.isMissing(WindowScrollBars)) {
-                    if (!string.IsNullOrEmpty(WindowScrollBars)) {
-                        temphtml_GetWindowOpenJScript = temphtml_GetWindowOpenJScript + Delimiter + "scrollbars=" + WindowScrollBars;
-                        Delimiter = ",";
-                    }
-                }
-                if (WindowResizable) {
-                    temphtml_GetWindowOpenJScript = temphtml_GetWindowOpenJScript + Delimiter + "resizable";
-                    Delimiter = ",";
-                }
-                return temphtml_GetWindowOpenJScript + "')";
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
-            //
-            return temphtml_GetWindowOpenJScript;
-        }
-        //
-        //====================================================================================================
-        // Popup a separate window with the contents of a file
-        //
-        public string javascriptOpenModal(string URI, string WindowWidth = "", string WindowHeight = "", bool WindowScrollBars = false, bool WindowResizable = false, string WindowName = "") {
-            string temphtml_GetWindowDialogJScript = null;
-            try {
-                string iWindowName = null;
-                //
-                iWindowName = genericController.encodeEmptyText(WindowName, "_blank");
-                //
-                // Added addl options from huhcorp.com sample
-                //
-                temphtml_GetWindowDialogJScript = "";
-                temphtml_GetWindowDialogJScript = temphtml_GetWindowDialogJScript + "showModalDialog('" + URI + "', '" + iWindowName + "'";
-                temphtml_GetWindowDialogJScript = temphtml_GetWindowDialogJScript + ",'status:false";
-                if (!genericController.isMissing(WindowWidth)) {
-                    if (!string.IsNullOrEmpty(WindowWidth)) {
-                        temphtml_GetWindowDialogJScript = temphtml_GetWindowDialogJScript + ";dialogWidth:" + WindowWidth + "px";
-                    }
-                }
-                if (!genericController.isMissing(WindowHeight)) {
-                    if (!string.IsNullOrEmpty(WindowHeight)) {
-                        temphtml_GetWindowDialogJScript = temphtml_GetWindowDialogJScript + ";dialogHeight:" + WindowHeight + "px";
-                    }
-                }
-                if (WindowScrollBars) {
-                    temphtml_GetWindowDialogJScript = temphtml_GetWindowDialogJScript + ";scroll:yes";
-                }
-                if (WindowResizable) {
-                    temphtml_GetWindowDialogJScript = temphtml_GetWindowDialogJScript + ";resizable:yes";
-                }
-                return temphtml_GetWindowDialogJScript + "')";
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
-            //
-            return temphtml_GetWindowDialogJScript;
-        }
-        //
-        //====================================================================================================
         //
         public void javascriptAddEvent(string HtmlId, string DOMEvent, string Javascript) {
             string JSCodeAsString = Javascript;
@@ -1747,274 +1536,6 @@ namespace Contensive.Core.Controllers {
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, "\n", "\\n");
             JSCodeAsString = "'" + JSCodeAsString + "'";
             addScriptCode_onLoad("cj.addListener(document.getElementById('" + HtmlId + "'),'" + DOMEvent + "',function(){eval(" + JSCodeAsString + ")})", "");
-        }
-        //
-        //====================================================================================================
-        //
-        public string inputField(string ContentName, string FieldName, string htmlName = "", string HtmlValue = "", string HtmlClass = "", string HtmlId = "", string HtmlStyle = "", int ManyToManySourceRecordID = 0) {
-            string result = "";
-            try {
-                bool IgnoreBoolean = false;
-                string LookupContentName = null;
-                int fieldType = 0;
-                string InputName = null;
-                int GroupID = 0;
-                Models.Complex.cdefModel CDef = null;
-                string MTMContent0 = null;
-                string MTMContent1 = null;
-                string MTMRuleContent = null;
-                string MTMRuleField0 = null;
-                string MTMRuleField1 = null;
-                //
-                InputName = htmlName;
-                if (string.IsNullOrEmpty(InputName)) {
-                    InputName = FieldName;
-                }
-                //
-                fieldType = genericController.encodeInteger(Models.Complex.cdefModel.GetContentFieldProperty(core, ContentName, FieldName, "type"));
-                switch (fieldType) {
-                    case FieldTypeIdBoolean: {
-                            //
-                            //
-                            //
-                            result = inputCheckbox(InputName, genericController.encodeBoolean(HtmlValue) == true, HtmlId, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdFileCSS: {
-                            //
-                            //
-                            //
-                            result = inputTextExpandable(InputName, HtmlValue, 0, "100%", HtmlId, false, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdCurrency: {
-                            //
-                            //
-                            //
-                            result = inputText(InputName, HtmlValue, -1, -1, HtmlId, false, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdDate: {
-                            //
-                            //
-                            //
-                            result = inputDate(InputName, HtmlValue, "", HtmlId);
-                            if (!string.IsNullOrEmpty(HtmlClass)) {
-                                result = genericController.vbReplace(result, ">", " class=\"" + HtmlClass + "\">");
-                            }
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdFile: {
-                            //
-                            //
-                            //
-                            if (string.IsNullOrEmpty(HtmlValue)) {
-                                result = inputFile(InputName, HtmlId, HtmlClass);
-                            } else {
-
-                                string FieldValuefilename = "";
-                                string FieldValuePath = "";
-                                core.cdnFiles.splitDosPathFilename(HtmlValue, ref FieldValuePath, ref FieldValuefilename);
-                                result = result + "<a href=\"http://" + genericController.EncodeURL(core.webServer.requestDomain + genericController.getCdnFileLink(core, HtmlValue)) + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + FieldValuefilename + "]</A>";
-                                result = result + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + inputCheckbox(InputName + ".Delete", false);
-                                result = result + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + inputFile(InputName, HtmlId, HtmlClass);
-                            }
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdFloat: {
-                            //
-                            //
-                            //
-                            result = inputText(InputName, HtmlValue, -1, -1, HtmlId, false, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdFileImage: {
-                            //
-                            //
-                            //
-                            if (string.IsNullOrEmpty(HtmlValue)) {
-                                result = inputFile(InputName, HtmlId, HtmlClass);
-                            } else {
-                                string FieldValuefilename = "";
-                                string FieldValuePath = "";
-                                core.cdnFiles.splitDosPathFilename(HtmlValue, ref FieldValuePath, ref FieldValuefilename);
-                                result = result + "<a href=\"http://" + genericController.EncodeURL(core.webServer.requestDomain + genericController.getCdnFileLink(core, HtmlValue)) + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + FieldValuefilename + "]</A>";
-                                result = result + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + inputCheckbox(InputName + ".Delete", false);
-                                result = result + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + inputFile(InputName, HtmlId, HtmlClass);
-                            }
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdInteger: {
-                            //
-                            //
-                            //
-                            result = inputText(InputName, HtmlValue, -1, -1, HtmlId, false, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdFileJavascript: {
-                            //
-                            //
-                            //
-                            result = inputTextExpandable(InputName, HtmlValue, 0, "100%", HtmlId, false, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdLink: {
-                            //
-                            //
-                            //
-                            result = inputText(InputName, HtmlValue, -1, -1, HtmlId, false, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdLookup: {
-                            //
-                            //
-                            //
-                            CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
-                            LookupContentName = "";
-                            foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in CDef.fields) {
-                                Models.Complex.cdefFieldModel field = keyValuePair.Value;
-                                if (genericController.vbUCase(field.nameLc) == genericController.vbUCase(FieldName)) {
-                                    if (field.lookupContentID != 0) {
-                                        LookupContentName = genericController.encodeText(Models.Complex.cdefModel.getContentNameByID(core, field.lookupContentID));
-                                    }
-                                    if (!string.IsNullOrEmpty(LookupContentName)) {
-                                        result = selectFromContent(InputName, genericController.encodeInteger(HtmlValue), LookupContentName, "", "Select One", HtmlId, ref IgnoreBoolean, HtmlClass);
-                                    } else if (field.lookupList != "") {
-                                        result = selectFromList(InputName, genericController.encodeInteger(HtmlValue), field.lookupList, "Select One", HtmlId, HtmlClass);
-                                    }
-                                    if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                        result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                                    }
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    case FieldTypeIdManyToMany: {
-                            //
-                            //
-                            //
-                            CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
-                            var tempVar = CDef.fields[FieldName.ToLower()];
-                            MTMContent0 = Models.Complex.cdefModel.getContentNameByID(core, tempVar.contentId);
-                            MTMContent1 = Models.Complex.cdefModel.getContentNameByID(core, tempVar.manyToManyContentID);
-                            MTMRuleContent = Models.Complex.cdefModel.getContentNameByID(core, tempVar.manyToManyRuleContentID);
-                            MTMRuleField0 = tempVar.ManyToManyRulePrimaryField;
-                            MTMRuleField1 = tempVar.ManyToManyRuleSecondaryField;
-                            result = getCheckList(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false);
-                            //result = getInputCheckListCategories(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, HtmlValue)
-                            break;
-                        }
-                    case FieldTypeIdMemberSelect: {
-                            //
-                            //
-                            //
-                            GroupID = genericController.encodeInteger(Models.Complex.cdefModel.GetContentFieldProperty(core, ContentName, FieldName, "memberselectgroupid"));
-                            result = selectUserFromGroup(InputName, genericController.encodeInteger(HtmlValue), GroupID, "", "", HtmlId);
-                            if (!string.IsNullOrEmpty(HtmlClass)) {
-                                result = genericController.vbReplace(result, ">", " class=\"" + HtmlClass + "\">");
-                            }
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdResourceLink: {
-                            //
-                            //
-                            //
-                            result = inputText(InputName, HtmlValue, -1, -1, HtmlId, false, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdText: {
-                            //
-                            //
-                            //
-                            result = inputText(InputName, HtmlValue, -1, -1, HtmlId, false, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdLongText:
-                    case FieldTypeIdFileText: {
-                            //
-                            //
-                            //
-                            result = inputTextExpandable(InputName, HtmlValue, 0, "100%", HtmlId, false, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdFileXML: {
-                            //
-                            //
-                            //
-                            result = inputTextExpandable(InputName, HtmlValue, 0, "100%", HtmlId, false, false, HtmlClass);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            break;
-                        }
-                    case FieldTypeIdHTML:
-                    case FieldTypeIdFileHTML: {
-                            //
-                            //
-                            //
-                            result = getFormInputHTML(InputName, HtmlValue);
-                            if (!string.IsNullOrEmpty(HtmlStyle)) {
-                                result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
-                            }
-                            if (!string.IsNullOrEmpty(HtmlClass)) {
-                                result = genericController.vbReplace(result, ">", " class=\"" + HtmlClass + "\">");
-                            }
-                            break;
-                        }
-                    default: {
-                            //
-                            // unsupported field type
-                            //
-                            break;
-                        }
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            return result;
         }
         //
         //====================================================================================================
@@ -2280,70 +1801,48 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        // Modify a string to be printed through the HTML stream
-        //   convert carriage returns ( 0x10 ) to <br>
-        //   remove linefeeds ( 0x13 )
-        //====================================================================================================
-        //
-        public string convertCRLFToHtmlBreak(object Source) {
-            string tempconvertCRLFToHtmlBreak = null;
-            try {
-                //
-                string iSource;
-                //
-                iSource = genericController.encodeText(Source);
-                tempconvertCRLFToHtmlBreak = "";
-                if (!string.IsNullOrEmpty(iSource)) {
-                    tempconvertCRLFToHtmlBreak = iSource;
-                    tempconvertCRLFToHtmlBreak = genericController.vbReplace(tempconvertCRLFToHtmlBreak, "\r", "");
-                    tempconvertCRLFToHtmlBreak = genericController.vbReplace(tempconvertCRLFToHtmlBreak, "\n", "<br>");
-                }
-                return tempconvertCRLFToHtmlBreak;
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                core.handleException(ex);
+        /// <summary>
+        /// Modify a string to be printed through the HTML stream
+        ///   convert carriage returns ( 0x10 ) to <br>
+        ///   remove linefeeds ( 0x13 )
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public string convertCRLFToHtmlBreak(string source) {
+            string  result = "";
+            if (!string.IsNullOrEmpty(source)) {
+                result = source;
+                result = genericController.vbReplace(result, "\r", "");
+                result = genericController.vbReplace(result, "\n", "<br>");
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_EncodeCRLF")
-            return tempconvertCRLFToHtmlBreak;
+            return result;
         }
         //
         //====================================================================================================
-        //   Encodes characters to be compatibile with HTML
-        //   i.e. it converts the equation 5 > 6 to th sequence "5 &gt; 6"
-        //
-        //   convert carriage returns ( 0x10 ) to <br>
-        //   remove linefeeds ( 0x13 )
-        //====================================================================================================
-        //
-        public string encodeHTML(object Source) {
-            return genericController.encodeHTML(genericController.encodeText(Source));
-        }
-        //
-        //========================================================================
-        //   Convert an HTML source to a text equivelent
-        //
-        //       converts CRLF to <br>
-        //       encodes reserved HTML characters to their equivalent
-        //========================================================================
-        //
+        /// <summary>
+        /// Convert an HTML source to a text equivelent. converts CRLF to <br>, encodes reserved HTML characters to their equivalent
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
         public string convertTextToHTML(string Source) {
             return convertCRLFToHtmlBreak(genericController.encodeHTML(Source));
         }
         //
-        //===============================================================================================================================
-        //   Get Addon Selector
-        //
-        //   The addon selector is the string sent out with the content in edit-mode. In the editor, it is converted by javascript
-        //   to the popup window that selects instance options. It is in this format:
-        //
-        //   Select (creates a list of names in a select box, returns the selected name)
-        //       name=currentvalue[optionname0:optionvalue0|optionname1:optionvalue1|...]
-        //   CheckBox (creates a list of names in checkboxes, and returns the selected names)
-        //===============================================================================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// Get Addon Selector
+        ///
+        ///   The addon selector is the string sent out with the content in edit-mode. In the editor, it is converted by javascript
+        ///   to the popup window that selects instance options. It is in this format:
+        ///
+        ///   Select (creates a list of names in a select box, returns the selected name)
+        ///       name=currentvalue[optionname0:optionvalue0|optionname1:optionvalue1|...]
+        ///   CheckBox (creates a list of names in checkboxes, and returns the selected names)
+        /// </summary>
+        /// <param name="SrcOptionName"></param>
+        /// <param name="InstanceOptionValue_AddonEncoded"></param>
+        /// <param name="SrcOptionValueSelector"></param>
+        /// <returns></returns>
         public string getAddonSelector(string SrcOptionName, string InstanceOptionValue_AddonEncoded, string SrcOptionValueSelector) {
             string result = "";
             try {
@@ -2567,8 +2066,7 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
-        // main_Get an HTML Form text input (or text area)
+        //====================================================================================================
         //
         public string getFormInputHTML(string htmlName, string DefaultValue = "", string styleHeight = "", string styleWidth = "", bool readOnlyfield = false, bool allowActiveContent = false, string addonListJSON = "", string styleList = "", string styleOptionList = "", bool allowResourceLibrary = false) {
             string returnHtml = "";
@@ -2607,9 +2105,7 @@ namespace Contensive.Core.Controllers {
             return returnHtml;
         }
         //
-        //========================================================================
-        // ----- Process the reply from the Tools Panel form
-        //========================================================================
+        //====================================================================================================
         //
         public void processFormToolsPanel(string legacyFormSn = "") {
             try {
@@ -2671,9 +2167,7 @@ namespace Contensive.Core.Controllers {
             }
         }
         //
-        //========================================================================
-        // -----
-        //========================================================================
+        //====================================================================================================
         //
         public void processAddonSettingsEditor() {
             //
@@ -3016,9 +2510,7 @@ namespace Contensive.Core.Controllers {
             }
         }
         //
-        //========================================================================
-        // ----- Process the little edit form in the help bubble
-        //========================================================================
+        //====================================================================================================
         //
         public void processHelpBubbleEditor() {
             //
@@ -3050,41 +2542,40 @@ namespace Contensive.Core.Controllers {
                     break;
             }
         }
-
         //
-        //========================================================================
-        // Print the Member Edit form
-        //
-        //   For instance, list out a checklist of all public groups, with the ones checked that this member belongs to
-        //       PrimaryContentName = "People"
-        //       PrimaryRecordID = MemberID
-        //       SecondaryContentName = "Groups"
-        //       SecondaryContentSelectCriteria = "ccGroups.PublicJoin<>0"
-        //       RulesContentName = "Member Rules"
-        //       RulesPrimaryFieldName = "MemberID"
-        //       RulesSecondaryFieldName = "GroupID"
-        //========================================================================
+        //====================================================================================================
         //
         public string getCheckList2(string TagName, string PrimaryContentName, int PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectCriteria = "", string CaptionFieldName = "", bool readOnlyfield = false) {
             return getCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, genericController.encodeText(CaptionFieldName), readOnlyfield, false, "");
         }
         //
-        //========================================================================
-        //   main_Get a list of checkbox options based on a standard set of rules
-        //
-        //   IncludeContentFolderDivs
-        //       When true, the list of options (checkboxes) are grouped by ContentFolder and wrapped in a Div with ID="ContentFolder99"
-        //
-        //   For instance, list out a options of all public groups, with the ones checked that this member belongs to
-        //       PrimaryContentName = "People"
-        //       PrimaryRecordID = MemberID
-        //       SecondaryContentName = "Groups"
-        //       SecondaryContentSelectCriteria = "ccGroups.PublicJoin<>0"
-        //       RulesContentName = "Member Rules"
-        //       RulesPrimaryFieldName = "MemberID"
-        //       RulesSecondaryFieldName = "GroupID"
-        //========================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// list of checkbox options based on a standard set of rules.
+        ///   IncludeContentFolderDivs
+        ///       When true, the list of options (checkboxes) are grouped by ContentFolder and wrapped in a Div with ID="ContentFolder99"
+        ///   For instance, list out a options of all public groups, with the ones checked that this member belongs to
+        ///       PrimaryContentName = "People"
+        ///       PrimaryRecordID = MemberID
+        ///       SecondaryContentName = "Groups"
+        ///       SecondaryContentSelectCriteria = "ccGroups.PublicJoin<>0"
+        ///       RulesContentName = "Member Rules"
+        ///       RulesPrimaryFieldName = "MemberID"
+        ///       RulesSecondaryFieldName = "GroupID"
+        /// </summary>
+        /// <param name="TagName"></param>
+        /// <param name="PrimaryContentName"></param>
+        /// <param name="PrimaryRecordID"></param>
+        /// <param name="SecondaryContentName"></param>
+        /// <param name="RulesContentName"></param>
+        /// <param name="RulesPrimaryFieldname"></param>
+        /// <param name="RulesSecondaryFieldName"></param>
+        /// <param name="SecondaryContentSelectCriteria"></param>
+        /// <param name="CaptionFieldName"></param>
+        /// <param name="readOnlyfield"></param>
+        /// <param name="IncludeContentFolderDivs"></param>
+        /// <param name="DefaultSecondaryIDList"></param>
+        /// <returns></returns>
         public string getCheckList(string TagName, string PrimaryContentName, int PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectCriteria = "", string CaptionFieldName = "", bool readOnlyfield = false, bool IncludeContentFolderDivs = false, string DefaultSecondaryIDList = "") {
             string returnHtml = "";
             try {
@@ -3328,15 +2819,7 @@ namespace Contensive.Core.Controllers {
             return returnHtml;
         }
         //
-        //========================================================================
-        // main_GetRecordEditLink2( iContentName, iRecordID, AllowCut, RecordName )
-        //
-        //   ContentName The content for this link
-        //   RecordID    The ID of the record in the Table
-        //   AllowCut
-        //   RecordName
-        //   IsEditing
-        //========================================================================
+        //====================================================================================================
         //
         public string getRecordEditLink2(string ContentName, int RecordID, bool AllowCut, string RecordName, bool IsEditing) {
             string tempmain_GetRecordEditLink2 = null;
@@ -3432,11 +2915,7 @@ namespace Contensive.Core.Controllers {
             return tempmain_GetRecordEditLink2;
         }
         //
-        //========================================================================
-        // Print an add link for the current ContentSet
-        //   iCSPointer is the content set to be added to
-        //   PresetNameValueList is a name=value pair to force in the added record
-        //========================================================================
+        //====================================================================================================
         //
         public string cs_getRecordAddLink(int CSPointer, string PresetNameValueList = "", bool AllowPaste = false) {
             string tempmain_cs_getRecordAddLink = null;
@@ -3477,49 +2956,13 @@ namespace Contensive.Core.Controllers {
             return tempmain_cs_getRecordAddLink;
         }
         //
-        //========================================================================
-        // main_GetRecordAddLink( iContentName, iPresetNameValueList )
-        //
-        //   Returns a string of add tags for the Content Definition included, and all
-        //   child contents of that area.
-        //
-        //   iContentName The content for this link
-        //   iPresetNameValueList The sql equivalent used to select the record.
-        //           translates to name0=value0,name1=value1.. pairs separated by ,
-        //
-        //   LowestRootMenu - The Menu in the flyout structure that is the furthest down
-        //   in the chain that the user has content access to. This is so a content manager
-        //   does not have to navigate deep into a structure to main_Get to content he can
-        //   edit.
-        //   Basically, the entire menu is created down from the MenuName, and populated
-        //   with all the entiries this user has access to. The LowestRequiredMenuName is
-        //   is returned from the _branch routine, and that is to root on-which the
-        //   main_GetMenu uses
-        //========================================================================
+        //====================================================================================================
         //
         public string getRecordAddLink(string ContentName, string PresetNameValueList, bool AllowPaste = false) {
             return getRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, core.session.isEditing(ContentName));
         }
         //
-        //========================================================================
-        // main_GetRecordAddLink2
-        //
-        //   Returns a string of add tags for the Content Definition included, and all
-        //   child contents of that area.
-        //
-        //   iContentName The content for this link
-        //   iPresetNameValueList The sql equivalent used to select the record.
-        //           translates to name0=value0,name1=value1.. pairs separated by ,
-        //
-        //   LowestRootMenu - The Menu in the flyout structure that is the furthest down
-        //   in the chain that the user has content access to. This is so a content manager
-        //   does not have to navigate deep into a structure to main_Get to content he can
-        //   edit.
-        //   Basically, the entire menu is created down from the MenuName, and populated
-        //   with all the entiries this user has access to. The LowestRequiredMenuName is
-        //   is returned from the _branch routine, and that is to root on-which the
-        //   main_GetMenu uses
-        //========================================================================
+        //====================================================================================================
         //
         public string getRecordAddLink2(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
             string tempmain_GetRecordAddLink2 = null;
@@ -3668,21 +3111,7 @@ namespace Contensive.Core.Controllers {
             return tempmain_GetRecordAddLink2;
         }
         //
-        //========================================================================
-        // main_GetRecordAddLink_AddMenuEntry( ContentName, PresetNameValueList, ContentNameList, MenuName )
-        //
-        //   adds an add entry for the content name, and all the child content
-        //   returns the MenuName of the lowest branch that has valid
-        //   Navigator Entries.
-        //
-        //   ContentName The content for this link
-        //   PresetNameValueList The sql equivalent used to select the record.
-        //           translates to (name0=value0)&(name1=value1).. pairs separated by &
-        //   ContentNameList is a comma separated list of names of the content included so far
-        //   MenuName is the name of the root branch, for flyout menu
-        //
-        //   IsMember(), main_IsAuthenticated() And Member_AllowLinkAuthoring must already be checked
-        //========================================================================
+        //====================================================================================================
         //
         private string getRecordAddLink_AddMenuEntry(string ContentName, string PresetNameValueList, string ContentNameList, string MenuName, string ParentMenuName) {
             string result = "";
@@ -3838,10 +3267,7 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
-        //   main_GetPanel( Panel, Optional StylePanel, Optional StyleHilite, Optional StyleShadow, Optional Width, Optional Padding, Optional HeightMin) As String
-        // Return a panel with the input as center
-        //========================================================================
+        //====================================================================================================
         //
         public string getPanel(string content, string StylePanel = "", string StyleHilite = "ccPanelHilite", string StyleShadow = "ccPanelShadow", string Width = "100%", int Padding = 5, int HeightMin = 1) {
             string result = null;
@@ -3910,25 +3336,7 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
-        //   main_GetPanel( Panel, Optional StylePanel, Optional StyleHilite, Optional StyleShadow, Optional Width, Optional Padding, Optional HeightMin) As String
-        // Return a panel with the input as center
-        //========================================================================
-        //
-        public string getReversePanel(string Panel, string StylePanel = "", string StyleHilite = "ccPanelShadow", string StyleShadow = "ccPanelHilite", string Width = "", string Padding = "", string HeightMin = "") {
-            string MyStyleHilite = null;
-            string MyStyleShadow = null;
-            //
-            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelShadow");
-            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelHilite");
-
-            return getPanelTop(StylePanel, MyStyleHilite, MyStyleShadow, Width, Padding, HeightMin) + genericController.encodeText(Panel) + getPanelBottom(StylePanel, MyStyleHilite, MyStyleShadow, Width, Padding);
-        }
-        //
-        //========================================================================
-        // Return a panel header with the header message reversed out of the left
-        //========================================================================
-        //
+        //====================================================================================================
         public string getPanelHeader(string HeaderMessage, string RightSideMessage = "") {
             string iHeaderMessage = null;
             string iRightSideMessage = null;
@@ -3939,12 +3347,8 @@ namespace Contensive.Core.Controllers {
             iRightSideMessage = genericController.encodeEmptyText(RightSideMessage, core.doc.profileStartTime.ToString("G"));
             return adminUIController.GetHeader(core, iHeaderMessage, iRightSideMessage);
         }
-
         //
-        //========================================================================
-        // Prints the top of display panel
-        //   Must be closed with PrintPanelBottom
-        //========================================================================
+        //====================================================================================================
         //
         public string getPanelTop(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "", string HeightMin = "") {
             string tempmain_GetPanelTop = null;
@@ -3981,9 +3385,7 @@ namespace Contensive.Core.Controllers {
             return tempmain_GetPanelTop;
         }
         //
-        //========================================================================
-        // Return a panel with the input as center
-        //========================================================================
+        //====================================================================================================
         //
         public string getPanelBottom(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "") {
             string result = "";
@@ -4000,24 +3402,23 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
-        //
-        //========================================================================
+        //====================================================================================================
         //
         public string getPanelButtons(string ButtonValueList, string ButtonName, string PanelWidth = "", string PanelHeightMin = "") {
             return adminUIController.GetButtonBar(core, adminUIController.GetButtonsFromList(core, ButtonValueList, true, true, ButtonName), "");
         }
         //
-        //
+        //====================================================================================================
         //
         public string getPanelInput(string PanelContent, string PanelWidth = "", string PanelHeightMin = "1") {
             return getPanel(PanelContent, "ccPanelInput", "ccPanelShadow", "ccPanelHilite", PanelWidth, 2, genericController.encodeInteger(PanelHeightMin));
         }
         //
-        //========================================================================
-        // Print the tools panel at the bottom of the page
-        //========================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// standard tool panel at the bottom of every page
+        /// </summary>
+        /// <returns></returns>
         public string getToolsPanel() {
             string result = "";
             try {
@@ -4310,21 +3711,13 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //
-        //
-        private string getDebugPanelRow(string Label, string Value) {
-            return cr2 + "<tr><td valign=\"top\" class=\"ccPanel ccAdminSmall\">" + Label + "</td><td valign=\"top\" class=\"ccPanel ccAdminSmall\">" + Value + "</td></tr>";
-        }
-
-        //
         //=================================================================================================================
-        //   csv_GetAddonOptionStringValue
-        //
-        //   gets the value from a list matching the name
-        //
-        //   InstanceOptionstring is an "AddonEncoded" name=AddonEncodedValue[selector]descriptor&name=value string
-        //=================================================================================================================
-        //
+        /// <summary>
+        /// return value from name/value special form
+        /// </summary>
+        /// <param name="OptionName"></param>
+        /// <param name="addonOptionString"></param>
+        /// <returns></returns>
         public static string getAddonOptionStringValue(string OptionName, string addonOptionString) {
             string result = genericController.getSimpleNameValue(OptionName, addonOptionString, "", "&");
             int Pos = genericController.vbInstr(1, result, "[");
@@ -4350,10 +3743,6 @@ namespace Contensive.Core.Controllers {
             try {
                 string encoding = genericController.encodeHTML(core.siteProperties.getText("Site Character Encoding", "utf-8"));
                 addHeadTag("<meta http-equiv=\"content-type\" content=\"text/html; charset=" + encoding + "\">");
-                //addHeadTag("<meta http-equiv=\"content-language\" content=\"en-us\">");
-                //addHeadTag("<meta http-equiv=\"cache-control\" content=\"no-cache\">");
-                //addHeadTag("<meta http-equiv=\"expires\" content=\"-1\">");
-                //addHeadTag("<meta http-equiv=\"pragma\" content=\"no-cache\">");
                 string htmlHead = getHtmlHead();
                 string htmlBeforeEndOfBody = getHtmlBodyEnd(allowLogin, allowTools);
                 result = ""
@@ -4378,7 +3767,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="core"></param>
         /// <param name="ButtonList"></param>
         /// <returns></returns>
-        public static string legacy_closeFormTable(coreController core, string ButtonList) {
+        public static string closeFormTableLegacy(coreController core, string ButtonList) {
             string templegacy_closeFormTable = null;
             if (!string.IsNullOrEmpty(ButtonList)) {
                 templegacy_closeFormTable = core.html.getPanelButtons(ButtonList, "Button") + "</form>";
@@ -4395,7 +3784,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="core"></param>
         /// <param name="ButtonList"></param>
         /// <returns></returns>
-        public static string legacy_openFormTable(coreController core, string ButtonList) {
+        public static string openFormTableLegacy(coreController core, string ButtonList) {
             string result = "";
             try {
 
@@ -4532,7 +3921,6 @@ namespace Contensive.Core.Controllers {
             }
             return string.Join("\r", headList);
         }
-
         //
         //====================================================================================================
         //
@@ -4613,23 +4001,6 @@ namespace Contensive.Core.Controllers {
                 core.handleException(ex);
             }
         }
-        ////
-        ////=========================================================================================================
-        ////
-        //public void addScriptLink_Body(string Filename, string addedByMessage) {
-        //    try {
-        //        if (!string.IsNullOrEmpty(Filename)) {
-        //            core.doc.htmlAssetList.Add(new htmlAssetClass {
-        //                assetType = htmlAssetTypeEnum.script,
-        //                addedByMessage = addedByMessage,
-        //                isLink = true,
-        //                content = Filename
-        //            });
-        //        }
-        //    } catch (Exception ex) {
-        //        core.handleException(ex);
-        //    }
-        //}
         //
         //=========================================================================================================
         //
@@ -4672,24 +4043,6 @@ namespace Contensive.Core.Controllers {
                         inHead = true,
                         isLink = true,
                         content = StyleSheetLink
-                    });
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-        }
-        //
-        //=========================================================================================================
-        //
-        public void addStyleCode(string code, string addedByMessage = "") {
-            try {
-                if (!string.IsNullOrEmpty(code.Trim())) {
-                    core.doc.htmlAssetList.Add(new htmlAssetClass() {
-                        addedByMessage = addedByMessage,
-                        assetType = htmlAssetTypeEnum.style,
-                        inHead = true,
-                        isLink = false,
-                        content = code
                     });
                 }
             } catch (Exception ex) {
@@ -4755,9 +4108,6 @@ namespace Contensive.Core.Controllers {
         }
         //
         //============================================================================
-        //   csv_GetContentCopy3
-        //       To get them, cp.content.getCopy must call the coreClass version, which calls this for the content
-        //============================================================================
         //
         public string getContentCopy(string CopyName, string DefaultContent, int personalizationPeopleId, bool AllowEditWrapper, bool personalizationIsAuthenticated) {
             string returnCopy = "";
@@ -4805,99 +4155,9 @@ namespace Contensive.Core.Controllers {
             return returnCopy;
         }
         //
-        //
-        //
-        public void addTabEntry(string Caption, string Link, bool IsHit, string StylePrefix = "", string LiveBody = "") {
-            try {
-                //
-                // should use the ccNav object, no the ccCommon module for this code
-                //
-                core.menuTab.AddEntry(genericController.encodeText(Caption), genericController.encodeText(Link), genericController.encodeBoolean(IsHit), genericController.encodeText(StylePrefix));
-
-                //Call ccAddTabEntry(genericController.encodeText(Caption), genericController.encodeText(Link), genericController.EncodeBoolean(IsHit), genericController.encodeText(StylePrefix), genericController.encodeText(LiveBody))
-                //
-                return;
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_AddTabEntry")
-        }
-        //
         //====================================================================================================
         //
-        //
-        public void addLiveTabEntry(string Caption, string LiveBody, string StylePrefix = "") {
-            try {
-                //
-                // should use the ccNav object, no the ccCommon module for this code
-                //
-                if (core.doc.menuLiveTab == null) {
-                    core.doc.menuLiveTab = new menuLiveTabController();
-                }
-                core.doc.menuLiveTab.AddEntry(genericController.encodeText(Caption), genericController.encodeText(LiveBody), genericController.encodeText(StylePrefix));
-                //
-                return;
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_AddLiveTabEntry")
-        }
-        //
-        //
-        //
-        public string getLiveTabs() {
-            string result = "";
-            try {
-                if (core.doc.menuLiveTab == null) {
-                    core.doc.menuLiveTab = new menuLiveTabController();
-                }
-                result = core.doc.menuLiveTab.GetTabs(core);
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            return result;
-        }
-        //
-        //
-        //
-        public void addComboTabEntry(string Caption, string Link, string AjaxLink, string LiveBody, bool IsHit, string ContainerClass) {
-            try {
-                //
-                // should use the ccNav object, no the ccCommon module for this code
-                //
-                if (core.doc.menuComboTab == null) {
-                    core.doc.menuComboTab = new menuComboTabController();
-                }
-                core.doc.menuComboTab.AddEntry(Caption, Link, AjaxLink, LiveBody, IsHit, ContainerClass);
-                //
-                return;
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_AddComboTabEntry")
-        }
-        //
-        //
-        //
-        public string getComboTabs() {
-            string result = "";
-            try {
-                if (core.doc.menuComboTab == null) {
-                    core.doc.menuComboTab = new menuComboTabController();
-                }
-                result = core.doc.menuComboTab.GetTabs(core);
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            return result;
-        }
-        //
-        //====================================================================================================
-        //
-        public string getResourceLibrary2(string RootFolderName, bool AllowSelectResource, string SelectResourceEditorName, string SelectLinkObjectName, bool AllowGroupAdd) {
+        public string getResourceLibrary(string RootFolderName, bool AllowSelectResource, string SelectResourceEditorName, string SelectLinkObjectName, bool AllowGroupAdd) {
             string addonGuidResourceLibrary = "{564EF3F5-9673-4212-A692-0942DD51FF1A}";
             Dictionary<string, string> arguments = new Dictionary<string, string>();
             arguments.Add("RootFolderName", RootFolderName);
@@ -4909,24 +4169,20 @@ namespace Contensive.Core.Controllers {
                 addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                 instanceArguments = arguments
             });
-            //Dim Option_String As String
-            //Option_String = "" _
-            //    & "RootFolderName=" & RootFolderName _
-            //    & "&AllowSelectResource=" & AllowSelectResource _
-            //    & "&SelectResourceEditorName=" & SelectResourceEditorName _
-            //    & "&SelectLinkObjectName=" & SelectLinkObjectName _
-            //    & "&AllowGroupAdd=" & AllowGroupAdd _
-            //    & ""
-
-            //Return core.addon.execute_legacy4(addonGuidResourceLibrary, Option_String, CPUtilsBaseClass.addonContext.ContextAdmin)
-        }
+       }
         //
-        //========================================================================
-        // Read and save a main_GetFormInputCheckList
-        //   see main_GetFormInputCheckList for an explaination of the input
-        //========================================================================
-        //
-        public void processCheckList(string TagName, string PrimaryContentName, string PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName) {
+        //====================================================================================================
+        /// <summary>
+        /// process the input of a checklist, making changes to rule records
+        /// </summary>
+        /// <param name="tagName"></param>
+        /// <param name="primaryContentName"></param>
+        /// <param name="primaryRecordID"></param>
+        /// <param name="secondaryContentName"></param>
+        /// <param name="rulesContentName"></param>
+        /// <param name="rulesPrimaryFieldname"></param>
+        /// <param name="rulesSecondaryFieldName"></param>
+        public void processCheckList(string tagName, string primaryContentName, string primaryRecordID, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName) {
             //
             string rulesTablename = null;
             string SQL = null;
@@ -4949,16 +4205,16 @@ namespace Contensive.Core.Controllers {
             //
             // --- create Rule records for all selected
             //
-            GroupCnt = core.docProperties.getInteger(TagName + ".RowCount");
+            GroupCnt = core.docProperties.getInteger(tagName + ".RowCount");
             if (GroupCnt > 0) {
                 //
                 // Test if RuleCopy is supported
                 //
-                SupportRuleCopy = Models.Complex.cdefModel.isContentFieldSupported(core, RulesContentName, "RuleCopy");
+                SupportRuleCopy = Models.Complex.cdefModel.isContentFieldSupported(core, rulesContentName, "RuleCopy");
                 if (SupportRuleCopy) {
-                    SupportRuleCopy = SupportRuleCopy && Models.Complex.cdefModel.isContentFieldSupported(core, SecondaryContentName, "AllowRuleCopy");
+                    SupportRuleCopy = SupportRuleCopy && Models.Complex.cdefModel.isContentFieldSupported(core, secondaryContentName, "AllowRuleCopy");
                     if (SupportRuleCopy) {
-                        SupportRuleCopy = SupportRuleCopy && Models.Complex.cdefModel.isContentFieldSupported(core, SecondaryContentName, "RuleCopyCaption");
+                        SupportRuleCopy = SupportRuleCopy && Models.Complex.cdefModel.isContentFieldSupported(core, secondaryContentName, "RuleCopyCaption");
                     }
                 }
                 //
@@ -4969,8 +4225,8 @@ namespace Contensive.Core.Controllers {
                 //
                 currentRulesCnt = 0;
                 dupRuleIdList = "";
-                rulesTablename = Models.Complex.cdefModel.getContentTablename(core, RulesContentName);
-                SQL = "select " + RulesSecondaryFieldName + ",id from " + rulesTablename + " where (" + RulesPrimaryFieldname + "=" + PrimaryRecordID + ")and(active<>0) order by " + RulesSecondaryFieldName;
+                rulesTablename = Models.Complex.cdefModel.getContentTablename(core, rulesContentName);
+                SQL = "select " + rulesSecondaryFieldName + ",id from " + rulesTablename + " where (" + rulesPrimaryFieldname + "=" + primaryRecordID + ")and(active<>0) order by " + rulesSecondaryFieldName;
                 currentRulesCnt = 0;
                 currentRules = core.db.executeQuery(SQL);
                 currentRulesCnt = currentRules.Rows.Count;
@@ -4978,9 +4234,9 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Read Response
                     //
-                    SecondaryRecordID = core.docProperties.getInteger(TagName + "." + GroupPtr + ".ID");
-                    RuleCopy = core.docProperties.getText(TagName + "." + GroupPtr + ".RuleCopy");
-                    RuleNeeded = core.docProperties.getBoolean(TagName + "." + GroupPtr);
+                    SecondaryRecordID = core.docProperties.getInteger(tagName + "." + GroupPtr + ".ID");
+                    RuleCopy = core.docProperties.getText(tagName + "." + GroupPtr + ".RuleCopy");
+                    RuleNeeded = core.docProperties.getBoolean(tagName + "." + GroupPtr);
                     //
                     // ----- Update Record
                     //
@@ -5019,11 +4275,11 @@ namespace Contensive.Core.Controllers {
                         //
                         // No record exists, and one is needed
                         //
-                        CSRule = core.db.csInsertRecord(RulesContentName);
+                        CSRule = core.db.csInsertRecord(rulesContentName);
                         if (core.db.csOk(CSRule)) {
                             core.db.csSet(CSRule, "Active", RuleNeeded);
-                            core.db.csSet(CSRule, RulesPrimaryFieldname, PrimaryRecordID);
-                            core.db.csSet(CSRule, RulesSecondaryFieldName, SecondaryRecordID);
+                            core.db.csSet(CSRule, rulesPrimaryFieldname, primaryRecordID);
+                            core.db.csSet(CSRule, rulesSecondaryFieldName, SecondaryRecordID);
                             if (SupportRuleCopy) {
                                 core.db.csSet(CSRule, "RuleCopy", RuleCopy);
                             }
@@ -5049,22 +4305,32 @@ namespace Contensive.Core.Controllers {
                 }
             }
             if (RuleContentChanged) {
-                core.cache.invalidateAllInContent(RulesContentName);
+                core.cache.invalidateAllInContent(rulesContentName);
             }
         }
         //
-        //====================================================================================================
-        // main_GetRecordEditLink( iContentName, iRecordID )
-        //
-        //   iContentName The content for this link
-        //   iRecordID    The ID of the record in the Table
         //========================================================================
-        //
+        /// <summary>
+        /// create UI edit record link
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <param name="AllowCut"></param>
+        /// <returns></returns>
         public string getRecordEditLink(string ContentName, int RecordID, bool AllowCut = false) {
-            return getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), "", core.session.isEditing(ContentName));
+            return getRecordEditLink2(ContentName, RecordID, AllowCut, "", core.session.isEditing(ContentName));
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// create an html block tag like div
+        /// </summary>
+        /// <param name="TagName"></param>
+        /// <param name="InnerHtml"></param>
+        /// <param name="HtmlName"></param>
+        /// <param name="HtmlClass"></param>
+        /// <param name="HtmlId"></param>
+        /// <returns></returns>
         public static string genericBlockTag(string TagName, string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
             string s = "";
             //
@@ -5081,7 +4347,14 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// create div tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlClass"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public static string div(string innerHtml, string htmlName = "", string htmlClass = "", string htmlId = "") {
             return genericBlockTag("div", innerHtml, htmlName, htmlClass, htmlId);
         }

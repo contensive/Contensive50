@@ -106,8 +106,7 @@ namespace Contensive.CLI {
                             appConfig.remoteWwwPath = cliController.promptForReply("AWS S3 folder for app www storage", "/" + appName + "/www/");
                             appConfig.remoteFilePath = cliController.promptForReply("AWS S3 folder for cdn file storage", "/" + appName + "/files/");
                             appConfig.remotePrivatePath = cliController.promptForReply("AWS S3 folder for private file storage", "/" + appName + "/private/");
-                            string cdnDomainName = cliController.promptForReply("domain for CDN", domainName);
-                            appConfig.cdnFileUrl = cliController.promptForReply("files Url (typically a public folder in CDN website)", "http://" + cdnDomainName + "/" + appName + "/files/");
+                            appConfig.cdnFileUrl = cliController.promptForReply("files Url (typically a public folder in CDN website)", "https://s3.amazonaws.com/" + cp.core.serverConfig.awsBucketName + "/" + appName + "/files/");
                             break;
                             //case "4":
                             //    //
@@ -229,10 +228,10 @@ namespace Contensive.CLI {
                     //
                     // replace "appName" with blank to use iis siteName as appName, or the name of this app in the default document in the apps public folder
                     //
-                    Contensive.Core.Controllers.logController.logInfo(cp.core, "Update web.config.");
-                    string defaultContent = cp.core.appRootFiles.readFileText("web.config");
-                    defaultContent = defaultContent.Replace("{{appName}}", appName);
-                    cp.core.appRootFiles.saveFile("web.config", defaultContent);
+                    //Contensive.Core.Controllers.logController.logInfo(cp.core, "Update web.config.");
+                    //string defaultContent = cp.core.appRootFiles.readFileText("web.config");
+                    //defaultContent = defaultContent.Replace("{{appName}}", appName);
+                    //cp.core.appRootFiles.saveFile("web.config", defaultContent);
                 }
                 //
                 // initialize the new app, use the save authentication that was used to authorize this object

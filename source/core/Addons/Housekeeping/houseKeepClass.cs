@@ -2090,8 +2090,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 bool loadOK = true;
                 try {
-                    collectionFileFilename = core.privateFiles.localAbsRootPath + core.addon.getPrivateFilesAddonPath() + "Collections.xml";
-                    Doc.Load(collectionFileFilename);
+                    collectionFileFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
+                    string collectionFileContent = core.privateFiles.readFileText(collectionFileFilename);
+                    Doc.LoadXml(collectionFileContent);
                 } catch (Exception) {
                     logHousekeeping(core, "RegisterAddonFolder, Hint=[" + hint + "], Error loading Collections.xml file.");
                     loadOK = false;
