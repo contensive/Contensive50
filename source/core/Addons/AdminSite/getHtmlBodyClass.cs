@@ -501,7 +501,9 @@ namespace Contensive.Core.Addons.AdminSite {
                     JavaScriptString += "\rButtonObjectCount = " + ButtonObjectCount + ";";
                     core.html.addScriptCode(JavaScriptString, "Admin Site");
                 }
-                result = errorController.getDocExceptionHtmlList(core) + Stream.Text;
+                if ( core.session.user.Developer ) {
+                    result = errorController.getDocExceptionHtmlList(core) + Stream.Text;
+                }
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -2599,14 +2601,14 @@ namespace Contensive.Core.Addons.AdminSite {
                             foreach (var kvp in IndexConfig.Sorts) {
                                 indexConfigSortClass sort = kvp.Value;
                                 if (sort.direction > 0) {
-                                    SubTitlePart = SubTitlePart + " and " + adminContent.fields[sort.fieldName].caption;
+                                    SubTitlePart = SubTitlePart + ", then " + adminContent.fields[sort.fieldName].caption;
                                     if (sort.direction > 1) {
                                         SubTitlePart += " reverse";
                                     }
                                 }
                             }
                             if (!string.IsNullOrEmpty(SubTitlePart)) {
-                                SubTitle += ", sorted by" + SubTitlePart.Substring(4);
+                                SubTitle += ", sorted by" + SubTitlePart.Substring(6);
                             }
                             //
                             Title = adminContent.name;
@@ -8177,8 +8179,8 @@ namespace Contensive.Core.Addons.AdminSite {
                         EditorHelp = "";
                         LcaseName = genericController.vbLCase(field.nameLc);
                         if (AllowHelpMsgCustom) {
-                            HelpMsgDefault = field.HelpDefault;
-                            HelpMsgCustom = field.HelpCustom;
+                            HelpMsgDefault = field.helpDefault;
+                            HelpMsgCustom = field.helpCustom;
                             //HelpPtr = helpIdIndex.getPtr(CStr(.id))
                             //If HelpPtr >= 0 Then
                             //    FieldHelpFound = True
@@ -13572,6 +13574,38 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                         if (ColumnWidthTotal > 0) {
                             Stream.Add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
+                            //
+                            // -- header
+                            Stream.Add("<tr>");
+                            foreach (var kvp in IndexConfig.Columns) {
+                                indexConfigColumnClass column = kvp.Value;
+                                //
+                                // print column headers - anchored so they sort columns
+                                //
+                                ColumnWidth = encodeInteger(100 * (column.Width / (double)ColumnWidthTotal));
+                                cdefFieldModel field = adminContent.fields[column.Name.ToLower()];
+                                fieldId = field.id;
+                                Caption = field.caption;
+                                if (field.inherited) {
+                                    Caption = Caption + "*";
+                                    InheritedFieldCount = InheritedFieldCount + 1;
+                                }
+                                //AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + genericController.encodeHTML(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
+                                Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + Caption + "</td>");
+                                //Stream.Add("<img src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\" >");
+                                //Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><img src=\"/ccLib/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
+                                //Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><img src=\"/ccLib/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
+                                //Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><img src=\"/ccLib/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
+                                ////Call Stream.Add(AStart & "&dta=" & ToolsActionSetAZ & """><img src=""/ccLib/images/LibButtonSortazUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
+                                ////Call Stream.Add(AStart & "&dta=" & ToolsActionSetZA & """><img src=""/ccLib/images/LibButtonSortzaUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
+                                //Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><img src=\"/ccLib/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
+                                //Stream.Add(AStart + "&dta=" + ToolsActionContract + "\"><img src=\"/ccLib/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A>");
+                                //Stream.Add("</span></td>");
+                            }
+                            Stream.Add("</tr>");
+                            //
+                            // -- body
+                            Stream.Add("<tr>");
                             foreach (var kvp in IndexConfig.Columns) {
                                 indexConfigColumnClass column = kvp.Value;
                                 //
@@ -13586,7 +13620,8 @@ namespace Contensive.Core.Addons.AdminSite {
                                     InheritedFieldCount = InheritedFieldCount + 1;
                                 }
                                 AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + genericController.encodeHTML(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
-                                Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
+                                Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">");
+                                //Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
                                 Stream.Add("<img src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\" >");
                                 Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><img src=\"/ccLib/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
                                 Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><img src=\"/ccLib/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
@@ -13595,9 +13630,11 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //Call Stream.Add(AStart & "&dta=" & ToolsActionSetZA & """><img src=""/ccLib/images/LibButtonSortzaUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
                                 Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><img src=\"/ccLib/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
                                 Stream.Add(AStart + "&dta=" + ToolsActionContract + "\"><img src=\"/ccLib/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A>");
-                                Stream.Add("</span></td>");
+                                Stream.Add("</td>");
+                                //Stream.Add("</span></td>");
                             }
                             Stream.Add("</tr>");
+                            //
                             Stream.Add("</table>");
                         }
                     }
@@ -14918,7 +14955,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 int FieldPtr = 0;
                 bool RowEven = false;
-                string Button = null;
                 string RQS = null;
                 string[] FieldNames = null;
                 string[] FieldCaption = null;
@@ -14939,484 +14975,343 @@ namespace Contensive.Core.Addons.AdminSite {
                 string Title = null;
                 string TitleBar = null;
                 string Content = null;
-                string TitleDescription = null;
-                indexConfigClass IndexConfig = null;
+                
                 //
-                if (!(false)) {
-                    //
-                    // Process last form
-                    //
-                    Button = core.docProperties.getText("button");
-                    if (!string.IsNullOrEmpty(Button)) {
-                        switch (Button) {
-                            case ButtonSearch:
-                                IndexConfig = LoadIndexConfig(adminContent);
-                                FormFieldCnt = core.docProperties.getInteger("fieldcnt");
-                                if (FormFieldCnt > 0) {
-                                    for (FormFieldPtr = 0; FormFieldPtr < FormFieldCnt; FormFieldPtr++) {
-                                        FieldName = genericController.vbLCase(core.docProperties.getText("fieldname" + FormFieldPtr));
-                                        MatchOption = (FindWordMatchEnum)core.docProperties.getInteger("FieldMatch" + FormFieldPtr);
-                                        switch (MatchOption) {
-                                            case FindWordMatchEnum.MatchEquals:
-                                            case FindWordMatchEnum.MatchGreaterThan:
-                                            case FindWordMatchEnum.matchincludes:
-                                            case FindWordMatchEnum.MatchLessThan:
-                                                SearchValue = core.docProperties.getText("FieldValue" + FormFieldPtr);
-                                                break;
-                                            default:
-                                                SearchValue = "";
-                                                break;
+                // Process last form
+                //
+                string Button = core.docProperties.getText("button");
+                indexConfigClass IndexConfig = null;
+                if (!string.IsNullOrEmpty(Button)) {
+                    switch (Button) {
+                        case ButtonSearch:
+                            IndexConfig = LoadIndexConfig(adminContent);
+                            FormFieldCnt = core.docProperties.getInteger("fieldcnt");
+                            if (FormFieldCnt > 0) {
+                                for (FormFieldPtr = 0; FormFieldPtr < FormFieldCnt; FormFieldPtr++) {
+                                    FieldName = genericController.vbLCase(core.docProperties.getText("fieldname" + FormFieldPtr));
+                                    MatchOption = (FindWordMatchEnum)core.docProperties.getInteger("FieldMatch" + FormFieldPtr);
+                                    switch (MatchOption) {
+                                        case FindWordMatchEnum.MatchEquals:
+                                        case FindWordMatchEnum.MatchGreaterThan:
+                                        case FindWordMatchEnum.matchincludes:
+                                        case FindWordMatchEnum.MatchLessThan:
+                                            SearchValue = core.docProperties.getText("FieldValue" + FormFieldPtr);
+                                            break;
+                                        default:
+                                            SearchValue = "";
+                                            break;
+                                    }
+                                    if (!IndexConfig.FindWords.ContainsKey(FieldName)) {
+                                        //
+                                        // fieldname not found, save if not FindWordMatchEnum.MatchIgnore
+                                        //
+                                        if (MatchOption != FindWordMatchEnum.MatchIgnore) {
+                                            indexConfigFindWordClass findWord = new indexConfigFindWordClass();
+                                            findWord.Name = FieldName;
+                                            findWord.MatchOption = MatchOption;
+                                            findWord.Value = SearchValue;
+                                            IndexConfig.FindWords.Add(FieldName, findWord);
                                         }
-                                        if (!IndexConfig.FindWords.ContainsKey(FieldName)) {
-                                            //
-                                            // fieldname not found, save if not FindWordMatchEnum.MatchIgnore
-                                            //
-                                            if (MatchOption != FindWordMatchEnum.MatchIgnore) {
-                                                indexConfigFindWordClass findWord = new indexConfigFindWordClass();
-                                                findWord.Name = FieldName;
-                                                findWord.MatchOption = MatchOption;
-                                                findWord.Value = SearchValue;
-                                                IndexConfig.FindWords.Add(FieldName, findWord);
-                                            }
-                                        } else {
-                                            //
-                                            // fieldname was found
-                                            //
-                                            IndexConfig.FindWords[FieldName].MatchOption = MatchOption;
-                                            IndexConfig.FindWords[FieldName].Value = SearchValue;
-                                        }
+                                    } else {
+                                        //
+                                        // fieldname was found
+                                        //
+                                        IndexConfig.FindWords[FieldName].MatchOption = MatchOption;
+                                        IndexConfig.FindWords[FieldName].Value = SearchValue;
                                     }
                                 }
-                                SetIndexSQL_SaveIndexConfig(IndexConfig);
-                                return string.Empty;
-                            case ButtonCancel:
-                                return string.Empty;
-                        }
-                    }
-                    IndexConfig = LoadIndexConfig(adminContent);
-                    Button = "CriteriaSelect";
-                    RQS = core.doc.refreshQueryString;
-                    //
-                    // ----- ButtonBar
-                    //
-                    if (MenuDepth > 0) {
-                        LeftButtons += adminUIController.getButtonPrimary(ButtonClose, "window.close();");
-                    } else {
-                        LeftButtons += adminUIController.getButtonPrimary(ButtonCancel);
-                        //LeftButtons &= core.main_GetFormButton(ButtonCancel, , , "return processSubmit(this)")
-                    }
-                    LeftButtons += adminUIController.getButtonPrimary(ButtonSearch);
-                    //LeftButtons &= core.main_GetFormButton(ButtonSearch, , , "return processSubmit(this)")
-                    ButtonBar = adminUIController.GetButtonBar(core, LeftButtons, "");
-                    //
-                    // ----- TitleBar
-                    //
-                    Title = adminContent.name;
-                    Title = Title + " Advanced Search";
-                    Title = "<strong>" + Title + "</strong>";
-                    Title = SpanClassAdminNormal + Title + "</span>";
-                    //Title = Title & core.main_GetHelpLink(46, "Using the Advanced Search Page", BubbleCopy_AdminIndexPage)
-                    TitleDescription = "<div>Enter criteria for each field to identify and select your results. The results of a search will have to have all of the criteria you enter.</div>";
-                    TitleBar = adminUIController.GetTitleBar(core, Title, TitleDescription);
-                    //
-                    // ----- List out all fields
-                    //
-                    CDef = cdefModel.getCdef(core, adminContent.name);
-                    FieldSize = 100;
-                    Array.Resize(ref FieldNames, FieldSize + 1);
-                    Array.Resize(ref FieldCaption, FieldSize + 1);
-                    Array.Resize(ref fieldId, FieldSize + 1);
-                    Array.Resize(ref fieldTypeId, FieldSize + 1);
-                    Array.Resize(ref FieldValue, FieldSize + 1);
-                    Array.Resize(ref FieldMatchOptions, FieldSize + 1);
-                    Array.Resize(ref FieldLookupContentName, FieldSize + 1);
-                    Array.Resize(ref FieldLookupList, FieldSize + 1);
-                    foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContent.fields) {
-                        cdefFieldModel field = keyValuePair.Value;
-                        if (FieldPtr >= FieldSize) {
-                            FieldSize = FieldSize + 100;
-                            Array.Resize(ref FieldNames, FieldSize + 1);
-                            Array.Resize(ref FieldCaption, FieldSize + 1);
-                            Array.Resize(ref fieldId, FieldSize + 1);
-                            Array.Resize(ref fieldTypeId, FieldSize + 1);
-                            Array.Resize(ref FieldValue, FieldSize + 1);
-                            Array.Resize(ref FieldMatchOptions, FieldSize + 1);
-                            Array.Resize(ref FieldLookupContentName, FieldSize + 1);
-                            Array.Resize(ref FieldLookupList, FieldSize + 1);
-                        }
-                        FieldName = genericController.vbLCase(field.nameLc);
-                        FieldNames[FieldPtr] = FieldName;
-                        FieldCaption[FieldPtr] = field.caption;
-                        fieldId[FieldPtr] = field.id;
-                        fieldTypeId[FieldPtr] = field.fieldTypeId;
-                        if (fieldTypeId[FieldPtr] == FieldTypeIdLookup) {
-                            ContentID = field.lookupContentID;
-                            if (ContentID > 0) {
-                                FieldLookupContentName[FieldPtr] = cdefModel.getContentNameByID(core, ContentID);
                             }
-                            FieldLookupList[FieldPtr] = field.lookupList;
-                        }
-                        //
-                        // set prepoplate value from indexconfig
-                        //
-                        if (IndexConfig.FindWords.ContainsKey(FieldName)) {
-                            FieldValue[FieldPtr] = IndexConfig.FindWords[FieldName].Value;
-                            FieldMatchOptions[FieldPtr] = (int)IndexConfig.FindWords[FieldName].MatchOption;
-                        }
-                        FieldPtr += 1;
+                            SetIndexSQL_SaveIndexConfig(IndexConfig);
+                            return string.Empty;
+                        case ButtonCancel:
+                            return string.Empty;
                     }
-                    //        Criteria = "(active<>0)and(ContentID=" & adminContent.id & ")and(authorable<>0)"
-                    //        CS = core.app.csOpen("Content Fields", Criteria, "EditSortPriority")
-                    //        FieldPtr = 0
-                    //        Do While core.app.csv_IsCSOK(CS)
-                    //            If FieldPtr >= FieldSize Then
-                    //                FieldSize = FieldSize + 100
-                    //                ReDim Preserve FieldNames(FieldSize)
-                    //                ReDim Preserve FieldCaption(FieldSize)
-                    //                ReDim Preserve FieldID(FieldSize)
-                    //                ReDim Preserve FieldType(FieldSize)
-                    //                ReDim Preserve FieldValue(FieldSize)
-                    //                ReDim Preserve FieldMatchOptions(FieldSize)
-                    //                ReDim Preserve FieldLookupContentName(FieldSize)
-                    //                ReDim Preserve FieldLookupList(FieldSize)
-                    //            End If
-                    //            FieldName = genericController.vbLCase(core.db.cs_getText(CS, "name"))
-                    //            FieldNames(FieldPtr) = FieldName
-                    //            FieldCaption(FieldPtr) = core.db.cs_getText(CS, "Caption")
-                    //            FieldID(FieldPtr) = core.app.cs_getInteger(CS, "ID")
-                    //            FieldType(FieldPtr) = core.app.cs_getInteger(CS, "Type")
-                    //            If FieldType(FieldPtr) = 7 Then
-                    //                ContentID = core.app.cs_getInteger(CS, "LookupContentID")
-                    //                If ContentID > 0 Then
-                    //                    FieldLookupContentName(FieldPtr) = cdefmodel.getContentNameByID(core,ContentID)
-                    //                End If
-                    //                FieldLookupList(FieldPtr) = core.db.cs_getText(CS, "LookupList")
-                    //            End If
-                    //            '
-                    //            ' set prepoplate value from indexconfig
-                    //            '
-                    //            With IndexConfig
-                    //                If .findwords.count > 0 Then
-                    //                    For Ptr = 0 To .findwords.count - 1
-                    //                        If .FindWords[Ptr].Name = FieldName Then
-                    //                            FieldValue(FieldPtr) = .FindWords[Ptr].Value
-                    //                            FieldMatchOptions(FieldPtr) = .FindWords[Ptr].MatchOption
-                    //                            Exit For
-                    //                        End If
-                    //                    Next
-                    //                End If
-                    //            End With
-                    //            If CriteriaCount > 0 Then
-                    //                For CriteriaPointer = 0 To CriteriaCount - 1
-                    //                    FieldMatchOptions(FieldPtr) = 0
-                    //                    If genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "=", vbTextCompare) = 1 Then
-                    //                        NameValues = Split(CriteriaValues(CriteriaPointer), "=")
-                    //                        FieldValue(FieldPtr) = NameValues(1)
-                    //                        FieldMatchOptions(FieldPtr) = 1
-                    //                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & ">", vbTextCompare) = 1 Then
-                    //                        NameValues = Split(CriteriaValues(CriteriaPointer), ">")
-                    //                        FieldValue(FieldPtr) = NameValues(1)
-                    //                        FieldMatchOptions(FieldPtr) = 2
-                    //                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "<", vbTextCompare) = 1 Then
-                    //                        NameValues = Split(CriteriaValues(CriteriaPointer), "<")
-                    //                        FieldValue(FieldPtr) = NameValues(1)
-                    //                        FieldMatchOptions(FieldPtr) = 3
-                    //                    End If
-                    //                Next
-                    //            End If
-                    //            FieldPtr = FieldPtr + 1
-                    //            Call core.app.nextCSRecord(CS)
-                    //        Loop
-                    //        Call core.app.closeCS(CS)
-                    FieldCnt = FieldPtr;
-                    //
-                    // Add headers to stream
-                    //
-                    returnForm = returnForm + "<table border=0 width=100% cellspacing=0 cellpadding=4>";
-                    //
-                    RowPointer = 0;
-                    for (FieldPtr = 0; FieldPtr < FieldCnt; FieldPtr++) {
-                        returnForm = returnForm + core.html.inputHidden("fieldname" + FieldPtr, FieldNames[FieldPtr]);
-                        RowEven = ((RowPointer % 2) == 0);
-                        FieldMatchOption = FieldMatchOptions[FieldPtr];
-                        switch (fieldTypeId[FieldPtr]) {
-                            case FieldTypeIdDate:
-                                //
-                                // Date
-                                //
-                                returnForm = returnForm + "<tr>"
-                                + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
-                                + "<td class=\"ccAdminEditField\">"
-                                + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEquals).ToString(), FieldMatchOption.ToString(), "") + "=</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
-                                + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputDateWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], "5", "", "", "ccAdvSearchText") + "</div>"
-                                + "</div>"
-                                + "</td>"
-                                + "</tr>";
-                                break;
-                            case FieldTypeIdCurrency:
-                            case FieldTypeIdFloat:
-                            case FieldTypeIdInteger:
-                            case FieldTypeIdAutoIdIncrement:
-                                //
-                                // Numeric
-                                //
-                                // changed FindWordMatchEnum.MatchEquals to MatchInclude to be compatible with Find Search
-                                returnForm = returnForm + "<tr>"
-                                + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
-                                + "<td class=\"ccAdminEditField\">"
-                                + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "n" + FieldPtr) + "=</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
-                                + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('n" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
-                                + "</div>"
-                                + "</td>"
-                                + "</tr>";
-
-                                //                    s = s _
-                                //                        & "<tr>" _
-                                //                        & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
-                                //                        & "<td class=""ccAdminEditField"">" _
-                                //                        & "<table border=0 width=100% cellspacing=0 cellpadding=0><tr>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore, FieldMatchOption, "") & "</td><td align=left width=100>ignore</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEmpty, FieldMatchOption, "") & "</td><td align=left width=100>empty</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchNotEmpty, FieldMatchOption, "") & "</td><td align=left width=100>not&nbsp;empty</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEquals, FieldMatchOption, "") & "</td><td align=left width=100>=</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchGreaterThan, FieldMatchOption, "") & "</td><td align=left width=100>&gt;</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchLessThan, FieldMatchOption, "") & "</td><td align=left width=100>&lt;</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td align=left width=99%>" & GetFormInputWithFocus("fieldvalue" & FieldPtr, FieldValue(FieldPtr), 1, 5, "", "") & "</td>" _
-                                //                        & "</tr></table>" _
-                                //                        & "</td>" _
-                                //                        & "</tr>"
-
-                                RowPointer = RowPointer + 1;
-                                break;
-                            case FieldTypeIdFile:
-                            case FieldTypeIdFileImage:
-                                //
-                                // File
-                                //
-                                returnForm = returnForm + "<tr>"
-                                + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
-                                + "<td class=\"ccAdminEditField\">"
-                                + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
-                                + "</div>"
-                                + "</td>"
-                                + "</tr>";
-                                //s = s _
-                                //    & "<tr>" _
-                                //    & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
-                                //    & "<td class=""ccAdminEditField"">" _
-                                //    & "<table border=0 width=100% cellspacing=0 cellpadding=0><tr>" _
-                                //        & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore, FieldMatchOption, "") & "</td><td align=left width=100>ignore</td>" _
-                                //        & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //        & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEmpty, FieldMatchOption, "") & "</td><td align=left width=100>empty</td>" _
-                                //        & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //        & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchNotEmpty, FieldMatchOption, "") & "</td><td align=left width=100>not&nbsp;empty</td>" _
-                                //        & "<td align=left width=99%>&nbsp;</td>" _
-                                //    & "</tr></table>" _
-                                //    & "</td>" _
-                                //    & "</tr>"
-                                RowPointer = RowPointer + 1;
-                                break;
-                            case FieldTypeIdBoolean:
-                                //
-                                // Boolean
-                                //
-                                returnForm = returnForm + "<tr>"
-                                + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
-                                + "<td class=\"ccAdminEditField\">"
-                                + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchTrue).ToString(), FieldMatchOption.ToString(), "") + "true</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchFalse).ToString(), FieldMatchOption.ToString(), "") + "false</div>"
-                                + "</div>"
-                                + "</td>"
-                                + "</tr>";
-                                //                    s = s _
-                                //                        & "<tr>" _
-                                //                        & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
-                                //                        & "<td class=""ccAdminEditField"">" _
-                                //                        & "<table border=0 width=100% cellspacing=0 cellpadding=0><tr>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore, FieldMatchOption, "") & "</td><td align=left width=100>  ignore</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchTrue, FieldMatchOption, "") & "</td><td align=left width=100>true</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchFalse, FieldMatchOption, "") & "</td><td align=left width=100>false</td>" _
-                                //                            & "<td width=99%>&nbsp;</td>" _
-                                //                        & "</tr></table>" _
-                                //                        & "</td>" _
-                                //                        & "</tr>"
-                                break;
-                            case FieldTypeIdText:
-                            case FieldTypeIdLongText:
-                            case FieldTypeIdHTML:
-                            case FieldTypeIdFileHTML:
-                            case FieldTypeIdFileCSS:
-                            case FieldTypeIdFileJavascript:
-                            case FieldTypeIdFileXML:
-                                //
-                                // Text
-                                //
-                                returnForm = returnForm + "<tr>"
-                                + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
-                                + "<td class=\"ccAdminEditField\">"
-                                + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
-                                + "<div style=\"display:block;float:left;width:150px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
-                                + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('t" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
-                                + "</div>"
-                                + "</td>"
-                                + "</tr>";
-                                //
-                                //
-                                //                    s = s _
-                                //                        & "<tr>" _
-                                //                        & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
-                                //                        & "<td class=""ccAdminEditField"" valign=absmiddle>" _
-                                //                        & "<table border=0 width=100% cellspacing=0 cellpadding=0><tr>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore, FieldMatchOption, "") & "</td><td align=left width=100>&nbsp;&nbsp;ignore</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEmpty, FieldMatchOption, "") & "</td><td align=left width=100>empty</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchNotEmpty, FieldMatchOption, "") & "</td><td align=left width=100>not&nbsp;empty</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.matchincludes, FieldMatchOption, "t" & FieldPtr) & "</td><td align=center width=100>includes&nbsp;</td>" _
-                                //                            & "<td align=left width=99%>" & GetFormInputWithFocus("FieldValue" & FieldPtr, FieldValue(FieldPtr), 1, 20, "", "var e=getElementById('t" & FieldPtr & "');e.checked=1;") & "</td>" _
-                                //                        & "</tr></table>" _
-                                //                        & "</td>" _
-                                //                        & "</tr>"
-                                RowPointer = RowPointer + 1;
-                                break;
-                            case FieldTypeIdLookup:
-                            case FieldTypeIdMemberSelect:
-                                //
-                                // Lookup
-                                //
-                                //Dim SelectOption As String
-                                //Dim CurrentValue As String
-                                //If FieldLookupContentName(FieldPtr) <> "" Then
-                                //    ContentName = FieldLookupContentName(FieldPtr)
-                                //    DataSourceName = cdefmodel.getContentDataSource(core,ContentName)
-                                //    TableName = core.main_GetContentTablename(ContentName)
-                                //    SQL = "select distinct Name from " & TableName & " where (name is not null) order by name"
-                                //    CS = core.app.openCsSql_rev(DataSourceName, SQL)
-                                //    If Not core.app.csv_IsCSOK(CS) Then
-                                //        selector = "no options"
-                                //    Else
-                                //        selector = vbCrLf & "<select name=""FieldValue" & FieldPtr & """ onFocus=""var e=getElementById('t" & FieldPtr & "');e.checked=1;"">"
-                                //        CurrentValue = FieldValue(FieldPtr)
-                                //        Do While core.app.csv_IsCSOK(CS)
-                                //            SelectOption = core.db.cs_getText(CS, "name")
-                                //            If CurrentValue = SelectOption Then
-                                //                selector = selector & vbCrLf & "<option selected>" & SelectOption & "</option>"
-                                //            Else
-                                //                selector = selector & vbCrLf & "<option>" & SelectOption & "</option>"
-                                //            End If
-                                //            Call core.app.nextCSRecord(CS)
-                                //        Loop
-                                //        selector = selector & vbCrLf & "</select>"
-                                //    End If
-                                //    Call core.app.closeCS(CS)
-                                //    'selector = core.htmldoc.main_GetFormInputSelect2("FieldValue" & FieldPtr, FieldValue(FieldPtr), FieldLookupContentName(FieldPtr))
-                                //Else
-                                //    selector = core.htmldoc.main_GetFormInputSelectList2("FieldValue" & FieldPtr, FieldValue(FieldPtr), FieldLookupList(FieldPtr))
-                                //End If
-                                //selector = genericController.vbReplace(selector, ">", "onFocus=""var e=getElementById('t" & FieldPtr & "');e.checked=1;"">")
-                                returnForm = returnForm + "<tr>"
-                                + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
-                                + "<td class=\"ccAdminEditField\">"
-                                + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
-                                + "<div style=\"display:block;float:left;width:150px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
-                                + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('t" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
-                                + "</div>"
-                                + "</td>"
-                                + "</tr>";
-
-                                //& "<div style=""display:block;float:left;width:150px;"">" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEquals, FieldMatchOption, "t" & FieldPtr) & "=&nbsp;</div>" _
-                                //& "<div style=""display:block;float:left;width:300px;"">" & selector & "</div>" _
-
-                                //                    s = s _
-                                //                        & "<tr>" _
-                                //                        & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
-                                //                        & "<td class=""ccAdminEditField"" valign=absmiddle>" _
-                                //                        & "<table border=0 width=100% cellspacing=0 cellpadding=0><tr>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore, FieldMatchOption, "") & "</td><td align=left width=100>&nbsp;&nbsp;ignore</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEmpty, FieldMatchOption, "") & "</td><td align=left width=100>empty</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchNotEmpty, FieldMatchOption, "") & "</td><td align=left width=100>not&nbsp;empty</td>" _
-                                //                            & "<td width=10>&nbsp;&nbsp;</td>" _
-                                //                            & "<td width=10 align=right>" & core.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEquals, FieldMatchOption, "t" & FieldPtr) & "</td><td align=center width=100>=&nbsp;</td>" _
-                                //                            & "<td align=left width=99%>" & selector & "</td>" _
-                                //                        & "</tr></table>" _
-                                //                        & "</td>" _
-                                //                        & "</tr>"
-
-
-
-                                //s = s & "<tr><td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>"
-                                //If FieldLookupContentName(FieldPtr) <> "" Then
-                                //    s = s _
-                                //        & "<td class=""ccAdminEditField"">" _
-                                //        & core.htmldoc.main_GetFormInputSelect2(FieldNames(FieldPtr), FieldValue(FieldPtr), FieldLookupContentName(FieldPtr), , "Any") & "</td>"
-                                //Else
-                                //    s = s _
-                                //        & "<td class=""ccAdminEditField"">" _
-                                //        & core.htmldoc.main_GetFormInputSelectList2(FieldNames(FieldPtr), FieldValue(FieldPtr), FieldLookupList(FieldPtr), , "Any") & "</td>"
-                                //End If
-                                //s = s & "</tr>"
-                                RowPointer = RowPointer + 1;
-                                break;
-                        }
-                    }
-                    returnForm = returnForm + genericController.StartTableRow();
-                    returnForm = returnForm + genericController.StartTableCell("120", 1, RowEven, "right") + "<img src=/ccLib/images/spacer.gif width=120 height=1></td>";
-                    returnForm = returnForm + genericController.StartTableCell("99%", 1, RowEven, "left") + "<img src=/ccLib/images/spacer.gif width=1 height=1></td>";
-                    returnForm = returnForm + kmaEndTableRow;
-                    returnForm = returnForm + "</table>";
-                    Content = returnForm;
-                    //
-                    // Assemble LiveWindowTable
-                    //
-                    //        Stream.Add( OpenLiveWindowTable)
-                    Stream.Add("\r\n" + core.html.formStart());
-                    Stream.Add(ButtonBar);
-                    Stream.Add(TitleBar);
-                    Stream.Add(Content);
-                    Stream.Add(ButtonBar);
-                    Stream.Add("<input type=hidden name=fieldcnt VALUE=" + FieldCnt + ">");
-                    //Stream.Add( "<input type=hidden name=af VALUE=" & AdminFormIndex & ">")
-                    Stream.Add("<input type=hidden name=" + RequestNameAdminSubForm + " VALUE=" + AdminFormIndex_SubFormAdvancedSearch + ">");
-                    Stream.Add("</form>");
-                    //        Stream.Add( CloseLiveWindowTable)
-                    //
-                    returnForm = Stream.Text;
-                    core.html.addTitle(adminContent.name + " Advanced Search");
                 }
+                IndexConfig = LoadIndexConfig(adminContent);
+                Button = "CriteriaSelect";
+                RQS = core.doc.refreshQueryString;
+                //
+                // ----- ButtonBar
+                //
+                if (MenuDepth > 0) {
+                    LeftButtons += adminUIController.getButtonPrimary(ButtonClose, "window.close();");
+                } else {
+                    LeftButtons += adminUIController.getButtonPrimary(ButtonCancel);
+                    //LeftButtons &= core.main_GetFormButton(ButtonCancel, , , "return processSubmit(this)")
+                }
+                LeftButtons += adminUIController.getButtonPrimary(ButtonSearch);
+                //LeftButtons &= core.main_GetFormButton(ButtonSearch, , , "return processSubmit(this)")
+                ButtonBar = adminUIController.GetButtonBar(core, LeftButtons, "");
+                //
+                // ----- TitleBar
+                //
+                Title = adminContent.name;
+                Title = Title + " Advanced Search";
+                Title = "<strong>" + Title + "</strong>";
+                Title = SpanClassAdminNormal + Title + "</span>";
+                //Title = Title & core.main_GetHelpLink(46, "Using the Advanced Search Page", BubbleCopy_AdminIndexPage)
+                string TitleDescription = "<div>Enter criteria for each field to identify and select your results. The results of a search will have to have all of the criteria you enter.</div>";
+                TitleBar = adminUIController.GetTitleBar(core, Title, TitleDescription);
+                //
+                // ----- List out all fields
+                //
+                CDef = cdefModel.getCdef(core, adminContent.name);
+                FieldSize = 100;
+                Array.Resize(ref FieldNames, FieldSize + 1);
+                Array.Resize(ref FieldCaption, FieldSize + 1);
+                Array.Resize(ref fieldId, FieldSize + 1);
+                Array.Resize(ref fieldTypeId, FieldSize + 1);
+                Array.Resize(ref FieldValue, FieldSize + 1);
+                Array.Resize(ref FieldMatchOptions, FieldSize + 1);
+                Array.Resize(ref FieldLookupContentName, FieldSize + 1);
+                Array.Resize(ref FieldLookupList, FieldSize + 1);
+                foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContent.fields) {
+                    cdefFieldModel field = keyValuePair.Value;
+                    if (FieldPtr >= FieldSize) {
+                        FieldSize = FieldSize + 100;
+                        Array.Resize(ref FieldNames, FieldSize + 1);
+                        Array.Resize(ref FieldCaption, FieldSize + 1);
+                        Array.Resize(ref fieldId, FieldSize + 1);
+                        Array.Resize(ref fieldTypeId, FieldSize + 1);
+                        Array.Resize(ref FieldValue, FieldSize + 1);
+                        Array.Resize(ref FieldMatchOptions, FieldSize + 1);
+                        Array.Resize(ref FieldLookupContentName, FieldSize + 1);
+                        Array.Resize(ref FieldLookupList, FieldSize + 1);
+                    }
+                    FieldName = genericController.vbLCase(field.nameLc);
+                    FieldNames[FieldPtr] = FieldName;
+                    FieldCaption[FieldPtr] = field.caption;
+                    fieldId[FieldPtr] = field.id;
+                    fieldTypeId[FieldPtr] = field.fieldTypeId;
+                    if (fieldTypeId[FieldPtr] == FieldTypeIdLookup) {
+                        ContentID = field.lookupContentID;
+                        if (ContentID > 0) {
+                            FieldLookupContentName[FieldPtr] = cdefModel.getContentNameByID(core, ContentID);
+                        }
+                        FieldLookupList[FieldPtr] = field.lookupList;
+                    }
+                    //
+                    // set prepoplate value from indexconfig
+                    //
+                    if (IndexConfig.FindWords.ContainsKey(FieldName)) {
+                        FieldValue[FieldPtr] = IndexConfig.FindWords[FieldName].Value;
+                        FieldMatchOptions[FieldPtr] = (int)IndexConfig.FindWords[FieldName].MatchOption;
+                    }
+                    FieldPtr += 1;
+                }
+                //        Criteria = "(active<>0)and(ContentID=" & adminContent.id & ")and(authorable<>0)"
+                //        CS = core.app.csOpen("Content Fields", Criteria, "EditSortPriority")
+                //        FieldPtr = 0
+                //        Do While core.app.csv_IsCSOK(CS)
+                //            If FieldPtr >= FieldSize Then
+                //                FieldSize = FieldSize + 100
+                //                ReDim Preserve FieldNames(FieldSize)
+                //                ReDim Preserve FieldCaption(FieldSize)
+                //                ReDim Preserve FieldID(FieldSize)
+                //                ReDim Preserve FieldType(FieldSize)
+                //                ReDim Preserve FieldValue(FieldSize)
+                //                ReDim Preserve FieldMatchOptions(FieldSize)
+                //                ReDim Preserve FieldLookupContentName(FieldSize)
+                //                ReDim Preserve FieldLookupList(FieldSize)
+                //            End If
+                //            FieldName = genericController.vbLCase(core.db.cs_getText(CS, "name"))
+                //            FieldNames(FieldPtr) = FieldName
+                //            FieldCaption(FieldPtr) = core.db.cs_getText(CS, "Caption")
+                //            FieldID(FieldPtr) = core.app.cs_getInteger(CS, "ID")
+                //            FieldType(FieldPtr) = core.app.cs_getInteger(CS, "Type")
+                //            If FieldType(FieldPtr) = 7 Then
+                //                ContentID = core.app.cs_getInteger(CS, "LookupContentID")
+                //                If ContentID > 0 Then
+                //                    FieldLookupContentName(FieldPtr) = cdefmodel.getContentNameByID(core,ContentID)
+                //                End If
+                //                FieldLookupList(FieldPtr) = core.db.cs_getText(CS, "LookupList")
+                //            End If
+                //            '
+                //            ' set prepoplate value from indexconfig
+                //            '
+                //            With IndexConfig
+                //                If .findwords.count > 0 Then
+                //                    For Ptr = 0 To .findwords.count - 1
+                //                        If .FindWords[Ptr].Name = FieldName Then
+                //                            FieldValue(FieldPtr) = .FindWords[Ptr].Value
+                //                            FieldMatchOptions(FieldPtr) = .FindWords[Ptr].MatchOption
+                //                            Exit For
+                //                        End If
+                //                    Next
+                //                End If
+                //            End With
+                //            If CriteriaCount > 0 Then
+                //                For CriteriaPointer = 0 To CriteriaCount - 1
+                //                    FieldMatchOptions(FieldPtr) = 0
+                //                    If genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "=", vbTextCompare) = 1 Then
+                //                        NameValues = Split(CriteriaValues(CriteriaPointer), "=")
+                //                        FieldValue(FieldPtr) = NameValues(1)
+                //                        FieldMatchOptions(FieldPtr) = 1
+                //                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & ">", vbTextCompare) = 1 Then
+                //                        NameValues = Split(CriteriaValues(CriteriaPointer), ">")
+                //                        FieldValue(FieldPtr) = NameValues(1)
+                //                        FieldMatchOptions(FieldPtr) = 2
+                //                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "<", vbTextCompare) = 1 Then
+                //                        NameValues = Split(CriteriaValues(CriteriaPointer), "<")
+                //                        FieldValue(FieldPtr) = NameValues(1)
+                //                        FieldMatchOptions(FieldPtr) = 3
+                //                    End If
+                //                Next
+                //            End If
+                //            FieldPtr = FieldPtr + 1
+                //            Call core.app.nextCSRecord(CS)
+                //        Loop
+                //        Call core.app.closeCS(CS)
+                FieldCnt = FieldPtr;
+                //
+                // Add headers to stream
+                //
+                returnForm = returnForm + "<table border=0 width=100% cellspacing=0 cellpadding=4>";
+                //
+                RowPointer = 0;
+                for (FieldPtr = 0; FieldPtr < FieldCnt; FieldPtr++) {
+                    returnForm = returnForm + core.html.inputHidden("fieldname" + FieldPtr, FieldNames[FieldPtr]);
+                    RowEven = ((RowPointer % 2) == 0);
+                    FieldMatchOption = FieldMatchOptions[FieldPtr];
+                    switch (fieldTypeId[FieldPtr]) {
+                        case FieldTypeIdDate:
+                            //
+                            // Date
+                            //
+                            returnForm = returnForm + "<tr>"
+                            + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
+                            + "<td class=\"ccAdminEditField\">"
+                            + "<div style=\"display:block;float:left;width:800px;\">"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                            + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEquals).ToString(), FieldMatchOption.ToString(), "") + "=</div>"
+                            + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
+                            + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
+                            + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputDateWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], "5", "", "", "ccAdvSearchText") + "</div>"
+                            + "</div>"
+                            + "</td>"
+                            + "</tr>";
+                            break;
+                        case FieldTypeIdCurrency:
+                        case FieldTypeIdFloat:
+                        case FieldTypeIdInteger:
+                        case FieldTypeIdAutoIdIncrement:
+                            //
+                            // -- Numeric - changed FindWordMatchEnum.MatchEquals to MatchInclude to be compatible with Find Search
+                            returnForm = returnForm + "<tr>"
+                            + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
+                            + "<td class=\"ccAdminEditField\">"
+                            + "<div style=\"display:block;float:left;width:800px;\">"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                            + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.matchincludes).ToString() , FieldMatchOption.ToString(), "n" + FieldPtr) + "=</div>"
+                            + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
+                            + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
+                            + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('n" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
+                            + "</div>"
+                            + "</td>"
+                            + "</tr>";
+                            RowPointer += 1;
+                            break;
+                        case FieldTypeIdFile:
+                        case FieldTypeIdFileImage:
+                            //
+                            // File
+                            //
+                            returnForm = returnForm + "<tr>"
+                            + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
+                            + "<td class=\"ccAdminEditField\">"
+                            + "<div style=\"display:block;float:left;width:800px;\">"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                            + "</div>"
+                            + "</td>"
+                            + "</tr>";
+                            RowPointer = RowPointer + 1;
+                            break;
+                        case FieldTypeIdBoolean:
+                            //
+                            // Boolean
+                            //
+                            returnForm = returnForm + "<tr>"
+                            + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
+                            + "<td class=\"ccAdminEditField\">"
+                            + "<div style=\"display:block;float:left;width:800px;\">"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchTrue).ToString(), FieldMatchOption.ToString(), "") + "true</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchFalse).ToString(), FieldMatchOption.ToString(), "") + "false</div>"
+                            + "</div>"
+                            + "</td>"
+                            + "</tr>";
+                            break;
+                        case FieldTypeIdText:
+                        case FieldTypeIdLongText:
+                        case FieldTypeIdHTML:
+                        case FieldTypeIdFileHTML:
+                        case FieldTypeIdFileCSS:
+                        case FieldTypeIdFileJavascript:
+                        case FieldTypeIdFileXML:
+                            //
+                            // Text
+                            //
+                            returnForm = returnForm + "<tr>"
+                            + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
+                            + "<td class=\"ccAdminEditField\">"
+                            + "<div style=\"display:block;float:left;width:800px;\">"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                            + "<div style=\"display:block;float:left;width:150px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
+                            + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('t" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
+                            + "</div>"
+                            + "</td>"
+                            + "</tr>";
+                            RowPointer = RowPointer + 1;
+                            break;
+                        case FieldTypeIdLookup:
+                        case FieldTypeIdMemberSelect:
+                            //
+                            // Lookup
+                            returnForm = returnForm + "<tr>"
+                            + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
+                            + "<td class=\"ccAdminEditField\">"
+                            + "<div style=\"display:block;float:left;width:800px;\">"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                            + "<div style=\"display:block;float:left;width:150px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
+                            + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('t" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
+                            + "</div>"
+                            + "</td>"
+                            + "</tr>";
+                            RowPointer = RowPointer + 1;
+                            break;
+                    }
+                }
+                returnForm = returnForm + genericController.StartTableRow();
+                returnForm = returnForm + genericController.StartTableCell("120", 1, RowEven, "right") + "<img src=/ccLib/images/spacer.gif width=120 height=1></td>";
+                returnForm = returnForm + genericController.StartTableCell("99%", 1, RowEven, "left") + "<img src=/ccLib/images/spacer.gif width=1 height=1></td>";
+                returnForm = returnForm + kmaEndTableRow;
+                returnForm = returnForm + "</table>";
+                Content = returnForm;
+                //
+                // Assemble LiveWindowTable
+                Stream.Add("\r\n" + core.html.formStart());
+                Stream.Add(ButtonBar);
+                Stream.Add(TitleBar);
+                Stream.Add(Content);
+                Stream.Add(ButtonBar);
+                Stream.Add("<input type=hidden name=fieldcnt VALUE=" + FieldCnt + ">");
+                //Stream.Add( "<input type=hidden name=af VALUE=" & AdminFormIndex & ">")
+                Stream.Add("<input type=hidden name=" + RequestNameAdminSubForm + " VALUE=" + AdminFormIndex_SubFormAdvancedSearch + ">");
+                Stream.Add("</form>");
+                //        Stream.Add( CloseLiveWindowTable)
+                //
+                returnForm = Stream.Text;
+                core.html.addTitle(adminContent.name + " Advanced Search");
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;

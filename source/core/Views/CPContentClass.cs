@@ -287,9 +287,9 @@ namespace Contensive.Core {
             //field.lookupContentName = ""
             field.lookupList = "";
             field.manyToManyContentID = 0;
-            field.set_ManyToManyContentName(core, "");
+            field.set_manyToManyContentName(core, "");
             field.manyToManyRuleContentID = 0;
-            field.set_ManyToManyRuleContentName(core, "");
+            field.set_manyToManyRuleContentName(core, "");
             field.ManyToManyRulePrimaryField = "";
             field.ManyToManyRuleSecondaryField = "";
             field.memberSelectGroupId_set( core, 0 );
@@ -297,7 +297,7 @@ namespace Contensive.Core {
             field.password = false;
             field.readOnly = false;
             field.redirectContentID = 0;
-            field.set_RedirectContentName(core, "");
+            field.set_redirectContentName(core, "");
             field.redirectID = "";
             field.redirectPath = "";
             field.required = false;

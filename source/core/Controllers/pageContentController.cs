@@ -1582,7 +1582,9 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 // add exception list header
-                returnHtml = errorController.getDocExceptionHtmlList(core) + returnHtml;
+                if (core.session.user.Developer) {
+                    returnHtml = errorController.getDocExceptionHtmlList(core) + returnHtml;
+                }
             } catch (Exception ex) {
                 core.handleException(ex);
             }

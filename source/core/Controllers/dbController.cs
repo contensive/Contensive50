@@ -1748,40 +1748,33 @@ namespace Contensive.Core.Controllers {
         public string csGetValue(int CSPointer, string FieldName) {
             string returnValue = "";
             try {
-                bool fieldFound = false;
-                string fieldNameTrimUpper = null;
-                string fieldNameTrim;
-                //
-                fieldNameTrim = FieldName.Trim();
-                fieldNameTrimUpper = genericController.vbUCase(fieldNameTrim);
+                string fieldNameTrim = FieldName.Trim();
                 if (!csOk(CSPointer)) {
-                    throw new ApplicationException("Attempt To GetValue fieldname[" + FieldName + "], but the dataset Is empty Or does Not point To a valid row");
+                    throw new ApplicationException("Attempt To GetValue fieldname[" + fieldNameTrim + "], but the dataset Is empty Or does Not point To a valid row");
                 } else {
                     var contentSet = contentSetStore[CSPointer];
-                    //
-                    //
-                    fieldFound = false;
+                    bool fieldFound = false;
                     if (contentSet.writeCache.Count > 0) {
                         //
                         // ----- something has been set in buffer, check it first
-                        //
-                        if (contentSet.writeCache.ContainsKey(FieldName.ToLower())) {
-                            returnValue = contentSet.writeCache[FieldName.ToLower()];
+                        if (contentSet.writeCache.ContainsKey(fieldNameTrim.ToLower())) {
+                            returnValue = contentSet.writeCache[fieldNameTrim.ToLower()];
                             fieldFound = true;
                         }
                     }
                     if (!fieldFound) {
                         //
                         // ----- attempt read from readCache
-                        //
-                        if (!contentSet.dt.Columns.Contains(FieldName.ToLower())) {
+                        if (!contentSet.dt.Columns.Contains(fieldNameTrim.ToLower())) {
                             if (contentSet.Updateable) {
-                                throw new ApplicationException("Field [" + fieldNameTrim + "] was not found in [" + contentSet.ContentName + "] with selected fields [" + contentSet.SelectTableFieldList + "]");
+                                var dtFieldList = new List<string>();
+                                foreach (DataColumn column in contentSet.dt.Columns) dtFieldList.Add(column.ColumnName);
+                                throw new ApplicationException("Field [" + fieldNameTrim + "] was not found in [" + contentSet.ContentName + "] with selected fields [" + String.Join( ",", dtFieldList.ToArray()) + "]");
                             } else {
                                 throw new ApplicationException("Field [" + fieldNameTrim + "] was not found in sql [" + contentSet.Source + "]");
                             }
                         } else {
-                            returnValue = genericController.encodeText(contentSet.dt.Rows[contentSet.readCacheRowPtr][FieldName.ToLower()]);
+                            returnValue = genericController.encodeText(contentSet.dt.Rows[contentSet.readCacheRowPtr][fieldNameTrim.ToLower()]);
                         }
                     }
                     contentSet.LastUsed = DateTime.Now;

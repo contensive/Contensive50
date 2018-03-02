@@ -170,7 +170,6 @@
     <Compile Include="Controllers\appBuilderController.cs" />
     <Compile Include="Controllers\cacheController.cs" />
     <Compile Include="Controllers\cacheKeyPtrController.cs" />
-    <Compile Include="Controllers\Collection.cs" />
     <Compile Include="Controllers\contentCmdController.cs" />
     <Compile Include="Controllers\csController.cs" />
     <Compile Include="Controllers\dataTreeController.cs" />

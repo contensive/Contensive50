@@ -89,12 +89,12 @@ namespace Contensive.Core.Controllers {
             this.core = core;
         }
         //
-        //========================================================================
-        // ----- Save all content to an XML Stream
-        //   4/28/08 - changed so content is read from Db using RS/Conn, not cache version
-        //   2/20/2010 - changed to include includebasefield
-        //========================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// return an xml collection of the current application (all addon collections, etc)
+        /// </summary>
+        /// <param name="IncludeBaseFields"></param>
+        /// <returns></returns>
         public string getApplicationCollectionXml(bool IncludeBaseFields = false) {
             string tempGetXMLContentDefinition3 = null;
             try {
@@ -433,201 +433,12 @@ namespace Contensive.Core.Controllers {
             }
             return tempGetXMLContentDefinition3;
         }
-        ////
-        ////========================================================================
-        //// ----- Save all content to an XML Stream
-        ////   4/28/08 - changed so content is read from Db using RS/Conn, not cache version
-        ////========================================================================
-        ////
-        //public string GetXMLContentDefinition(string ContentName = "") {
-        //    return GetXMLContentDefinition3(ContentName, false);
-        //}
         //
-        //========================================================================
-        // ----- Save all content to an XML Stream
-        //========================================================================
-        //
-        //Private Function GetXMLContent(cmc as appServicesClass, ContentName As String) As String
-        //    On Error GoTo ErrorTrap
-        //    '
-        //    Dim CS as integer
-        //    Dim sb as new system.text.stringBuilder
-        //    Dim CDefPointer as integer
-        //    Dim CDefArrayCount as integer
-        //    Dim CSRows as object
-        //    Dim CSRowCaptions as object
-        //    Dim RowCount as integer
-        //    Dim RowPointer as integer
-        //    Dim ColumnCount as integer
-        //    Dim ColumnPointer as integer
-        //    '
-        //    sb.append( "<ContensiveContent>" & vbCrLf)
-        //    If ContentName <> "" Then
-        //        Call sb.append("<CDef Name=""" & ContentName & """>" & vbCrLf)
-        //        CS = core.csOpen(ContentName)
-        //        CSRows = core.Csv_cs_getRows(CS)
-        //        RowCount = UBound(CSRows, 2)
-        //        CSRowCaptions = core.Csv_cs_getRowFields(CS)
-        //        ColumnCount = UBound(CSRowCaptions)
-        //        For RowPointer = 0 To RowCount - 1
-        //            sb.append( "<CR>")
-        //            For ColumnPointer = 0 To ColumnCount - 1
-        //                sb.append( "<CC Name=""" & CSRowCaptions(ColumnPointer) & """>")
-        //                sb.append( CSRows(RowPointer, ColumnPointer))
-        //                sb.append( "</CC>")
-        //                Next
-        //            sb.append( "</CR>" & vbCrLf)
-        //            Next
-        //        sb.append( "</CDef>" & vbCrLf)
-        //        End If
-        //    sb.append( "</ContensiveContent>" & vbCrLf)
-        //    GetXMLContent = sb.tostring
-        //    '
-        //    Exit Function
-        //    '
-        //    ' ----- Error Trap
-        //    '
-        ////ErrorTrap:
-        //    Call HandleClassErrorAndBubble(appname,"GetXMLContent")
-        //End Function
-        //////
-        //////========================================================================
-        ////// ----- Get an XML nodes attribute based on its name
-        //////========================================================================
-        //////
-        //private string GetXMLAttribute(bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
-        //    string tempGetXMLAttribute = null;
-        //    try {
-        //        //
-        //        //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-        //        //				XmlAttribute NodeAttribute = null;
-        //        XmlNode ResultNode = null;
-        //        string UcaseName = null;
-        //        //
-        //        tempGetXMLAttribute = "";
-        //        Found = false;
-        //        //Set REsultNode = Node.Attributes.getNamedItem(Name)
-        //        //If Not (REsultNode Is Nothing) Then
-        //        //    GetXMLAttribute = REsultNode.Value
-        //        //    Found = True
-        //        //End If
-        //        //If Not Found Then
-        //        //    GetXMLAttribute = DefaultIfNotFound
-        //        //End If
-        //        //Exit Function
-        //        //If Not (Node.Attributes Is Nothing) Then
-        //        //    REsultNode = Node.Attributes.getNamedItem(Name)
-        //        //    If (REsultNode Is Nothing) Then
-        //        UcaseName = genericController.vbUCase(Name);
-        //        foreach (XmlAttribute NodeAttribute in Node.Attributes) {
-        //            if (genericController.vbUCase(NodeAttribute.Name) == UcaseName) {
-        //                tempGetXMLAttribute = NodeAttribute.Value;
-        //                Found = true;
-        //                break;
-        //            }
-        //        }
-        //        if (!Found) {
-        //            tempGetXMLAttribute = DefaultIfNotFound;
-        //        }
-        //        //    Else
-        //        //        GetXMLAttribute = REsultNode.Value
-        //        //        Found = True
-        //        //    End If
-        //        //End If
-        //        return tempGetXMLAttribute;
-        //        //
-        //        // ----- Error Trap
-        //        //
-        //    } catch( Exception ex ) {
-        //        core.handleException(ex);
-        //    }
-        //    return tempGetXMLAttribute;
-        //}
-        ////
-        ////========================================================================
-        ////
-        ////========================================================================
-        ////
-        //private double GetXMLAttributeNumber(bool Found, XmlNode Node, string Name, double DefaultIfNotFound) {
-        //    return EncodeNumber(GetXMLAttribute(Found, Node, Name, DefaultIfNotFound.ToString()));
-        //}
-        ////
-        ////========================================================================
-        ////
-        ////========================================================================
-        ////
-        //private bool GetXMLAttributeBoolean(bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
-        //    return genericController.encodeBoolean(GetXMLAttribute(Found, Node, Name, encodeText(DefaultIfNotFound)));
-        //}
-        ////
-        ////========================================================================
-        ////
-        ////========================================================================
-        ////
-        //private int GetXMLAttributeInteger(bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
-        //    return genericController.EncodeInteger(GetXMLAttribute(Found, Node, Name, DefaultIfNotFound.ToString()));
-        //}
-        //
-        //========================================================================
-        // ----- Get an XML nodes attribute based on its name
-        //========================================================================
-        //
-        //Private Function GetXMLAttribute(NodeName As XmlNode, Name As String) As String
-        //    On Error GoTo ErrorTrap
-        //    '
-        //    Dim NodeAttribute As xmlattribute
-        //    Dim MethodName As String
-        //    '
-        //    MethodName = "XMLClass.GetXMLAttribute"
-        //    '
-        //    For Each NodeAttribute In NodeName.Attributes
-        //        If genericController.vbUCase(NodeAttribute.Name) = genericController.vbUCase(Name) Then
-        //            GetXMLAttribute = NodeAttribute.nodeValue
-        //            End If
-        //        Next
-        //    '
-        //    Exit Function
-        //    '
-        //    ' ----- Error Trap
-        //    '
-        ////ErrorTrap:
-        //    Call HandleClassErrorAndBubble(appname,"GetXMLAttribute")
-        //End Function
-        //
-        //
-        //
-        //Private Function GetContentNameByID(cmc As appServicesClass, ContentID as integer) As String
-        //    On Error GoTo ErrorTrap
-        //    '
-        //    dim dt as datatable
-        //    Dim appName As String
-        //    '
-        //    appName = core.appEnvironment.name
-        //    GetContentNameByID = ""
-        //    RS = core.app.executeSql("Default", "Select Name from ccContent where ID=" & encodeSQLNumber(ContentID))
-        //    If isDataTableOk(RS) Then
-        //        GetContentNameByID = core.getDataRowColumnName(RS.rows(0), "Name")
-        //        End If
-        //    Call closeDataTable(RS)
-        //    If (isDataTableOk(rs)) Then
-        //        If false Then
-        //            RS.Close
-        //        End If
-        //        'RS = Nothing
-        //    End If
-        //    '
-        //    Exit Function
-        //    '
-        //    ' ----- Error Trap
-        //    '
-        ////ErrorTrap:
-        //    Call HandleClassErrorAndBubble(appName, "GetContentNameByID")
-        //End Function
-        //
-        //========================================================================
-        // ----- Save the admin menus to CDef AdminMenu tags
-        //========================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// get an xml string representing sql indexes section of appliction collection
+        /// </summary>
+        /// <returns></returns>
         private string GetXMLContentDefinition_SQLIndexes() {
             string result = "";
             try {
@@ -646,7 +457,6 @@ namespace Contensive.Core.Controllers {
                     if (!string.IsNullOrEmpty(IndexList)) {
                         string[] ListRows = genericController.stringSplit(IndexList, "\r\n");
                         string IndexName = "";
-                        //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of UBound(ListRows) + 1 for every iteration:
                         int tempVar = ListRows.GetUpperBound(0) + 1;
                         string IndexFields = "";
                         for (int Ptr = 0; Ptr <= tempVar; Ptr++) {

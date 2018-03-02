@@ -20,9 +20,13 @@ namespace Contensive.Core.Controllers {
     // - local server checks the list and runs install on new zips, if remote file system, download and install
     // - addon manager just copies zip file into the /private/collectionInstall folder
     //
+    // todo -- To make it easy to add code to a site, be able to upload DLL files. Get the class names, find the collection and install in the correct collection folder
+    //
+    // todo -- Even in collection files, auto discover DLL file classes and create addons out of them. Create/update collections, create collection xml and install.
+    //
     //====================================================================================================
     /// <summary>
-    /// install addon collections
+    /// install addon collections.
     /// </summary>
     public class collectionController {
         //
@@ -243,18 +247,18 @@ namespace Contensive.Core.Controllers {
                                     updateDst |= (srcCdefField.isBaseField != dstCdefField.isBaseField);
                                     updateDst |= !textMatch(srcCdefField.get_lookupContentName(core), dstCdefField.get_lookupContentName(core));
                                     updateDst |= !textMatch(srcCdefField.get_lookupContentName(core), dstCdefField.get_lookupContentName(core));
-                                    updateDst |= !textMatch(srcCdefField.get_ManyToManyRuleContentName(core), dstCdefField.get_ManyToManyRuleContentName(core));
-                                    updateDst |= !textMatch(srcCdefField.get_RedirectContentName(core), dstCdefField.get_RedirectContentName(core));
+                                    updateDst |= !textMatch(srcCdefField.get_manyToManyRuleContentName(core), dstCdefField.get_manyToManyRuleContentName(core));
+                                    updateDst |= !textMatch(srcCdefField.get_redirectContentName(core), dstCdefField.get_redirectContentName(core));
                                     updateDst |= !textMatch(srcCdefField.installedByCollectionGuid, dstCdefField.installedByCollectionGuid);
                                 }
                                 //
                                 // Check Help fields, track changed independantly so frequent help changes will not force timely cdef loads
                                 //
-                                HelpSrc = srcCdefField.HelpCustom;
-                                HelpCustomChanged = !textMatch(HelpSrc, srcCdefField.HelpCustom);
+                                HelpSrc = srcCdefField.helpCustom;
+                                HelpCustomChanged = !textMatch(HelpSrc, srcCdefField.helpCustom);
                                 //
-                                HelpSrc = srcCdefField.HelpDefault;
-                                HelpDefaultChanged = !textMatch(HelpSrc, srcCdefField.HelpDefault);
+                                HelpSrc = srcCdefField.helpDefault;
+                                HelpDefaultChanged = !textMatch(HelpSrc, srcCdefField.helpDefault);
                                 //
                                 HelpChanged = HelpDefaultChanged || HelpCustomChanged;
                             } else {
@@ -310,14 +314,14 @@ namespace Contensive.Core.Controllers {
                                 dstCdefField.uniqueName = srcCdefField.uniqueName;
                                 dstCdefField.isBaseField = srcCdefField.isBaseField;
                                 dstCdefField.set_lookupContentName(core, srcCdefField.get_lookupContentName(core));
-                                dstCdefField.set_ManyToManyContentName(core, srcCdefField.get_ManyToManyContentName(core));
-                                dstCdefField.set_ManyToManyRuleContentName(core, srcCdefField.get_ManyToManyRuleContentName(core));
-                                dstCdefField.set_RedirectContentName(core, srcCdefField.get_RedirectContentName(core));
+                                dstCdefField.set_manyToManyContentName(core, srcCdefField.get_manyToManyContentName(core));
+                                dstCdefField.set_manyToManyRuleContentName(core, srcCdefField.get_manyToManyRuleContentName(core));
+                                dstCdefField.set_redirectContentName(core, srcCdefField.get_redirectContentName(core));
                                 dstCdefField.installedByCollectionGuid = srcCdefField.installedByCollectionGuid;
                                 dstCdefField.dataChanged = true;
                                 if (HelpChanged) {
-                                    dstCdefField.HelpCustom = srcCdefField.HelpCustom;
-                                    dstCdefField.HelpDefault = srcCdefField.HelpDefault;
+                                    dstCdefField.helpCustom = srcCdefField.helpCustom;
+                                    dstCdefField.helpDefault = srcCdefField.helpDefault;
                                     dstCdefField.HelpChanged = true;
                                 }
                                 dstCdef.includesAFieldChange = true;
@@ -331,15 +335,15 @@ namespace Contensive.Core.Controllers {
                 // Check SQL Indexes
                 // -------------------------------------------------------------------------------------------------
                 //
-                foreach (miniCollectionModel.collectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
+                foreach (miniCollectionModel.miniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
                     string srcName = (srcSqlIndex.DataSourceName + "-" + srcSqlIndex.TableName + "-" + srcSqlIndex.IndexName).ToLower();
                     updateDst = false;
                     //
                     // Search for this name in the Dst
                     bool indexFound = false;
                     bool indexChanged = false;
-                    miniCollectionModel.collectionSQLIndexModel indexToUpdate = new miniCollectionModel.collectionSQLIndexModel() { };
-                    foreach (miniCollectionModel.collectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
+                    miniCollectionModel.miniCollectionSQLIndexModel indexToUpdate = new miniCollectionModel.miniCollectionSQLIndexModel() { };
+                    foreach (miniCollectionModel.miniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
                         dstName = (dstSqlIndex.DataSourceName + "-" + dstSqlIndex.TableName + "-" + dstSqlIndex.IndexName).ToLower();
                         if (textMatch(dstName, srcName)) {
                             //
@@ -373,7 +377,7 @@ namespace Contensive.Core.Controllers {
                 DataBuildVersion = core.siteProperties.dataBuildVersion;
                 foreach (var srcKvp in srcCollection.menus) {
                     string srcKey = srcKvp.Key.ToLower() ;
-                    miniCollectionModel.collectionMenuModel srcMenu = srcKvp.Value;
+                    miniCollectionModel.miniCollectionMenuModel srcMenu = srcKvp.Value;
                     string srcName = srcMenu.Name.ToLower();
                     string srcGuid = srcMenu.Guid;
                     string SrcParentName = genericController.vbLCase(srcMenu.ParentName);
@@ -382,11 +386,11 @@ namespace Contensive.Core.Controllers {
                     updateDst = false;
                     //
                     // Search for match using guid
-                    miniCollectionModel.collectionMenuModel dstMenuMatch = new miniCollectionModel.collectionMenuModel() { } ;
+                    miniCollectionModel.miniCollectionMenuModel dstMenuMatch = new miniCollectionModel.miniCollectionMenuModel() { } ;
                     IsMatch = false;
                     foreach (var dstKvp in dstCollection.menus) {
                         string dstKey = dstKvp.Key.ToLower();
-                        miniCollectionModel.collectionMenuModel dstMenu = dstKvp.Value;
+                        miniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
                         string dstGuid = dstMenu.Guid;
                         if (dstGuid == srcGuid) {
                             DstIsNavigator = dstMenu.IsNavigator;
@@ -404,7 +408,7 @@ namespace Contensive.Core.Controllers {
                         // no match found on guid, try name and ( either namespace or parentname )
                         foreach (var dstKvp in dstCollection.menus) {
                             string dstKey = dstKvp.Key.ToLower();
-                            miniCollectionModel.collectionMenuModel dstMenu = dstKvp.Value;
+                            miniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
                             dstName = genericController.vbLCase(dstMenu.Name);
                             if ((srcName == dstName) && (SrcIsNavigator == DstIsNavigator)) {
                                 if (SrcIsNavigator) {
@@ -615,7 +619,7 @@ namespace Contensive.Core.Controllers {
        //
         //====================================================================================================
         //
-        private static string GetMenuNameSpace(coreController core, Dictionary<string,miniCollectionModel.collectionMenuModel> menus, miniCollectionModel.collectionMenuModel menu, string UsedIDList) {
+        private static string GetMenuNameSpace(coreController core, Dictionary<string,miniCollectionModel.miniCollectionMenuModel> menus, miniCollectionModel.miniCollectionMenuModel menu, string UsedIDList) {
             string returnAttr = "";
             try {
                 string ParentName = null;
@@ -628,7 +632,7 @@ namespace Contensive.Core.Controllers {
                 if (!string.IsNullOrEmpty(ParentName)) {
                     LCaseParentName = genericController.vbLCase(ParentName);
                     foreach ( var kvp in menus) {
-                        miniCollectionModel.collectionMenuModel testMenu = kvp.Value;
+                        miniCollectionModel.miniCollectionMenuModel testMenu = kvp.Value;
                         if (genericController.vbInstr(1, "," + UsedIDList + ",", "," + Ptr.ToString() + ",") == 0) {
                             if (LCaseParentName == genericController.vbLCase(testMenu.Name) && (menu.IsNavigator == testMenu.IsNavigator)) {
                                 Prefix = GetMenuNameSpace(core, menus, testMenu, UsedIDList + "," + menu.Guid);
@@ -803,11 +807,8 @@ namespace Contensive.Core.Controllers {
         //
         public static void exportApplicationCDefXml(coreController core, string privateFilesPathFilename, bool IncludeBaseFields) {
             try {
-                collectionXmlController XML = null;
-                string Content = null;
-                //
-                XML = new collectionXmlController(core);
-                Content = XML.getApplicationCollectionXml(IncludeBaseFields);
+                collectionXmlController XML = new collectionXmlController(core);
+                string Content = XML.getApplicationCollectionXml(IncludeBaseFields);
                 core.privateFiles.saveFile(privateFilesPathFilename, Content);
                 XML = null;
             } catch (Exception ex) {
@@ -835,12 +836,6 @@ namespace Contensive.Core.Controllers {
                 string Collectionname = null;
                 int Pos = 0;
                 string UserError = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode CDefSection = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode CDefInterfaces = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode ActiveXNode = null;
                 string errorPrefix = null;
                 int downloadRetry = 0;
                 const int downloadRetryMax = 3;
@@ -1778,7 +1773,6 @@ namespace Contensive.Core.Controllers {
                         }
                         //
                         // -- Process the other files
-                        //todo  NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
                         bool CollectionblockNavigatorNode_fileValueOK = false;
                         foreach (FileDetail file in srcFileInfoArray) {
                             if (file.Extension == ".xml") {
@@ -2632,10 +2626,6 @@ namespace Contensive.Core.Controllers {
                 string LocalFilename = null;
                 string LocalGuid = null;
                 XmlDocument Doc = new XmlDocument();
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode CollectionNode = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode LocalListNode = null;
                 XmlNode NewCollectionNode = null;
                 XmlNode NewAttrNode = null;
                 bool CollectionFound = false;
@@ -2661,8 +2651,6 @@ namespace Contensive.Core.Controllers {
                                                 case "guid":
                                                     //
                                                     LocalGuid = genericController.vbLCase(CollectionNode.InnerText);
-                                                    //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                    //ORIGINAL LINE: Exit For
                                                     goto ExitLabel1;
                                             }
                                         }
@@ -2682,8 +2670,6 @@ namespace Contensive.Core.Controllers {
                                                         break;
                                                 }
                                             }
-                                            //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                            //ORIGINAL LINE: Exit For
                                             goto ExitLabel2;
                                         }
                                         break;
@@ -3806,13 +3792,9 @@ namespace Contensive.Core.Controllers {
                 string MenuGuid = null;
                
                 XmlNode CDef_Node = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode CDefChildNode = null;
                 string DataSourceName = null;
                 XmlDocument srcXmlDom = new XmlDocument();
                 string NodeName = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode FieldChildNode = null;
                 //
                 logController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_LoadDataToCollection");
                 //
@@ -4038,26 +4020,26 @@ namespace Contensive.Core.Controllers {
                                                     // case 2 - when the base file is loaded, all fields must include the attribute
                                                     //Return_Collection.CDefExt(CDefPtr).Fields(FieldPtr).IsBaseField = IsccBaseFile
                                                     cdefField.isBaseField =xmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "IsBaseField", false) || IsccBaseFile;
-                                                    cdefField.set_RedirectContentName(core,xmlController.GetXMLAttribute(core, Found, CDefChildNode, "RedirectContent", DefaultCDefField.get_RedirectContentName(core)));
-                                                    cdefField.set_ManyToManyContentName(core,xmlController.GetXMLAttribute(core, Found, CDefChildNode, "ManyToManyContent", DefaultCDefField.get_ManyToManyContentName(core)));
-                                                    cdefField.set_ManyToManyRuleContentName(core,xmlController.GetXMLAttribute(core, Found, CDefChildNode, "ManyToManyRuleContent", DefaultCDefField.get_ManyToManyRuleContentName(core)));
+                                                    cdefField.set_redirectContentName(core,xmlController.GetXMLAttribute(core, Found, CDefChildNode, "RedirectContent", DefaultCDefField.get_redirectContentName(core)));
+                                                    cdefField.set_manyToManyContentName(core,xmlController.GetXMLAttribute(core, Found, CDefChildNode, "ManyToManyContent", DefaultCDefField.get_manyToManyContentName(core)));
+                                                    cdefField.set_manyToManyRuleContentName(core,xmlController.GetXMLAttribute(core, Found, CDefChildNode, "ManyToManyRuleContent", DefaultCDefField.get_manyToManyRuleContentName(core)));
                                                     cdefField.isModifiedSinceInstalled =xmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "IsModified", DefaultCDefField.isModifiedSinceInstalled);
                                                     cdefField.installedByCollectionGuid =xmlController.GetXMLAttribute(core, Found, CDefChildNode, "installedByCollectionId", DefaultCDefField.installedByCollectionGuid);
                                                     cdefField.dataChanged = setAllDataChanged;
                                                     //
                                                     // ----- handle child nodes (help node)
                                                     //
-                                                    cdefField.HelpCustom = "";
-                                                    cdefField.HelpDefault = "";
+                                                    cdefField.helpCustom = "";
+                                                    cdefField.helpDefault = "";
                                                     foreach (XmlNode FieldChildNode in CDefChildNode.ChildNodes) {
                                                         //
                                                         // ----- process CDef Field
                                                         //
                                                         if (textMatch(FieldChildNode.Name, "HelpDefault")) {
-                                                            cdefField.HelpDefault = FieldChildNode.InnerText;
+                                                            cdefField.helpDefault = FieldChildNode.InnerText;
                                                         }
                                                         if (textMatch(FieldChildNode.Name, "HelpCustom")) {
-                                                            cdefField.HelpCustom = FieldChildNode.InnerText;
+                                                            cdefField.helpCustom = FieldChildNode.InnerText;
                                                         }
                                                         cdefField.HelpChanged = setAllDataChanged;
                                                     }
@@ -4077,8 +4059,8 @@ namespace Contensive.Core.Controllers {
                                         DataSourceName = "default";
                                     }
                                     bool removeDup = false;
-                                    miniCollectionModel.collectionSQLIndexModel dupToRemove = new miniCollectionModel.collectionSQLIndexModel();
-                                    foreach (miniCollectionModel.collectionSQLIndexModel index in result.sqlIndexes) {
+                                    miniCollectionModel.miniCollectionSQLIndexModel dupToRemove = new miniCollectionModel.miniCollectionSQLIndexModel();
+                                    foreach (miniCollectionModel.miniCollectionSQLIndexModel index in result.sqlIndexes) {
                                         if (textMatch(index.IndexName, IndexName) & textMatch(index.TableName, TableName) & textMatch(index.DataSourceName, DataSourceName)) {
                                             dupToRemove = index;
                                             removeDup = true;
@@ -4088,7 +4070,7 @@ namespace Contensive.Core.Controllers {
                                     if (removeDup) {
                                         result.sqlIndexes.Remove(dupToRemove);
                                     }
-                                    miniCollectionModel.collectionSQLIndexModel newIndex = new miniCollectionModel.collectionSQLIndexModel();
+                                    miniCollectionModel.miniCollectionSQLIndexModel newIndex = new miniCollectionModel.miniCollectionSQLIndexModel();
                                     newIndex.IndexName = IndexName;
                                     newIndex.TableName = TableName;
                                     newIndex.DataSourceName = DataSourceName;
@@ -4115,7 +4097,7 @@ namespace Contensive.Core.Controllers {
                                         if (string.IsNullOrEmpty(ActiveText)) {
                                             ActiveText = "1";
                                         }
-                                        result.menus.Add(MenuKey, new miniCollectionModel.collectionMenuModel() {
+                                        result.menus.Add(MenuKey, new miniCollectionModel.miniCollectionMenuModel() {
                                             dataChanged = setAllDataChanged,
                                             Name = MenuName,
                                             Guid = MenuGuid,
@@ -4142,11 +4124,11 @@ namespace Contensive.Core.Controllers {
                                     // Aggregate Objects (just make them -- there are not too many
                                     //
                                     Name =xmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Name", "");
-                                    miniCollectionModel.collectionAddOnModel addon;
+                                    miniCollectionModel.miniCollectionAddOnModel addon;
                                     if (result.addOns.ContainsKey(Name.ToLower())) {
                                         addon = result.addOns[Name.ToLower()];
                                     } else {
-                                        addon = new miniCollectionModel.collectionAddOnModel();
+                                        addon = new miniCollectionModel.miniCollectionAddOnModel();
                                         result.addOns.Add(Name.ToLower(), addon);
                                     }
                                     addon.dataChanged = setAllDataChanged;
@@ -4267,7 +4249,7 @@ namespace Contensive.Core.Controllers {
                         // Convert Menus.ParentName to Menu.menuNameSpace
                         //
                         foreach ( var kvp in result.menus) {
-                            miniCollectionModel.collectionMenuModel menu = kvp.Value;
+                            miniCollectionModel.miniCollectionMenuModel menu = kvp.Value;
                             if ( !string.IsNullOrEmpty( menu.ParentName )) {
                                 menu.menuNameSpace = GetMenuNameSpace(core, result.menus, menu, "");
                             }
@@ -4396,13 +4378,8 @@ namespace Contensive.Core.Controllers {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (var keypairvalue in Collection.cdef) {
-                    //
-                    // todo tmp fix, changes to field caption in base.xml do not set fieldChange
-                    if (true) // If .dataChanged Or .includesAFieldChange Then
-                    {
-                        if (keypairvalue.Value.name.ToLower() != "content") {
-                            installCollection_BuildDbFromCollection_AddCDefToDb(core, keypairvalue.Value, BuildVersion);
-                        }
+                    if (keypairvalue.Value.name.ToLower() != "content") {
+                        installCollection_BuildDbFromCollection_AddCDefToDb(core, keypairvalue.Value, BuildVersion);
                     }
                 }
                 core.doc.clearMetaData();
@@ -4440,9 +4417,9 @@ namespace Contensive.Core.Controllers {
                                 }
                                 rs.Dispose();
                                 if (FieldHelpID != 0) {
-                                    Copy = tempVar.HelpCustom;
+                                    Copy = tempVar.helpCustom;
                                     if (string.IsNullOrEmpty(Copy)) {
-                                        Copy = tempVar.HelpDefault;
+                                        Copy = tempVar.helpDefault;
                                         if (!string.IsNullOrEmpty(Copy)) {
                                             //Copy = Copy;
                                         }
@@ -4461,7 +4438,7 @@ namespace Contensive.Core.Controllers {
                 logController.logInfo(core, "CDef Load, stage 8: create SQL indexes");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                foreach (miniCollectionModel.collectionSQLIndexModel index in Collection.sqlIndexes) {
+                foreach (miniCollectionModel.miniCollectionSQLIndexModel index in Collection.sqlIndexes) {
                     if (index.dataChanged) {
                         logController.logInfo(core, "creating index [" + index.IndexName + "], fields [" + index.FieldNameList + "], on table [" + index.TableName + "]");
                         core.db.createSQLIndex(index.DataSourceName, index.TableName, index.IndexName, index.FieldNameList);
@@ -4675,7 +4652,7 @@ namespace Contensive.Core.Controllers {
                             if (FieldHelpID != 0) {
                                 string SQL = "update ccfieldhelp"
                                     + " set fieldid=" + fieldId + ",active=1"
-                                    + ",contentcontrolid=" + FieldHelpCID + ",helpdefault=" + core.db.encodeSQLText(field.HelpDefault) + ",helpcustom=" + core.db.encodeSQLText(field.HelpCustom) + " where id=" + FieldHelpID;
+                                    + ",contentcontrolid=" + FieldHelpCID + ",helpdefault=" + core.db.encodeSQLText(field.helpDefault) + ",helpcustom=" + core.db.encodeSQLText(field.helpCustom) + " where id=" + FieldHelpID;
                                 core.db.executeQuery(SQL);
                             }
                         }

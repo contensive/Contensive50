@@ -45,13 +45,13 @@ namespace Contensive.Core.Models.Complex {
         /// <summary>
         /// Name dictionary of all addons in the miniCollection
         /// </summary>
-        public Dictionary<string, collectionAddOnModel> addOns = new Dictionary<string, collectionAddOnModel>() { };
+        public Dictionary<string, miniCollectionAddOnModel> addOns = new Dictionary<string, miniCollectionAddOnModel>() { };
         //
         //====================================================================================================
         /// <summary>
         /// Model of addons in the minicollection
         /// </summary>
-        public class collectionAddOnModel {
+        public class miniCollectionAddOnModel {
             public string Name;
             public string Link;
             public string ObjectProgramID;
@@ -65,13 +65,13 @@ namespace Contensive.Core.Models.Complex {
         /// <summary>
         /// List of sql indexes for the minicollection
         /// </summary>
-        public List<collectionSQLIndexModel> sqlIndexes = new List<collectionSQLIndexModel> { };
+        public List<miniCollectionSQLIndexModel> sqlIndexes = new List<miniCollectionSQLIndexModel> { };
         //
         //====================================================================================================
         /// <summary>
         /// Model of sqlIndexes for the collection
         /// </summary>
-        public class collectionSQLIndexModel {
+        public class miniCollectionSQLIndexModel {
             public string DataSourceName;
             public string TableName;
             public string IndexName;
@@ -83,13 +83,13 @@ namespace Contensive.Core.Models.Complex {
         /// <summary>
         /// Name dictionary for admin navigator menus in the minicollection
         /// </summary>
-        public Dictionary<string, collectionMenuModel> menus = new Dictionary<string, collectionMenuModel> { };
+        public Dictionary<string, miniCollectionMenuModel> menus = new Dictionary<string, miniCollectionMenuModel> { };
         //
         //====================================================================================================
         /// <summary>
         /// Model for menu dictionary
         /// </summary>
-        public class collectionMenuModel {
+        public class miniCollectionMenuModel {
             public string Name;
             public bool IsNavigator;
             public string menuNameSpace;
@@ -113,14 +113,14 @@ namespace Contensive.Core.Models.Complex {
         /// <summary>
         /// Array of styles for the minicollection
         /// </summary>
-       // [Obsolete("Shared styles deprecated")]
+        // [Obsolete("Shared styles deprecated")]
         public StyleType[] styles;
         //
         //====================================================================================================
         /// <summary>
         /// Model for style array
         /// </summary>
-    //    [Obsolete("Shared styles deprecated")]
+        // [Obsolete("Shared styles deprecated")]
         public struct StyleType {
             public string Name;
             public bool Overwrite;
@@ -132,7 +132,7 @@ namespace Contensive.Core.Models.Complex {
         /// <summary>
         /// count of styles
         /// </summary>
-    //    [Obsolete("Shared styles deprecated")]
+        // [Obsolete("Shared styles deprecated")]
         public int styleCnt;
         //
         // todo
@@ -140,7 +140,7 @@ namespace Contensive.Core.Models.Complex {
         /// <summary>
         /// Site style sheet
         /// </summary>
-     //   [Obsolete("Shared styles deprecated")]
+        // [Obsolete("Shared styles deprecated")]
         public string styleSheet;
         //
         //====================================================================================================
@@ -162,11 +162,11 @@ namespace Contensive.Core.Models.Complex {
         /// <summary>
         /// count of page templates in collection
         /// </summary>
-        public int pageTemplateCnt;
+        public int pageTemplateCnt { get; set; }
         //
         //====================================================================================================
         /// <summary>
-        /// Array of page templates
+        /// Array of page templates in collection
         /// </summary>
         public PageTemplateType[] pageTemplates;
         //

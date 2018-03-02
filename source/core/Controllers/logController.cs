@@ -126,41 +126,36 @@ namespace Contensive.Core.Controllers {
         /// <param name="level"></param>
         public static void logWithoutConfig(string message, logLevel level ) {
             try {
-                //FileTarget target = LogManager.Configuration.FindTargetByName<FileTarget>("LogFile");
-                //target.FileName = filename;
                 string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
                 string logContent = level.ToString() + "\tthread:" + threadName + "\t" + message;
                 Logger nlogLogger = LogManager.GetCurrentClassLogger();
-                //Logger nlogLogger = LogManager.GetLogger("loggerName"); //??? throws error
-                //logger.Info("nlog test");
                 //
-                // decouple NLog types from internal enum
+                // -- decouple NLog types from internal enum
+                LogLevel nLogLevel = LogLevel.Info;
                 switch (level) {
                     case logLevel.Trace:
-                        //Console.WriteLine("Trace:" + message);
-                        nlogLogger.Trace(message);
+                        nLogLevel = NLog.LogLevel.Trace;
                         break;
                     case logLevel.Debug:
-                        //Console.WriteLine("Debug:" + message);
-                        nlogLogger.Debug(message);
+                        nLogLevel = NLog.LogLevel.Debug;
                         break;
                     case logLevel.Info:
-                        //Console.WriteLine("Info:" + message);
-                        nlogLogger.Info(message);
+                        nLogLevel = NLog.LogLevel.Info;
                         break;
                     case logLevel.Warn:
-                        //Console.WriteLine("Warn:" + message);
-                        nlogLogger.Warn(message);
+                        nLogLevel = NLog.LogLevel.Warn;
                         break;
                     case logLevel.Error:
-                        //Console.WriteLine("Error:" + message);
-                        nlogLogger.Error(message);
+                        nLogLevel = NLog.LogLevel.Error;
                         break;
                     case logLevel.Fatal:
-                        //Console.WriteLine("Fatal:" + message);
-                        nlogLogger.Fatal(message);
+                        nLogLevel = NLog.LogLevel.Fatal;
                         break;
                 }
+                //
+                // -- log with even so we can pass in the type of our wrapper
+                LogEventInfo logEvent = new LogEventInfo(nLogLevel, nlogLogger.Name, message);
+                nlogLogger.Log(typeof(logController), logEvent);
             } catch (Exception) {
                 // -- ignore errors in error handling
             } finally {

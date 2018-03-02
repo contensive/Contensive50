@@ -1,14 +1,7 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using Contensive.Core;
 using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
@@ -16,141 +9,226 @@ using static Contensive.Core.constants;
 //
 namespace Contensive.Core.Models.Complex {
     //
-    // ---------------------------------------------------------------------------------------------------
-    // ----- CDefType
-    //       class not structure because it has to marshall to vb6
-    // ---------------------------------------------------------------------------------------------------
-    //
+    //====================================================================================================
+    /// <summary>
+    /// complex model (storage not db) for content definitions
+    /// </summary>
     [Serializable]
     public class cdefModel {
         //
         private const string cacheNameInvalidateAll = "cdefInvalidateAll";
         //
-        // -- index in content table
+        /// <summary>
+        /// index in content table
+        /// </summary>
         public int id { get; set; }
         //
-        // -- Name of Content
+        /// <summary>
+        /// Name of Content
+        /// </summary>
         public string name { get; set; }
         //
-        // -- the name of the content table
+        /// <summary>
+        /// the name of the content table
+        /// </summary>
         public string contentTableName { get; set; } 
         //
-        // -- 
+        /// <summary>
+        /// The name of the datasource that stores this content (the name of the database connection)
+        /// </summary>
         public string contentDataSourceName { get; set; }
         //
-        // -- Allow adding records
+        /// <summary>
+        /// Allow adding records
+        /// </summary>
         public bool allowAdd { get; set; }
         //
-        // -- Allow deleting records
+        /// <summary>
+        /// Allow deleting records
+        /// </summary>
         public bool allowDelete { get; set; }
         //
-        // -- Used to filter records in the admin area
+        /// <summary>
+        /// deprecate - filter records from the datasource for this content
+        /// </summary>
         public string whereClause { get; set; }
         //
-        // FieldName Direction, ....
+        /// <summary>
+        /// name of sort method to use as default for queries against this content
+        /// </summary>
         public string defaultSortMethod { get; set; } 
         //
-        // -- 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool activeOnly { get; set; }
         //
-        // Only allow administrators to modify content
+        /// <summary>
+        /// Only allow administrators to modify content
+        /// </summary>
         public bool adminOnly { get; set; }
         //
-        // Only allow developers to modify content
+        /// <summary>
+        /// Only allow developers to modify content
+        /// </summary>
         public bool developerOnly { get; set; }
         //
-        // String used to populate select boxes
+        /// <summary>
+        /// String used to populate select boxes
+        /// </summary>
         public string dropDownFieldList { get; set; }
         //
-        // Group of members who administer Workflow Authoring
+        /// <summary>
+        /// Group of members who administer Workflow Authoring
+        /// </summary>
         public string editorGroupName { get; set; } 
         //
-        // -- 
+        /// <summary>
+        /// 
+        /// </summary>
         public int dataSourceId { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// 
+        /// </summary>
         private string _dataSourceName { get; set; } = "";
         //
-        // -- if true, all records in the source are in this content
+        /// <summary>
+        /// if true, all records in the source are in this content
+        /// </summary>
         public bool ignoreContentControl { get; set; }
         //
-        // -- Field Name of the required "name" field
+        /// <summary>
+        /// deprecate - Field Name of the required "name" field
+        /// </summary>
         public string aliasName { get; set; }
         //
-        // -- Field Name of the required "id" field
+        /// <summary>
+        /// deprecate - Field Name of the required "id" field
+        /// </summary>
         public string aliasID { get; set; }
         //
-        // For admin edit page
+        /// <summary>
+        /// deprecate - For admin edit page
+        /// </summary>
         public bool allowTopicRules { get; set; }
         //
-        // For admin edit page
+        /// <summary>
+        /// deprecate - For admin edit page
+        /// </summary>
         public bool allowContentTracking { get; set; }
         //
-        // For admin edit page
+        /// <summary>
+        /// deprecate - For admin edit page
+        /// </summary>
         public bool allowCalendarEvents { get; set; } 
         //
-        // -- 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool dataChanged { get; set; }
         //
-        // -- 
-        public bool includesAFieldChange { get; set; } // if any fields().changed, this is set true to
+        /// <summary>
+        /// deprecate - if any fields().changed, this is set true to
+        /// </summary>
+        public bool includesAFieldChange { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// when false, the content is not included in queries
+        /// </summary>
         public bool active { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// deprecate
+        /// </summary>
         public bool allowContentChildTool { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// deprecate
+        /// </summary>
         public bool isModifiedSinceInstalled { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// icon for content
+        /// </summary>
         public string iconLink { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// icon for content
+        /// </summary>
         public int iconWidth { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// icon for content
+        /// </summary>
         public int iconHeight { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// icon for content
+        /// </summary>
         public int iconSprites { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// 
+        /// </summary>
         public string guid { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// deprecate, true if this was installed as part of the base collection. replaced with isntalledByCollectionGuid
+        /// </summary>
         public bool isBaseContent { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// the guid of the collection that installed this content
+        /// </summary>
         public string installedByCollectionGuid { get; set; }
         //
-        // read from Db, if not IgnoreContentControl, the ID of the parent content
-        public int parentID { get; set; } 
+        /// <summary>
+        /// consider deprecation - read from Db, if not IgnoreContentControl, the ID of the parent content
+        /// </summary>
+        public int parentID { get; set; }
         //
-        // read from xml, used to set parentId
-        public string parentName { get; set; } 
+        /// <summary>
+        /// consider deprecation - read from xml, used to set parentId
+        /// </summary>
+        public string parentName { get; set; }
         //
-        // string that changes if any record in Content Definition changes, in memory only
+        /// <summary>
+        /// string that changes if any record in Content Definition changes, in memory only
+        /// </summary>
         public string timeStamp { get; set; } 
         //
-        // -- 
+        /// <summary>
+        /// field for this content
+        /// </summary>
         public Dictionary<string, Models.Complex.cdefFieldModel> fields { get; set; } = new Dictionary<string, Models.Complex.cdefFieldModel>();
         //
-        // -- 
+        /// <summary>
+        /// metadata for admin site editing columns
+        /// </summary>
         public SortedList<string, CDefAdminColumnClass> adminColumns { get; set; } = new SortedList<string, CDefAdminColumnClass>();
         //
-        // -- 
-        public string contentControlCriteria { get; set; } // String created from ParentIDs used to select records
+        /// <summary>
+        /// consider deprection - string created from ParentIDs used to select records. If we eliminate parentId, then the whole table belongs to the content. This will speed queries and simplify concepts
+        /// </summary>
+        public string contentControlCriteria { get; set; }
         //
-        // -- 
+        /// <summary>
+        /// 
+        /// </summary>
         public List<string> selectList { get; set; } = new List<string>();
         //
-        // -- Field list used in OpenCSContent calls (all active field definitions)
+        /// <summary>
+        /// Field list used in OpenCSContent calls (all active field definitions)
+        /// </summary>
         public string selectCommaList { get; set; } 
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// consider deprecating - list of child content definitions. Not needed if we deprecate parentid
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
         public List<int> get_childIdList(coreController core) {
             if (_childIdList == null) {
                 string Sql = "select id from cccontent where parentid=" + id;
@@ -171,7 +249,9 @@ namespace Contensive.Core.Models.Complex {
         private List<int> _childIdList = null;
         //
         //====================================================================================================
-        // CDefAdminColumnType
+        /// <summary>
+        /// metadata for column definition
+        /// </summary>
         //
         [Serializable]
         public class CDefAdminColumnClass {
@@ -461,12 +541,12 @@ namespace Contensive.Core.Models.Complex {
                                     field.uniqueName = genericController.encodeBoolean(rowWithinLoop[1]);
                                     //.ValueVariant
                                     //
-                                    field.HelpCustom = genericController.encodeText(rowWithinLoop[41]);
-                                    field.HelpDefault = genericController.encodeText(rowWithinLoop[40]);
-                                    if (string.IsNullOrEmpty(field.HelpCustom)) {
-                                        field.helpMessage = field.HelpDefault;
+                                    field.helpCustom = genericController.encodeText(rowWithinLoop[41]);
+                                    field.helpDefault = genericController.encodeText(rowWithinLoop[40]);
+                                    if (string.IsNullOrEmpty(field.helpCustom)) {
+                                        field.helpMessage = field.helpDefault;
                                     } else {
-                                        field.helpMessage = field.HelpCustom;
+                                        field.helpMessage = field.helpCustom;
                                     }
                                     field.HelpChanged = false;
                                     dt.Dispose();
@@ -1424,7 +1504,7 @@ namespace Contensive.Core.Models.Complex {
                     LookupContentName = field.get_lookupContentName(core);
                     AdminIndexWidth = field.indexWidth;
                     AdminIndexSort = field.indexSortOrder;
-                    RedirectContentName = field.get_RedirectContentName(core);
+                    RedirectContentName = field.get_redirectContentName(core);
                     RedirectIDField = field.redirectID;
                     RedirectPath = field.redirectPath;
                     HTMLContent = field.htmlContent;
@@ -1571,7 +1651,7 @@ namespace Contensive.Core.Models.Complex {
                                     //
                                     // -- many-to-many field
                                     //
-                                    string ManyToManyContent = field.get_ManyToManyContentName(core);
+                                    string ManyToManyContent = field.get_manyToManyContentName(core);
                                     if (!string.IsNullOrEmpty(ManyToManyContent)) {
                                         int ManyToManyContentID = Models.Complex.cdefModel.getContentId(core, ManyToManyContent);
                                         if (ManyToManyContentID <= 0) {
@@ -1580,7 +1660,7 @@ namespace Contensive.Core.Models.Complex {
                                         sqlList.add("MANYTOMANYCONTENTID", core.db.encodeSQLNumber(ManyToManyContentID));
                                     }
                                     //
-                                    string ManyToManyRuleContent = field.get_ManyToManyRuleContentName(core);
+                                    string ManyToManyRuleContent = field.get_manyToManyRuleContentName(core);
                                     if (!string.IsNullOrEmpty(ManyToManyRuleContent)) {
                                         int ManyToManyRuleContentID = Models.Complex.cdefModel.getContentId(core, ManyToManyRuleContent);
                                         if (ManyToManyRuleContentID <= 0) {
