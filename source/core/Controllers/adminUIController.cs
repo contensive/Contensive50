@@ -445,7 +445,7 @@ namespace Contensive.Core {
             string Style = null;
             string CellCopy = null;
             //
-            iAlign = encodeEmptyText(Align, "left");
+            iAlign = encodeEmpty(Align, "left");
             //
             if ((RowPointer % 2) > 0) {
                 Style = "ccAdminListRowOdd";

@@ -362,66 +362,66 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // No content so far, try the forms
                         // todo - convert this to switch
-                        if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormBuilderCollection) {
+                        if (AdminForm == AdminFormBuilderCollection) {
                             ContentCell = GetForm_BuildCollection();
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormSecurityControl) {
+                        } else if (AdminForm == AdminFormSecurityControl) {
                             AddonGuid = AddonGuidPreferences;
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormMetaKeywordTool) {
+                        } else if (AdminForm == AdminFormMetaKeywordTool) {
                             ContentCell = GetForm_MetaKeywordTool();
-                        } else if ((encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormMobileBrowserControl) || (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormPageControl) || (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormEmailControl)) {
+                        } else if ((AdminForm == AdminFormMobileBrowserControl) || (AdminForm == AdminFormPageControl) || (AdminForm == AdminFormEmailControl)) {
                             ContentCell = core.addon.execute(addonModel.create(core, AddonGuidPreferences), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorCaption = "Preferences"
                             });
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormClearCache) {
+                        } else if (AdminForm == AdminFormClearCache) {
                             ContentCell = GetForm_ClearCache();
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormSpiderControl) {
+                        } else if (AdminForm == AdminFormSpiderControl) {
                             ContentCell = core.addon.execute(addonModel.createByName(core, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorCaption = "Content Spider Control"
                             });
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormResourceLibrary) {
+                        } else if (AdminForm == AdminFormResourceLibrary) {
                             ContentCell = core.html.getResourceLibrary("", false, "", "", true);
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormQuickStats) {
+                        } else if (AdminForm == AdminFormQuickStats) {
                             ContentCell = (GetForm_QuickStats());
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormIndex) {
+                        } else if (AdminForm == AdminFormIndex) {
                             ContentCell = (GetForm_Index(AdminContent, editRecord, (AdminContent.contentTableName.ToLower() == "ccemail")));
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormEdit) {
+                        } else if (AdminForm == AdminFormEdit) {
                             ContentCell = GetForm_Edit(AdminContent, editRecord);
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormClose) {
+                        } else if (AdminForm == AdminFormClose) {
                             Stream.Add("<Script Language=\"JavaScript\" type=\"text/javascript\"> window.close(); </Script>");
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormPublishing) {
+                        } else if (AdminForm == AdminFormPublishing) {
                             ContentCell = (GetForm_Publish());
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormContentChildTool) {
+                        } else if (AdminForm == AdminFormContentChildTool) {
                             ContentCell = (GetContentChildTool());
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminformPageContentMap) {
+                        } else if (AdminForm == AdminformPageContentMap) {
                             ContentCell = (GetForm_PageContentMap());
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminformHousekeepingControl) {
+                        } else if (AdminForm == AdminformHousekeepingControl) {
                             ContentCell = (GetForm_HouseKeepingControl());
-                        } else if ((encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormTools) || (encodeInteger(Math.Floor(encodeNumber(AdminForm))) >= 100 && encodeInteger(Math.Floor(encodeNumber(AdminForm))) <= 199)) {
+                        } else if ((AdminForm == AdminFormTools) || (AdminForm >= 100 && AdminForm <= 199)) {
                             legacyToolsClass Tools = new legacyToolsClass(core);
                             ContentCell = Tools.GetForm();
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormStyleEditor) {
+                        } else if (AdminForm == AdminFormStyleEditor) {
                             ContentCell = (admin_GetForm_StyleEditor());
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormDownloads) {
+                        } else if (AdminForm == AdminFormDownloads) {
                             ContentCell = (GetForm_Downloads());
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminformRSSControl) {
+                        } else if (AdminForm == AdminformRSSControl) {
                             ContentCell = core.webServer.redirect("?cid=" + cdefModel.getContentId(core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormImportWizard) {
+                        } else if (AdminForm == AdminFormImportWizard) {
                             ContentCell = core.addon.execute(addonModel.create(core, addonGuidImportWizard), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorCaption = "Import Wizard"
                             });
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormCustomReports) {
+                        } else if (AdminForm == AdminFormCustomReports) {
                             ContentCell = GetForm_CustomReports();
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormFormWizard) {
+                        } else if (AdminForm == AdminFormFormWizard) {
                             ContentCell = core.addon.execute(addonModel.create(core, addonGuidFormWizard), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorCaption = "Form Wizard"
                             });
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormLegacyAddonManager) {
+                        } else if (AdminForm == AdminFormLegacyAddonManager) {
                             ContentCell = addonController.GetAddonManager(core);
-                        } else if (encodeInteger(Math.Floor(encodeNumber(AdminForm))) == AdminFormEditorConfig) {
+                        } else if (AdminForm == AdminFormEditorConfig) {
                             ContentCell = GetForm_EditConfig();
                         } else {
                             ContentCell = "<p>The form requested is not supported</p>";
@@ -10421,7 +10421,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //ContentControlCriteria = core.csv_GetContentControlCriteria(MenuContentName)
                     Criteria = Criteria + "AND" + cdefModel.getContentControlCriteria(core, MenuContentName);
                 }
-                iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "");
+                iParentCriteria = genericController.encodeEmpty(ParentCriteria, "");
                 if (core.session.isAuthenticatedDeveloper(core)) {
                     //
                     // ----- Developer
@@ -10478,7 +10478,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         private int GetMenuCSPointer(string ParentCriteria) {
             //
-            string iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "");
+            string iParentCriteria = genericController.encodeEmpty(ParentCriteria, "");
             if (!string.IsNullOrEmpty(iParentCriteria)) {
                 iParentCriteria = "(" + iParentCriteria + ")";
             }

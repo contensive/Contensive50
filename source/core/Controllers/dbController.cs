@@ -1316,10 +1316,10 @@ namespace Contensive.Core.Controllers {
                         //
                         //hint = hint & ", 100"
                         iActiveOnly = ((ActiveOnly));
-                        iSortFieldList = genericController.encodeEmptyText(SortFieldList, CDef.defaultSortMethod);
+                        iSortFieldList = genericController.encodeEmpty(SortFieldList, CDef.defaultSortMethod);
                         iMemberID = MemberID;
-                        iCriteria = genericController.encodeEmptyText(Criteria, "");
-                        iSelectFieldList = genericController.encodeEmptyText(SelectFieldList, CDef.selectCommaList);
+                        iCriteria = genericController.encodeEmpty(Criteria, "");
+                        iSelectFieldList = genericController.encodeEmpty(SelectFieldList, CDef.selectCommaList);
                         //
                         // verify the sortfields are in this table
                         //

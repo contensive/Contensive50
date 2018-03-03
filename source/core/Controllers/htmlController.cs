@@ -429,7 +429,7 @@ namespace Contensive.Core.Controllers {
                 //
                 string iMenuName = genericController.encodeText(MenuName);
                 currentValue = genericController.encodeInteger(currentValue);
-                noneCaption = genericController.encodeEmptyText(noneCaption, "Select One");
+                noneCaption = genericController.encodeEmpty(noneCaption, "Select One");
                 string sqlCriteria = "";
                 //
                 string SelectRaw = "";
@@ -551,13 +551,13 @@ namespace Contensive.Core.Controllers {
                             // ----- Start select box
                             //
                             string TagClass = "";
-                            if (genericController.encodeEmptyText(HtmlClass, "") != "") {
-                                TagClass = " Class=\"" + genericController.encodeEmptyText(HtmlClass, "") + "\"";
+                            if (genericController.encodeEmpty(HtmlClass, "") != "") {
+                                TagClass = " Class=\"" + genericController.encodeEmpty(HtmlClass, "") + "\"";
                             }
                             //
                             string TagID = "";
-                            if (genericController.encodeEmptyText(HtmlId, "") != "") {
-                                TagID = " ID=\"" + genericController.encodeEmptyText(HtmlId, "") + "\"";
+                            if (genericController.encodeEmpty(HtmlId, "") != "") {
+                                TagID = " ID=\"" + genericController.encodeEmpty(HtmlId, "") + "\"";
                             }
                             //
                             FastString.Add("<select size=\"1\" name=\"" + MenuNameFPO + "\"" + TagID + TagClass + ">");
@@ -971,7 +971,7 @@ namespace Contensive.Core.Controllers {
                 defaultValue = genericController.encodeHTML(defaultValue);
                 string TagID = "";
                 if (!string.IsNullOrEmpty(htmlId)) {
-                    TagID = TagID + " id=\"" + genericController.encodeEmptyText(htmlId, "") + "\"";
+                    TagID = TagID + " id=\"" + genericController.encodeEmpty(htmlId, "") + "\"";
                 }
                 //
                 if (!string.IsNullOrEmpty(htmlClass)) {
@@ -1104,14 +1104,14 @@ namespace Contensive.Core.Controllers {
                 string AnchorName = null;
                 //
                 iTagName = genericController.encodeText(TagName);
-                iDefaultValue = genericController.encodeEmptyText(DefaultValue, "");
+                iDefaultValue = genericController.encodeEmpty(DefaultValue, "");
                 if ((iDefaultValue == "0") || (iDefaultValue == "12:00:00 AM")) {
                     iDefaultValue = "";
                 } else {
                     iDefaultValue = genericController.encodeHTML(iDefaultValue);
                 }
-                if (genericController.encodeEmptyText(Id, "") != "") {
-                    TagID = " ID=\"" + genericController.encodeEmptyText(Id, "") + "\"";
+                if (genericController.encodeEmpty(Id, "") != "") {
+                    TagID = " ID=\"" + genericController.encodeEmpty(Id, "") + "\"";
                 }
                 //
                 iWidth = genericController.encodeEmptyInteger(Width, 20);
@@ -1179,7 +1179,7 @@ namespace Contensive.Core.Controllers {
                 iTagName = genericController.encodeText(TagName);
                 iTagValue = genericController.encodeText(TagValue);
                 iCurrentValue = genericController.encodeText(CurrentValue);
-                ihtmlId = genericController.encodeEmptyText(htmlId, "");
+                ihtmlId = genericController.encodeEmpty(htmlId, "");
                 if (!string.IsNullOrEmpty(ihtmlId)) {
                     TagID = " ID=\"" + ihtmlId + "\"";
                 }
@@ -1478,10 +1478,10 @@ namespace Contensive.Core.Controllers {
         //
         public static string getButton(string ButtonLabel, string Name = "button", string htmlId = "", string OnClick = "", bool Disabled = false, string htmlClass = "") {
             string s = "<input type=\"submit\""
-                + " name=\"" + genericController.encodeEmptyText(Name, "button") + "\""
+                + " name=\"" + genericController.encodeEmpty(Name, "button") + "\""
                 + " value=\"" + genericController.encodeText(ButtonLabel) + "\""
-                + " onclick=\"" + genericController.encodeEmptyText(OnClick, "") + "\""
-                + " id=\"" + genericController.encodeEmptyText(htmlId, "") + "\""
+                + " onclick=\"" + genericController.encodeEmpty(OnClick, "") + "\""
+                + " id=\"" + genericController.encodeEmpty(htmlId, "") + "\""
                 + " class=\"" + htmlClass + "\"";
             if (Disabled) {
                 s = s + " disabled=\"disabled\"";
@@ -2626,7 +2626,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(CaptionFieldName)) {
                     CaptionFieldName = "name";
                 }
-                CaptionFieldName = genericController.encodeEmptyText(CaptionFieldName, "name");
+                CaptionFieldName = genericController.encodeEmpty(CaptionFieldName, "name");
                 if (string.IsNullOrEmpty(PrimaryContentName) || string.IsNullOrEmpty(SecondaryContentName) || string.IsNullOrEmpty(RulesContentName) || string.IsNullOrEmpty(RulesPrimaryFieldname) || string.IsNullOrEmpty(RulesSecondaryFieldName)) {
                     returnHtml = "[Checklist not configured]";
                     core.handleException(new Exception("Creating checklist, all required fields were not supplied, Caption=[" + CaptionFieldName + "], PrimaryContentName=[" + PrimaryContentName + "], SecondaryContentName=[" + SecondaryContentName + "], RulesContentName=[" + RulesContentName + "], RulesPrimaryFieldName=[" + RulesPrimaryFieldname + "], RulesSecondaryFieldName=[" + RulesSecondaryFieldName + "]"));
@@ -2928,7 +2928,7 @@ namespace Contensive.Core.Controllers {
                 int iCSPointer;
                 //
                 iCSPointer = genericController.encodeInteger(CSPointer);
-                iPresetNameValueList = genericController.encodeEmptyText(PresetNameValueList, "");
+                iPresetNameValueList = genericController.encodeEmpty(PresetNameValueList, "");
                 //
                 if (iCSPointer < 0) {
                     throw (new ApplicationException("invalid ContentSet pointer [" + iCSPointer + "]")); // handleLegacyError14(MethodName, "main_cs_getRecordAddLink was called with ")
@@ -3285,10 +3285,10 @@ namespace Contensive.Core.Controllers {
             string s4 = null;
             string contentPanelWidthStyle = null;
             //
-            MyStylePanel = genericController.encodeEmptyText(StylePanel, "ccPanel");
-            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelHilite");
-            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelShadow");
-            MyWidth = genericController.encodeEmptyText(Width, "100%");
+            MyStylePanel = genericController.encodeEmpty(StylePanel, "ccPanel");
+            MyStyleHilite = genericController.encodeEmpty(StyleHilite, "ccPanelHilite");
+            MyStyleShadow = genericController.encodeEmpty(StyleShadow, "ccPanelShadow");
+            MyWidth = genericController.encodeEmpty(Width, "100%");
             MyPadding = Padding.ToString();
             MyHeightMin = HeightMin.ToString();
             //
@@ -3344,7 +3344,7 @@ namespace Contensive.Core.Controllers {
             //If Not (true) Then Exit Function
             //
             iHeaderMessage = genericController.encodeText(HeaderMessage);
-            iRightSideMessage = genericController.encodeEmptyText(RightSideMessage, core.doc.profileStartTime.ToString("G"));
+            iRightSideMessage = genericController.encodeEmpty(RightSideMessage, core.doc.profileStartTime.ToString("G"));
             return adminUIController.GetHeader(core, iHeaderMessage, iRightSideMessage);
         }
         //
@@ -3361,12 +3361,12 @@ namespace Contensive.Core.Controllers {
             string MyHeightMin = null;
             //
             tempmain_GetPanelTop = "";
-            MyStylePanel = genericController.encodeEmptyText(StylePanel, "ccPanel");
-            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelHilite");
-            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelShadow");
-            MyWidth = genericController.encodeEmptyText(Width, "100%");
-            MyPadding = genericController.encodeEmptyText(Padding, "5");
-            MyHeightMin = genericController.encodeEmptyText(HeightMin, "1");
+            MyStylePanel = genericController.encodeEmpty(StylePanel, "ccPanel");
+            MyStyleHilite = genericController.encodeEmpty(StyleHilite, "ccPanelHilite");
+            MyStyleShadow = genericController.encodeEmpty(StyleShadow, "ccPanelShadow");
+            MyWidth = genericController.encodeEmpty(Width, "100%");
+            MyPadding = genericController.encodeEmpty(Padding, "5");
+            MyHeightMin = genericController.encodeEmpty(HeightMin, "1");
             if (MyWidth.IsNumeric()) {
                 ContentPanelWidth = (int.Parse(MyWidth) - 2).ToString();
             } else {

@@ -34,8 +34,14 @@ namespace Contensive.Core.Controllers {
         /// <param name="CP"></param>
         /// <param name="registryFormat"></param>
         /// <returns></returns>
-        public static string getGUID() => getGUID(false);
+        public static string getGUID() => getGUID(true);
         //
+        //====================================================================================================
+        /// <summary>
+        /// rturn a normalized guid
+        /// </summary>
+        /// <param name="registryFormat"></param>
+        /// <returns></returns>
         public static string getGUID(bool registryFormat) {
             string result = "";
             Guid g = Guid.NewGuid();
@@ -43,29 +49,62 @@ namespace Contensive.Core.Controllers {
                 result = g.ToString();
                 //
                 if (!string.IsNullOrEmpty(result)) {
-                    result = registryFormat ? result : "{" + result + "}";
+                    result = registryFormat ? "{" + result + "}" : result;
                 }
             }
             return result;
         }
         //
-        //
-        //
-        public static string encodeEmptyText(string sourceText, string DefaultText) {
+        //====================================================================================================
+        /// <summary>
+        /// If string is empty, return default value
+        /// </summary>
+        /// <param name="sourceText"></param>
+        /// <param name="defaultText"></param>
+        /// <returns></returns>
+        public static string encodeEmpty(string sourceText, string defaultText) {
             string returnText = sourceText;
             if (string.IsNullOrEmpty(returnText)) {
-                returnText = DefaultText;
+                returnText = defaultText;
             }
             return returnText;
         }
         //
-        public static int encodeEmptyInteger(string sourceText, int DefaultInteger) => encodeInteger(encodeEmptyText(sourceText, DefaultInteger.ToString()));
+        //====================================================================================================
+        /// <summary>
+        /// convert a string to an integer. If the string is not empty, but a non-valid integer, return 0. If the string is empty, return a default value
+        /// </summary>
+        /// <param name="sourceText"></param>
+        /// <param name="DefaultInteger"></param>
+        /// <returns></returns>
+        public static int encodeEmptyInteger(string sourceText, int DefaultInteger) => encodeInteger(encodeEmpty(sourceText, DefaultInteger.ToString()));
         //
-        public static DateTime encodeEmptyDate(string sourceText, DateTime DefaultDate) => encodeDate(encodeEmptyText(sourceText, DefaultDate.ToString()));
+        //====================================================================================================
+        /// <summary>
+        /// convert a string to a date. If the string is empty, return the defaultDate. If the string is not a valid date, return date.minvalue
+        /// </summary>
+        /// <param name="sourceText"></param>
+        /// <param name="DefaultDate"></param>
+        /// <returns></returns>
+        public static DateTime encodeEmptyDate(string sourceText, DateTime DefaultDate) => encodeDate(encodeEmpty(sourceText, DefaultDate.ToString()));
         //
-        public static double encodeEmptyNumber(string sourceText, double DefaultNumber) => encodeNumber(encodeEmptyText(sourceText, DefaultNumber.ToString()));
+        //====================================================================================================
+        /// <summary>
+        /// convert a string to a double. If the string is empty, return the default number. If the string is not a valid number, return 0.0
+        /// </summary>
+        /// <param name="sourceText"></param>
+        /// <param name="DefaultNumber"></param>
+        /// <returns></returns>
+        public static double encodeEmptyNumber(string sourceText, double DefaultNumber) => encodeNumber(encodeEmpty(sourceText, DefaultNumber.ToString()));
         //
-        public static bool encodeEmptyBoolean(string sourceText, bool DefaultState) => encodeBoolean(encodeEmptyText(sourceText, DefaultState.ToString()));
+        //====================================================================================================
+        /// <summary>
+        /// convert a string to a boolean. If the string is empty, return the default state. if the string is empty, return false
+        /// </summary>
+        /// <param name="sourceText"></param>
+        /// <param name="DefaultState"></param>
+        /// <returns></returns>
+        public static bool encodeEmptyBoolean(string sourceText, bool DefaultState) => encodeBoolean(encodeEmpty(sourceText, DefaultState.ToString()));
         //
         //=============================================================================
         // Create the part of the sql where clause that is modified by the user
@@ -2671,35 +2710,22 @@ namespace Contensive.Core.Controllers {
         }
         //
         //========================================================================
-        // splitDelimited
-        //   returns the result of a Split, except it honors quoted text
-        //   if a quote is found, it is assumed to also be a delimiter ( 'this"that"theother' = 'this "that" theother' )
-        //========================================================================
-        //
+        /// <summary>
+        /// splitDelimited, returns the result of a Split, except it honors quoted text, if a quote is found, it is assumed to also be a delimiter ( 'this"that"theother' = 'this "that" theother' )
+        /// </summary>
+        /// <param name="WordList"></param>
+        /// <param name="Delimiter"></param>
+        /// <returns></returns>
         public static string[] SplitDelimited(string WordList, string Delimiter) {
-            // ##### removed to catch err<>0 problem //On Error //Resume Next
-            //
-            string[] QuoteSplit = null;
-            int QuoteSplitCount = 0;
-            int QuoteSplitPointer = 0;
-            bool InQuote = false;
-            string[] Out = null;
+            string[] Out = new string[1];
             int OutPointer = 0;
-            int OutSize = 0;
-            string[] SpaceSplit = null;
-            int SpaceSplitCount = 0;
-            int SpaceSplitPointer = 0;
-            string Fragment = null;
-            //
-            OutPointer = 0;
-            Out = new string[1];
-            OutSize = 1;
             if (!string.IsNullOrEmpty(WordList)) {
-                QuoteSplit = stringSplit( WordList, @"\" );
-                QuoteSplitCount = QuoteSplit.GetUpperBound(0) + 1;
-                InQuote = (string.IsNullOrEmpty(WordList.Left( 1)));
-                for (QuoteSplitPointer = 0; QuoteSplitPointer < QuoteSplitCount; QuoteSplitPointer++) {
-                    Fragment = QuoteSplit[QuoteSplitPointer];
+                string[] QuoteSplit = stringSplit( WordList, "\"" );
+                int QuoteSplitCount = QuoteSplit.GetUpperBound(0) + 1;
+                bool InQuote = (string.IsNullOrEmpty(WordList.Left( 1)));
+                int OutSize = 1;
+                for (int QuoteSplitPointer = 0; QuoteSplitPointer < QuoteSplitCount; QuoteSplitPointer++) {
+                    string Fragment = QuoteSplit[QuoteSplitPointer];
                     if (string.IsNullOrEmpty(Fragment)) {
                         //
                         // empty fragment
@@ -2713,9 +2739,9 @@ namespace Contensive.Core.Controllers {
                         //OutPointer = OutPointer + 1
                     } else {
                         if (!InQuote) {
-                            SpaceSplit = Fragment.Split(Delimiter.ToCharArray());
-                            SpaceSplitCount = SpaceSplit.GetUpperBound(0) + 1;
-                            for (SpaceSplitPointer = 0; SpaceSplitPointer < SpaceSplitCount; SpaceSplitPointer++) {
+                            string[] SpaceSplit = Fragment.Split(Delimiter.ToCharArray());
+                            int SpaceSplitCount = SpaceSplit.GetUpperBound(0) + 1;
+                            for (int SpaceSplitPointer = 0; SpaceSplitPointer < SpaceSplitCount; SpaceSplitPointer++) {
                                 if (OutPointer >= OutSize) {
                                     OutSize = OutSize + 10;
                                     Array.Resize(ref Out, OutSize + 1);
@@ -2740,38 +2766,19 @@ namespace Contensive.Core.Controllers {
                 }
             }
             Array.Resize(ref Out, OutPointer + 1);
-            //
-            //
             return Out;
-            //
         }
         //
         //
         //
         public static string GetYesNo(bool Key) {
-            string tempGetYesNo = null;
             if (Key) {
-                tempGetYesNo = "Yes";
+                return "Yes";
             } else {
-                tempGetYesNo = "No";
+                return "No";
             }
-            return tempGetYesNo;
         }
         //
-        //
-        //
-        //Public shared Function GetFilename(ByVal PathFilename As String) As String
-        //    Dim Position As Integer
-        //    '
-        //    GetFilename = PathFilename
-        //    Position = InStrRev(GetFilename, "/")
-        //    If Position <> 0 Then
-        //        GetFilename = Mid(GetFilename, Position + 1)
-        //    End If
-        //End Function
-        //        '
-        //        '
-        //        '
         public static string StartTable(int Padding, int Spacing, int Border, string ClassStyle = "") {
             return "<table border=\"" + Border + "\" cellpadding=\"" + Padding + "\" cellspacing=\"" + Spacing + "\" class=\"" + ClassStyle + "\" width=\"100%\">";
         }

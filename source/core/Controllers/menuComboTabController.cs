@@ -46,7 +46,7 @@ namespace Contensive.Core.Controllers {
                 } else {
                     Tabs[TabsCnt].ContainerClass = ContainerClass;
                 }
-                Tabs[TabsCnt].LiveBody = encodeEmptyText(LiveBody, "");
+                Tabs[TabsCnt].LiveBody = encodeEmpty(LiveBody, "");
                 TabsCnt = TabsCnt + 1;
             } catch (Exception) {
                 throw;

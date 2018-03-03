@@ -2774,7 +2774,7 @@ namespace Contensive.Core.Controllers {
                 //
                 iContentName = genericController.encodeText(ContentName);
                 iRecordID = genericController.encodeInteger(RecordID);
-                iHeadline = genericController.encodeEmptyText(headline, "");
+                iHeadline = genericController.encodeEmpty(headline, "");
                 //
                 const string FeedbackButtonSubmit = "Submit";
                 //

@@ -109,7 +109,7 @@ namespace Contensive.Core.Controllers {
                 string iEntryName = null;
                 string UcaseEntryName = null;
                 //
-                iEntryName = genericController.vbReplace(encodeEmptyText(EntryName, ""), ",", " ");
+                iEntryName = genericController.vbReplace(encodeEmpty(EntryName, ""), ",", " ");
                 UcaseEntryName = genericController.vbUCase(iEntryName);
                 //
                 if ((!string.IsNullOrEmpty(iEntryName)) && ((UsedEntries + ",").IndexOf("," + UcaseEntryName + ",")  == -1)) {
@@ -118,24 +118,24 @@ namespace Contensive.Core.Controllers {
                         iEntrySize = iEntrySize + 10;
                         Array.Resize(ref iEntry, iEntrySize + 1);
                     }
-                    iEntry[iEntryCount].Link = encodeEmptyText(Link, "");
-                    iEntry[iEntryCount].Image = encodeEmptyText(ImageLink, "");
-                    iEntry[iEntryCount].OnClick = encodeEmptyText(OnClickJavascript, "");
+                    iEntry[iEntryCount].Link = encodeEmpty(Link, "");
+                    iEntry[iEntryCount].Image = encodeEmpty(ImageLink, "");
+                    iEntry[iEntryCount].OnClick = encodeEmpty(OnClickJavascript, "");
                     if (string.IsNullOrEmpty(iEntry[iEntryCount].Image)) {
                         //
                         // No image, must have a caption
                         //
-                        iEntry[iEntryCount].Caption = encodeEmptyText(Caption, iEntryName);
+                        iEntry[iEntryCount].Caption = encodeEmpty(Caption, iEntryName);
                     } else {
                         //
                         // Image present, caption is extra
                         //
-                        iEntry[iEntryCount].Caption = encodeEmptyText(Caption, "");
+                        iEntry[iEntryCount].Caption = encodeEmpty(Caption, "");
                     }
                     iEntry[iEntryCount].Name = UcaseEntryName;
-                    iEntry[iEntryCount].ParentName = genericController.vbUCase(encodeEmptyText(ParentiEntryName, ""));
-                    iEntry[iEntryCount].ImageOver = encodeEmptyText(ImageOverLink, "");
-                    iEntry[iEntryCount].ImageOpen = encodeEmptyText(ImageOpenLink, "");
+                    iEntry[iEntryCount].ParentName = genericController.vbUCase(encodeEmpty(ParentiEntryName, ""));
+                    iEntry[iEntryCount].ImageOver = encodeEmpty(ImageOverLink, "");
+                    iEntry[iEntryCount].ImageOpen = encodeEmpty(ImageOpenLink, "");
                     iEntry[iEntryCount].NewWindow = NewWindow;
                     EntryIndexName.setPtr(UcaseEntryName, iEntryCount);
                     iEntryCount = iEntryCount + 1;

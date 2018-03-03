@@ -92,28 +92,28 @@ namespace Contensive.Core.Controllers {
                 }
                 switch (MenuStyle) {
                     case 11:
-                        returnHtml = getMenuType(menuName, false, 3, encodeEmptyText(StyleSheetPrefix, ""));
+                        returnHtml = getMenuType(menuName, false, 3, encodeEmpty(StyleSheetPrefix, ""));
                         break;
                     case 10:
-                        returnHtml = getMenuType(menuName, false, 2, encodeEmptyText(StyleSheetPrefix, ""));
+                        returnHtml = getMenuType(menuName, false, 2, encodeEmpty(StyleSheetPrefix, ""));
                         break;
                     case 9:
-                        returnHtml = getMenuType(menuName, false, 1, encodeEmptyText(StyleSheetPrefix, ""));
+                        returnHtml = getMenuType(menuName, false, 1, encodeEmpty(StyleSheetPrefix, ""));
                         break;
                     case 8:
-                        returnHtml = getMenuType(menuName, false, 0, encodeEmptyText(StyleSheetPrefix, ""));
+                        returnHtml = getMenuType(menuName, false, 0, encodeEmpty(StyleSheetPrefix, ""));
                         break;
                     case 7:
-                        returnHtml = getMenuType(menuName, true, 3, encodeEmptyText(StyleSheetPrefix, ""));
+                        returnHtml = getMenuType(menuName, true, 3, encodeEmpty(StyleSheetPrefix, ""));
                         break;
                     case 6:
-                        returnHtml = getMenuType(menuName, true, 2, encodeEmptyText(StyleSheetPrefix, ""));
+                        returnHtml = getMenuType(menuName, true, 2, encodeEmpty(StyleSheetPrefix, ""));
                         break;
                     case 5:
-                        returnHtml = getMenuType(menuName, true, 1, encodeEmptyText(StyleSheetPrefix, ""));
+                        returnHtml = getMenuType(menuName, true, 1, encodeEmpty(StyleSheetPrefix, ""));
                         break;
                     default:
-                        returnHtml = getMenuType(menuName, true, 0, encodeEmptyText(StyleSheetPrefix, ""));
+                        returnHtml = getMenuType(menuName, true, 0, encodeEmpty(StyleSheetPrefix, ""));
                         break;
                 }
             } catch (Exception ex) {
@@ -182,7 +182,7 @@ namespace Contensive.Core.Controllers {
                 string iEntryName = null;
                 string UcaseEntryName = null;
                 //
-                iEntryName = genericController.vbReplace(encodeEmptyText(EntryName, ""), ",", " ");
+                iEntryName = genericController.vbReplace(encodeEmpty(EntryName, ""), ",", " ");
                 UcaseEntryName = genericController.vbUCase(iEntryName);
                 //
                 if ((!string.IsNullOrEmpty(iEntryName)) && ((UsedEntries + ",").IndexOf("," + UcaseEntryName + ",")  == -1)) {
@@ -191,22 +191,22 @@ namespace Contensive.Core.Controllers {
                         iEntrySize = iEntrySize + 10;
                         Array.Resize(ref iEntry, iEntrySize + 1);
                     }
-                    iEntry[iEntryCount].Link = encodeEmptyText(Link, "");
-                    iEntry[iEntryCount].Image = encodeEmptyText(ImageLink, "");
+                    iEntry[iEntryCount].Link = encodeEmpty(Link, "");
+                    iEntry[iEntryCount].Image = encodeEmpty(ImageLink, "");
                     if (string.IsNullOrEmpty(iEntry[iEntryCount].Image)) {
                         //
                         // No image, must have a caption
                         //
-                        iEntry[iEntryCount].Caption = encodeEmptyText(Caption, iEntryName);
+                        iEntry[iEntryCount].Caption = encodeEmpty(Caption, iEntryName);
                     } else {
                         //
                         // Image present, caption is extra
                         //
-                        iEntry[iEntryCount].Caption = encodeEmptyText(Caption, "");
+                        iEntry[iEntryCount].Caption = encodeEmpty(Caption, "");
                     }
-                    iEntry[iEntryCount].CaptionImage = encodeEmptyText(CaptionImageLink, "");
+                    iEntry[iEntryCount].CaptionImage = encodeEmpty(CaptionImageLink, "");
                     iEntry[iEntryCount].Name = UcaseEntryName;
-                    iEntry[iEntryCount].ParentName = genericController.vbUCase(encodeEmptyText(ParentiEntryName, ""));
+                    iEntry[iEntryCount].ParentName = genericController.vbUCase(encodeEmpty(ParentiEntryName, ""));
                     iEntry[iEntryCount].ImageOver = ImageOverLink;
                     iEntry[iEntryCount].NewWindow = NewWindow;
                     EntryIndexName.setPtr(UcaseEntryName, iEntryCount);
@@ -294,7 +294,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Get the menu pointer
                     //
-                    LocalStyleSheetPrefix = encodeEmptyText(StyleSheetPrefix, "ccFlyout");
+                    LocalStyleSheetPrefix = encodeEmpty(StyleSheetPrefix, "ccFlyout");
                     if (string.IsNullOrEmpty(LocalStyleSheetPrefix)) {
                         LocalStyleSheetPrefix = "ccFlyout";
                     }

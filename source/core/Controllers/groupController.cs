@@ -277,7 +277,7 @@ namespace Contensive.Core.Controllers {
             string iGroupCaption = null;
             //
             iGroupName = genericController.encodeText(GroupName);
-            iGroupCaption = genericController.encodeEmptyText(GroupCaption, iGroupName);
+            iGroupCaption = genericController.encodeEmpty(GroupCaption, iGroupName);
             //
             tempgroup_Add = -1;
             DataTable dt = core.db.executeQuery("SELECT ID FROM ccgroups WHERE NAME=" + core.db.encodeSQLText(iGroupName));

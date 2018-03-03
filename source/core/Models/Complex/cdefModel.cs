@@ -1047,7 +1047,7 @@ namespace Contensive.Core.Models.Complex {
                         returnContentId = 0;
                         LcContentGuid = "";
                         ContentIsBaseContent = false;
-                        NewGuid = encodeEmptyText(ccGuid, "");
+                        NewGuid = encodeEmpty(ccGuid, "");
                         //
                         // get contentId, guid, IsBaseContent
                         //
@@ -1141,7 +1141,7 @@ namespace Contensive.Core.Models.Complex {
                             }
                             //
                             // ----- Get Sort Method ID from SortMethod
-                            iDefaultSortMethod = encodeEmptyText(DefaultSortMethod, "");
+                            iDefaultSortMethod = encodeEmpty(DefaultSortMethod, "");
                             DefaultSortMethodID = 0;
                             //
                             // First - try lookup by name
@@ -1182,7 +1182,7 @@ namespace Contensive.Core.Models.Complex {
                             sqlList.add("AdminOnly", core.db.encodeSQLBoolean(AdminOnly));
                             sqlList.add("ParentID", core.db.encodeSQLNumber(parentId));
                             sqlList.add("DefaultSortMethodID", core.db.encodeSQLNumber(DefaultSortMethodID));
-                            sqlList.add("DropDownFieldList", core.db.encodeSQLText(encodeEmptyText(DropDownFieldList, "Name")));
+                            sqlList.add("DropDownFieldList", core.db.encodeSQLText(encodeEmpty(DropDownFieldList, "Name")));
                             sqlList.add("ContentTableID", core.db.encodeSQLNumber(TableID));
                             sqlList.add("AuthoringTableID", core.db.encodeSQLNumber(TableID));
                             sqlList.add("ModifiedDate", core.db.encodeSQLDate(DateTime.Now));
@@ -1193,7 +1193,7 @@ namespace Contensive.Core.Models.Complex {
                             sqlList.add("AllowTopicRules", core.db.encodeSQLBoolean(AllowTopicRules));
                             sqlList.add("AllowContentChildTool", core.db.encodeSQLBoolean(AllowContentChildTool));
                             //Call sqlList.add("AllowMetaContent", core.db.encodeSQLBoolean(ignore1))
-                            sqlList.add("IconLink", core.db.encodeSQLText(encodeEmptyText(IconLink, "")));
+                            sqlList.add("IconLink", core.db.encodeSQLText(encodeEmpty(IconLink, "")));
                             sqlList.add("IconHeight", core.db.encodeSQLNumber(IconHeight));
                             sqlList.add("IconWidth", core.db.encodeSQLNumber(IconWidth));
                             sqlList.add("IconSprites", core.db.encodeSQLNumber(IconSprites));

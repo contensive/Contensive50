@@ -1083,9 +1083,9 @@ namespace Contensive.Core.Controllers {
             //
             iContentName = genericController.encodeText(ContentName);
             iRecordID = genericController.encodeInteger(RecordID);
-            iFieldName = genericController.encodeEmptyText(FieldName, "link");
+            iFieldName = genericController.encodeEmpty(FieldName, "link");
             //
-            MethodName = "main_RedirectByRecord_ReturnStatus( " + iContentName + ", " + iRecordID + ", " + genericController.encodeEmptyText(FieldName, "(fieldname empty)") + ")";
+            MethodName = "main_RedirectByRecord_ReturnStatus( " + iContentName + ", " + iRecordID + ", " + genericController.encodeEmpty(FieldName, "(fieldname empty)") + ")";
             //
             tempmain_RedirectByRecord_ReturnStatus = false;
             BlockRedirect = false;

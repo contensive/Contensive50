@@ -311,7 +311,7 @@ namespace Contensive.Core.Controllers {
                 string MethodName = null;
                 int CS = 0;
                 //
-                iSortFieldList = encodeText(encodeEmptyText(SortFieldList, "")).Trim(' ');
+                iSortFieldList = encodeText(encodeEmpty(SortFieldList, "")).Trim(' ');
                 //iSortFieldList = encodeMissingText(SortFieldList, "DateAdded")
                 if (string.IsNullOrEmpty(iSortFieldList)) {
                     iSortFieldList = "DateAdded";
