@@ -458,7 +458,7 @@ namespace Contensive.Core.Controllers {
                                                             string ACNameCaption = genericController.vbReplace(ACName, "\"", "");
                                                             ACNameCaption = genericController.encodeHTML(ACNameCaption);
                                                             string IDControlString = "AC," + ACType + "," + NotUsedID + "," + genericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
-                                                            Copy = genericController.GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0);
+                                                            Copy = addonController.GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0);
                                                         } else if (EncodeNonCachableTags) {
                                                             //
                                                             // Add-on Experiment - move all processing to the Webclient
@@ -499,7 +499,7 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     if (encodeForWysiwygEditor) {
                                                         string IconIDControlString = "AC," + ACTypeDate;
-                                                        Copy = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0);
+                                                        Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/ccLib/images/ACDate.GIF"">"
                                                     } else if (EncodeNonCachableTags) {
@@ -514,7 +514,7 @@ namespace Contensive.Core.Controllers {
                                                     }
                                                     if (encodeForWysiwygEditor) {
                                                         string IconIDControlString = "AC," + ACType + "," + fieldName;
-                                                        Copy = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Organization " + fieldName, "Renders as [User's Organization " + fieldName + "]", ACInstanceID, 0);
+                                                        Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Organization " + fieldName, "Renders as [User's Organization " + fieldName + "]", ACInstanceID, 0);
                                                     } else if (EncodeNonCachableTags) {
                                                         if ( !core.db.csOk(csOrganization)) {
                                                             if (!core.db.csOk(csPeople)) {
@@ -540,7 +540,7 @@ namespace Contensive.Core.Controllers {
                                                     if (string.IsNullOrEmpty(fieldName)) {
                                                         fieldName = htmlController.getAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"));
                                                     }
-                                                    string fieldNameInitialCaps = genericController.EncodeInitialCaps(fieldName);
+                                                    string fieldNameInitialCaps = genericController.encodeInitialCaps(fieldName);
                                                     if (string.IsNullOrEmpty(fieldNameInitialCaps)) {
                                                         fieldNameInitialCaps = "Name";
                                                     }
@@ -549,21 +549,21 @@ namespace Contensive.Core.Controllers {
                                                             case "FIRSTNAME":
                                                                 //
                                                                 string IconIDControlString = "AC," + ACType + "," + fieldNameInitialCaps;
-                                                                Copy = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0);
+                                                                Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0);
                                                                 //Copy = IconImg;
                                                                 //
                                                                 break;
                                                             case "LASTNAME":
                                                                 //
                                                                 IconIDControlString = "AC," + ACType + "," + fieldNameInitialCaps;
-                                                                Copy = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0);
+                                                                Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0);
                                                                 //Copy = IconImg;
                                                                 //
                                                                 break;
                                                             default:
                                                                 //
                                                                 IconIDControlString = "AC," + ACType + "," + fieldNameInitialCaps;
-                                                                Copy = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's " + fieldNameInitialCaps, "Renders as [User's " + fieldNameInitialCaps + "]", ACInstanceID, 0);
+                                                                Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's " + fieldNameInitialCaps, "Renders as [User's " + fieldNameInitialCaps + "]", ACInstanceID, 0);
                                                                 //Copy = IconImg;
                                                                 //
                                                                 break;
@@ -592,7 +592,7 @@ namespace Contensive.Core.Controllers {
 
                                                     if (encodeForWysiwygEditor) {
                                                         string IconIDControlString = "AC," + ACType + ",," + ACName;
-                                                        Copy = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0);
+                                                        Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                     } else if (EncodeCachableTags) {
                                                         //
@@ -610,7 +610,7 @@ namespace Contensive.Core.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType;
-                                                        Copy = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0);
+                                                        Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                         //
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
@@ -628,7 +628,7 @@ namespace Contensive.Core.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType;
-                                                        Copy = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, false, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0);
+                                                        Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, false, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                         //
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/ccLib/images/ACFeedBack.GIF"">"
@@ -658,7 +658,7 @@ namespace Contensive.Core.Controllers {
                                                         if (file != null) {
                                                             string Filename = file.Filename;
                                                             Filename = genericController.vbReplace(Filename, "\\", "/");
-                                                            Filename = genericController.EncodeURL(Filename);
+                                                            Filename = genericController.encodeURL(Filename);
                                                             Copy += "<img ID=\"AC,IMAGE,," + ACAttrRecordID + "\" src=\"" + genericController.getCdnFileLink(core, Filename) + "\"";
                                                             //
                                                             if (ACAttrWidth == 0) {
@@ -725,7 +725,7 @@ namespace Contensive.Core.Controllers {
                                                         //
                                                         // Encoding the edit icons for the active editor form
                                                         string IconIDControlString = "AC," + ACTypeDownload + ",," + ACAttrRecordID;
-                                                        Copy = genericController.GetAddonIconImg(AdminURL, 16, 16, 0, true, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0);
+                                                        Copy = addonController.GetAddonIconImg(AdminURL, 16, 16, 0, true, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                         //
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
@@ -750,7 +750,7 @@ namespace Contensive.Core.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        Copy = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0);
+                                                        Copy = addonController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                     } else if (EncodeNonCachableTags) {
                                                         //
@@ -768,7 +768,7 @@ namespace Contensive.Core.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        Copy = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0);
+                                                        Copy = addonController.GetAddonIconImg(AdminURL, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                         //
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
@@ -792,7 +792,7 @@ namespace Contensive.Core.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        Copy = genericController.GetAddonIconImg(AdminURL, 109, 10, 0, true, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" + ACName + "]", ACInstanceID, 0);
+                                                        Copy = addonController.GetAddonIconImg(AdminURL, 109, 10, 0, true, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" + ACName + "]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                     } else if (EncodeNonCachableTags) {
                                                         Copy = "{{" + ACTypeWatchList + "?" + addonOptionString + "}}";
@@ -959,7 +959,7 @@ namespace Contensive.Core.Controllers {
                                                     ImageSrcOriginal = genericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
                                                 }
                                                 ImageSrc = genericController.decodeHtml(ImageSrcOriginal);
-                                                ImageSrc = DecodeURL(ImageSrc);
+                                                ImageSrc = decodeURL(ImageSrc);
                                                 //
                                                 // problem with this case is if the addon icon image is from another site.
                                                 // not sure how it happened, but I do not think the src of an addon edit icon
@@ -1381,7 +1381,7 @@ namespace Contensive.Core.Controllers {
                                                                                             //
                                                                                             NewImageFilename = ImageFilenameNoExt + "-" + ImageAltSize + "." + ImageFilenameExt;
                                                                                             // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                            imageNewLink = genericController.EncodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename);
+                                                                                            imageNewLink = genericController.encodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename);
                                                                                             ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, genericController.encodeHTML(imageNewLink));
                                                                                         } else if ((RecordWidth < ImageWidth) || (RecordHeight < ImageHeight)) {
                                                                                             //
@@ -1389,7 +1389,7 @@ namespace Contensive.Core.Controllers {
                                                                                             // reize image larger then original - go with it as is
                                                                                             //
                                                                                             // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, genericController.encodeHTML(genericController.EncodeURL(genericController.getCdnFileLink(core, RecordVirtualFilename))));
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, genericController.encodeHTML(genericController.encodeURL(genericController.getCdnFileLink(core, RecordVirtualFilename))));
                                                                                         } else {
                                                                                             //
                                                                                             // resized image - create NewImageFilename (and add new alt size to the record)
@@ -1475,7 +1475,7 @@ namespace Contensive.Core.Controllers {
                                                                                                 }
                                                                                                 //
                                                                                                 // Change the image src to the AltSize
-                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, genericController.encodeHTML(genericController.EncodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename)));
+                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, genericController.encodeHTML(genericController.encodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename)));
                                                                                             }
                                                                                         }
                                                                                     }
@@ -1949,7 +1949,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             string RecordVirtualFilename = file.Filename;
                                             //RecordAltSizeList = file.AltSizeList;
-                                            if (RecordVirtualFilename == genericController.EncodeJavascript(RecordVirtualFilename)) {
+                                            if (RecordVirtualFilename == genericController.EncodeJavascriptStringSingleQuote(RecordVirtualFilename)) {
                                                 //
                                                 // The javascript version of the filename must match the filename, since we have no way
                                                 // of differentiating a ligitimate file, from a block of javascript. If the file
@@ -2087,7 +2087,7 @@ namespace Contensive.Core.Controllers {
 
                                                                 //hint = hint & ",120"
                                                                 SegmentAfterImage = FilenameSegment.Substring(EndPos - 1);
-                                                                ImageFilename = genericController.DecodeResponseVariable(FilenameSegment.Left(EndPos - 1));
+                                                                ImageFilename = genericController.decodeResponseVariable(FilenameSegment.Left(EndPos - 1));
                                                                 ImageFilenameNoExt = ImageFilename;
                                                                 ImageFilenameExt = "";
                                                                 Pos = ImageFilename.LastIndexOf(".") + 1;
@@ -2150,7 +2150,7 @@ namespace Contensive.Core.Controllers {
                                                                     TableSplit[1] = "";
                                                                     TableSplit[2] = "";
                                                                     TableSplit[3] = SegmentAfterImage;
-                                                                    NewRecordFilename = genericController.EncodeURL(NewRecordFilename) + ((string)(string.Join("/", TableSplit))).Substring(3);
+                                                                    NewRecordFilename = genericController.encodeURL(NewRecordFilename) + ((string)(string.Join("/", TableSplit))).Substring(3);
                                                                     LinkSplit[LinkPtr] = NewRecordFilename;
                                                                     SaveChanges = true;
                                                                 }

@@ -851,28 +851,28 @@ namespace Contensive.Core.Models.Complex {
                 DateNow = DateTime.MinValue;
                 SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ChildContentName) + ";";
                 rs = core.db.executeQuery(SQL);
-                if (isDataTableOk(rs)) {
+                if (dbController.isDataTableOk(rs)) {
                     ChildContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                     //
                     // mark the record touched so upgrade will not delete it
                     //
                     core.db.executeQuery("update ccContent set CreateKey=0 where ID=" + ChildContentID);
                 }
-                closeDataTable(rs);
+                dbController.closeDataTable(rs);
                 if (ChildContentID == 0) {
                     //
                     // Get ContentID of parent
                     //
                     SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ParentContentName) + ";";
                     rs = core.db.executeQuery(SQL, DataSourceName);
-                    if (isDataTableOk(rs)) {
+                    if (dbController.isDataTableOk(rs)) {
                         ParentContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                         //
                         // mark the record touched so upgrade will not delete it
                         //
                         core.db.executeQuery("update ccContent set CreateKey=0 where ID=" + ParentContentID);
                     }
-                    closeDataTable(rs);
+                    dbController.closeDataTable(rs);
                     //
                     if (ParentContentID == 0) {
                         throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] was not found."));
@@ -1465,7 +1465,7 @@ namespace Contensive.Core.Models.Complex {
                 TableID = 0;
                 SQL = "select ID,ContentTableID from ccContent where name=" + core.db.encodeSQLText(ContentName) + ";";
                 rs = core.db.executeQuery(SQL);
-                if (isDataTableOk(rs)) {
+                if (dbController.isDataTableOk(rs)) {
                     ContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                     TableID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
                 }
@@ -1476,7 +1476,7 @@ namespace Contensive.Core.Models.Complex {
                 RecordIsBaseField = false;
                 SQL = "select ID,IsBaseField from ccFields where (ContentID=" + core.db.encodeSQLNumber(ContentID) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ");";
                 rs = core.db.executeQuery(SQL);
-                if (isDataTableOk(rs)) {
+                if (dbController.isDataTableOk(rs)) {
                     isNewFieldRecord = false;
                     RecordID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                     RecordIsBaseField = genericController.encodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
@@ -1542,7 +1542,7 @@ namespace Contensive.Core.Models.Complex {
                         //
                         TableName = "";
                         rs = core.db.executeQuery("Select Name, DataSourceID from ccTables where ID=" + core.db.encodeSQLNumber(TableID) + ";");
-                        if (!isDataTableOk(rs)) {
+                        if (!dbController.isDataTableOk(rs)) {
                             throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because table For tableID [" + TableID + "] was Not found."));
                         } else {
                             DataSourceID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
@@ -1557,7 +1557,7 @@ namespace Contensive.Core.Models.Complex {
                                 DataSourceName = "Default";
                             } else {
                                 rs = core.db.executeQuery("Select Name from ccDataSources where ID=" + core.db.encodeSQLNumber(DataSourceID) + ";");
-                                if (!isDataTableOk(rs)) {
+                                if (!dbController.isDataTableOk(rs)) {
 
                                     DataSourceName = "Default";
                                     // change condition to successful -- the goal is 1) deliver pages 2) report problems
@@ -1575,7 +1575,7 @@ namespace Contensive.Core.Models.Complex {
                             InstalledByCollectionID = 0;
                             if (!string.IsNullOrEmpty(installedByCollectionGuid)) {
                                 rs = core.db.executeQuery("Select id from ccAddonCollections where ccguid=" + core.db.encodeSQLText(installedByCollectionGuid) + ";");
-                                if (isDataTableOk(rs)) {
+                                if (dbController.isDataTableOk(rs)) {
                                     InstalledByCollectionID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "Id"));
                                 }
                                 rs.Dispose();
@@ -1781,7 +1781,7 @@ namespace Contensive.Core.Models.Complex {
             string RecordContentName = "";
             string DataSourceName = null;
             //
-            if (!genericController.IsInDelimitedString(UsedIDString, RecordID.ToString(), ",")) {
+            if (!genericController.isInDelimitedString(UsedIDString, RecordID.ToString(), ",")) {
                 ContentName = getContentNameByID(core, ContentID);
                 CS = core.db.csOpenRecord(ContentName, RecordID, false, false);
                 if (core.db.csOk(CS)) {

@@ -723,7 +723,7 @@ namespace Contensive.Core.Controllers {
                 TableBad = false;
                 RowsFound = 0;
                 using (DataTable rs = core.db.executeQuery("Select ID from ccFieldTypes order by id")) {
-                    if (!isDataTableOk(rs)) {
+                    if (!dbController.isDataTableOk(rs)) {
                         //
                         // problem
                         //
@@ -1134,7 +1134,7 @@ namespace Contensive.Core.Controllers {
                                     //-----------------------------------------------------------------------------------------------
                                     //
                                     LibraryCollections = new XmlDocument();
-                                    SupportURL = "http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&guidlist=" + EncodeRequestVariable(GuidList);
+                                    SupportURL = "http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&guidlist=" + encodeRequestVariable(GuidList);
                                     bool loadOK = true;
                                     if ( packageNumber>1 ) {
                                         Thread.Sleep(2000);
@@ -4333,7 +4333,7 @@ namespace Contensive.Core.Controllers {
                 //
                 List<string> installedContentList = new List<string>();
                 rs = core.db.executeQuery("SELECT Name from ccContent where (active<>0)");
-                if (isDataTableOk(rs)) {
+                if (dbController.isDataTableOk(rs)) {
                     installedContentList = new List<string>(convertDataTableColumntoItemList(rs));
                 }
                 rs.Dispose();
@@ -4401,7 +4401,7 @@ namespace Contensive.Core.Controllers {
                             fieldId = 0;
                             SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + core.db.encodeSQLText(FieldName) + ")and(c.name=" + core.db.encodeSQLText(ContentName) + ") order by f.id";
                             rs = core.db.executeQuery(SQL);
-                            if (isDataTableOk(rs)) {
+                            if (dbController.isDataTableOk(rs)) {
                                 fieldId = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "id"));
                             }
                             rs.Dispose();
@@ -4410,7 +4410,7 @@ namespace Contensive.Core.Controllers {
                             } else {
                                 SQL = "select id from ccfieldhelp where fieldid=" + fieldId + " order by id";
                                 rs = core.db.executeQuery(SQL);
-                                if (isDataTableOk(rs)) {
+                                if (dbController.isDataTableOk(rs)) {
                                     FieldHelpID = genericController.encodeInteger(rs.Rows[0]["id"]);
                                 } else {
                                     FieldHelpID = core.db.insertTableRecordGetId("default", "ccfieldhelp", 0);
@@ -4469,7 +4469,6 @@ namespace Contensive.Core.Controllers {
                     DateTime lastChangeDate = new DateTime();
                     string emptyString = "";
                     GetCollectionConfig(core, import.Guid , ref CollectionPath, ref lastChangeDate, ref emptyString);
-                    string Guid = "";
                     string errorMessage = "";
                     if (!string.IsNullOrEmpty(CollectionPath)) {
                         //
@@ -4579,7 +4578,7 @@ namespace Contensive.Core.Controllers {
                     // -- get contentid and protect content with IsBaseContent true
                     string SQL = core.db.GetSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" + core.db.encodeSQLText(cdef.name), "ID", "", 1);
                     DataTable dt = core.db.executeQuery(SQL);
-                    if (isDataTableOk(dt)) {
+                    if (dbController.isDataTableOk(dt)) {
                         if (dt.Rows.Count > 0) {
                             ContentID = genericController.encodeInteger(core.db.getDataRowColumnName(dt.Rows[0], "ID"));
                             ContentIsBaseContent = genericController.encodeBoolean(core.db.getDataRowColumnName(dt.Rows[0], "IsBaseContent"));
@@ -4609,7 +4608,7 @@ namespace Contensive.Core.Controllers {
                         int EditorGroupID = 0;
                         if (cdef.editorGroupName != "") {
                             DataTable dt = core.db.executeQuery("select ID from ccGroups where name=" + core.db.encodeSQLText(cdef.editorGroupName));
-                            if (isDataTableOk(dt)) {
+                            if (dbController.isDataTableOk(dt)) {
                                 if (dt.Rows.Count > 0) {
                                     EditorGroupID = genericController.encodeInteger(core.db.getDataRowColumnName(dt.Rows[0], "ID"));
                                 }
@@ -4639,7 +4638,7 @@ namespace Contensive.Core.Controllers {
                         if (field.HelpChanged) {
                             int FieldHelpID = 0;
                             DataTable dt = core.db.executeQuery("select ID from ccFieldHelp where fieldid=" + fieldId);
-                            if (isDataTableOk(dt)) {
+                            if (dbController.isDataTableOk(dt)) {
                                 if (dt.Rows.Count > 0) {
                                     FieldHelpID = genericController.encodeInteger(core.db.getDataRowColumnName(dt.Rows[0], "ID"));
                                 }

@@ -230,11 +230,11 @@ namespace Contensive.Core.Controllers {
                     if (!string.IsNullOrEmpty(nameValuePair)) {
                         if (genericController.vbInstr(1, nameValuePair, "=") != 0) {
                             ValuePair = nameValuePair.Split('=');
-                            key = DecodeResponseVariable(encodeText(ValuePair[0]));
+                            key = decodeResponseVariable(encodeText(ValuePair[0]));
                             if (!string.IsNullOrEmpty(key)) {
                                 docProperty.Name = key;
                                 if (ValuePair.GetUpperBound(0) > 0) {
-                                    docProperty.Value = DecodeResponseVariable(encodeText(ValuePair[1]));
+                                    docProperty.Value = decodeResponseVariable(encodeText(ValuePair[1]));
                                 }
                                 docProperty.IsForm = false;
                                 docProperty.IsFile = false;

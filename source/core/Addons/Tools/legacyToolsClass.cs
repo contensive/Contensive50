@@ -2418,13 +2418,13 @@ namespace Contensive.Core.Addons.Tools {
                     + " Left Join ccDataSources on ccTables.DataSourceID=ccDataSources.ID"
                     + " where ccContent.name=" + core.db.encodeSQLText(ContentName);
                 DataTable RS = core.db.executeQuery(SQL);
-                if (isDataTableOk(RS)) {
+                if (dbController.isDataTableOk(RS)) {
                     tempLocal_GetContentDataSource = genericController.encodeText(RS.Rows[0]["Name"]);
                 }
                 if (string.IsNullOrEmpty(tempLocal_GetContentDataSource)) {
                     tempLocal_GetContentDataSource = "Default";
                 }
-                closeDataTable(RS);
+                dbController.closeDataTable(RS);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -2483,7 +2483,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     RSSchema = core.db.getTableSchemaData(TableName);
                     Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
-                    if (!isDataTableOk(RSSchema)) {
+                    if (!dbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
@@ -2545,7 +2545,7 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add(DateTime.Now + " Opening Index Schema<br>");
                     //
                     RSSchema = core.db.getIndexSchemaData(TableName);
-                    if (!isDataTableOk(RSSchema)) {
+                    if (!dbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
@@ -2607,7 +2607,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     RSSchema = core.db.getColumnSchemaData(TableName);
                     Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
-                    if (isDataTableOk(RSSchema)) {
+                    if (dbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
@@ -3004,7 +3004,7 @@ namespace Contensive.Core.Addons.Tools {
                             } else {
                                 sortOrder += "1";
                             }
-                            sortOrder += fieldSort.field.editTabName + GetIntegerString(fieldSort.field.editSortPriority, 10) + GetIntegerString(fieldSort.field.id, 10);
+                            sortOrder += fieldSort.field.editTabName + getIntegerString(fieldSort.field.editSortPriority, 10) + getIntegerString(fieldSort.field.id, 10);
                             fieldSort.sort = sortOrder;
                             fieldList.Add(fieldSort);
                         }
@@ -3327,12 +3327,12 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 result = result + core.html.formStart();
                 TableColSpan = 3;
-                result = result + StartTable(2, 0, 0);
+                result = result + htmlController.tableStart(2, 0, 0);
                 //
                 // Select Table Form
                 //
-                result = result + GetTableRow("<br><br><B>Select table to index</b>", TableColSpan, false);
-                result = result + GetTableRow(core.html.selectFromContent("TableID", TableID, "Tables","", "Select a SQL table to start"), TableColSpan, false);
+                result = result + htmlController.tableRow("<br><br><B>Select table to index</b>", TableColSpan, false);
+                result = result + htmlController.tableRow(core.html.selectFromContent("TableID", TableID, "Tables","", "Select a SQL table to start"), TableColSpan, false);
                 if (TableID != 0) {
                     //
                     // Add/Drop Indexes form
@@ -3341,7 +3341,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Drop Indexes
                     //
-                    result = result + GetTableRow("<br><br><B>Select indexes to remove</b>", TableColSpan, TableRowEven);
+                    result = result + htmlController.tableRow("<br><br><B>Select indexes to remove</b>", TableColSpan, TableRowEven);
                     RSSchema = core.db.getIndexSchemaData(TableName);
 
 
@@ -3350,7 +3350,7 @@ namespace Contensive.Core.Addons.Tools {
                         // ----- no result
                         //
                         Copy += DateTime.Now + " A schema was returned, but it contains no indexs.";
-                        result = result + GetTableRow(Copy, TableColSpan, TableRowEven);
+                        result = result + htmlController.tableRow(Copy, TableColSpan, TableRowEven);
                     } else {
 
                         Rows = core.db.convertDataTabletoArray(RSSchema);
@@ -3358,11 +3358,11 @@ namespace Contensive.Core.Addons.Tools {
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             IndexName = genericController.encodeText(Rows[5, RowPointer]);
                             if (!string.IsNullOrEmpty(IndexName)) {
-                                result = result + StartTableRow();
+                                result = result + htmlController.tableRowStart();
                                 Copy = core.html.inputCheckbox("DropIndex." + RowPointer, false) + core.html.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
-                                result = result + GetTableCell(Copy,"",0, TableRowEven);
-                                result = result + GetTableCell(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
-                                result = result + GetTableCell("&nbsp;","",0, TableRowEven);
+                                result = result + htmlController.tableCell(Copy,"",0, TableRowEven);
+                                result = result + htmlController.tableCell(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
+                                result = result + htmlController.tableCell("&nbsp;","",0, TableRowEven);
                                 result = result + kmaEndTableRow;
                                 TableRowEven = !TableRowEven;
                             }
@@ -3373,25 +3373,25 @@ namespace Contensive.Core.Addons.Tools {
                     // Add Indexes
                     //
                     TableRowEven = false;
-                    result = result + GetTableRow("<br><br><B>Select database fields to index</b>", TableColSpan, TableRowEven);
+                    result = result + htmlController.tableRow("<br><br><B>Select database fields to index</b>", TableColSpan, TableRowEven);
                     RSSchema = core.db.getColumnSchemaData(TableName);
                     if (RSSchema.Rows.Count == 0) {
                         //
                         // ----- no result
                         //
                         Copy += DateTime.Now + " A schema was returned, but it contains no indexs.";
-                        result = result + GetTableRow(Copy, TableColSpan, TableRowEven);
+                        result = result + htmlController.tableRow(Copy, TableColSpan, TableRowEven);
                     } else {
 
                         Rows = core.db.convertDataTabletoArray(RSSchema);
                         //
                         RowMax = Rows.GetUpperBound(1);
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                            result = result + StartTableRow();
+                            result = result + htmlController.tableRowStart();
                             Copy = core.html.inputCheckbox("AddIndex." + RowPointer, false) + core.html.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
-                            result = result + GetTableCell(Copy,"",0, TableRowEven);
-                            result = result + GetTableCell("&nbsp;","",0, TableRowEven);
-                            result = result + GetTableCell("&nbsp;","",0, TableRowEven);
+                            result = result + htmlController.tableCell(Copy,"",0, TableRowEven);
+                            result = result + htmlController.tableCell("&nbsp;","",0, TableRowEven);
+                            result = result + htmlController.tableCell("&nbsp;","",0, TableRowEven);
                             result = result + kmaEndTableRow;
                             TableRowEven = !TableRowEven;
                         }
@@ -3400,10 +3400,10 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Spacers
                     //
-                    result = result + StartTableRow();
-                    result = result + GetTableCell(getSpacer(300, 1), "200");
-                    result = result + GetTableCell(getSpacer(200, 1), "200");
-                    result = result + GetTableCell("&nbsp;", "100%");
+                    result = result + htmlController.tableRowStart();
+                    result = result + htmlController.tableCell(nop2(300, 1), "200");
+                    result = result + htmlController.tableCell(nop2(200, 1), "200");
+                    result = result + htmlController.tableCell("&nbsp;", "100%");
                     result = result + kmaEndTableRow;
                 }
                 result = result + kmaEndTable;
@@ -3436,7 +3436,7 @@ namespace Contensive.Core.Addons.Tools {
                 result = GetTitle("Get Content Database Schema", "This tool displays all tables and fields required for the current Content Defintions.");
                 //
                 TableColSpan = 3;
-                result = result + StartTable(2, 0, 0);
+                result = result + htmlController.tableStart(2, 0, 0);
                 SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName, ccFieldTypes.Name as FieldType"
                         + " FROM ((ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID) LEFT JOIN ccFields ON ccContent.ID = ccFields.ContentID) LEFT JOIN ccFieldTypes ON ccFields.Type = ccFieldTypes.ID"
                         + " ORDER BY ccTables.Name, ccFields.Name;";
@@ -3445,12 +3445,12 @@ namespace Contensive.Core.Addons.Tools {
                 while (core.db.csOk(CS)) {
                     if (TableName != core.db.csGetText(CS, "TableName")) {
                         TableName = core.db.csGetText(CS, "TableName");
-                        result = result + GetTableRow("<B>" + TableName + "</b>", TableColSpan, TableEvenRow);
+                        result = result + htmlController.tableRow("<B>" + TableName + "</b>", TableColSpan, TableEvenRow);
                     }
-                    result = result + StartTableRow();
-                    result = result + GetTableCell("&nbsp;","",0, TableEvenRow);
-                    result = result + GetTableCell(core.db.csGetText(CS, "FieldName"), "", 0, TableEvenRow);
-                    result = result + GetTableCell(core.db.csGetText(CS, "FieldType"), "", 0, TableEvenRow);
+                    result = result + htmlController.tableRowStart();
+                    result = result + htmlController.tableCell("&nbsp;","",0, TableEvenRow);
+                    result = result + htmlController.tableCell(core.db.csGetText(CS, "FieldName"), "", 0, TableEvenRow);
+                    result = result + htmlController.tableCell(core.db.csGetText(CS, "FieldType"), "", 0, TableEvenRow);
                     result = result + kmaEndTableRow;
                     TableEvenRow = !TableEvenRow;
                     core.db.csGoNext(CS);
@@ -3458,25 +3458,25 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Field Type Definitions
                 //
-                result = result + GetTableRow("<br><br><B>Field Type Definitions</b>", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("Boolean - Boolean values 0 and 1 are stored in a database long integer field type", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("Lookup - References to related records stored as database long integer field type", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("Integer - database long integer field type", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("Float - database floating point value", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("Date - database DateTime field type.", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("AutoIncrement - database long integer field type. Field automatically increments when a record is added.", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("Text - database character field up to 255 characters.", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("LongText - database character field up to 64K characters.", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("TextFile - references a filename in the Content Files folder. Database character field up to 255 characters. ", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("File - references a filename in the Content Files folder. Database character field up to 255 characters. ", TableColSpan, TableEvenRow);
-                result = result + GetTableRow("Redirect - This field has no database equivelent. No Database field is required.", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("<br><br><B>Field Type Definitions</b>", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("Boolean - Boolean values 0 and 1 are stored in a database long integer field type", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("Lookup - References to related records stored as database long integer field type", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("Integer - database long integer field type", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("Float - database floating point value", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("Date - database DateTime field type.", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("AutoIncrement - database long integer field type. Field automatically increments when a record is added.", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("Text - database character field up to 255 characters.", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("LongText - database character field up to 64K characters.", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("TextFile - references a filename in the Content Files folder. Database character field up to 255 characters. ", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("File - references a filename in the Content Files folder. Database character field up to 255 characters. ", TableColSpan, TableEvenRow);
+                result = result + htmlController.tableRow("Redirect - This field has no database equivelent. No Database field is required.", TableColSpan, TableEvenRow);
                 //
                 // Spacers
                 //
-                result = result + StartTableRow();
-                result = result + GetTableCell(getSpacer(20, 1), "20");
-                result = result + GetTableCell(getSpacer(300, 1), "300");
-                result = result + GetTableCell("&nbsp;", "100%");
+                result = result + htmlController.tableRowStart();
+                result = result + htmlController.tableCell(nop2(20, 1), "20");
+                result = result + htmlController.tableCell(nop2(300, 1), "300");
+                result = result + htmlController.tableCell("&nbsp;", "100%");
                 result = result + kmaEndTableRow;
                 result = result + kmaEndTable;
                 //
@@ -3504,7 +3504,7 @@ namespace Contensive.Core.Addons.Tools {
                 tempGetForm_LogFiles = tempGetForm_LogFiles + "<P></P>";
                 //
                 string QueryOld = ".asp?";
-                string QueryNew = genericController.ModifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
+                string QueryNew = genericController.modifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
                 tempGetForm_LogFiles = tempGetForm_LogFiles + genericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
                 //
                 tempGetForm_LogFiles = htmlController.openFormTableLegacy(core, ButtonList) + tempGetForm_LogFiles + (htmlController.closeFormTableLegacy(core, ButtonList));
@@ -3633,9 +3633,9 @@ namespace Contensive.Core.Addons.Tools {
                                 FileDate = LineSplit[3];
                                 FileURL = StartPath + CurrentPath + "\\" + Filename;
                                 QueryString = core.doc.refreshQueryString;
-                                QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, encodeText(AdminFormTool), true);
-                                QueryString = genericController.ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, true);
-                                QueryString = genericController.ModifyQueryString(QueryString, "SourceFile", FileURL, true);
+                                QueryString = genericController.modifyQueryString(QueryString, RequestNameAdminForm, encodeText(AdminFormTool), true);
+                                QueryString = genericController.modifyQueryString(QueryString, "at", AdminFormToolLogFileView, true);
+                                QueryString = genericController.modifyQueryString(QueryString, "SourceFile", FileURL, true);
                                 CellCopy = "<A href=\"" + core.webServer.requestPath + "?" + QueryString + "\" target=\"_blank\">" + Filename + "</A>";
                                 result = result + GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven);
                             }

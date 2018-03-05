@@ -1255,8 +1255,8 @@ namespace Contensive.Core.Controllers {
                                     string ViewingName = ((string)(session.visit.id + "." + session.visit.PageVisits)).Left(10);
                                     int PageID = 0;
                                     if (_doc != null) {
-                                        if (doc.page != null) {
-                                            PageID = doc.page.id;
+                                        if (doc.pageController.page != null) {
+                                            PageID = doc.pageController.page.id;
                                         }
                                     }
                                     //

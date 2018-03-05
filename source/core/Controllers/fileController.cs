@@ -831,7 +831,6 @@ namespace Contensive.Core.Controllers {
         /// <param name="path"></param>
         /// <returns></returns>
         private bool pathExists_remote(string path) {
-            bool returnOK = false;
             try {
                 //
                 // -- remote
@@ -853,7 +852,6 @@ namespace Contensive.Core.Controllers {
                 core.handleException(ex);
                 throw;
             }
-            return returnOK;
         }
 
 
@@ -1278,7 +1276,7 @@ namespace Contensive.Core.Controllers {
                     var docProperty = core.docProperties.getProperty(key);
                     if ((docProperty.IsFile) && (docProperty.Name.ToLower() == key)) {
                         string dosPathFilename = fileController.normalizeDosPath(path);
-                        returnFilename = encodeFilename(docProperty.Value);
+                        returnFilename = encodeDosFilename(docProperty.Value);
                         dosPathFilename += returnFilename;
                         deleteFile(dosPathFilename);
                         if (docProperty.tempfilename != "") {
@@ -1428,9 +1426,9 @@ namespace Contensive.Core.Controllers {
             bool result = false;
             try {
                 pathFilename = normalizeDosPathFilename(pathFilename);
-                if (isLocal) {
-                    // not exception, can be used regardless of isLocal //throw new ApplicationException("copyRemoteToLocal is not valid in a local File system [" + localAbsRootPath + "]");
-                } else {
+                if (!isLocal) {
+                    //
+                    // note: local call is not exception, can be used regardless of isLocal
                     verifyPath_remote(getPath(pathFilename));
                     string remoteUnixAbsPathFilename = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
                     string localDosPathFilename = genericController.convertToDosSlash(pathFilename);
@@ -1521,22 +1519,80 @@ namespace Contensive.Core.Controllers {
             }
         }
         //
-        // ========================================================================================================================
+        //====================================================================================================
         /// <summary>
         /// return the actual filename, or blank if the file is not found
         /// </summary>
-        /// <param name="pathFilename"></param>
-        /// <returns></returns>
+        /// <param name="pathFilename">A case-insensative path and filename</param>
+        /// <returns>The correct case for the path and filename</returns>
         public string correctFilenameCase( string pathFilename ) {
-            string path = "";
             string filename = "";
-            splitDosPathFilename(pathFilename, ref path, ref filename);
-            filename = filename.ToLower();
-            FileDetail resultFile = getFileList(path).Find( x => x.Name.ToLower() == filename );
-            if ( resultFile != null) {
-                filename = resultFile.Name;
+            try {
+                string path = "";
+                splitDosPathFilename(pathFilename, ref path, ref filename);
+                filename = filename.ToLower();
+                FileDetail resultFile = getFileList(path).Find(x => x.Name.ToLower() == filename);
+                if (resultFile != null) {
+                    filename = resultFile.Name;
+                }
+            } catch (Exception ex) {
+                core.handleException(ex);
             }
             return filename;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// convert a string a valid Dos filename. Replace all non-allowed characters with underscore.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static string encodeDosFilename(string filename) {
+            const string allowed = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ^&'@{}[],$-#()%.+~_";
+            return encodeFilename(filename, allowed);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// convert a string a valid Dos filename. Replace all non-allowed characters with underscore.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static string encodeDosPathFilename(string filename) {
+            const string allowed = @"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ^&'@{}[],$-#()%.+~_\";
+            return encodeFilename(filename, allowed);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// convert a string a valid Unix filename. Replace all non-allowed characters with underscore.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static string encodeUnixFilename(string filename) {
+            const string allowed = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._";
+            return encodeFilename(filename, allowed);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Replace all non-allowed characters with underscore.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        private static string encodeFilename(string filename, string allowedCharacters) {
+            string result = "";
+            int Cnt = filename.Length;
+            if (Cnt > 254) Cnt = 254;
+            for (int Ptr = 1; Ptr <= Cnt; Ptr++) {
+                string chr = filename.Substring(Ptr - 1, 1);
+                if (allowedCharacters.IndexOf(chr) + 1 >= 0) {
+                    result += chr;
+                } else {
+                    result += "_";
+                }
+            }
+            return result;
         }
 
         //

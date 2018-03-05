@@ -1093,7 +1093,7 @@ namespace Contensive.Core.Controllers {
             bool returnOk = false;
             try {
                 DataTable dt = executeQuery("Select top 1 id from ccFields where name=" + encodeSQLText(FieldName) + " And contentid=" + ContentID);
-                tempisCdefField = genericController.isDataTableOk(dt);
+                tempisCdefField = dbController.isDataTableOk(dt);
                 dt.Dispose();
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -1919,7 +1919,7 @@ namespace Contensive.Core.Controllers {
                     throw new ArgumentException("dataset is not valid");
                 } else {
                     string CSSelectFieldList = csGetSelectFieldList(CSPointer);
-                    returnResult = genericController.IsInDelimitedString(CSSelectFieldList, FieldName, ",");
+                    returnResult = genericController.isInDelimitedString(CSSelectFieldList, FieldName, ",");
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -2679,7 +2679,7 @@ namespace Contensive.Core.Controllers {
                                     DbTable = Models.Complex.cdefModel.getContentTablename(core, ContentName);
                                     SQL = "Select " + field.ManyToManyRuleSecondaryField + " from " + DbTable + " where " + field.ManyToManyRulePrimaryField + "=" + RecordID;
                                     rs = executeQuery(SQL);
-                                    if (genericController.isDataTableOk(rs)) {
+                                    if (dbController.isDataTableOk(rs)) {
                                         foreach (DataRow dr in rs.Rows) {
                                             fieldValue += "," + dr[0].ToString();
                                         }
@@ -3667,7 +3667,7 @@ namespace Contensive.Core.Controllers {
             int returnResult = 0;
             try {
                 DataTable dt = executeQuery("select ContentTableID from ccContent where name=" + encodeSQLText(ContentName));
-                if (!genericController.isDataTableOk(dt)) {
+                if (!dbController.isDataTableOk(dt)) {
                     throw new ApplicationException("Content [" + ContentName + "] was not found in ccContent table");
                 } else {
                     returnResult = genericController.encodeInteger(dt.Rows[0]["ContentTableID"]);
@@ -4738,7 +4738,7 @@ namespace Contensive.Core.Controllers {
                     result = DefaultLink;
                 }
                 //
-                result = genericController.EncodeAppRootPath(result, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                result = genericController.encodeVirtualPath(result, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -4930,6 +4930,44 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             }
+        }
+
+
+        //
+        //=================================================================================
+        // fix for isDataTableOk
+        //=================================================================================
+        //
+        public static bool isDataTableOk(DataTable dt) {
+            return (dt.Rows.Count > 0);
+        }
+        //
+        //=================================================================================
+        // fix for closeRS
+        //=================================================================================
+        //
+        public static void closeDataTable(DataTable dt) {
+            // nothing needed
+            //dt.Clear()
+            dt.Dispose();
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// Return just the tablename from a tablename reference (database.object.tablename->tablename)
+        /// </summary>
+        /// <param name="DbObject"></param>
+        /// <returns></returns>
+        public static string GetDbObjectTableName(string DbObject) {
+            string tempGetDbObjectTableName = null;
+            int Position = 0;
+            //
+            tempGetDbObjectTableName = DbObject;
+            Position = tempGetDbObjectTableName.LastIndexOf(".") + 1;
+            if (Position > 0) {
+                tempGetDbObjectTableName = tempGetDbObjectTableName.Substring(Position);
+            }
+            return tempGetDbObjectTableName;
         }
 
 

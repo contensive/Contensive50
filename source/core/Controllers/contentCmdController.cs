@@ -249,7 +249,7 @@ namespace Contensive.Core.Controllers {
                                         escape = src.Substring(posSq - 2, 1);
                                     }
                                 } while (escape == "\\");
-                                switch (GetFirstNonZeroInteger(posSq, posDq)) {
+                                switch (getFirstNonZeroInteger(posSq, posDq)) {
                                     case 0:
                                         //
                                         // both 0, posClose is OK as-is

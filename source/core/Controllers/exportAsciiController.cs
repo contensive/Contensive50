@@ -65,7 +65,7 @@ namespace Contensive.Core.Controllers {
                 //
                 core.webServer.setResponseContentType("text/plain");
                 core.html.enableOutputBuffer(false);
-                TableName = genericController.GetDbObjectTableName(Models.Complex.cdefModel.getContentTablename(core, iContentName));
+                TableName = dbController.GetDbObjectTableName(Models.Complex.cdefModel.getContentTablename(core, iContentName));
                 switch (genericController.vbUCase(TableName)) {
                     case "CCMEMBERS":
                         //

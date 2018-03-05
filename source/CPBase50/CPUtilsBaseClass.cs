@@ -144,9 +144,9 @@ namespace Contensive.BaseClasses
 		[Obsolete("Deprecated, use AppendLog",false)] public abstract void AppendLogFile(string Text);
         [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", false)] public abstract void AppendLog(string pathFilename, string logText);
 		public abstract void AppendLog(string logText);
-		public abstract string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath);
-		public abstract string ConvertShortLinkToLink(string URL, string PathPagePrefix);
-		public abstract DateTime DecodeGMTDate(string GMTDate);
+        [Obsolete("Deprecated", false)] public abstract string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath);
+        [Obsolete("Deprecated", false)] public abstract string ConvertShortLinkToLink(string URL, string PathPagePrefix);
+        [Obsolete("Deprecated. Use native methods to convert date formats.", false)] public abstract DateTime DecodeGMTDate(string GMTDate);
 		public abstract string DecodeResponseVariable(string Source);
 		public abstract string EncodeJavascript(string Source);
 		public abstract string EncodeQueryString(string Source);

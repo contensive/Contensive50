@@ -48,7 +48,7 @@ namespace Contensive.Core.Controllers {
             string temperror_GetUserError = null;
             temperror_GetUserError = genericController.encodeText(core.doc.debug_iUserError);
             if (!string.IsNullOrEmpty(temperror_GetUserError)) {
-                temperror_GetUserError = "<ul class=\"ccError\">" + genericController.htmlIndent(temperror_GetUserError) + "\r</ul>";
+                temperror_GetUserError = "<ul class=\"ccError\">" + genericController.nop(temperror_GetUserError) + "\r</ul>";
                 temperror_GetUserError = UserErrorHeadline + "" + temperror_GetUserError;
                 core.doc.debug_iUserError = "";
             }
@@ -68,7 +68,7 @@ namespace Contensive.Core.Controllers {
                 if (core.doc.errList != null) {
                     if (core.doc.errList.Count > 0) {
                         foreach (string exMsg in core.doc.errList) {
-                            returnHtmlList += cr2 + "<li class=\"ccExceptionListRow\">" + cr3 + core.html.convertTextToHTML(exMsg) + cr2 + "</li>";
+                            returnHtmlList += cr2 + "<li class=\"ccExceptionListRow\">" + cr3 + core.html.convertTextToHtml(exMsg) + cr2 + "</li>";
                         }
                         returnHtmlList = "\r<ul class=\"ccExceptionList\">" + returnHtmlList + "\r</ul>";
                     }

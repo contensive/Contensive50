@@ -292,11 +292,11 @@ namespace Contensive.Core.Tests.UnitTests.Views {
             // arrange
             // act
             // assert
-            Assert.AreEqual("", ModifyQueryString("", "a", "1", false));
-            Assert.AreEqual("a=1", ModifyQueryString("", "a", "1", true));
-            Assert.AreEqual("a=1", ModifyQueryString("a=0", "a", "1", false));
-            Assert.AreEqual("a=1", ModifyQueryString("a=0", "a", "1", true));
-            Assert.AreEqual("a=1&b=2", ModifyQueryString("a=1", "b", "2", true));
+            Assert.AreEqual("", modifyQueryString("", "a", "1", false));
+            Assert.AreEqual("a=1", modifyQueryString("", "a", "1", true));
+            Assert.AreEqual("a=1", modifyQueryString("a=0", "a", "1", false));
+            Assert.AreEqual("a=1", modifyQueryString("a=0", "a", "1", true));
+            Assert.AreEqual("a=1&b=2", modifyQueryString("a=1", "b", "2", true));
         }
         //
         [TestMethod()]

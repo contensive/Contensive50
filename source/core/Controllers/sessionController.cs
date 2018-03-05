@@ -978,7 +978,7 @@ namespace Contensive.Core.Controllers {
                 returnAllowEdit = false;
                 returnAllowAdd = false;
                 returnAllowDelete = false;
-                if (genericController.IsInDelimitedString(usedContentIdList, ContentID.ToString(), ",")) {
+                if (genericController.isInDelimitedString(usedContentIdList, ContentID.ToString(), ",")) {
                     //
                     // failed usedContentIdList test, this content id was in the child path
                     //
@@ -987,17 +987,17 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- not a valid contentname
                     //
-                } else if (genericController.IsInDelimitedString(contentAccessRights_NotList, ContentID.ToString(), ",")) {
+                } else if (genericController.isInDelimitedString(contentAccessRights_NotList, ContentID.ToString(), ",")) {
                     //
                     // ----- was previously found to not be a Content Manager
                     //
-                } else if (genericController.IsInDelimitedString(contentAccessRights_List, ContentID.ToString(), ",")) {
+                } else if (genericController.isInDelimitedString(contentAccessRights_List, ContentID.ToString(), ",")) {
                     //
                     // ----- was previously found to be a Content Manager
                     //
                     returnAllowEdit = true;
-                    returnAllowAdd = genericController.IsInDelimitedString(contentAccessRights_AllowAddList, ContentID.ToString(), ",");
-                    returnAllowDelete = genericController.IsInDelimitedString(contentAccessRights_AllowDeleteList, ContentID.ToString(), ",");
+                    returnAllowAdd = genericController.isInDelimitedString(contentAccessRights_AllowAddList, ContentID.ToString(), ",");
+                    returnAllowDelete = genericController.isInDelimitedString(contentAccessRights_AllowDeleteList, ContentID.ToString(), ",");
                 } else {
                     //
                     // ----- Must test it
@@ -1365,11 +1365,11 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(cacheTestName)) {
                     cacheTestName = "iseditingall";
                 }
-                if (genericController.IsInDelimitedString(main_IsEditingContentList, cacheTestName, ",")) {
+                if (genericController.isInDelimitedString(main_IsEditingContentList, cacheTestName, ",")) {
                     //
                     // -- 
                     returnResult = true;
-                } else if (genericController.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",")) {
+                } else if (genericController.isInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",")) {
                     //
                     // -- 
                     //Call debugController.debug_testPoint(core, "...is in main_IsNotEditingContentList")

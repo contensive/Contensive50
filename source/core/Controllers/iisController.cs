@@ -237,7 +237,7 @@ namespace Contensive.Core.Controllers {
                     foreach (string key in iisContext.Request.QueryString) {
                         string keyValue = iisContext.Request.QueryString[key];
                         core.docProperties.setProperty(key, keyValue);
-                        requestQueryString = genericController.ModifyQueryString(requestQueryString, key, keyValue);
+                        requestQueryString = genericController.modifyQueryString(requestQueryString, key, keyValue);
                     }
                 }
                 //
@@ -263,7 +263,7 @@ namespace Contensive.Core.Controllers {
                             docPropertiesClass prop = new docPropertiesClass();
                             prop.Name = formName;
                             prop.Value = file.FileName;
-                            prop.NameValue = EncodeRequestVariable(prop.Name) + "=" + EncodeRequestVariable(prop.Value);
+                            prop.NameValue = encodeRequestVariable(prop.Name) + "=" + encodeRequestVariable(prop.Value);
                             prop.IsFile = true;
                             prop.IsForm = true;
                             prop.tempfilename = instanceId + "-" + filePtr.ToString() + ".bin";
@@ -280,7 +280,7 @@ namespace Contensive.Core.Controllers {
                 //
                 foreach (string key in iisContext.Request.Cookies) {
                     string keyValue = iisContext.Request.Cookies[key].Value;
-                    keyValue = DecodeResponseVariable(keyValue);
+                    keyValue = decodeResponseVariable(keyValue);
                     addRequestCookie(key, keyValue);
                 }
                 //
@@ -791,7 +791,7 @@ namespace Contensive.Core.Controllers {
                         }
                         ShortLink = NonEncodedLink;
                         ShortLink = genericController.ConvertLinkToShortLink(ShortLink, requestDomain, requestVirtualFilePath);
-                        ShortLink = genericController.EncodeAppRootPath(ShortLink, requestVirtualFilePath, requestAppRootPath, requestDomain);
+                        ShortLink = genericController.encodeVirtualPath(ShortLink, requestVirtualFilePath, requestAppRootPath, requestDomain);
                         FullLink = requestProtocol + requestDomain + ShortLink;
                     }
 
@@ -1102,7 +1102,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- handle content special cases (prevent redirect to deleted records)
                     //
-                    NonEncodedLink = genericController.DecodeResponseVariable(EncodedLink);
+                    NonEncodedLink = genericController.decodeResponseVariable(EncodedLink);
                     switch (genericController.vbUCase(iContentName)) {
                         case "CONTENT WATCH":
                             //
@@ -1152,7 +1152,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // If link incorrectly includes the LinkPrefix, take it off first, then add it back
                     //
-                    NonEncodedLink = genericController.ConvertShortLinkToLink(NonEncodedLink, LinkPrefix);
+                    NonEncodedLink = genericController.removeUrlPrefix(NonEncodedLink, LinkPrefix);
                     if (core.db.csIsFieldSupported(CSPointer, "Clicks")) {
                         core.db.csSet(CSPointer, "Clicks", (core.db.csGetNumber(CSPointer, "Clicks")) + 1);
                     }

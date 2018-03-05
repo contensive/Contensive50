@@ -226,7 +226,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string EncodeAppRootPath(string Link) {
-            return genericController.EncodeAppRootPath(genericController.encodeText(Link), core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+            return genericController.encodeVirtualPath(genericController.encodeText(Link), core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
         }
         //
         //====================================================================================================

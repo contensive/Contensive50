@@ -106,10 +106,10 @@ namespace Contensive.Core {
         /// <returns></returns>
         public override int PageId {
             get {
-                if (core.doc.page == null) {
+                if (core.doc.pageController.page == null) {
                     return 0;
                 } else {
-                    return core.doc.page.id;
+                    return core.doc.pageController.page.id;
                 }
             }
         }
@@ -121,10 +121,10 @@ namespace Contensive.Core {
         /// <returns></returns>
         public override string PageName {
             get {
-                if (core.doc.page == null) {
+                if (core.doc.pageController.page == null) {
                     return string.Empty;
                 } else {
-                    return core.doc.page.name;
+                    return core.doc.pageController.page.name;
                 }
             }
         }
@@ -170,8 +170,8 @@ namespace Contensive.Core {
         public override int TemplateId {
             get {
                 if (core.doc != null) {
-                    if (core.doc.template != null) {
-                        return core.doc.template.id;
+                    if (core.doc.pageController.template != null) {
+                        return core.doc.pageController.template.id;
                     }
                 }
                 return 0;

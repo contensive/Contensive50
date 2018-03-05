@@ -197,7 +197,7 @@ namespace Contensive.Core.Controllers {
                         // Fix links for HTML send
                         //
                         rootUrl = "http://" + core.appConfig.domainList[0] + "/";
-                        BodyMessage = genericController.ConvertLinksToAbsolute(BodyMessage, rootUrl);
+                        BodyMessage = genericController.convertLinksToAbsolute(BodyMessage, rootUrl);
                         //
                         // compose body
                         //

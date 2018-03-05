@@ -861,7 +861,7 @@ namespace Contensive.Core.Controllers {
                 if (ActionQueryString == null) {
                     ActionQueryString = core.doc.refreshQueryString;
                 }
-                string iActionQueryString = genericController.ModifyQueryString(ActionQueryString, RequestNameRequestBinary, true, true);
+                string iActionQueryString = genericController.modifyQueryString(ActionQueryString, RequestNameRequestBinary, true, true);
                 result = "<form action=\"" + core.webServer.serverFormActionURL + "?" + iActionQueryString + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" METHOD=\"POST\"  style=\"display: inline;\" >";
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -920,10 +920,10 @@ namespace Contensive.Core.Controllers {
                         for (Ptr = 0; Ptr <= QSParts.GetUpperBound(0); Ptr++) {
                             QSNameValues = QSParts[Ptr].Split('=');
                             if (QSNameValues.GetUpperBound(0) == 0) {
-                                QSName = genericController.DecodeResponseVariable(QSNameValues[0]);
+                                QSName = genericController.decodeResponseVariable(QSNameValues[0]);
                             } else {
-                                QSName = genericController.DecodeResponseVariable(QSNameValues[0]);
-                                QSValue = genericController.DecodeResponseVariable(QSNameValues[1]);
+                                QSName = genericController.decodeResponseVariable(QSNameValues[0]);
+                                QSValue = genericController.decodeResponseVariable(QSNameValues[1]);
                                 RefreshHiddens = RefreshHiddens + "\r<input type=\"hidden\" name=\"" + genericController.encodeHTML(QSName) + "\" value=\"" + genericController.encodeHTML(QSValue) + "\">";
                             }
                         }
@@ -1074,7 +1074,7 @@ namespace Contensive.Core.Controllers {
                 //
                 temphtml_GetFormInputTextExpandable2 = ""
                     + "<div class=\"" + HtmlClass + "\">"
-                    + genericController.htmlIndent(EditorClosed) + genericController.htmlIndent(EditorOpened) + "</div>";
+                    + genericController.nop(EditorClosed) + genericController.nop(EditorOpened) + "</div>";
                 core.doc.formInputTextCnt = core.doc.formInputTextCnt + 1;
                 return temphtml_GetFormInputTextExpandable2;
                 //
@@ -1539,75 +1539,42 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        //
-        public string JSONeditorAddonList(csv_contentTypeEnum ContentType) {
+        /// <summary>
+        /// returns a json format list of all addons that can be placed into the contentType provided (page, mail). Cached in doc scope
+        /// </summary>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public string getWysiwygAddonList(contentTypeEnum contentType) {
             string result = "";
             try {
-                string AddonName = null;
-                string LastAddonName = "";
-                int CSAddons = 0;
-                string DefaultAddonOption_String = null;
-                bool UseAjaxDefaultAddonOptions = false;
-                int PtrTest = 0;
-                string s = null;
-                int IconWidth = 0;
-                int IconHeight = 0;
-                int IconSprites = 0;
-                bool IsInline = false;
-                string AddonGuid = null;
-                string IconIDControlString = null;
-                string IconImg = null;
-                string AddonContentName = null;
-                string ObjectProgramID2 = null;
-                int LoopPtr = 0;
-                string FieldCaption = null;
-                string SelectList = null;
-                string IconFilename = null;
-                string FieldName = null;
-                string ArgumentList = null;
-                keyPtrController Index = null;
-                string[] Items = null;
-                int ItemsSize = 0;
-                int ItemsCnt = 0;
-                int ItemsPtr = 0;
-                string Criteria = null;
-                int CSLists = 0;
-                string FieldList = null;
-                string cacheKey;
-                //
-                // can not save this because there are multiple main_versions
-                //
-                cacheKey = "editorAddonList:" + ContentType;
-                result = core.docProperties.getText(cacheKey);
-                if (string.IsNullOrEmpty(result)) {
+                if (core.doc.wysiwygAddonList.ContainsKey(contentType)) {
+                    result = core.doc.wysiwygAddonList[contentType];
+                } else {
                     //
-                    // ----- AC Tags, Would like to replace these with Add-ons eventually
+                    // -- AC Tags, Would like to replace these with Add-ons eventually
+                    int ItemsSize = 100;
+                    string[] Items = new string[101];
+                    int ItemsCnt = 0;
+                    var Index = new keyPtrController();
                     //
-                    ItemsSize = 100;
-                    Items = new string[101];
-                    ItemsCnt = 0;
-                    Index = new keyPtrController();
-                    //Set main_cmc = main_cs_getv()
-                    //
-                    // AC StartBlockText
-                    //
-                    IconIDControlString = "AC," + ACTypeAggregateFunction + ",0,Block Text,";
-                    IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0);
-                    IconImg = genericController.EncodeJavascript(IconImg);
+                    // -- AC StartBlockText
+                    string IconIDControlString = "AC," + ACTypeAggregateFunction + ",0,Block Text,";
+                    string IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0);
+                    IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                     Items[ItemsCnt] = "['Block Text','" + IconImg + "']";
                     Index.setPtr("Block Text", ItemsCnt);
-                    ItemsCnt = ItemsCnt + 1;
+                    ItemsCnt += 1;
                     //
                     // AC EndBlockText
                     //
                     IconIDControlString = "AC," + ACTypeAggregateFunction + ",0,Block Text End,";
-                    IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block End", "End of text block", "", 0);
-                    IconImg = genericController.EncodeJavascript(IconImg);
+                    IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block End", "End of text block", "", 0);
+                    IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                     Items[ItemsCnt] = "['Block Text End','" + IconImg + "']";
                     Index.setPtr("Block Text", ItemsCnt);
-                    ItemsCnt = ItemsCnt + 1;
+                    ItemsCnt += 1;
                     //
-                    if ((ContentType == csv_contentTypeEnum.contentTypeEmail) || (ContentType == csv_contentTypeEnum.contentTypeEmailTemplate)) {
+                    if ((contentType == contentTypeEnum.contentTypeEmail) || (contentType == contentTypeEnum.contentTypeEmailTemplate)) {
                         //
                         // ----- Email Only AC tags
                         //
@@ -1615,16 +1582,16 @@ namespace Contensive.Core.Controllers {
                         //
                         // Personalization Tag
                         //
-                        FieldList = Models.Complex.cdefModel.GetContentProperty(core, "people", "SelectFieldList");
+                        string FieldList = Models.Complex.cdefModel.GetContentProperty(core, "people", "SelectFieldList");
                         FieldList = genericController.vbReplace(FieldList, ",", "|");
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + FieldList + "]";
-                        IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
-                        IconImg = genericController.EncodeJavascript(IconImg);
+                        IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
+                        IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                         Items[ItemsCnt] = "['Personalization','" + IconImg + "']";
                         Index.setPtr("Personalization", ItemsCnt);
-                        ItemsCnt = ItemsCnt + 1;
+                        ItemsCnt += 1;
                         //
-                        if (ContentType == csv_contentTypeEnum.contentTypeEmailTemplate) {
+                        if (contentType == contentTypeEnum.contentTypeEmailTemplate) {
                             //
                             // Editing Email Templates
                             //   This is a special case
@@ -1633,20 +1600,20 @@ namespace Contensive.Core.Controllers {
                             //   Need a more consistant solution later
                             //
                             IconIDControlString = "AC," + ACTypeTemplateContent + ",0,Template Content,";
-                            IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
-                            IconImg = genericController.EncodeJavascript(IconImg);
+                            IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
+                            IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                             Items[ItemsCnt] = "['Content Box','" + IconImg + "']";
                             //Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
                             Index.setPtr("Content Box", ItemsCnt);
-                            ItemsCnt = ItemsCnt + 1;
+                            ItemsCnt += 1;
                             //
                             IconIDControlString = "AC," + ACTypeTemplateText + ",0,Template Text,Name=Default";
-                            IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
-                            IconImg = genericController.EncodeJavascript(IconImg);
+                            IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
+                            IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                             Items[ItemsCnt] = "['Template Text','" + IconImg + "']";
                             //Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
                             Index.setPtr("Template Text", ItemsCnt);
-                            ItemsCnt = ItemsCnt + 1;
+                            ItemsCnt += 1;
                         }
                     } else {
                         //
@@ -1654,20 +1621,20 @@ namespace Contensive.Core.Controllers {
                         //
                         // Watch Lists
                         //
-                        CSLists = core.db.csOpen("Content Watch Lists", "", "Name,ID", false, 0, false, false, "Name,ID", 20, 1);
+                        int CSLists = core.db.csOpen("Content Watch Lists", "", "Name,ID", false, 0, false, false, "Name,ID", 20, 1);
                         if (core.db.csOk(CSLists)) {
                             while (core.db.csOk(CSLists)) {
-                                FieldName = encodeText(core.db.csGetText(CSLists, "name")).Trim(' ');
+                                string FieldName = encodeText(core.db.csGetText(CSLists, "name")).Trim(' ');
                                 if (!string.IsNullOrEmpty(FieldName)) {
-                                    FieldCaption = "Watch List [" + FieldName + "]";
+                                    string FieldCaption = "Watch List [" + FieldName + "]";
                                     IconIDControlString = "AC,WATCHLIST,0," + FieldName + ",ListName=" + FieldName + "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]";
-                                    IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, FieldCaption, "Rendered as the " + FieldCaption, "", 0);
-                                    IconImg = genericController.EncodeJavascript(IconImg);
-                                    FieldCaption = genericController.EncodeJavascript(FieldCaption);
+                                    IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, FieldCaption, "Rendered as the " + FieldCaption, "", 0);
+                                    IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
+                                    FieldCaption = genericController.EncodeJavascriptStringSingleQuote(FieldCaption);
                                     Items[ItemsCnt] = "['" + FieldCaption + "','" + IconImg + "']";
                                     //Items(ItemsCnt) = "['" & FieldCaption & "','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the " & FieldCaption & """ id=""AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"" src=""/ccLib/images/ACWatchList.GIF"">']"
                                     Index.setPtr(FieldCaption, ItemsCnt);
-                                    ItemsCnt = ItemsCnt + 1;
+                                    ItemsCnt += 1;
                                     if (ItemsCnt >= ItemsSize) {
                                         ItemsSize = ItemsSize + 100;
                                         Array.Resize(ref Items, ItemsSize + 1);
@@ -1679,107 +1646,97 @@ namespace Contensive.Core.Controllers {
                         core.db.csClose(ref CSLists);
                     }
                     //
-                    // ----- Add-ons (AC Aggregate Functions)
-                    //
-                    if ((false) && (ContentType == csv_contentTypeEnum.contentTypeEmail)) {
+                    // -- addons
+                    string Criteria = "(1=1)";
+                    if (contentType == contentTypeEnum.contentTypeEmail) {
                         //
-                        // Email did not support add-ons
+                        // select only addons with email placement (dont need to check main_version bc if email, must be >4.0.325
                         //
+                        Criteria = Criteria + "and(email<>0)";
                     } else {
-                        //
-                        // Either non-email or > 4.0.325
-                        //
-                        Criteria = "(1=1)";
-                        if (ContentType == csv_contentTypeEnum.contentTypeEmail) {
+                        if (contentType == contentTypeEnum.contentTypeWeb) {
                             //
-                            // select only addons with email placement (dont need to check main_version bc if email, must be >4.0.325
-                            //
-                            Criteria = Criteria + "and(email<>0)";
+                            // Non Templates
+                            Criteria = Criteria + "and(content<>0)";
                         } else {
-                            if (true) {
-                                if (ContentType == csv_contentTypeEnum.contentTypeWeb) {
-                                    //
-                                    // Non Templates
-                                    //
-                                    Criteria = Criteria + "and(content<>0)";
-                                } else {
-                                    //
-                                    // Templates
-                                    //
-                                    Criteria = Criteria + "and(template<>0)";
-                                }
-                            }
+                            //
+                            // Templates
+                            Criteria = Criteria + "and(template<>0)";
                         }
-                        AddonContentName = cnAddons;
-                        SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid";
-                        CSAddons = core.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
-                        if (core.db.csOk(CSAddons)) {
-                            while (core.db.csOk(CSAddons)) {
-                                AddonGuid = core.db.csGetText(CSAddons, "ccguid");
-                                ObjectProgramID2 = core.db.csGetText(CSAddons, "ObjectProgramID");
-                                if ((ContentType == csv_contentTypeEnum.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
+                    }
+                    string AddonContentName = cnAddons;
+                    string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid";
+                    int CSAddons = core.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
+                    if (core.db.csOk(CSAddons)) {
+                        string LastAddonName = "";
+                        while (core.db.csOk(CSAddons)) {
+                            string addonGuid = core.db.csGetText(CSAddons, "ccguid");
+                            string ObjectProgramID2 = core.db.csGetText(CSAddons, "ObjectProgramID");
+                            if ((contentType == contentTypeEnum.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
+                                //
+                                // Block activex addons from email
+                                //
+                                //ObjectProgramID2 = ObjectProgramID2;
+                            } else {
+                                string addonName = encodeText(core.db.csGet(CSAddons, "name")).Trim(' ');
+                                if (!string.IsNullOrEmpty(addonName) & (addonName != LastAddonName)) {
                                     //
-                                    // Block activex addons from email
+                                    // Icon (fieldtyperesourcelink)
                                     //
-                                    //ObjectProgramID2 = ObjectProgramID2;
-                                } else {
-                                    AddonName = encodeText(core.db.csGet(CSAddons, "name")).Trim(' ');
-                                    if (!string.IsNullOrEmpty(AddonName) & (AddonName != LastAddonName)) {
-                                        //
-                                        // Icon (fieldtyperesourcelink)
-                                        //
-                                        IsInline = core.db.csGetBoolean(CSAddons, "IsInline");
-                                        IconFilename = core.db.csGet(CSAddons, "Iconfilename");
-                                        if (string.IsNullOrEmpty(IconFilename)) {
-                                            IconWidth = 0;
-                                            IconHeight = 0;
-                                            IconSprites = 0;
-                                        } else {
-                                            IconWidth = core.db.csGetInteger(CSAddons, "IconWidth");
-                                            IconHeight = core.db.csGetInteger(CSAddons, "IconHeight");
-                                            IconSprites = core.db.csGetInteger(CSAddons, "IconSprites");
-                                        }
-                                        //
-                                        // Calculate DefaultAddonOption_String
-                                        //
-                                        UseAjaxDefaultAddonOptions = true;
-                                        if (UseAjaxDefaultAddonOptions) {
-                                            DefaultAddonOption_String = "";
-                                        } else {
-                                            ArgumentList = encodeText(core.db.csGet(CSAddons, "ArgumentList")).Trim(' ');
-                                            DefaultAddonOption_String = addonController.main_GetDefaultAddonOption_String(core, ArgumentList, AddonGuid, IsInline);
-                                            DefaultAddonOption_String = encodeHTML(DefaultAddonOption_String);
-                                        }
-                                        //
-                                        // Changes necessary to support commas in AddonName and OptionString
-                                        //   Remove commas in Field Name
-                                        //   Then in Javascript, when spliting on comma, anything past position 4, put back onto 4
-                                        //
-                                        LastAddonName = AddonName;
-                                        IconIDControlString = "AC,AGGREGATEFUNCTION,0," + AddonName + "," + DefaultAddonOption_String + "," + AddonGuid;
-                                        IconImg = genericController.GetAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, core.appConfig.cdnFileUrl, AddonName, "Rendered as the Add-on [" + AddonName + "]", "", 0);
-                                        Items[ItemsCnt] = "['" + genericController.EncodeJavascript(AddonName) + "','" + genericController.EncodeJavascript(IconImg) + "']";
-                                        Index.setPtr(AddonName, ItemsCnt);
-                                        ItemsCnt = ItemsCnt + 1;
-                                        if (ItemsCnt >= ItemsSize) {
-                                            ItemsSize = ItemsSize + 100;
-                                            Array.Resize(ref Items, ItemsSize + 1);
-                                        }
+                                    bool IsInline = core.db.csGetBoolean(CSAddons, "IsInline");
+                                    string IconFilename = core.db.csGet(CSAddons, "Iconfilename");
+                                    int IconWidth = 0;
+                                    int IconHeight = 0;
+                                    int IconSprites = 0;
+                                    if (!string.IsNullOrEmpty(IconFilename)) {
+                                        IconWidth = core.db.csGetInteger(CSAddons, "IconWidth");
+                                        IconHeight = core.db.csGetInteger(CSAddons, "IconHeight");
+                                        IconSprites = core.db.csGetInteger(CSAddons, "IconSprites");
+                                    }
+                                    //
+                                    // Calculate DefaultAddonOption_String
+                                    //
+                                    string ArgumentList = core.db.csGet(CSAddons, "ArgumentList").Trim(' ');
+                                    string defaultAddonOptions = addonController.getDefaultAddonOptions(core, ArgumentList, addonGuid, IsInline);
+                                    defaultAddonOptions = encodeHTML(defaultAddonOptions);
+                                    //UseAjaxDefaultAddonOptions = false;
+                                    //if (UseAjaxDefaultAddonOptions) {
+                                    //    DefaultAddonOption_String = "";
+                                    //} else {
+                                    //    ArgumentList = encodeText(core.db.csGet(CSAddons, "ArgumentList")).Trim(' ');
+                                    //    DefaultAddonOption_String = addonController.getDefaultAddonOption(core, ArgumentList, AddonGuid, IsInline);
+                                    //    DefaultAddonOption_String = encodeHTML(DefaultAddonOption_String);
+                                    //}
+                                    //
+                                    // Changes necessary to support commas in AddonName and OptionString
+                                    //   Remove commas in Field Name
+                                    //   Then in Javascript, when spliting on comma, anything past position 4, put back onto 4
+                                    //
+                                    LastAddonName = addonName;
+                                    IconIDControlString = "AC,AGGREGATEFUNCTION,0," + addonName + "," + defaultAddonOptions + "," + addonGuid;
+                                    IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, core.appConfig.cdnFileUrl, addonName, "Rendered as the Add-on [" + addonName + "]", "", 0);
+                                    Items[ItemsCnt] = "['" + genericController.EncodeJavascriptStringSingleQuote(addonName) + "','" + genericController.EncodeJavascriptStringSingleQuote(IconImg) + "']";
+                                    Index.setPtr(addonName, ItemsCnt);
+                                    ItemsCnt += 1;
+                                    if (ItemsCnt >= ItemsSize) {
+                                        ItemsSize = ItemsSize + 100;
+                                        Array.Resize(ref Items, ItemsSize + 1);
                                     }
                                 }
-                                core.db.csGoNext(CSAddons);
                             }
+                            core.db.csGoNext(CSAddons);
                         }
-                        core.db.csClose(ref CSAddons);
                     }
+                    core.db.csClose(ref CSAddons);
                     //
                     // Build output sting in alphabetical order by name
                     //
-                    s = "";
-                    ItemsPtr = Index.getFirstPtr();
-                    while (ItemsPtr >= 0 && LoopPtr < ItemsCnt) {
+                    string s = "";
+                    int ItemsPtr = Index.getFirstPtr();
+                    int LoopPtr = 0;
+                    while ((ItemsPtr >= 0) && (LoopPtr < ItemsCnt)) {
                         s = s + "\r\n," + Items[ItemsPtr];
-                        PtrTest = Index.getNextPtr();
+                        int PtrTest = Index.getNextPtr();
                         if (PtrTest < 0) {
                             break;
                         } else {
@@ -1792,7 +1749,7 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     result = s;
-                    core.docProperties.setProperty(cacheKey, result, false);
+                    core.doc.wysiwygAddonList.Add(contentType, result);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -1802,30 +1759,21 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Modify a string to be printed through the HTML stream
-        ///   convert carriage returns ( 0x10 ) to <br>
-        ///   remove linefeeds ( 0x13 )
+        /// replace string new-line with html break
         /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public string convertCRLFToHtmlBreak(string source) {
-            string  result = "";
-            if (!string.IsNullOrEmpty(source)) {
-                result = source;
-                result = genericController.vbReplace(result, "\r", "");
-                result = genericController.vbReplace(result, "\n", "<br>");
-            }
-            return result;
+        public string convertNewLineToHtmlBreak(string text) {
+            if (string.IsNullOrWhiteSpace(text)) return "";
+            return text.Replace(windowsNewLine, "<br>").Replace(unixNewLine, "<br>").Replace(macNewLine, "<br>");
         }
         //
         //====================================================================================================
         /// <summary>
         /// Convert an HTML source to a text equivelent. converts CRLF to <br>, encodes reserved HTML characters to their equivalent
         /// </summary>
-        /// <param name="Source"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        public string convertTextToHTML(string Source) {
-            return convertCRLFToHtmlBreak(genericController.encodeHTML(Source));
+        public string convertTextToHtml(string text) {
+            return convertNewLineToHtmlBreak(genericController.encodeHTML(text));
         }
         //
         //====================================================================================================
@@ -2644,7 +2592,7 @@ namespace Contensive.Core.Controllers {
                     //
                     //
                     rulesTablename = Models.Complex.cdefModel.getContentTablename(core, RulesContentName);
-                    SingularPrefixHtmlEncoded = genericController.encodeHTML(genericController.GetSingular(SecondaryContentName)) + "&nbsp;";
+                    SingularPrefixHtmlEncoded = genericController.encodeHTML(genericController.getSingular_Sortof(SecondaryContentName)) + "&nbsp;";
                     //
                     main_MemberShipCount = 0;
                     main_MemberShipSize = 0;
@@ -3003,7 +2951,7 @@ namespace Contensive.Core.Controllers {
                         if (!useFlyout) {
                             Link = "/" + core.appConfig.adminRoute + "?cid=" + iContentID + "&af=4&aa=2&ad=1";
                             if (!string.IsNullOrEmpty(PresetNameValueList)) {
-                                Link = Link + "&wc=" + genericController.EncodeRequestVariable(PresetNameValueList);
+                                Link = Link + "&wc=" + genericController.encodeRequestVariable(PresetNameValueList);
                             }
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a"
                                 + " TabIndex=-1"
@@ -3082,7 +3030,7 @@ namespace Contensive.Core.Controllers {
                         if (!string.IsNullOrEmpty(tempmain_GetRecordAddLink2)) {
                             tempmain_GetRecordAddLink2 = ""
                                 + "\r\n\t<div style=\"display:inline;\">"
-                                + genericController.htmlIndent(tempmain_GetRecordAddLink2) + "\r\n\t</div>";
+                                + genericController.nop(tempmain_GetRecordAddLink2) + "\r\n\t</div>";
                         }
                         //
                         // ----- Add the flyout panels to the content to return
@@ -3227,7 +3175,7 @@ namespace Contensive.Core.Controllers {
                             Link = "/" + core.appConfig.adminRoute + "?cid=" + ContentID + "&af=4&aa=2&ad=1";
                             if (!string.IsNullOrEmpty(PresetNameValueList)) {
                                 string NameValueList = PresetNameValueList;
-                                Link = Link + "&wc=" + genericController.EncodeRequestVariable(PresetNameValueList);
+                                Link = Link + "&wc=" + genericController.encodeRequestVariable(PresetNameValueList);
                             }
                         }
                         core.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName, "", "", Link, ButtonCaption, "", "", true);
@@ -3304,33 +3252,33 @@ namespace Contensive.Core.Controllers {
             //
             s0 = ""
                 + "\r<td style=\"padding:" + MyPadding + "px;vertical-align:top\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(genericController.encodeText(content))
+                + genericController.nop(genericController.encodeText(content))
                 + "\r</td>"
                 + "";
             //
             s1 = ""
                 + "\r<tr>"
-                + genericController.htmlIndent(s0)
+                + genericController.nop(s0)
                 + "\r</tr>"
                 + "";
             s2 = ""
                 + "\r<table style=\"width:" + contentPanelWidthStyle + ";border:0px;\" class=\"" + MyStylePanel + "\" cellspacing=\"0\">"
-                + genericController.htmlIndent(s1)
+                + genericController.nop(s1)
                 + "\r</table>"
                 + "";
             s3 = ""
                 + "\r<td colspan=\"3\" width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(s2)
+                + genericController.nop(s2)
                 + "\r</td>"
                 + "";
             s4 = ""
                 + "\r<tr>"
-                + genericController.htmlIndent(s3)
+                + genericController.nop(s3)
                 + "\r</tr>"
                 + "";
             result = ""
                 + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(s4)
+                + genericController.nop(s4)
                 + "\r</table>"
                 + "";
             return result;
@@ -3454,11 +3402,11 @@ namespace Contensive.Core.Controllers {
                     if (core.siteProperties.getBoolean("AllowMobileTemplates", false)) {
                         if (core.session.visit.Mobile) {
                             QS = core.doc.refreshQueryString;
-                            QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile");
+                            QS = genericController.modifyQueryString(QS, "method", "forcenonmobile");
                             LinkPanel.Add("<a class=\"ccAdminLink\" href=\"?" + QS + "\">Non-Mobile Version</A> | ");
                         } else {
                             QS = core.doc.refreshQueryString;
-                            QS = genericController.ModifyQueryString(QS, "method", "forcemobile");
+                            QS = genericController.modifyQueryString(QS, "method", "forcemobile");
                             LinkPanel.Add("<a class=\"ccAdminLink\" href=\"?" + QS + "\">Mobile Version</A> | ");
                         }
                     }
@@ -3466,7 +3414,7 @@ namespace Contensive.Core.Controllers {
                     //
                     if (ShowLegacyToolsPanel) {
                         ToolsPanel = new stringBuilderLegacyController();
-                        WorkingQueryString = genericController.ModifyQueryString(core.doc.refreshQueryString, "ma", "", false);
+                        WorkingQueryString = genericController.modifyQueryString(core.doc.refreshQueryString, "ma", "", false);
                         //
                         // ----- Tools Panel Caption
                         //
@@ -3647,16 +3595,16 @@ namespace Contensive.Core.Controllers {
                         //
                         Copy = ""
                         + "\r<td width=\"50%\" class=\"ccPanelInput\" style=\"vertical-align:bottom;\">"
-                        + genericController.htmlIndent(LoginPanel) + "\r</td>"
+                        + genericController.nop(LoginPanel) + "\r</td>"
                         + "\r<td width=\"50%\" class=\"ccPanelInput\" style=\"vertical-align:bottom;\">"
-                        + genericController.htmlIndent(OptionsPanel) + "\r</td>";
+                        + genericController.nop(OptionsPanel) + "\r</td>";
                         Copy = ""
                         + "\r<tr>"
-                        + genericController.htmlIndent(Copy) + "\r</tr>"
+                        + genericController.nop(Copy) + "\r</tr>"
                         + "";
                         Copy = ""
                         + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
-                        + genericController.htmlIndent(Copy) + "\r</table>";
+                        + genericController.nop(Copy) + "\r</table>";
                         ToolsPanel.Add(getPanelInput(Copy));
                         ToolsPanel.Add(core.html.formEnd());
                         result += getPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
@@ -3703,7 +3651,7 @@ namespace Contensive.Core.Controllers {
                             result += getPanelHeader("Debug Panel") + getPanel(LinkPanel.Text) + getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         }
                     }
-                    result = "\r<div class=\"ccCon\">" + genericController.htmlIndent(result) + "\r</div>";
+                    result = "\r<div class=\"ccCon\">" + genericController.nop(result) + "\r</div>";
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -4348,7 +4296,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// create div tag
+        /// html div tag
         /// </summary>
         /// <param name="innerHtml"></param>
         /// <param name="htmlName"></param>
@@ -4358,5 +4306,111 @@ namespace Contensive.Core.Controllers {
         public static string div(string innerHtml, string htmlName = "", string htmlClass = "", string htmlId = "") {
             return genericBlockTag("div", innerHtml, htmlName, htmlClass, htmlId);
         }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// html img tag
+        /// </summary>
+        /// <param name="src"></param>
+        /// <returns></returns>
+        public static string img(string src) {
+            return String.Join("_", new String[] {"<img src=\"", src, ">" });
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// create html span inline tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="htmlClass"></param>
+        /// <returns></returns>
+        public static string span(string innerHtml, string htmlClass) => "<span class=\"" + htmlClass + "\">" + innerHtml + "</span>";
+        /// <summary>
+        /// create html span inline tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <returns></returns>
+        public static string span(string innerHtml) => "<span>" + innerHtml + "</span>";
+        /// <summary>
+        /// create html span inline tag
+        /// </summary>
+        /// <returns></returns>
+        public static string span() => "<span/>";
+        //
+        public static string tableStart(int Padding, int Spacing, int Border, string ClassStyle = "") {
+            return "<table border=\"" + Border + "\" cellpadding=\"" + Padding + "\" cellspacing=\"" + Spacing + "\" class=\"" + ClassStyle + "\" width=\"100%\">";
+        }
+        //
+        public static string tableRowStart() {
+            return "<tr>";
+        }
+        //        '
+        //        '
+        //        '
+        public static string tableCellStart(string Width = "", int ColSpan = 0, bool EvenRow = false, string Align = "", string BGColor = "") {
+            string tempStartTableCell = null;
+            tempStartTableCell = "";
+            if (!string.IsNullOrEmpty(Width)) {
+                tempStartTableCell = " width=\"" + Width + "\"";
+            }
+            if (!string.IsNullOrEmpty(BGColor)) {
+                tempStartTableCell = tempStartTableCell + " bgcolor=\"" + BGColor + "\"";
+            } else if (EvenRow) {
+                tempStartTableCell = tempStartTableCell + " class=\"ccPanelRowEven\"";
+            } else {
+                tempStartTableCell = tempStartTableCell + " class=\"ccPanelRowOdd\"";
+            }
+            if (ColSpan != 0) {
+                tempStartTableCell = tempStartTableCell + " colspan=\"" + ColSpan + "\"";
+            }
+            if (!string.IsNullOrEmpty(Align)) {
+                tempStartTableCell = tempStartTableCell + " align=\"" + Align + "\"";
+            }
+            return "<TD" + tempStartTableCell + ">";
+        }
+        //        '
+        //        '
+        //        '
+        public static string tableCell(string Copy, string Width = "", int ColSpan = 0, bool EvenRow = false, string Align = "", string BGColor = "") {
+            return tableCellStart(Width, ColSpan, EvenRow, Align, BGColor) + Copy + kmaEndTableCell;
+        }
+        //        '
+        //        '
+        //        '
+        public static string tableRow(string Cell, int ColSpan = 0, bool EvenRow = false) {
+            return tableRowStart() + tableCell(Cell, "100%", ColSpan, EvenRow) + kmaEndTableRow;
+        }
+        //
+        //
+        //
+        public static string removeTag(string Source, string TagName) {
+            string tempRemoveTag = null;
+            int Pos = 0;
+            int PosEnd = 0;
+            tempRemoveTag = Source;
+            Pos = vbInstr(1, Source, "<" + TagName, 1);
+            if (Pos != 0) {
+                PosEnd = vbInstr(Pos, Source, ">");
+                if (PosEnd > 0) {
+                    tempRemoveTag = Source.Left(Pos - 1) + Source.Substring(PosEnd);
+                }
+            }
+            return tempRemoveTag;
+        }
+        //
+        //
+        //
+        public static string RemoveStyleTags(string Source) {
+            string tempRemoveStyleTags = null;
+            tempRemoveStyleTags = Source;
+            while (vbInstr(1, tempRemoveStyleTags, "<style", 1) != 0) {
+                tempRemoveStyleTags = removeTag(tempRemoveStyleTags, "style");
+            }
+            while (vbInstr(1, tempRemoveStyleTags, "</style", 1) != 0) {
+                tempRemoveStyleTags = removeTag(tempRemoveStyleTags, "/style");
+            }
+            return tempRemoveStyleTags;
+        }
+
     }
 }

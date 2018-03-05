@@ -47,7 +47,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 // assert
                 Assert.AreEqual( "", result );
                 Assert.AreEqual(0, cp.core.doc.htmlAssetList.Count);
-                Assert.AreEqual(false, cp.core.doc.htmlDocument);
+                Assert.AreEqual(false, cp.core.doc.isHtml);
                 Assert.AreEqual("", cp.core.doc.htmlForEndOfBody);
                 Assert.AreEqual(0, cp.core.doc.htmlMetaContent_Description.Count);
                 Assert.AreEqual(0, cp.core.doc.htmlMetaContent_KeyWordList.Count);
@@ -88,7 +88,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 // assert
                 Assert.AreEqual(addon.Copy, result);
                 Assert.AreEqual(0, cp.core.doc.htmlAssetList.Count);
-                Assert.AreEqual(false, cp.core.doc.htmlDocument);
+                Assert.AreEqual(false, cp.core.doc.isHtml);
                 Assert.AreEqual("", cp.core.doc.htmlForEndOfBody);
                 Assert.AreEqual("", cp.core.doc.htmlMetaContent_Description);
                 Assert.AreEqual(0, cp.core.doc.htmlMetaContent_KeyWordList.Count);

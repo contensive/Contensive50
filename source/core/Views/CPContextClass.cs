@@ -241,10 +241,10 @@ namespace Contensive.Core {
                         string cookieName = null;
                         string NameValue = ampSplit[ampSplitPointer];
                         string[] ValuePair = NameValue.Split('=');
-                        cookieName = DecodeResponseVariable(encodeText(ValuePair[0]));
+                        cookieName = decodeResponseVariable(encodeText(ValuePair[0]));
                         newCookie.name = cookieName;
                         if (ValuePair.GetUpperBound(0) > 0) {
-                            newCookie.value = DecodeResponseVariable(encodeText(ValuePair[1]));
+                            newCookie.value = decodeResponseVariable(encodeText(ValuePair[1]));
                         }
                         if (cp.core.webServer.requestCookies.ContainsKey(cookieName)) {
                             cp.core.webServer.requestCookies.Remove(cookieName);

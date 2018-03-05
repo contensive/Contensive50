@@ -56,7 +56,7 @@ namespace Contensive.Core.Controllers {
                 //
                 Body = ""
                     + "\r<div class=\"ccCon\" style=\"width:400px;margin:100px auto 0 auto;\">"
-                    + htmlIndent(core.html.getPanelHeader("Login")) + htmlIndent(Body) + "</div>";
+                    + nop(core.html.getPanelHeader("Login")) + nop(Body) + "</div>";
                 //
                 returnREsult = Body;
                 //Call core.doc.setMetaContent(0, 0)
@@ -112,8 +112,8 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     QueryString = core.webServer.requestQueryString;
-                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
-                    QueryString = genericController.ModifyQueryString(QueryString, "requestbinary", "", false);
+                    QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+                    QueryString = genericController.modifyQueryString(QueryString, "requestbinary", "", false);
                     //
                     // ----- Username
                     //
@@ -162,11 +162,11 @@ namespace Contensive.Core.Controllers {
                         + "";
                     loginForm = ""
                         + "\r<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
-                        + htmlIndent(loginForm) + "\r</table>"
+                        + nop(loginForm) + "\r</table>"
                         + "";
                     loginForm = loginForm + core.html.inputHidden("Type", FormTypeLogin) + core.html.inputHidden("email", core.session.user.Email) + core.html.getPanelButtons(ButtonLogin, "Button") + "";
                     loginForm = ""
-                        + core.html.formStart(QueryString) + htmlIndent(loginForm) + "\r</form>"
+                        + core.html.formStart(QueryString) + nop(loginForm) + "\r</form>"
                         + "";
 
                     //-------
@@ -185,7 +185,7 @@ namespace Contensive.Core.Controllers {
                     //
                     returnHtml = ""
                         + "\r<div class=\"ccLoginFormCon\">"
-                        + htmlIndent(Panel) + "\r</div>"
+                        + nop(Panel) + "\r</div>"
                         + "";
                 }
             } catch (Exception ex) {
@@ -217,8 +217,8 @@ namespace Contensive.Core.Controllers {
                             //
                             // -- login successful, redirect back to this page (without a method)
                             string QS = core.doc.refreshQueryString;
-                            QS = genericController.ModifyQueryString(QS, "method", "");
-                            QS = genericController.ModifyQueryString(QS, "RequestBinary", "");
+                            QS = genericController.modifyQueryString(QS, "method", "");
+                            QS = genericController.modifyQueryString(QS, "RequestBinary", "");
                             //
                             return core.webServer.redirect("?" + QS, "Login form success");
                         }
@@ -259,7 +259,7 @@ namespace Contensive.Core.Controllers {
                     + cr2 + "</tr>"
                     + cr2 + "<tr>"
                     + cr3 + "<td colspan=\"2\">"
-                    + htmlIndent(htmlIndent(core.html.getPanelButtons(ButtonSendPassword, "Button"))) + cr3 + "</td>"
+                    + nop(nop(core.html.getPanelButtons(ButtonSendPassword, "Button"))) + cr3 + "</td>"
                     + cr2 + "</tr>"
                     + "\r</table>"
                     + "";
@@ -288,10 +288,10 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     QueryString = core.doc.refreshQueryString;
-                    QueryString = genericController.ModifyQueryString(QueryString, "S", "");
-                    QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "");
+                    QueryString = genericController.modifyQueryString(QueryString, "S", "");
+                    QueryString = genericController.modifyQueryString(QueryString, "ccIPage", "");
                     returnResult = ""
-                    + core.html.formStart(QueryString) + htmlIndent(returnResult) + "\r</form>"
+                    + core.html.formStart(QueryString) + nop(returnResult) + "\r</form>"
                     + "";
                 }
             } catch (Exception ex) {

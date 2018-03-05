@@ -80,7 +80,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string ConvertText2HTML(string Source) {
-            return CP.core.html.convertTextToHTML(Source);
+            return CP.core.html.convertTextToHtml(Source);
         }
         //
         // ====================================================================================================
@@ -92,7 +92,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string DecodeUrl(string Url) {
-            return genericController.DecodeURL(Url);
+            return genericController.decodeURL(Url);
         }
         //
         // ====================================================================================================
@@ -121,7 +121,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string EncodeUrl(string Source) {
-            return genericController.EncodeURL(Source);
+            return genericController.encodeURL(Source);
         }
         //
         // ====================================================================================================
@@ -248,50 +248,53 @@ namespace Contensive.Core {
         //
         // ====================================================================================================
         //
+        [Obsolete("Deprecated", false)]
         public override string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath) {
             return genericController.ConvertLinkToShortLink(URL, ServerHost, ServerVirtualPath);
         }
         //
         // ====================================================================================================
         //
-        public override string ConvertShortLinkToLink(string URL, string PathPagePrefix) {
-            return genericController.ConvertShortLinkToLink(URL, PathPagePrefix);
+        [Obsolete("Deprecated", false)]
+        public override string ConvertShortLinkToLink(string url, string pathPagePrefix) {
+            return genericController.removeUrlPrefix(url, pathPagePrefix);
         }
         //
         // ====================================================================================================
         //
+        [Obsolete("Deprecated. Use native methods to convert date formats.",false)]
         public override DateTime DecodeGMTDate(string GMTDate) {
-            return genericController.DecodeGMTDate(GMTDate);
+            return genericController.deprecatedDecodeGMTDate(GMTDate);
         }
         //
         // ====================================================================================================
         //
         public override string DecodeResponseVariable(string Source) {
-            return genericController.DecodeResponseVariable(Source);
+            return genericController.decodeResponseVariable(Source);
         }
         //
         // ====================================================================================================
         //
         public override string EncodeJavascript(string Source) {
-            return genericController.EncodeJavascript(Source);
+            return genericController.EncodeJavascriptStringSingleQuote(Source);
         }
         //
         // ====================================================================================================
         //
         public override string EncodeQueryString(string Source) {
-            return genericController.EncodeQueryString(Source);
+            return genericController.encodeQueryString(Source);
         }
         //
         // ====================================================================================================
         //
         public override string EncodeRequestVariable(string Source) {
-            return genericController.EncodeRequestVariable(Source);
+            return genericController.encodeRequestVariable(Source);
         }
         //
         // ====================================================================================================
         //
         public override string GetArgument(string Name, string ArgumentString, string DefaultValue = "", string Delimiter = "") {
-            return genericController.GetArgument(Name, ArgumentString, DefaultValue, Delimiter);
+            return genericController.getValueFromNameValueString(Name, ArgumentString, DefaultValue, Delimiter);
         }
         //
         // ====================================================================================================
@@ -306,19 +309,19 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1) {
-            return genericController.GetFirstNonZeroDate(Date0, Date1);
+            return genericController.getFirstNonZeroDate(Date0, Date1);
         }
         //
         // ====================================================================================================
         //
         public override int GetFirstNonZeroInteger(int Integer0, int Integer1) {
-            return genericController.GetFirstNonZeroInteger(Integer0, Integer1);
+            return genericController.getFirstNonZeroInteger(Integer0, Integer1);
         }
         //
         // ====================================================================================================
         //
         public override string GetIntegerString(int Value, int DigitCount) {
-            return genericController.GetIntegerString(Value, DigitCount);
+            return genericController.getIntegerString(Value, DigitCount);
         }
         //
         // ====================================================================================================
@@ -336,7 +339,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override int GetProcessID() {
-            return genericController.GetProcessID();
+            return Process.GetCurrentProcess().Id;
         }
         //
         // ====================================================================================================
@@ -348,29 +351,46 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override bool IsInDelimitedString(string DelimitedString, string TestString, string Delimiter) {
-            return genericController.IsInDelimitedString(DelimitedString, TestString, Delimiter);
+            return genericController.isInDelimitedString(DelimitedString, TestString, Delimiter);
         }
         //
         // ====================================================================================================
         //
         public override string ModifyLinkQueryString(string Link, string QueryName, string QueryValue, bool AddIfMissing = true) {
-            return genericController.ModifyLinkQueryString(Link, QueryName, QueryValue, AddIfMissing);
+            return genericController.modifyLinkQuery(Link, QueryName, QueryValue, AddIfMissing);
         }
         //
         // ====================================================================================================
         //
         public override string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true) {
-            return genericController.ModifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing);
+            return genericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing);
         }
         //
         // ====================================================================================================
-        //
+        /// <summary>
+        /// seperate a url into its parts
+        /// </summary>
+        /// <param name="SourceURL"></param>
+        /// <param name="Protocol"></param>
+        /// <param name="Host"></param>
+        /// <param name="Port"></param>
+        /// <param name="Path"></param>
+        /// <param name="Page"></param>
+        /// <param name="QueryString"></param>
         public override void ParseURL(string SourceURL, ref string Protocol, ref string Host, ref string Port, ref string Path, ref string Page, ref string QueryString) {
-            genericController.ParseURL(SourceURL, ref Protocol, ref Host, ref Port, ref Path, ref Page, ref QueryString);
+            genericController.splitUrl(SourceURL, ref Protocol, ref Host, ref Port, ref Path, ref Page, ref QueryString);
         }
         //
         // ====================================================================================================
-        //
+        /// <summary>
+        /// seperate a url into its parts
+        /// </summary>
+        /// <param name="SourceURL"></param>
+        /// <param name="Protocol"></param>
+        /// <param name="Host"></param>
+        /// <param name="Path"></param>
+        /// <param name="Page"></param>
+        /// <param name="QueryString"></param>
         public override void SeparateURL(string SourceURL, ref string Protocol, ref string Host, ref string Path, ref string Page, ref string QueryString) {
             genericController.splitUrl(SourceURL, ref Protocol, ref Host, ref Path, ref Page, ref QueryString);
         }

@@ -43,7 +43,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (core.db.csOk(CS)) {
                     addonArgumentList = core.db.csGetText(CS, "argumentlist");
                     addonIsInline = core.db.csGetBoolean(CS, "IsInline");
-                    returnHtml = addonController.main_GetDefaultAddonOption_String(core, addonArgumentList, AddonGuid, addonIsInline);
+                    returnHtml = addonController.getDefaultAddonOptions(core, addonArgumentList, AddonGuid, addonIsInline);
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {

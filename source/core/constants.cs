@@ -86,6 +86,10 @@ namespace Contensive.Core {
         //
         public const string PageChildListInstanceID = "{ChildPageList}";
         //
+        public const string unixNewLine = "\n";
+        public const string macNewLine = "\r";
+        public const string windowsNewLine = "\r\n";
+        //
         public const string cr = "\r\n\t";
         public const string cr2 = cr + "\t";
         public const string cr3 = cr2 + "\t";
@@ -1041,7 +1045,7 @@ namespace Contensive.Core {
         //
         public const string rnEmailMemberID = "emi8s9Kj";
         public const string rnEmailOpenFlag = "eof9as88";
-        public const string RequestNameEmailOpenCssFlag = "8aa41pM3";
+        public const string rnEmailOpenCssFlag = "8aa41pM3";
         public const string rnEmailClickFlag = "ecf34Msi";
         public const string rnEmailBlockRecipientEmail = "9dq8Nh61";
         public const string rnEmailBlockRequestDropID = "BlockEmailRequest";
@@ -1475,7 +1479,7 @@ namespace Contensive.Core {
         public const string kmaEndTableCell = "</td>";
         public const string kmaEndTableRow = "</tr>";
         //
-        public enum csv_contentTypeEnum {
+        public enum contentTypeEnum {
             contentTypeWeb = 1,
             contentTypeEmail = 2,
             contentTypeWebTemplate = 3,

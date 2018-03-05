@@ -13,11 +13,11 @@ using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
-//
 using System.Net;
 using System.Text;
 using Contensive.Core.Models.Context;
-//
+using System.Web;
+
 namespace Contensive.Core.Controllers {
     //
     //====================================================================================================
@@ -107,40 +107,15 @@ namespace Contensive.Core.Controllers {
         public static bool encodeEmptyBoolean(string sourceText, bool DefaultState) => encodeBoolean(encodeEmpty(sourceText, DefaultState.ToString()));
         //
         //=============================================================================
-        // Create the part of the sql where clause that is modified by the user
-        //   WorkingQuery is the original querystring to change
-        //   QueryName is the name part of the name pair to change
-        //   If the QueryName is not found in the string, ignore call
-        //=============================================================================
-        //
-        public static string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true) {
-            string result = null;
-            //
-            if (WorkingQuery.IndexOf("?") >= 0) {
-                result = modifyLinkQuery(WorkingQuery, QueryName, QueryValue, AddIfMissing);
-            } else {
-                result = modifyLinkQuery("?" + WorkingQuery, QueryName, QueryValue, AddIfMissing);
-                if ( result.Length>0) {
-                    result = result.Substring(1);
-                }
-            }
-            return result;
-        }
-        //
-        public static string ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue, bool AddIfMissing = true) => ModifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), AddIfMissing);
-        //
-        public static string ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue, bool AddIfMissing = true) => ModifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), AddIfMissing);
-        //
-        //=============================================================================
         /// <summary>
         /// Modify the querystring at the end of a link. If there is no, question mark, the link argument is assumed to be a link, not the querysting
         /// </summary>
-        /// <param name="Link"></param>
-        /// <param name="QueryName"></param>
-        /// <param name="QueryValue"></param>
-        /// <param name="AddIfMissing"></param>
+        /// <param name="link"></param>
+        /// <param name="queryName"></param>
+        /// <param name="queryValue"></param>
+        /// <param name="addIfMissing"></param>
         /// <returns></returns>
-        public static string modifyLinkQuery(string Link, string QueryName, string QueryValue, bool AddIfMissing = true) {
+        public static string modifyLinkQuery(string link, string queryName, string queryValue, bool addIfMissing = true) {
             string tempmodifyLinkQuery = null;
             try {
                 string[] Element = { };
@@ -152,15 +127,15 @@ namespace Contensive.Core.Controllers {
                 bool iAddIfMissing = false;
                 string QueryString = null;
                 //
-                iAddIfMissing = AddIfMissing;
-                if (vbInstr(1, Link, "?") != 0) {
-                    tempmodifyLinkQuery = Link.Left( vbInstr(1, Link, "?") - 1);
-                    QueryString = Link.Substring(tempmodifyLinkQuery.Length + 1);
+                iAddIfMissing = addIfMissing;
+                if (vbInstr(1, link, "?") != 0) {
+                    tempmodifyLinkQuery = link.Left(vbInstr(1, link, "?") - 1);
+                    QueryString = link.Substring(tempmodifyLinkQuery.Length + 1);
                 } else {
-                    tempmodifyLinkQuery = Link;
+                    tempmodifyLinkQuery = link;
                     QueryString = "";
                 }
-                UcaseQueryName = vbUCase(EncodeRequestVariable(QueryName));
+                UcaseQueryName = vbUCase(encodeRequestVariable(queryName));
                 if (!string.IsNullOrEmpty(QueryString)) {
                     Element = QueryString.Split('&');
                     ElementCount = Element.GetUpperBound(0) + 1;
@@ -168,10 +143,10 @@ namespace Contensive.Core.Controllers {
                         NameValue = Element[ElementPointer].Split('=');
                         if (NameValue.GetUpperBound(0) == 1) {
                             if (vbUCase(NameValue[0]) == UcaseQueryName) {
-                                if (string.IsNullOrEmpty(QueryValue)) {
+                                if (string.IsNullOrEmpty(queryValue)) {
                                     Element[ElementPointer] = "";
                                 } else {
-                                    Element[ElementPointer] = QueryName + "=" + QueryValue;
+                                    Element[ElementPointer] = queryName + "=" + queryValue;
                                 }
                                 ElementFound = true;
                                 break;
@@ -179,15 +154,15 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                if (!ElementFound && (!string.IsNullOrEmpty(QueryValue))) {
+                if (!ElementFound && (!string.IsNullOrEmpty(queryValue))) {
                     //
                     // element not found, it needs to be added
                     //
                     if (iAddIfMissing) {
                         if (string.IsNullOrEmpty(QueryString)) {
-                            QueryString = EncodeRequestVariable(QueryName) + "=" + EncodeRequestVariable(QueryValue);
+                            QueryString = encodeRequestVariable(queryName) + "=" + encodeRequestVariable(queryValue);
                         } else {
-                            QueryString = QueryString + "&" + EncodeRequestVariable(QueryName) + "=" + EncodeRequestVariable(QueryValue);
+                            QueryString = QueryString + "&" + encodeRequestVariable(queryName) + "=" + encodeRequestVariable(queryValue);
                         }
                     }
                 } else {
@@ -195,16 +170,16 @@ namespace Contensive.Core.Controllers {
                     // element found
                     //
                     QueryString = string.Join("&", Element);
-                    if ((!string.IsNullOrEmpty(QueryString)) && (string.IsNullOrEmpty(QueryValue))) {
+                    if ((!string.IsNullOrEmpty(QueryString)) && (string.IsNullOrEmpty(queryValue))) {
                         //
                         // element found and needs to be removed
                         //
                         QueryString = vbReplace(QueryString, "&&", "&");
-                        if (QueryString.Left( 1) == "&") {
+                        if (QueryString.Left(1) == "&") {
                             QueryString = QueryString.Substring(1);
                         }
                         if (QueryString.Substring(QueryString.Length - 1) == "&") {
-                            QueryString = QueryString.Left( QueryString.Length - 1);
+                            QueryString = QueryString.Left(QueryString.Length - 1);
                         }
                     }
                 }
@@ -217,1213 +192,286 @@ namespace Contensive.Core.Controllers {
             //
             return tempmodifyLinkQuery;
         }
-        //    '
-        //    '=================================================================================
-        //    '
-        //    '=================================================================================
-        //    '
-        //    Public shared Function GetIntegerString(Value As Integer, DigitCount As Integer) As String
-        //        If Len(Value) <= DigitCount Then
-        //        GetIntegerString = String(DigitCount - Len(CStr(Value)), "0") & CStr(Value)
-        //        Else
-        //            GetIntegerString = CStr(Value)
-        //        End If
-        //    End Function
-        //    '
-        //    '==========================================================================================
-        //    '   the current process to a high priority
-        //    '       Should be called once from the objects parent when it is first created.
-        //    '
-        //    '   taken from an example labeled
-        //    '       KPD-Team 2000
-        //    '       URL: http://www.allapi.net/
-        //    '       Email: KPDTeam@Allapi.net
-        //    '==========================================================================================
-        //    '
-        //    Public shared sub SetProcessHighPriority()
-        //        Dim hProcess As Integer
-        //        '
-        //        'set the new priority class
-        //        '
-        //        hProcess = GetCurrentProcess
-        //        Call SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS)
-        //        '
-        //    End Sub
         //
-        //==========================================================================================
-        //   Format the current error object into a standard string
-        //==========================================================================================
+        //=============================================================================
+        /// <summary>
+        /// Create the part of the sql where clause that is modified by the user, WorkingQuery is the original querystring to change, QueryName is the name part of the name pair to change, If the QueryName is not found in the string
+        /// </summary>
+        /// <param name="workingQuery"></param>
+        /// <param name="queryName"></param>
+        /// <param name="queryValue"></param>
+        /// <param name="addIfMissing"></param>
+        /// <returns></returns>
         //
-        //Public shared Function GetErrString(Optional ErrorObject As Object) As String
-        //    Dim Copy As String
-        //    If ErrorObject Is Nothing Then
-        //        If Err.Number = 0 Then
-        //            GetErrString = "[no error]"
-        //        Else
-        //            Copy = Err.Description
-        //            Copy = vbReplace(Copy, vbCrLf, "-")
-        //            Copy = vbReplace(Copy, vbLf, "-")
-        //            Copy = vbReplace(Copy, vbCrLf, "")
-        //            GetErrString = "[" & Err.Source & " #" & Err.Number & ", " & Copy & "]"
-        //        End If
-        //    Else
-        //        If ErrorObject.Number = 0 Then
-        //            GetErrString = "[no error]"
-        //        Else
-        //            Copy = ErrorObject.Description
-        //            Copy = vbReplace(Copy, vbCrLf, "-")
-        //            Copy = vbReplace(Copy, vbLf, "-")
-        //            Copy = vbReplace(Copy, vbCrLf, "")
-        //            GetErrString = "[" & ErrorObject.Source & " #" & ErrorObject.Number & ", " & Copy & "]"
-        //        End If
-        //    End If
-        //    '
-        //End Function
-        //    '
-        //    '==========================================================================================
-        //    '   Format the current error object into a standard string
-        //    '==========================================================================================
-        //    '
-        //    Public shared Function GetProcessID() As Integer
-        //        GetProcessID = GetCurrentProcessId
-        //    End Function
-        //    '
-        //    '==========================================================================================
-        //    '   Test if a test string is in a delimited string
-        //    '==========================================================================================
-        //    '
-        //    Public shared Function genericController.IsInDelimitedString(DelimitedString As String, TestString As String, Delimiter As String) As Boolean
-        //        IsInDelimitedString = (0 <> vbInstr(1, Delimiter & DelimitedString & Delimiter, Delimiter & TestString & Delimiter, vbTextCompare))
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    ' encodeURL
-        //    '
-        //    '   Encodes only what is to the left of the first ?
-        //    '   All URL path characters are assumed to be correct (/:#)
-        //    '========================================================================
-        //    '
-        //    Function encodeURL(Source As String) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim URLSplit() As String
-        //        Dim LeftSide As String
-        //        Dim RightSide As String
-        //        '
-        //        encodeURL = Source
-        //        If Source <> "" Then
-        //            URLSplit = Split(Source, "?")
-        //            encodeURL = URLSplit(0)
-        //            encodeURL = vbReplace(encodeURL, "%", "%25")
-        //            '
-        //            encodeURL = vbReplace(encodeURL, """", "%22")
-        //            encodeURL = vbReplace(encodeURL, " ", "%20")
-        //            encodeURL = vbReplace(encodeURL, "$", "%24")
-        //            encodeURL = vbReplace(encodeURL, "+", "%2B")
-        //            encodeURL = vbReplace(encodeURL, ",", "%2C")
-        //            encodeURL = vbReplace(encodeURL, ";", "%3B")
-        //            encodeURL = vbReplace(encodeURL, "<", "%3C")
-        //            encodeURL = vbReplace(encodeURL, "=", "%3D")
-        //            encodeURL = vbReplace(encodeURL, ">", "%3E")
-        //            encodeURL = vbReplace(encodeURL, "@", "%40")
-        //            If UBound(URLSplit) > 0 Then
-        //                encodeURL = encodeURL & "?" & encodeQueryString(URLSplit(1))
-        //            End If
-        //        End If
-        //        '
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    ' encodeQueryString
-        //    '
-        //    '   This routine encodes the URL QueryString to conform to rules
-        //    '========================================================================
-        //    '
-        //    Function encodeQueryString(Source As String) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim QSSplit() As String
-        //        Dim QSPointer As Integer
-        //        Dim NVSplit() As String
-        //        Dim NV As String
-        //        '
-        //        encodeQueryString = ""
-        //        If Source <> "" Then
-        //            QSSplit = Split(Source, "&")
-        //            For QSPointer = 0 To UBound(QSSplit)
-        //                NV = QSSplit(QSPointer)
-        //                If NV <> "" Then
-        //                    NVSplit = Split(NV, "=")
-        //                    If UBound(NVSplit) = 0 Then
-        //                        NVSplit(0) = encodeRequestVariable(NVSplit(0))
-        //                        encodeQueryString = encodeQueryString & "&" & NVSplit(0)
-        //                    Else
-        //                        NVSplit(0) = encodeRequestVariable(NVSplit(0))
-        //                        NVSplit(1) = encodeRequestVariable(NVSplit(1))
-        //                        encodeQueryString = encodeQueryString & "&" & NVSplit(0) & "=" & NVSplit(1)
-        //                    End If
-        //                End If
-        //            Next
-        //            If encodeQueryString <> "" Then
-        //                encodeQueryString = Mid(encodeQueryString, 2)
-        //            End If
-        //        End If
-        //        '
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    ' encodeRequestVariable
-        //    '
-        //    '   This routine encodes a request variable for a URL Query String
-        //    '       ...can be the requestname or the requestvalue
-        //    '========================================================================
-        //    '
-        //    Function encodeRequestVariable(Source As String) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim SourcePointer As Integer
-        //        Dim Character As String
-        //        Dim LocalSource As String
-        //        '
-        //        If Source <> "" Then
-        //            LocalSource = Source
-        //            ' "+" is an allowed character for filenames. If you add it, the wrong file will be looked up
-        //            'LocalSource = vbReplace(LocalSource, " ", "+")
-        //            For SourcePointer = 1 To Len(LocalSource)
-        //                Character = Mid(LocalSource, SourcePointer, 1)
-        //                ' "%" added so if this is called twice, it will not destroy "%20" values
-        //                'If Character = " " Then
-        //                '    encodeRequestVariable = encodeRequestVariable & "+"
-        //                If vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
-        //                    'ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
-        //                    'ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
-        //                    encodeRequestVariable = encodeRequestVariable & Character
-        //                Else
-        //                    encodeRequestVariable = encodeRequestVariable & "%" & Hex(Asc(Character))
-        //                End If
-        //            Next
-        //        End If
-        //        '
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    ' encodeHTML
-        //    '
-        //    '   Convert all characters that are not allowed in HTML to their Text equivalent
-        //    '   in preperation for use on an HTML page
-        //    '========================================================================
-        //    '
-        //    Function encodeHTML(Source As String) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        encodeHTML = Source
-        //        encodeHTML = vbReplace(encodeHTML, "&", "&amp;")
-        //        encodeHTML = vbReplace(encodeHTML, "<", "&lt;")
-        //        encodeHTML = vbReplace(encodeHTML, ">", "&gt;")
-        //        encodeHTML = vbReplace(encodeHTML, """", "&quot;")
-        //        encodeHTML = vbReplace(encodeHTML, "'", "&#39;")
-        //        'encodeHTML = vbReplace(encodeHTML, "'", "&apos;")
-        //        '
-        //    End Function
+        //=============================================================================
         //
-        //========================================================================
-        // decodeHtml
-        //
-        //   Convert HTML equivalent characters to their equivalents
-        //========================================================================
-        //
-        public static string decodeHtml(string Source) {
-            string tempdecodeHtml = null;
-            // ##### removed to catch err<>0 problem //On Error //Resume Next
+        public static string modifyQueryString(string workingQuery, string queryName, string queryValue, bool addIfMissing = true) {
+            string result = "";
             //
-            int Pos = 0;
-            string s = null;
-            string CharCodeString = null;
-            int CharCode = 0;
-            int posEnd = 0;
-            //
-            // 11/26/2009 - basically re-wrote it, I commented the old one out below
-            //
-            tempdecodeHtml = "";
-            if (!string.IsNullOrEmpty(Source)) {
-                s = Source;
-                //
-                Pos = s.Length;
-                Pos = s.LastIndexOf("&#", Pos - 1) + 1;
-                while (Pos != 0) {
-                    CharCodeString = "";
-                    if (s.Substring(Pos + 2, 1) == ";") {
-                        CharCodeString = s.Substring(Pos + 1, 1);
-                        posEnd = Pos + 4;
-                    } else if (s.Substring(Pos + 3, 1) == ";") {
-                        CharCodeString = s.Substring(Pos + 1, 2);
-                        posEnd = Pos + 5;
-                    } else if (s.Substring(Pos + 4, 1) == ";") {
-                        CharCodeString = s.Substring(Pos + 1, 3);
-                        posEnd = Pos + 6;
-                    }
-                    if (!string.IsNullOrEmpty(CharCodeString)) {
-                        if (CharCodeString.IsNumeric()) {
-                            CharCode = encodeInteger(CharCodeString);
-                            s = s.Left( Pos - 1) + Convert.ToChar(CharCode) + s.Substring(posEnd - 1);
-                        }
-                    }
-                    //
-                    Pos = s.LastIndexOf("&#", Pos - 1) + 1;
-                }
-                //
-                // replace out all common names (at least the most common for now)
-                //
-                s = vbReplace(s, "&lt;", "<");
-                s = vbReplace(s, "&gt;", ">");
-                s = vbReplace(s, "&quot;", "\"");
-                s = vbReplace(s, "&apos;", "'");
-                //
-                // Always replace the amp last
-                //
-                s = vbReplace(s, "&amp;", "&");
-                //
-                tempdecodeHtml = s;
-            }
-            // pre-11/26/2009
-            //decodeHtml = Source
-            //decodeHtml = vbReplace(decodeHtml, "&amp;", "&")
-            //decodeHtml = vbReplace(decodeHtml, "&lt;", "<")
-            //decodeHtml = vbReplace(decodeHtml, "&gt;", ">")
-            //decodeHtml = vbReplace(decodeHtml, "&quot;", """")
-            //decodeHtml = vbReplace(decodeHtml, "&nbsp;", " ")
-            //
-            return tempdecodeHtml;
-        }
-        //    '
-        //    '   Indent every line by 1 tab
-        //    '
-        public static string htmlIndent(string Source, int depth = 1) {
-            string temphtmlIndent = null;
-            int posStart = 0;
-            int posEnd = 0;
-            string pre = null;
-            string post = null;
-            string target = null;
-            //
-            posStart = vbInstr(1, Source, "<![CDATA[", 1);
-            if (posStart == 0) {
-                //
-                // no cdata
-                //
-                posStart = vbInstr(1, Source, "<textarea", 1);
-                if (posStart == 0) {
-                    //
-                    // no textarea
-                    //
-                    string replaceText = "\r\n" + new string(Convert.ToChar("\t"), (depth + 1));
-                    temphtmlIndent = vbReplace(Source, "\r\n\t", replaceText);
-                } else {
-                    //
-                    // text area found, isolate it and indent before and after
-                    //
-                    posEnd = vbInstr(posStart, Source, "</textarea>", 1);
-                    pre = Source.Left( posStart - 1);
-                    if (posEnd == 0) {
-                        target = Source.Substring(posStart - 1);
-                        post = "";
-                    } else {
-                        target = Source.Substring(posStart - 1, posEnd - posStart + ((string)("</textarea>")).Length);
-                        post = Source.Substring((posEnd + ((string)("</textarea>")).Length) - 1);
-                    }
-                    temphtmlIndent = htmlIndent(pre) + target + htmlIndent(post);
-                }
+            if (workingQuery.IndexOf("?") >= 0) {
+                result = modifyLinkQuery(workingQuery, queryName, queryValue, addIfMissing);
             } else {
-                //
-                // cdata found, isolate it and indent before and after
-                //
-                posEnd = vbInstr(posStart, Source, "]]>", 1);
-                pre = Source.Left( posStart - 1);
-                if (posEnd == 0) {
-                    target = Source.Substring(posStart - 1);
-                    post = "";
-                } else {
-                    target = Source.Substring(posStart - 1, posEnd - posStart + ((string)("]]>")).Length);
-                    post = Source.Substring(posEnd + 2);
+                result = modifyLinkQuery("?" + workingQuery, queryName, queryValue, addIfMissing);
+                if (result.Length > 0) {
+                    result = result.Substring(1);
                 }
-                temphtmlIndent = htmlIndent(pre) + target + htmlIndent(post);
             }
-            //    kmaIndent = Source
-            //    If vbInstr(1, kmaIndent, "<textarea", vbTextCompare) = 0 Then
-            //        kmaIndent = vbReplace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
-            //    End If
-            return temphtmlIndent;
+            return result;
+        }
+        //
+        //=============================================================================
+        //
+        public static string modifyQueryString(string WorkingQuery, string QueryName, int QueryValue, bool AddIfMissing = true) => modifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), AddIfMissing);
+        //
+        //=============================================================================
+        //
+        public static string modifyQueryString(string WorkingQuery, string QueryName, bool QueryValue, bool AddIfMissing = true) => modifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), AddIfMissing);
+        //
+        //========================================================================
+        /// <summary>
+        /// decodeHtml, Convert HTML equivalent characters to their equivalents
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string decodeHtml(string Source) {
+            return WebUtility.HtmlDecode(Source);
+            // string result = Source.Trim();
+            // if (!string.IsNullOrWhiteSpace(result)) {
+            //     //
+            //     int Pos = result.Length;
+            //     Pos = result.LastIndexOf("&#", Pos - 1) + 1;
+            //     while (Pos != 0) {
+            //         string CharCodeString = "";
+            //         int posEnd = 0;
+            //         if (result.Substring(Pos + 2, 1) == ";") {
+            //             CharCodeString = result.Substring(Pos + 1, 1);
+            //             posEnd = Pos + 4;
+            //         } else if (result.Substring(Pos + 3, 1) == ";") {
+            //             CharCodeString = result.Substring(Pos + 1, 2);
+            //             posEnd = Pos + 5;
+            //         } else if (result.Substring(Pos + 4, 1) == ";") {
+            //             CharCodeString = result.Substring(Pos + 1, 3);
+            //             posEnd = Pos + 6;
+            //         }
+            //         if (!string.IsNullOrEmpty(CharCodeString)) {
+            //             if (CharCodeString.IsNumeric()) {
+            //                 int CharCode = encodeInteger(CharCodeString);
+            //                 result = result.Left( Pos - 1) + Convert.ToChar(CharCode) + result.Substring(posEnd - 1);
+            //             }
+            //         }
+            //         //
+            //         Pos = result.LastIndexOf("&#", Pos - 1) + 1;
+            //     }
+            //     //
+            //     // replace out all common names (at least the most common for now)
+            //     result = vbReplace(result, "&lt;", "<");
+            //     result = vbReplace(result, "&gt;", ">");
+            //     result = vbReplace(result, "&quot;", "\"");
+            //     result = vbReplace(result, "&apos;", "'");
+            //     //
+            //     // Always replace the amp last
+            //     result = vbReplace(result, "&amp;", "&");
+            // }
+            //return result;
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// legacy indent - now returns source
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="depth"></param>
+        /// <returns></returns>
+        public static string nop(string Source, int depth = 1) {
+            return Source;
+            //string temphtmlIndent = null;
+            //int posStart = 0;
+            //int posEnd = 0;
+            //string pre = null;
+            //string post = null;
+            //string target = null;
+            ////
+            //posStart = vbInstr(1, Source, "<![CDATA[", 1);
+            //if (posStart == 0) {
+            //    //
+            //    // no cdata
+            //    //
+            //    posStart = vbInstr(1, Source, "<textarea", 1);
+            //    if (posStart == 0) {
+            //        //
+            //        // no textarea
+            //        //
+            //        string replaceText = "\r\n" + new string(Convert.ToChar("\t"), (depth + 1));
+            //        temphtmlIndent = vbReplace(Source, "\r\n\t", replaceText);
+            //    } else {
+            //        //
+            //        // text area found, isolate it and indent before and after
+            //        //
+            //        posEnd = vbInstr(posStart, Source, "</textarea>", 1);
+            //        pre = Source.Left( posStart - 1);
+            //        if (posEnd == 0) {
+            //            target = Source.Substring(posStart - 1);
+            //            post = "";
+            //        } else {
+            //            target = Source.Substring(posStart - 1, posEnd - posStart + ((string)("</textarea>")).Length);
+            //            post = Source.Substring((posEnd + ((string)("</textarea>")).Length) - 1);
+            //        }
+            //        temphtmlIndent = nop(pre) + target + nop(post);
+            //    }
+            //} else {
+            //    //
+            //    // cdata found, isolate it and indent before and after
+            //    //
+            //    posEnd = vbInstr(posStart, Source, "]]>", 1);
+            //    pre = Source.Left( posStart - 1);
+            //    if (posEnd == 0) {
+            //        target = Source.Substring(posStart - 1);
+            //        post = "";
+            //    } else {
+            //        target = Source.Substring(posStart - 1, posEnd - posStart + ((string)("]]>")).Length);
+            //        post = Source.Substring(posEnd + 2);
+            //    }
+            //    temphtmlIndent = nop(pre) + target + nop(post);
+            //}
+            ////    kmaIndent = Source
+            ////    If vbInstr(1, kmaIndent, "<textarea", vbTextCompare) = 0 Then
+            ////        kmaIndent = vbReplace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
+            ////    End If
+            //return temphtmlIndent;
         }
         //
         //========================================================================================================
-        //Place code in a form module
-        //Add a Command button.
-        //========================================================================================================
-        //
-        public static string kmaByteArrayToString(byte[] Bytes) {
+        /// <summary>
+        /// convert byte array to string
+        /// </summary>
+        /// <param name="Bytes"></param>
+        /// <returns></returns>
+        public static string byteArrayToString(byte[] Bytes) {
             return System.Text.UTF8Encoding.ASCII.GetString(Bytes);
-
-            //Dim iUnicode As Integer, i As Integer, j As Integer
-
-            ////On Error //Resume Next
-            //i = UBound(Bytes)
-
-            //If (i < 1) Then
-            //    'ANSI, just convert to unicode and return
-            //    kmaByteArrayToString = StrConv(Bytes, VbStrConv.vbUnicode)
-            //    Exit Function
-            //End If
-            //i = i + 1
-
-            //Examine the first two bytes
-            //CopyMemory(iUnicode, Bytes(0), 2)
-
-            //If iUnicode = Bytes(0) Then 'Unicode
-            //    'Account for terminating null
-            //    If (i Mod 2) Then i = i - 1
-            //    'Set up a buffer to recieve the string
-            //    kmaByteArrayToString = String$(i / 2, 0)
-            //    'Copy to string
-            //    CopyMemory ByVal StrPtr(kmaByteArrayToString), Bytes(0), i
-            //Else 'ANSI
-            //    kmaByteArrayToString = StrConv(Bytes, vbUnicode)
-            //End If
-
         }
-        //    '
-        //    '========================================================================================================
-        //    '
-        //    '========================================================================================================
-        //    '
-        //    Public shared Function kmaStringToByteArray(strInput As String, _
-        //                                    Optional bReturnAsUnicode As Boolean = True, _
-        //                                    Optional bAddNullTerminator As Boolean = False) As Byte()
-
-        //        Dim lRet As Integer
-        //        Dim bytBuffer() As Byte
-        //        Dim lLenB As Integer
-
-        //        If bReturnAsUnicode Then
-        //            'Number of bytes
-        //            lLenB = LenB(strInput)
-        //            'Resize buffer, do we want terminating null?
-        //            If bAddNullTerminator Then
-        //                ReDim bytBuffer(lLenB)
-        //            Else
-        //                ReDim bytBuffer(lLenB - 1)
-        //            End If
-        //            'Copy characters from string to byte array
-        //        CopyMemory bytBuffer(0), ByVal StrPtr(strInput), lLenB
-        //        Else
-        //            'METHOD ONE
-        //            '        'Get rid of embedded nulls
-        //            '        strRet = StrConv(strInput, vbFromUnicode)
-        //            '        lLenB = LenB(strRet)
-        //            '        If bAddNullTerminator Then
-        //            '            ReDim bytBuffer(lLenB)
-        //            '        Else
-        //            '            ReDim bytBuffer(lLenB - 1)
-        //            '        End If
-        //            '        CopyMemory bytBuffer(0), ByVal StrPtr(strInput), lLenB
-
-        //            'METHOD TWO
-        //            'Num of characters
-        //            lLenB = Len(strInput)
-        //            If bAddNullTerminator Then
-        //                ReDim bytBuffer(lLenB)
-        //            Else
-        //                ReDim bytBuffer(lLenB - 1)
-        //            End If
-        //        lRet = WideCharToMultiByte(CP_ACP, 0&, ByVal StrPtr(strInput), -1, ByVal VarPtr(bytBuffer(0)), lLenB, 0&, 0&)
-        //        End If
-
-        //        kmaStringToByteArray = bytBuffer
-
-        //    End Function
-        //    '
-        //    '========================================================================================================
-        //    '   Sample kmaStringToByteArray
-        //    '========================================================================================================
-        //    '
-        //    Private Sub SampleStringToByteArray()
-        //        Dim bAnsi() As Byte
-        //        Dim bUni() As Byte
-        //        Dim str As String
-        //        Dim i As Integer
-        //        '
-        //        str = "Convert"
-        //        bAnsi = kmaStringToByteArray(str, False)
-        //        bUni = kmaStringToByteArray(str)
-        //        '
-        //        For i = 0 To UBound(bAnsi)
-        //            Debug.Print("=" & bAnsi(i))
-        //        Next
-        //        '
-        //        Debug.Print("========")
-        //        '
-        //        For i = 0 To UBound(bUni)
-        //            Debug.Print("=" & bUni(i))
-        //        Next
-        //        '
-        //        Debug.Print("ANSI= " & kmaByteArrayToString(bAnsi))
-        //        Debug.Print("UNICODE= " & kmaByteArrayToString(bUni))
-        //        'Using StrConv to convert a Unicode character array directly
-        //        'will cause the resultant string to have extra embedded nulls
-        //        'reason, StrConv does not know the difference between Unicode and ANSI
-        //        Debug.Print("Resull= " & StrConv(bUni, vbUnicode))
-        //    End Sub
-
-        //    '======================================================================================
-        //    '
-        //    '======================================================================================
-        //    '
-        //    Public shared sub StartDebugTimer(Enabled As Boolean, Label As String)
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        If Enabled Then
-        //            If TimerStackCount < TimerStackMax Then
-        //                TimerStack(TimerStackCount).Label = Label
-        //                TimerStack(TimerStackCount).StartTicks = GetTickCount
-        //            Else
-        //                Call AppendLogFile("dll" & ".?.StartDebugTimer, " & "Timer Stack overflow, attempting push # [" & TimerStackCount & "], but max = [" & TimerStackMax & "]")
-        //            End If
-        //            TimerStackCount = TimerStackCount + 1
-        //        End If
-        //    End Sub
-        //    '
-        //    Public shared sub StopDebugTimer(Enabled As Boolean, Label As String)
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        If Enabled Then
-        //            If TimerStackCount <= 0 Then
-        //                Call AppendLogFile("dll" & ".?.StopDebugTimer, " & "Timer Error, attempting to Pop, but the stack is empty")
-        //            Else
-        //                If TimerStackCount <= TimerStackMax Then
-        //                    If TimerStack(TimerStackCount - 1).Label = Label Then
-        //                    Call AppendLogFile("dll" & ".?.StopDebugTimer, " & "Timer [" & String(2 * TimerStackCount, ".") & Label & "] took " & (GetTickCount - TimerStack(TimerStackCount - 1).StartTicks) & " msec")
-        //                    Else
-        //                        Call AppendLogFile("dll" & ".?.StopDebugTimer, " & "Timer Error, [" & Label & "] was popped, but [" & TimerStack(TimerStackCount).Label & "] was on the top of the stack")
-        //                    End If
-        //                End If
-        //                TimerStackCount = TimerStackCount - 1
-        //            End If
-        //        End If
-        //    End Sub
-        //    '
-        //    '
-        //    '
-        //    Public shared Function PayString(Index) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        Select Case Index
-        //            Case PayTypeCreditCardOnline
-        //                PayString = "Credit Card"
-        //            Case PayTypeCreditCardByPhone
-        //                PayString = "Credit Card by phone"
-        //            Case PayTypeCreditCardByFax
-        //                PayString = "Credit Card by fax"
-        //            Case PayTypeCHECK
-        //                PayString = "Personal Check"
-        //            Case PayTypeCHECKCOMPANY
-        //                PayString = "Company Check"
-        //            Case PayTypeCREDIT
-        //                PayString = "You will be billed"
-        //            Case PayTypeNetTerms
-        //                PayString = "Net Terms (Approved customers only)"
-        //            Case PayTypeCODCompanyCheck
-        //                PayString = "COD- Pre-Approved Only"
-        //            Case PayTypeCODCertifiedFunds
-        //                PayString = "COD- Certified Funds"
-        //            Case PayTypePAYPAL
-        //                PayString = "PayPal"
-        //            Case Else
-        //                ' Case PayTypeNONE
-        //                PayString = "No payment required"
-        //        End Select
-        //    End Function
-        //    '
-        //    '
-        //    '
-        //    Public shared Function CCString(Index) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        Select Case Index
-        //            Case CCTYPEVISA
-        //                CCString = "Visa"
-        //            Case CCTYPEMC
-        //                CCString = "MasterCard"
-        //            Case CCTYPEAMEX
-        //                CCString = "American Express"
-        //            Case CCTYPEDISCOVER
-        //                CCString = "Discover"
-        //            Case Else
-        //                ' Case CCTYPENOVUS
-        //                CCString = "Novus Card"
-        //        End Select
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    ' Get a Long from a CommandPacket
-        //    '   position+0, 4 byte value
-        //    '========================================================================
-        //    '
-        //    Public shared Function GetLongFromByteArray(ByteArray() As Byte, Position As Integer) As Integer
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        GetLongFromByteArray = ByteArray(Position + 3)
-        //        GetLongFromByteArray = ByteArray(Position + 2) + (256 * GetLongFromByteArray)
-        //        GetLongFromByteArray = ByteArray(Position + 1) + (256 * GetLongFromByteArray)
-        //        GetLongFromByteArray = ByteArray(Position + 0) + (256 * GetLongFromByteArray)
-        //        Position = Position + 4
-        //        '
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    ' Get a Long from a byte array
-        //    '   position+0, 4 byte size of the number
-        //    '   position+3, start of the number
-        //    '========================================================================
-        //    '
-        //    Public shared Function GetNumberFromByteArray(ByteArray() As Byte, Position As Integer) As Integer
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim ArgumentCount As Integer
-        //        Dim ArgumentLength As Integer
-        //        '
-        //        ArgumentLength = GetLongFromByteArray(ByteArray(), Position)
-        //        '
-        //        If ArgumentLength > 0 Then
-        //            GetNumberFromByteArray = 0
-        //            For ArgumentCount = ArgumentLength - 1 To 0 Step -1
-        //                GetNumberFromByteArray = ByteArray(Position + ArgumentCount) + (256 * GetNumberFromByteArray)
-        //            Next
-        //        End If
-        //        Position = Position + ArgumentLength
-        //        '
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    ' Get a String a byte array
-        //    '   position+0, 4 byte length of the string
-        //    '   position+3, start of the string
-        //    '========================================================================
-        //    '
-        //    Public shared Function GetStringFromByteArray(ByteArray() As Byte, Position As Integer) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim Pointer As Integer
-        //        Dim ArgumentLength As Integer
-        //        '
-        //        ArgumentLength = GetLongFromByteArray(ByteArray(), Position)
-        //        '
-        //        GetStringFromByteArray = ""
-        //        If ArgumentLength > 0 Then
-        //            For Pointer = 0 To ArgumentLength - 1
-        //                GetStringFromByteArray = GetStringFromByteArray & chr(ByteArray(Position + Pointer))
-        //            Next
-        //        End If
-        //        Position = Position + ArgumentLength
-        //        '
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    ' Get a Long from a byte array
-        //    '========================================================================
-        //    '
-        //    Public shared sub SetLongByteArray(ByRef ByteArray() As Byte, Position As Integer, LongValue As Integer)
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        ByteArray(Position + 0) = LongValue And (&HFF)
-        //        ByteArray(Position + 1) = Int(LongValue / 256) And (&HFF)
-        //        ByteArray(Position + 2) = Int(LongValue / (256 ^ 2)) And (&HFF)
-        //        ByteArray(Position + 3) = Int(LongValue / (256 ^ 3)) And (&HFF)
-        //        Position = Position + 4
-        //        '
-        //    End Sub
-        //    '
-        //    '========================================================================
-        //    ' Set a string in a byte array
-        //    '========================================================================
-        //    '
-        //    Public shared sub SetStringByteArray(ByRef ByteArray() As Byte, Position As Integer, StringValue As String)
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim Pointer As Integer
-        //        Dim LenStringValue As Integer
-        //        '
-        //        LenStringValue = Len(StringValue)
-        //        If LenStringValue > 0 Then
-        //            For Pointer = 0 To LenStringValue - 1
-        //                ByteArray(Position + Pointer) = Asc(Mid(StringValue, Pointer + 1, 1)) And (&HFF)
-        //            Next
-        //            Position = Position + LenStringValue
-        //        End If
-        //        '
-        //    End Sub
-
-        //    '
-        //    '========================================================================
-        //    '   a Long long on the end of a RMB (Remote Method Block)
-        //    '       You determine the position, or it will add it to the end
-        //    '========================================================================
-        //    '
-        //Public shared sub SetRMBLong(ByRef ByteArray() As Byte, LongValue As Integer, Optional Position)
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim Temp As Integer
-        //        Dim MyPosition As Integer
-        //        Dim ByteArraySize As Integer
-        //        '
-        //        ' ----- determine the position
-        //        '
-        //        If Not IsMissing(Position) Then
-        //            MyPosition = Position
-        //        Else
-        //            '
-        //            ' ----- Add it to the end, determine length
-        //            '
-        //            MyPosition = ByteArray(RMBPositionLength + 3)
-        //            MyPosition = ByteArray(RMBPositionLength + 2) + (256 * MyPosition)
-        //            MyPosition = ByteArray(RMBPositionLength + 1) + (256 * MyPosition)
-        //            MyPosition = ByteArray(RMBPositionLength + 0) + (256 * MyPosition)
-        //            '
-        //            ' ----- adjust size of array if necessary
-        //            '
-        //            ByteArraySize = UBound(ByteArray)
-        //            If ByteArraySize < (MyPosition + 8) Then
-        //                ReDim Preserve ByteArray(ByteArraySize + 8)
-        //            End If
-        //        End If
-        //        '
-        //        ' ----- set the length
-        //        '
-        //        'ByteArray(MyPosition + 0) = 4
-        //        'ByteArray(MyPosition + 1) = 0
-        //        'ByteArray(MyPosition + 2) = 0
-        //        'ByteArray(MyPosition + 3) = 0
-        //        'MyPosition = MyPosition + 4
-        //        '
-        //        ' ----- set the value
-        //        '
-        //        ByteArray(MyPosition + 0) = LongValue And (&HFF)
-        //        ByteArray(MyPosition + 1) = Int(LongValue / 256) And (&HFF)
-        //        ByteArray(MyPosition + 2) = Int(LongValue / (256 ^ 2)) And (&HFF)
-        //        ByteArray(MyPosition + 3) = Int(LongValue / (256 ^ 3)) And (&HFF)
-        //        MyPosition = MyPosition + 4
-        //        '
-        //        If IsMissing(Position) Then
-        //            '
-        //            ' ----- Adjust the RMB length if length not given
-        //            '
-        //            ByteArray(RMBPositionLength + 0) = MyPosition And (&HFF)
-        //            ByteArray(RMBPositionLength + 1) = Int(MyPosition / 256) And (&HFF)
-        //            ByteArray(RMBPositionLength + 2) = Int(MyPosition / (256 ^ 2)) And (&HFF)
-        //            ByteArray(RMBPositionLength + 3) = Int(MyPosition / (256 ^ 3)) And (&HFF)
-        //        End If
-        //        '
-        //    End Sub
-        //    '
-        //    '========================================================================
-        //    '   a Long long on the end of a RMB (Remote Method Block)
-        //    '       You determine the position, or it will add it to the end
-        //    '========================================================================
-        //    '
-        //Public shared sub SetRMBString(ByRef ByteArray() As Byte, StringValue As String, Optional Position)
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim Temp As Integer
-        //        Dim MyPosition As Integer
-        //        Dim ByteArraySize As Integer
-        //        '
-        //        ' ----- determine the position
-        //        '
-        //        If Not IsMissing(Position) Then
-        //            MyPosition = Position
-        //        Else
-        //            '
-        //            ' ----- Add it to the end, determine length
-        //            '
-        //            MyPosition = ByteArray(RMBPositionLength + 3)
-        //            MyPosition = ByteArray(RMBPositionLength + 2) + (256 * MyPosition)
-        //            MyPosition = ByteArray(RMBPositionLength + 1) + (256 * MyPosition)
-        //            MyPosition = ByteArray(RMBPositionLength + 0) + (256 * MyPosition)
-        //            '
-        //            ' ----- adjust size of array if necessary
-        //            '
-        //            ByteArraySize = UBound(ByteArray)
-        //            If ByteArraySize < (MyPosition + 8) Then
-        //                ReDim Preserve ByteArray(ByteArraySize + 4 + Len(StringValue))
-        //            End If
-        //        End If
-        //        '
-        //        ' ----- set the value
-        //        '
-
-        //        '
-        //        Dim Pointer As Integer
-        //        Dim LenStringValue As Integer
-        //        '
-        //        LenStringValue = Len(StringValue)
-        //        If LenStringValue > 0 Then
-        //            For Pointer = 0 To LenStringValue - 1
-        //                ByteArray(MyPosition + Pointer) = Asc(Mid(StringValue, Pointer + 1, 1)) And (&HFF)
-        //            Next
-        //            MyPosition = MyPosition + LenStringValue
-        //        End If
-        //        '
-        //        If IsMissing(Position) Then
-        //            '
-        //            ' ----- Adjust the RMB length if length not given
-        //            '
-        //            ByteArray(RMBPositionLength + 0) = MyPosition And (&HFF)
-        //            ByteArray(RMBPositionLength + 1) = Int(MyPosition / 256) And (&HFF)
-        //            ByteArray(RMBPositionLength + 2) = Int(MyPosition / (256 ^ 2)) And (&HFF)
-        //            ByteArray(RMBPositionLength + 3) = Int(MyPosition / (256 ^ 3)) And (&HFF)
-        //        End If
-        //        '
-        //    End Sub
-        //    '
-        //    '========================================================================
-        //    '   IsTrue
-        //    '       returns true or false depending on the state of the variant input
-        //    '========================================================================
-        //    '
-        //    Function IsTrue(ValueVariant) As Boolean
-        //        IsTrue = EncodeBoolean(ValueVariant)
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    ' EncodeXML
-        //    '
-        //    '========================================================================
-        //    '
-        //    Function EncodeXML(ValueVariant As Object, fieldType As Integer) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim TimeValuething As Single
-        //        Dim TimeHours As Integer
-        //        Dim TimeMinutes As Integer
-        //        Dim TimeSeconds As Integer
-        //        '
-        //        Select Case fieldType
-        //            Case FieldTypeInteger, FieldTypeLookup, FieldTypeRedirect, FieldTypeManyToMany, FieldTypeMemberSelect
-        //                If IsNull(ValueVariant) Then
-        //                    EncodeXML = "null"
-        //                ElseIf ValueVariant = "" Then
-        //                    EncodeXML = "null"
-        //                ElseIf vbIsNumeric(ValueVariant) Then
-        //                    EncodeXML = Int(ValueVariant)
-        //                Else
-        //                    EncodeXML = "null"
-        //                End If
-        //            Case FieldTypeBoolean
-        //                If IsNull(ValueVariant) Then
-        //                    EncodeXML = "0"
-        //                ElseIf ValueVariant <> False Then
-        //                    EncodeXML = "1"
-        //                Else
-        //                    EncodeXML = "0"
-        //                End If
-        //            Case FieldTypeCurrency
-        //                If IsNull(ValueVariant) Then
-        //                    EncodeXML = "null"
-        //                ElseIf ValueVariant = "" Then
-        //                    EncodeXML = "null"
-        //                ElseIf vbIsNumeric(ValueVariant) Then
-        //                    EncodeXML = ValueVariant
-        //                Else
-        //                    EncodeXML = "null"
-        //                End If
-        //            Case FieldTypeFloat
-        //                If IsNull(ValueVariant) Then
-        //                    EncodeXML = "null"
-        //                ElseIf ValueVariant = "" Then
-        //                    EncodeXML = "null"
-        //                ElseIf vbIsNumeric(ValueVariant) Then
-        //                    EncodeXML = ValueVariant
-        //                Else
-        //                    EncodeXML = "null"
-        //                End If
-        //            Case FieldTypeDate
-        //                If IsNull(ValueVariant) Then
-        //                    EncodeXML = "null"
-        //                ElseIf ValueVariant = "" Then
-        //                    EncodeXML = "null"
-        //                ElseIf IsDate(ValueVariant) Then
-        //                    'TimeVar = CDate(ValueVariant)
-        //                    'TimeValuething = 86400! * (TimeVar - Int(TimeVar))
-        //                    'TimeHours = Int(TimeValuething / 3600!)
-        //                    'TimeMinutes = Int(TimeValuething / 60!) - (TimeHours * 60)
-        //                    'TimeSeconds = TimeValuething - (TimeHours * 3600!) - (TimeMinutes * 60!)
-        //                    'EncodeXML = Year(ValueVariant) & "-" & Right("0" & Month(ValueVariant), 2) & "-" & Right("0" & Day(ValueVariant), 2) & " " & Right("0" & TimeHours, 2) & ":" & Right("0" & TimeMinutes, 2) & ":" & Right("0" & TimeSeconds, 2)
-        //                    EncodeXML = encodeText(ValueVariant)
-        //                End If
-        //            Case Else
-        //                '
-        //                ' ----- FieldTypeText
-        //                ' ----- FieldTypeLongText
-        //                ' ----- FieldTypeFile
-        //                ' ----- FieldTypeImage
-        //                ' ----- FieldTypeTextFile
-        //                ' ----- FieldTypeCSSFile
-        //                ' ----- FieldTypeXMLFile
-        //                ' ----- FieldTypeJavascriptFile
-        //                ' ----- FieldTypeLink
-        //                ' ----- FieldTypeResourceLink
-        //                ' ----- FieldTypeHTML
-        //                ' ----- FieldTypeHTMLFile
-        //                '
-        //                If IsNull(ValueVariant) Then
-        //                    EncodeXML = "null"
-        //                ElseIf ValueVariant = "" Then
-        //                    EncodeXML = ""
-        //                Else
-        //                    'EncodeXML = ASPServer.HTMLEncode(ValueVariant)
-        //                    'EncodeXML = vbReplace(ValueVariant, "&", "&lt;")
-        //                    'EncodeXML = vbReplace(ValueVariant, "<", "&lt;")
-        //                    'EncodeXML = vbReplace(EncodeXML, ">", "&gt;")
-        //                End If
-        //        End Select
-        //        '
-        //    End Function
         //
-        //========================================================================
-        // EncodeFilename
+        //========================================================================================================
+        /// <summary>
+        /// RFC1123 is "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'"
+        /// convert a date to a string with RFC1123 format as is used in http last-modified header, "day, DD-Mon-YYYY HH:MM:SS GMT" 
+        /// Note: it does NOT perform a time change, just converts to the formatted string
+        /// </summary>
+        /// <param name="DateValue"></param>
+        /// <returns></returns>
         //
-        //========================================================================
-        //
-        public static string encodeFilename(string Source) {
-            string allowed = null;
-            string chr = null;
-            int Ptr = 0;
-            int Cnt = 0;
-            string returnString;
+        public static string GetRFC1123PatternDateFormat(DateTime DateValue) {
             //
-            returnString = "";
-            Cnt = Source.Length;
-            if (Cnt > 254) {
-                Cnt = 254;
-            }
-            allowed = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ^&'@{}[],$-#()%.+~_";
-            for (Ptr = 1; Ptr <= Cnt; Ptr++) {
-                chr = Source.Substring(Ptr - 1, 1);
-                if (allowed.IndexOf(chr) + 1 >= 0) {
-                    returnString = returnString + chr;
-                } else {
-                    returnString += "_";
-                }
-            }
-            return returnString;
+            return DateValue.ToString("R");
+            //string tempGetGMTFromDate = null;
+            //int WorkLong = 0;
+            ////
+            //tempGetGMTFromDate = "";
+            //if (dateController.IsDate(DateValue)) {
+            //    switch ((int)DateValue.DayOfWeek) {
+            //        case 0:
+            //            tempGetGMTFromDate = "Sun, ";
+            //            break;
+            //        case 1:
+            //            tempGetGMTFromDate = "Mon, ";
+            //            break;
+            //        case 2:
+            //            tempGetGMTFromDate = "Tue, ";
+            //            break;
+            //        case 3:
+            //            tempGetGMTFromDate = "Wed, ";
+            //            break;
+            //        case 4:
+            //            tempGetGMTFromDate = "Thu, ";
+            //            break;
+            //        case 5:
+            //            tempGetGMTFromDate = "Fri, ";
+            //            break;
+            //        case 6:
+            //            tempGetGMTFromDate = "Sat, ";
+            //            break;
+            //    }
+            //    //
+            //    WorkLong = DateValue.Day;
+            //    if (WorkLong < 10) {
+            //        tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString() + " ";
+            //    } else {
+            //        tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString() + " ";
+            //    }
+            //    //
+            //    switch (DateValue.Month) {
+            //        case 1:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Jan ";
+            //            break;
+            //        case 2:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Feb ";
+            //            break;
+            //        case 3:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Mar ";
+            //            break;
+            //        case 4:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Apr ";
+            //            break;
+            //        case 5:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "May ";
+            //            break;
+            //        case 6:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Jun ";
+            //            break;
+            //        case 7:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Jul ";
+            //            break;
+            //        case 8:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Aug ";
+            //            break;
+            //        case 9:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Sep ";
+            //            break;
+            //        case 10:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Oct ";
+            //            break;
+            //        case 11:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Nov ";
+            //            break;
+            //        case 12:
+            //            tempGetGMTFromDate = tempGetGMTFromDate + "Dec ";
+            //            break;
+            //    }
+            //    //
+            //    tempGetGMTFromDate = tempGetGMTFromDate + encodeText(DateValue.Year) + " ";
+            //    //
+            //    WorkLong = DateValue.Hour;
+            //    if (WorkLong < 10) {
+            //        tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString() + ":";
+            //    } else {
+            //        tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString() + ":";
+            //    }
+            //    //
+            //    WorkLong = DateValue.Minute;
+            //    if (WorkLong < 10) {
+            //        tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString() + ":";
+            //    } else {
+            //        tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString() + ":";
+            //    }
+            //    //
+            //    WorkLong = DateValue.Second;
+            //    if (WorkLong < 10) {
+            //        tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString();
+            //    } else {
+            //        tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString();
+            //    }
+            //    //
+            //    tempGetGMTFromDate = tempGetGMTFromDate + " GMT";
+            //}
+            //
+            //return tempGetGMTFromDate;
         }
-        //    '
-        //    'Function encodeFilename(Filename As String) As String
-        //    '    ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //    '    '
-        //    '    Dim Source() as object
-        //    '    Dim Replacement() as object
-        //    '    '
-        //    '    Source = Array("""", "*", "/", ":", "<", ">", "?", "\", "|", "=")
-        //    '    Replacement = Array("_", "_", "_", "_", "_", "_", "_", "_", "_", "_")
-        //    '    '
-        //    '    encodeFilename = ReplaceMany(Filename, Source, Replacement)
-        //    '    If Len(encodeFilename) > 254 Then
-        //    '        encodeFilename = Left(encodeFilename, 254)
-        //    '    End If
-        //    '    encodeFilename = vbReplace(encodeFilename, vbCr, "_")
-        //    '    encodeFilename = vbReplace(encodeFilename, vbLf, "_")
-        //    '    '
-        //    '    End Function
-        //    '
-        //    '
-        //    '
-
-        //    '
-        //    '========================================================================
-        //    ' DecodeHTML
-        //    '
-        //    '========================================================================
-        //    '
-        //    Function DecodeHTML(Source As String) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        DecodeHTML = decodeHtml(Source)
-        //        'Dim SourceChr() as object
-        //        'Dim ReplacementChr() as object
-        //        ''
-        //        'SourceChr = Array("&gt;", "&lt;", "&nbsp;", "&amp;")
-        //        'ReplacementChr = Array(">", "<", " ", "&")
-        //        ''
-        //        'DecodeHTML = ReplaceMany(Source, SourceChr, ReplacementChr)
-        //        '
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    ' EncodeFilename
-        //    '
-        //    '========================================================================
-        //    '
-        //    Function ReplaceMany(Source As String, ArrayOfSource() As Object, ArrayOfReplacement() As Object) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim Count As Integer
-        //        Dim Pointer As Integer
-        //        '
-        //        Count = UBound(ArrayOfSource) + 1
-        //        ReplaceMany = Source
-        //        For Pointer = 0 To Count - 1
-        //            ReplaceMany = vbReplace(ReplaceMany, ArrayOfSource(Pointer), ArrayOfReplacement(Pointer))
-        //        Next
-        //        '
-        //    End Function
-        //    '
-        //    '
-        //    '
-        //    Public shared Function GetURIHost(URI) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        '   Divide the URI into URIHost, URIPath, and URIPage
-        //        '
-        //        Dim URIWorking As String
-        //        Dim Slash As Integer
-        //        Dim LastSlash As Integer
-        //        Dim URIHost As String
-        //        Dim URIPath As String
-        //        Dim URIPage As String
-        //        URIWorking = URI
-        //        If Mid(vbUCase(URIWorking), 1, 4) = "HTTP" Then
-        //            URIWorking = Mid(URIWorking, vbInstr(1, URIWorking, "//") + 2)
-        //        End If
-        //        URIHost = URIWorking
-        //        Slash = vbInstr(1, URIHost, "/")
-        //        If Slash = 0 Then
-        //            URIPath = "/"
-        //            URIPage = ""
-        //        Else
-        //            URIPath = Mid(URIHost, Slash)
-        //            URIHost = Mid(URIHost, 1, Slash - 1)
-        //            Slash = vbInstr(1, URIPath, "/")
-        //            Do While Slash <> 0
-        //                LastSlash = Slash
-        //                Slash = vbInstr(LastSlash + 1, URIPath, "/")
-        //                '''DoEvents()
-        //            Loop
-        //            URIPage = Mid(URIPath, LastSlash + 1)
-        //            URIPath = Mid(URIPath, 1, LastSlash)
-        //        End If
-        //        GetURIHost = URIHost
-        //        '
-        //    End Function
-        //    '
-        //    '
-        //    '
-        //    Public shared Function GetURIPage(URI) As String
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        '   Divide the URI into URIHost, URIPath, and URIPage
-        //        '
-        //        Dim Slash As Integer
-        //        Dim LastSlash As Integer
-        //        Dim URIHost As String
-        //        Dim URIPath As String
-        //        Dim URIPage As String
-        //        Dim URIWorking As String
-        //        URIWorking = URI
-        //        If Mid(vbUCase(URIWorking), 1, 4) = "HTTP" Then
-        //            URIWorking = Mid(URIWorking, vbInstr(1, URIWorking, "//") + 2)
-        //        End If
-        //        URIHost = URIWorking
-        //        Slash = vbInstr(1, URIHost, "/")
-        //        If Slash = 0 Then
-        //            URIPath = "/"
-        //            URIPage = ""
-        //        Else
-        //            URIPath = Mid(URIHost, Slash)
-        //            URIHost = Mid(URIHost, 1, Slash - 1)
-        //            Slash = vbInstr(1, URIPath, "/")
-        //            Do While Slash <> 0
-        //                LastSlash = Slash
-        //                Slash = vbInstr(LastSlash + 1, URIPath, "/")
-        //                '''DoEvents()
-        //            Loop
-        //            URIPage = Mid(URIPath, LastSlash + 1)
-        //            URIPath = Mid(URIPath, 1, LastSlash)
-        //        End If
-        //        GetURIPage = URIPage
-        //        '
-        //    End Function
-        //    '
-        //    '
-        //    '
-        //    Function GetDateFromGMT(GMTDate As String) As Date
-        //        ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //        '
-        //        Dim WorkString As String
-        //        GetDateFromGMT = 0
-        //        If GMTDate <> "" Then
-        //            WorkString = Mid(GMTDate, 6, 11)
-        //            If IsDate(WorkString) Then
-        //                GetDateFromGMT = CDate(WorkString)
-        //                WorkString = Mid(GMTDate, 18, 8)
-        //                If IsDate(WorkString) Then
-        //                    GetDateFromGMT = GetDateFromGMT + CDate(WorkString) + 4 / 24
-        //                End If
-        //            End If
-        //        End If
-        //        '
-        //    End Function
         //
-        // Wdy, DD-Mon-YYYY HH:MM:SS GMT
-        //
-        public static string GetGMTFromDate(DateTime DateValue) {
-            string tempGetGMTFromDate = null;
-            int WorkLong = 0;
-            //
-            tempGetGMTFromDate = "";
-            if (dateController.IsDate(DateValue)) {
-                switch ((int)DateValue.DayOfWeek) {
-                    case 0:
-                        tempGetGMTFromDate = "Sun, ";
-                        break;
-                    case 1:
-                        tempGetGMTFromDate = "Mon, ";
-                        break;
-                    case 2:
-                        tempGetGMTFromDate = "Tue, ";
-                        break;
-                    case 3:
-                        tempGetGMTFromDate = "Wed, ";
-                        break;
-                    case 4:
-                        tempGetGMTFromDate = "Thu, ";
-                        break;
-                    case 5:
-                        tempGetGMTFromDate = "Fri, ";
-                        break;
-                    case 6:
-                        tempGetGMTFromDate = "Sat, ";
-                        break;
-                }
-                //
-                WorkLong = DateValue.Day;
-                if (WorkLong < 10) {
-                    tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString() + " ";
-                } else {
-                    tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString() + " ";
-                }
-                //
-                switch (DateValue.Month) {
-                    case 1:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Jan ";
-                        break;
-                    case 2:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Feb ";
-                        break;
-                    case 3:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Mar ";
-                        break;
-                    case 4:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Apr ";
-                        break;
-                    case 5:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "May ";
-                        break;
-                    case 6:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Jun ";
-                        break;
-                    case 7:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Jul ";
-                        break;
-                    case 8:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Aug ";
-                        break;
-                    case 9:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Sep ";
-                        break;
-                    case 10:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Oct ";
-                        break;
-                    case 11:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Nov ";
-                        break;
-                    case 12:
-                        tempGetGMTFromDate = tempGetGMTFromDate + "Dec ";
-                        break;
-                }
-                //
-                tempGetGMTFromDate = tempGetGMTFromDate + encodeText(DateValue.Year) + " ";
-                //
-                WorkLong = DateValue.Hour;
-                if (WorkLong < 10) {
-                    tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString() + ":";
-                } else {
-                    tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString() + ":";
-                }
-                //
-                WorkLong = DateValue.Minute;
-                if (WorkLong < 10) {
-                    tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString() + ":";
-                } else {
-                    tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString() + ":";
-                }
-                //
-                WorkLong = DateValue.Second;
-                if (WorkLong < 10) {
-                    tempGetGMTFromDate = tempGetGMTFromDate + "0" + WorkLong.ToString();
-                } else {
-                    tempGetGMTFromDate = tempGetGMTFromDate + WorkLong.ToString();
-                }
-                //
-                tempGetGMTFromDate = tempGetGMTFromDate + " GMT";
-            }
-            //
-            return tempGetGMTFromDate;
-        }
-        //    '
-        //    '========================================================================
-        //    '   EncodeSQL
-        //    '       encode a variable to go in an sql expression
-        //    '       NOT supported
-        //    '========================================================================
-        //    '
-        //Public shared Function EncodeSQL(ByVal expression As Object, Optional ByVal fieldType As Integer = FieldTypeIdText) As String
-        //    ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //    '
-        //    Dim iFieldType As Integer
-        //    Dim MethodName As String
-        //    '
-        //    MethodName = "EncodeSQL"
-        //    '
-        //    iFieldType = fieldType
-        //    Select Case iFieldType
-        //        Case FieldTypeIdBoolean
-        //            EncodeSQL = app.EncodeSQLBoolean(expression)
-        //        Case FieldTypeIdCurrency, FieldTypeIdAutoIdIncrement, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdMemberSelect
-        //            EncodeSQL = app.EncodeSQLNumber(expression)
-        //        Case FieldTypeIdDate
-        //            EncodeSQL = app.EncodeSQLDate(expression)
-        //        Case FieldTypeIdLongText, FieldTypeIdHTML
-        //            EncodeSQL = app.EncodeSQLText(expression)
-        //        Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
-        //            EncodeSQL = app.EncodeSQLText(expression)
-        //        Case Else
-        //            EncodeSQL = app.EncodeSQLText(expression)
-        //            On Error GoTo 0
-        //            fixme-- core.handleException(New ApplicationException("")) ' -----ignoreInteger, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
-        //    End Select
-        //    '
-        //End Function
-        //
-        //=====================================================================================================
-        //   a value in a name/value pair
-        //=====================================================================================================
-        //
-        //Public shared sub SetNameValueArrays(ByVal InputName As String, ByVal InputValue As String, ByRef SQLName() As String, ByRef SQLValue() As String, ByRef Index As Integer)
-        //    ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //    '
-        //    SQLName(Index) = InputName
-        //    SQLValue(Index) = InputValue
-        //    Index = Index + 1
-        //    '
-        //End Sub
-        //    '
-        //    '
-        //    '
+        //========================================================================================================
+        /// <summary>
+        /// convert the enum status into a displayable caption
+        /// </summary>
+        /// <param name="ApplicationStatus"></param>
+        /// <returns></returns>
         public static string GetApplicationStatusMessage(appConfigModel.appStatusEnum ApplicationStatus) {
             string tempGetApplicationStatusMessage = null;
 
@@ -1440,179 +488,76 @@ namespace Contensive.Core.Controllers {
             }
             return tempGetApplicationStatusMessage;
         }
-        //    '
-        //    '
-        //    '
-        //    Public shared Function GetFormInputSelectNameValue(SelectName As String, NameValueArray() As NameValuePairType) As String
-        //        Dim Pointer As Integer
-        //        Dim Source() As NameValuePairType
-        //        '
-        //        Source = NameValueArray
-        //        GetFormInputSelectNameValue = "<SELECT name=""" & SelectName & """ Size=""1"">"
-        //        For Pointer = 0 To UBound(NameValueArray)
-        //            GetFormInputSelectNameValue = GetFormInputSelectNameValue & "<OPTION value=""" & Source(Pointer).Value & """>" & Source(Pointer).Name & "</OPTION>"
-        //        Next
-        //        GetFormInputSelectNameValue = GetFormInputSelectNameValue & "</SELECT>"
-        //    End Function
         //
-        //
-        //
-        public static string getSpacer(int Width, int Height) {
-            return "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + Width + "\" height=\"" + Height + "\" border=\"0\">";
+        //========================================================================================================
+        /// <summary>
+        /// Legacy spacer
+        /// </summary>
+        /// <param name="Width"></param>
+        /// <param name="Height"></param>
+        /// <returns></returns>
+        public static string nop2(int Width, int Height) {
+            return "<!-- removed spacer -->"; // "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + Width + "\" height=\"" + Height + "\" border=\"0\">";
         }
         //
-        //
-        //
-        public static string processReplacement(object NameValueLines, object Source) {
-            string tempprocessReplacement = null;
-            //
-            string iNameValueLines = null;
-            string[] Lines = null;
-            int LinePtr = 0;
-            string[] Names = { };
-            string[] Values = { };
-            int PairPtr = 0;
-            int PairCnt = 0;
-            string[] Splits = null;
-            //
-            // ----- read pairs in from NameValueLines
-            //
-            iNameValueLines = encodeText(NameValueLines);
-            if (vbInstr(1, iNameValueLines, "=") != 0) {
-                PairCnt = 0;
-                Lines = SplitCRLF(iNameValueLines);
-                for (LinePtr = 0; LinePtr <= Lines.GetUpperBound(0); LinePtr++) {
-                    if (vbInstr(1, Lines[LinePtr], "=") != 0) {
-                        Splits = Lines[LinePtr].Split('=');
-                        Array.Resize(ref Names, PairCnt + 1);
-                        Array.Resize(ref Names, PairCnt + 1);
-                        Array.Resize(ref Values, PairCnt + 1);
-                        Names[PairCnt] = Splits[0].Trim(' ');
-                        Names[PairCnt] = vbReplace(Names[PairCnt], "\t", "");
-                        Splits[0] = "";
-                        Values[PairCnt] = Splits[1].Trim(' ');
-                        PairCnt = PairCnt + 1;
-                    }
-                }
-            }
-            //
-            // ----- Process replacements on Source
-            //
-            tempprocessReplacement = encodeText(Source);
-            if (PairCnt > 0) {
-                for (PairPtr = 0; PairPtr < PairCnt; PairPtr++) {
-                    tempprocessReplacement = vbReplace(tempprocessReplacement, Names[PairPtr], Values[PairPtr], 1, 99, 1);
-                }
-            }
-            //
-            return tempprocessReplacement;
-        }
-        public static string ConvertLinksToAbsolute(string Source, string RootLink) {
-            string result = Source;
+        //========================================================================================================
+        /// <summary>
+        /// Convert the href and src links in html content to full urls that include the protocol and domain 
+        /// </summary>
+        /// <param name="htmlContent"></param>
+        /// <param name="urlProtocolDomainSlash"></param>
+        /// <returns></returns>
+        public static string convertLinksToAbsolute(string htmlContent, string urlProtocolDomainSlash) {
+            string result = htmlContent;
             try {
                 result = result.Replace(" href=\"", " href=\"/");
                 result = result.Replace(" href=\"/http", " href=\"http");
                 result = result.Replace(" href=\"/mailto", " href=\"mailto");
-                result = result.Replace(" href=\"//", " href=\"" + RootLink);
-                result = result.Replace(" href=\"/?", " href=\"" + RootLink + "?");
-                result = result.Replace(" href=\"/", " href=\"" + RootLink);
+                result = result.Replace(" href=\"//", " href=\"" + urlProtocolDomainSlash);
+                result = result.Replace(" href=\"/?", " href=\"" + urlProtocolDomainSlash + "?");
+                result = result.Replace(" href=\"/", " href=\"" + urlProtocolDomainSlash);
                 //
                 result = result.Replace(" href=", " href=/");
                 result = result.Replace(" href=/\"", " href=\"");
                 result = result.Replace(" href=/http", " href=http");
-                result = result.Replace(" href=//", " href=" + RootLink);
-                result = result.Replace(" href=/?", " href=" + RootLink + "?");
-                result = result.Replace(" href=/", " href=" + RootLink);
+                result = result.Replace(" href=//", " href=" + urlProtocolDomainSlash);
+                result = result.Replace(" href=/?", " href=" + urlProtocolDomainSlash + "?");
+                result = result.Replace(" href=/", " href=" + urlProtocolDomainSlash);
                 //
                 result = result.Replace(" src=\"", " src=\"/");
                 result = result.Replace(" src=\"/http", " src=\"http");
-                result = result.Replace(" src=\"//", " src=\"" + RootLink);
-                result = result.Replace(" src=\"/?", " src=\"" + RootLink + "?");
-                result = result.Replace(" src=\"/", " src=\"" + RootLink);
+                result = result.Replace(" src=\"//", " src=\"" + urlProtocolDomainSlash);
+                result = result.Replace(" src=\"/?", " src=\"" + urlProtocolDomainSlash + "?");
+                result = result.Replace(" src=\"/", " src=\"" + urlProtocolDomainSlash);
                 //
                 result = result.Replace(" src=", " src=/");
                 result = result.Replace(" src=/\"", " src=\"");
                 result = result.Replace(" src=/http", " src=http");
-                result = result.Replace(" src=//", " src=" + RootLink);
-                result = result.Replace(" src=/?", " src=" + RootLink + "?");
-                result = result.Replace(" src=/", " src=" + RootLink);
+                result = result.Replace(" src=//", " src=" + urlProtocolDomainSlash);
+                result = result.Replace(" src=/?", " src=" + urlProtocolDomainSlash + "?");
+                result = result.Replace(" src=/", " src=" + urlProtocolDomainSlash);
             } catch (Exception) {
                 throw new ApplicationException("Error in ConvertLinksToAbsolute");
             }
             return result;
         }
         //
-        //
-        //
-        //Public shared Function GetAddonRootPath() As String
-        //    Dim testPath As String
-        //    '
-        //    GetAddonRootPath = getAppPath & "\addons"
-        //    If vbInstr(1, GetAddonRootPath, "\github\", vbTextCompare) <> 0 Then
-        //        '
-        //        ' debugging - change program path to dummy path so addon builds all copy to
-        //        '
-        //        testPath = Environ$("programfiles(x86)")
-        //        If testPath = "" Then
-        //            testPath = Environ$("programfiles")
-        //        End If
-        //        GetAddonRootPath = testPath & "\kma\contensive\addons"
-        //    End If
-        //End Function
-        //
-        //
-        //
-        public static string GetHTMLComment(string Comment) {
-            return "<!-- " + Comment + " -->";
+        //========================================================================================================
+        /// <summary>
+        /// return an array of strings split on new line (crlf)
+        /// </summary>
+        /// <param name="textToSplit"></param>
+        /// <returns></returns>
+        public static string[] splitNewLine(string textToSplit) {
+            return textToSplit.Split(new[] { windowsNewLine, macNewLine, unixNewLine }, StringSplitOptions.None);
         }
         //
-        //
-        //
-        public static string[] SplitCRLF(string Expression) {
-            string[] tempSplitCRLF = null;
-            //
-            if (vbInstr(1, Expression, "\r\n") != 0) {
-                tempSplitCRLF = Expression.Split(new[] { "\r\n" }, StringSplitOptions.None);
-            } else if (vbInstr(1, Expression, "\r") != 0) {
-                tempSplitCRLF = Expression.Split('\r');
-            } else if (vbInstr(1, Expression, "\n") != 0) {
-                tempSplitCRLF = Expression.Split('\n');
-            } else {
-                tempSplitCRLF = new string[1];
-                tempSplitCRLF = Expression.Split(new[] { "\r\n" }, StringSplitOptions.None);
-            }
-            return tempSplitCRLF;
-        }
-        //    '
-        //    '
-        //    '
-        //Public shared sub runProcess(cp.core,Cmd As String, Optional ByVal eWindowStyle As VBA.VbAppWinStyle = vbHide, Optional WaitForReturn As Boolean)
-        //        On Error GoTo ErrorTrap
-        //        '
-        //        Dim ShellObj As Object
-        //        '
-        //        ShellObj = CreateObject("WScript.Shell")
-        //        If Not (ShellObj Is Nothing) Then
-        //            Call ShellObj.Run(Cmd, 0, WaitForReturn)
-        //        End If
-        //        ShellObj = Nothing
-        //        Exit Sub
-        //        '
-        ////ErrorTrap:
-        //        Call AppendLogFile("ErrorTrap, runProcess running command [" & Cmd & "], WaitForReturn=" & WaitForReturn & ", err=" & GetErrString(Err))
-        //    End Sub
-        //
-        //------------------------------------------------------------------------------------------------------------
-        //   Encodes an argument in an Addon OptionString (QueryString) for all non-allowed characters
-        //       call this before parsing them together
-        //       call decodeAddonConstructorArgument after parsing them apart
-        //
-        //       Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
-        //
-        //       This routine is needed for all Arg, Name, Value, Option values
-        //
-        //------------------------------------------------------------------------------------------------------------
-        //
+        //========================================================================================================
+        /// <summary>
+        /// legacy encode - not referenced but the decode is still used, so this will be needed
+        /// </summary>
+        /// <param name="Arg"></param>
+        /// <returns></returns>
         public static string EncodeAddonConstructorArgument(string Arg) {
             string a = Arg;
             a = vbReplace(a, "\\", "\\\\");
@@ -1630,22 +575,19 @@ namespace Contensive.Core.Controllers {
             return a;
         }
         //
-        //------------------------------------------------------------------------------------------------------------
-        //   Decodes an argument parsed from an AddonConstructorString for all non-allowed characters
-        //       AddonConstructorString is a & delimited string of name=value[selector]descriptor
-        //
-        //       to get a value from an AddonConstructorString, first use getargument() to get the correct value[selector]descriptor
-        //       then remove everything to the right of any '['
-        //
-        //       call encodeAddonConstructorargument before parsing them together
-        //       call decodeAddonConstructorArgument after parsing them apart
-        //
-        //       Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
-        //
-        //       This routine is needed for all Arg, Name, Value, Option values
-        //
-        //------------------------------------------------------------------------------------------------------------
-        //
+        //========================================================================================================
+        /// <summary>
+        /// Decodes an argument parsed from an AddonConstructorString for all non-allowed characters.
+        ///       AddonConstructorString is a & delimited string of name=value[selector]descriptor
+        ///       to get a value from an AddonConstructorString, first use getargument() to get the correct value[selector]descriptor
+        ///       then remove everything to the right of any '['
+        ///       call encodeAddonConstructorargument before parsing them together
+        ///       call decodeAddonConstructorArgument after parsing them apart
+        ///       Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
+        ///       This routine is needed for all Arg, Name, Value, Option values
+        /// </summary>
+        /// <param name="EncodedArg"></param>
+        /// <returns></returns>
         public static string DecodeAddonConstructorArgument(string EncodedArg) {
             string a;
             //
@@ -1664,271 +606,16 @@ namespace Contensive.Core.Controllers {
             a = vbReplace(a, "\\\\", "\\");
             return a;
         }
-        //    '
-        //    ' returns true of the link is a valid link on the source host
-        //    '
-        public static bool IsLinkToThisHost(string Host, string Link) {
-            bool tempIsLinkToThisHost = false;
-            bool result = false;
-            try {
-                string LinkHost = null;
-                int Pos = 0;
-                //
-                if (string.IsNullOrEmpty(Link.Trim(' '))) {
-                    //
-                    // Blank is not a link
-                    //
-                    tempIsLinkToThisHost = false;
-                } else if (vbInstr(1, Link, "://") != 0) {
-                    //
-                    // includes protocol, may be link to another site
-                    //
-                    LinkHost = vbLCase(Link);
-                    Pos = 1;
-                    Pos = vbInstr(Pos, LinkHost, "://");
-                    if (Pos > 0) {
-                        Pos = vbInstr(Pos + 3, LinkHost, "/");
-                        if (Pos > 0) {
-                            LinkHost = LinkHost.Left( Pos - 1);
-                        }
-                        tempIsLinkToThisHost = (vbLCase(Host) == LinkHost);
-                        if (!tempIsLinkToThisHost) {
-                            //
-                            // try combinations including/excluding www.
-                            //
-                            if (vbInstr(1, LinkHost, "www.", 1) != 0) {
-                                //
-                                // remove it
-                                //
-                                LinkHost = vbReplace(LinkHost, "www.", "", 1, 99, 1);
-                                tempIsLinkToThisHost = (vbLCase(Host) == LinkHost);
-                            } else {
-                                //
-                                // add it
-                                //
-                                LinkHost = vbReplace(LinkHost, "://", "://www.", 1, 99, 1);
-                                tempIsLinkToThisHost = (vbLCase(Host) == LinkHost);
-                            }
-                        }
-                    }
-                } else if (vbInstr(1, Link, "#") == 1) {
-                    //
-                    // Is a bookmark, not a link
-                    //
-                    tempIsLinkToThisHost = false;
-                } else {
-                    //
-                    // all others are links on the source
-                    //
-                    tempIsLinkToThisHost = true;
-                }
-                if (!tempIsLinkToThisHost) {
-                    //Link = Link;
-                }
-            } catch (Exception) {
-                throw;
-            }
-            return result;
-        }
-        //
-        //========================================================================================================
-        //   ConvertLinkToRootRelative
-        //
-        //   /images/logo-cmc.main_jpg with any Basepath to /images/logo-cmc.main_jpg
-        //   http://gcm.brandeveolve.com/images/logo-cmc.main_jpg with any BasePath  to /images/logo-cmc.main_jpg
-        //   images/logo-cmc.main_jpg with Basepath '/' to /images/logo-cmc.main_jpg
-        //   logo-cmc.main_jpg with Basepath '/images/' to /images/logo-cmc.main_jpg
-        //
-        //========================================================================================================
-        //
-        public static string ConvertLinkToRootRelative(string Link, string BasePath) {
-            string tempConvertLinkToRootRelative = null;
-            //
-            int Pos = 0;
-            //
-            tempConvertLinkToRootRelative = Link;
-            if (vbInstr(1, Link, "/") == 1) {
-                //
-                //   case /images/logo-cmc.main_jpg with any Basepath to /images/logo-cmc.main_jpg
-                //
-            } else if (vbInstr(1, Link, "://") != 0) {
-                //
-                //   case http://gcm.brandeveolve.com/images/logo-cmc.main_jpg with any BasePath  to /images/logo-cmc.main_jpg
-                //
-                Pos = vbInstr(1, Link, "://");
-                if (Pos > 0) {
-                    Pos = vbInstr(Pos + 3, Link, "/");
-                    if (Pos > 0) {
-                        tempConvertLinkToRootRelative = Link.Substring(Pos - 1);
-                    } else {
-                        //
-                        // This is just the domain name, RootRelative is the root
-                        //
-                        tempConvertLinkToRootRelative = "/";
-                    }
-                }
-            } else {
-                //
-                //   case images/logo-cmc.main_jpg with Basepath '/' to /images/logo-cmc.main_jpg
-                //   case logo-cmc.main_jpg with Basepath '/images/' to /images/logo-cmc.main_jpg
-                //
-                tempConvertLinkToRootRelative = BasePath + Link;
-            }
-            //
-            return tempConvertLinkToRootRelative;
-        }
-        //
-        //
-        //
-        public static string GetAddonIconImg(string AdminURL, int IconWidth, int IconHeight, int IconSprites, bool IconIsInline, string IconImgID, string IconFilename, string serverFilePath, string IconAlt, string IconTitle, string ACInstanceID, int IconSpriteColumn) {
-            string tempGetAddonIconImg = null;
-            //
-            if (string.IsNullOrEmpty(IconAlt)) {
-                IconAlt = "Add-on";
-            }
-            if (string.IsNullOrEmpty(IconTitle)) {
-                IconTitle = "Rendered as Add-on";
-            }
-            if (string.IsNullOrEmpty(IconFilename)) {
-                //
-                // No icon given, use the default
-                //
-                if (IconIsInline) {
-                    IconFilename = "/ccLib/images/IconAddonInlineDefault.png";
-                    IconWidth = 62;
-                    IconHeight = 17;
-                    IconSprites = 0;
-                } else {
-                    IconFilename = "/ccLib/images/IconAddonBlockDefault.png";
-                    IconWidth = 57;
-                    IconHeight = 59;
-                    IconSprites = 4;
-                }
-            } else if (vbInstr(1, IconFilename, "://") != 0) {
-                //
-                // icon is an Absolute URL - leave it
-                //
-            } else if (IconFilename.Left( 1) == "/") {
-                //
-                // icon is Root Relative, leave it
-                //
-            } else {
-                //
-                // icon is a virtual file, add the serverfilepath
-                //
-                IconFilename = serverFilePath + IconFilename;
-            }
-            //IconFilename = encodeJavascript(IconFilename)
-            if ((IconWidth == 0) || (IconHeight == 0)) {
-                IconSprites = 0;
-            }
-
-            if (IconSprites == 0) {
-                //
-                // just the icon
-                //
-                tempGetAddonIconImg = "<img"
-                    + " border=0"
-                    + " id=\"" + IconImgID + "\""
-                    + " onDblClick=\"window.parent.OpenAddonPropertyWindow(this,'" + AdminURL + "');\""
-                    + " alt=\"" + IconAlt + "\""
-                    + " title=\"" + IconTitle + "\""
-                    + " src=\"" + IconFilename + "\"";
-                //GetAddonIconImg = "<img" _
-                //    & " id=""AC,AGGREGATEFUNCTION,0," & FieldName & "," & ArgumentList & """" _
-                //    & " onDblClick=""window.parent.OpenAddonPropertyWindow(this);""" _
-                //    & " alt=""" & IconAlt & """" _
-                //    & " title=""" & IconTitle & """" _
-                //    & " src=""" & IconFilename & """"
-                if (IconWidth != 0) {
-                    tempGetAddonIconImg = tempGetAddonIconImg + " width=\"" + IconWidth + "px\"";
-                }
-                if (IconHeight != 0) {
-                    tempGetAddonIconImg = tempGetAddonIconImg + " height=\"" + IconHeight + "px\"";
-                }
-                if (IconIsInline) {
-                    tempGetAddonIconImg = tempGetAddonIconImg + " style=\"vertical-align:middle;display:inline;\" ";
-                } else {
-                    tempGetAddonIconImg = tempGetAddonIconImg + " style=\"display:block\" ";
-                }
-                if (!string.IsNullOrEmpty(ACInstanceID)) {
-                    tempGetAddonIconImg = tempGetAddonIconImg + " ACInstanceID=\"" + ACInstanceID + "\"";
-                }
-                tempGetAddonIconImg = tempGetAddonIconImg + ">";
-            } else {
-                //
-                // Sprite Icon
-                //
-                tempGetAddonIconImg = GetIconSprite(IconImgID, IconSpriteColumn, IconFilename, IconWidth, IconHeight, IconAlt, IconTitle, "window.parent.OpenAddonPropertyWindow(this,'" + AdminURL + "');", IconIsInline, ACInstanceID);
-            }
-            return tempGetAddonIconImg;
-        }
-        //
-        //
-        //
-        public static string ConvertRSTypeToGoogleType(int RecordFieldType) {
-            string tempConvertRSTypeToGoogleType = null;
-            switch (RecordFieldType) {
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 14:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 131:
-                    tempConvertRSTypeToGoogleType = "number";
-                    break;
-                default:
-                    tempConvertRSTypeToGoogleType = "string";
-                    break;
-            }
-            return tempConvertRSTypeToGoogleType;
-        }
-        //    '
-        //    '
-        //    '
-        public static string GetIconSprite(string TagID, int SpriteColumn, string IconSrc, int IconWidth, int IconHeight, string IconAlt, string IconTitle, string onDblClick, bool IconIsInline, string ACInstanceID) {
-            string tempGetIconSprite = null;
-            //
-            string ImgStyle = null;
-            //
-            tempGetIconSprite = "<img"
-                + " border=0"
-                + " id=\"" + TagID + "\""
-                + " onMouseOver=\"this.style.backgroundPosition='" + (-1 * SpriteColumn * IconWidth) + "px -" + (2 * IconHeight) + "px';\""
-                + " onMouseOut=\"this.style.backgroundPosition='" + (-1 * SpriteColumn * IconWidth) + "px 0px'\""
-                + " onDblClick=\"" + onDblClick + "\""
-                + " alt=\"" + IconAlt + "\""
-                + " title=\"" + IconTitle + "\""
-                + " src=\"/ccLib/images/spacer.gif\"";
-            ImgStyle = "background:url(" + IconSrc + ") " + (-1 * SpriteColumn * IconWidth) + "px 0px no-repeat;";
-            ImgStyle = ImgStyle + "width:" + IconWidth + "px;";
-            ImgStyle = ImgStyle + "height:" + IconHeight + "px;";
-            if (IconIsInline) {
-                ImgStyle = ImgStyle + "vertical-align:middle;display:inline;";
-            } else {
-                ImgStyle = ImgStyle + "display:block;";
-            }
-            if (!string.IsNullOrEmpty(ACInstanceID)) {
-                tempGetIconSprite = tempGetIconSprite + " ACInstanceID=\"" + ACInstanceID + "\"";
-            }
-            return tempGetIconSprite + " style=\"" + ImgStyle + "\">";
-        }
         //
         // ====================================================================================================
         /// <summary>
         /// return argument for separateUrl
         /// </summary>
         public class urlDetailsClass {
-            public string protocol ="";
+            public string protocol = "";
             public string host = "";
-            public List<String> pathSegments = new List<String>(); 
+            public string port = "";
+            public List<String> pathSegments = new List<String>();
             public string filename = "";
             public string queryString = "";
             public string unixPath() { return String.Join("/", pathSegments); }
@@ -1940,11 +627,11 @@ namespace Contensive.Core.Controllers {
         /// split a source Url into its components. Url and Uri are always UNIX slashed.
         /// </summary>
         /// <param name="sourceUrl"></param>
-        public static urlDetailsClass splitUrl( string sourceUrl ) {
+        public static urlDetailsClass splitUrl(string sourceUrl) {
             var urlDetails = new urlDetailsClass();
             string path = "";
-            splitUrl(sourceUrl, ref urlDetails.protocol, ref urlDetails.host, ref path, ref urlDetails.filename, ref urlDetails.queryString);
-            foreach( string segment in path.Split('/')) {
+            splitUrl(sourceUrl, ref urlDetails.protocol, ref urlDetails.host, ref urlDetails.port, ref path, ref urlDetails.filename, ref urlDetails.queryString);
+            foreach (string segment in path.Split('/')) {
                 if (!string.IsNullOrEmpty(segment)) { urlDetails.pathSegments.Add(segment); }
             }
             return urlDetails;
@@ -1952,75 +639,84 @@ namespace Contensive.Core.Controllers {
         //
         // ====================================================================================================
         /// <summary>
-        /// separate a source Url into its components
+        /// separate a source Url into its components. Querystring includes questionmark
         /// </summary>
-        public static void splitUrl(string SourceURL, ref string Protocol, ref string Host, ref string Path, ref string Page, ref string QueryString) {
-            //
-            // -- Divide the URL into URLHost, URLPath, and URLPage
-            string WorkingURL = convertToUnixSlash( SourceURL);
-            //
-            // -- Get Protocol (before the first :)
-            int Position = vbInstr(1, WorkingURL, ":");
-            if (Position != 0) {
-                Protocol = WorkingURL.Left( Position + 2);
-                WorkingURL = WorkingURL.Substring(Position + 2);
-            }
-            //
-            // -- compatibility fix
-            if (vbInstr(1, WorkingURL, "//") == 1) {
-                if (string.IsNullOrEmpty(Protocol)) {
-                    Protocol = "http:";
-                }
-                Protocol = Protocol + "//";
-                WorkingURL = WorkingURL.Substring(2);
-            }
-            //
-            // -- Get QueryString
-            Position = vbInstr(1, WorkingURL, "?");
-            if (Position > 0) {
-                QueryString = WorkingURL.Substring(Position - 1);
-                WorkingURL = WorkingURL.Left( Position - 1);
-            }
-            //
-            // -- separate host from pathpage
-            Position = vbInstr(WorkingURL, "/");
-            if ((Position == 0) && (string.IsNullOrEmpty(Protocol))) {
-                //
-                // -- Page without path or host
-                Page = WorkingURL;
-                Path = "";
-                Host = "";
-            } else if (Position == 0) {
-                //
-                // -- host, without path or page
-                Page = "";
-                Path = "/";
-                Host = WorkingURL;
-            } else {
-                //
-                // -- host with a path (at least)
-                Path = WorkingURL.Substring(Position - 1);
-                Host = WorkingURL.Left( Position - 1);
-                //
-                // -- separate page from path
-                Position = Path.LastIndexOf("/") + 1;
-                if (Position == 0) {
-                    //
-                    // -- no path, just a page
-                    Page = Path;
-                    Path = "/";
-                } else {
-                    Page = Path.Substring(Position);
-                    Path = Path.Left( Position);
-                }
-            }
+        public static void splitUrl(string sourceUrl, ref string protocol, ref string host, ref string path, ref string page, ref string queryString) {
+            string port = "";
+            splitUrl(sourceUrl, ref protocol, ref host, ref port, ref path, ref page, ref queryString);
+            ////
+            //// -- Divide the URL into URLHost, URLPath, and URLPage
+            //string WorkingURL = convertToUnixSlash( sourceUrl);
+            ////
+            //// -- Get Protocol (before the first :)
+            //int Position = vbInstr(1, WorkingURL, ":");
+            //if (Position != 0) {
+            //    protocol = WorkingURL.Left( Position + 2);
+            //    WorkingURL = WorkingURL.Substring(Position + 2);
+            //}
+            ////
+            //// -- compatibility fix
+            //if (vbInstr(1, WorkingURL, "//") == 1) {
+            //    if (string.IsNullOrEmpty(protocol)) {
+            //        protocol = "http:";
+            //    }
+            //    protocol = protocol + "//";
+            //    WorkingURL = WorkingURL.Substring(2);
+            //}
+            ////
+            //// -- Get QueryString
+            //Position = vbInstr(1, WorkingURL, "?");
+            //if (Position > 0) {
+            //    queryString = WorkingURL.Substring(Position - 1);
+            //    WorkingURL = WorkingURL.Left( Position - 1);
+            //}
+            ////
+            //// -- separate host from pathpage
+            //Position = vbInstr(WorkingURL, "/");
+            //if ((Position == 0) && (string.IsNullOrEmpty(protocol))) {
+            //    //
+            //    // -- Page without path or host
+            //    page = WorkingURL;
+            //    path = "";
+            //    host = "";
+            //} else if (Position == 0) {
+            //    //
+            //    // -- host, without path or page
+            //    page = "";
+            //    path = "/";
+            //    host = WorkingURL;
+            //} else {
+            //    //
+            //    // -- host with a path (at least)
+            //    path = WorkingURL.Substring(Position - 1);
+            //    host = WorkingURL.Left( Position - 1);
+            //    //
+            //    // -- separate page from path
+            //    Position = path.LastIndexOf("/") + 1;
+            //    if (Position == 0) {
+            //        //
+            //        // -- no path, just a page
+            //        page = path;
+            //        path = "/";
+            //    } else {
+            //        page = path.Substring(Position);
+            //        path = path.Left( Position);
+            //    }
+            //}
         }
         //
         //================================================================================================================
-        //   Separate a URL into its host, path, page parts
-        //================================================================================================================
-        //
-        public static void ParseURL(string SourceURL, ref string Protocol, ref string Host, ref string Port, ref string Path, ref string Page, ref string QueryString) {
+        /// <summary>
+        /// Separate a URL into its host, path, page parts. Protocol includes ://, path includes leading and trailing slash, querystring includes questionmark
+        /// </summary>
+        /// <param name="sourceURL"></param>
+        /// <param name="protocol"></param>
+        /// <param name="host"></param>
+        /// <param name="port"></param>
+        /// <param name="path"></param>
+        /// <param name="page"></param>
+        /// <param name="queryString"></param>
+        public static void splitUrl(string sourceURL, ref string protocol, ref string host, ref string port, ref string path, ref string page, ref string queryString) {
             //
             //   Divide the URL into URLHost, URLPath, and URLPage
             //
@@ -2033,10 +729,10 @@ namespace Contensive.Core.Controllers {
             string iURLQueryString = "";
             int Position = 0;
             //
-            iURLWorking = SourceURL;
+            iURLWorking = sourceURL;
             Position = vbInstr(1, iURLWorking, "://");
             if (Position != 0) {
-                iURLProtocol = iURLWorking.Left( Position + 2);
+                iURLProtocol = iURLWorking.Left(Position + 2);
                 iURLWorking = iURLWorking.Substring(Position + 2);
             }
             //
@@ -2052,7 +748,7 @@ namespace Contensive.Core.Controllers {
                 iURLPage = "";
             } else {
                 iURLPath = iURLHost.Substring(Position - 1);
-                iURLHost = iURLHost.Left( Position - 1);
+                iURLHost = iURLHost.Left(Position - 1);
                 //
                 // separate page from path
                 //
@@ -2065,7 +761,7 @@ namespace Contensive.Core.Controllers {
                     iURLPath = "/";
                 } else {
                     iURLPage = iURLPath.Substring(Position);
-                    iURLPath = iURLPath.Left( Position);
+                    iURLPath = iURLPath.Left(Position);
                 }
             }
             //
@@ -2090,623 +786,337 @@ namespace Contensive.Core.Controllers {
                 }
             } else {
                 iURLPort = iURLHost.Substring(Position);
-                iURLHost = iURLHost.Left( Position - 1);
+                iURLHost = iURLHost.Left(Position - 1);
             }
             Position = vbInstr(1, iURLPage, "?");
             if (Position > 0) {
                 iURLQueryString = iURLPage.Substring(Position - 1);
-                iURLPage = iURLPage.Left( Position - 1);
+                iURLPage = iURLPage.Left(Position - 1);
             }
-            Protocol = iURLProtocol;
-            Host = iURLHost;
-            Port = iURLPort;
-            Path = iURLPath;
-            Page = iURLPage;
-            QueryString = iURLQueryString;
+            protocol = iURLProtocol;
+            host = iURLHost;
+            port = iURLPort;
+            path = iURLPath;
+            page = iURLPage;
+            queryString = iURLQueryString;
         }
         //
-        //
-        //
-        public static DateTime DecodeGMTDate(string GMTDate) {
-            DateTime tempDecodeGMTDate = default(DateTime);
-            //
-            double YearPart = 0;
-            double HourPart = 0;
-            //
-            tempDecodeGMTDate = Convert.ToDateTime("12:00:00 AM");
-            if (!string.IsNullOrEmpty(GMTDate)) {
-                HourPart = encodeNumber(GMTDate.Substring(5, 11));
-                if (dateController.IsDate(HourPart)) {
-                    YearPart = encodeNumber(GMTDate.Substring(17, 8));
-                    if (dateController.IsDate(YearPart)) {
-                        tempDecodeGMTDate = DateTime.FromOADate(YearPart + (HourPart + 4) / 24);
-                    }
-                }
-            }
-            return tempDecodeGMTDate;
-        }
-        //
-        //
-        //
-        //Public shared Function  EncodeGMTDate(ByVal MSDate As Date) As String
-        //    EncodeGMTDate = ""
-        //End Function
-        //
-        //=================================================================================
-        // Get the value of a name in a string of name value pairs parsed with vrlf and =
-        //   the legacy line delimiter was a '&' -> name1=value1&name2=value2"
-        //   new format is "name1=value1 crlf name2=value2 crlf ..."
-        //   There can be no extra spaces between the delimiter, the name and the "="
-        //=================================================================================
-        //
-        public static string GetArgument(string Name, string ArgumentString, string DefaultValue = "", string Delimiter = "") {
-            string tempGetArgument = null;
-            //
-            string WorkingString = null;
-            string iDefaultValue = null;
-            int NameLength = 0;
-            int ValueStart = 0;
-            int ValueEnd = 0;
-            bool IsQuoted = false;
-            //
-            // determine delimiter
-            //
-            if (string.IsNullOrEmpty(Delimiter)) {
-                //
-                // If not explicit
-                //
-                if (vbInstr(1, ArgumentString, "\r\n") != 0) {
-                    //
-                    // crlf can only be here if it is the delimiter
-                    //
-                    Delimiter = "\r\n";
-                } else {
-                    //
-                    // either only one option, or it is the legacy '&' delimit
-                    //
-                    Delimiter = "&";
-                }
-            }
-            iDefaultValue = DefaultValue;
-            WorkingString = ArgumentString;
-            tempGetArgument = iDefaultValue;
-            if (!string.IsNullOrEmpty(WorkingString)) {
-                WorkingString = Delimiter + WorkingString + Delimiter;
-                ValueStart = vbInstr(1, WorkingString, Delimiter + Name + "=", 1);
-                if (ValueStart != 0) {
-                    NameLength = Name.Length;
-                    ValueStart = ValueStart + Delimiter.Length + NameLength + 1;
-                    if (WorkingString.Substring(ValueStart - 1, 1) == "\"") {
-                        IsQuoted = true;
-                        ValueStart = ValueStart + 1;
-                    }
-                    if (IsQuoted) {
-                        ValueEnd = vbInstr(ValueStart, WorkingString, "\"" + Delimiter);
-                    } else {
-                        ValueEnd = vbInstr(ValueStart, WorkingString, Delimiter);
-                    }
-                    if (ValueEnd == 0) {
-                        tempGetArgument = WorkingString.Substring(ValueStart - 1);
-                    } else {
-                        tempGetArgument = WorkingString.Substring(ValueStart - 1, ValueEnd - ValueStart);
-                    }
-                }
-            }
-            return tempGetArgument;
-        }
-        //
-        //=================================================================================
-        //   Get a Random Long Value
-        //=================================================================================
-        //
-        public static int GetRandomInteger(coreController core) {
-            int RandomBase = 1; ;
-            int RandomLimit = encodeInteger( (Math.Pow(2, 31)) - RandomBase - 1);
-            return core.random.Next(RandomBase, RandomLimit);
-        }
-        //
-        //=================================================================================
-        // fix for isDataTableOk
-        //=================================================================================
-        //
-        public static bool isDataTableOk(DataTable dt) {
-            return (dt.Rows.Count > 0);
-        }
-        //
-        //=================================================================================
-        // fix for closeRS
-        //=================================================================================
-        //
-        public static void closeDataTable(DataTable dt) {
-            // nothing needed
-            //dt.Clear()
-            dt.Dispose();
-        }
-        //
-        //=============================================================================
-        // Create the part of the sql where clause that is modified by the user
-        //   WorkingQuery is the original querystring to change
-        //   QueryName is the name part of the name pair to change
-        //   If the QueryName is not found in the string, ignore call
-        //=============================================================================
-        //
-        //Public shared Function ModifyQueryString(ByVal WorkingQuery As String, ByVal QueryName As String, ByVal QueryValue As String, Optional ByVal AddIfMissing As Boolean = True) As String
-        //    '
-        //    If vbInstr(1, WorkingQuery, "?") Then
-        //        ModifyQueryString = ModifyLinkQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing)
-        //    Else
-        //        ModifyQueryString = Mid(ModifyLinkQueryString("?" & WorkingQuery, QueryName, QueryValue, AddIfMissing), 2)
-        //    End If
-        //End Function
-        //
-        //=============================================================================
-        //   Modify a querystring name/value pair in a Link
-        //=============================================================================
-        //
-        public static string ModifyLinkQueryString(string Link, string QueryName, string QueryValue, bool AddIfMissing = true) {
-            string tempModifyLinkQueryString = null;
-            //
-            string[] Element = ("").Split(',');
-            int ElementCount = 0;
-            int ElementPointer = 0;
-            string[] NameValue = null;
-            string UcaseQueryName = null;
-            bool ElementFound = false;
-            string QueryString = null;
-            //
-            if (vbInstr(1, Link, "?") != 0) {
-                tempModifyLinkQueryString = Link.Left( vbInstr(1, Link, "?") - 1);
-                QueryString = Link.Substring(tempModifyLinkQueryString.Length + 1);
-            } else {
-                tempModifyLinkQueryString = Link;
-                QueryString = "";
-            }
-            UcaseQueryName = vbUCase(EncodeRequestVariable(QueryName));
-            if (!string.IsNullOrEmpty(QueryString)) {
-                Element = QueryString.Split('&');
-                ElementCount = Element.GetUpperBound(0) + 1;
-                for (ElementPointer = 0; ElementPointer < ElementCount; ElementPointer++) {
-                    NameValue = Element[ElementPointer].Split('=');
-                    if (NameValue.GetUpperBound(0) == 1) {
-                        if (vbUCase(NameValue[0]) == UcaseQueryName) {
-                            if (string.IsNullOrEmpty(QueryValue)) {
-                                Element[ElementPointer] = "";
-                            } else {
-                                Element[ElementPointer] = QueryName + "=" + QueryValue;
-                            }
-                            ElementFound = true;
-                            break;
+        //================================================================================================================
+        /// <summary>
+        /// deprecated, use native date conversions - convert a GMT date string to a datetime object. I honestly cannot find any kind of backup for this format
+        /// </summary>
+        /// <param name="GMTDate"></param>
+        /// <returns></returns>
+        public static DateTime deprecatedDecodeGMTDate(string GMTDate) {
+            DateTime result = default(DateTime);
+            try {
+                if (!string.IsNullOrEmpty(GMTDate)) {
+                    double HourPart = encodeNumber(GMTDate.Substring(5, 11));
+                    if (dateController.IsDate(HourPart)) {
+                        double YearPart = encodeNumber(GMTDate.Substring(17, 8));
+                        if (dateController.IsDate(YearPart)) {
+                            result = DateTime.FromOADate(YearPart + (HourPart + 4) / 24);
                         }
                     }
                 }
+            } catch (Exception) {
+                throw;
             }
-            if (!ElementFound && (!string.IsNullOrEmpty(QueryValue))) {
+            return result;
+        }
+        // 
+        //=================================================================================
+        /// <summary>
+        /// Get the value of a name in a string of name value pairs parsed with vrlf and =
+        ///   ex delimiter '&' -> name1=value1&name2=value2"
+        ///   There can be no extra spaces between the delimiter, the name and the "="
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="nameValueString"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="delimiter"></param>
+        /// <returns></returns>
+        public static string getValueFromNameValueString(string name, string nameValueString, string defaultValue, string delimiter) {
+            string result = defaultValue;
+            try {
                 //
-                // element not found, it needs to be added
-                //
-                if (AddIfMissing) {
-                    if (string.IsNullOrEmpty(QueryString)) {
-                        QueryString = EncodeRequestVariable(QueryName) + "=" + EncodeRequestVariable(QueryValue);
+                // determine delimiter
+                if (string.IsNullOrEmpty(delimiter)) {
+                    //
+                    // If not explicit
+                    if (vbInstr(1, nameValueString, "\r\n") != 0) {
+                        //
+                        // crlf can only be here if it is the delimiter
+                        delimiter = "\r\n";
                     } else {
-                        QueryString = QueryString + "&" + EncodeRequestVariable(QueryName) + "=" + EncodeRequestVariable(QueryValue);
+                        //
+                        // either only one option, or it is the legacy '&' delimit
+                        delimiter = "&";
                     }
                 }
-            } else {
-                //
-                // element found
-                //
-                QueryString = string.Join("&", Element);
-                if ((!string.IsNullOrEmpty(QueryString)) && (string.IsNullOrEmpty(QueryValue))) {
-                    //
-                    // element found and needs to be removed
-                    //
-                    QueryString = vbReplace(QueryString, "&&", "&");
-                    if (QueryString.Left( 1) == "&") {
-                        QueryString = QueryString.Substring(1);
-                    }
-                    if (QueryString.Substring(QueryString.Length - 1) == "&") {
-                        QueryString = QueryString.Left( QueryString.Length - 1);
-                    }
-                }
-            }
-            if (!string.IsNullOrEmpty(QueryString)) {
-                tempModifyLinkQueryString = tempModifyLinkQueryString + "?" + QueryString;
-            }
-            return tempModifyLinkQueryString;
-        }
-        //
-        //=================================================================================
-        //
-        //=================================================================================
-        //
-        public static string GetIntegerString(int Value, int DigitCount) {
-            string tempGetIntegerString = null;
-            if (sizeof(int) <= DigitCount) {
-                tempGetIntegerString = new string('0', DigitCount - Value.ToString().Length) + Value.ToString();
-            } else {
-                tempGetIntegerString = Value.ToString();
-            }
-            return tempGetIntegerString;
-        }
-        //
-        //==========================================================================================
-        //   Format the current error object into a standard string
-        //==========================================================================================
-        //
-        public static int GetProcessID() {
-            Process Instance = Process.GetCurrentProcess();
-            //
-            return Instance.Id;
-        }
-        //
-        //==========================================================================================
-        //   Test if a test string is in a delimited string
-        //==========================================================================================
-        //
-        public static bool IsInDelimitedString(string DelimitedString, string TestString, string Delimiter) {
-            return (0 != vbInstr(1, Delimiter + DelimitedString + Delimiter, Delimiter + TestString + Delimiter, 1));
-        }
-        //
-        //========================================================================
-        // EncodeURL
-        //
-        //   Encodes only what is to the left of the first ?
-        //   All URL path characters are assumed to be correct (/:#)
-        //========================================================================
-        //
-        public static string EncodeURL(string Source) {
-            return WebUtility.UrlEncode(Source);
-            // ##### removed to catch err<>0 problem //On Error //Resume Next
-            //
-            //Dim URLSplit() As String
-            //Dim LeftSide As String
-            //Dim RightSide As String
-            //
-            //EncodeURL = Source
-            //If Source <> "" Then
-            //    URLSplit = Split(Source, "?")
-            //    EncodeURL = URLSplit(0)
-            //    EncodeURL = vbReplace(EncodeURL, "%", "%25")
-            //    '
-            //    EncodeURL = vbReplace(EncodeURL, """", "%22")
-            //    EncodeURL = vbReplace(EncodeURL, " ", "%20")
-            //    EncodeURL = vbReplace(EncodeURL, "$", "%24")
-            //    EncodeURL = vbReplace(EncodeURL, "+", "%2B")
-            //    EncodeURL = vbReplace(EncodeURL, ",", "%2C")
-            //    EncodeURL = vbReplace(EncodeURL, ";", "%3B")
-            //    EncodeURL = vbReplace(EncodeURL, "<", "%3C")
-            //    EncodeURL = vbReplace(EncodeURL, "=", "%3D")
-            //    EncodeURL = vbReplace(EncodeURL, ">", "%3E")
-            //    EncodeURL = vbReplace(EncodeURL, "@", "%40")
-            //    If UBound(URLSplit) > 0 Then
-            //        EncodeURL = EncodeURL & "?" & EncodeQueryString(URLSplit(1))
-            //    End If
-            //End If
-            //
-        }
-        //
-        //========================================================================
-        // EncodeQueryString
-        //
-        //   This routine encodes the URL QueryString to conform to rules
-        //========================================================================
-        //
-        public static string EncodeQueryString(string Source) {
-            string tempEncodeQueryString = null;
-            // ##### removed to catch err<>0 problem //On Error //Resume Next
-            //
-            string[] QSSplit = null;
-            int QSPointer = 0;
-            string[] NVSplit = null;
-            string NV = null;
-            //
-            tempEncodeQueryString = "";
-            if (!string.IsNullOrEmpty(Source)) {
-                QSSplit = Source.Split('&');
-                for (QSPointer = 0; QSPointer <= QSSplit.GetUpperBound(0); QSPointer++) {
-                    NV = QSSplit[QSPointer];
-                    if (!string.IsNullOrEmpty(NV)) {
-                        NVSplit = NV.Split('=');
-                        if (NVSplit.GetUpperBound(0) == 0) {
-                            NVSplit[0] = EncodeRequestVariable(NVSplit[0]);
-                            tempEncodeQueryString = tempEncodeQueryString + "&" + NVSplit[0];
+                string WorkingString = nameValueString;
+                if (!string.IsNullOrEmpty(WorkingString)) {
+                    WorkingString = delimiter + WorkingString + delimiter;
+                    int ValueStart = vbInstr(1, WorkingString, delimiter + name + "=", 1);
+                    if (ValueStart != 0) {
+                        int NameLength = name.Length;
+                        bool IsQuoted = false;
+                        ValueStart = ValueStart + delimiter.Length + NameLength + 1;
+                        if (WorkingString.Substring(ValueStart - 1, 1) == "\"") {
+                            IsQuoted = true;
+                            ValueStart = ValueStart + 1;
+                        }
+                        int ValueEnd = 0;
+                        if (IsQuoted) {
+                            ValueEnd = vbInstr(ValueStart, WorkingString, "\"" + delimiter);
                         } else {
-                            NVSplit[0] = EncodeRequestVariable(NVSplit[0]);
-                            NVSplit[1] = EncodeRequestVariable(NVSplit[1]);
-                            tempEncodeQueryString = tempEncodeQueryString + "&" + NVSplit[0] + "=" + NVSplit[1];
+                            ValueEnd = vbInstr(ValueStart, WorkingString, delimiter);
+                        }
+                        if (ValueEnd == 0) {
+                            result = WorkingString.Substring(ValueStart - 1);
+                        } else {
+                            result = WorkingString.Substring(ValueStart - 1, ValueEnd - ValueStart);
                         }
                     }
                 }
-                if (!string.IsNullOrEmpty(tempEncodeQueryString)) {
-                    tempEncodeQueryString = tempEncodeQueryString.Substring(1);
-                }
+            } catch (Exception) {
+                throw;
             }
-            //
-            return tempEncodeQueryString;
+            return result;
+        }
+        //
+        //=================================================================================
+        /// <summary>
+        /// Get a Random Long Value
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static int GetRandomInteger(coreController core) {
+            return core.random.Next(Int32.MaxValue);
+        }
+        //
+        //=================================================================================
+        /// <summary>
+        /// return a string from an integer, padded left with 0. If the number is longer then the width, the full number is returned.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="digitCount"></param>
+        /// <returns></returns>
+        public static string getIntegerString(int value, int digitCount) {
+            if (sizeof(int) <= digitCount) {
+                return value.ToString().PadLeft(digitCount, '0');
+            } else {
+                return value.ToString();
+            }
+        }
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Test if a test string is in a delimited string
+        /// </summary>
+        /// <param name="stringToSearch"></param>
+        /// <param name="find"></param>
+        /// <param name="Delimiter"></param>
+        /// <returns></returns>
+        public static bool isInDelimitedString(string stringToSearch, string find, string Delimiter) {
+            return ((Delimiter + stringToSearch + Delimiter).ToLower().IndexOf((Delimiter + find + Delimiter).ToLower()) >= 0);
+        }
+        //========================================================================
+        /// <summary>
+        /// Encode a string to be used as a path or filename in a url. only what is to the left of the question mark.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string encodeURL(string Source) {
+            return WebUtility.UrlEncode(Source);
         }
         //
         //========================================================================
-        // EncodeRequestVariable
+        /// <summary>
+        /// It is prefered to encode the request variables then assemble then into a query string. This routine parses them out and encodes them.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string encodeQueryString(string Source) {
+            string result = "";
+            try {
+                if (!string.IsNullOrWhiteSpace(Source)) {
+                    string[] QSSplit = Source.Split('&');
+                    for (int QSPointer = 0; QSPointer <= QSSplit.GetUpperBound(0); QSPointer++) {
+                        string NV = QSSplit[QSPointer];
+                        if (!string.IsNullOrEmpty(NV)) {
+                            string[] NVSplit = NV.Split('=');
+                            if (NVSplit.GetUpperBound(0) == 0) {
+                                NVSplit[0] = encodeRequestVariable(NVSplit[0]);
+                                result = result + "&" + NVSplit[0];
+                            } else {
+                                NVSplit[0] = encodeRequestVariable(NVSplit[0]);
+                                NVSplit[1] = encodeRequestVariable(NVSplit[1]);
+                                result = result + "&" + NVSplit[0] + "=" + NVSplit[1];
+                            }
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(result)) {
+                        result = result.Substring(1);
+                    }
+                }
+            } catch (Exception) {
+                throw;
+            }
+            return result;
+        }
         //
-        //   This routine encodes a request variable for a URL Query String
-        //       ...can be the requestname or the requestvalue
         //========================================================================
-        //
-        public static string EncodeRequestVariable(string Source) {
+        /// <summary>
+        /// encode the name or value part of a querystring, to be parsed with & and = 
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string encodeRequestVariable(string Source) {
             if (Source == null) {
                 return "";
-            } else {
-                return System.Uri.EscapeDataString(Source);
             }
-            // ##### removed to catch err<>0 problem //On Error //Resume Next
-            //
-            //Dim SourcePointer As Integer
-            //Dim Character As String
-            //Dim LocalSource As String
-            //
-            //EncodeRequestVariable = ""
-            //If Source <> "" Then
-            //    LocalSource = Source
-            //    ' "+" is an allowed character for filenames. If you add it, the wrong file will be looked up
-            //    'LocalSource = vbReplace(LocalSource, " ", "+")
-            //    For SourcePointer = 1 To Len(LocalSource)
-            //        Character = Mid(LocalSource, SourcePointer, 1)
-            //        ' "%" added so if this is called twice, it will not destroy "%20" values
-            //        If False Then
-            //            'End If
-            //            'If Character = " " Then
-            //            EncodeRequestVariable += "+"
-            //        ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
-            //            'ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
-            //            EncodeRequestVariable += Character
-            //        Else
-            //            EncodeRequestVariable += "%" & Hex(Asc(Character))
-            //        End If
-            //    Next
-            //End If
-            //
+            return System.Uri.EscapeDataString(Source);
         }
         //
         //========================================================================
-        // DecodeHTML
-        //
-        //   Convert HTML equivalent characters to their equivalents
-        //========================================================================
-        //
-        //Public shared Function DecodeHTML(ByVal Source As String) As String
-        //    ' ##### removed to catch err<>0 problem //On Error //Resume Next
-        //    '
-        //    Dim Pos As Integer
-        //    Dim s As String
-        //    Dim CharCodeString As String
-        //    Dim CharCode As Integer
-        //    Dim PosEnd As Integer
-        //    '
-        //    ' 11/26/2009 - basically re-wrote it, I commented the old one out below
-        //    '
-        //    s = Source
-        //    '
-        //    ' numeric entities
-        //    '
-        //    Pos = Len(s)
-        //    Pos = InStrRev(s, "&#", Pos)
-        //    Do While Pos <> 0
-        //        CharCodeString = ""
-        //        If Mid(s, Pos + 3, 1) = ";" Then
-        //            CharCodeString = Mid(s, Pos + 2, 1)
-        //            PosEnd = Pos + 4
-        //        ElseIf Mid(s, Pos + 4, 1) = ";" Then
-        //            CharCodeString = Mid(s, Pos + 2, 2)
-        //            PosEnd = Pos + 5
-        //        ElseIf Mid(s, Pos + 5, 1) = ";" Then
-        //            CharCodeString = Mid(s, Pos + 2, 3)
-        //            PosEnd = Pos + 6
-        //        End If
-        //        If CharCodeString <> "" Then
-        //            If vbIsNumeric(CharCodeString) Then
-        //                CharCode = CLng(CharCodeString)
-        //                s = Mid(s, 1, Pos - 1) & Chr(CharCode) & Mid(s, PosEnd)
-        //            End If
-        //        End If
-        //        '
-        //        Pos = InStrRev(s, "&#", Pos)
-        //    Loop
-        //    '
-        //    ' character entities (at least the most common )
-        //    '
-        //    s = vbReplace(s, "&lt;", "<")
-        //    s = vbReplace(s, "&gt;", ">")
-        //    s = vbReplace(s, "&quot;", """")
-        //    s = vbReplace(s, "&apos;", "'")
-        //    '
-        //    ' always last
-        //    '
-        //    s = vbReplace(s, "&amp;", "&")
-        //    '
-        //    DecodeHTML = s
-        //    '
-        //End Function
-        //
-        //========================================================================
-        // AddSpanClass
-        //
-        //   Adds a span around the copy with the class name provided
-        //========================================================================
-        //
-        public static string AddSpan(string Copy, string ClassName) => "<span class=\"" + ClassName + "\">" + Copy + "</span>";
-        public static string AddSpan(string Copy) => "<span>" + Copy + "</span>";
-        public static string AddSpan() => "<span/>";
-        //
-        //========================================================================
-        // DecodeResponseVariable
-        //
-        //   Converts a querystring name or value back into the characters it represents
-        //   This is the same code as the decodeurl
-        //========================================================================
-        //
-        public static string DecodeResponseVariable(string Source) {
-            string tempDecodeResponseVariable = null;
+        /// <summary>
+        /// return the string that would result from encoding the string
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static string decodeResponseVariable(string source) {
+            string result = source;
             //
-            int Position = 0;
-            string ESCString = null;
-            string Digit0 = null;
-            string Digit1 = null;
-            //Dim iURL As String
-            //
-            //iURL = Source
-            // plus to space only applies for query component of a URL, but %99 encoding works for both
-            //DecodeResponseVariable = vbReplace(iURL, "+", " ")
-            tempDecodeResponseVariable = Source;
-            Position = vbInstr(1, tempDecodeResponseVariable, "%");
+            int Position = vbInstr(1, result, "%");
             while (Position != 0) {
-                ESCString = tempDecodeResponseVariable.Substring(Position - 1, 3);
-                Digit0 = vbUCase(ESCString.Substring(1, 1));
-                Digit1 = vbUCase(ESCString.Substring(2, 1));
+                string ESCString = result.Substring(Position - 1, 3);
+                string Digit0 = vbUCase(ESCString.Substring(1, 1));
+                string Digit1 = vbUCase(ESCString.Substring(2, 1));
                 if (((string.CompareOrdinal(Digit0, "0") >= 0) && (string.CompareOrdinal(Digit0, "9") <= 0)) || ((string.CompareOrdinal(Digit0, "A") >= 0) && (string.CompareOrdinal(Digit0, "F") <= 0))) {
                     if (((string.CompareOrdinal(Digit1, "0") >= 0) && (string.CompareOrdinal(Digit1, "9") <= 0)) || ((string.CompareOrdinal(Digit1, "A") >= 0) && (string.CompareOrdinal(Digit1, "F") <= 0))) {
                         int ESCValue = 0;
                         try {
                             ESCValue = Convert.ToInt32(ESCString.Substring(1), 16);
-                        } catch  {
+                        } catch {
                             // do nothing -- just put a 0 in as the escape code was not valid, a data problem not a code problem
                         }
-                        tempDecodeResponseVariable = tempDecodeResponseVariable.Left(Position - 1) + Convert.ToChar(ESCValue) + tempDecodeResponseVariable.Substring(Position + 2);
+                        result = result.Left(Position - 1) + Convert.ToChar(ESCValue) + result.Substring(Position + 2);
                     }
                 }
-                Position = vbInstr(Position + 1, tempDecodeResponseVariable, "%");
+                Position = vbInstr(Position + 1, result, "%");
             }
             //
-            return tempDecodeResponseVariable;
+            return result;
+        }
+        //   
+        //========================================================================
+        /// <summary>
+        /// Converts a querystring from an Encoded URL (with %20 and +), to non incoded (with spaced)
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static string decodeURL(string source) {
+            return WebUtility.UrlDecode(source);
+            //string tempDecodeURL = null;
+            //// ##### removed to catch err<>0 problem //On Error //Resume Next
+            ////
+            //int Position = 0;
+            //string ESCString = null;
+            //int ESCValue = 0;
+            //string Digit0 = null;
+            //string Digit1 = null;
+            ////Dim iURL As String
+            ////
+            ////iURL = Source
+            //// plus to space only applies for query component of a URL, but %99 encoding works for both
+            ////DecodeURL = vbReplace(iURL, "+", " ")
+            //tempDecodeURL = source;
+            //Position = vbInstr(1, tempDecodeURL, "%");
+            //while (Position != 0) {
+            //    ESCString = tempDecodeURL.Substring(Position - 1, 3);
+            //    Digit0 = vbUCase(ESCString.Substring(1, 1));
+            //    Digit1 = vbUCase(ESCString.Substring(2, 1));
+            //    if (((string.CompareOrdinal(Digit0, "0") >= 0) && (string.CompareOrdinal(Digit0, "9") <= 0)) || ((string.CompareOrdinal(Digit0, "A") >= 0) && (string.CompareOrdinal(Digit0, "F") <= 0))) {
+            //        if (((string.CompareOrdinal(Digit1, "0") >= 0) && (string.CompareOrdinal(Digit1, "9") <= 0)) || ((string.CompareOrdinal(Digit1, "A") >= 0) && (string.CompareOrdinal(Digit1, "F") <= 0))) {
+            //            ESCValue = int.Parse("&H" + ESCString.Substring(1));
+            //            tempDecodeURL = vbReplace(tempDecodeURL, ESCString, Convert.ToChar(ESCValue));
+            //        }
+            //    }
+            //    Position = vbInstr(Position + 1, tempDecodeURL, "%");
+            //}
+            ////
+            //return tempDecodeURL;
         }
         //
         //========================================================================
-        // DecodeURL
-        //   Converts a querystring from an Encoded URL (with %20 and +), to non incoded (with spaced)
-        //========================================================================
-        //
-        public static string DecodeURL(string Source) {
-            string tempDecodeURL = null;
-            // ##### removed to catch err<>0 problem //On Error //Resume Next
-            //
-            int Position = 0;
-            string ESCString = null;
-            int ESCValue = 0;
-            string Digit0 = null;
-            string Digit1 = null;
-            //Dim iURL As String
-            //
-            //iURL = Source
-            // plus to space only applies for query component of a URL, but %99 encoding works for both
-            //DecodeURL = vbReplace(iURL, "+", " ")
-            tempDecodeURL = Source;
-            Position = vbInstr(1, tempDecodeURL, "%");
-            while (Position != 0) {
-                ESCString = tempDecodeURL.Substring(Position - 1, 3);
-                Digit0 = vbUCase(ESCString.Substring(1, 1));
-                Digit1 = vbUCase(ESCString.Substring(2, 1));
-                if (((string.CompareOrdinal(Digit0, "0") >= 0) && (string.CompareOrdinal(Digit0, "9") <= 0)) || ((string.CompareOrdinal(Digit0, "A") >= 0) && (string.CompareOrdinal(Digit0, "F") <= 0))) {
-                    if (((string.CompareOrdinal(Digit1, "0") >= 0) && (string.CompareOrdinal(Digit1, "9") <= 0)) || ((string.CompareOrdinal(Digit1, "A") >= 0) && (string.CompareOrdinal(Digit1, "F") <= 0))) {
-                        ESCValue = int.Parse("&H" + ESCString.Substring(1));
-                        tempDecodeURL = vbReplace(tempDecodeURL, ESCString, Convert.ToChar(ESCValue));
-                    }
-                }
-                Position = vbInstr(Position + 1, tempDecodeURL, "%");
-            }
-            //
-            return tempDecodeURL;
-        }
-        //
-        //========================================================================
-        // GetFirstNonZeroDate
-        //
-        //   Converts a querystring name or value back into the characters it represents
-        //========================================================================
-        //
-        public static DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1) {
-            DateTime tempGetFirstNonZeroDate = default(DateTime);
-            // ##### removed to catch err<>0 problem //On Error //Resume Next
-            //
-            DateTime NullDate;
-            //
-            NullDate = DateTime.MinValue;
-            if (Date0 == NullDate) {
-                if (Date1 == NullDate) {
+        /// <summary>
+        /// return the first of two dates, excluding minValue
+        /// </summary>
+        /// <param name="Date0"></param>
+        /// <param name="Date1"></param>
+        /// <returns></returns>
+        public static DateTime getFirstNonZeroDate(DateTime Date0, DateTime Date1) {
+            if (Date0 == DateTime.MinValue) {
+                if (Date1 == DateTime.MinValue) {
                     //
                     // Both 0, return 0
                     //
-                    tempGetFirstNonZeroDate = NullDate;
+                    return DateTime.MinValue;
                 } else {
                     //
                     // Date0 is NullDate, return Date1
                     //
-                    tempGetFirstNonZeroDate = Date1;
+                    return Date1;
                 }
             } else {
-                if (Date1 == NullDate) {
+                if (Date1 == DateTime.MinValue) {
                     //
                     // Date1 is nulldate, return Date0
                     //
-                    tempGetFirstNonZeroDate = Date0;
+                    return Date0;
                 } else if (Date0 < Date1) {
                     //
                     // Date0 is first
                     //
-                    tempGetFirstNonZeroDate = Date0;
+                    return Date0;
                 } else {
                     //
                     // Date1 is first
                     //
-                    tempGetFirstNonZeroDate = Date1;
+                    return Date1;
                 }
             }
-            //
-            return tempGetFirstNonZeroDate;
         }
         //
         //========================================================================
-        // getFirstposition
         //
-        //   returns 0 if both are zero
-        //   returns 1 if the first integer is non-zero and less then the second
-        //   returns 2 if the second integer is non-zero and less then the first
-        //========================================================================
-        //
-        public static int GetFirstNonZeroInteger(int Integer1, int Integer2) {
-            int tempGetFirstNonZeroInteger = 0;
-            // ##### removed to catch err<>0 problem //On Error //Resume Next
-            //
+        public static int getFirstNonZeroInteger(int Integer1, int Integer2) {
             if (Integer1 == 0) {
                 if (Integer2 == 0) {
                     //
                     // Both 0, return 0
-                    //
-                    tempGetFirstNonZeroInteger = 0;
+                    return 0;
                 } else {
                     //
                     // Integer1 is 0, return Integer2
-                    //
-                    tempGetFirstNonZeroInteger = 2;
+                    return Integer2;
                 }
             } else {
                 if (Integer2 == 0) {
                     //
                     // Integer2 is 0, return Integer1
-                    //
-                    tempGetFirstNonZeroInteger = 1;
+                    return Integer1;
                 } else if (Integer1 < Integer2) {
                     //
                     // Integer1 is first
-                    //
-                    tempGetFirstNonZeroInteger = 1;
+                    return Integer1;
                 } else {
                     //
                     // Integer2 is first
-                    //
-                    tempGetFirstNonZeroInteger = 2;
+                    return Integer2;
                 }
             }
-            //
-            return tempGetFirstNonZeroInteger;
         }
         //
         //========================================================================
@@ -2720,9 +1130,9 @@ namespace Contensive.Core.Controllers {
             string[] Out = new string[1];
             int OutPointer = 0;
             if (!string.IsNullOrEmpty(WordList)) {
-                string[] QuoteSplit = stringSplit( WordList, "\"" );
+                string[] QuoteSplit = stringSplit(WordList, "\"");
                 int QuoteSplitCount = QuoteSplit.GetUpperBound(0) + 1;
-                bool InQuote = (string.IsNullOrEmpty(WordList.Left( 1)));
+                bool InQuote = (string.IsNullOrEmpty(WordList.Left(1)));
                 int OutSize = 1;
                 for (int QuoteSplitPointer = 0; QuoteSplitPointer < QuoteSplitCount; QuoteSplitPointer++) {
                     string Fragment = QuoteSplit[QuoteSplitPointer];
@@ -2769,99 +1179,61 @@ namespace Contensive.Core.Controllers {
             return Out;
         }
         //
-        //
-        //
-        public static string GetYesNo(bool Key) {
+        //========================================================================
+        /// <summary>
+        /// return Yes if true, No if false
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <returns></returns>
+        public static string getYesNo(bool Key) {
             if (Key) {
                 return "Yes";
-            } else {
-                return "No";
             }
+            return "No";
         }
         //
-        public static string StartTable(int Padding, int Spacing, int Border, string ClassStyle = "") {
-            return "<table border=\"" + Border + "\" cellpadding=\"" + Padding + "\" cellspacing=\"" + Spacing + "\" class=\"" + ClassStyle + "\" width=\"100%\">";
-        }
-        //        '
-        //        '
-        //        '
-        public static string StartTableRow() {
-            return "<tr>";
-        }
-        //        '
-        //        '
-        //        '
-        public static string StartTableCell(string Width = "", int ColSpan = 0, bool EvenRow = false, string Align = "", string BGColor = "") {
-            string tempStartTableCell = null;
-            tempStartTableCell = "";
-            if (!string.IsNullOrEmpty(Width)) {
-                tempStartTableCell = " width=\"" + Width + "\"";
-            }
-            if (!string.IsNullOrEmpty(BGColor)) {
-                tempStartTableCell = tempStartTableCell + " bgcolor=\"" + BGColor + "\"";
-            } else if (EvenRow) {
-                tempStartTableCell = tempStartTableCell + " class=\"ccPanelRowEven\"";
-            } else {
-                tempStartTableCell = tempStartTableCell + " class=\"ccPanelRowOdd\"";
-            }
-            if (ColSpan != 0) {
-                tempStartTableCell = tempStartTableCell + " colspan=\"" + ColSpan + "\"";
-            }
-            if (!string.IsNullOrEmpty(Align)) {
-                tempStartTableCell = tempStartTableCell + " align=\"" + Align + "\"";
-            }
-            return "<TD" + tempStartTableCell + ">";
-        }
-        //        '
-        //        '
-        //        '
-        public static string GetTableCell(string Copy, string Width = "", int ColSpan = 0, bool EvenRow = false, string Align = "", string BGColor = "") {
-            return StartTableCell(Width, ColSpan, EvenRow, Align, BGColor) + Copy + kmaEndTableCell;
-        }
-        //        '
-        //        '
-        //        '
-        public static string GetTableRow(string Cell, int ColSpan = 0, bool EvenRow = false) {
-            return StartTableRow() + GetTableCell(Cell, "100%", ColSpan, EvenRow) + kmaEndTableRow;
-        }
-        //
-        // remove the host and approotpath, leaving the "active" path and all else
-        //
-        public static string ConvertShortLinkToLink(string URL, string PathPagePrefix) {
-            string tempConvertShortLinkToLink = null;
-            tempConvertShortLinkToLink = URL;
-            if (!string.IsNullOrEmpty(URL) & !string.IsNullOrEmpty(PathPagePrefix)) {
-                if (vbInstr(1, tempConvertShortLinkToLink, PathPagePrefix, 1) == 1) {
-                    tempConvertShortLinkToLink = tempConvertShortLinkToLink.Substring(PathPagePrefix.Length);
+        // ====================================================================================================
+        /// <summary>
+        /// remove the host and approotpath, leaving the "active" path and all else
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="urlPrefix"></param>
+        /// <returns></returns>
+        public static string removeUrlPrefix(string url, string urlPrefix) {
+            string result = url;
+            if (!string.IsNullOrEmpty(url) & !string.IsNullOrEmpty(urlPrefix)) {
+                if (vbInstr(1, result, urlPrefix, 1) == 1) {
+                    result = result.Substring(urlPrefix.Length);
                 }
             }
-            return tempConvertShortLinkToLink;
+            return result;
         }
         //
-        // ------------------------------------------------------------------------------------------------------
-        //   Preserve URLs that do not start HTTP or HTTPS
-        //   Preserve URLs from other sites (offsite)
-        //   Preserve HTTP://ServerHost/ServerVirtualPath/Files/ in all cases
-        //   Convert HTTP://ServerHost/ServerVirtualPath/folder/page -> /folder/page
-        //   Convert HTTP://ServerHost/folder/page -> /folder/page
-        // ------------------------------------------------------------------------------------------------------
-        //
-        public static string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath) {
+        // ====================================================================================================
+        /// <summary>convert links as follows
+        ///   Preserve URLs that do not start HTTP or HTTPS
+        ///   Preserve URLs from other sites (offsite)
+        ///   Preserve HTTP://ServerHost/ServerVirtualPath/Files/ in all cases
+        ///   Convert HTTP://ServerHost/ServerVirtualPath/folder/page -> /folder/page
+        ///   Convert HTTP://ServerHost/folder/page -> /folder/page
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="domain"></param>
+        /// <param name="appVirtualPath">App virtualPath is typically /appName,  </param>
+        /// <returns></returns>
+        public static string ConvertLinkToShortLink(string url, string domain, string appVirtualPath) {
             //
             string BadString = "";
             string GoodString = "";
             string Protocol = "";
-            string WorkingLink = "";
-            //
-            WorkingLink = URL;
+            string WorkingLink = url;
             //
             // ----- Determine Protocol
-            //
             if (vbInstr(1, WorkingLink, "HTTP://", 1) == 1) {
                 //
                 // HTTP
                 //
-                Protocol = WorkingLink.Left( 7);
+                Protocol = WorkingLink.Left(7);
             } else if (vbInstr(1, WorkingLink, "HTTPS://", 1) == 1) {
                 //
                 // HTTPS
@@ -2873,28 +1245,28 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Protcol found, determine if is local
                 //
-                GoodString = Protocol + ServerHost;
-                if (WorkingLink.IndexOf(GoodString, System.StringComparison.OrdinalIgnoreCase)  != -1) {
+                GoodString = Protocol + domain;
+                if (WorkingLink.IndexOf(GoodString, System.StringComparison.OrdinalIgnoreCase) != -1) {
                     //
                     // URL starts with Protocol ServerHost
                     //
-                    GoodString = Protocol + ServerHost + ServerVirtualPath + "/files/";
-                    if (WorkingLink.IndexOf(GoodString, System.StringComparison.OrdinalIgnoreCase)  != -1) {
+                    GoodString = Protocol + domain + appVirtualPath + "/files/";
+                    if (WorkingLink.IndexOf(GoodString, System.StringComparison.OrdinalIgnoreCase) != -1) {
                         //
                         // URL is in the virtual files directory
                         //
                         BadString = GoodString;
-                        GoodString = ServerVirtualPath + "/files/";
+                        GoodString = appVirtualPath + "/files/";
                         WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, 1);
                     } else {
                         //
                         // URL is not in files virtual directory
                         //
-                        BadString = Protocol + ServerHost + ServerVirtualPath + "/";
+                        BadString = Protocol + domain + appVirtualPath + "/";
                         GoodString = "/";
                         WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, 1);
                         //
-                        BadString = Protocol + ServerHost + "/";
+                        BadString = Protocol + domain + "/";
                         GoodString = "/";
                         WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, 1);
                     }
@@ -2903,77 +1275,69 @@ namespace Contensive.Core.Controllers {
             return WorkingLink;
         }
         //
-        // Correct the link for the virtual path, either add it or remove it
-        //
-        public static string EncodeAppRootPath(string Link, string VirtualPath, string AppRootPath, string ServerHost) {
-            string tempEncodeAppRootPath = null;
-            //
-            string Protocol = "";
-            string Host = "";
-            string Path = "";
-            string Page = "";
-            string QueryString = "";
+        // ====================================================================================================
+        /// <summary>
+        /// todo Please write what this does
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="virtualPath"></param>
+        /// <param name="appRootPath"></param>
+        /// <param name="serverHost"></param>
+        /// <returns></returns>
+        public static string encodeVirtualPath(string url, string virtualPath, string appRootPath, string serverHost) {
+            string result = url;
             bool VirtualHosted = false;
-            //
-            tempEncodeAppRootPath = Link;
-            if ((tempEncodeAppRootPath.IndexOf(ServerHost, System.StringComparison.OrdinalIgnoreCase)  != -1) || (Link.IndexOf("/") + 1 == 1)) {
+            if ((result.IndexOf(serverHost, System.StringComparison.OrdinalIgnoreCase) != -1) || (url.IndexOf("/") + 1 == 1)) {
                 //If (InStr(1, EncodeAppRootPath, ServerHost, vbTextCompare) <> 0) And (InStr(1, Link, "/") <> 0) Then
                 //
                 // This link is onsite and has a path
                 //
-                VirtualHosted = (AppRootPath.IndexOf(VirtualPath, System.StringComparison.OrdinalIgnoreCase)  != -1);
-                if (VirtualHosted && (Link.IndexOf(AppRootPath, System.StringComparison.OrdinalIgnoreCase) + 1 == 1)) {
+                VirtualHosted = (appRootPath.IndexOf(virtualPath, System.StringComparison.OrdinalIgnoreCase) != -1);
+                if (VirtualHosted && (url.IndexOf(appRootPath, System.StringComparison.OrdinalIgnoreCase) + 1 == 1)) {
                     //
                     // quick - virtual hosted and link starts at AppRootPath
                     //
-                } else if ((!VirtualHosted) && (Link.Left( 1) == "/") && (Link.IndexOf(AppRootPath, System.StringComparison.OrdinalIgnoreCase) + 1 == 1)) {
+                } else if ((!VirtualHosted) && (url.Left(1) == "/") && (url.IndexOf(appRootPath, System.StringComparison.OrdinalIgnoreCase) + 1 == 1)) {
                     //
                     // quick - not virtual hosted and link starts at Root
                     //
                 } else {
-                    splitUrl(Link, ref Protocol, ref Host, ref Path, ref Page, ref QueryString);
+                    urlDetailsClass urlDetails = splitUrl(url);
+                    string path = urlDetails.unixPath();
+                    //splitUrl(Link, ref Protocol, ref Host, ref Path, ref Page, ref QueryString);
                     if (VirtualHosted) {
                         //
                         // Virtual hosted site, add VirualPath if it is not there
                         //
-                        if (vbInstr(1, Path, AppRootPath, 1) == 0) {
-                            if (Path == "/") {
-                                Path = AppRootPath;
+                        if (vbInstr(1, urlDetails.unixPath(), appRootPath, 1) == 0) {
+                            if (path == "/") {
+                                path = appRootPath;
                             } else {
-                                Path = AppRootPath + Path.Substring(1);
+                                path = appRootPath + path.Substring(1);
                             }
                         }
                     } else {
                         //
                         // Root hosted site, remove virtual path if it is there
                         //
-                        if (vbInstr(1, Path, AppRootPath, 1) != 0) {
-                            Path = vbReplace(Path, AppRootPath, "/");
+                        if (vbInstr(1, path, appRootPath, 1) != 0) {
+                            path = vbReplace(path, appRootPath, "/");
                         }
                     }
-                    tempEncodeAppRootPath = Protocol + Host + Path + Page + QueryString;
+                    result = urlDetails.protocol + urlDetails.host + path + urlDetails.filename + urlDetails.queryString;
                 }
             }
-            return tempEncodeAppRootPath;
+            return result;
         }
         //
-        // Return just the tablename from a tablename reference (database.object.tablename->tablename)
-        //
-        public static string GetDbObjectTableName(string DbObject) {
-            string tempGetDbObjectTableName = null;
-            int Position = 0;
-            //
-            tempGetDbObjectTableName = DbObject;
-            Position = tempGetDbObjectTableName.LastIndexOf(".") + 1;
-            if (Position > 0) {
-                tempGetDbObjectTableName = tempGetDbObjectTableName.Substring(Position);
-            }
-            return tempGetDbObjectTableName;
-        }
-        //
-        //
-        //
-        public static string GetLinkedText(string AnchorTag, string AnchorText) {
+        // ====================================================================================================
+        /// <summary>
+        /// create a linked string. replace the start <link> tag with the provided anchorTag, and convert the end </link> tag to an </a>
+        /// </summary>
+        /// <param name="AnchorTag">The anchor tag to be inserted (a complete <a> tag)</param>
+        /// <param name="AnchorText">A string containing a <link>toBeAnchored</link> tag set</param>
+        /// <returns></returns>
+        public static string getLinkedText(string AnchorTag, string AnchorText) {
             string tempGetLinkedText = null;
             //
             string UcaseAnchorText = null;
@@ -2993,10 +1357,10 @@ namespace Contensive.Core.Controllers {
                     tempGetLinkedText = iAnchorText;
                     LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>") + 1;
                     while (LinkPosition > 1) {
-                        tempGetLinkedText = tempGetLinkedText.Left( LinkPosition - 1) + "</A>" + tempGetLinkedText.Substring(LinkPosition + 6);
+                        tempGetLinkedText = tempGetLinkedText.Left(LinkPosition - 1) + "</A>" + tempGetLinkedText.Substring(LinkPosition + 6);
                         LinkPosition = UcaseAnchorText.LastIndexOf("<LINK>", LinkPosition - 2) + 1;
                         if (LinkPosition != 0) {
-                            tempGetLinkedText = tempGetLinkedText.Left( LinkPosition - 1) + iAnchorTag + tempGetLinkedText.Substring(LinkPosition + 5);
+                            tempGetLinkedText = tempGetLinkedText.Left(LinkPosition - 1) + iAnchorTag + tempGetLinkedText.Substring(LinkPosition + 5);
                         }
                         LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>", LinkPosition - 1) + 1;
                     }
@@ -3006,102 +1370,72 @@ namespace Contensive.Core.Controllers {
             return tempGetLinkedText;
         }
         //
-        public static string EncodeInitialCaps(string Source) {
-            string tempEncodeInitialCaps = null;
-            string[] SegSplit = null;
-            int SegPtr = 0;
-            int SegMax = 0;
-            //
-            tempEncodeInitialCaps = "";
+        // ====================================================================================================
+        /// <summary>
+        /// encode initial caps
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string encodeInitialCaps(string Source) {
+            string result = "";
             if (!string.IsNullOrEmpty(Source)) {
-                SegSplit = Source.Split(' ');
-                SegMax = SegSplit.GetUpperBound(0);
+                string[] SegSplit = Source.Split(' ');
+                int SegMax = SegSplit.GetUpperBound(0);
                 if (SegMax >= 0) {
-                    for (SegPtr = 0; SegPtr <= SegMax; SegPtr++) {
-                        SegSplit[SegPtr] = vbUCase(SegSplit[SegPtr].Left( 1)) + vbLCase(SegSplit[SegPtr].Substring(1));
+                    for (int SegPtr = 0; SegPtr <= SegMax; SegPtr++) {
+                        SegSplit[SegPtr] = vbUCase(SegSplit[SegPtr].Left(1)) + vbLCase(SegSplit[SegPtr].Substring(1));
                     }
                 }
-                tempEncodeInitialCaps = string.Join(" ", SegSplit);
+                result = string.Join(" ", SegSplit);
             }
-            return tempEncodeInitialCaps;
+            return result;
         }
         //
-        //
-        //
-        public static string RemoveTag(string Source, string TagName) {
-            string tempRemoveTag = null;
-            int Pos = 0;
-            int PosEnd = 0;
-            tempRemoveTag = Source;
-            Pos = vbInstr(1, Source, "<" + TagName, 1);
-            if (Pos != 0) {
-                PosEnd = vbInstr(Pos, Source, ">");
-                if (PosEnd > 0) {
-                    tempRemoveTag = Source.Left( Pos - 1) + Source.Substring(PosEnd);
-                }
-            }
-            return tempRemoveTag;
-        }
-        //
-        //
-        //
-        public static string RemoveStyleTags(string Source) {
-            string tempRemoveStyleTags = null;
-            tempRemoveStyleTags = Source;
-            while (vbInstr(1, tempRemoveStyleTags, "<style", 1) != 0) {
-                tempRemoveStyleTags = RemoveTag(tempRemoveStyleTags, "style");
-            }
-            while (vbInstr(1, tempRemoveStyleTags, "</style", 1) != 0) {
-                tempRemoveStyleTags = RemoveTag(tempRemoveStyleTags, "/style");
-            }
-            return tempRemoveStyleTags;
-        }
-        //
-        //
-        //
-        public static string GetSingular(string PluralSource) {
-            string tempGetSingular = null;
-            //
+        // ====================================================================================================
+        /// <summary>
+        /// attempt to make the word from plural to singular
+        /// </summary>
+        /// <param name="PluralSource"></param>
+        /// <returns></returns>
+        public static string getSingular_Sortof(string PluralSource) {
+            string result = PluralSource;
             bool UpperCase = false;
-            string LastCharacter = null;
-            //
-            tempGetSingular = PluralSource;
-            if (tempGetSingular.Length > 1) {
-                LastCharacter = tempGetSingular.Substring(tempGetSingular.Length - 1);
-                if (LastCharacter != vbUCase(LastCharacter)) {
-                    UpperCase = true;
-                }
-                if (vbUCase(tempGetSingular.Substring(tempGetSingular.Length - 3)) == "IES") {
-                    if (UpperCase) {
-                        tempGetSingular = tempGetSingular.Left( tempGetSingular.Length - 3) + "Y";
-                    } else {
-                        tempGetSingular = tempGetSingular.Left( tempGetSingular.Length - 3) + "y";
-                    }
-                } else if (vbUCase(tempGetSingular.Substring(tempGetSingular.Length - 2)) == "SS") {
+            if (result.Length > 1) {
+                string LastCharacter = result.Substring(result.Length - 1);
+                UpperCase = (LastCharacter == LastCharacter.ToUpper());
+                if (vbUCase(result.Substring(result.Length - 3)) == "IES") {
+                    result = result.Left(result.Length - 3) + (UpperCase ? "Y" : "y");
+                } else if (vbUCase(result.Substring(result.Length - 2)) == "SS") {
                     // nothing
-                } else if (vbUCase(tempGetSingular.Substring(tempGetSingular.Length - 1)) == "S") {
-                    tempGetSingular = tempGetSingular.Left( tempGetSingular.Length - 1);
-                } else {
-                    // nothing
+                } else if (vbUCase(result.Substring(result.Length - 1)) == "S") {
+                    result = result.Left(result.Length - 1);
                 }
             }
-            return tempGetSingular;
+            return result;
         }
         //
-        //
-        //
-        public static string EncodeJavascript(string Source) {
-            string tempEncodeJavascript = null;
-            //
-            tempEncodeJavascript = Source;
-            tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\\", "\\\\");
-            tempEncodeJavascript = vbReplace(tempEncodeJavascript, "'", "\\'");
-            //EncodeJavascript = vbReplace(EncodeJavascript, "'", "'+""'""+'")
-            tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\r\n", "\\n");
-            tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\r", "\\n");
-            return vbReplace(tempEncodeJavascript, "\n", "\\n");
-            //
+        // ====================================================================================================
+        /// <summary>
+        /// encode a string to be used as a javascript single quoted string. 
+        /// For example, if creating a string "alert('" + ex.Message + "');"; 
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string EncodeJavascriptStringSingleQuote(string Source) {
+            return HttpUtility.JavaScriptStringEncode(Source);
+            //string tempEncodeJavascript = null;
+            ////
+            //tempEncodeJavascript = Source;
+            //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\\", "\\\\");
+            //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "'", "\\'");
+            ////EncodeJavascript = vbReplace(EncodeJavascript, "'", "'+""'""+'")
+            //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\r\n", "\\n");
+            //tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\r", "\\n");
+            //return vbReplace(tempEncodeJavascript, "\n", "\\n");
+            ////
         }
+        //
+        // ====================================================================================================
         /// <summary>
         /// returns a 1-based index into the comma seperated ListOfItems where Item is found
         /// </summary>
@@ -3133,18 +1467,18 @@ namespace Contensive.Core.Controllers {
             return tempGetListIndex;
         }
         //
-        //
+        // ====================================================================================================
         //
         public static int encodeInteger(object expression) {
-            int result = 0;
             if (expression == null) {
                 return 0;
             } else {
                 double number = 0;
                 string tmpString = expression.ToString();
-                if ( String.IsNullOrWhiteSpace( tmpString)) {
+                if (String.IsNullOrWhiteSpace(tmpString)) {
                     return 0;
                 } else {
+                    int result = 0;
                     if (Int32.TryParse(tmpString, out result)) {
                         return result;
                     } else if (Double.TryParse(tmpString, out number)) {
@@ -3155,55 +1489,9 @@ namespace Contensive.Core.Controllers {
                 }
             }
 
-            //if (expression == null) {
-            //    return 0;
-            //}
-            //string result = expression.ToString();
-
-
-
-            //else if ((expression is int) || (expression is Int16) || (expression is Int32)) {
-            //    return Convert.ToInt32(expression);
-            //} else if ((expression is decimal) || (expression is float) || (expression is double) || (expression is Int64)) {
-            //    double? result = expression as double?;
-            //    if ( result == null ) {
-            //        return 0;
-            //    } else {
-            //        return Conversion.toIN;
-            //    }
-
-            //    Int32 output = 0;
-            //    if (Int32.TryParse((string)expression, out output)) {
-            //        return output;
-            //    } else {
-            //        return 0;
-            //    }
-            //} else if (expression is string) {
-            //    double output = 0;
-            //    if (double.TryParse((string)expression, out output)) {
-            //        return    ( output );
-            //    } else {
-            //        return 0;
-            //    }
-
-            //    return double.TryParse((string)expression, out output);
-            //} else {
-            //    return false;
-            //}
-
-
-            //tempEncodeInteger = 0;
-            //if (Expression.IsNumeric()) {
-            //    tempEncodeInteger = Convert.ToInt32(Expression);
-            //} else if (Expression is bool) {
-            //    if ((bool)Expression) {
-            //        tempEncodeInteger = 1;
-            //    }
-            //}
-            //return tempEncodeInteger;
         }
         //
-        //
+        // ====================================================================================================
         //
         public static double encodeNumber(object Expression) {
             double tempEncodeNumber = 0;
@@ -3268,7 +1556,6 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //   Gets the next line from a string, and removes the line
-        //========================================================================
         //
         public static string getLine(ref string Body) {
             string returnFirstLine = Body;
@@ -3304,17 +1591,17 @@ namespace Contensive.Core.Controllers {
                         EOL = NextLF - 1;
                         BOL = NextLF + 1;
                     }
-                    returnFirstLine = Body.Left( EOL);
+                    returnFirstLine = Body.Left(EOL);
                     Body = Body.Substring(BOL - 1);
                 } else {
                     returnFirstLine = Body;
                     Body = "";
                 }
-            } catch (Exception) {}
+            } catch (Exception) { }
             return returnFirstLine;
         }
         //
-        //
+        // ====================================================================================================
         //
         public static string runProcess(coreController core, string Cmd, string Arguments = "", bool WaitForReturn = false) {
             string returnResult = "";
@@ -3342,31 +1629,7 @@ namespace Contensive.Core.Controllers {
             return returnResult;
         }
         //
-        //Public shared sub runProcess(cp.core,cmd As String, Optional ignore As Object = "", Optional waitforreturn As Boolean = False)
-        //    Call runProcess(cp.core,cmd, waitforreturn)
-        //    'Dim ShellObj As Object
-        //    'ShellObj = CreateObject("WScript.Shell")
-        //    'If Not (ShellObj Is Nothing) Then
-        //    '    Call ShellObj.Run(Cmd, 0, WaitForReturn)
-        //    'End If
-        //    'ShellObj = Nothing
-        //End Sub
-        //
-        //------------------------------------------------------------------------------------------------------------
-        //   use only internally
-        //
-        //   encode an argument to be used in a name=value& (N-V-A) string
-        //
-        //   an argument can be any one of these is this format:
-        //       Arg0,Arg1,Arg2,Arg3,Name=Value&Name=Value[Option1|Option2]descriptor
-        //
-        //   to create an nva string
-        //       string = encodeNvaArgument( name ) & "=" & encodeNvaArgument( value ) & "&"
-        //
-        //   to decode an nva string
-        //       split on ampersand then on equal, and genericController.decodeNvaArgument() each part
-        //
-        //------------------------------------------------------------------------------------------------------------
+        // ====================================================================================================
         //
         public static string encodeNvaArgument(string Arg) {
             string a = Arg;
@@ -3387,11 +1650,10 @@ namespace Contensive.Core.Controllers {
             return a;
         }
         //
-        //------------------------------------------------------------------------------------------------------------
+        // ====================================================================================================
         //   use only internally
         //       decode an argument removed from a name=value& string
         //       see encodeNvaArgument for details on how to use this
-        //------------------------------------------------------------------------------------------------------------
         //
         public static string decodeNvaArgument(string EncodedArg) {
             string a;
@@ -3409,115 +1671,6 @@ namespace Contensive.Core.Controllers {
             a = vbReplace(a, "#0013#", "\r\n");
             return a;
         }
-        //        '
-        //        '========================================================================
-        //        '   encodeSQLText
-        //        '========================================================================
-        //        '
-        //        Public shared Function app.EncodeSQLText(ByVal expression As Object) As String
-        //            Dim returnString As String = ""
-        //            If expression Is Nothing Then
-        //                returnString = "null"
-        //            Else
-        //                returnString = encodeText(expression)
-        //                If returnString = "" Then
-        //                    returnString = "null"
-        //                Else
-        //                    returnString = "'" & vbReplace(returnString, "'", "''") & "'"
-        //                End If
-        //            End If
-        //            Return returnString
-        //        End Function
-        //        '
-        //        '========================================================================
-        //        '   encodeSQLLongText
-        //        '========================================================================
-        //        '
-        //        Public shared Function app.EncodeSQLText(ByVal expression As Object) As String
-        //            Dim returnString As String = ""
-        //            If expression Is Nothing Then
-        //                returnString = "null"
-        //            Else
-        //                returnString = encodeText(expression)
-        //                If returnString = "" Then
-        //                    returnString = "null"
-        //                Else
-        //                    returnString = "'" & vbReplace(returnString, "'", "''") & "'"
-        //                End If
-        //            End If
-        //            Return returnString
-        //        End Function
-        //        '
-        //        '========================================================================
-        //        '   encodeSQLDate
-        //        '       encode a date variable to go in an sql expression
-        //        '========================================================================
-        //        '
-        //        Public shared Function app.EncodeSQLDate(ByVal expression As Object) As String
-        //            Dim returnString As String = ""
-        //            Dim expressionDate As Date = Date.MinValue
-        //            If expression Is Nothing Then
-        //                returnString = "null"
-        //            ElseIf Not IsDate(expression) Then
-        //                returnString = "null"
-        //            Else
-        //                If IsDBNull(expression) Then
-        //                    returnString = "null"
-        //                Else
-        //                    expressionDate =  EncodeDate(expression)
-        //                    If (expressionDate = Date.MinValue) Then
-        //                        returnString = "null"
-        //                    Else
-        //                        returnString = "'" & Year(expressionDate) & Right("0" & Month(expressionDate), 2) & Right("0" & Day(expressionDate), 2) & " " & Right("0" & expressionDate.Hour, 2) & ":" & Right("0" & expressionDate.Minute, 2) & ":" & Right("0" & expressionDate.Second, 2) & ":" & Right("00" & expressionDate.Millisecond, 3) & "'"
-        //                    End If
-        //                End If
-        //            End If
-        //            Return returnString
-        //        End Function
-        //        '
-        //        '========================================================================
-        //        '   encodeSQLNumber
-        //        '       encode a number variable to go in an sql expression
-        //        '========================================================================
-        //        '
-        //        Public shared Function app.EncodeSQLNumber(ByVal expression As Object) As String
-        //            Dim returnString As String = ""
-        //            Dim expressionNumber As Double = 0
-        //            If expression Is Nothing Then
-        //                returnString = "null"
-        //            ElseIf VarType(expression) = vbBoolean Then
-        //                If expression Then
-        //                    returnString = SQLTrue
-        //                Else
-        //                    returnString = SQLFalse
-        //                End If
-        //            ElseIf Not vbIsNumeric(expression) Then
-        //                returnString = "null"
-        //            Else
-        //                returnString = expression.ToString
-        //            End If
-        //            Return returnString
-        //            Exit Function
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        ////ErrorTrap:
-        //        End Function
-        //        '
-        //        '========================================================================
-        //        '   encodeSQLBoolean
-        //        '       encode a boolean variable to go in an sql expression
-        //        '========================================================================
-        //        '
-        //        Public shared Function app.EncodeSQLBoolean(ByVal ExpressionVariant As Object) As String
-        //            '
-        //            'Dim src As String
-        //            '
-        //            app.EncodeSQLBoolean = SQLFalse
-        //            If EncodeBoolean(ExpressionVariant) Then
-        //                app.EncodeSQLBoolean = SQLTrue
-        //            End If
-        //        End Function
         //
         //=================================================================================
         //   Renamed to catch all the cases that used it in addons
@@ -3586,18 +1739,8 @@ namespace Contensive.Core.Controllers {
             }
             return tempgetSimpleNameValue;
         }
-        ////==========================================================================================================================
-        ////   To convert from site license to server licenses, we still need the URLEncoder in the site license
-        ////   This routine generates a site license that is just the URL encoder.
-        ////==========================================================================================================================
-        ////
-        //public static string GetURLEncoder()
-        //{
-        //	Microsoft.VisualBasic.VBMath.Randomize();
-        //	return encodeText(EncodeInteger(Math.Floor(EncodeNumber(1 + (Microsoft.VisualBasic.VBMath.Rnd() * 8))))) + encodeText(EncodeInteger(Math.Floor(EncodeNumber(1 + (Microsoft.VisualBasic.VBMath.Rnd() * 8))))) + encodeText(EncodeInteger(Math.Floor(EncodeNumber(1000000000 + (Microsoft.VisualBasic.VBMath.Rnd() * 899999999)))));
-        //}
         //
-        //
+        // ====================================================================================================
         //
         public static string getIpAddressList() {
             string ipAddressList = "";
@@ -3615,51 +1758,19 @@ namespace Contensive.Core.Controllers {
             return ipAddressList;
         }
         //
-        //
-        //
-        //Public shared Function GetAddonRootPath() As String
-        //    Dim testPath As String
-        //    '
-        //    GetAddonRootPath = "addons"
-        //    If vbInstr(1, GetAddonRootPath, "\github\", vbTextCompare) <> 0 Then
-        //        '
-        //        ' debugging - change program path to dummy path so addon builds all copy to
-        //        '
-        //        testPath = Environ$("programfiles(x86)")
-        //        If testPath = "" Then
-        //            testPath = Environ$("programfiles")
-        //        End If
-        //        GetAddonRootPath = testPath & "\kma\contensive\addons"
-        //    End If
-        //End Function
-        //
-        //
+        // ====================================================================================================
         //
         public static bool IsNull(object source) {
             return (source == null);
         }
         //
-        //
-        //
-        //Public shared Function isNothing(ByVal source As Object) As Boolean
-        //    Return IsNothing(source)
-        //    'Dim returnIsEmpty As Boolean = True
-        //    'Try
-        //    '    If Not IsNothing(source) Then
-
-        //    '    End If
-        //    'Catch ex As Exception
-        //    '    '
-        //    'End Try
-        //    'Return returnIsEmpty
-        //End Function
-        //
-        //
+        // ====================================================================================================
         //
         public static bool isMissing(object source) {
             return false;
         }
         //
+        // ====================================================================================================
         // convert date to number of seconds since 1/1/1990
         //
         public static int dateToSeconds(DateTime sourceDate) {
@@ -3670,20 +1781,8 @@ namespace Contensive.Core.Controllers {
             }
             return returnSeconds;
         }
-        ////
-        //// ==============================================================================
-        //// true if there is a previous instance of this application running
-        //// ==============================================================================
-        ////
-        //public static bool PrevInstance() {
-        //    if (System.Diagnostics.Process.GetProcessesByName(Diagnostics.Process.GetCurrentProcess.ProcessName).GetUpperBound(0) > 0) {
-        //        return true;
-        //    } else {
-        //        return false;
-        //    }
-        //}
         //
-        //====================================================================================================
+        // ====================================================================================================
         /// <summary>
         /// Encode a date to minvalue, if date is < minVAlue,m set it to minvalue, if date < 1/1/1990 (the beginning of time), it returns date.minvalue
         /// </summary>
@@ -3706,53 +1805,8 @@ namespace Contensive.Core.Controllers {
             return encodeDateMinValue(sourceDate) == DateTime.MinValue;
         }
         //
-        //Public Shared Function getVirtualTableFieldPath(ByVal TableName As String, ByVal FieldName As String) As String
-        //    Dim result As String = TableName & "/" & FieldName & "/"
-        //    Return result.Replace(" ", "_").Replace(".", "_")
-        //End Function
-        //Public Shared Function getVirtualTableFieldIdPath(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer) As String
-        //    Return getVirtualTableFieldPath(TableName, FieldName) & RecordID.ToString().PadLeft(12, "0"c) & "/"
-        //End Function
-        //
-        //========================================================================
-        // ----- Create a filename for the Virtual Directory
-        //   Do not allow spaces.
-        //   If the content supports authoring, the filename returned will be for the
-        //   current authoring record.
-        //========================================================================
-        //
-        //Public Shared Function getVirtualRecordPathFilename(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer, ByVal OriginalFilename As String, ByVal fieldType As Integer) As String
-        //    Dim result As String = ""
-        //    '
-        //    Dim iOriginalFilename As String = OriginalFilename.Replace(" ", "_").Replace(".", "_")
-        //    If OriginalFilename <> "" Then
-        //        result = getVirtualTableFieldIdPath(TableName, FieldName, RecordID) & OriginalFilename
-        //    Else
-        //        Dim IdFilename As String = CStr(RecordID)
-        //        If RecordID = 0 Then
-        //            IdFilename = getGUID().Replace("{", "").Replace("}", "").Replace("-", "")
-        //        Else
-        //            IdFilename = RecordID.ToString().PadLeft(12, "0"c)
-        //        End If
-        //        Select Case fieldType
-        //            Case FieldTypeIdFileCSS
-        //                result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".css"
-        //            Case FieldTypeIdFileXML
-        //                result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".xml"
-        //            Case FieldTypeIdFileJavascript
-        //                result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".js"
-        //            Case FieldTypeIdFileHTML
-        //                result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".html"
-        //            Case Else
-        //                result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".txt"
-        //        End Select
-        //    End If
-        //    Return result
-        //End Function
-        //
-        //====================================================================================================
+        // ====================================================================================================
         // the the name of the current executable
-        //====================================================================================================
         //
         public static string getAppExeName() {
             return System.IO.Path.GetFileName(System.Windows.Forms.Application.ExecutablePath);
@@ -3801,7 +1855,9 @@ namespace Contensive.Core.Controllers {
         public static bool isInStr(int start, string haystack, string needle, Microsoft.VisualBasic.CompareMethod ignore = Microsoft.VisualBasic.CompareMethod.Text) {
             return (haystack.IndexOf(needle, start - 1, System.StringComparison.OrdinalIgnoreCase) + 1 >= 0);
         }
-        public static bool isInStr(int start, string haystack, string needle ) {
+        //
+        // ====================================================================================================
+        public static bool isInStr(int start, string haystack, string needle) {
             return (haystack.IndexOf(needle, start - 1, System.StringComparison.OrdinalIgnoreCase) + 1 >= 0);
         }
         //
@@ -3821,11 +1877,11 @@ namespace Contensive.Core.Controllers {
                     while (normalizedRoute.IndexOf("//") >= 0) {
                         normalizedRoute = normalizedRoute.Replace("//", "/");
                     }
-                    if (normalizedRoute.Left( 1).Equals("/")) {
+                    if (normalizedRoute.Left(1).Equals("/")) {
                         normalizedRoute = normalizedRoute.Substring(1);
                     }
                     if (normalizedRoute.Substring(normalizedRoute.Length - 1, 1) == "/") {
-                        normalizedRoute = normalizedRoute.Left( normalizedRoute.Length - 1);
+                        normalizedRoute = normalizedRoute.Left(normalizedRoute.Length - 1);
                     }
                 }
             } catch (Exception ex) {
@@ -3842,7 +1898,6 @@ namespace Contensive.Core.Controllers {
         //       if it includes "://", it is a root file
         //       if it starts with "/", it is already root relative
         //       else (if it start with a file or a path), add the publicFileContentPathPrefix
-        //========================================================================
         //
         public static string convertCdnUrlToCdnPathFilename(string cdnUrl) {
             //
@@ -3856,12 +1911,12 @@ namespace Contensive.Core.Controllers {
         public static bool isGuid(string Source) {
             bool returnValue = false;
             try {
-                if ((Source.Length == 38) && (Source.Left( 1) == "{") && (Source.Substring(Source.Length - 1) == "}")) {
+                if ((Source.Length == 38) && (Source.Left(1) == "{") && (Source.Substring(Source.Length - 1) == "}")) {
                     //
                     // Good to go
                     //
                     returnValue = true;
-                } else if ((Source.Length == 36) && (Source.IndexOf(" ")  == -1)) {
+                } else if ((Source.Length == 36) && (Source.IndexOf(" ") == -1)) {
                     //
                     // might be valid with the brackets, add them
                     //
@@ -3909,18 +1964,23 @@ namespace Contensive.Core.Controllers {
                 }
             }
         }
+        //
+        // ====================================================================================================
         public static int vbInstr(string string1, string string2, int text1Binary2) {
             return vbInstr(1, string1, string2, text1Binary2);
         }
+        //
+        // ====================================================================================================
         //
         public static int vbInstr(string string1, string string2) {
             return vbInstr(1, string1, string2, 2);
         }
         //
+        // ====================================================================================================
+        //
         public static int vbInstr(int startBase1, string string1, string string2) {
             return vbInstr(startBase1, string1, string2, 2);
         }
-
         //
         //====================================================================================================
         //
@@ -3950,7 +2010,11 @@ namespace Contensive.Core.Controllers {
             }
         }
         //
+        // ====================================================================================================
+        //
         public static string vbReplace(string expression, string find, int replacement) { return vbReplace(expression, find, replacement.ToString()); }
+        //
+        // ====================================================================================================
         //
         public static string vbReplace(string expression, string find, string replacement) { return vbReplace(expression, find, replacement, 1, 9999, 1); }
         //
@@ -3981,10 +2045,8 @@ namespace Contensive.Core.Controllers {
                 return source.ToLower();
             }
         }
-
-
         //
-        //====================================================================================================
+        // ====================================================================================================
         /// <summary>
         /// Visual Basic Len()
         /// </summary>
@@ -4028,7 +2090,6 @@ namespace Contensive.Core.Controllers {
                 return source.Substring(startIndex, length);
             }
         }
-
         //
         //====================================================================================================
         /// <summary>
@@ -4049,7 +2110,6 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="Arg"></param>
         /// <returns></returns>
-        //------------------------------------------------------------------------------------------------------------
         //
         public static string encodeLegacyOptionStringArgument(string Arg) {
             string a = "";
@@ -4086,7 +2146,7 @@ namespace Contensive.Core.Controllers {
         public static bool common_isGuid(string guid) {
             bool returnIsGuid = false;
             try {
-                returnIsGuid = (guid.Length == 38) && (guid.Left( 1) == "{") && (guid.Substring(guid.Length - 1) == "}");
+                returnIsGuid = (guid.Length == 38) && (guid.Left(1) == "{") && (guid.Substring(guid.Length - 1) == "}");
             } catch (Exception ex) {
                 throw (ex);
             }
@@ -4094,39 +2154,13 @@ namespace Contensive.Core.Controllers {
         }
         //
         //========================================================================
-        // main_encodeCookieName
-        //   replace invalid cookie characters with %hex
-        //========================================================================
+        // main_encodeCookieName, replace invalid cookie characters with %hex
         //
         public static string main_encodeCookieName(string Source) {
-            return EncodeURL(Source);
-            //			string result = "";
-
-            //			int SourcePointer = 0;
-            //			string Character = null;
-            //			string localSource = null;
-            //			//
-            //			if (!string.IsNullOrEmpty(Source))
-            //			{
-            //				localSource = Source;
-            ////todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(localSource) for every iteration:
-            //				int tempVar = localSource.Length;
-            //				for (SourcePointer = 1; SourcePointer <= tempVar; SourcePointer++)
-            //				{
-            //					Character = localSource.Substring(SourcePointer - 1, 1);
-            //					if (genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, 1) != 0)
-            //					{
-            //						result = result + Character;
-            //					}
-            //					else
-            //					{
-            //						result = result + "%" + encodeText(Microsoft.VisualBasic.Strings.Asc(Character), 16).ToUpper();
-            //					}
-            //				}
-            //			}
-            //			//
-            //			return result;
+            return encodeURL(Source);
         }
+        //
+        // ====================================================================================================
         public static string main_GetYesNo(bool InputValue) {
             if (InputValue) {
                 return "Yes";
@@ -4142,7 +2176,6 @@ namespace Contensive.Core.Controllers {
         //   If Name is not given, returns ""
         //   If Name present but no value, returns true (as if Name=true)
         //   If Name = Value, it returns value
-        //=============================================================================
         //
         public static string main_GetNameValue_Internal(coreController core, string NameValueString, string Name) {
             string result = "";
@@ -4187,62 +2220,6 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //		//
-        //		//=============================================================================
-        //		// Cleans a text file of control characters, allowing only vblf
-        //		//=============================================================================
-        //		//
-        //		public static string main_RemoveControlCharacters(string DirtyText)
-        //		{
-        //			string result = DirtyText;
-        //			int Pointer = 0;
-        //			int ChrTest = 0;
-        //			string iDirtyText;
-        //			//
-        //			iDirtyText = encodeText(DirtyText);
-        //			result = "";
-        //			if (!string.IsNullOrEmpty(iDirtyText))
-        //			{
-        //				result = "";
-        ////todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(iDirtyText) for every iteration:
-        //				int tempVar = iDirtyText.Length;
-        //				for (Pointer = 1; Pointer <= tempVar; Pointer++)
-        //				{
-        //                    ChrTest = iDirtyText.Substring(Pointer - 1, 1).ToCharArray()[0];
-        //					if (ChrTest >= 32 && ChrTest < 128)
-        //					{
-        //						result = result + (int)str[i] Microsoft.VisualBasic.Strings.Chr(ChrTest);
-        //					}
-        //					else
-        //					{
-        //						switch (ChrTest)
-        //						{
-        //							case 9:
-        //								result = result + " ";
-        //								break;
-        //							case 10:
-        //								result = result + "\n";
-        //								break;
-        //						}
-        //					}
-        //				}
-        //				//
-        //				// limit CRLF to 2
-        //				//
-        //				while (vbInstr(result, "\n\n\n") != 0)
-        //				{
-        //					result = vbReplace(result, "\n\n\n", "\n\n");
-        //				}
-        //				//
-        //				// limit spaces to 1
-        //				//
-        //				while (vbInstr(result, "  ") != 0)
-        //				{
-        //					result = vbReplace(result, "  ", " ");
-        //				}
-        //			}
-        //			return result;
-        //		}
         //
         //========================================================================
         //   convert a virtual file into a Link usable on the website:
@@ -4250,7 +2227,6 @@ namespace Contensive.Core.Controllers {
         //       if it includes "://", leave it along
         //       if it starts with "/", it is already root relative, leave it alone
         //       else (if it start with a file or a path), add the serverFilePath
-        //========================================================================
         //
         public static string getCdnFileLink(coreController core, string virtualFile) {
             string returnLink = virtualFile;
@@ -4260,7 +2236,7 @@ namespace Contensive.Core.Controllers {
                 // icon is an Absolute URL - leave it
                 //
                 return returnLink;
-            } else if (returnLink.Left( 1) == "/") {
+            } else if (returnLink.Left(1) == "/") {
                 //
                 // icon is Root Relative, leave it
                 //
@@ -4273,7 +2249,7 @@ namespace Contensive.Core.Controllers {
             }
         }
         //
-        //
+        // ====================================================================================================
         //
         public static string csv_GetLinkedText(string AnchorTag, string AnchorText) {
             string result = "";
@@ -4293,10 +2269,10 @@ namespace Contensive.Core.Controllers {
                     result = iAnchorText;
                     LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>") + 1;
                     while (LinkPosition > 1) {
-                        result = result.Left( LinkPosition - 1) + "</a>" + result.Substring(LinkPosition + 6);
+                        result = result.Left(LinkPosition - 1) + "</a>" + result.Substring(LinkPosition + 6);
                         LinkPosition = UcaseAnchorText.LastIndexOf("<LINK>", LinkPosition - 2) + 1;
                         if (LinkPosition != 0) {
-                            result = result.Left( LinkPosition - 1) + iAnchorTag + result.Substring(LinkPosition + 5);
+                            result = result.Left(LinkPosition - 1) + iAnchorTag + result.Substring(LinkPosition + 5);
                         }
                         LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>", LinkPosition - 1) + 1;
                     }
@@ -4305,11 +2281,13 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
+        // ====================================================================================================
+        //
         public static string convertNameValueDictToREquestString(Dictionary<string, string> nameValueDict) {
             string requestFormSerialized = "";
             if (nameValueDict.Count > 0) {
                 foreach (KeyValuePair<string, string> kvp in nameValueDict) {
-                    requestFormSerialized += "&" + EncodeURL(kvp.Key.Left( 255)) + "=" + EncodeURL(kvp.Value.Left( 255));
+                    requestFormSerialized += "&" + encodeURL(kvp.Key.Left(255)) + "=" + encodeURL(kvp.Value.Left(255));
                     if (requestFormSerialized.Length > 255) {
                         break;
                     }
@@ -4361,18 +2339,19 @@ namespace Contensive.Core.Controllers {
                 return "";
             } else {
                 int slashpos = convertToDosSlash(pathFilename).LastIndexOf("\\");
-                if (slashpos<0) {
+                if (slashpos < 0) {
                     //
                     // -- pathFilename is all filename
                     return "";
-                } if (slashpos == pathFilename.Length) {
+                }
+                if (slashpos == pathFilename.Length) {
                     //
                     // -- pathfilename is all path
                     return pathFilename;
-                } else { 
+                } else {
                     //
                     // -- divide path and filename and return just path
-                    return pathFilename.Left( slashpos + 1);
+                    return pathFilename.Left(slashpos + 1);
                 }
             }
         }
@@ -4382,7 +2361,6 @@ namespace Contensive.Core.Controllers {
         //
         //   Convert all characters that are not allowed in HTML to their Text equivalent
         //   in preperation for use on an HTML page
-        //========================================================================
         //
         public static string encodeHTML(string Source) {
             string tempencodeHTML = null;
@@ -4421,7 +2399,7 @@ namespace Contensive.Core.Controllers {
                             Pos = genericController.vbInstr(1, key, "=");
                             if (Pos > 0) {
                                 value = key.Substring(Pos);
-                                key = key.Left( Pos - 1);
+                                key = key.Left(Pos - 1);
                             }
                             returnList.Add(key, value);
                         }
@@ -4533,7 +2511,7 @@ namespace Contensive.Core.Controllers {
                 if (EndPos != 0) {
                     EndPos = genericController.vbInstr(EndPos, result, ">", 1);
                     if (EndPos != 0) {
-                        result = result.Left( StartPos - 1) + result.Substring(EndPos);
+                        result = result.Left(StartPos - 1) + result.Substring(EndPos);
                     }
                 }
             }
@@ -4547,8 +2525,8 @@ namespace Contensive.Core.Controllers {
         /// <param name="src"></param>
         /// <param name="delimiter"></param>
         /// <returns></returns>
-        public static string[] stringSplit( string src, string delimiter ) {
-            return src.Split( new[] { delimiter }, StringSplitOptions.None );
+        public static string[] stringSplit(string src, string delimiter) {
+            return src.Split(new[] { delimiter }, StringSplitOptions.None);
         }
         //
         // ====================================================================================================

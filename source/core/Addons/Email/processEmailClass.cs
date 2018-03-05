@@ -449,7 +449,7 @@ namespace Contensive.Core.Addons.Email {
         /// <param name="MemberID"></param>
         /// <param name="emailID"></param>
         /// <param name="DateBlockExpires"></param>
-        /// <param name="EmailDropID"></param>
+        /// <param name="emailDropID"></param>
         /// <param name="BounceAddress"></param>
         /// <param name="ReplyToAddress"></param>
         /// <param name="EmailTemplate"></param>
@@ -460,30 +460,30 @@ namespace Contensive.Core.Addons.Email {
         /// <param name="EmailAllowLinkEID"></param>
         /// <param name="emailStyles"></param>
         /// <returns>OK if successful, else returns user error.</returns>
-        private string SendEmailRecord(coreController core, int MemberID, int emailID, DateTime DateBlockExpires, int EmailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
+        private string SendEmailRecord(coreController core, int MemberID, int emailID, DateTime DateBlockExpires, int emailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
             string returnStatus = "";
             int CSPeople = 0;
             int CSLog = 0;
             try {
-                string ServerPageDefault = null;
-                string EmailToName = null;
+                string defaultPage = null;
+                string emailToName = null;
                 string ClickFlagQuery = null;
                 string EmailStatus = null;
                 string emailWorkingStyles = null;
-                string RootURL = null;
+                string urlProtocolDomainSlash = null;
                 string protocolHostLink = null;
-                string ToAddress = null;
+                string emailToAddress = null;
                 string EmailBodyEncoded = null;
                 string EmailSubjectEncoded = null;
                 string EmailTemplateEncoded = "";
-                string OpenTriggerCode = "";
+                string openTriggerCode = "";
                 //
                 EmailBodyEncoded = EmailBody;
                 EmailSubjectEncoded = EmailSubject;
                 CSLog = core.db.csInsertRecord("Email Log", 0);
                 if (core.db.csOk(CSLog)) {
                     core.db.csSet(CSLog, "Name", "Sent " + encodeText(DateTime.Now));
-                    core.db.csSet(CSLog, "EmailDropID", EmailDropID);
+                    core.db.csSet(CSLog, "EmailDropID", emailDropID);
                     core.db.csSet(CSLog, "EmailID", emailID);
                     core.db.csSet(CSLog, "MemberID", MemberID);
                     core.db.csSet(CSLog, "LogType", EmailLogTypeDrop);
@@ -503,17 +503,17 @@ namespace Contensive.Core.Addons.Email {
                     //
                     CSPeople = core.db.csOpenContentRecord("People", MemberID, 0, false, false, "Email,Name");
                     if (core.db.csOk(CSPeople)) {
-                        ToAddress = core.db.csGet(CSPeople, "Email");
-                        EmailToName = core.db.csGet(CSPeople, "Name");
-                        ServerPageDefault = core.siteProperties.getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue);
-                        RootURL = protocolHostLink + requestAppRootPath;
-                        if (EmailDropID != 0) {
+                        emailToAddress = core.db.csGet(CSPeople, "Email");
+                        emailToName = core.db.csGet(CSPeople, "Name");
+                        defaultPage = core.siteProperties.getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue);
+                        urlProtocolDomainSlash = protocolHostLink + requestAppRootPath;
+                        if (emailDropID != 0) {
                             switch (core.siteProperties.getInteger("GroupEmailOpenTriggerMethod", 0)) {
                                 case 1:
-                                    OpenTriggerCode = "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + RootURL + ServerPageDefault + "?" + RequestNameEmailOpenCssFlag + "=" + EmailDropID + "&" + rnEmailMemberID + "=#member_id#\">";
+                                    openTriggerCode = "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenCssFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=#member_id#\">";
                                     break;
                                 default:
-                                    OpenTriggerCode = "<img src=\"" + RootURL + ServerPageDefault + "?" + rnEmailOpenFlag + "=" + EmailDropID + "&" + rnEmailMemberID + "=#member_id#\">";
+                                    openTriggerCode = "<img src=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=#member_id#\">";
                                     break;
                             }
                         }
@@ -524,7 +524,7 @@ namespace Contensive.Core.Addons.Email {
                         //
                         // Create the clickflag to be added to all anchors
                         //
-                        ClickFlagQuery = rnEmailClickFlag + "=" + EmailDropID + "&" + rnEmailMemberID + "=" + MemberID;
+                        ClickFlagQuery = rnEmailClickFlag + "=" + emailDropID + "&" + rnEmailMemberID + "=" + MemberID;
                         //
                         // Encode body and subject
                         //
@@ -574,43 +574,43 @@ namespace Contensive.Core.Addons.Email {
                             //
                             // non-authorable, default true - leave it as an option in case there is an important exception
                             //
-                            EmailBodyEncoded = EmailBodyEncoded + "<div style=\"padding:10px;\">" + GetLinkedText("<a href=\"" + RootURL + ServerPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#&" + rnEmailBlockRequestDropID + "=" + EmailDropID + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                            EmailBodyEncoded = EmailBodyEncoded + "<div style=\"padding:10px;\">" + getLinkedText("<a href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailBlockRecipientEmail + "=#member_email#&" + rnEmailBlockRequestDropID + "=" + emailDropID + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                         }
                         //
                         // open trigger under footer (so it does not shake as the image comes in)
                         //
-                        EmailBodyEncoded = EmailBodyEncoded + OpenTriggerCode;
+                        EmailBodyEncoded = EmailBodyEncoded + openTriggerCode;
                         EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, "#member_id#", MemberID);
-                        EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, "#member_email#", ToAddress);
+                        EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, "#member_email#", emailToAddress);
                         //
                         // Now convert URLS to absolute
                         //
-                        EmailBodyEncoded = ConvertLinksToAbsolute(EmailBodyEncoded, RootURL);
+                        EmailBodyEncoded = convertLinksToAbsolute(EmailBodyEncoded, urlProtocolDomainSlash);
                         //
                         EmailBodyEncoded = ""
                             + "<HTML>"
                             + "<Head>"
                             + "<Title>" + EmailSubjectEncoded + "</Title>"
-                            + "<Base href=\"" + RootURL + "\">"
+                            + "<Base href=\"" + urlProtocolDomainSlash + "\">"
                             + "</Head>"
                             + "<BODY class=ccBodyEmail>"
-                            + "<Base href=\"" + RootURL + "\">"
+                            + "<Base href=\"" + urlProtocolDomainSlash + "\">"
                             + emailWorkingStyles + EmailBodyEncoded + "</BODY>"
                             + "</HTML>";
                         //
                         // Send
                         //
-                        emailController.sendAdHoc(core, ToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", true, true, 0, ref EmailStatus);
+                        emailController.sendAdHoc(core, emailToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", true, true, 0, ref EmailStatus);
                         if (string.IsNullOrEmpty(EmailStatus)) {
                             EmailStatus = "ok";
                         }
-                        returnStatus = returnStatus + "Send to " + EmailToName + " at " + ToAddress + ", Status = " + EmailStatus;
+                        returnStatus = returnStatus + "Send to " + emailToName + " at " + emailToAddress + ", Status = " + EmailStatus;
                         //
                         // ----- Log the send
                         //
                         core.db.csSet(CSLog, "SendStatus", EmailStatus);
                         if (true) {
-                            core.db.csSet(CSLog, "toaddress", ToAddress);
+                            core.db.csSet(CSLog, "toaddress", emailToAddress);
                         }
                         core.db.csSave(CSLog);
                     }

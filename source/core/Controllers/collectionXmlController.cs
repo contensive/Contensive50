@@ -604,7 +604,7 @@ namespace Contensive.Core.Controllers {
                 string appName = core.appConfig.name;
                 int MenuContentID = core.db.getRecordID("Content", cnNavigatorEntries);
                 DataTable rs = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
-                if (isDataTableOk(rs)) {
+                if (dbController.isDataTableOk(rs)) {
                     if (true) {
                         foreach (DataRow dr in rs.Rows) {
                             string RecordName = genericController.encodeText(dr["Name"]);
@@ -729,11 +729,11 @@ namespace Contensive.Core.Controllers {
                         ParentID = 0;
                         if (RecordID != 0) {
                             rs = core.db.executeQuery("select Name,ParentID from ccMenuEntries where ID=" + RecordID);
-                            if (isDataTableOk(rs)) {
+                            if (dbController.isDataTableOk(rs)) {
                                 ParentID = genericController.encodeInteger(rs.Rows[0]["ParentID"]);
                                 RecordName = genericController.encodeText(rs.Rows[0]["Name"]);
                             }
-                            if (isDataTableOk(rs)) {
+                            if (dbController.isDataTableOk(rs)) {
                                 if (false) {
                                     //RS.Close()
                                 }

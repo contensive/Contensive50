@@ -44,11 +44,11 @@ namespace Contensive.Core.Addons.Primitives {
                     core.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Resource Library");
                     string Copy = core.html.getResourceLibrary("", true, EditorObjectName, LinkObjectName, true);
                     string htmlBody = ""
-                        + genericController.htmlIndent(core.html.getPanelHeader("Contensive Resource Library")) + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>"
+                        + genericController.nop(core.html.getPanelHeader("Contensive Resource Library")) + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>"
                         + cr2 + "<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"spacer\" src=\"/ccLib/images/spacer.gif\" width=1 height=1></div>"
-                        + genericController.htmlIndent(Copy) + "\r</td></tr>"
+                        + genericController.nop(Copy) + "\r</td></tr>"
                         + "\r<tr><td>"
-                        + genericController.htmlIndent(core.html.getHtmlBodyEnd(false, false)) + "\r</td></tr></table>"
+                        + genericController.nop(core.html.getHtmlBodyEnd(false, false)) + "\r</td></tr></table>"
                         + "\r<script language=javascript type=\"text/javascript\">fixDialog();</script>"
                         + "";
                     string htmlBodyTag = "<body class=\"ccBodyAdmin ccCon\" style=\"overflow:scroll\">";

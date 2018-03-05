@@ -9,7 +9,8 @@ namespace Contensive.Core.Tests {
         //
         // code version for this build. This is saved in a site property and checked in the housekeeping event - checkDataVersion
         //
-        public const string testAppName = "app20180217tests2";
+        public const string testAppName = "app20180227222207";
+
     }
 }
 

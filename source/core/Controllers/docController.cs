@@ -1,62 +1,65 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Core;
 using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 using Contensive.BaseClasses;
 //
-//
 namespace Contensive.Core.Controllers {
-    //
+    /// <summary>
+    /// persistence object during document construction
+    /// </summary>
     public class docController {
         /// <summary>
-        /// Persistence for the doc. Maintain all the parts and output the results. Constructor initializes the object. Call initDoc() to setup pages
+        /// parent object
         /// </summary>
-        // -- not sure if this is the best plan, buts lets try this and see if we can get out of it later (to make this an addon) 
-        //
         private coreController core;
-        //
-        // -- this documents unique guid (created on the fly)
+        /// <summary>
+        /// this documents unique guid (created on the fly)
+        /// </summary>
         public string docGuid { get; set; }
-        //
-        // -- set true if any addon executed is set  htmlDocument=true. When true, the initial addon executed is returned in the html wrapper (html with head)
-        public bool htmlDocument { get; set; } = false;
-        //
-        // -- head tags, script tags, style tags, etc
+        /// <summary>
+        /// boolean that tracks if the current document is html. set true if any addon executed is set htmlDocument=true. When true, the initial addon executed is returned in the html wrapper (html with head)
+        /// If no addon executed is an html addon, the result is returned as-is.
+        /// </summary>
+        public bool isHtml { get; set; } = false;
+        /// <summary>
+        /// head tags, script tags, style tags, etc
+        /// </summary>
         public List<htmlAssetClass> htmlAssetList { get; set; } = new List<htmlAssetClass>();
-        //
-        // -- head meta tag list (convert to list object)
+        /// <summary>
+        /// head meta tag list (convert to list object)
+        /// </summary>
         public List<htmlMetaClass> htmlMetaContent_OtherTags { get; set; } = new List<htmlMetaClass>();
+        /// <summary>
+        /// html title elements
+        /// </summary>
         public List<htmlMetaClass> htmlMetaContent_TitleList { get; set; } = new List<htmlMetaClass>();
+        /// <summary>
+        /// html meta description
+        /// </summary>
         public List<htmlMetaClass> htmlMetaContent_Description { get; set; } = new List<htmlMetaClass>();
+        /// <summary>
+        /// html meta keywords
+        /// </summary>
         public List<htmlMetaClass> htmlMetaContent_KeyWordList { get; set; } = new List<htmlMetaClass>();
-        //
-        // -- current domain
+        /// <summary>
+        /// current domain for website documents. For all others this is the primary domain for the application.
+        /// </summary>
         public domainModel domain { get; set; }
-        //
-        // -- current page
-        public pageContentModel page { get; set; }
-        //
-        // todo docController properties relating to html page rending should go in a pageController property, and not spread out
-        // -- current page to it's root
-        public List<Models.DbModels.pageContentModel> pageToRootList { get; set; }
-        //
-        // -- current template
-        public pageTemplateModel template { get; set; }
-        public string templateReason { get; set; } = "";
-        //
-        // -- Anything that needs to be written to the Page during main_GetClosePage
+        /// <summary>
+        /// if this document is composed of page content records and templates, this object provides supporting properties and methods
+        /// </summary>
+        public pageContentController pageController { get; }
+        /// <summary>
+        /// Anything that needs to be written to the Page during main_GetClosePage
+        /// </summary>
         public string htmlForEndOfBody { get; set; } = "";
+        //
+        public Dictionary<contentTypeEnum, string> wysiwygAddonList;
         //
         // -- others to be sorted
         public int editWrapperCnt { get; set; } = 0;
@@ -81,26 +84,32 @@ namespace Contensive.Core.Controllers {
         //
         // -- todo
         internal int helpDialogCnt { get; set; } = 0;
-        //
-        // -- todo
-        public string refreshQueryString { get; set; } = ""; // the querystring required to return to the current state (perform a refresh)
+        /// <summary>
+        /// querystring required to return to the current state (perform a refresh)
+        /// </summary>
+        public string refreshQueryString { get; set; } = "";
         //
         // -- todo
         public int redirectContentID { get; set; } = 0;
         //
         // -- todo
         public int redirectRecordID { get; set; } = 0;
-        //
-        // -- todo
-        public bool outputBufferEnabled { get; set; } = true; // when true (default), stream is buffered until page is done
-        //
-        //
+        /// <summary>
+        /// when true (default), stream is buffered until page is done
+        /// </summary>
+        public bool outputBufferEnabled { get; set; } = true;
+        /// <summary>
+        /// tab systems used for admin site
+        /// </summary>
         public menuComboTabController menuComboTab {
             get {
                 if (_menuComboTab == null) _menuComboTab = new menuComboTabController();
                 return _menuComboTab;
             }
         } private menuComboTabController _menuComboTab;
+        /// <summary>
+        /// tab systems used for admin site
+        /// </summary>
         public menuLiveTabController menuLiveTab {
             get {
                 if (_menuLiveTab == null) _menuLiveTab = new menuLiveTabController();
@@ -108,19 +117,17 @@ namespace Contensive.Core.Controllers {
             }
         }
         private menuLiveTabController _menuLiveTab;
-
-        //
-        // -- todo
-        public string adminWarning { get; set; } = ""; // Message - when set displays in an admin hint box in the page
-        //
-        // -- todo
-        public int adminWarningPageID { get; set; } = 0; // PageID that goes with the warning
+        /// <summary>
+        /// Message - when set displays in an admin hint box in the page
+        /// </summary>
+        public string adminWarning { get; set; } = "";
+        /// <summary>
+        /// PageID that goes with the warning
+        /// </summary>
+        public int adminWarningPageID { get; set; } = 0;
         //
         // -- todo
         public int checkListCnt { get; set; } = 0; // cnt of the main_GetFormInputCheckList calls - used for javascript
-        //
-        // -- todo
-        //public string includedAddonIDList { get; set; } = "";
         //
         // -- todo
         public int inputDateCnt { get; set; } = 0;
@@ -168,9 +175,6 @@ namespace Contensive.Core.Controllers {
         public string debug_iUserError { get; set; } = ""; // User Error String
         //
         // -- todo
-        public string trapLogMessage { get; set; } = ""; // The content of the current traplog (keep for popups if no Csv)
-        //
-        // -- todo
         public string testPointMessage { get; set; } = "";
         //
         // -- todo
@@ -181,9 +185,6 @@ namespace Contensive.Core.Controllers {
         //
         // -- todo
         public DateTime profileStartTime { get; set; } // set in constructor
-        //
-        // -- todo
-        public int profileStartTickCount { get; set; } = 0;
         //
         // -- todo
         public bool allowDebugLog { get; set; } = false; // turn on in script -- use to write /debug.log in content files for whatever is needed
@@ -258,7 +259,7 @@ namespace Contensive.Core.Controllers {
                 if (_landingLink == "") {
                     _landingLink = core.siteProperties.getText("SectionLandingLink", requestAppRootPath + core.siteProperties.serverPageDefault);
                     _landingLink = genericController.ConvertLinkToShortLink(_landingLink, core.webServer.requestDomain, core.webServer.requestVirtualFilePath);
-                    _landingLink = genericController.EncodeAppRootPath(_landingLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                    _landingLink = genericController.encodeVirtualPath(_landingLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
                 }
                 return _landingLink;
             }
@@ -277,12 +278,11 @@ namespace Contensive.Core.Controllers {
         public docController(coreController core) {
             this.core = core;
             //
+            pageController = new pageContentController();
             domain = new domainModel();
-            page = new pageContentModel();
-            pageToRootList = new List<pageContentModel>();
-            template = new pageTemplateModel();
             cdefDictionary = new Dictionary<string, Models.Complex.cdefModel>();
             tableSchemaDictionary = null;
+            wysiwygAddonList = new Dictionary<contentTypeEnum, string>();
         }
         //
         //========================================================================
@@ -410,7 +410,7 @@ namespace Contensive.Core.Controllers {
                         }
                         this.core.db.csGoNext(CSPointer);
                     }
-                    result = "\r<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r</ul>";
+                    result = "\r<ul class=\"ccWatchList\">" + nop(result) + "\r</ul>";
                 }
                 this.core.db.csClose(ref CSPointer);
             } catch (Exception ex) {
@@ -454,7 +454,7 @@ namespace Contensive.Core.Controllers {
                         this.core.db.csGoNext(CS);
                     }
                     if (!string.IsNullOrEmpty(result)) {
-                        result = this.core.html.getContentCopy("Watch List Caption: " + ListName, ListName, this.core.session.user.id, true, this.core.session.isAuthenticated) + "\r<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r</ul>";
+                        result = this.core.html.getContentCopy("Watch List Caption: " + ListName, ListName, this.core.session.user.id, true, this.core.session.isAuthenticated) + "\r<ul class=\"ccWatchList\">" + nop(result) + "\r</ul>";
                     }
                 }
                 this.core.db.csClose(ref CS);
@@ -524,10 +524,10 @@ namespace Contensive.Core.Controllers {
                 //
                 // main_Get Authoring Status and permissions
                 //
-                IsEditLocked = core.workflow.GetEditLockStatus(LiveRecordContentName, page.id);
+                IsEditLocked = core.workflow.GetEditLockStatus(LiveRecordContentName, pageController.page.id);
                 if (IsEditLocked) {
-                    main_EditLockMemberName = core.workflow.GetEditLockMemberName(LiveRecordContentName, page.id);
-                    main_EditLockDateExpires = genericController.encodeDate(core.workflow.GetEditLockMemberName(LiveRecordContentName, page.id));
+                    main_EditLockMemberName = core.workflow.GetEditLockMemberName(LiveRecordContentName, pageController.page.id);
+                    main_EditLockDateExpires = genericController.encodeDate(core.workflow.GetEditLockMemberName(LiveRecordContentName, pageController.page.id));
                 }
                 bool IsModified = false;
                 bool IsSubmitted = false;
@@ -538,18 +538,18 @@ namespace Contensive.Core.Controllers {
                 bool IsDeleted = false;
                 bool IsInserted = false;
                 bool IsRootPage = false;
-                getAuthoringStatus(LiveRecordContentName, page.id, ref IsSubmitted, ref IsApproved, ref SubmittedMemberName, ref ApprovedMemberName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedMemberName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
+                getAuthoringStatus(LiveRecordContentName, pageController.page.id, ref IsSubmitted, ref IsApproved, ref SubmittedMemberName, ref ApprovedMemberName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedMemberName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
                 bool tempVar = false;
                 bool tempVar2 = false;
                 bool tempVar3 = false;
                 bool tempVar4 = false;
-                getAuthoringPermissions(LiveRecordContentName, page.id, ref AllowInsert, ref AllowCancel, ref allowSave, ref AllowDelete, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref readOnlyField);
+                getAuthoringPermissions(LiveRecordContentName, pageController.page.id, ref AllowInsert, ref AllowCancel, ref allowSave, ref AllowDelete, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref readOnlyField);
                 AllowMarkReviewed = Models.Complex.cdefModel.isContentFieldSupported(core, pageContentModel.contentName, "DateReviewed");
                 OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(core, false, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
                 //
                 // Set Editing Authoring Control
                 //
-                core.workflow.SetEditLock(LiveRecordContentName, page.id);
+                core.workflow.SetEditLock(LiveRecordContentName, pageController.page.id);
                 //
                 // SubPanel: Authoring Status
                 //
@@ -601,17 +601,17 @@ namespace Contensive.Core.Controllers {
                 }
                 result = result + "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:10px;\">Name</td>"
-                    + cr2 + "<td class=\"qeRow qeRight\">" + core.html.inputText("name", page.name, 1, 0, "", false, readOnlyField) + "</td>"
+                    + cr2 + "<td class=\"qeRow qeRight\">" + core.html.inputText("name", pageController.page.name, 1, 0, "", false, readOnlyField) + "</td>"
                     + "\r</tr>"
                     + "";
                 //
                 // ----- Parent pages
                 //
-                if (pageToRootList.Count == 1) {
+                if (pageController.pageToRootList.Count == 1) {
                     PageList = "&nbsp;(there are no parent pages)";
                 } else {
                     PageList = "<ul class=\"qeListUL\"><li class=\"qeListLI\">Current Page</li></ul>";
-                    foreach (pageContentModel testPage in Enumerable.Reverse(pageToRootList)) {
+                    foreach (pageContentModel testPage in Enumerable.Reverse(pageController.pageToRootList)) {
                         Link = testPage.name;
                         if (string.IsNullOrEmpty(Link)) {
                             Link = "no name #" + genericController.encodeText(testPage.id);
@@ -634,9 +634,9 @@ namespace Contensive.Core.Controllers {
                     hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
                         contentName = pageContentModel.contentName,
                         fieldName = "",
-                        recordId = page.id
+                        recordId = pageController.page.id
                     },
-                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, page.ChildListInstanceOptions),
+                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, pageController.page.ChildListInstanceOptions),
                     instanceGuid = PageChildListInstanceID
                 };
                 PageList = core.addon.execute(addon, executeContext);
@@ -650,7 +650,7 @@ namespace Contensive.Core.Controllers {
                     + "\r</tr>";
                 result = ""
                     + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                    + genericController.htmlIndent(result) + "\r</table>";
+                    + genericController.nop(result) + "\r</table>";
                 result = ""
                     + ButtonList + result + ButtonList;
                 result = core.html.getPanel(result);
@@ -658,13 +658,13 @@ namespace Contensive.Core.Controllers {
                 // Form Wrapper
                 //
                 result = ""
-                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + core.html.inputHidden("Type", FormTypePageAuthoring) + '\r' + core.html.inputHidden("ID", page.id) + '\r' + core.html.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + core.html.formEnd();
+                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + core.html.inputHidden("Type", FormTypePageAuthoring) + '\r' + core.html.inputHidden("ID", pageController.page.id) + '\r' + core.html.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + core.html.formEnd();
 
                 //& cr & core.html.main_GetPanelHeader("Contensive Quick Editor") _
 
                 result = ""
                     + "\r<div class=\"ccCon\">"
-                    + genericController.htmlIndent(result) + "\r</div>";
+                    + genericController.nop(result) + "\r</div>";
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -676,7 +676,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         internal string getQuickEditingBody(string ContentName, string OrderByClause, bool AllowChildList, bool Authoring, int rootPageId, bool readOnlyField, bool AllowReturnLink, string RootPageContentName, bool ArchivePage, int contactMemberID) {
-            string pageCopy = page.Copyfilename.content;
+            string pageCopy = pageController.page.Copyfilename.content;
             //If page.Copyfilename <> "" Then
             //    pageCopy = page.Copyfilename.copy(core)
             //    'pageCopy = core.cdnFiles.readFile(page.Copyfilename)
@@ -702,7 +702,7 @@ namespace Contensive.Core.Controllers {
         internal string getReturnBreadcrumb(string RootPageContentName, int ignore, int rootPageId, string ParentIDPath, bool ArchivePage, string BreadCrumbDelimiter) {
             string returnHtml = "";
             //
-            foreach (pageContentModel testpage in pageToRootList) {
+            foreach (pageContentModel testpage in pageController.pageToRootList) {
                 string pageCaption = testpage.MenuHeadline;
                 if (string.IsNullOrEmpty(pageCaption)) {
                     pageCaption = genericController.encodeText(testpage.name);
@@ -936,9 +936,9 @@ namespace Contensive.Core.Controllers {
                 //
                 string archiveLink = core.webServer.requestPathPage;
                 archiveLink = genericController.ConvertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.webServer.requestVirtualFilePath);
-                archiveLink = genericController.EncodeAppRootPath(archiveLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                archiveLink = genericController.encodeVirtualPath(archiveLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
                 //
-                string sqlCriteria = "(parentId=" + page.id + ")";
+                string sqlCriteria = "(parentId=" + pageController.page.id + ")";
                 string sqlOrderBy = "sortOrder";
                 List<pageContentModel> childPageList = pageContentModel.createList(core, sqlCriteria, sqlOrderBy);
                 string inactiveList = "";
@@ -1077,10 +1077,10 @@ namespace Contensive.Core.Controllers {
                 //
                 result = "";
                 if (!string.IsNullOrEmpty(activeList)) {
-                    result = result + "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + genericController.htmlIndent(activeList) + "\r</ul>";
+                    result = result + "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + genericController.nop(activeList) + "\r</ul>";
                 }
                 if (!string.IsNullOrEmpty(inactiveList)) {
-                    result = result + "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + genericController.htmlIndent(inactiveList) + "\r</ul>";
+                    result = result + "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + genericController.nop(inactiveList) + "\r</ul>";
                 }
                 //
                 // ----- if non-orphan list, authoring and none found, print none message
@@ -1483,7 +1483,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.db.csClose(ref CSPointer);
                 //
-                return genericController.EncodeAppRootPath(tempgetContentWatchLinkByKey, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                return genericController.encodeVirtualPath(tempgetContentWatchLinkByKey, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
                 //
                 //
             } catch (Exception ex) {
@@ -1547,7 +1547,7 @@ namespace Contensive.Core.Controllers {
                 // Chase page tree to main_Get templateid
                 //
                 if (templateId == 0 && ParentID != 0) {
-                    if (!genericController.IsInDelimitedString(UsedIDList, ParentID.ToString(), ",")) {
+                    if (!genericController.isInDelimitedString(UsedIDList, ParentID.ToString(), ",")) {
                         tempmain_GetPageDynamicLink_GetTemplateID = main_GetPageDynamicLink_GetTemplateID(ParentID, UsedIDList + "," + ParentID);
                     }
                 }
@@ -1648,7 +1648,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                resultLink = genericController.EncodeAppRootPath(resultLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                resultLink = genericController.encodeVirtualPath(resultLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -1740,9 +1740,9 @@ namespace Contensive.Core.Controllers {
                 //
                 if (Name.IndexOf("=") + 1 > 0) {
                     temp = Name.Split('=');
-                    refreshQueryString = genericController.ModifyQueryString(core.doc.refreshQueryString, temp[0], temp[1], true);
+                    refreshQueryString = genericController.modifyQueryString(core.doc.refreshQueryString, temp[0], temp[1], true);
                 } else {
-                    refreshQueryString = genericController.ModifyQueryString(core.doc.refreshQueryString, Name, Value, true);
+                    refreshQueryString = genericController.modifyQueryString(core.doc.refreshQueryString, Name, Value, true);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);

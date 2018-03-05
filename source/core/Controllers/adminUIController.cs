@@ -170,9 +170,9 @@ namespace Contensive.Core {
                 if (isInStr(1, HeaderMessage + RightSideMessage, "\r\n")) {
                     s = ""
                         + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">"
-                        + htmlIndent(HeaderMessage) + "\r</td>"
+                        + nop(HeaderMessage) + "\r</td>"
                         + "\r<td width=\"50%\" valign=Middle class=\"cchRight\">"
-                        + htmlIndent(RightSideMessage) + "\r</td>";
+                        + nop(RightSideMessage) + "\r</td>";
                 } else {
                     s = ""
                         + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">" + HeaderMessage + "</td>"
@@ -180,11 +180,11 @@ namespace Contensive.Core {
                 }
                 s = ""
                     + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
-                    + htmlIndent(s) + "\r</tr></table>"
+                    + nop(s) + "\r</tr></table>"
                     + "";
                 s = ""
                     + "\r<div class=\"ccHeaderCon\">"
-                    + htmlIndent(s) + "\r</div>"
+                    + nop(s) + "\r</div>"
                     + "";
                 //
             } catch (Exception ex) {
@@ -321,15 +321,15 @@ namespace Contensive.Core {
                 if (!string.IsNullOrEmpty(ContentSummary)) {
                     CellContentSummary = ""
                     + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
-                    + htmlIndent(core.html.getPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) + "\r</div>";
+                    + nop(core.html.getPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) + "\r</div>";
                 }
                 //
                 ContentCell = ""
                 + "\r<div style=\"padding:" + ContentPadding + "px;\">"
-                + htmlIndent(Content) + "\r</div>";
-                result = result + htmlIndent(ButtonBar) + htmlIndent(GetTitleBar(core,Caption, Description)) + htmlIndent(CellContentSummary) + htmlIndent(ContentCell) + htmlIndent(ButtonBar) + "";
+                + nop(Content) + "\r</div>";
+                result = result + nop(ButtonBar) + nop(GetTitleBar(core,Caption, Description)) + nop(CellContentSummary) + nop(ContentCell) + nop(ButtonBar) + "";
 
-                result = '\r' + core.html.formStartMultipart() + htmlIndent(result) + '\r' + core.html.formEnd();
+                result = '\r' + core.html.formStartMultipart() + nop(result) + '\r' + core.html.formEnd();
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -500,18 +500,18 @@ namespace Contensive.Core {
                 //
                 switch (SortingState) {
                     case SortingStateEnum.SortableNotSet:
-                        QS = genericController.ModifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
-                        QS = genericController.ModifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
+                        QS = genericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
+                        QS = genericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
                         Copy = "<a href=\"?" + QS + "\" title=\"Sort A-Z\" class=\"ccAdminListCaption\">" + Copy + "</a>";
                         break;
                     case SortingStateEnum.SortableSetza:
-                        QS = genericController.ModifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
-                        QS = genericController.ModifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
+                        QS = genericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
+                        QS = genericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
                         Copy = "<a href=\"?" + QS + "\" title=\"Sort A-Z\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ccLib/images/arrowup.gif\" width=8 height=8 border=0></a>";
                         break;
                     case SortingStateEnum.SortableSetAZ:
-                        QS = genericController.ModifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetza).ToString(), true);
-                        QS = genericController.ModifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
+                        QS = genericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetza).ToString(), true);
+                        QS = genericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
                         Copy = "<a href=\"?" + QS + "\" title=\"Sort Z-A\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ccLib/images/arrowdown.gif\" width=8 height=8 border=0></a>";
                         break;
                 }
@@ -655,7 +655,7 @@ namespace Contensive.Core {
                 //
                 // ----- Start the table
                 //
-                Content.Add(StartTable(3, 1, 0));
+                Content.Add(htmlController.tableStart(3, 1, 0));
                 //
                 // ----- Header
                 //
@@ -734,27 +734,27 @@ namespace Contensive.Core {
                         result = result + "<br>Go to Page ";
                         if (PagePointer != 1) {
                             WorkingQS = core.doc.refreshQueryString;
-                            WorkingQS = genericController.ModifyQueryString(WorkingQS, "GotoPage", "1", true);
+                            WorkingQS = genericController.modifyQueryString(WorkingQS, "GotoPage", "1", true);
                             result = result + "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">1</A>...&nbsp;";
                         }
                         WorkingQS = core.doc.refreshQueryString;
-                        WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageSize, ReportPageSize.ToString(), true);
+                        WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageSize, ReportPageSize.ToString(), true);
                         while ((PagePointer <= PageCount) && (LinkCount < 20)) {
                             if (PagePointer == ReportPageNumber) {
                                 result = result + PagePointer + "&nbsp;";
                             } else {
-                                WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, PagePointer.ToString(), true);
+                                WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PagePointer.ToString(), true);
                                 result = result + "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PagePointer + "</A>&nbsp;";
                             }
                             PagePointer = PagePointer + 1;
                             LinkCount = LinkCount + 1;
                         }
                         if (PagePointer < PageCount) {
-                            WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, PageCount.ToString(), true);
+                            WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PageCount.ToString(), true);
                             result = result + "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PageCount + "</A>&nbsp;";
                         }
                         if (ReportPageNumber < PageCount) {
-                            WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, (ReportPageNumber + 1).ToString(), true);
+                            WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageNumber, (ReportPageNumber + 1).ToString(), true);
                             result = result + "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">next</A>&nbsp;";
                         }
                         result = result + "<br>&nbsp;";

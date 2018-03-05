@@ -102,7 +102,7 @@ namespace Contensive.WindowsServices {
                 return_needsErrorRecovery = false;
                 kmaHTTP.userAgent = "Contensive Monitor";
                 HTTPLastError = 0;
-                URLWorking = Contensive.Core.Controllers.genericController.EncodeURL(Link);
+                URLWorking = Contensive.Core.Controllers.genericController.encodeURL(Link);
                 kmaHTTP.timeout = RequestTimeout;
                 tempGetDoc = kmaHTTP.getURL(ref URLWorking);
                 HTTPLastError = 0;

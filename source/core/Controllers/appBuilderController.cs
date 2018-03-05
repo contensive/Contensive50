@@ -562,7 +562,7 @@ namespace Contensive.Core.Controllers {
                 DataTable rs;
                 //
                 rs = core.db.executeQuery("Select ID from " + TableName + " where name=" + core.db.encodeSQLText(RecordName));
-                if (isDataTableOk(rs)) {
+                if (dbController.isDataTableOk(rs)) {
                     tempGetIDBYName = genericController.encodeInteger(rs.Rows[0]["ID"]);
                 }
                 rs.Dispose();
@@ -804,7 +804,7 @@ namespace Contensive.Core.Controllers {
                     if (!string.IsNullOrEmpty(row)) {
                         string[] attrs = row.Split(';');
                         foreach (var attr in attrs) {
-                            VerifyCountry(core, EncodeInitialCaps(attr), attrs[1]);
+                            VerifyCountry(core, encodeInitialCaps(attr), attrs[1]);
                         }
                     }
                 }

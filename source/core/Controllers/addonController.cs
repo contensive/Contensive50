@@ -454,12 +454,12 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- Script Callback
                         if (addon.Link != "") {
-                            string callBackLink = EncodeAppRootPath(addon.Link, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                            string callBackLink = encodeVirtualPath(addon.Link, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
                             foreach (var key in core.docProperties.getKeyList()) {
-                                callBackLink = modifyLinkQuery(callBackLink, EncodeRequestVariable(key), EncodeRequestVariable(core.docProperties.getText(key)), true);
+                                callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(key), encodeRequestVariable(core.docProperties.getText(key)), true);
                             }
                             foreach (var kvp in executeContext.instanceArguments) {
-                                callBackLink = modifyLinkQuery(callBackLink, EncodeRequestVariable(kvp.Key), EncodeRequestVariable(core.docProperties.getText(kvp.Value)), true);
+                                callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(kvp.Key), encodeRequestVariable(core.docProperties.getText(kvp.Value)), true);
                             }
                             result += "<SCRIPT LANGUAGE=\"JAVASCRIPT\" SRC=\"" + callBackLink + "\"></SCRIPT>";
                         }
@@ -509,7 +509,7 @@ namespace Contensive.Core.Controllers {
                             if (addon.IsInline) {
                                 result = "\r<span id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
                             } else {
-                                result = "\r<div id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\">" + htmlIndent(result) + "\r</div>";
+                                result = "\r<div id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\">" + nop(result) + "\r</div>";
                             }
                         }
                     }
@@ -574,7 +574,7 @@ namespace Contensive.Core.Controllers {
                                 if (addon.IsInline) {
                                     result = "<!-- Add-on " + AddonCommentName + " -->" + result + "<!-- /Add-on " + AddonCommentName + " -->";
                                 } else {
-                                    result = "\r<!-- Add-on " + AddonCommentName + " -->" + htmlIndent(result) + "\r<!-- /Add-on " + AddonCommentName + " -->";
+                                    result = "\r<!-- Add-on " + AddonCommentName + " -->" + nop(result) + "\r<!-- /Add-on " + AddonCommentName + " -->";
                                 }
                             }
                         }
@@ -996,7 +996,7 @@ namespace Contensive.Core.Controllers {
                                                                             } else {
                                                                                 NonEncodedLink = genericController.getCdnFileLink(core, FieldValue);
                                                                                 //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
-                                                                                EncodedLink = EncodeURL(NonEncodedLink);
+                                                                                EncodedLink = encodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
                                                                                 core.privateFiles.splitDosPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
@@ -1189,7 +1189,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                                                                 Copy = "Error: ";
-                                                            } else if (!isDataTableOk(dt)) {
+                                                            } else if (!dbController.isDataTableOk(dt)) {
                                                                 //
                                                                 // ----- no result
                                                                 //
@@ -1858,7 +1858,7 @@ namespace Contensive.Core.Controllers {
                     logController.logTrace(core, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                     //
                     string cmdQueryString = ""
-                        + "appname=" + encodeNvaArgument(EncodeRequestVariable(core.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(EncodeRequestVariable(OptionString));
+                        + "appname=" + encodeNvaArgument(encodeRequestVariable(core.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(encodeRequestVariable(OptionString));
                     cmdDetailClass cmdDetail = new cmdDetailClass();
                     cmdDetail.addonId = addon.id;
                     cmdDetail.addonName = addon.name;
@@ -2098,7 +2098,7 @@ namespace Contensive.Core.Controllers {
                         //
                         BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
                         QueryString = core.doc.refreshQueryString;
-                        QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+                        QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
                             + core.html.formStartMultipart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
@@ -2176,7 +2176,7 @@ namespace Contensive.Core.Controllers {
                         //
                         BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
                         QueryString = core.doc.refreshQueryString;
-                        QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+                        QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         string Dialog = "";
 
@@ -2256,7 +2256,7 @@ namespace Contensive.Core.Controllers {
                         + "";
                     //
                     QueryString = core.doc.refreshQueryString;
-                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+                    QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                     //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
                         + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
@@ -2320,7 +2320,7 @@ namespace Contensive.Core.Controllers {
                             + "";
                         //
                         QueryString = core.doc.refreshQueryString;
-                        QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+                        QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"" + HTMLViewerBubbleID + "\" style=\"display:none;visibility:hidden;\">"
@@ -2729,7 +2729,7 @@ namespace Contensive.Core.Controllers {
                                                                             } else {
                                                                                 NonEncodedLink = genericController.getCdnFileLink(core, FieldValue);
                                                                                 //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
-                                                                                EncodedLink = EncodeURL(NonEncodedLink);
+                                                                                EncodedLink = encodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
                                                                                 core.privateFiles.splitDosPathFilename(FieldValue,  ref FieldValuePath, ref FieldValuefilename);
@@ -3429,8 +3429,15 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        //
-        public static string main_GetDefaultAddonOption_String(coreController core, string ArgumentList, string AddonGuid, bool IsInline) {
+        /// <summary>
+        /// get an option from an argument list
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ArgumentList"></param>
+        /// <param name="AddonGuid"></param>
+        /// <param name="IsInline"></param>
+        /// <returns></returns>
+        public static string getDefaultAddonOptions(coreController core, string ArgumentList, string AddonGuid, bool IsInline) {
             string result = "";
             //
             string NameValuePair = null;
@@ -3464,7 +3471,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // Argument list is present, translate from AddonConstructor to AddonOption format (see main_executeAddon for details)
                 //
-                QuerySplit = genericController.SplitCRLF(ArgumentList);
+                QuerySplit = genericController.splitNewLine(ArgumentList);
                 result = "";
                 for (Ptr = 0; Ptr <= QuerySplit.GetUpperBound(0); Ptr++) {
                     NameValue = QuerySplit[Ptr];
@@ -3514,7 +3521,7 @@ namespace Contensive.Core.Controllers {
                         // rejoin
                         //
                         NameValuePair = core.html.getAddonSelector(OptionName, OptionValue, OptionSelector);
-                        NameValuePair = genericController.EncodeJavascript(NameValuePair);
+                        NameValuePair = genericController.EncodeJavascriptStringSingleQuote(NameValuePair);
                         result = result + "&" + NameValuePair;
                         if (genericController.vbInstr(1, NameValuePair, "=") == 0) {
                             result = result + "=";
@@ -3711,7 +3718,149 @@ namespace Contensive.Core.Controllers {
             Assembly assembly = Assembly.LoadFrom(assemblyPath);
             return assembly;
         }
+        //
+        //========================================================================================================
+        /// <summary>
+        /// create an addon icon image for the desktop
+        /// </summary>
+        /// <param name="AdminURL"></param>
+        /// <param name="IconWidth"></param>
+        /// <param name="IconHeight"></param>
+        /// <param name="IconSprites"></param>
+        /// <param name="IconIsInline"></param>
+        /// <param name="IconImgID"></param>
+        /// <param name="IconFilename"></param>
+        /// <param name="serverFilePath"></param>
+        /// <param name="IconAlt"></param>
+        /// <param name="IconTitle"></param>
+        /// <param name="ACInstanceID"></param>
+        /// <param name="IconSpriteColumn"></param>
+        /// <returns></returns>
+        public static string GetAddonIconImg(string AdminURL, int IconWidth, int IconHeight, int IconSprites, bool IconIsInline, string IconImgID, string IconFilename, string serverFilePath, string IconAlt, string IconTitle, string ACInstanceID, int IconSpriteColumn) {
+            string tempGetAddonIconImg = "";
+            try {
+                if (string.IsNullOrEmpty(IconAlt)) {
+                    IconAlt = "Add-on";
+                }
+                if (string.IsNullOrEmpty(IconTitle)) {
+                    IconTitle = "Rendered as Add-on";
+                }
+                if (string.IsNullOrEmpty(IconFilename)) {
+                    //
+                    // No icon given, use the default
+                    //
+                    if (IconIsInline) {
+                        IconFilename = "/ccLib/images/IconAddonInlineDefault.png";
+                        IconWidth = 62;
+                        IconHeight = 17;
+                        IconSprites = 0;
+                    } else {
+                        IconFilename = "/ccLib/images/IconAddonBlockDefault.png";
+                        IconWidth = 57;
+                        IconHeight = 59;
+                        IconSprites = 4;
+                    }
+                } else if (vbInstr(1, IconFilename, "://") != 0) {
+                    //
+                    // icon is an Absolute URL - leave it
+                    //
+                } else if (IconFilename.Left(1) == "/") {
+                    //
+                    // icon is Root Relative, leave it
+                    //
+                } else {
+                    //
+                    // icon is a virtual file, add the serverfilepath
+                    //
+                    IconFilename = serverFilePath + IconFilename;
+                }
+                //IconFilename = encodeJavascript(IconFilename)
+                if ((IconWidth == 0) || (IconHeight == 0)) {
+                    IconSprites = 0;
+                }
 
+                if (IconSprites == 0) {
+                    //
+                    // just the icon
+                    //
+                    tempGetAddonIconImg = "<img"
+                        + " border=0"
+                        + " id=\"" + IconImgID + "\""
+                        + " onDblClick=\"window.parent.OpenAddonPropertyWindow(this,'" + AdminURL + "');\""
+                        + " alt=\"" + IconAlt + "\""
+                        + " title=\"" + IconTitle + "\""
+                        + " src=\"" + IconFilename + "\"";
+                    if (IconWidth != 0) {
+                        tempGetAddonIconImg += " width=\"" + IconWidth + "px\"";
+                    }
+                    if (IconHeight != 0) {
+                        tempGetAddonIconImg += " height=\"" + IconHeight + "px\"";
+                    }
+                    if (IconIsInline) {
+                        tempGetAddonIconImg += " style=\"vertical-align:middle;display:inline;\" ";
+                    } else {
+                        tempGetAddonIconImg += " style=\"display:block\" ";
+                    }
+                    if (!string.IsNullOrEmpty(ACInstanceID)) {
+                        tempGetAddonIconImg += " ACInstanceID=\"" + ACInstanceID + "\"";
+                    }
+                    tempGetAddonIconImg += ">";
+                } else {
+                    //
+                    // Sprite Icon
+                    //
+                    tempGetAddonIconImg = GetIconSprite(IconImgID, IconSpriteColumn, IconFilename, IconWidth, IconHeight, IconAlt, IconTitle, "window.parent.OpenAddonPropertyWindow(this,'" + AdminURL + "');", IconIsInline, ACInstanceID);
+                }
+            } catch (Exception) {
+                throw;
+            }
+            return tempGetAddonIconImg;
+        }
+        //
+        //========================================================================================================
+        /// <summary>
+        /// get addon sprite img
+        /// </summary>
+        /// <param name="TagID"></param>
+        /// <param name="SpriteColumn"></param>
+        /// <param name="IconSrc"></param>
+        /// <param name="IconWidth"></param>
+        /// <param name="IconHeight"></param>
+        /// <param name="IconAlt"></param>
+        /// <param name="IconTitle"></param>
+        /// <param name="onDblClick"></param>
+        /// <param name="IconIsInline"></param>
+        /// <param name="ACInstanceID"></param>
+        /// <returns></returns>
+        public static string GetIconSprite(string TagID, int SpriteColumn, string IconSrc, int IconWidth, int IconHeight, string IconAlt, string IconTitle, string onDblClick, bool IconIsInline, string ACInstanceID) {
+            string tempGetIconSprite = "";
+            try {
+                tempGetIconSprite = "<img"
+                    + " border=0"
+                    + " id=\"" + TagID + "\""
+                    + " onMouseOver=\"this.style.backgroundPosition='" + (-1 * SpriteColumn * IconWidth) + "px -" + (2 * IconHeight) + "px';\""
+                    + " onMouseOut=\"this.style.backgroundPosition='" + (-1 * SpriteColumn * IconWidth) + "px 0px'\""
+                    + " onDblClick=\"" + onDblClick + "\""
+                    + " alt=\"" + IconAlt + "\""
+                    + " title=\"" + IconTitle + "\""
+                    + " src=\"/ccLib/images/spacer.gif\"";
+                string ImgStyle = "background:url(" + IconSrc + ") " + (-1 * SpriteColumn * IconWidth) + "px 0px no-repeat;";
+                ImgStyle += "width:" + IconWidth + "px;";
+                ImgStyle = ImgStyle + "height:" + IconHeight + "px;";
+                if (IconIsInline) {
+                    ImgStyle += "vertical-align:middle;display:inline;";
+                } else {
+                    ImgStyle += "display:block;";
+                }
+                if (!string.IsNullOrEmpty(ACInstanceID)) {
+                    tempGetIconSprite += " ACInstanceID=\"" + ACInstanceID + "\"";
+                }
+                tempGetIconSprite += " style=\"" + ImgStyle + "\">";
+            } catch (Exception) {
+                throw;
+            }
+            return tempGetIconSprite;
+        }
         //====================================================================================================
         #region  IDisposable Support 
         //
