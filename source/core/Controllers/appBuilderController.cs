@@ -20,7 +20,7 @@ namespace Contensive.Core.Controllers {
         // 
         //=========================================================================
         //
-        public static void upgrade(coreController core, bool isNewBuild) {
+        public static void upgrade(coreController core, bool isNewBuild, bool forceFullInstall) {
             try {
                 if (core.doc.upgradeInProgress) {
                     // leftover from 4.1
@@ -49,7 +49,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- verify base collection
                     logController.logInfo(core, "Install base collection");
-                    collectionController.installBaseCollection(core, isNewBuild,ref  nonCriticalErrorList);
+                    collectionController.installBaseCollection(core, isNewBuild, forceFullInstall, ref  nonCriticalErrorList);
                     ////
                     //// -- Update server config file
                     //logController.logInfo(core, "Update configuration file");
@@ -64,17 +64,38 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- verify root developer
                     logController.logInfo(core, "verify developer user");
-                    var rootList = personModel.createList(core, "(Developer<>0)");
-                    if ( rootList.Count==0 ) {
+                    var root = personModel.create(core, defaultRootUserGuid);
+                    if ( root == null ) {
                         logController.logInfo(core, "verify root user, no developers found, adding root/contensive");
-                        var root = personModel.add(core);
-                        root.name = "root";
-                        root.FirstName = "root";
-                        root.Username = "root";
-                        root.Password = "contensive";
+                        root = personModel.add(core);
+                        root.name = defaultRootUserName;
+                        root.FirstName = defaultRootUserName;
+                        root.Username = defaultRootUserUsername;
+                        root.Password = defaultRootUserPassword;
                         root.Developer = true;
                         root.save(core);
                     }
+                    //
+                    // -- verify site managers group
+                    logController.logInfo(core, "verify site managers groups");
+                    var group = groupModel.create(core, "{0685bd36-fe24-4542-be42-27337af50da8}");
+                    if (group == null) {
+                        logController.logInfo(core, "verify site manager group");
+                        group.name = defaultSiteManagerName;
+                        group.Caption = defaultSiteManagerName;
+                        group.AllowBulkEmail = true;
+                        group.ccguid = defaultSiteManagerGuid;
+                        group.save(core);
+                    }
+                    //
+                    // -- verify root is in site managers
+                    var memberRuleList = memberRuleModel.createList(core, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
+                    if ( memberRuleList.Count==0) {
+                        var memberRule = memberRuleModel.add(core);
+                        memberRule.GroupID = group.id;
+                        memberRule.MemberID = root.id;
+                        memberRule.save(core);
+                    }                    
                     //
                     //---------------------------------------------------------------------
                     // ----- Convert Database fields for new Db
@@ -253,7 +274,7 @@ namespace Contensive.Core.Controllers {
                             //RegisterList = ""
                             logController.logInfo(core, "Upgrading All Local Collections to new server build.");
                             string tmpString = "";
-                            bool UpgradeOK = collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, ref  nonCriticalErrorList);
+                            bool UpgradeOK = collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, forceFullInstall, ref  nonCriticalErrorList);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
                                 throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             } else if (!UpgradeOK) {
@@ -383,7 +404,7 @@ namespace Contensive.Core.Controllers {
                                                         ErrorMessage = "";
                                                         if (!localCollectionFound) {
                                                             logController.logInfo(core, "...site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
-                                                            bool addonInstallOk = collectionController.installCollectionFromRemoteRepo(core, CollectionGuid, ref  ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
+                                                            bool addonInstallOk = collectionController.installCollectionFromRemoteRepo(core, CollectionGuid, ref  ErrorMessage, "", isNewBuild, forceFullInstall, ref nonCriticalErrorList);
                                                             if (!addonInstallOk) {
                                                                 //
                                                                 // this may be OK so log, but do not call it an error
@@ -393,7 +414,7 @@ namespace Contensive.Core.Controllers {
                                                         } else {
                                                             if (upgradeCollection) {
                                                                 logController.logInfo(core, "...upgrading collection");
-                                                                collectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
+                                                                collectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, forceFullInstall, ref nonCriticalErrorList);
                                                             }
                                                         }
                                                     }

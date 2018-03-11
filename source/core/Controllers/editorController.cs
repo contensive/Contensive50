@@ -107,10 +107,10 @@ namespace Contensive.Core.Controllers {
                         EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
                     } else {
                         Copy = core.db.csGet(CSPointer, strFieldName);
-                        EditorPanel = EditorPanel + core.html.inputHidden("Type", FormTypeActiveEditor);
+                        EditorPanel = EditorPanel + core.html.getHtmlInputHidden("Type", FormTypeActiveEditor);
                         EditorPanel = EditorPanel + core.html.inputHidden("cid", ContentID);
                         EditorPanel = EditorPanel + core.html.inputHidden("ID", intRecordId);
-                        EditorPanel = EditorPanel + core.html.inputHidden("fn", strFieldName);
+                        EditorPanel = EditorPanel + core.html.getHtmlInputHidden("fn", strFieldName);
                         EditorPanel = EditorPanel + genericController.encodeText(FormElements);
                         EditorPanel = EditorPanel + core.html.getFormInputHTML("ContentCopy", Copy, "3", "45", false, true);
                         //EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)

@@ -248,7 +248,7 @@
 //                                            break;
 //                                    }
 //                                }
-//                                result = result + ElementText;
+//                                result += ElementText;
 //                                ElementPointer = ElementPointer + 1;
 //                                LoopCount += 1;
 //                            }

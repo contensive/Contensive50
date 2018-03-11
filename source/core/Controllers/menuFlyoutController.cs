@@ -323,7 +323,7 @@ namespace Contensive.Core.Controllers {
                                 break;
                         }
                         //
-                        Link = genericController.encodeHTML(iEntry[EntryPointer].Link);
+                        Link = htmlController.encodeHtml(iEntry[EntryPointer].Link);
                         if (!string.IsNullOrEmpty(iEntry[EntryPointer].Image)) {
                             //
                             // Create hotspot from image
@@ -494,7 +494,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // ----- Link but no child panel
                                     //
-                                    PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" href=\"" + genericController.encodeHTML(iEntry[EntryPointer].Link) + "\"" + target + " onmouseover=\"ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" + StyleSheetPrefix + "');\">" + HotSpotHTML + "</a>";
+                                    PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" href=\"" + htmlController.encodeHtml(iEntry[EntryPointer].Link) + "\"" + target + " onmouseover=\"ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" + StyleSheetPrefix + "');\">" + HotSpotHTML + "</a>";
                                 }
                             } else {
                                 if (string.IsNullOrEmpty(iEntry[EntryPointer].Link)) {
@@ -511,9 +511,9 @@ namespace Contensive.Core.Controllers {
                                     // ----- Child Panel and a link
                                     //
                                     if (FlyoutHover) {
-                                        PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" onmouseover=\"ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" + MenuFlyoutNamePrefix + "_" + iEntry[EntryPointer].Name + "','" + StyleSheetPrefix + "');\" onmouseout=\"ccFlyoutHoverMode(0);\" href=\"" + genericController.encodeHTML(iEntry[EntryPointer].Link) + "\"" + target + ">" + HotSpotHTML + MenuFlyoutIcon_Local + "</a>";
+                                        PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" onmouseover=\"ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" + MenuFlyoutNamePrefix + "_" + iEntry[EntryPointer].Name + "','" + StyleSheetPrefix + "');\" onmouseout=\"ccFlyoutHoverMode(0);\" href=\"" + htmlController.encodeHtml(iEntry[EntryPointer].Link) + "\"" + target + ">" + HotSpotHTML + MenuFlyoutIcon_Local + "</a>";
                                     } else {
-                                        PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" onmouseover=\"ccFlyoutPanelButtonHover(event,'" + MenuFlyoutNamePrefix + "_" + iEntry[EntryPointer].Name + "','" + StyleSheetPrefix + "');\" href=\"" + genericController.encodeHTML(iEntry[EntryPointer].Link) + "\"" + target + ">" + HotSpotHTML + MenuFlyoutIcon_Local + "</a>";
+                                        PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" onmouseover=\"ccFlyoutPanelButtonHover(event,'" + MenuFlyoutNamePrefix + "_" + iEntry[EntryPointer].Name + "','" + StyleSheetPrefix + "');\" href=\"" + htmlController.encodeHtml(iEntry[EntryPointer].Link) + "\"" + target + ">" + HotSpotHTML + MenuFlyoutIcon_Local + "</a>";
                                     }
                                 }
                             }
@@ -604,7 +604,7 @@ namespace Contensive.Core.Controllers {
                 //
                 if (core.menuFlyout != null) {
                     core.doc.menuSystemCloseCount = core.doc.menuSystemCloseCount + 1;
-                    result = result + core.menuFlyout.GetMenuClose();
+                    result += core.menuFlyout.GetMenuClose();
                     MenuFlyoutIcon = core.siteProperties.getText("MenuFlyoutIcon", "&#187;");
                     if (MenuFlyoutIcon != "&#187;") {
                         result = genericController.vbReplace(result, "&#187;</a>", MenuFlyoutIcon + "</a>");

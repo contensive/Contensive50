@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Text.RegularExpressions;
 
 public static class ExtensionMethods {
     //
@@ -119,5 +120,16 @@ public static class ExtensionMethods {
         }
         result.Append(s, pos, s.Length - pos);
         return result.ToString();
+    }
+    //
+    //====================================================================================================
+    /// <summary>
+    /// return true/false if the string is a valid base64 encode. Use this to prevent throwing an exception on fail
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
+    public static bool IsBase64String(this string s) {
+        s = s.Trim();
+        return (s.Length % 4 == 0) && Regex.IsMatch(s, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None);
     }
 }

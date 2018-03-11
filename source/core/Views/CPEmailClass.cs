@@ -70,7 +70,7 @@ namespace Contensive.Core {
         public override void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) {
             try {
                 string sendStatus = "";
-                emailController.sendAdHoc(core, ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0, ref sendStatus);
+                emailController.queueAdHocEmail(core, ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0, ref sendStatus);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -86,7 +86,7 @@ namespace Contensive.Core {
         /// <param name="Subject"></param>
         public override void sendForm(string ToAddress, string FromAddress, string Subject) {
             try {
-                emailController.sendForm(core, ToAddress, FromAddress, Subject);
+                emailController.queueFormEmail(core, ToAddress, FromAddress, Subject);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -105,7 +105,7 @@ namespace Contensive.Core {
         /// <param name="BodyIsHTML"></param>
         public override void sendGroup(string GroupList, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) {
             try {
-                emailController.sendGroup(core, GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML);
+                emailController.queueGroupEmail(core, GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML);
             } catch (Exception ex) {
                 core.handleException(ex);
                 throw;
@@ -122,7 +122,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void sendSystem(string EmailName, string AdditionalCopy = "", int AdditionalUserID = 0) {
-            emailController.sendSystem(core, EmailName, AdditionalCopy, AdditionalUserID);
+            emailController.queueSystemEmail(core, EmailName, AdditionalCopy, AdditionalUserID);
         }
         //
         //====================================================================================================
@@ -135,7 +135,7 @@ namespace Contensive.Core {
                 if ( person != null ) {
                     string sendStatus = "";
                     string queryStringForLinkAppend = "";
-                    emailController.sendPerson(core, person, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", false, ref sendStatus, queryStringForLinkAppend);
+                    emailController.queuePersonEmail(core, person, FromAddress, Subject, Body, "", "", SendImmediately, BodyIsHTML, 0, "", false, ref sendStatus, queryStringForLinkAppend);
                 }
             }
         }

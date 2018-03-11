@@ -757,7 +757,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ccLib\Config\Countries.csv" />
-    <Content Include="ccLib\Config\CustomReport_592841658668848001.csv" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>

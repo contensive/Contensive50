@@ -72,7 +72,7 @@ end function
 DataSourceModel
 
 public string ConnString { get; set; }
-public int ContentCategoryID { get; set; }
+
 
 
 
@@ -80,7 +80,7 @@ public int ContentCategoryID { get; set; }
 ---------------------------------------------
 TableModel
 
-public int ContentCategoryID { get; set; }
+
 public int DataSourceID { get; set; }
 
 
@@ -98,7 +98,7 @@ public bool AllowMetaContent { get; set; }
 public bool AllowTopicRules { get; set; }
 public bool AllowWorkflowAuthoring { get; set; }
 public int AuthoringTableID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentTableID { get; set; }
 public int DefaultSortMethodID { get; set; }
 public bool DeveloperOnly { get; set; }
@@ -121,7 +121,7 @@ ContentFieldModel
 public bool AdminOnly { get; set; }
 public bool Authorable { get; set; }
 public string Caption { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 public bool createResourceFilesOnRoot { get; set; }
 public string DefaultValue { get; set; }
@@ -164,7 +164,7 @@ public bool UniqueName { get; set; }
 ---------------------------------------------
 ContentFieldHelpModel
 
-public int ContentCategoryID { get; set; }
+
 public int FieldID { get; set; }
 public string HelpCustom { get; set; }
 public string HelpDefault { get; set; }
@@ -175,7 +175,7 @@ public string HelpDefault { get; set; }
 ---------------------------------------------
 ContentFieldTypeModel
 
-public int ContentCategoryID { get; set; }
+
 public int EditorAddonId { get; set; }
 
 
@@ -185,7 +185,7 @@ public int EditorAddonId { get; set; }
 Add-onContentFieldTypeRuleModel
 
 public int addonID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int contentFieldTypeID { get; set; }
 
 
@@ -194,7 +194,7 @@ public int contentFieldTypeID { get; set; }
 ---------------------------------------------
 SortMethodModel
 
-public int ContentCategoryID { get; set; }
+
 public string OrderByClause { get; set; }
 
 
@@ -203,7 +203,7 @@ public string OrderByClause { get; set; }
 ---------------------------------------------
 ContentCategorieModel
 
-public int ContentCategoryID { get; set; }
+
 
 
 
@@ -214,7 +214,7 @@ VisitSummaryModel
 public int AuthenticatedVisits { get; set; }
 public int AveTimeOnSite { get; set; }
 public int BotVisits { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int DateNumber { get; set; }
 public int MobileVisits { get; set; }
 public int NewVisitorVisits { get; set; }
@@ -233,7 +233,7 @@ PageViewSummaryModel
 
 public int AuthenticatedPageViews { get; set; }
 public int BotPageViews { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int DateNumber { get; set; }
 public int MobilePageViews { get; set; }
 public int NoCookiePageViews { get; set; }
@@ -249,7 +249,7 @@ public int TimeNumber { get; set; }
 ---------------------------------------------
 VisitorModel
 
-public int ContentCategoryID { get; set; }
+
 public int ForceBrowserMobile { get; set; }
 public int MemberID { get; set; }
 public int OrderID { get; set; }
@@ -262,7 +262,7 @@ VisitModel
 
 public bool Bot { get; set; }
 public string Browser { get; set; }
-public int ContentCategoryID { get; set; }
+
 public bool CookieSupport { get; set; }
 public bool ExcludeFromAnalytics { get; set; }
 public string HTTP_FROM { get; set; }
@@ -292,7 +292,7 @@ public bool VisitorNew { get; set; }
 ---------------------------------------------
 ViewingModel
 
-public int ContentCategoryID { get; set; }
+
 public bool ExcludeFromAnalytics { get; set; }
 public string Form { get; set; }
 public string Host { get; set; }
@@ -316,7 +316,7 @@ AdminMenuingModel
 
 public int AddonID { get; set; }
 public bool AdminOnly { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 public bool DeveloperOnly { get; set; }
 public int HelpAddonID { get; set; }
@@ -354,7 +354,7 @@ ReportRuleModel
 
 public string Address { get; set; }
 public string Browser { get; set; }
-public int ContentCategoryID { get; set; }
+
 
 
 
@@ -362,7 +362,7 @@ public int ContentCategoryID { get; set; }
 ---------------------------------------------
 TrapLogModel
 
-public int ContentCategoryID { get; set; }
+
 public string CopyFilename { get; set; }
 public string Host { get; set; }
 public string Page { get; set; }
@@ -376,7 +376,7 @@ public bool Resolved { get; set; }
 ---------------------------------------------
 SitePropertieModel
 
-public int ContentCategoryID { get; set; }
+
 public string FieldValue { get; set; }
 
 
@@ -393,7 +393,7 @@ AdminSitePropertieModel
 TopicModel
 
 public bool AllowBulkEmail { get; set; }
-public int ContentCategoryID { get; set; }
+
 public bool PublicJoin { get; set; }
 
 
@@ -402,7 +402,7 @@ public bool PublicJoin { get; set; }
 ---------------------------------------------
 PageContentTopicRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int PageID { get; set; }
 public int TopicID { get; set; }
 
@@ -412,7 +412,7 @@ public int TopicID { get; set; }
 ---------------------------------------------
 MemberTopicRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int MemberID { get; set; }
 public int TopicID { get; set; }
 
@@ -422,7 +422,7 @@ public int TopicID { get; set; }
 ---------------------------------------------
 TopicHabitModel
 
-public int ContentCategoryID { get; set; }
+
 public string ContentRecordKey { get; set; }
 public int MemberID { get; set; }
 public int Score { get; set; }
@@ -435,7 +435,7 @@ public int VisitID { get; set; }
 ---------------------------------------------
 LanguageModel
 
-public int ContentCategoryID { get; set; }
+
 public string HTTP_Accept_Language { get; set; }
 
 
@@ -467,7 +467,7 @@ public int BirthdayMonth { get; set; }
 public int BirthdayYear { get; set; }
 public string City { get; set; }
 public string Company { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string Country { get; set; }
 public bool CreatedByVisit { get; set; }
 public DateTime DateExpires { get; set; }
@@ -518,7 +518,7 @@ GroupModel
 
 public bool AllowBulkEmail { get; set; }
 public string Caption { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string CopyFilename { get; set; }
 public bool PublicJoin { get; set; }
 
@@ -530,7 +530,7 @@ GroupRuleModel
 
 public bool AllowAdd { get; set; }
 public bool AllowDelete { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 public int GroupID { get; set; }
 
@@ -540,7 +540,7 @@ public int GroupID { get; set; }
 ---------------------------------------------
 MemberRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public DateTime DateExpires { get; set; }
 public int GroupID { get; set; }
 public int MemberID { get; set; }
@@ -557,7 +557,7 @@ public string BriefFilename { get; set; }
 public string City { get; set; }
 public int Clicks { get; set; }
 public int ContactMemberID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string CopyFilename { get; set; }
 public string Country { get; set; }
 public string Email { get; set; }
@@ -604,7 +604,7 @@ public int ChildListSortMethodID { get; set; }
 public bool ChildPagesFound { get; set; }
 public int Clicks { get; set; }
 public int ContactMemberID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentPadding { get; set; }
 public string Copyfilename { get; set; }
 public string CustomBlockMessage { get; set; }
@@ -655,7 +655,7 @@ public int Viewings { get; set; }
 ---------------------------------------------
 PageContentBlockRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int GroupID { get; set; }
 public int RecordID { get; set; }
 
@@ -671,7 +671,7 @@ public bool BlockSiteStyles { get; set; }
 public DateTime ConditionExpireDate { get; set; }
 public int ConditionID { get; set; }
 public int ConditionPeriod { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string CopyFilename { get; set; }
 public int EmailTemplateID { get; set; }
 public int EmailWizardID { get; set; }
@@ -692,7 +692,7 @@ public bool ToAll { get; set; }
 ---------------------------------------------
 EmailStyleRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int emailId { get; set; }
 public int sharedStylesId { get; set; }
 
@@ -738,7 +738,7 @@ public bool ToAll { get; set; }
 ---------------------------------------------
 EmailGroupModel
 
-public int ContentCategoryID { get; set; }
+
 public int EmailID { get; set; }
 public int GroupID { get; set; }
 
@@ -748,7 +748,7 @@ public int GroupID { get; set; }
 ---------------------------------------------
 EmailTopicModel
 
-public int ContentCategoryID { get; set; }
+
 public int EmailID { get; set; }
 public int TopicID { get; set; }
 
@@ -758,7 +758,7 @@ public int TopicID { get; set; }
 ---------------------------------------------
 EmailDropModel
 
-public int ContentCategoryID { get; set; }
+
 public int EmailID { get; set; }
 
 
@@ -767,7 +767,7 @@ public int EmailID { get; set; }
 ---------------------------------------------
 EmailLogModel
 
-public int ContentCategoryID { get; set; }
+
 public DateTime DateBlockExpires { get; set; }
 public int EmailDropID { get; set; }
 public int EmailID { get; set; }
@@ -786,7 +786,7 @@ public int VisitID { get; set; }
 EmailTemplateModel
 
 public string BodyHTML { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string Source { get; set; }
 
 
@@ -796,7 +796,7 @@ public string Source { get; set; }
 EmailWizardModel
 
 public bool AllowSpamFooterDefault { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string ContentFormInstructions { get; set; }
 public int DefaultConditionPeriod { get; set; }
 public string DefaultContent { get; set; }
@@ -821,7 +821,7 @@ ContentWatchModel
 
 public bool AllowWhatsNew { get; set; }
 public int Clicks { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int Contentid { get; set; }
 public string ContentRecordKey { get; set; }
 public string Link { get; set; }
@@ -835,7 +835,7 @@ public DateTime WhatsNewDateExpires { get; set; }
 ---------------------------------------------
 ContentWatchListModel
 
-public int ContentCategoryID { get; set; }
+
 
 
 
@@ -843,7 +843,7 @@ public int ContentCategoryID { get; set; }
 ---------------------------------------------
 ContentWatchListRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int ContentWatchID { get; set; }
 public int ContentWatchListID { get; set; }
 
@@ -854,7 +854,7 @@ public int ContentWatchListID { get; set; }
 SeeAlsoModel
 
 public string Brief { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 public string Link { get; set; }
 public int RecordID { get; set; }
@@ -865,7 +865,7 @@ public int RecordID { get; set; }
 ---------------------------------------------
 PathModel
 
-public int ContentCategoryID { get; set; }
+
 
 
 
@@ -873,7 +873,7 @@ public int ContentCategoryID { get; set; }
 ---------------------------------------------
 PathRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int GroupID { get; set; }
 public int PathID { get; set; }
 
@@ -884,7 +884,7 @@ public int PathID { get; set; }
 StateModel
 
 public string Abbreviation { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int CountryID { get; set; }
 public string FIPSState { get; set; }
 public double SalesTax { get; set; }
@@ -897,7 +897,7 @@ public int StateRegionID { get; set; }
 CountrieModel
 
 public string Abbreviation { get; set; }
-public int ContentCategoryID { get; set; }
+
 public bool DomesticShipping { get; set; }
 
 
@@ -910,7 +910,7 @@ public string Align { get; set; }
 public string Caption { get; set; }
 public int Clicks { get; set; }
 public int ClicksMax { get; set; }
-public int ContentCategoryID { get; set; }
+
 public DateTime DateExpires { get; set; }
 public int Height { get; set; }
 public string ImageFilename { get; set; }
@@ -930,7 +930,7 @@ public int Width { get; set; }
 ---------------------------------------------
 PropertieModel
 
-public int ContentCategoryID { get; set; }
+
 public string FieldValue { get; set; }
 public int KeyID { get; set; }
 public int TypeID { get; set; }
@@ -941,7 +941,7 @@ public int TypeID { get; set; }
 ---------------------------------------------
 AuthoringControlModel
 
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 public string ContentRecordKey { get; set; }
 public int ControlType { get; set; }
@@ -954,7 +954,7 @@ public int RecordID { get; set; }
 ---------------------------------------------
 SharedStylesIncludeRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int IncludedStyleID { get; set; }
 public int StyleID { get; set; }
 
@@ -965,7 +965,7 @@ public int StyleID { get; set; }
 SharedStyleModel
 
 public bool AlwaysInclude { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string Prefix { get; set; }
 public string StyleFilename { get; set; }
 public string Suffix { get; set; }
@@ -977,7 +977,7 @@ public string Suffix { get; set; }
 SharedStylesAdd-onRuleModel
 
 public int AddonID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int StyleID { get; set; }
 
 
@@ -987,7 +987,7 @@ public int StyleID { get; set; }
 ScriptingModuleModel
 
 public string Code { get; set; }
-public int ContentCategoryID { get; set; }
+
 
 
 
@@ -995,7 +995,7 @@ public int ContentCategoryID { get; set; }
 ---------------------------------------------
 ScriptingLanguageModel
 
-public int ContentCategoryID { get; set; }
+
 
 
 
@@ -1004,7 +1004,7 @@ public int ContentCategoryID { get; set; }
 Add-onScriptingModuleRuleModel
 
 public int AddonID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ScriptingModuleID { get; set; }
 
 
@@ -1014,7 +1014,7 @@ public int ScriptingModuleID { get; set; }
 Add-onIncludeRuleModel
 
 public int AddonID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int IncludedAddonID { get; set; }
 
 
@@ -1024,7 +1024,7 @@ public int IncludedAddonID { get; set; }
 Add-onContentTriggerRuleModel
 
 public int AddonID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 
 
@@ -1033,7 +1033,7 @@ public int ContentID { get; set; }
 ---------------------------------------------
 Add-onEventModel
 
-public int ContentCategoryID { get; set; }
+
 
 
 
@@ -1042,7 +1042,7 @@ public int ContentCategoryID { get; set; }
 Add-onEventThrowerModel
 
 public int collectionId { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int eventId { get; set; }
 
 
@@ -1052,7 +1052,7 @@ public int eventId { get; set; }
 Add-onEventCatcherModel
 
 public int addonId { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int eventId { get; set; }
 
 
@@ -1068,7 +1068,7 @@ public bool BlockDefaultStyles { get; set; }
 public bool BlockEditTools { get; set; }
 public int CollectionID { get; set; }
 public bool Content { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string Copy { get; set; }
 public string CopyText { get; set; }
 public string CustomStylesFilename { get; set; }
@@ -1155,7 +1155,7 @@ public string ObjectProgramID { get; set; }
 Add-onCollectionParentRuleModel
 
 public int ChildID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ParentID { get; set; }
 
 
@@ -1165,7 +1165,7 @@ public int ParentID { get; set; }
 Add-onCollectionCDefRuleModel
 
 public int CollectionID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 
 
@@ -1175,7 +1175,7 @@ public int ContentID { get; set; }
 Add-onCollectionModuleRuleModel
 
 public int CollectionID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ScriptingModuleID { get; set; }
 
 
@@ -1185,7 +1185,7 @@ public int ScriptingModuleID { get; set; }
 Add-onCollectionModel
 
 public bool blockNavigatorNode { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string ContentFileList { get; set; }
 public string DataRecordList { get; set; }
 public string ExecFileList { get; set; }
@@ -1204,7 +1204,7 @@ public string wwwFileList { get; set; }
 ---------------------------------------------
 LibraryFolderModel
 
-public int ContentCategoryID { get; set; }
+
 public string Description { get; set; }
 public int ParentID { get; set; }
 
@@ -1214,7 +1214,7 @@ public int ParentID { get; set; }
 ---------------------------------------------
 LibraryFolderRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int FolderID { get; set; }
 public int GroupID { get; set; }
 
@@ -1227,7 +1227,7 @@ LibraryFileModel
 public string AltSizeList { get; set; }
 public string AltText { get; set; }
 public int Clicks { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string Description { get; set; }
 public string Filename { get; set; }
 public int FileSize { get; set; }
@@ -1242,7 +1242,7 @@ public string Width { get; set; }
 ---------------------------------------------
 LibraryFileTypeModel
 
-public int ContentCategoryID { get; set; }
+
 public string DownloadIconFilename { get; set; }
 public string ExtensionList { get; set; }
 public string IconFilename { get; set; }
@@ -1258,7 +1258,7 @@ public string MediaIconFilename { get; set; }
 ---------------------------------------------
 LibraryFileLogModel
 
-public int ContentCategoryID { get; set; }
+
 public int FileID { get; set; }
 public int MemberID { get; set; }
 public int VisitID { get; set; }
@@ -1269,7 +1269,7 @@ public int VisitID { get; set; }
 ---------------------------------------------
 LinkForwardModel
 
-public int ContentCategoryID { get; set; }
+
 public string DestinationLink { get; set; }
 public int GroupID { get; set; }
 public string SourceLink { get; set; }
@@ -1281,7 +1281,7 @@ public int Viewings { get; set; }
 ---------------------------------------------
 LinkAliaseModel
 
-public int ContentCategoryID { get; set; }
+
 public string Link { get; set; }
 public int PageID { get; set; }
 public string QueryStringSuffix { get; set; }
@@ -1293,7 +1293,7 @@ public string QueryStringSuffix { get; set; }
 DomainModel
 
 public bool allowCrossLogin { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int DefaultTemplateId { get; set; }
 public int forwardDomainId { get; set; }
 public string ForwardURL { get; set; }
@@ -1311,7 +1311,7 @@ PageTemplateModel
 
 public string BodyHTML { get; set; }
 public string BodyTag { get; set; }
-public int ContentCategoryID { get; set; }
+
 public bool IsSecure { get; set; }
 public string JSEndBody { get; set; }
 public string JSFilename { get; set; }
@@ -1329,7 +1329,7 @@ public string StylesFilename { get; set; }
 ---------------------------------------------
 TemplateDomainRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int domainId { get; set; }
 public int templateId { get; set; }
 
@@ -1339,7 +1339,7 @@ public int templateId { get; set; }
 ---------------------------------------------
 SharedStylesTemplateRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int StyleID { get; set; }
 public int TemplateID { get; set; }
 
@@ -1351,7 +1351,7 @@ SiteSectionModel
 
 public bool BlockSection { get; set; }
 public string Caption { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 public bool HideMenu { get; set; }
 public string JSEndBody { get; set; }
@@ -1371,7 +1371,7 @@ public int TemplateID { get; set; }
 ---------------------------------------------
 SectionBlockRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int GroupID { get; set; }
 public int SectionID { get; set; }
 
@@ -1381,7 +1381,7 @@ public int SectionID { get; set; }
 ---------------------------------------------
 MetaContentModel
 
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 public string MetaDescription { get; set; }
 public string MetaKeywordList { get; set; }
@@ -1394,7 +1394,7 @@ public int RecordID { get; set; }
 ---------------------------------------------
 MetaKeywordModel
 
-public int ContentCategoryID { get; set; }
+
 
 
 
@@ -1402,7 +1402,7 @@ public int ContentCategoryID { get; set; }
 ---------------------------------------------
 MetaKeywordRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int MetaContentID { get; set; }
 public int MetaKeywordID { get; set; }
 
@@ -1412,7 +1412,7 @@ public int MetaKeywordID { get; set; }
 ---------------------------------------------
 AggregateAccesModel
 
-public int ContentCategoryID { get; set; }
+
 public string Link { get; set; }
 
 
@@ -1421,7 +1421,7 @@ public string Link { get; set; }
 ---------------------------------------------
 CopyContentModel
 
-public int ContentCategoryID { get; set; }
+
 public string Copy { get; set; }
 
 
@@ -1430,7 +1430,7 @@ public string Copy { get; set; }
 ---------------------------------------------
 UserFormResponseModel
 
-public int ContentCategoryID { get; set; }
+
 public string Copy { get; set; }
 public int VisitID { get; set; }
 
@@ -1441,7 +1441,7 @@ public int VisitID { get; set; }
 TaskModel
 
 public string Command { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string DataSource { get; set; }
 public DateTime DateCompleted { get; set; }
 public DateTime DateStarted { get; set; }
@@ -1467,7 +1467,7 @@ public string classTierList { get; set; }
 public string classTopItem { get; set; }
 public string classTopList { get; set; }
 public string classTopWrapper { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string Delimiter { get; set; }
 public int Depth { get; set; }
 public int FlyoutDirection { get; set; }
@@ -1486,7 +1486,7 @@ public bool useJsFlyoutCode { get; set; }
 ---------------------------------------------
 DynamicMenuSectionRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int DynamicMenuID { get; set; }
 public int SectionID { get; set; }
 
@@ -1496,7 +1496,7 @@ public int SectionID { get; set; }
 ---------------------------------------------
 CustomReportModel
 
-public int ContentCategoryID { get; set; }
+
 public string SQLQuery { get; set; }
 
 
@@ -1506,7 +1506,7 @@ public string SQLQuery { get; set; }
 FormPageModel
 
 public string Body { get; set; }
-public int ContentCategoryID { get; set; }
+
 public string Instructions { get; set; }
 
 
@@ -1516,7 +1516,7 @@ public string Instructions { get; set; }
 RemoteQuerieModel
 
 public bool AllowInactiveRecords { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 public string Criteria { get; set; }
 public int DataSourceID { get; set; }
@@ -1535,7 +1535,7 @@ public int VisitID { get; set; }
 ---------------------------------------------
 WrapperModel
 
-public int ContentCategoryID { get; set; }
+
 public string copytext { get; set; }
 public string javascriptbodyend { get; set; }
 public string javascriptinhead { get; set; }
@@ -1551,7 +1551,7 @@ public string targetstring { get; set; }
 ---------------------------------------------
 ActivityLogModel
 
-public int ContentCategoryID { get; set; }
+
 public string Link { get; set; }
 public int MemberID { get; set; }
 public string Message { get; set; }
@@ -1565,7 +1565,7 @@ public int VisitorID { get; set; }
 ---------------------------------------------
 LayoutModel
 
-public int ContentCategoryID { get; set; }
+
 public string Layout { get; set; }
 public string StylesFilename { get; set; }
 
@@ -1575,7 +1575,7 @@ public string StylesFilename { get; set; }
 ---------------------------------------------
 SharedStylesLayoutRuleModel
 
-public int ContentCategoryID { get; set; }
+
 public int LayoutID { get; set; }
 public int StyleID { get; set; }
 
@@ -1585,7 +1585,7 @@ public int StyleID { get; set; }
 ---------------------------------------------
 SiteWarningModel
 
-public int ContentCategoryID { get; set; }
+
 public int count { get; set; }
 public DateTime DateLastReported { get; set; }
 public string description { get; set; }
@@ -1606,7 +1606,7 @@ public bool AddCancelButton { get; set; }
 public bool AddContinueButton { get; set; }
 public string BackButtonName { get; set; }
 public string CancelButtonName { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentID { get; set; }
 public string ContinueButtonName { get; set; }
 public int FormSetID { get; set; }
@@ -1622,7 +1622,7 @@ public bool UseAuthOrgContent { get; set; }
 ---------------------------------------------
 ImportWizardTaskModel
 
-public int ContentCategoryID { get; set; }
+
 public DateTime DateCompleted { get; set; }
 public DateTime DateStarted { get; set; }
 public string ImportMapFilename { get; set; }
@@ -1636,7 +1636,7 @@ public string uploadFilename { get; set; }
 ---------------------------------------------
 FormSetModel
 
-public int ContentCategoryID { get; set; }
+
 public int JoinGroupID { get; set; }
 public int NotificationEmailID { get; set; }
 public int ResponseEmailID { get; set; }
@@ -1650,7 +1650,7 @@ FormFieldModel
 
 public int ButtonActionID { get; set; }
 public string Caption { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int ContentFieldID { get; set; }
 public int FormID { get; set; }
 public string InputType { get; set; }
@@ -1663,7 +1663,7 @@ public bool Required { get; set; }
 ---------------------------------------------
 RSSAggregatorModel
 
-public int ContentCategoryID { get; set; }
+
 
 
 
@@ -1671,7 +1671,7 @@ public int ContentCategoryID { get; set; }
 ---------------------------------------------
 RSSAggregatorSourceModel
 
-public int ContentCategoryID { get; set; }
+
 public string Link { get; set; }
 
 
@@ -1681,7 +1681,7 @@ public string Link { get; set; }
 RSSAggregatorSourceRuleModel
 
 public int AggregatorID { get; set; }
-public int ContentCategoryID { get; set; }
+
 public int SourceID { get; set; }
 
 
@@ -1690,7 +1690,7 @@ public int SourceID { get; set; }
 ---------------------------------------------
 RSSAggregatorSourceStorieModel
 
-public int ContentCategoryID { get; set; }
+
 public string description { get; set; }
 public string itemGuid { get; set; }
 public string link { get; set; }

@@ -70,7 +70,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     foreach (DataRow rsDr in dt.Rows) {
                         int addonId = genericController.encodeInteger(rsDr["addonid"]);
                         if ((addonId != 0) & (addonId != addonDefaultEditorId)) {
-                            result = result + "\r\n\t<div class=\"radioCon\">" + core.html.inputRadio(radioGroupName, genericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + genericController.encodeText(rsDr["addonName"]) + "</div>";
+                            result += "\r\n\t<div class=\"radioCon\">" + core.html.inputRadio(radioGroupName, genericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + genericController.encodeText(rsDr["addonName"]) + "</div>";
                         }
 
                     }

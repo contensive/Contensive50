@@ -454,7 +454,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                             //---------------------------------------------------------------------------------------------
                             //
                             if (core.session.isAuthenticatedDeveloper(core) & core.docProperties.getBoolean("InstallCore")) {
-                                UpgradeOK = collectionController.installCollectionFromRemoteRepo(core, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, ref nonCriticalErrorList);
+                                UpgradeOK = collectionController.installCollectionFromRemoteRepo(core, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
                             }
                             //
                             //---------------------------------------------------------------------------------------------
@@ -490,7 +490,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                             Cnt = LibGuids.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 RegisterList = "";
-                                UpgradeOK = collectionController.installCollectionFromRemoteRepo(core, LibGuids[Ptr], ref ErrorMessage, "", false, ref nonCriticalErrorList);
+                                UpgradeOK = collectionController.installCollectionFromRemoteRepo(core, LibGuids[Ptr], ref ErrorMessage, "", false, true, ref nonCriticalErrorList);
                                 if (!UpgradeOK) {
                                     //
                                     // block the reset because we will loose the error message
@@ -515,7 +515,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                         if (AllowInstallFromFolder) {
                             //InstallFolder = core.asv.config.physicalFilePath & InstallFolderName & "\"
                             if (core.privateFiles.pathExists(privateFilesInstallPath)) {
-                                UpgradeOK = collectionController.InstallCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, ref nonCriticalErrorList);
+                                UpgradeOK = collectionController.InstallCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, true, ref nonCriticalErrorList);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         errorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");
@@ -740,7 +740,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                                                 //
                                                                 // Not installed yet
                                                                 //
-                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + core.html.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + core.html.inputHidden("LibraryRowName" + RowPtr, Collectionname);
+                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + core.html.getHtmlInputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + core.html.getHtmlInputHidden("LibraryRowName" + RowPtr, Collectionname);
                                                                 //Cells3(RowPtr, 0) = core.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & core.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & core.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
                                                                 Cells3[RowPtr, 1] = Collectionname + "&nbsp;";
                                                                 Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";

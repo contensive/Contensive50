@@ -241,7 +241,7 @@ namespace Contensive.CLI {
                     Core.Controllers.iisController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
                     //
                     Contensive.Core.Controllers.logController.logInfo(cp.core, "Run db upgrade.");
-                    Core.Controllers.appBuilderController.upgrade(cp.core, true);
+                    Core.Controllers.appBuilderController.upgrade(cp.core, true, true);
                     //
                     // -- set the application back to normal mode
                     cp.core.serverConfig.saveObject(cp.core);

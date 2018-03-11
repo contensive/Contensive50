@@ -140,7 +140,6 @@ namespace Contensive.Core.Models.DbModels {
             // -- set by load(). Used by field to read content from filename when needed
             public coreController internalcore { get; set; } = null;
         }
-
         //
         public class fieldTypeTextFile : fieldCdnFile {
         }
@@ -153,19 +152,57 @@ namespace Contensive.Core.Models.DbModels {
         //
         //====================================================================================================
         // -- instance properties
+        /// <summary>
+        /// identity integer, primary key for every table
+        /// </summary>
         public int id { get; set; }
+        /// <summary>
+        /// name of the record used for lookup lists
+        /// </summary>
         public string name { get; set; }
+        /// <summary>
+        /// optional guid, created automatically in the model
+        /// </summary>
         public string ccguid { get; set; }
+        /// <summary>
+        /// optionally can be used to disable a record. Must be implemented in each query
+        /// </summary>
         public bool active { get; set; }
+        /// <summary>
+        /// id of the metadata record in ccContent that controls the display and handing for this record
+        /// </summary>
         public int contentControlID { get; set; }
+        /// <summary>
+        /// foreign key to ccmembers table, populated by admin when record added.
+        /// </summary>
         public int createdBy { get; set; }
+        /// <summary>
+        /// used when creating new record
+        /// </summary>
         public int createKey { get; set; }
+        /// <summary>
+        /// date record added, populated by admin when record added.
+        /// </summary>
         public DateTime dateAdded { get; set; }
+        /// <summary>
+        /// foreign key to ccmembers table set to user who modified the record last in the admin site
+        /// </summary>
         public int modifiedBy { get; set; }
+        /// <summary>
+        /// date when the record was last modified in the admin site
+        /// </summary>
         public DateTime modifiedDate { get; set; }
+        /// <summary>
+        /// optionally used to sort recrods in the table
+        /// </summary>
         public string sortOrder { get; set; }
         //
         //====================================================================================================
+        /// <summary>
+        /// return the name of the content (metadata for the table) for the derived class
+        /// </summary>
+        /// <param name="derivedType"></param>
+        /// <returns></returns>
         private static string derivedContentName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentName");
             if (fieldInfo == null) {
@@ -176,6 +213,11 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// return the name of the database table associated to the derived content
+        /// </summary>
+        /// <param name="derivedType"></param>
+        /// <returns></returns>
         private static string derivedContentTableName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentTableName");
             if (fieldInfo == null) {
@@ -186,6 +228,11 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// return the name of the datasource assocated to the database table assocated to the derived content
+        /// </summary>
+        /// <param name="derivedType"></param>
+        /// <returns></returns>
         private static string contentDataSource(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentTableName");
             if (fieldInfo == null) {
@@ -197,7 +244,7 @@ namespace Contensive.Core.Models.DbModels {
         //
         //====================================================================================================
         /// <summary>
-        /// Create an empty object. needed for deserialization
+        /// simple constructor needed for deserialization
         /// </summary>
         public baseModel() {
             //
@@ -334,6 +381,13 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// create an object from a record with matching ccGuid
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="recordGuid"></param>
+        /// <returns></returns>
         protected static T create<T>(coreController core, string recordGuid) where T : baseModel {
             var tempVar = new List<string>();
             return create<T>(core, recordGuid, ref tempVar);
@@ -341,7 +395,7 @@ namespace Contensive.Core.Models.DbModels {
         //
         //====================================================================================================
         /// <summary>
-        /// open an existing object
+        /// create an object from a record with a matching ccguid, add an object cache name to the argument list
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
@@ -379,14 +433,21 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// create an object from the first record found from a list created with matching name records, ordered by id
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="recordName"></param>
+        /// <returns></returns>
         protected static T createByName<T>(coreController core, string recordName) where T : baseModel {
-            var tempVar = new List<string>();
-            return createByName<T>(core, recordName, ref tempVar);
+            var cacheNameList = new List<string>();
+            return createByName<T>(core, recordName, ref cacheNameList);
         }
         //
         //====================================================================================================
         /// <summary>
-        /// open an existing object
+        /// create an object from the first record found from a list created with matching name records, ordered by id, add an object cache name to the argument list
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordName"></param>
@@ -825,18 +886,33 @@ namespace Contensive.Core.Models.DbModels {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// create a list of objects based on the sql criteria
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <returns></returns>
         protected static List<T> createList<T>(coreController core, string sqlCriteria) where T : baseModel {
             return createList<T>(core, sqlCriteria, "id", new List<string> { });
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// create a list of objects based on the sql criteria and sort order
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sqlOrderBy"></param>
+        /// <returns></returns>
         protected static List<T> createList<T>(coreController core, string sqlCriteria, string sqlOrderBy) where T : baseModel {
             return createList<T>(core, sqlCriteria, sqlOrderBy, new List<string> { });
         }
         //
         //====================================================================================================
         /// <summary>
-        /// pattern get a list of objects from this model
+        /// create a list of objects based on the sql criteria and sort order, and add a cache object to an argument
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
@@ -1067,12 +1143,16 @@ namespace Contensive.Core.Models.DbModels {
             return instance;
         }
         //
+        //====================================================================================================
+        //
         private static T readModelCache<T>(coreController core, string fieldName, string fieldValue) where T : baseModel {
             Type instanceType = typeof(T);
             string tableName = derivedContentTableName(instanceType);
             string cacheName = Controllers.cacheController.getCacheKey_Entity(tableName, fieldName, fieldValue);
             return core.cache.getObject<T>(cacheName);
         }
+        //
+        //====================================================================================================
         //
         private static string getSelectSql<T>(List<string> fieldList = null, string criteria = "", string orderBy = "") where T : baseModel {
             string result = "";

@@ -109,7 +109,7 @@ namespace Contensive.Core.Controllers {
                     //
                     TabBlank = LiveTab.GetTabBlank();
                     TabEdgeStyle = "ccTabEdge";
-                    result = result + "<table border=0 cellspacing=0 cellpadding=0><tr>";
+                    result += "<table border=0 cellspacing=0 cellpadding=0><tr>";
                     for (TabPtr = 0; TabPtr < TabsCnt; TabPtr++) {
                         TabID = "Tab" + encodeText(genericController.GetRandomInteger(core));
                         TabStyle = Tabs[TabPtr].StylePrefix;
@@ -123,12 +123,12 @@ namespace Contensive.Core.Controllers {
                             //
                             // This tab is linked to a page
                             //
-                            TabLink = genericController.encodeHTML(Tabs[TabPtr].Link);
+                            TabLink = htmlController.encodeHtml(Tabs[TabPtr].Link);
                         } else {
                             //
                             // This tab has a visible body
                             //
-                            TabLink = genericController.encodeHTML(Tabs[TabPtr].Link);
+                            TabLink = htmlController.encodeHtml(Tabs[TabPtr].Link);
                             if (!FirstLiveBodyShown) {
                                 FirstLiveBodyShown = true;
                                 TabBody = TabBody + "<div style=\"visibility: visible; position: absolute; left: 0px;\" class=\"" + Tabs[TabPtr].StylePrefix + "Body\" id=\"" + TabID + "\"></div>";
@@ -152,13 +152,13 @@ namespace Contensive.Core.Controllers {
                             TabCurrent = genericController.vbReplace(TabCurrent, "Replace-HotSpot", "<a href=\"" + TabLink + "\" Class=\"" + TabLinkStyle + "\">" + Tabs[TabPtr].Caption + "</a>");
                             TabCurrent = genericController.vbReplace(TabCurrent, "Replace-StyleHit", TabStyle);
                         }
-                        result = result + "<td valign=bottom>" + TabCurrent + "</td>";
+                        result += "<td valign=bottom>" + TabCurrent + "</td>";
                     }
-                    result = result + "<td class=ccTabEnd>&nbsp;</td></tr>";
+                    result += "<td class=ccTabEnd>&nbsp;</td></tr>";
                     if (!string.IsNullOrEmpty(TabBody)) {
-                        result = result + "<tr><td colspan=6>" + TabBody + "</td></tr>";
+                        result += "<tr><td colspan=6>" + TabBody + "</td></tr>";
                     }
-                    result = result + "</table>";
+                    result += "</table>";
                     TabsCnt = 0;
                 }
             } catch (Exception ex) {

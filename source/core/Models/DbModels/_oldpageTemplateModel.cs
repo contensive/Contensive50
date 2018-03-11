@@ -133,33 +133,33 @@ namespace Contensive.Core.Models.DbModels {
             }
             return result;
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// template for open an existing object with multiple keys (like a rule)
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="foreignKey1Id"></param>
-        public static oldPageTemplateModel create(coreController core, int foreignKey1Id, int foreignKey2Id, ref List<string> callersCacheNameList) {
-            oldPageTemplateModel result = null;
-            try {
-                if ((foreignKey1Id > 0) && (foreignKey2Id > 0)) {
-                    result = core.cache.getObject<oldPageTemplateModel>(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "foreignKey1", foreignKey1Id, "foreignKey2", foreignKey2Id));
-                    if (result == null) {
-                        using (csController cs = new csController(core)) {
-                            if (cs.open(primaryContentName, "(foreignKey1=" + foreignKey1Id.ToString() + ")and(foreignKey1=" + foreignKey1Id.ToString() + ")")) {
-                                result = loadRecord(core, cs, ref callersCacheNameList);
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
-            return result;
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// template for open an existing object with multiple keys (like a rule)
+        ///// </summary>
+        ///// <param name="cp"></param>
+        ///// <param name="foreignKey1Id"></param>
+        //public static oldPageTemplateModel create(coreController core, int foreignKey1Id, int foreignKey2Id, ref List<string> callersCacheNameList) {
+        //    oldPageTemplateModel result = null;
+        //    try {
+        //        if ((foreignKey1Id > 0) && (foreignKey2Id > 0)) {
+        //            result = core.cache.getObject<oldPageTemplateModel>(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "foreignKey1", foreignKey1Id, "foreignKey2", foreignKey2Id));
+        //            if (result == null) {
+        //                using (csController cs = new csController(core)) {
+        //                    if (cs.open(primaryContentName, "(foreignKey1=" + foreignKey1Id.ToString() + ")and(foreignKey1=" + foreignKey1Id.ToString() + ")")) {
+        //                        result = loadRecord(core, cs, ref callersCacheNameList);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    } catch (Exception ex) {
+        //        core.handleException(ex);
+        //        throw;
+        //        throw;
+        //    }
+        //    return result;
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -375,30 +375,30 @@ namespace Contensive.Core.Models.DbModels {
                 throw;
             }
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// pattern to delete an existing object based on multiple criteria (like a rule record)
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="foreignKey1Id"></param>
-        /// <param name="foreignKey2Id"></param>
-        public static void delete(coreController core, int foreignKey1Id, int foreignKey2Id) {
-            try {
-                if ((foreignKey2Id > 0) && (foreignKey1Id > 0)) {
-                    var tempVar = new List<string>();
-                    oldPageTemplateModel instance = create(core, foreignKey1Id, foreignKey2Id, ref tempVar);
-                    if (instance != null) {
-                        invalidatePrimaryCache(core, instance.ID);
-                        core.db.deleteTableRecord(primaryContentTableName, instance.ID, primaryContentDataSource);
-                    }
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// pattern to delete an existing object based on multiple criteria (like a rule record)
+        ///// </summary>
+        ///// <param name="cp"></param>
+        ///// <param name="foreignKey1Id"></param>
+        ///// <param name="foreignKey2Id"></param>
+        //public static void delete(coreController core, int foreignKey1Id, int foreignKey2Id) {
+        //    try {
+        //        if ((foreignKey2Id > 0) && (foreignKey1Id > 0)) {
+        //            var tempVar = new List<string>();
+        //            oldPageTemplateModel instance = create(core, foreignKey1Id, foreignKey2Id, ref tempVar);
+        //            if (instance != null) {
+        //                invalidatePrimaryCache(core, instance.ID);
+        //                core.db.deleteTableRecord(primaryContentTableName, instance.ID, primaryContentDataSource);
+        //            }
+        //        }
+        //    } catch (Exception ex) {
+        //        core.handleException(ex);
+        //        throw;
+        //        throw;
+        //    }
+        //}
         //
         //====================================================================================================
         /// <summary>

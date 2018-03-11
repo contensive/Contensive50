@@ -15,371 +15,115 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
 namespace Contensive.Core.Models.DbModels {
-    public class groupModel {
+    public class groupModel : baseModel {
         //
+        //====================================================================================================
         //-- const
-        public const string primaryContentName = "groups"; //<------ set content name
-        private const string primaryContentTableName = "ccgroups"; //<------ set to tablename for the primary content (used for cache names)
-        private const string primaryContentDataSource = "default"; //<----- set to datasource if not default
-                                                                   //
-                                                                   // -- instance properties
-        public int ID;
-        public bool Active;
-        public bool AllowBulkEmail;
-        public string Caption;
-        public string ccGuid;
-
-        public int ContentControlID;
-        public string CopyFilename;
-        public int CreatedBy;
-        public int CreateKey;
-        public DateTime DateAdded;
-
-
-
-        public int ModifiedBy;
-        public DateTime ModifiedDate;
-        public string Name;
-        public bool PublicJoin;
-        public string SortOrder;
+        public const string contentName = "groups";
+        public const string contentTableName = "ccgroups";
+        private const string contentDataSource = "default";
         //
         //====================================================================================================
-        /// <summary>
-        /// Create an empty object. needed for deserialization
-        /// </summary>
-        public groupModel() {
-            //
+        // -- instance properties
+        public bool AllowBulkEmail { get; set; }
+        public string Caption { get; set; }
+        
+        public string CopyFilename { get; set; }
+        public bool PublicJoin { get; set; }
+        //
+        //====================================================================================================
+        public static groupModel add(coreController core) {
+            return add<groupModel>(core);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// add a new recod to the db and open it. Starting a new model with this method will use the default
-        /// values in Contensive metadata (active, contentcontrolid, etc)
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="cacheNameList"></param>
-        /// <returns></returns>
-        public static groupModel add(coreController core, ref List<string> cacheNameList) {
-            groupModel result = null;
-            try {
-                result = create(core, core.db.insertContentRecordGetID(primaryContentName, 0), ref cacheNameList);
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
-            return result;
+        public static groupModel add(coreController core, ref List<string> callersCacheNameList) {
+            return add<groupModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// return a new model with the data selected. All cacheNames related to the object will be added to the cacheNameList.
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="recordId">The id of the record to be read into the new object</param>
-        /// <param name="cacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        public static groupModel create(coreController core, int recordId, ref List<string> cacheNameList) {
-            groupModel result = null;
-            try {
-                if (recordId > 0) {
-                    string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId);
-                    result = core.cache.getObject<groupModel>(cacheName);
-                    if (result == null) {
-                        result = loadObject(core, "id=" + recordId.ToString(), ref cacheNameList);
-                    }
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
-            return result;
+        public static groupModel create(coreController core, int recordId) {
+            return create<groupModel>(core, recordId);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// open an existing object
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="recordGuid"></param>
-        public static groupModel create(coreController core, string recordGuid, ref List<string> cacheNameList) {
-            groupModel result = null;
-            try {
-                if (!string.IsNullOrEmpty(recordGuid)) {
-                    string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", recordGuid);
-                    result = core.cache.getObject<groupModel>(cacheName);
-                    if (result == null) {
-                        result = loadObject(core, "ccGuid=" + core.db.encodeSQLText(recordGuid), ref cacheNameList);
-                    }
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
-            return result;
+        public static groupModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<groupModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// template for open an existing object with multiple keys (like a rule)
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="foreignKey1Id"></param>
-        public static groupModel create(coreController core, int foreignKey1Id, int foreignKey2Id, ref List<string> cacheNameList) {
-            groupModel result = null;
-            try {
-                if ((foreignKey1Id > 0) && (foreignKey2Id > 0)) {
-                    result = core.cache.getObject<groupModel>(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "foreignKey1", foreignKey1Id, "foreignKey2", foreignKey2Id));
-                    if (result == null) {
-                        result = loadObject(core, "(foreignKey1=" + foreignKey1Id.ToString() + ")and(foreignKey1=" + foreignKey1Id.ToString() + ")", ref cacheNameList);
-                    }
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
-            return result;
+        public static groupModel create(coreController core, string recordGuid) {
+            return create<groupModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// open an existing object
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="sqlCriteria"></param>
-        private static groupModel loadObject(coreController core, string sqlCriteria, ref List<string> callersCacheNameList) {
-            groupModel result = null;
-            try {
-                csController cs = new csController(core);
-                if (cs.open(primaryContentName, sqlCriteria)) {
-                    result = new groupModel();
-                    //
-                    // -- populate result model
-                    result.ID = cs.getInteger("ID");
-                    result.Active = cs.getBoolean("Active");
-                    result.AllowBulkEmail = cs.getBoolean("AllowBulkEmail");
-                    result.Caption = cs.getText("Caption");
-                    result.ccGuid = cs.getText("ccGuid");
-                    //
-                    result.ContentControlID = cs.getInteger("ContentControlID");
-                    result.CopyFilename = cs.getText("CopyFilename");
-                    result.CreatedBy = cs.getInteger("CreatedBy");
-                    result.CreateKey = cs.getInteger("CreateKey");
-                    result.DateAdded = cs.getDate("DateAdded");
-                    //
-                    //
-                    //
-                    result.ModifiedBy = cs.getInteger("ModifiedBy");
-                    result.ModifiedDate = cs.getDate("ModifiedDate");
-                    result.Name = cs.getText("Name");
-                    result.PublicJoin = cs.getBoolean("PublicJoin");
-                    result.SortOrder = cs.getText("SortOrder");
-                    if (result != null) {
-                        //
-                        // -- set primary cache to the object created
-                        // -- set secondary caches to the primary cache
-                        // -- add all cachenames to the injected cachenamelist
-                        string cacheName0 = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", result.ID.ToString());
-                        callersCacheNameList.Add(cacheName0);
-                        core.cache.setObject(cacheName0, result);
-                        //
-                        string cacheName1 = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", result.ccGuid);
-                        callersCacheNameList.Add(cacheName1);
-                        core.cache.setAlias(cacheName1, cacheName0);
-                    }
-                }
-                cs.close();
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
-            return result;
+        public static groupModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<groupModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// save the instance properties to a record with matching id. If id is not provided, a new record is created.
-        /// </summary>
-        /// <param name="core"></param>
-        /// <returns></returns>
-        public int saveObject(coreController core) {
-            try {
-                csController cs = new csController(core);
-                if (ID > 0) {
-                    if (!cs.open(primaryContentName, "id=" + ID)) {
-                        ID = 0;
-                        cs.close();
-                        throw new ApplicationException("Unable to open record in content [" + primaryContentName + "], with id [" + ID + "]");
-                    }
-                } else {
-                    if (!cs.insert(primaryContentName)) {
-                        cs.close();
-                        ID = 0;
-                        throw new ApplicationException("Unable to insert record in content [" + primaryContentName + "]");
-                    }
-                }
-                if (cs.ok()) {
-                    ID = cs.getInteger("id");
-                    if (string.IsNullOrEmpty(ccGuid)) {
-                        ccGuid = Controllers.genericController.getGUID();
-                    }
-                    cs.setField("Active", Active.ToString());
-                    cs.setField("AllowBulkEmail", AllowBulkEmail.ToString());
-                    cs.setField("Caption", Caption);
-                    cs.setField("ccGuid", ccGuid);
-                    //
-                    cs.setField("ContentControlID", ContentControlID.ToString());
-                    cs.setField("CopyFilename", CopyFilename);
-                    cs.setField("CreatedBy", CreatedBy.ToString());
-                    cs.setField("CreateKey", CreateKey.ToString());
-                    cs.setField("DateAdded", DateAdded.ToString());
-                    //
-                    //
-                    //
-                    cs.setField("ModifiedBy", ModifiedBy.ToString());
-                    cs.setField("ModifiedDate", ModifiedDate.ToString());
-                    cs.setField("Name", Name);
-                    cs.setField("PublicJoin", PublicJoin.ToString());
-                    cs.setField("SortOrder", SortOrder);
-                }
-                cs.close();
-                //
-                // -- invalidate objects
-                // -- no, the primary is invalidated by the cs.save()
-                //core.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"id", id.ToString))
-                // -- no, the secondary points to the pirmary, which is invalidated. Dont waste resources invalidating
-                //core.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
-                //
-                // -- object is here, but the cache was invalidated, setting
-                core.cache.setObject(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.ID.ToString()), this);
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
-            return ID;
+        public static groupModel createByName(coreController core, string recordName) {
+            return createByName<groupModel>(core, recordName);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// delete an existing database record by id
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="recordId"></param>
+        public static groupModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<groupModel>(core, recordName, ref callersCacheNameList);
+        }
+        //
+        //====================================================================================================
+        public new void save(coreController core) {
+            base.save(core);
+        }
+        //
+        //====================================================================================================
         public static void delete(coreController core, int recordId) {
-            try {
-                if (recordId > 0) {
-                    core.db.deleteContentRecords(primaryContentName, "id=" + recordId.ToString());
-                    core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
+            delete<groupModel>(core, recordId);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// delete an existing database record by guid
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="recordId"></param>
-        public static void delete(coreController core, string ccguid) {
-            try {
-                if (!string.IsNullOrEmpty(ccguid)) {
-                    core.db.deleteContentRecords(primaryContentName, "(ccguid=" + core.db.encodeSQLText(ccguid) + ")");
-                    core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", ccguid));
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
+        public static void delete(coreController core, string ccGuid) {
+            delete<groupModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// pattern to delete an existing object based on multiple criteria (like a rule record)
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="foreignKey1Id"></param>
-        /// <param name="foreignKey2Id"></param>
-        public static void delete(coreController core, int foreignKey1Id, int foreignKey2Id) {
-            try {
-                if ((foreignKey2Id > 0) && (foreignKey1Id > 0)) {
-                    var tempVar = new List<string>();
-                    groupModel rule = create(core, foreignKey1Id, foreignKey2Id, ref tempVar);
-                    if (rule != null) {
-                        core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "foreignKey1", foreignKey1Id.ToString()) + Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "foreignKey2", foreignKey1Id.ToString()));
-                        core.db.deleteTableRecord(primaryContentTableName, rule.ID, primaryContentDataSource);
-                    }
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-                throw;
-            }
+        public static List<groupModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<groupModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// pattern get a list of objects from this model
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="someCriteria"></param>
-        /// <returns></returns>
-        public static List<groupModel> getObjectList(coreController core, int someCriteria) {
-            List<groupModel> result = new List<groupModel>();
-            try {
-                csController cs = new csController(core);
-                List<string> ignoreCacheNames = new List<string>();
-                if (cs.open(primaryContentName, "(someCriteria=" + someCriteria + ")", "name", true, "id")) {
-                    groupModel instance = null;
-                    do {
-                        instance = groupModel.create(core, cs.getInteger("id"), ref ignoreCacheNames);
-                        if (instance != null) {
-                            result.Add(instance);
-                        }
-                        cs.goNext();
-                    } while (cs.ok());
-                }
-                cs.close();
-            } catch (Exception ex) {
-                core.handleException(ex);
-                throw;
-            }
-            return result;
+        public static List<groupModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<groupModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// invalidate the primary key (which depends on all secondary keys)
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="recordId"></param>
-        public static void invalidatePrimaryCache(coreController core, int recordId) {
-            core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
-            //
-            // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-            core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
+        public static List<groupModel> createList(coreController core, string sqlCriteria) {
+            return createList<groupModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        // <summary>
-        // produce a standard format cachename for this model
-        // </summary>
-        // <param name="fieldName"></param>
-        // <param name="fieldValue"></param>
-        // <returns></returns>
-        //Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,fieldName As String, fieldValue As String) As String
-        //    Return (primaryContentTableName & "-" & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
-        //End Function
-        //Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,field1Name As String, field1Value As String, field2Name As String, field2Value As String) As String
-        //    Return (primaryContentTableName & "-" & field1Name & "." & field1Value & "-" & field2Name & "." & field2Value).ToLower().Replace(" ", "_")
-        //End Function
+        public void invalidatePrimaryCache(coreController core, int recordId) {
+            invalidateCacheSingleRecord<groupModel>(core, recordId);
+        }
+        //
+        //====================================================================================================
+        public static string getRecordName(coreController core, int recordId) {
+            return baseModel.getRecordName<groupModel>(core, recordId);
+        }
+        //
+        //====================================================================================================
+        public static string getRecordName(coreController core, string ccGuid) {
+            return baseModel.getRecordName<groupModel>(core, ccGuid);
+        }
+        //
+        //====================================================================================================
+        public static int getRecordId(coreController core, string ccGuid) {
+            return baseModel.getRecordId<groupModel>(core, ccGuid);
+        }
+        //
+        //====================================================================================================
+        public static groupModel createDefault(coreController core) {
+            return createDefault<groupModel>(core);
+        }
     }
 }

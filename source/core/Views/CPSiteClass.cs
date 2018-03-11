@@ -334,7 +334,7 @@ namespace Contensive.Core {
             try {
                 string ignoreReturnedCollectionGuid = "";
                 var tmpList = new List<string> { };
-                returnOk = collectionController.installCollectionsFromPrivateFile(core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, ref tmpList);
+                returnOk = collectionController.installCollectionsFromPrivateFile(core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList);
             } catch (Exception ex) {
                 core.handleException(ex);
                 if (!core.siteProperties.trapErrors) {

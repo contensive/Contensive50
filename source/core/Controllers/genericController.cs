@@ -229,54 +229,6 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// decodeHtml, Convert HTML equivalent characters to their equivalents
-        /// </summary>
-        /// <param name="Source"></param>
-        /// <returns></returns>
-        public static string decodeHtml(string Source) {
-            return WebUtility.HtmlDecode(Source);
-            // string result = Source.Trim();
-            // if (!string.IsNullOrWhiteSpace(result)) {
-            //     //
-            //     int Pos = result.Length;
-            //     Pos = result.LastIndexOf("&#", Pos - 1) + 1;
-            //     while (Pos != 0) {
-            //         string CharCodeString = "";
-            //         int posEnd = 0;
-            //         if (result.Substring(Pos + 2, 1) == ";") {
-            //             CharCodeString = result.Substring(Pos + 1, 1);
-            //             posEnd = Pos + 4;
-            //         } else if (result.Substring(Pos + 3, 1) == ";") {
-            //             CharCodeString = result.Substring(Pos + 1, 2);
-            //             posEnd = Pos + 5;
-            //         } else if (result.Substring(Pos + 4, 1) == ";") {
-            //             CharCodeString = result.Substring(Pos + 1, 3);
-            //             posEnd = Pos + 6;
-            //         }
-            //         if (!string.IsNullOrEmpty(CharCodeString)) {
-            //             if (CharCodeString.IsNumeric()) {
-            //                 int CharCode = encodeInteger(CharCodeString);
-            //                 result = result.Left( Pos - 1) + Convert.ToChar(CharCode) + result.Substring(posEnd - 1);
-            //             }
-            //         }
-            //         //
-            //         Pos = result.LastIndexOf("&#", Pos - 1) + 1;
-            //     }
-            //     //
-            //     // replace out all common names (at least the most common for now)
-            //     result = vbReplace(result, "&lt;", "<");
-            //     result = vbReplace(result, "&gt;", ">");
-            //     result = vbReplace(result, "&quot;", "\"");
-            //     result = vbReplace(result, "&apos;", "'");
-            //     //
-            //     // Always replace the amp last
-            //     result = vbReplace(result, "&amp;", "&");
-            // }
-            //return result;
-        }
-        //
-        //========================================================================
-        /// <summary>
         /// legacy indent - now returns source
         /// </summary>
         /// <param name="Source"></param>
@@ -948,11 +900,11 @@ namespace Contensive.Core.Controllers {
                             string[] NVSplit = NV.Split('=');
                             if (NVSplit.GetUpperBound(0) == 0) {
                                 NVSplit[0] = encodeRequestVariable(NVSplit[0]);
-                                result = result + "&" + NVSplit[0];
+                                result += "&" + NVSplit[0];
                             } else {
                                 NVSplit[0] = encodeRequestVariable(NVSplit[0]);
                                 NVSplit[1] = encodeRequestVariable(NVSplit[1]);
-                                result = result + "&" + NVSplit[0] + "=" + NVSplit[1];
+                                result += "&" + NVSplit[0] + "=" + NVSplit[1];
                             }
                         }
                     }
@@ -2354,25 +2306,6 @@ namespace Contensive.Core.Controllers {
                     return pathFilename.Left(slashpos + 1);
                 }
             }
-        }
-        //
-        //========================================================================
-        // EncodeHTML
-        //
-        //   Convert all characters that are not allowed in HTML to their Text equivalent
-        //   in preperation for use on an HTML page
-        //
-        public static string encodeHTML(string Source) {
-            string tempencodeHTML = null;
-            // ##### removed to catch err<>0 problem //On Error //Resume Next
-            //
-            tempencodeHTML = Source;
-            tempencodeHTML = genericController.vbReplace(tempencodeHTML, "&", "&amp;");
-            tempencodeHTML = genericController.vbReplace(tempencodeHTML, "<", "&lt;");
-            tempencodeHTML = genericController.vbReplace(tempencodeHTML, ">", "&gt;");
-            tempencodeHTML = genericController.vbReplace(tempencodeHTML, "\"", "&quot;");
-            return genericController.vbReplace(tempencodeHTML, "'", "&apos;");
-            //
         }
         //
         //======================================================================================

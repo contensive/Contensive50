@@ -16,6 +16,7 @@ using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using System.Net;
 
 namespace Contensive.Core.Controllers {
     /// <summary>
@@ -209,7 +210,7 @@ namespace Contensive.Core.Controllers {
                         //                    core.handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
 
                         core.handleException(new Exception("Error creating select list from content [" + ContentName + "] called [" + MenuName + "]. Selection of [" + RowCnt + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property SelectFieldLimit."));
-                        result = result + inputHidden(MenuNameFPO, CurrentValue);
+                        result += inputHidden(MenuNameFPO, CurrentValue);
                         if (CurrentValue == 0) {
                             result = inputText(MenuName, "0");
                         } else {
@@ -219,7 +220,7 @@ namespace Contensive.Core.Controllers {
                             }
                             core.db.csClose(ref CSPointer);
                         }
-                        result = result + "(Selection is too large to display option list)";
+                        result += "(Selection is too large to display option list)";
                     } else {
                         //
                         // ----- Generate Drop Down Field Names
@@ -354,7 +355,7 @@ namespace Contensive.Core.Controllers {
                                             Copy = Copy.Left(core.siteProperties.selectFieldWidthLimit) + "...+";
                                         }
                                     }
-                                    FastString.Add(">" + genericController.encodeHTML(Copy) + "</option>");
+                                    FastString.Add(">" + htmlController.encodeHtml(Copy) + "</option>");
                                 }
                                 if (!SelectedFound && (CurrentValue != 0)) {
                                     core.db.csClose(ref CSPointer);
@@ -383,7 +384,7 @@ namespace Contensive.Core.Controllers {
                                                 Copy = Copy.Left(core.siteProperties.selectFieldWidthLimit) + "...+";
                                             }
                                         }
-                                        FastString.Add(">" + genericController.encodeHTML(Copy) + "</option>");
+                                        FastString.Add(">" + htmlController.encodeHtml(Copy) + "</option>");
                                     }
                                 }
                             }
@@ -463,7 +464,7 @@ namespace Contensive.Core.Controllers {
                         // Selection is too big
                         //
                         core.handleException(new Exception("While building a group members list for group [" + groupController.group_GetGroupName(core, GroupID) + "], too many rows were selected. [" + RowMax + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property app.SiteProperty_SelectFieldLimit."));
-                        result = result + inputHidden(MenuNameFPO, currentValue);
+                        result += inputHidden(MenuNameFPO, currentValue);
                         if (currentValue != 0) {
                             CSPointer = core.db.csOpenRecord("people", currentValue);
                             if (core.db.csOk(CSPointer)) {
@@ -471,7 +472,7 @@ namespace Contensive.Core.Controllers {
                             }
                             core.db.csClose(ref CSPointer);
                         }
-                        result = result + "(Selection is too large to display)";
+                        result += "(Selection is too large to display)";
                     } else {
                         //
                         // ----- Generate Drop Down Field Names
@@ -743,23 +744,23 @@ namespace Contensive.Core.Controllers {
                 string IconFilename = null;
                 //
                 if (core.siteProperties.getBoolean("AllowLoginIcon", true)) {
-                    result = result + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">";
-                    result = result + "<tr><td align=\"right\">";
+                    result += "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">";
+                    result += "<tr><td align=\"right\">";
                     if (core.session.isAuthenticatedContentManager(core)) {
-                        result = result + "<a href=\"" + genericController.encodeHTML("/" + core.appConfig.adminRoute) + "\" target=\"_blank\">";
+                        result += "<a href=\"" + htmlController.encodeHtml("/" + core.appConfig.adminRoute) + "\" target=\"_blank\">";
                     } else {
                         Link = core.webServer.requestPage + "?" + core.doc.refreshQueryString;
                         Link = genericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, true);
                         //Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
-                        result = result + "<a href=\"" + genericController.encodeHTML(Link) + "\" >";
+                        result += "<a href=\"" + htmlController.encodeHtml(Link) + "\" >";
                     }
                     IconFilename = core.siteProperties.LoginIconFilename;
                     if (genericController.vbLCase(IconFilename.Left(7)) != "/ccLib/") {
                         IconFilename = genericController.getCdnFileLink(core, IconFilename);
                     }
-                    result = result + "<img alt=\"Login\" src=\"" + IconFilename + "\" border=\"0\" >";
-                    result = result + "</A>";
-                    result = result + "</td></tr></table>";
+                    result += "<img alt=\"Login\" src=\"" + IconFilename + "\" border=\"0\" >";
+                    result += "</A>";
+                    result += "</td></tr></table>";
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -924,7 +925,7 @@ namespace Contensive.Core.Controllers {
                             } else {
                                 QSName = genericController.decodeResponseVariable(QSNameValues[0]);
                                 QSValue = genericController.decodeResponseVariable(QSNameValues[1]);
-                                RefreshHiddens = RefreshHiddens + "\r<input type=\"hidden\" name=\"" + genericController.encodeHTML(QSName) + "\" value=\"" + genericController.encodeHTML(QSValue) + "\">";
+                                RefreshHiddens = RefreshHiddens + "\r<input type=\"hidden\" name=\"" + htmlController.encodeHtml(QSName) + "\" value=\"" + htmlController.encodeHtml(QSValue) + "\">";
                             }
                         }
                     }
@@ -968,7 +969,7 @@ namespace Contensive.Core.Controllers {
         public string inputText(string htmlName, string defaultValue, int height, int width, string htmlId = "", bool passwordField = false, bool disabled = false, string htmlClass = "") {
             string result = "";
             try {
-                defaultValue = genericController.encodeHTML(defaultValue);
+                defaultValue = htmlController.encodeHtml(defaultValue);
                 string TagID = "";
                 if (!string.IsNullOrEmpty(htmlId)) {
                     TagID = TagID + " id=\"" + genericController.encodeEmpty(htmlId, "") + "\"";
@@ -1032,7 +1033,7 @@ namespace Contensive.Core.Controllers {
                 string EditorClosed = null;
                 string EditorOpened = null;
                 //
-                Value_Local = genericController.encodeHTML(Value);
+                Value_Local = htmlController.encodeHtml(Value);
                 IDRoot = Id;
                 if (string.IsNullOrEmpty(IDRoot)) {
                     IDRoot = "TextArea" + core.doc.formInputTextCnt;
@@ -1108,7 +1109,7 @@ namespace Contensive.Core.Controllers {
                 if ((iDefaultValue == "0") || (iDefaultValue == "12:00:00 AM")) {
                     iDefaultValue = "";
                 } else {
-                    iDefaultValue = genericController.encodeHTML(iDefaultValue);
+                    iDefaultValue = htmlController.encodeHtml(iDefaultValue);
                 }
                 if (genericController.encodeEmpty(Id, "") != "") {
                     TagID = " ID=\"" + genericController.encodeEmpty(Id, "") + "\"";
@@ -1140,7 +1141,7 @@ namespace Contensive.Core.Controllers {
                 }
 
 
-                result = result + "\r\n<input TYPE=\"text\" NAME=\"" + iTagName + "\" ID=\"" + iTagName + "\" VALUE=\"" + iDefaultValue + "\"  SIZE=\"" + iWidth + "\">"
+                result += "\r\n<input TYPE=\"text\" NAME=\"" + iTagName + "\" ID=\"" + iTagName + "\" VALUE=\"" + iDefaultValue + "\"  SIZE=\"" + iWidth + "\">"
                 + "\r\n<a HREF=\"#\" Onclick = \"cal.select(document.getElementById('" + iTagName + "'),'" + AnchorName + "','MM/dd/yyyy','" + DateString + "'); return false;\" NAME=\"" + AnchorName + "\" ID=\"" + AnchorName + "\"><img title=\"Select a date\" alt=\"Select a date\" src=\"/ccLib/images/table.jpg\" width=12 height=10 border=0></A>"
                 + "\r\n";
 
@@ -1476,12 +1477,12 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static string getButton(string ButtonLabel, string Name = "button", string htmlId = "", string OnClick = "", bool Disabled = false, string htmlClass = "") {
+        public static string getHtmlInputSubmit(string value, string name = "button", string htmlId = "", string OnClick = "", bool Disabled = false, string htmlClass = "") {
             string s = "<input type=\"submit\""
-                + " name=\"" + genericController.encodeEmpty(Name, "button") + "\""
-                + " value=\"" + genericController.encodeText(ButtonLabel) + "\""
-                + " onclick=\"" + genericController.encodeEmpty(OnClick, "") + "\""
-                + " id=\"" + genericController.encodeEmpty(htmlId, "") + "\""
+                + " name=\"" + genericController.encodeEmpty(name, "button") + "\""
+                + " value=\"" + value + "\""
+                + " onclick=\"" + OnClick + "\""
+                + " id=\"" + htmlId + "\""
                 + " class=\"" + htmlClass + "\"";
             if (Disabled) {
                 s = s + " disabled=\"disabled\"";
@@ -1492,22 +1493,22 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string inputHidden(string TagName, string TagValue, string htmlId = "") {
+        public string getHtmlInputHidden(string name, string value, string htmlId = "") {
             string result = "";
             try {
-                result = "\r<input type=\"hidden\" NAME=\"" + genericController.encodeHTML(genericController.encodeText(TagName)) + "\"";
+                result = "<input type=\"hidden\" name=\"" + htmlController.encodeHtml(name) + "\"";
                 //
-                string iTagValue = genericController.encodeHTML(genericController.encodeText(TagValue));
+                string iTagValue = htmlController.encodeHtml(value);
                 if (!string.IsNullOrEmpty(iTagValue)) {
-                    result = result + " VALUE=\"" + iTagValue + "\"";
+                    result += " VALUE=\"" + iTagValue + "\"";
                 }
                 //
                 string ihtmlId = genericController.encodeText(htmlId);
                 if (!string.IsNullOrEmpty(ihtmlId)) {
-                    result = result + " ID=\"" + genericController.encodeHTML(ihtmlId) + "\"";
+                    result += " ID=\"" + htmlController.encodeHtml(ihtmlId) + "\"";
                 }
                 //
-                result = result + ">";
+                result += ">";
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -1517,13 +1518,13 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string inputHidden(string TagName, bool TagValue, string htmlId = "") {
-            return inputHidden(TagName, TagValue.ToString(), htmlId);
+            return getHtmlInputHidden(TagName, TagValue.ToString(), htmlId);
         }
         //
         //====================================================================================================
         //
         public string inputHidden(string TagName, int TagValue, string htmlId = "") {
-            return inputHidden(TagName, TagValue.ToString(), htmlId);
+            return getHtmlInputHidden(TagName, TagValue.ToString(), htmlId);
         }
         //
         //====================================================================================================
@@ -1698,7 +1699,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     string ArgumentList = core.db.csGet(CSAddons, "ArgumentList").Trim(' ');
                                     string defaultAddonOptions = addonController.getDefaultAddonOptions(core, ArgumentList, addonGuid, IsInline);
-                                    defaultAddonOptions = encodeHTML(defaultAddonOptions);
+                                    defaultAddonOptions = encodeHtml(defaultAddonOptions);
                                     //UseAjaxDefaultAddonOptions = false;
                                     //if (UseAjaxDefaultAddonOptions) {
                                     //    DefaultAddonOption_String = "";
@@ -1773,7 +1774,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="text"></param>
         /// <returns></returns>
         public string convertTextToHtml(string text) {
-            return convertNewLineToHtmlBreak(genericController.encodeHTML(text));
+            return convertNewLineToHtmlBreak(htmlController.encodeHtml(text));
         }
         //
         //====================================================================================================
@@ -1989,9 +1990,9 @@ namespace Contensive.Core.Controllers {
                 // Build output string
                 //
                 //csv_result = encodeNvaArgument(SrcOptionName)
-                result = genericController.encodeHTML(genericController.encodeNvaArgument(SrcOptionName)) + "=";
+                result = htmlController.encodeHtml(genericController.encodeNvaArgument(SrcOptionName)) + "=";
                 if (!string.IsNullOrEmpty(InstanceOptionValue_AddonEncoded)) {
-                    result = result + genericController.encodeHTML(InstanceOptionValue_AddonEncoded);
+                    result += htmlController.encodeHtml(InstanceOptionValue_AddonEncoded);
                 }
                 if (string.IsNullOrEmpty(SrcSelectorSuffix) && string.IsNullOrEmpty(list)) {
                     //
@@ -2001,12 +2002,12 @@ namespace Contensive.Core.Controllers {
                     //
                     // resource link, exit with empty list
                     //
-                    result = result + "[]ResourceLink";
+                    result += "[]ResourceLink";
                 } else {
                     //
                     //
                     //
-                    result = result + "[" + list + "]" + SrcSelectorSuffix;
+                    result += "[" + list + "]" + SrcSelectorSuffix;
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -2434,7 +2435,7 @@ namespace Contensive.Core.Controllers {
                                     PosIDEnd = genericController.vbInstr(PosIDStart, Copy, "\"");
                                     if (PosIDEnd != 0) {
                                         ParseOK = true;
-                                        Copy = Copy.Left(PosIDStart - 1) + genericController.encodeHTML(addonOption_String) + Copy.Substring(PosIDEnd - 1);
+                                        Copy = Copy.Left(PosIDStart - 1) + htmlController.encodeHtml(addonOption_String) + Copy.Substring(PosIDEnd - 1);
                                         core.db.csSet(CS, FieldName, Copy);
                                         needToClearCache = true;
                                     }
@@ -2592,7 +2593,7 @@ namespace Contensive.Core.Controllers {
                     //
                     //
                     rulesTablename = Models.Complex.cdefModel.getContentTablename(core, RulesContentName);
-                    SingularPrefixHtmlEncoded = genericController.encodeHTML(genericController.getSingular_Sortof(SecondaryContentName)) + "&nbsp;";
+                    SingularPrefixHtmlEncoded = htmlController.encodeHtml(genericController.getSingular_Sortof(SecondaryContentName)) + "&nbsp;";
                     //
                     main_MemberShipCount = 0;
                     main_MemberShipSize = 0;
@@ -2707,7 +2708,7 @@ namespace Contensive.Core.Controllers {
                                         if (string.IsNullOrEmpty(OptionCaption)) {
                                             optionCaptionHtmlEncoded = SingularPrefixHtmlEncoded + RecordID;
                                         } else {
-                                            optionCaptionHtmlEncoded = genericController.encodeHTML(OptionCaption);
+                                            optionCaptionHtmlEncoded = htmlController.encodeHtml(OptionCaption);
                                         }
                                         if (DivCheckBoxCnt != 0) {
                                             // leave this between checkboxes - it is searched in the admin page
@@ -2769,7 +2770,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string getRecordEditLink2(string ContentName, int RecordID, bool AllowCut, string RecordName, bool IsEditing) {
+        public string getRecordEditLink(string ContentName, int RecordID, bool AllowCut, string RecordName, bool IsEditing) {
             string tempmain_GetRecordEditLink2 = null;
             try {
                 int ContentID = 0;
@@ -2782,7 +2783,7 @@ namespace Contensive.Core.Controllers {
                 iContentName = genericController.encodeText(ContentName);
                 iRecordID = genericController.encodeInteger(RecordID);
                 iAllowCut = genericController.encodeBoolean(AllowCut);
-                ContentCaption = genericController.encodeHTML(iContentName);
+                ContentCaption = htmlController.encodeHtml(iContentName);
                 if (genericController.vbLCase(ContentCaption) == "aggregate functions") {
                     ContentCaption = "Add-on";
                 }
@@ -2810,12 +2811,12 @@ namespace Contensive.Core.Controllers {
                             tempmain_GetRecordEditLink2 = tempmain_GetRecordEditLink2 + "<a"
                                 + " class=\"ccRecordEditLink\" "
                                 + " TabIndex=-1"
-                                + " href=\"" + genericController.encodeHTML("/" + core.appConfig.adminRoute + "?cid=" + ContentID + "&id=" + iRecordID + "&af=4&aa=2&ad=1") + "\"";
+                                + " href=\"" + htmlController.encodeHtml("/" + core.appConfig.adminRoute + "?cid=" + ContentID + "&id=" + iRecordID + "&af=4&aa=2&ad=1") + "\"";
                             tempmain_GetRecordEditLink2 = tempmain_GetRecordEditLink2 + "><img"
                                 + " src=\"/ccLib/images/IconContentEdit.gif\""
                                 + " border=\"0\""
-                                + " alt=\"Edit this " + genericController.encodeHTML(ContentCaption) + "\""
-                                + " title=\"Edit this " + genericController.encodeHTML(ContentCaption) + "\""
+                                + " alt=\"Edit this " + htmlController.encodeHtml(ContentCaption) + "\""
+                                + " title=\"Edit this " + htmlController.encodeHtml(ContentCaption) + "\""
                                 + " align=\"absmiddle\""
                                 + "></a>";
                             //
@@ -2824,7 +2825,7 @@ namespace Contensive.Core.Controllers {
                             if (iAllowCut) {
                                 WorkingLink = genericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) + "." + genericController.encodeText(RecordID), true);
                                 tempmain_GetRecordEditLink2 = ""
-                                    + tempmain_GetRecordEditLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + genericController.encodeHTML(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
+                                    + tempmain_GetRecordEditLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
                             }
                             //
                             // Help link if enabled
@@ -2955,7 +2956,7 @@ namespace Contensive.Core.Controllers {
                             }
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a"
                                 + " TabIndex=-1"
-                                + " href=\"" + genericController.encodeHTML(Link) + "\"";
+                                + " href=\"" + htmlController.encodeHtml(Link) + "\"";
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "><img"
                                 + " src=\"/ccLib/images/IconContentAdd.gif\""
                                 + " border=\"0\""
@@ -3004,7 +3005,7 @@ namespace Contensive.Core.Controllers {
                                                 PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, iContentID.ToString(), true);
                                                 PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, ParentID.ToString(), true);
                                                 PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, true);
-                                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + genericController.encodeHTML(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste record in clipboard here\" title=\"Paste record in clipboard here\" align=\"absmiddle\"></a>";
+                                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste record in clipboard here\" title=\"Paste record in clipboard here\" align=\"absmiddle\"></a>";
                                             }
                                         }
                                     }
@@ -3018,7 +3019,7 @@ namespace Contensive.Core.Controllers {
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.getMenu(LowestRequiredMenuName, 0);
                             tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "class=\"ccFlyoutButton\" ", "", 1, 99, 1);
                             if (!string.IsNullOrEmpty(PasteLink)) {
-                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + genericController.encodeHTML(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
+                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + htmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
                             }
                         }
                         //
@@ -3338,7 +3339,7 @@ namespace Contensive.Core.Controllers {
         public string getPanelBottom(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "") {
             string result = "";
             try {
-                result = result + cr6 + "</span></td>"
+                result += cr6 + "</span></td>"
                     + cr5 + "</tr>"
                     + cr4 + "</table>"
                     + cr3 + "</td>"
@@ -3396,9 +3397,9 @@ namespace Contensive.Core.Controllers {
                     LinkPanel.Add("Contensive " + core.codeVersion() + " | ");
                     LinkPanel.Add(core.doc.profileStartTime.ToString("G") + " | ");
                     LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http://support.Contensive.com/\">Support</A> | ");
-                    LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + genericController.encodeHTML("/" + core.appConfig.adminRoute) + "\">Admin Home</A> | ");
-                    LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + genericController.encodeHTML("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
-                    LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"" + genericController.encodeHTML("/" + core.appConfig.adminRoute + "?" + RequestNameHardCodedPage + "=" + HardCodedPageMyProfile) + "\">My Profile</A> | ");
+                    LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + htmlController.encodeHtml("/" + core.appConfig.adminRoute) + "\">Admin Home</A> | ");
+                    LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + htmlController.encodeHtml("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
+                    LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"" + htmlController.encodeHtml("/" + core.appConfig.adminRoute + "?" + RequestNameHardCodedPage + "=" + HardCodedPageMyProfile) + "\">My Profile</A> | ");
                     if (core.siteProperties.getBoolean("AllowMobileTemplates", false)) {
                         if (core.session.visit.Mobile) {
                             QS = core.doc.refreshQueryString;
@@ -3423,7 +3424,7 @@ namespace Contensive.Core.Controllers {
                         result += getPanelHeader("Contensive Tools Panel" + helpLink);
                         //
                         ToolsPanel.Add(core.html.formStart(WorkingQueryString));
-                        ToolsPanel.Add(core.html.inputHidden("Type", FormTypeToolsPanel));
+                        ToolsPanel.Add(core.html.getHtmlInputHidden("Type", FormTypeToolsPanel));
                         //
                         if (true) {
                             //
@@ -3511,7 +3512,7 @@ namespace Contensive.Core.Controllers {
                             //            '
                             //            ' Path is blocked
                             //            '
-                            //            Tag = core.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & core.webServer.requestPath & "] [<a href=""" & genericController.encodeHTML("/" & core.appConfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & Models.Complex.cdefModel.getContentId(core,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                            //            Tag = core.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & core.webServer.requestPath & "] [<a href=""" & htmlController.encodeHTML("/" & core.appConfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & Models.Complex.cdefModel.getContentId(core,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                             //        Else
                             //            '
                             //            ' Path is not blocked
@@ -3531,7 +3532,7 @@ namespace Contensive.Core.Controllers {
                             //
                             OptionsPanel = OptionsPanel + ""
                             + "\r<div class=\"ccButtonCon\">"
-                            + cr2 + getButton(ButtonApply, "mb","","",false, "btn btn-primary mr-1 btn-sm")
+                            + cr2 + getHtmlInputSubmit(ButtonApply, "mb","","",false, "btn btn-primary mr-1 btn-sm")
                             + "\r</div>"
                             + "";
                         }
@@ -3627,8 +3628,8 @@ namespace Contensive.Core.Controllers {
                         LinkPanel.Add("Contensive " + core.codeVersion() + " | ");
                         LinkPanel.Add(core.doc.profileStartTime.ToString("G") + " | ");
                         LinkPanel.Add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http://support.Contensive.com/\">Support</A> | ");
-                        LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + genericController.encodeHTML("/" + core.appConfig.adminRoute) + "\">Admin Home</A> | ");
-                        LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + genericController.encodeHTML("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
+                        LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + htmlController.encodeHtml("/" + core.appConfig.adminRoute) + "\">Admin Home</A> | ");
+                        LinkPanel.Add("<a class=\"ccAdminLink\" href=\"" + htmlController.encodeHtml("http://" + core.webServer.requestDomain) + "\">Public Home</A> | ");
                         LinkPanel.Add("Render " + (Convert.ToSingle(core.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec | ");
                         LinkPanel.Add("</span>");
                         //
@@ -3689,7 +3690,7 @@ namespace Contensive.Core.Controllers {
         public string getHtmlDoc(string htmlBody, string htmlBodyTag, bool allowLogin = true, bool allowTools = true) {
             string result = "";
             try {
-                string encoding = genericController.encodeHTML(core.siteProperties.getText("Site Character Encoding", "utf-8"));
+                string encoding = htmlController.encodeHtml(core.siteProperties.getText("Site Character Encoding", "utf-8"));
                 addHeadTag("<meta http-equiv=\"content-type\" content=\"text/html; charset=" + encoding + "\">");
                 string htmlHead = getHtmlHead();
                 string htmlBeforeEndOfBody = getHtmlBodyEnd(allowLogin, allowTools);
@@ -3738,7 +3739,7 @@ namespace Contensive.Core.Controllers {
 
                 result = core.html.formStart();
                 if (!string.IsNullOrEmpty(ButtonList)) {
-                    result = result + core.html.getPanelButtons(ButtonList, "Button");
+                    result += core.html.getPanelButtons(ButtonList, "Button");
                 }
             } catch (Exception ex) {
                 core.handleException(ex);
@@ -3757,33 +3758,33 @@ namespace Contensive.Core.Controllers {
                     string content = "";
                     foreach (var asset in core.doc.htmlMetaContent_TitleList) {
                         if ((core.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("\r\n<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
+                            headList.Add("\r\n<!-- added by " + htmlController.encodeHtml(asset.addedByMessage) + " -->");
                         }
                         content += " | " + asset.content;
                     }
-                    headList.Add("\r\n<title>" + genericController.encodeHTML(content.Substring(3)) + "</title>");
+                    headList.Add("\r\n<title>" + htmlController.encodeHtml(content.Substring(3)) + "</title>");
                 }
                 if (core.doc.htmlMetaContent_KeyWordList.Count > 0) {
                     string content = "";
                     foreach (var asset in core.doc.htmlMetaContent_KeyWordList.FindAll((a) => (!string.IsNullOrEmpty(a.content)))) {
                         if ((core.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("\r\n<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
+                            headList.Add("\r\n<!-- added by " + htmlController.encodeHtml(asset.addedByMessage) + " -->");
                         }
                         content += "," + asset.content;
                     }
                     if (!string.IsNullOrEmpty(content)) {
-                        headList.Add("\r\n<meta name=\"keywords\" content=\"" + genericController.encodeHTML(content.Substring(1)) + "\" >");
+                        headList.Add("\r\n<meta name=\"keywords\" content=\"" + htmlController.encodeHtml(content.Substring(1)) + "\" >");
                     }
                 }
                 if (core.doc.htmlMetaContent_Description.Count > 0) {
                     string content = "";
                     foreach (var asset in core.doc.htmlMetaContent_Description) {
                         if ((core.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("\r\n<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
+                            headList.Add("\r\n<!-- added by " + htmlController.encodeHtml(asset.addedByMessage) + " -->");
                         }
                         content += "," + asset.content;
                     }
-                    headList.Add("\r\n<meta name=\"description\" content=\"" + genericController.encodeHTML(content.Substring(1)) + "\" >");
+                    headList.Add("\r\n<meta name=\"description\" content=\"" + htmlController.encodeHtml(content.Substring(1)) + "\" >");
                 }
                 //
                 // -- favicon
@@ -3804,7 +3805,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 // -- misc caching, etc
-                //string encoding = genericController.encodeHTML(core.siteProperties.getText("Site Character Encoding", "utf-8"));
+                //string encoding = htmlController.encodeHTML(core.siteProperties.getText("Site Character Encoding", "utf-8"));
                 //headList.Add("<meta http-equiv=\"content-type\" content=\"text/html; charset=" + encoding + "\">");
                 //headList.Add("<meta http-equiv=\"content-language\" content=\"en-us\">");
                 //headList.Add("<meta http-equiv=\"cache-control\" content=\"no-cache\">");
@@ -3835,7 +3836,7 @@ namespace Contensive.Core.Controllers {
                     foreach (var asset in core.doc.htmlAssetList.FindAll((htmlAssetClass item) => (item.inHead))) {
                         string debugComment = "\r\n";
                         if ((core.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            debugComment = "\r\n<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->";
+                            debugComment = "\r\n<!-- added by " + htmlController.encodeHtml(asset.addedByMessage) + " -->";
                         }
                         if (asset.assetType.Equals(htmlAssetTypeEnum.style)) {
                             styleList.Add(debugComment);
@@ -3860,7 +3861,7 @@ namespace Contensive.Core.Controllers {
                 // -- other head tags - always last
                 foreach (var asset in core.doc.htmlMetaContent_OtherTags.FindAll((a) => (!string.IsNullOrEmpty(a.content)))) {
                     if ((core.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                        headList.Add("\r\n<!-- added by " + genericController.encodeHTML(asset.addedByMessage) + " -->");
+                        headList.Add("\r\n<!-- added by " + htmlController.encodeHtml(asset.addedByMessage) + " -->");
                     }
                     headList.Add(asset.content);
                 }
@@ -4257,7 +4258,7 @@ namespace Contensive.Core.Controllers {
             }
         }
         //
-        //========================================================================
+        //====================================================================================================
         /// <summary>
         /// create UI edit record link
         /// </summary>
@@ -4266,7 +4267,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="AllowCut"></param>
         /// <returns></returns>
         public string getRecordEditLink(string ContentName, int RecordID, bool AllowCut = false) {
-            return getRecordEditLink2(ContentName, RecordID, AllowCut, "", core.session.isEditing(ContentName));
+            return getRecordEditLink(ContentName, RecordID, AllowCut, "", core.session.isEditing(ContentName));
         }
         //
         //====================================================================================================
@@ -4317,7 +4318,7 @@ namespace Contensive.Core.Controllers {
             return String.Join("_", new String[] {"<img src=\"", src, ">" });
         }
         //
-        //========================================================================
+        // ====================================================================================================
         /// <summary>
         /// create html span inline tag
         /// </summary>
@@ -4325,92 +4326,113 @@ namespace Contensive.Core.Controllers {
         /// <param name="htmlClass"></param>
         /// <returns></returns>
         public static string span(string innerHtml, string htmlClass) => "<span class=\"" + htmlClass + "\">" + innerHtml + "</span>";
+        //
+        // ====================================================================================================
         /// <summary>
         /// create html span inline tag
         /// </summary>
         /// <param name="innerHtml"></param>
         /// <returns></returns>
         public static string span(string innerHtml) => "<span>" + innerHtml + "</span>";
-        /// <summary>
-        /// create html span inline tag
-        /// </summary>
-        /// <returns></returns>
-        public static string span() => "<span/>";
         //
-        public static string tableStart(int Padding, int Spacing, int Border, string ClassStyle = "") {
-            return "<table border=\"" + Border + "\" cellpadding=\"" + Padding + "\" cellspacing=\"" + Spacing + "\" class=\"" + ClassStyle + "\" width=\"100%\">";
+        // ====================================================================================================
+        /// <summary>
+        /// create a table start tag
+        /// </summary>
+        /// <param name="cellpadding"></param>
+        /// <param name="cellspacing"></param>
+        /// <param name="border"></param>
+        /// <param name="htmlClass"></param>
+        /// <returns></returns>
+        public static string tableStart(int cellpadding, int cellspacing, int border, string htmlClass = "") {
+            return "<table border=\"" + border + "\" cellpadding=\"" + cellpadding + "\" cellspacing=\"" + cellspacing + "\" class=\"" + htmlClass + "\" width=\"100%\">";
         }
         //
+        // ====================================================================================================
+        /// <summary>
+        /// return a row start (tr tag)
+        /// </summary>
+        /// <returns></returns>
         public static string tableRowStart() {
             return "<tr>";
         }
-        //        '
-        //        '
-        //        '
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// create a td tag (without /td)
+        /// </summary>
+        /// <param name="Width"></param>
+        /// <param name="ColSpan"></param>
+        /// <param name="EvenRow"></param>
+        /// <param name="Align"></param>
+        /// <param name="BGColor"></param>
+        /// <returns></returns>
         public static string tableCellStart(string Width = "", int ColSpan = 0, bool EvenRow = false, string Align = "", string BGColor = "") {
-            string tempStartTableCell = null;
-            tempStartTableCell = "";
+            string result = "";
             if (!string.IsNullOrEmpty(Width)) {
-                tempStartTableCell = " width=\"" + Width + "\"";
+                result += " width=\"" + Width + "\"";
             }
             if (!string.IsNullOrEmpty(BGColor)) {
-                tempStartTableCell = tempStartTableCell + " bgcolor=\"" + BGColor + "\"";
+                result += " bgcolor=\"" + BGColor + "\"";
             } else if (EvenRow) {
-                tempStartTableCell = tempStartTableCell + " class=\"ccPanelRowEven\"";
+                result += " class=\"ccPanelRowEven\"";
             } else {
-                tempStartTableCell = tempStartTableCell + " class=\"ccPanelRowOdd\"";
+                result += " class=\"ccPanelRowOdd\"";
             }
             if (ColSpan != 0) {
-                tempStartTableCell = tempStartTableCell + " colspan=\"" + ColSpan + "\"";
+                result += " colspan=\"" + ColSpan + "\"";
             }
             if (!string.IsNullOrEmpty(Align)) {
-                tempStartTableCell = tempStartTableCell + " align=\"" + Align + "\"";
+                result += " align=\"" + Align + "\"";
             }
-            return "<TD" + tempStartTableCell + ">";
+            return "<td" + result + ">";
         }
-        //        '
-        //        '
-        //        '
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// create a table cell <td>content</td>
+        /// </summary>
+        /// <param name="Copy"></param>
+        /// <param name="Width"></param>
+        /// <param name="ColSpan"></param>
+        /// <param name="EvenRow"></param>
+        /// <param name="Align"></param>
+        /// <param name="BGColor"></param>
+        /// <returns></returns>
         public static string tableCell(string Copy, string Width = "", int ColSpan = 0, bool EvenRow = false, string Align = "", string BGColor = "") {
-            return tableCellStart(Width, ColSpan, EvenRow, Align, BGColor) + Copy + kmaEndTableCell;
+            return tableCellStart(Width, ColSpan, EvenRow, Align, BGColor) + Copy + tableCellEnd;
         }
-        //        '
-        //        '
-        //        '
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// create a <tr><td>content</td></tr>
+        /// </summary>
+        /// <param name="Cell"></param>
+        /// <param name="ColSpan"></param>
+        /// <param name="EvenRow"></param>
+        /// <returns></returns>
         public static string tableRow(string Cell, int ColSpan = 0, bool EvenRow = false) {
             return tableRowStart() + tableCell(Cell, "100%", ColSpan, EvenRow) + kmaEndTableRow;
         }
         //
-        //
-        //
-        public static string removeTag(string Source, string TagName) {
-            string tempRemoveTag = null;
-            int Pos = 0;
-            int PosEnd = 0;
-            tempRemoveTag = Source;
-            Pos = vbInstr(1, Source, "<" + TagName, 1);
-            if (Pos != 0) {
-                PosEnd = vbInstr(Pos, Source, ">");
-                if (PosEnd > 0) {
-                    tempRemoveTag = Source.Left(Pos - 1) + Source.Substring(PosEnd);
-                }
-            }
-            return tempRemoveTag;
+        // ====================================================================================================
+        /// <summary>
+        /// convert html entities in a string
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string encodeHtml(string Source) {
+            return WebUtility.HtmlEncode(Source);
         }
         //
-        //
-        //
-        public static string RemoveStyleTags(string Source) {
-            string tempRemoveStyleTags = null;
-            tempRemoveStyleTags = Source;
-            while (vbInstr(1, tempRemoveStyleTags, "<style", 1) != 0) {
-                tempRemoveStyleTags = removeTag(tempRemoveStyleTags, "style");
-            }
-            while (vbInstr(1, tempRemoveStyleTags, "</style", 1) != 0) {
-                tempRemoveStyleTags = removeTag(tempRemoveStyleTags, "/style");
-            }
-            return tempRemoveStyleTags;
+        // ====================================================================================================
+        /// <summary>
+        /// decodeHtml, Convert HTML entity strings to their text equiv
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string decodeHtml(string Source) {
+            return WebUtility.HtmlDecode(Source);
         }
-
     }
 }

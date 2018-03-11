@@ -79,7 +79,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     string ignoreRefactorText = "";
                     bool ignoreRefactorBoolean = false;
                     List<string> nonCriticalErrorList = new List<string>();
-                    if (!collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref ignoreRefactorText, ref ignoreRefactorBoolean, false, ref nonCriticalErrorList)) {
+                    if (!collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref ignoreRefactorText, ref ignoreRefactorBoolean, false, false, ref nonCriticalErrorList)) {
                         if (string.IsNullOrEmpty(ErrorMessage)) {
                             ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
                         }
@@ -88,7 +88,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     // Verify core installation
                     //
-                    collectionController.installCollectionFromRemoteRepo(core, CoreCollectionGuid, ref ErrorMessage, "", false, ref nonCriticalErrorList);
+                    collectionController.installCollectionFromRemoteRepo(core, CoreCollectionGuid, ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
                     //
                     string DomainNamePrimary = core.appConfig.domainList[0];
                     int Pos = genericController.vbInstr(1, DomainNamePrimary, ",");

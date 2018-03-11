@@ -278,7 +278,7 @@ namespace Contensive.Core.Controllers {
                                                     // -- Add-on
                                                     NotUsedID = 0;
                                                     AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                    addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded);
+                                                    addonOptionString = htmlController.decodeHtml(AddonOptionStringHTMLEncoded);
                                                     if (IsEmailContent) {
                                                         //
                                                         // -- Addon for email
@@ -456,7 +456,7 @@ namespace Contensive.Core.Controllers {
                                                                 }
                                                             }
                                                             string ACNameCaption = genericController.vbReplace(ACName, "\"", "");
-                                                            ACNameCaption = genericController.encodeHTML(ACNameCaption);
+                                                            ACNameCaption = htmlController.encodeHtml(ACNameCaption);
                                                             string IDControlString = "AC," + ACType + "," + NotUsedID + "," + genericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
                                                             Copy = addonController.GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0);
                                                         } else if (EncodeNonCachableTags) {
@@ -763,7 +763,7 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     // ----- Create Template Content
                                                     AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                    addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded);
+                                                    addonOptionString = htmlController.decodeHtml(AddonOptionStringHTMLEncoded);
                                                     NotUsedID = 0;
                                                     if (encodeForWysiwygEditor) {
                                                         //
@@ -788,7 +788,7 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     // ----- Formatting Tag
                                                     AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                    addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded);
+                                                    addonOptionString = htmlController.decodeHtml(AddonOptionStringHTMLEncoded);
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
@@ -958,7 +958,7 @@ namespace Contensive.Core.Controllers {
                                                     ElementText = genericController.vbReplace(ElementText, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
                                                     ImageSrcOriginal = genericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
                                                 }
-                                                ImageSrc = genericController.decodeHtml(ImageSrcOriginal);
+                                                ImageSrc = htmlController.decodeHtml(ImageSrcOriginal);
                                                 ImageSrc = decodeURL(ImageSrc);
                                                 //
                                                 // problem with this case is if the addon icon image is from another site.
@@ -1036,7 +1036,7 @@ namespace Contensive.Core.Controllers {
                                                                         RecordID = genericController.encodeInteger(ACInstanceName);
                                                                         ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH");
                                                                         ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT");
-                                                                        ImageAlt = genericController.encodeHTML(DHTML.ElementAttribute(ElementPointer, "Alt"));
+                                                                        ImageAlt = htmlController.encodeHtml(DHTML.ElementAttribute(ElementPointer, "Alt"));
                                                                         ImageVSpace = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"));
                                                                         ImageHSpace = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"));
                                                                         ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align");
@@ -1120,14 +1120,14 @@ namespace Contensive.Core.Controllers {
                                                                         // I find it VERY odd that this could be the case
                                                                         //
                                                                         QSHTMLEncoded = genericController.encodeText(ACQueryString);
-                                                                        QueryString = genericController.decodeHtml(QSHTMLEncoded);
+                                                                        QueryString = htmlController.decodeHtml(QSHTMLEncoded);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
                                                                             Pos = genericController.vbInstr(1, QSSplit[QSPtr], "[");
                                                                             if (Pos > 0) {
                                                                                 QSSplit[QSPtr] = QSSplit[QSPtr].Left(Pos - 1);
                                                                             }
-                                                                            QSSplit[QSPtr] = genericController.encodeHTML(QSSplit[QSPtr]);
+                                                                            QSSplit[QSPtr] = htmlController.encodeHtml(QSSplit[QSPtr]);
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
                                                                     }
@@ -1150,7 +1150,7 @@ namespace Contensive.Core.Controllers {
                                                                         QueryString = genericController.encodeText(ImageIDArray[4]);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = genericController.encodeHTML(QSSplit[QSPtr]);
+                                                                            QSSplit[QSPtr] = htmlController.encodeHtml(QSSplit[QSPtr]);
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
 
@@ -1164,10 +1164,10 @@ namespace Contensive.Core.Controllers {
                                                                     QueryString = "";
                                                                     if (ImageIDArrayCount > 4) {
                                                                         QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                        QueryString = genericController.decodeHtml(QueryString);
+                                                                        QueryString = htmlController.decodeHtml(QueryString);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = genericController.encodeHTML(QSSplit[QSPtr]);
+                                                                            QSSplit[QSPtr] = htmlController.encodeHtml(QSSplit[QSPtr]);
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
                                                                     }
@@ -1180,10 +1180,10 @@ namespace Contensive.Core.Controllers {
                                                                     QueryString = "";
                                                                     if (ImageIDArrayCount > 4) {
                                                                         QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                        QueryString = genericController.decodeHtml(QueryString);
+                                                                        QueryString = htmlController.decodeHtml(QueryString);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = genericController.encodeHTML(QSSplit[QSPtr]);
+                                                                            QSSplit[QSPtr] = htmlController.encodeHtml(QSSplit[QSPtr]);
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
                                                                     }
@@ -1196,10 +1196,10 @@ namespace Contensive.Core.Controllers {
                                                                     QueryString = "";
                                                                     if (ImageIDArrayCount > 4) {
                                                                         QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                        QueryString = genericController.decodeHtml(QueryString);
+                                                                        QueryString = htmlController.decodeHtml(QueryString);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = genericController.encodeHTML(QSSplit[QSPtr]);
+                                                                            QSSplit[QSPtr] = htmlController.encodeHtml(QSSplit[QSPtr]);
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
                                                                     }
@@ -1382,14 +1382,14 @@ namespace Contensive.Core.Controllers {
                                                                                             NewImageFilename = ImageFilenameNoExt + "-" + ImageAltSize + "." + ImageFilenameExt;
                                                                                             // images included in email have spaces that must be converted to "%20" or they 404
                                                                                             imageNewLink = genericController.encodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename);
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, genericController.encodeHTML(imageNewLink));
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, htmlController.encodeHtml(imageNewLink));
                                                                                         } else if ((RecordWidth < ImageWidth) || (RecordHeight < ImageHeight)) {
                                                                                             //
                                                                                             // OK
                                                                                             // reize image larger then original - go with it as is
                                                                                             //
                                                                                             // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, genericController.encodeHTML(genericController.encodeURL(genericController.getCdnFileLink(core, RecordVirtualFilename))));
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, htmlController.encodeHtml(genericController.encodeURL(genericController.getCdnFileLink(core, RecordVirtualFilename))));
                                                                                         } else {
                                                                                             //
                                                                                             // resized image - create NewImageFilename (and add new alt size to the record)
@@ -1475,7 +1475,7 @@ namespace Contensive.Core.Controllers {
                                                                                                 }
                                                                                                 //
                                                                                                 // Change the image src to the AltSize
-                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, genericController.encodeHTML(genericController.encodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename)));
+                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, htmlController.encodeHtml(genericController.encodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename)));
                                                                                             }
                                                                                         }
                                                                                     }
@@ -1583,14 +1583,14 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // Add in the non-command text that is before the first command
                                 //
-                                result = result + Segment;
+                                result += Segment;
                             } else if (!string.IsNullOrEmpty(Segment)) {
                                 if (genericController.vbInstr(1, Segment, "}}") == 0) {
                                     //
                                     // No command found, return the marker and deliver the Segment
                                     //
                                     //hint = hint & ",210"
-                                    result = result + "{{" + Segment;
+                                    result += "{{" + Segment;
                                 } else {
                                     //
                                     // isolate the command
@@ -1612,7 +1612,7 @@ namespace Contensive.Core.Controllers {
                                             addonOptionString = "";
                                         } else {
                                             addonOptionString = AcCmdSplit[1];
-                                            addonOptionString = genericController.decodeHtml(addonOptionString);
+                                            addonOptionString = htmlController.decodeHtml(addonOptionString);
                                         }
                                         //
                                         // execute the command
@@ -1643,7 +1643,7 @@ namespace Contensive.Core.Controllers {
                                                 //
                                                 //hint = hint & ",320"
                                                 string ListName = addonController.getAddonOption("name", addonOptionString);
-                                                result = result + core.doc.getChildPageList(ListName, ContextContentName, ContextRecordID, true);
+                                                result += core.doc.getChildPageList(ListName, ContextContentName, ContextRecordID, true);
                                                 break;
                                             case ACTypeTemplateText:
                                                 //
@@ -1656,7 +1656,7 @@ namespace Contensive.Core.Controllers {
                                                         CopyName = "Default";
                                                     }
                                                 }
-                                                result = result + core.html.getContentCopy(CopyName, "", personalizationPeopleId, false, personalizationIsAuthenticated);
+                                                result += core.html.getContentCopy(CopyName, "", personalizationPeopleId, false, personalizationIsAuthenticated);
                                                 break;
                                             case ACTypeWatchList:
                                                 //
@@ -1666,21 +1666,21 @@ namespace Contensive.Core.Controllers {
                                                 ListName = addonController.getAddonOption("LISTNAME", addonOptionString);
                                                 string SortField = addonController.getAddonOption("SORTFIELD", addonOptionString);
                                                 bool SortReverse = genericController.encodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString));
-                                                result = result + core.doc.main_GetWatchList(core, ListName, SortField, SortReverse);
+                                                result += core.doc.main_GetWatchList(core, ListName, SortField, SortReverse);
                                                 break;
                                             default:
                                                 //
                                                 // Unrecognized command - put all the syntax back in
                                                 //
                                                 //hint = hint & ",340"
-                                                result = result + "{{" + AcCmd + "}}";
+                                                result += "{{" + AcCmd + "}}";
                                                 break;
                                         }
                                     }
                                     //
                                     // add the SegmentSuffix back on
                                     //
-                                    result = result + SegmentSuffix;
+                                    result += SegmentSuffix;
                                 }
                             }
                             //
@@ -1724,7 +1724,7 @@ namespace Contensive.Core.Controllers {
                                     if (ArgCnt > 1) {
                                         if (!string.IsNullOrEmpty(ArgSplit[1])) {
                                             addonOptionString = ArgSplit[1].Substring(1, ArgSplit[1].Length - 2);
-                                            addonOptionString = genericController.decodeHtml(addonOptionString.Trim(' '));
+                                            addonOptionString = htmlController.decodeHtml(addonOptionString.Trim(' '));
                                         }
                                         if (ArgCnt > 2) {
                                             if (!string.IsNullOrEmpty(ArgSplit[2])) {

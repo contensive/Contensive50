@@ -247,7 +247,7 @@ namespace Contensive.Core.Controllers {
                         if ((iUsedEntries + ",").IndexOf("," + EntryPointer + ",")  == -1) {
                             JSChildObject = JSObject + ".s[" + SubMenuCount + "]";
                             iUsedEntries = iUsedEntries + "," + EntryPointer;
-                            result = result + JSChildObject + " = new so(0,'" + iEntry[EntryPointer].Caption + "','" + iEntry[EntryPointer].Link + "','_blank',''); \r\n" + GetMenuTreeBranch(iEntry[EntryPointer].Name, JSChildObject, iUsedEntries);
+                            result += JSChildObject + " = new so(0,'" + iEntry[EntryPointer].Caption + "','" + iEntry[EntryPointer].Link + "','_blank',''); \r\n" + GetMenuTreeBranch(iEntry[EntryPointer].Name, JSChildObject, iUsedEntries);
                             SubMenuCount = SubMenuCount + 1;
                         }
                     }
@@ -313,12 +313,12 @@ namespace Contensive.Core.Controllers {
                     // Output this node
                     //
                     if (genericController.vbInstr(1, "," + NodePointer.ToString() + ",", "," + UsedEntriesList + ",") == 0) {
-                        result = result + "<ul Style=\"list-style-type: none; margin-left: 20px\">";
+                        result += "<ul Style=\"list-style-type: none; margin-left: 20px\">";
                         //
                         // The Node has not already been used in this branch
                         //
                         Caption = iEntry[NodePointer].Caption;
-                        Link = genericController.encodeHTML(iEntry[NodePointer].Link);
+                        Link = htmlController.encodeHtml(iEntry[NodePointer].Link);
                         if (!string.IsNullOrEmpty(Link)) {
                             Caption = "<A TARGET=\"_blank\" HREF=\"" + Link + "\">" + Caption + "</A>";
                         }
@@ -328,7 +328,7 @@ namespace Contensive.Core.Controllers {
                             // The branch is closed
                             //
                             Image = iEntry[NodePointer].Image;
-                            result = result + "<li><A HREF=\"?OpenNodesList=" + OpenNodesList + "&OpenNode=" + NodePointer + "\"><IMG SRC=\"" + Image + "\" HEIGHT=\"18\" WIDTH=\"18\" BORDER=0 ALT=\"Open Folder\"></A>&nbsp;" + Caption + "</li>";
+                            result += "<li><A HREF=\"?OpenNodesList=" + OpenNodesList + "&OpenNode=" + NodePointer + "\"><IMG SRC=\"" + Image + "\" HEIGHT=\"18\" WIDTH=\"18\" BORDER=0 ALT=\"Open Folder\"></A>&nbsp;" + Caption + "</li>";
                         } else {
                             //
                             // The branch is open
@@ -337,7 +337,7 @@ namespace Contensive.Core.Controllers {
                             if (string.IsNullOrEmpty(Image)) {
                                 Image = iEntry[NodePointer].Image;
                             }
-                            result = result + "<li>"
+                            result += "<li>"
                             + "<A HREF=\"?OpenNodesList=" + OpenNodesList + "&CloseNode=" + NodePointer + "\">"
                             + "<IMG SRC=\"" + Image + "\" HEIGHT=\"18\" WIDTH=\"18\" BORDER=0 ALT=\"Close Folder\">"
                             + "</A>&nbsp;" + Caption + "</li>";
@@ -347,11 +347,11 @@ namespace Contensive.Core.Controllers {
                             UcaseNodeName = genericController.vbUCase(iEntry[NodePointer].Name);
                             for (EntryPointer = 0; EntryPointer < iEntryCount; EntryPointer++) {
                                 if (iEntry[EntryPointer].ParentName == UcaseNodeName) {
-                                    result = result + GetMenuTreeListBranch2(EntryPointer, UsedEntriesList + "," + NodePointer, OpenNodesList);
+                                    result += GetMenuTreeListBranch2(EntryPointer, UsedEntriesList + "," + NodePointer, OpenNodesList);
                                 }
                             }
                         }
-                        result = result + "</ul>\r\n";
+                        result += "</ul>\r\n";
                     }
                 }
             } catch (Exception ex) {

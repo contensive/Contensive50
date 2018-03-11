@@ -126,7 +126,7 @@ namespace Contensive.Core.Controllers {
                         // Add template editing
                         //
                         if (core.visitProperty.getBoolean("AllowAdvancedEditor") & core.session.isEditing("Page Templates")) {
-                            returnBody = core.html.getEditWrapper("Page Template [" + LocalTemplateName + "]", core.html.getRecordEditLink2("Page Templates", LocalTemplateID, false, LocalTemplateName, core.session.isEditing("Page Templates")) + returnBody);
+                            returnBody = core.html.getEditWrapper("Page Template [" + LocalTemplateName + "]", core.html.getRecordEditLink("Page Templates", LocalTemplateID, false, LocalTemplateName, core.session.isEditing("Page Templates")) + returnBody);
                         }
                     }
                     //
@@ -280,7 +280,7 @@ namespace Contensive.Core.Controllers {
                     // Display Admin Warnings with Edits for record errors
                     //
                     if (core.doc.adminWarningPageID != 0) {
-                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + core.html.getRecordEditLink2("Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
+                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + core.html.getRecordEditLink("Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
                     }
                     //
@@ -1023,7 +1023,7 @@ namespace Contensive.Core.Controllers {
                     //
                     if (core.docProperties.getInteger("ContensiveUserForm") == 1) {
                         string FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
-                        emailController.sendForm(core, core.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + core.webServer.requestReferer);
+                        emailController.queueFormEmail(core, core.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + core.webServer.requestReferer);
                         int cs = core.db.csInsertRecord("User Form Response");
                         if (core.db.csOk(cs)) {
                             core.db.csSet(cs, "name", "Form " + core.webServer.requestReferrer);
@@ -1678,12 +1678,12 @@ namespace Contensive.Core.Controllers {
                                     }
                                     core.db.csClose(ref CS);
                                     if (!Success) {
-                                        errorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + genericController.encodeHTML(FormValue) + "] has already been used.");
+                                        errorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + htmlController.encodeHtml(FormValue) + "] has already been used.");
                                     }
                                 }
                                 if ((tempVar.REquired | genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
-                                    errorController.addUserError(core, "The field [" + genericController.encodeHTML(tempVar.Caption) + "] is required.");
+                                    errorController.addUserError(core, "The field [" + htmlController.encodeHtml(tempVar.Caption) + "] is required.");
                                 } else {
                                     if (!core.db.csOk(CSPeople)) {
                                         CSPeople = core.db.csOpenRecord("people", core.session.user.id);
@@ -1966,7 +1966,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 tempgetFormPage = ""
-                + errorController.getUserError(core) + core.html.formStartMultipart() + core.html.inputHidden("ContensiveFormPageID", FormPageID) + core.html.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + core.html.formEnd();
+                + errorController.getUserError(core) + core.html.formStartMultipart() + core.html.inputHidden("ContensiveFormPageID", FormPageID) + core.html.getHtmlInputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + core.html.formEnd();
                 //
                 return tempgetFormPage;
                 //
@@ -2286,7 +2286,7 @@ namespace Contensive.Core.Controllers {
                                     Body = Body + kmaEndTable;
                                     string queryStringForLinkAppend = "";
                                     string emailStatus = "";
-                                    emailController.sendPerson(core, person, core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain), "Page Hit Notification", Body, false, true, 0, "", false, ref emailStatus, queryStringForLinkAppend);
+                                    emailController.queuePersonEmail(core, person, core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain), "Page Hit Notification", Body, "", "", false, true, 0, "", false, ref emailStatus, queryStringForLinkAppend);
                                 }
                             }
                         }
@@ -2303,7 +2303,7 @@ namespace Contensive.Core.Controllers {
                                 // Always
                                 //
                                 if (SystemEMailID != 0) {
-                                    emailController.sendSystem(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
+                                    emailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                 }
                                 if (main_AddGroupID != 0) {
                                     groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, main_AddGroupID));
@@ -2319,7 +2319,7 @@ namespace Contensive.Core.Controllers {
                                 if (ConditionGroupID != 0) {
                                     if (core.session.isMemberOfGroup(core, groupController.group_GetGroupName(core, ConditionGroupID))) {
                                         if (SystemEMailID != 0) {
-                                            emailController.sendSystem(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
+                                            emailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                         }
                                         if (main_AddGroupID != 0) {
                                             groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, main_AddGroupID));
@@ -2343,7 +2343,7 @@ namespace Contensive.Core.Controllers {
                                             groupController.group_DeleteGroupMember(core, groupController.group_GetGroupName(core, RemoveGroupID));
                                         }
                                         if (SystemEMailID != 0) {
-                                            emailController.sendSystem(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
+                                            emailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                         }
                                     }
                                 }
@@ -2383,8 +2383,8 @@ namespace Contensive.Core.Controllers {
                     // Set the Meta Content flag
                     //---------------------------------------------------------------------------------
                     //
-                    core.html.addTitle(genericController.encodeHTML(core.doc.pageController.page.pageTitle), "page content");
-                    core.html.addMetaDescription(genericController.encodeHTML(core.doc.pageController.page.metaDescription), "page content");
+                    core.html.addTitle(htmlController.encodeHtml(core.doc.pageController.page.pageTitle), "page content");
+                    core.html.addMetaDescription(htmlController.encodeHtml(core.doc.pageController.page.metaDescription), "page content");
                     core.html.addHeadTag(core.doc.pageController.page.OtherHeadTags, "page content");
                     core.html.addMetaKeywordList(core.doc.pageController.page.MetaKeywordList, "page content");
                     //
@@ -2427,7 +2427,7 @@ namespace Contensive.Core.Controllers {
                 if (core.doc.adminWarning != "") {
                     //
                     if (core.doc.adminWarningPageID != 0) {
-                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + core.html.getRecordEditLink2("Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
+                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + core.html.getRecordEditLink("Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
                     }
                     returnHtml = ""
@@ -2470,11 +2470,11 @@ namespace Contensive.Core.Controllers {
                         LiveBody = getContentBox_content_Body(core, OrderByClause, AllowChildPageList, false, core.doc.pageController.pageToRootList.Last().id, AllowReturnLink, pageContentModel.contentName, ArchivePages);
                         bool isRootPage = (core.doc.pageController.pageToRootList.Count == 1);
                         if (core.session.isAdvancedEditing(core, "")) {
-                            result = result + core.html.getRecordEditLink(pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody;
+                            result += core.html.getRecordEditLink(pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody;
                         } else if (isEditing) {
-                            result = result + core.html.getEditWrapper("", core.html.getRecordEditLink(pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody);
+                            result += core.html.getEditWrapper("", core.html.getRecordEditLink(pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody);
                         } else {
-                            result = result + LiveBody;
+                            result += LiveBody;
                         }
                     }
                 }
@@ -2522,7 +2522,7 @@ namespace Contensive.Core.Controllers {
                         breadCrumb = "\r<p class=\"ccPageListNavigation\">" + BreadCrumbPrefix + " " + breadCrumb + "</p>";
                     }
                 }
-                result = result + breadCrumb;
+                result += breadCrumb;
                 //
                 if (true) {
                     string IconRow = "";
@@ -2536,7 +2536,7 @@ namespace Contensive.Core.Controllers {
                             QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, true);
                             string Caption = core.siteProperties.getText("PagePrinterVersionCaption", "Printer Version");
                             Caption = genericController.vbReplace(Caption, " ", "&nbsp;");
-                            IconRow = IconRow + "\r&nbsp;&nbsp;<a href=\"" + genericController.encodeHTML(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\"><img alt=\"image\" src=\"/ccLib/images/IconSmallPrinter.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp<a href=\"" + genericController.encodeHTML(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
+                            IconRow = IconRow + "\r&nbsp;&nbsp;<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\"><img alt=\"image\" src=\"/ccLib/images/IconSmallPrinter.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
                         }
                         if (core.doc.pageController.page.AllowEmailPage) {
                             string QueryString = core.doc.refreshQueryString;
@@ -2550,7 +2550,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     if (!string.IsNullOrEmpty(IconRow)) {
-                        result = result + "\r<div style=\"text-align:right;\">"
+                        result += "\r<div style=\"text-align:right;\">"
                         + genericController.nop(IconRow) + "\r</div>";
                     }
                 }
@@ -2565,7 +2565,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Headline
                     //
                     if (core.doc.pageController.page.Headline != "") {
-                        string headline = encodeHTML(core.doc.pageController.page.Headline);
+                        string headline = htmlController.encodeHtml(core.doc.pageController.page.Headline);
                         Cell = Cell + "\r<h1>" + headline + "</h1>";
                         //
                         // Add AC end here to force the end of any left over AC tags (like language)
@@ -2610,58 +2610,58 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 // ----- End Text Search
-                result = result + "\r<!-- TextSearchStart -->"
+                result += "\r<!-- TextSearchStart -->"
                     + genericController.nop(Cell) + "\r<!-- TextSearchEnd -->";
                 //
                 // ----- Page See Also
                 if (core.doc.pageController.page.AllowSeeAlso) {
-                    result = result + "\r<div>"
+                    result += "\r<div>"
                         + genericController.nop(getSeeAlso(core, pageContentModel.contentName, core.doc.pageController.page.id)) + "\r</div>";
                 }
                 //
                 // ----- Allow More Info
                 if ((core.doc.pageController.page.ContactMemberID != 0) & core.doc.pageController.page.AllowMoreInfo) {
-                    result = result + "\r<ac TYPE=\"" + ACTypeContact + "\">";
+                    result += "\r<ac TYPE=\"" + ACTypeContact + "\">";
                 }
                 //
                 // ----- Feedback
                 if ((core.doc.pageController.page.ContactMemberID != 0) & core.doc.pageController.page.AllowFeedback) {
-                    result = result + "\r<ac TYPE=\"" + ACTypeFeedback + "\">";
+                    result += "\r<ac TYPE=\"" + ACTypeFeedback + "\">";
                 }
                 //
                 // ----- Last Modified line
                 if ((core.doc.pageController.page.modifiedDate != DateTime.MinValue) & core.doc.pageController.page.AllowLastModifiedFooter) {
-                    result = result + "\r<p>This page was last modified " + core.doc.pageController.page.modifiedDate.ToString("G");
+                    result += "\r<p>This page was last modified " + core.doc.pageController.page.modifiedDate.ToString("G");
                     if (core.session.isAuthenticatedAdmin(core)) {
                         if (core.doc.pageController.page.modifiedBy == 0) {
-                            result = result + " (admin only: modified by unknown)";
+                            result += " (admin only: modified by unknown)";
                         } else {
                             string personName = core.db.getRecordName("people", core.doc.pageController.page.modifiedBy);
                             if (string.IsNullOrEmpty(personName)) {
-                                result = result + " (admin only: modified by person with unnamed or deleted record #" + core.doc.pageController.page.modifiedBy + ")";
+                                result += " (admin only: modified by person with unnamed or deleted record #" + core.doc.pageController.page.modifiedBy + ")";
                             } else {
-                                result = result + " (admin only: modified by " + personName + ")";
+                                result += " (admin only: modified by " + personName + ")";
                             }
                         }
                     }
-                    result = result + "</p>";
+                    result += "</p>";
                 }
                 //
                 // ----- Last Reviewed line
                 if ((core.doc.pageController.page.DateReviewed != DateTime.MinValue) & core.doc.pageController.page.AllowReviewedFooter) {
-                    result = result + "\r<p>This page was last reviewed " + core.doc.pageController.page.DateReviewed.ToString("");
+                    result += "\r<p>This page was last reviewed " + core.doc.pageController.page.DateReviewed.ToString("");
                     if (core.session.isAuthenticatedAdmin(core)) {
                         if (core.doc.pageController.page.ReviewedBy == 0) {
-                            result = result + " (by unknown)";
+                            result += " (by unknown)";
                         } else {
                             string personName = core.db.getRecordName("people", core.doc.pageController.page.ReviewedBy);
                             if (string.IsNullOrEmpty(personName)) {
-                                result = result + " (by person with unnamed or deleted record #" + core.doc.pageController.page.ReviewedBy + ")";
+                                result += " (by person with unnamed or deleted record #" + core.doc.pageController.page.ReviewedBy + ")";
                             } else {
-                                result = result + " (by " + personName + ")";
+                                result += " (by " + personName + ")";
                             }
                         }
-                        result = result + ".</p>";
+                        result += ".</p>";
                     }
                 }
                 //
@@ -2669,7 +2669,7 @@ namespace Contensive.Core.Controllers {
                 if (core.doc.pageController.page.AllowMessageFooter) {
                     string pageContentMessageFooter = core.siteProperties.getText("PageContentMessageFooter", "");
                     if (!string.IsNullOrEmpty(pageContentMessageFooter)) {
-                        result = result + "\r<p>" + pageContentMessageFooter + "</p>";
+                        result += "\r<p>" + pageContentMessageFooter + "</p>";
                     }
                 }
                 //Call core.db.cs_Close(CS)
@@ -2720,20 +2720,20 @@ namespace Contensive.Core.Controllers {
                         while (core.db.csOk(CS)) {
                             SeeAlsoLink = (core.db.csGetText(CS, "Link"));
                             if (!string.IsNullOrEmpty(SeeAlsoLink)) {
-                                result = result + "\r<li class=\"ccListItem\">";
+                                result += "\r<li class=\"ccListItem\">";
                                 if (genericController.vbInstr(1, SeeAlsoLink, "://") == 0) {
                                     SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
                                 }
                                 if (IsEditingLocal) {
-                                    result = result + core.html.getRecordEditLink2("See Also", (core.db.csGetInteger(CS, "ID")), false, "", core.session.isEditing("See Also"));
+                                    result += core.html.getRecordEditLink("See Also", (core.db.csGetInteger(CS, "ID")), false, "", core.session.isEditing("See Also"));
                                 }
-                                result = result + "<a href=\"" + genericController.encodeHTML(SeeAlsoLink) + "\" target=\"_blank\">" + (core.db.csGetText(CS, "Name")) + "</A>";
+                                result += "<a href=\"" + htmlController.encodeHtml(SeeAlsoLink) + "\" target=\"_blank\">" + (core.db.csGetText(CS, "Name")) + "</A>";
                                 Copy = (core.db.csGetText(CS, "Brief"));
                                 if (!string.IsNullOrEmpty(Copy)) {
-                                    result = result + "<br>" + htmlController.span(Copy, "ccListCopy");
+                                    result += "<br>" + htmlController.span(Copy, "ccListCopy");
                                 }
                                 SeeAlsoCount = SeeAlsoCount + 1;
-                                result = result + "</li>";
+                                result += "</li>";
                             }
                             core.db.csGoNext(CS);
                         }
@@ -2741,7 +2741,7 @@ namespace Contensive.Core.Controllers {
                         //
                         if (IsEditingLocal) {
                             SeeAlsoCount = SeeAlsoCount + 1;
-                            result = result + "\r<li class=\"ccListItem\">" + core.html.getRecordAddLink("See Also", "RecordID=" + iRecordID + ",ContentID=" + ContentID) + "</LI>";
+                            result += "\r<li class=\"ccListItem\">" + core.html.getRecordAddLink("See Also", "RecordID=" + iRecordID + ",ContentID=" + ContentID) + "</LI>";
                         }
                     }
                     //
@@ -2844,12 +2844,12 @@ namespace Contensive.Core.Controllers {
                         if ( person != null ) {
                             string sendStatus = "";
                             string queryStringForLinkAppend = "";
-                            emailController.sendPerson(core, person, NoteFromEmail, "Feedback Form Submitted", NoteCopy, false, true, 0, "", false,ref sendStatus, queryStringForLinkAppend);
+                            emailController.queuePersonEmail(core, person, NoteFromEmail, "Feedback Form Submitted", NoteCopy, "", "", false, true, 0, "", false,ref sendStatus, queryStringForLinkAppend);
                         }
                         //
                         // ----- Note sent, say thanks
                         //
-                        result = result + "<p>Thank you. Your feedback was received.</p>";
+                        result += "<p>Thank you. Your feedback was received.</p>";
                         break;
                     default:
                         //
@@ -2865,14 +2865,14 @@ namespace Contensive.Core.Controllers {
                         //
                         Copy = core.session.user.name;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Name</p></td>";
-                        Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + genericController.encodeHTML(Copy) + "\"></span></td>";
+                        Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + htmlController.encodeHtml(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";
                         //
                         // ----- From Email address
                         //
                         Copy = core.session.user.Email;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Email</p></td>";
-                        Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + genericController.encodeHTML(Copy) + "\"></span></td>";
+                        Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + htmlController.encodeHtml(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";
                         //
                         // ----- Message
@@ -2886,7 +2886,7 @@ namespace Contensive.Core.Controllers {
                         // ----- submit button
                         //
                         Panel = Panel + "<td>&nbsp;</td>";
-                        Panel = Panel + "<td>" + htmlController.getButton(FeedbackButtonSubmit, "fbb") + "</td>";
+                        Panel = Panel + "<td>" + htmlController.getHtmlInputSubmit(FeedbackButtonSubmit, "fbb") + "</td>";
                         //Panel = Panel + "<td><input type=\"submit\" name=\"fbb\" value=\"" + FeedbackButtonSubmit + "\"></td>";
                         Panel = Panel + "</tr></table>";
                         Panel = Panel + "</form>";

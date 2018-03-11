@@ -90,8 +90,8 @@ namespace Contensive.Core.Controllers {
                     //
                     TabWrapperID = "TabWrapper" + genericController.GetRandomInteger(core);
                     TabBlank = GetTabBlank();
-                    result = result + "<script language=\"JavaScript\" src=\"/ccLib/clientside/ccDynamicTab.js\" type=\"text/javascript\"></script>\r\n";
-                    result = result + "<table border=0 cellspacing=0 cellpadding=0 width=\"100%\"><tr>";
+                    result += "<script language=\"JavaScript\" src=\"/ccLib/clientside/ccDynamicTab.js\" type=\"text/javascript\"></script>\r\n";
+                    result += "<table border=0 cellspacing=0 cellpadding=0 width=\"100%\"><tr>";
                     for (TabPtr = 0; TabPtr < TabsCnt; TabPtr++) {
                         TabStyle = Tabs[TabPtr].ContainerClass;
                         TabLink = Tabs[TabPtr].Link;
@@ -111,7 +111,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // This tab is hit
                         //
-                        result = result + "<td valign=bottom>" + TabBlank + "</td>";
+                        result += "<td valign=bottom>" + TabBlank + "</td>";
                         result = genericController.vbReplace(result, "Replace-TabID", TabID);
                         result = genericController.vbReplace(result, "Replace-StyleEdge", TabEdgeStyle);
                         if (!string.IsNullOrEmpty(TabAjaxLink)) {
@@ -155,9 +155,9 @@ namespace Contensive.Core.Controllers {
                         }
                         HitPtr = TabPtr;
                     }
-                    result = result + "<td width=\"100%\" class=\"" + TabEndStyle + "\">&nbsp;</td></tr></table>";
-                    result = result + "<div ID=\"" + TabWrapperID + "\" class=\"" + TabBodyCollectionWrapStyle + "\">" + TabBody + "</div>";
-                    result = result + "<script type=text/javascript>" + JSClose + "</script>\r\n";
+                    result += "<td width=\"100%\" class=\"" + TabEndStyle + "\">&nbsp;</td></tr></table>";
+                    result += "<div ID=\"" + TabWrapperID + "\" class=\"" + TabBodyCollectionWrapStyle + "\">" + TabBody + "</div>";
+                    result += "<script type=text/javascript>" + JSClose + "</script>\r\n";
                     TabsCnt = 0;
                 }
             } catch (Exception) {
@@ -171,9 +171,9 @@ namespace Contensive.Core.Controllers {
         public string GetTabBlank() {
             string result = "";
             try {
-                result = result + "<!--\r\nTab Replace-TabID\r\n-->"
+                result += "<!--\r\nTab Replace-TabID\r\n-->"
                 + "<table cellspacing=0 cellPadding=0 border=0 id=Replace-TabID>";
-                result = result + "\r\n<tr>"
+                result += "\r\n<tr>"
                     + "\r\n<td id=Replace-TabIDR00 colspan=2 class=\"\" height=1 width=2></td>"
                     + "\r\n<td id=Replace-TabIDR01 colspan=1 class=\"Replace-StyleEdge\" height=1></td>"
                     + "\r\n<td id=Replace-TabIDR02 colspan=3 class=\"\" height=1 width=3></td>"
@@ -184,14 +184,14 @@ namespace Contensive.Core.Controllers {
                 //    & vbCrLf & "<td id=Replace-TabIDR01 colspan=1 class=""Replace-StyleEdge"" height=1></td>" _
                 //    & vbCrLf & "<td id=Replace-TabIDR02 colspan=3 class="""" height=1 width=3><img src=""/ccLib/images/spacer.gif"" width=3 height=1></td>" _
                 //    & vbCrLf & "</tr>"
-                result = result + "\r\n<tr>"
+                result += "\r\n<tr>"
                 + "\r\n<td id=Replace-TabIDR10 colspan=1 class=\"\" height=1 width=1></td>"
                 + "\r\n<td id=Replace-TabIDR11 colspan=1 class=\"Replace-StyleEdge\" height=1 width=1></td>"
                 + "\r\n<td id=Replace-TabIDR12 colspan=1 class=\"Replace-StyleHit\" height=1></td>"
                 + "\r\n<td id=Replace-TabIDR13 colspan=1 class=\"Replace-StyleEdge\" height=1 width=1></td>"
                 + "\r\n<td id=Replace-TabIDR14 colspan=2 class=\"\" height=1 width=2></td>"
                 + "\r\n</tr>";
-                result = result + "\r\n<tr>"
+                result += "\r\n<tr>"
                 + "\r\n<td id=Replace-TabIDR20 colspan=1 height=2 class=\"Replace-StyleEdge\"></td>"
                 + "\r\n<td id=Replace-TabIDR21 colspan=1 height=2 Class=\"Replace-StyleHit\"></td>"
                 + "\r\n<td id=Replace-TabIDR22 colspan=1 height=2 Class=\"Replace-StyleHit\"></td>"
@@ -199,7 +199,7 @@ namespace Contensive.Core.Controllers {
                 + "\r\n<td id=Replace-TabIDR24 colspan=1 height=2 width=1 class=\"Replace-StyleEdge\"></td>"
                 + "\r\n<td id=Replace-TabIDR25 colspan=1 height=2 width=1 Class=\"\"></td>"
                 + "\r\n</tr>";
-                result = result + "\r\n<tr>"
+                result += "\r\n<tr>"
                 + "\r\n<td id=Replace-TabIDR30 class=\"Replace-StyleEdge\"></td>"
                 + "\r\n<td id=Replace-TabIDR31 Class=\"Replace-StyleHit\"></td>"
                 + "\r\n<td id=Replace-TabIDR32 Class=\"Replace-StyleHit\" style=\"padding-right:10px;padding-left:10px;padding-bottom:2px;\">Replace-HotSpot</td>"
@@ -207,7 +207,7 @@ namespace Contensive.Core.Controllers {
                 + "\r\n<td id=Replace-TabIDR34 class=\"Replace-StyleEdge\"></td>"
                 + "\r\n<td id=Replace-TabIDR35 class=\"\"></td>"
                 + "\r\n</tr>";
-                result = result + "\r\n<tr>"
+                result += "\r\n<tr>"
                 + "\r\n<td id=Replace-TabIDR40 class=\"Replace-StyleEdge\"></td>"
                 + "\r\n<td id=Replace-TabIDR41 Class=\"Replace-StyleHit\"></td>"
                 + "\r\n<td id=Replace-TabIDR42 Class=\"Replace-StyleHit\"></td>"

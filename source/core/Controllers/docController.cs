@@ -216,8 +216,8 @@ namespace Contensive.Core.Controllers {
         internal Dictionary<string, Models.Complex.tableSchemaModel> tableSchemaDictionary { get; set; }
         //
         // -- Email Block List - these are people who have asked to not have email sent to them from this site, Loaded ondemand by csv_GetEmailBlockList
-        public string emailBlockList_Local { get; set; } = "";
-        public bool emailBlockListLocalLoaded { get; set; }
+        public string emailBlockListStore { get; set; } = "";
+        public bool emailBlockListStoreLoaded { get; set; }
         //
         // -- list of log files, managed in logController
         public Dictionary<string, TextWriterTraceListener> logList = new Dictionary<string, TextWriterTraceListener>();
@@ -400,13 +400,13 @@ namespace Contensive.Core.Controllers {
                         LinkLabel = this.core.db.csGetText(CSPointer, "LinkLabel");
                         RecordID = this.core.db.csGetInteger(CSPointer, "ID");
                         if (!string.IsNullOrEmpty(LinkLabel)) {
-                            result = result + "\r<li class=\"ccListItem\">";
+                            result += "\r<li class=\"ccListItem\">";
                             if (!string.IsNullOrEmpty(Link)) {
-                                result = result + genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML(core.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID) + "\">", LinkLabel);
+                                result += genericController.csv_GetLinkedText("<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID) + "\">", LinkLabel);
                             } else {
-                                result = result + LinkLabel;
+                                result += LinkLabel;
                             }
-                            result = result + "</li>";
+                            result += "</li>";
                         }
                         this.core.db.csGoNext(CSPointer);
                     }
@@ -443,13 +443,13 @@ namespace Contensive.Core.Controllers {
                         LinkLabel = this.core.db.csGetText(CS, "LinkLabel");
                         RecordID = this.core.db.csGetInteger(CS, "ID");
                         if (!string.IsNullOrEmpty(LinkLabel)) {
-                            result = result + "\r<li id=\"main_ContentWatch" + RecordID + "\" class=\"ccListItem\">";
+                            result += "\r<li id=\"main_ContentWatch" + RecordID + "\" class=\"ccListItem\">";
                             if (!string.IsNullOrEmpty(Link)) {
-                                result = result + "<a href=\"http://" + this.core.webServer.requestDomain + requestAppRootPath + this.core.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID + "\">" + LinkLabel + "</a>";
+                                result += "<a href=\"http://" + this.core.webServer.requestDomain + requestAppRootPath + this.core.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID + "\">" + LinkLabel + "</a>";
                             } else {
-                                result = result + LinkLabel;
+                                result += LinkLabel;
                             }
-                            result = result + "</li>";
+                            result += "</li>";
                         }
                         this.core.db.csGoNext(CS);
                     }
@@ -583,23 +583,23 @@ namespace Contensive.Core.Controllers {
                 //        & cr & "</tr>"
                 //End If
                 if (core.doc.debug_iUserError != "") {
-                    result = result + ""
+                    result += ""
                         + "\r<tr>"
                         + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + errorController.getUserError(core) + "</div></td>"
                         + "\r</tr>";
                 }
                 if (readOnlyField) {
-                    result = result + ""
+                    result += ""
                     + "\r<tr>"
                     + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, true, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) + "</td>"
                     + "\r</tr>";
                 } else {
-                    result = result + ""
+                    result += ""
                     + "\r<tr>"
                     + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, true, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) + "</td>"
                     + "\r</tr>";
                 }
-                result = result + "\r<tr>"
+                result += "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:10px;\">Name</td>"
                     + cr2 + "<td class=\"qeRow qeRight\">" + core.html.inputText("name", pageController.page.name, 1, 0, "", false, readOnlyField) + "</td>"
                     + "\r</tr>"
@@ -620,7 +620,7 @@ namespace Contensive.Core.Controllers {
                         PageList = "<ul class=\"qeListUL\"><li class=\"qeListLI\">" + Link + PageList + "</li></ul>";
                     }
                 }
-                result = result + ""
+                result += ""
                 + "\r<tr>"
                 + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:26px;\">Parent Pages</td>"
                 + cr2 + "<td class=\"qeRow qeRight\"><div class=\"qeListCon\">" + PageList + "</div></td>"
@@ -644,7 +644,7 @@ namespace Contensive.Core.Controllers {
                 if (genericController.vbInstr(1, PageList, "<ul", 1) == 0) {
                     PageList = "(there are no child pages)";
                 }
-                result = result + "\r<tr>"
+                result += "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:36px;\">Child Pages</td>"
                     + cr2 + "<td class=\"qeRow qeRight\"><div class=\"qeListCon\">" + PageList + "</div></td>"
                     + "\r</tr>";
@@ -658,7 +658,7 @@ namespace Contensive.Core.Controllers {
                 // Form Wrapper
                 //
                 result = ""
-                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + core.html.inputHidden("Type", FormTypePageAuthoring) + '\r' + core.html.inputHidden("ID", pageController.page.id) + '\r' + core.html.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + core.html.formEnd();
+                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + core.html.getHtmlInputHidden("Type", FormTypePageAuthoring) + '\r' + core.html.inputHidden("ID", pageController.page.id) + '\r' + core.html.getHtmlInputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + core.html.formEnd();
 
                 //& cr & core.html.main_GetPanelHeader("Contensive Quick Editor") _
 
@@ -710,7 +710,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(returnHtml)) {
                     returnHtml = pageCaption;
                 } else {
-                    returnHtml = "<a href=\"" + genericController.encodeHTML(pageContentController.getPageLink(core, testpage.id, "", true, false)) + "\">" + pageCaption + "</a>" + BreadCrumbDelimiter + returnHtml;
+                    returnHtml = "<a href=\"" + htmlController.encodeHtml(pageContentController.getPageLink(core, testpage.id, "", true, false)) + "\">" + pageCaption + "</a>" + BreadCrumbDelimiter + returnHtml;
                 }
             }
             return returnHtml;
@@ -954,7 +954,7 @@ namespace Contensive.Core.Controllers {
                     }
                     string pageEditLink = "";
                     if (core.session.isEditing(ContentName)) {
-                        pageEditLink = core.html.getRecordEditLink2(ContentName, childPage.id, true, childPage.name, true);
+                        pageEditLink = core.html.getRecordEditLink(ContentName, childPage.id, true, childPage.name, true);
                     }
                     //
                     string link = PageLink;
@@ -965,7 +965,7 @@ namespace Contensive.Core.Controllers {
                     if (childPage.BlockContent | childPage.BlockPage) {
                         blockContentComposite = !bypassContentBlock(childPage.contentControlID, childPage.id);
                     }
-                    string LinkedText = genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML(link) + "\">", pageMenuHeadline);
+                    string LinkedText = genericController.csv_GetLinkedText("<a href=\"" + htmlController.encodeHtml(link) + "\">", pageMenuHeadline);
                     if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.ParentListName != "") & (!isAuthoring)) {
                         //
                         // ----- Requested orphan list, and this record is in a named list, and not editing, do not display
@@ -1077,10 +1077,10 @@ namespace Contensive.Core.Controllers {
                 //
                 result = "";
                 if (!string.IsNullOrEmpty(activeList)) {
-                    result = result + "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + genericController.nop(activeList) + "\r</ul>";
+                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + genericController.nop(activeList) + "\r</ul>";
                 }
                 if (!string.IsNullOrEmpty(inactiveList)) {
-                    result = result + "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + genericController.nop(inactiveList) + "\r</ul>";
+                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + genericController.nop(inactiveList) + "\r</ul>";
                 }
                 //
                 // ----- if non-orphan list, authoring and none found, print none message
@@ -1165,7 +1165,7 @@ namespace Contensive.Core.Controllers {
                 //
                 CS = core.db.csOpen(ContentName, "parentid=" + RecordID, "", false, 0, false, false, "ID");
                 while (core.db.csOk(CS)) {
-                    result = result + "," + core.db.csGetInteger(CS, "ID");
+                    result += "," + core.db.csGetInteger(CS, "ID");
                     core.db.csGoNext(CS);
                 }
                 core.db.csClose(ref CS);
@@ -1180,7 +1180,7 @@ namespace Contensive.Core.Controllers {
                     for (Ptr = 0; Ptr < IDCnt; Ptr++) {
                         ChildList = deleteChildRecords(ContentName, genericController.encodeInteger(IDs[Ptr]), true);
                         if (!string.IsNullOrEmpty(ChildList)) {
-                            result = result + "," + ChildList;
+                            result += "," + ChildList;
                             SingleEntry = false;
                         }
                     }
@@ -1422,14 +1422,14 @@ namespace Contensive.Core.Controllers {
                 CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                 Link = "/" + core.appConfig.adminRoute + "?af=" + AdminFormPublishing;
                 Copy = Msg_AuthoringSubmittedNotification;
-                Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + genericController.encodeHTML(Link) + "\">" + core.webServer.requestDomain + "</a>");
+                Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + htmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");
                 Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName);
                 Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName);
                 Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString());
                 Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", core.doc.profileStartTime.ToString());
                 Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", core.session.user.name);
                 //
-                emailController.sendGroup(core, core.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
+                emailController.queueGroupEmail(core, core.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
                 //
                 return;
                 //
@@ -2091,8 +2091,8 @@ namespace Contensive.Core.Controllers {
                 CS = core.db.csOpen("Meta Content", Criteria, "", false, 0, false, false, FieldList);
                 if (core.db.csOk(CS)) {
                     MetaContentID = core.db.csGetInteger(CS, "ID");
-                    core.html.addTitle(genericController.encodeHTML(core.db.csGetText(CS, "Name")), "page content");
-                    core.html.addMetaDescription(genericController.encodeHTML(core.db.csGetText(CS, "MetaDescription")), "page content");
+                    core.html.addTitle(htmlController.encodeHtml(core.db.csGetText(CS, "Name")), "page content");
+                    core.html.addMetaDescription(htmlController.encodeHtml(core.db.csGetText(CS, "MetaDescription")), "page content");
                     core.html.addHeadTag(core.db.csGetText(CS, "OtherHeadTags"), "page content");
                     if (true) {
                         KeywordList = genericController.vbReplace(core.db.csGetText(CS, "MetaKeywordList"), "\r\n", ",");
@@ -2119,7 +2119,7 @@ namespace Contensive.Core.Controllers {
                         KeywordList = KeywordList.Substring(1);
                     }
                     //KeyWordList = Mid(KeyWordList, 2)
-                    KeywordList = genericController.encodeHTML(KeywordList);
+                    KeywordList = htmlController.encodeHtml(KeywordList);
                     core.html.addMetaKeywordList(KeywordList, "page content");
                 }
                 core.db.csClose(ref CS);

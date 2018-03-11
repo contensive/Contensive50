@@ -327,7 +327,7 @@ namespace Contensive.Core {
                 ContentCell = ""
                 + "\r<div style=\"padding:" + ContentPadding + "px;\">"
                 + nop(Content) + "\r</div>";
-                result = result + nop(ButtonBar) + nop(GetTitleBar(core,Caption, Description)) + nop(CellContentSummary) + nop(ContentCell) + nop(ButtonBar) + "";
+                result += nop(ButtonBar) + nop(GetTitleBar(core,Caption, Description)) + nop(CellContentSummary) + nop(ContentCell) + nop(ButtonBar) + "";
 
                 result = '\r' + core.html.formStartMultipart() + nop(result) + '\r' + core.html.formEnd();
             } catch (Exception ex) {
@@ -389,21 +389,21 @@ namespace Contensive.Core {
             try {
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
                 //
-                result = result + "<div class=\"ccPanel3DReverse ccAdminEditBody\">";
+                result += "<div class=\"ccPanel3DReverse ccAdminEditBody\">";
                 //
                 // ----- Subhead
                 //
                 if (AllowHeading && (!string.IsNullOrEmpty(PanelHeading))) {
-                    result = result + "<div class=\"ccAdminEditHeading\">" + PanelHeading + "</div>";
+                    result += "<div class=\"ccAdminEditHeading\">" + PanelHeading + "</div>";
                 }
                 //
                 // ----- Description
                 //
                 if (!string.IsNullOrEmpty(PanelDescription)) {
-                    result = result + "<div class=\"ccAdminEditDescription\">" + PanelDescription + "</div>";
+                    result += "<div class=\"ccAdminEditDescription\">" + PanelDescription + "</div>";
                 }
                 //
-                result = result + PanelBody + "</div>";
+                result += PanelBody + "</div>";
             } catch (Exception ex) {
                 core.handleException(ex);
             }
@@ -713,7 +713,7 @@ namespace Contensive.Core {
                 // ----- End Table
                 //
                 Content.Add(kmaEndTable);
-                result = result + Content.Text;
+                result += Content.Text;
                 //
                 // ----- Post Table copy
                 //
@@ -723,7 +723,7 @@ namespace Contensive.Core {
                     PageCount = encodeInteger(DataRowCount / (double)ReportPageSize);
                 }
                 if (PageCount > 1) {
-                    result = result + "<br>Page " + ReportPageNumber + " (Row " + (RowBAse) + " of " + DataRowCount + ")";
+                    result += "<br>Page " + ReportPageNumber + " (Row " + (RowBAse) + " of " + DataRowCount + ")";
                     if (PageCount > 20) {
                         PagePointer = ReportPageNumber - 10;
                     }
@@ -731,33 +731,33 @@ namespace Contensive.Core {
                         PagePointer = 1;
                     }
                     if (PageCount > 1) {
-                        result = result + "<br>Go to Page ";
+                        result += "<br>Go to Page ";
                         if (PagePointer != 1) {
                             WorkingQS = core.doc.refreshQueryString;
                             WorkingQS = genericController.modifyQueryString(WorkingQS, "GotoPage", "1", true);
-                            result = result + "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">1</A>...&nbsp;";
+                            result += "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">1</A>...&nbsp;";
                         }
                         WorkingQS = core.doc.refreshQueryString;
                         WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageSize, ReportPageSize.ToString(), true);
                         while ((PagePointer <= PageCount) && (LinkCount < 20)) {
                             if (PagePointer == ReportPageNumber) {
-                                result = result + PagePointer + "&nbsp;";
+                                result += PagePointer + "&nbsp;";
                             } else {
                                 WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PagePointer.ToString(), true);
-                                result = result + "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PagePointer + "</A>&nbsp;";
+                                result += "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PagePointer + "</A>&nbsp;";
                             }
                             PagePointer = PagePointer + 1;
                             LinkCount = LinkCount + 1;
                         }
                         if (PagePointer < PageCount) {
                             WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PageCount.ToString(), true);
-                            result = result + "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PageCount + "</A>&nbsp;";
+                            result += "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PageCount + "</A>&nbsp;";
                         }
                         if (ReportPageNumber < PageCount) {
                             WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageNumber, (ReportPageNumber + 1).ToString(), true);
-                            result = result + "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">next</A>&nbsp;";
+                            result += "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">next</A>&nbsp;";
                         }
-                        result = result + "<br>&nbsp;";
+                        result += "<br>&nbsp;";
                     }
                 }
                 //
@@ -781,7 +781,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public static string getButtonPrimary(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "", string htmlName = "button") {
-            return htmlController.getButton(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
+            return htmlController.getHtmlInputSubmit(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
            // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
            // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
        }
@@ -789,7 +789,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public static string getButtonDanger(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "") {
-            return htmlController.getButton(buttonValue, "button", htmlId, onclick, disabled, "btn btn-danger mr-1 btn-sm");
+            return htmlController.getHtmlInputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-danger mr-1 btn-sm");
             // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
             // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
         }

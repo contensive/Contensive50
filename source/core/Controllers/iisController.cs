@@ -837,7 +837,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink;
-                            result = "<div style=\"padding:20px;border:1px dashed black;background-color:white;color:black;\">" + RedirectReason + "<p>Click to continue the redirect to <a href=" + EncodedLink + ">" + genericController.encodeHTML(NonEncodedLink) + "</a>...</p></div>";
+                            result = "<div style=\"padding:20px;border:1px dashed black;background-color:white;color:black;\">" + RedirectReason + "<p>Click to continue the redirect to <a href=" + EncodedLink + ">" + htmlController.encodeHtml(NonEncodedLink) + "</a>...</p></div>";
                         } else {
                             //
                             // -- Redirect now

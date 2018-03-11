@@ -69,6 +69,9 @@ Public Class configurationClass
     End Function
     '
     Public Shared Sub loadRouteMap(cp As Contensive.BaseClasses.CPBaseClass)
+        ' 20180307, added clear to resolve error 
+        ' - configurationClass.loadRouteMap, cause=[Unexpected exception adding virtualRoute [admin]], ex=[System.ArgumentException: A route named 'admin' is already in the route collection. Route names must be unique.
+        RouteTable.Routes.Clear()
         For Each kvp In cp.Site.getRouteDictionary()
             Try
                 Dim newRouteName As String = kvp.Key

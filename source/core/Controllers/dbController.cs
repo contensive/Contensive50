@@ -621,7 +621,7 @@ namespace Contensive.Core.Controllers {
                 // -- block before appStatus OK because need site properties
                 if ((core.serverConfig.enableLogging) && (core.appConfig.appStatus == appConfigModel.appStatusEnum.ok)) {
                     if (core.siteProperties.allowTransactionLog) {
-                        string LogEntry = ("duration [" + ElapsedMilliseconds + "], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
+                        string LogEntry = ("duration [" + ElapsedMilliseconds + "ms], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
                         logController.logDebug(core, "dbController: " + LogEntry);
                     }
                     if (ElapsedMilliseconds > sqlSlowThreshholdMsec) {
@@ -4868,7 +4868,7 @@ namespace Contensive.Core.Controllers {
                     ContentControlID = (core.db.csGetInteger(iCSPointer, "contentcontrolid"));
                     ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentControlID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        result = core.html.getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
+                        result = core.html.getRecordEditLink(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
                     }
                 }
             }

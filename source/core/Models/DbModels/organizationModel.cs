@@ -31,7 +31,7 @@ namespace Contensive.Core.Models.DbModels {
         public string City { get; set; }
         public int Clicks { get; set; }
         public int ContactMemberID { get; set; }
-        public int ContentCategoryID { get; set; }
+        
         public string CopyFilename { get; set; }
         public string Country { get; set; }
         public string Email { get; set; }

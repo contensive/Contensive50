@@ -27,7 +27,7 @@ namespace Contensive.Core.Models.DbModels {
         // -- instance properties
         public bool Bot { get; set; }
         public string Browser { get; set; }
-        public int ContentCategoryID { get; set; }
+        
         public bool CookieSupport { get; set; }
         public bool ExcludeFromAnalytics { get; set; }
         public string HTTP_FROM { get; set; }

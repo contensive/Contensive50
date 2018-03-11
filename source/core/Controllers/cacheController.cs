@@ -59,18 +59,24 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class cacheController : IDisposable {
         //
+        // ====================================================================================================
         // ----- constants
-        //
+        /// <summary>
+        /// default number of days that a cache is invalidated
+        /// </summary>
         private const double invalidationDaysDefault = 365;
         //
+        // ====================================================================================================
         // ----- objects passed in constructor, do not dispose
         //
         private coreController core;
         //
+        // ====================================================================================================
         // ----- objects constructed that must be disposed
         //
         private Enyim.Caching.MemcachedClient cacheClient;
         //
+        // ====================================================================================================
         // ----- private instance storage
         //
         private bool remoteCacheInitialized;
@@ -543,12 +549,12 @@ namespace Contensive.Core.Controllers {
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
             return key;
         }
-        //
-        public static string getCacheKey_Entity(string tableName, string field1Name, int field1Value, string field2Name, int field2Value) {
-            string key = tableName + "/" + field1Name + "/" + field1Value + "/" + field2Name + "/" + field2Value;
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
-            return key;
-        }
+        ////
+        //public static string getCacheKey_Entity(string tableName, string field1Name, int field1Value, string field2Name, int field2Value) {
+        //    string key = tableName + "/" + field1Name + "/" + field1Value + "/" + field2Name + "/" + field2Value;
+        //    key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+        //    return key;
+        //}
         //
         //====================================================================================================
         /// <summary>

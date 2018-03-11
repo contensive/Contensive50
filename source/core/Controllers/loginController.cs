@@ -164,7 +164,7 @@ namespace Contensive.Core.Controllers {
                         + "\r<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
                         + nop(loginForm) + "\r</table>"
                         + "";
-                    loginForm = loginForm + core.html.inputHidden("Type", FormTypeLogin) + core.html.inputHidden("email", core.session.user.Email) + core.html.getPanelButtons(ButtonLogin, "Button") + "";
+                    loginForm = loginForm + core.html.getHtmlInputHidden("Type", FormTypeLogin) + core.html.getHtmlInputHidden("email", core.session.user.Email) + core.html.getPanelButtons(ButtonLogin, "Button") + "";
                     loginForm = ""
                         + core.html.formStart(QueryString) + nop(loginForm) + "\r</form>"
                         + "";
@@ -252,7 +252,7 @@ namespace Contensive.Core.Controllers {
                     + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                     + cr2 + "<tr>"
                     + cr3 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + "Email</span></td>"
-                    + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"email\" VALUE=\"" + genericController.encodeHTML(core.session.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
+                    + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"email\" VALUE=\"" + htmlController.encodeHtml(core.session.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
                     + cr2 + "</tr>"
                     + cr2 + "<tr>"
                     + cr3 + "<td colspan=\"2\">&nbsp;</td>"
@@ -268,7 +268,7 @@ namespace Contensive.Core.Controllers {
                     //
                     //
                     returnResult = ""
-                    + returnResult + core.html.inputHidden("Type", FormTypeSendPassword) + "";
+                    + returnResult + core.html.getHtmlInputHidden("Type", FormTypeSendPassword) + "";
                     foreach (string key in core.docProperties.getKeyList()) {
                         var tempVar = core.docProperties.getProperty(key);
                         if (tempVar.IsForm) {
@@ -281,7 +281,7 @@ namespace Contensive.Core.Controllers {
                                 case "EMAIL":
                                     break;
                                 default:
-                                    returnResult = returnResult + core.html.inputHidden(tempVar.Name, tempVar.Value);
+                                    returnResult = returnResult + core.html.getHtmlInputHidden(tempVar.Name, tempVar.Value);
                                     break;
                             }
                         }
@@ -538,7 +538,7 @@ namespace Contensive.Core.Controllers {
                 }
                 if (result) {
                     string sendStatus = "";
-                    emailController.sendAdHoc(core, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
+                    emailController.queueAdHocEmail(core, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
                 }
             } catch (Exception ex) {
                 core.handleException(ex);

@@ -164,7 +164,6 @@
     <Compile Include="Addons\Tools\legacyToolsClass.cs" />
     <Compile Include="constants.cs" />
     <Compile Include="Controllers\addonController.cs" />
-    <Compile Include="Controllers\awsS3Controller.cs" />
     <Compile Include="Controllers\collectionController.cs" />
     <Compile Include="Controllers\adminUIController.cs" />
     <Compile Include="Controllers\appBuilderController.cs" />
@@ -229,6 +228,11 @@
     <Compile Include="Models\DbModels\visitorModel.cs" />
     <Compile Include="Controllers\coreController.cs" />
     <Compile Include="Models\DbModels\organizationModel.cs" />
+    <Compile Include="Models\DbModels\groupModel.cs" />
+    <Compile Include="Models\DbModels\groupRuleModel.cs" />
+    <Compile Include="Models\DbModels\memberRuleModel.cs" />
+    <Compile Include="Models\DbModels\emailModel.cs" />
+    <Compile Include="Models\DbModels\siteSectionModel.cs" />
     <Compile Include="Views\CPAddonClass.cs" />
     <Compile Include="Views\CPBlockClass.cs" />
     <Compile Include="Views\CPCacheClass.cs" />
@@ -277,7 +281,6 @@
     <Compile Include="Models\DbModels\domainModel.cs" />
     <Compile Include="Models\DbModels\emailDropModel.cs" />
     <Compile Include="Models\DbModels\emailLogModel.cs" />
-    <Compile Include="Models\DbModels\groupModel.cs" />
     <Compile Include="Models\DbModels\languageModel.cs" />
     <Compile Include="Models\DbModels\libraryFileLogModel.cs" />
     <Compile Include="Models\DbModels\libraryFilesModel.cs" />
@@ -316,9 +319,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>

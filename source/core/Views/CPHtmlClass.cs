@@ -224,7 +224,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass = "", string HtmlId = "") {
-            return core.html.inputHidden(HtmlName, HtmlValue, HtmlId);
+            return core.html.getHtmlInputHidden(HtmlName, HtmlValue, HtmlId);
         }
         //
         // ====================================================================================================
@@ -341,7 +341,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string Button(string HtmlName, string HtmlValue = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.getButton(HtmlValue, HtmlName, HtmlId,"",false, HtmlClass);
+            return htmlController.getHtmlInputSubmit(HtmlValue, HtmlName, HtmlId,"",false, HtmlClass);
         }
         //
         // ====================================================================================================

@@ -42,7 +42,7 @@ namespace Contensive.Core.Addons.Primitives {
                     result = "User-agent: *\r\nDisallow: /admin/\r\nDisallow: /images/";
                     core.appRootFiles.saveFile(Filename, result);
                 }
-                result = result + core.addonCache.robotsTxt;
+                result += core.addonCache.robotsTxt;
                 core.webServer.setResponseContentType("text/plain");
                 core.doc.continueProcessing = false;
             } catch (Exception ex) {

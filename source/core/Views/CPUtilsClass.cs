@@ -74,7 +74,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string ConvertHTML2Text(string Source) {
-            return NUglify.Uglify.HtmlToText(Source).Code; //  htmlToTextControllers.convert(CP.core, Source);
+            return NUglify.Uglify.HtmlToText(Source).Code;
         }
         //
         // ====================================================================================================
@@ -104,7 +104,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string DecodeHTML(string Source) {
-            return genericController.decodeHtml(Source);
+            return htmlController.decodeHtml(Source);
         }
         //
         // ====================================================================================================
@@ -113,7 +113,7 @@ namespace Contensive.Core {
             string returnValue = "";
             //
             if (!string.IsNullOrEmpty(Source)) {
-                returnValue = genericController.encodeHTML(Source);
+                returnValue = htmlController.encodeHtml(Source);
             }
             return returnValue;
         }
@@ -431,7 +431,7 @@ namespace Contensive.Core {
             string ignoreUserMessage = "";
             string ignoreGuid = "";
             var ignoreList = new List<string> { };
-            collectionController.installCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, ref ignoreList);
+            collectionController.installCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, true, ref ignoreList);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status
@@ -447,7 +447,7 @@ namespace Contensive.Core {
             string ignoreUserMessage = "";
             List<string> ignoreList1 = new List<string>();
             List<string> ignoreList2 = new List<string>();
-            collectionController.InstallCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, ref ignoreList2);
+            collectionController.InstallCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, false, ref ignoreList2);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status
@@ -468,7 +468,7 @@ namespace Contensive.Core {
         public override int installCollectionFromLibrary(string collectionGuid) {
             int taskId = 0;
             string ignoreUserMessage = "";
-            collectionController.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false);
+            collectionController.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false, false);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status

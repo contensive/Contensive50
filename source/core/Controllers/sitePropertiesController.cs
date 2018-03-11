@@ -153,7 +153,7 @@ namespace Contensive.Core.Controllers {
         //
         public bool allowTransactionLog {
             get {
-                return booleanPropertyBase("UseContentWatchLink", false, ref _allowTransactionLog);
+                return booleanPropertyBase("allowTransactionLog", false, ref _allowTransactionLog);
             }
         }
         private bool? _allowTransactionLog = null;

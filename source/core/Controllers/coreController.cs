@@ -52,6 +52,18 @@ namespace Contensive.Core.Controllers {
         public Random random = new Random();
         //
         //===================================================================================================
+        /// <summary>
+        /// Set true and sendSmtp adds all email to mockSmtpList of smtpEmailClass
+        /// </summary>
+        public bool mockSmtp = false;
+        public List<smtpEmailClass> mockSmtpList = new List<smtpEmailClass>();
+        public class smtpEmailClass {
+            public emailController.emailClass email;
+            public string smtpServer;
+            public string AttachmentFilename;
+        }
+        //
+        //===================================================================================================
         // todo move to doc persistence object (doccontroller)
         /// <summary>
         /// when enable, use MS trace logging. An attempt to stop file append permission issues
@@ -91,17 +103,6 @@ namespace Contensive.Core.Controllers {
         private Dictionary<string, dataSourceModel> _dataSources = null;
         //
         //===================================================================================================
-        public emailController email {
-            get {
-                if (_email == null) {
-                    _email = new emailController(this);
-                }
-                return _email;
-            }
-        }
-        private emailController _email;
-        //
-        //===================================================================================================
         public docController doc {
             get {
                 if (_doc == null) {
@@ -111,17 +112,17 @@ namespace Contensive.Core.Controllers {
             }
         }
         private docController _doc;
-        //
-        //===================================================================================================
-        public menuTabController menuTab {
-            get {
-                if (_menuTab == null) {
-                    _menuTab = new menuTabController(this);
-                }
-                return _menuTab;
-            }
-        }
-        private menuTabController _menuTab;
+        ////
+        ////===================================================================================================
+        //public menuTabController menuTab {
+        //    get {
+        //        if (_menuTab == null) {
+        //            _menuTab = new menuTabController(this);
+        //        }
+        //        return _menuTab;
+        //    }
+        //}
+        //private menuTabController _menuTab;
         //
         //===================================================================================================
         public Controllers.htmlController html {
@@ -1051,7 +1052,7 @@ namespace Contensive.Core.Controllers {
                 //        gd.IsEmpty = true;
                 //        //
                 //        string Copy = remoteQueryController.main_FormatRemoteQueryOutput(this, gd, RemoteFormat);
-                //        Copy = genericController.encodeHTML(Copy);
+                //        Copy = htmlController.encodeHTML(Copy);
                 //        result = "<data>" + Copy + "</data>";
                 //    }
                 //}
@@ -1182,6 +1183,9 @@ namespace Contensive.Core.Controllers {
         }
         //
         //===================================================================================================
+        /// <summary>
+        /// future lazy initializer, for now just a proxy
+        /// </summary>
         public Dictionary<string, CPSiteBaseClass.routeClass> routeDictionary {
             get {
                 // -- when an addon changes, the route map has to reload on page exit so it is ready on the next hit. lazy cache here clears on page load, so this does work

@@ -53,6 +53,7 @@ namespace Contensive.CLI {
                         for (int argPtr = 0; argPtr < args.Length; argPtr++) {
                             string argument = args[argPtr];
                             bool exitArgumentProcessing = false;
+                            bool forceFullInstall = false;
                             switch (argument.ToLower()) {
                                 case "--flushcache":
                                     if (!string.IsNullOrEmpty(appName)) {
@@ -110,7 +111,7 @@ namespace Contensive.CLI {
                                                 foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
                                                     using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(kvp.Key)) {
                                                         string returnErrorMessage = "";
-                                                        collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false);
+                                                        collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, forceFullInstall);
                                                         if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                             Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                         }
@@ -119,7 +120,7 @@ namespace Contensive.CLI {
                                             } else {
                                                 using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
                                                     string returnErrorMessage = "";
-                                                    collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false);
+                                                    collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, forceFullInstall);
                                                     if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                         Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                     }
@@ -229,23 +230,14 @@ namespace Contensive.CLI {
                                     }
                                     exitArgumentProcessing = true;
                                     break;
+                                case "--repair":
+                                case "-r":
+                                    upgrade(cp, appName, true);
+                                    exitArgumentProcessing = true;
+                                    break;
                                 case "--upgrade":
                                 case "-u":
-                                    if (!string.IsNullOrEmpty(appName)) {
-                                        //
-                                        // -- upgrade app
-                                        using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(appName)) {
-                                            Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false);
-                                        }
-                                    } else {
-                                        //
-                                        // -- upgrade all apps
-                                        foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
-                                            using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(kvp.Key)) {
-                                                Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false);
-                                            }
-                                        }
-                                    }
+                                    upgrade(cp, appName, false);
                                     exitArgumentProcessing = true;
                                     break;
                                 case "--taskscheduler":
@@ -330,7 +322,7 @@ namespace Contensive.CLI {
                                         }
                                     }
                                     break;
-                                case "--enablelogging":
+                                case "--logging":
                                     //
                                     // -- logging
                                     if (argPtr != (args.Length + 1)) {
@@ -361,35 +353,26 @@ namespace Contensive.CLI {
             + "\r\n-a appName"
             + "\r\n    apply the current command to just one application"
             + "\r\n"
-            + "\r\n--newapp (-n)"
-            + "\r\n    new application wizard"
-            + "\r\n"
-            + "\r\n--upgrade (-u)"
-            + "\r\n    upgrade all applications, or just one if specified with -a"
-            + "\r\n"
-            + "\r\n--housekeep (-h)"
-            + "\r\n    housekeep all appications, or just one if specifid with -a"
+            + "\r\n--configure"
+            + "\r\n    setup or review server configuration (Sql, cache, filesystem, etc)"
             + "\r\n"
             + "\r\n--flushcache"
             + "\r\n    invalidate cache. Use with -a"
             + "\r\n"
-            + "\r\n--version (-v)"
-            + "\r\n    display code version"
+            + "\r\n--housekeep (-h)"
+            + "\r\n    housekeep all appications, or just one if specifid with -a"
+            + "\r\n"
+            + "\r\n--logging true|false"
+            + "\r\n    Enable or disable logging at the server level"
+            + "\r\n"
+            + "\r\n--newapp (-n)"
+            + "\r\n    new application wizard"
+            + "\r\n"
+            + "\r\n--repair (-r)"
+            + "\r\n    reinstall the base collection and all it's dependancies. For all applications, or just one if specified with -a"
             + "\r\n"
             + "\r\n--status (-s)"
             + "\r\n    display configuration status"
-            + "\r\n"
-            + "\r\n--configure"
-            + "\r\n    setup or review server configuration (Sql, cache, filesystem, etc)"
-            + "\r\n"
-            + "\r\n--taskscheduler run"
-            + "\r\n    Run the taskscheduler in the console (temporary)"
-            + "\r\n"
-            + "\r\n--enablelogging true|false"
-            + "\r\n    Enable or disable logging at the server level"
-            + "\r\n"
-            + "\r\n--taskscheduler on|off"
-            + "\r\n    Start or stop the taskscheduler service"
             + "\r\n"
             + "\r\n--taskrunner run"
             + "\r\n    Run the taskrunner in the console (temporary)"
@@ -399,7 +382,43 @@ namespace Contensive.CLI {
             + "\r\n"
             + "\r\n--tasks run"
             + "\r\n    Run the taskscheduler and the taskrunner in the console (temporary)"
+            + "\r\n"
+            + "\r\n--taskscheduler run"
+            + "\r\n    Run the taskscheduler in the console (temporary)"
+            + "\r\n"
+            + "\r\n--taskscheduler on|off"
+            + "\r\n    Start or stop the taskscheduler service"
+            + "\r\n"
+            + "\r\n--upgrade (-u)"
+            + "\r\n    upgrade all applications, or just one if specified with -a"
+            + "\r\n"
+            + "\r\n--version (-v)"
+            + "\r\n    display code version"
             + "";
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// Upgrade a single or all apps, optionally forcing full install to include up-to-date collections (to fix broken collection addons)
+        /// </summary>
+        /// <param name="appName"></param>
+        /// <param name="forceFullInstall"></param>
+        private static void upgrade( Contensive.Core.CPClass cp, string appName, bool forceFullInstall) {
+            if (!string.IsNullOrEmpty(appName)) {
+                //
+                // -- upgrade app
+                using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(appName)) {
+                    Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false, forceFullInstall);
+                }
+            } else {
+                //
+                // -- upgrade all apps
+                foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
+                    using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(kvp.Key)) {
+                        Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false, forceFullInstall);
+                    }
+                }
+            }
+        }
     }
 
 }

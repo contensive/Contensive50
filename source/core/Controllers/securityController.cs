@@ -92,7 +92,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// return an decrypted string. Exception thrown if decryption error. This is a two way so use it for little sister security, not foreign government security
+        /// return an decrypted string. blank or non-base64 strings return an empty string. Exception thrown if decryption error. This is a two way so use it for little sister security, not foreign government security
         /// </summary>
         /// <param name="sourceToDecrypt"></param>
         /// <returns></returns>
@@ -100,14 +100,18 @@ namespace Contensive.Core.Controllers {
             string returnResult = "";
             try {
                 byte[] buffer = null;
-                TripleDESCryptoServiceProvider DES = new TripleDESCryptoServiceProvider();
-                MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
                 //
                 if (string.IsNullOrEmpty(sourceToDecrypt)) {
                     //
+                    // -- source blank, decrypt to blank
+                } else if (!sourceToDecrypt.IsBase64String()) {
+                    //
+                    // -- source invalid, decrypt to blank
                 } else {
                     // Compute the MD5 hash.
                     buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
+                    MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
+                    TripleDESCryptoServiceProvider DES = new TripleDESCryptoServiceProvider();
                     DES.Key = hashMD5.ComputeHash(buffer);
                     // Set the cipher mode.
                     DES.Mode = CipherMode.ECB;

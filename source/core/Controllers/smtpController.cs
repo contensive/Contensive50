@@ -47,19 +47,16 @@ namespace Contensive.Core.Controllers {
                 if ((string.IsNullOrEmpty(email.textBody)) && (!string.IsNullOrEmpty(email.htmlBody))) {
                     //
                     // html only
-                    //
                     mailMessage.Body = email.htmlBody;
                     mailMessage.IsBodyHtml = true;
                 } else if ((!string.IsNullOrEmpty(email.textBody)) && (string.IsNullOrEmpty(email.htmlBody))) {
                     //
                     // text body only
-                    //
                     mailMessage.Body = email.textBody;
                     mailMessage.IsBodyHtml = false;
                 } else {
                     //
                     // both html and text
-                    //
                     mailMessage.Body = email.textBody;
                     mailMessage.IsBodyHtml = false;
                     mimeType = new System.Net.Mime.ContentType("text/html");
@@ -68,7 +65,6 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 // Create  the file attachment for this e-mail message.
-                //
                 if (!string.IsNullOrEmpty(AttachmentFilename)) {
                     data = new Attachment(AttachmentFilename, MediaTypeNames.Application.Octet);
                     disposition = data.ContentDisposition;
@@ -77,16 +73,29 @@ namespace Contensive.Core.Controllers {
                     disposition.ReadDate = System.IO.File.GetLastAccessTime(AttachmentFilename);
                     mailMessage.Attachments.Add(data);
                 }
-                //
-                // -- try-catch the server connection for a better return message
-                try {
-                    client.Send(mailMessage);
+                if (core.mockSmtp) {
+                    //
+                    // -- for unit tests, mock interface by adding email to core.mockSmptList
+                    core.mockSmtpList.Add(new coreController.smtpEmailClass() {
+                        AttachmentFilename = AttachmentFilename,
+                        email = email,
+                        smtpServer = smtpServer
+                    });
                     status = true;
-                } catch (Exception ex) {
-                    returnErrorMessage = "There was an error connecting to the email server [" + smtpServer + "]. The error from the server was [" + ex.ToString() + "]";
-                    status = false;
+                } else {
+                    //
+                    // -- send email
+                    try {
+                        logController.logInfo(core, "sendSmtp, to [" + email.toAddress + "], from [" + email.fromAddress + "], subject [" + email.subject + "], BounceAddress [" + email.BounceAddress + "], replyTo [" + email.replyToAddress + "]");
+                        client.Send(mailMessage);
+                        status = true;
+                    } catch (Exception ex) {
+                        returnErrorMessage = "There was an error sending email [" + ex.ToString() + "]";
+                        logController.logError(core, returnErrorMessage);
+                    }
                 }
-            } catch (Exception) {
+            } catch (Exception ex) {
+                logController.logError(core, "There was an error configuring smtp server ex [" + ex.ToString() + "]");
                 throw;
             }
             return status;
