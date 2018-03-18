@@ -68,7 +68,7 @@ namespace Contensive.Core.Models.DbModels {
             try {
                 result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.session.user.id), ref callersCacheNameList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -98,7 +98,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -127,7 +127,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -154,7 +154,7 @@ namespace Contensive.Core.Models.DbModels {
         //            }
         //        }
         //    } catch (Exception ex) {
-        //        core.handleException(ex);
+        //        logController.handleException( core,ex);
         //        throw;
         //        throw;
         //    }
@@ -186,7 +186,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -253,7 +253,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -327,7 +327,7 @@ namespace Contensive.Core.Models.DbModels {
                 // -- added tablename as depedant object - any change to any template flushes this cache
                 core.cache.setObject(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.ID.ToString()), this, primaryContentTableName);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -347,7 +347,7 @@ namespace Contensive.Core.Models.DbModels {
                     core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -370,7 +370,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -394,7 +394,7 @@ namespace Contensive.Core.Models.DbModels {
         //            }
         //        }
         //    } catch (Exception ex) {
-        //        core.handleException(ex);
+        //        logController.handleException( core,ex);
         //        throw;
         //        throw;
         //    }
@@ -424,7 +424,7 @@ namespace Contensive.Core.Models.DbModels {
                 }
                 cs.close();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -529,7 +529,7 @@ namespace Contensive.Core.Models.DbModels {
                     // instance.StylesFilename = genericController.encodeText(.fields["StylesFilename"].defaultValue)
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return instance;
         }

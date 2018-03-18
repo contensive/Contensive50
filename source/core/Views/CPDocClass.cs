@@ -416,7 +416,7 @@ namespace Contensive.Core {
                 try {
                     returnIsAdmin = (cp.Request.PathPage.IndexOf(cp.Site.GetText("adminUrl"), System.StringComparison.OrdinalIgnoreCase)  != -1);
                 } catch (Exception ex) {
-                    core.handleException(ex); 
+                    logController.handleError( core,ex); 
                     throw;
                 }
                 return returnIsAdmin;

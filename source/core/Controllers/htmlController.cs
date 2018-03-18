@@ -97,7 +97,7 @@ namespace Contensive.Core.Controllers {
                     result.Add("<div class=\"ccTestPointMessageCon\">" + core.doc.testPointMessage + "</div>");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return string.Join("\r", result);
@@ -207,9 +207,9 @@ namespace Contensive.Core.Controllers {
                         // Selection is too big
                         //
                         errorController.addUserError(core, "The drop down list for " + ContentName + " called " + MenuName + " is too long to display. The site administrator has been notified and the problem will be resolved shortly. To fix this issue temporarily, go to the admin tab of the Preferences page and set the Select Field Limit larger than " + RowCnt + ".");
-                        //                    core.handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
+                        //                    logController.handleException( core,New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
 
-                        core.handleException(new Exception("Error creating select list from content [" + ContentName + "] called [" + MenuName + "]. Selection of [" + RowCnt + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property SelectFieldLimit."));
+                        logController.handleError( core,new Exception("Error creating select list from content [" + ContentName + "] called [" + MenuName + "]. Selection of [" + RowCnt + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property SelectFieldLimit."));
                         result += inputHidden(MenuNameFPO, CurrentValue);
                         if (CurrentValue == 0) {
                             result = inputText(MenuName, "0");
@@ -286,7 +286,7 @@ namespace Contensive.Core.Controllers {
                             DropDownFieldCount = DropDownFieldCount + 1;
                         }
                         if (DropDownFieldCount == 0) {
-                            core.handleException(new Exception("No drop down field names found for content [" + ContentName + "]."));
+                            logController.handleError( core,new Exception("No drop down field names found for content [" + ContentName + "]."));
                         } else {
                             DropDownFieldPointer = new int[DropDownFieldCount];
                             SelectFields = "ID";
@@ -413,7 +413,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = SelectRaw;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -463,7 +463,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Selection is too big
                         //
-                        core.handleException(new Exception("While building a group members list for group [" + groupController.group_GetGroupName(core, GroupID) + "], too many rows were selected. [" + RowMax + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property app.SiteProperty_SelectFieldLimit."));
+                        logController.handleError( core,new Exception("While building a group members list for group [" + groupController.group_GetGroupName(core, GroupID) + "], too many rows were selected. [" + RowMax + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property app.SiteProperty_SelectFieldLimit."));
                         result += inputHidden(MenuNameFPO, currentValue);
                         if (currentValue != 0) {
                             CSPointer = core.db.csOpenRecord("people", currentValue);
@@ -541,7 +541,7 @@ namespace Contensive.Core.Controllers {
                             DropDownFieldCount = DropDownFieldCount + 1;
                         }
                         if (DropDownFieldCount == 0) {
-                            core.handleException(new Exception("No drop down field names found for content [" + GroupID + "]."));
+                            logController.handleError( core,new Exception("No drop down field names found for content [" + GroupID + "]."));
                         } else {
                             int[] DropDownFieldPointer = new int[DropDownFieldCount];
                             string SelectFields = "P.ID";
@@ -652,7 +652,7 @@ namespace Contensive.Core.Controllers {
                 SelectRaw = genericController.vbReplace(SelectRaw, NoneCaptionFPO, noneCaption);
                 result = SelectRaw;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -724,7 +724,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -763,7 +763,7 @@ namespace Contensive.Core.Controllers {
                     result += "</td></tr></table>";
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -790,7 +790,7 @@ namespace Contensive.Core.Controllers {
                 //
                 return temphtml_GetLegacySiteStyles;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError13("main_GetLegacySiteStyles")
@@ -822,7 +822,7 @@ namespace Contensive.Core.Controllers {
 
                 return temphtml_GetAdminHintWrapper;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_GetAdminHintWrapper")
@@ -845,7 +845,7 @@ namespace Contensive.Core.Controllers {
                     core.doc.outputBufferEnabled = BufferOn;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -865,20 +865,29 @@ namespace Contensive.Core.Controllers {
                 string iActionQueryString = genericController.modifyQueryString(ActionQueryString, RequestNameRequestBinary, true, true);
                 result = "<form action=\"" + core.webServer.serverFormActionURL + "?" + iActionQueryString + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" METHOD=\"POST\"  style=\"display: inline;\" >";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
         //
         //====================================================================================================
         /// <summary>
-        /// Starts an HTML form, Should be closed with PrintFormEnd
+        /// create an html form
         /// </summary>
-        /// <param name="ActionQueryString"></param>
+        /// <param name="innerHtml"></param>
+        /// <param name="actionQueryString"></param>
         /// <param name="htmlName"></param>
         /// <param name="htmlId"></param>
         /// <param name="htmlMethod"></param>
         /// <returns></returns>
+        public string form( string innerHtml, string actionQueryString = "", string htmlName = "", string htmlId = "", string htmlMethod = "" ) {
+            return formStart(actionQueryString, htmlName, htmlId, htmlMethod) + innerHtml + formEnd();
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// </summary>
+        [Obsolete("use form()", false)]
         public string formStart(string ActionQueryString = null, string htmlName = "", string htmlId = "", string htmlMethod = "") {
             string temphtml_GetFormStart = null;
             try {
@@ -940,7 +949,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
@@ -954,6 +963,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <returns></returns>
         //
+        [Obsolete("use form()", false)]
         public string formEnd() {
             return "</form>";
         }
@@ -1001,7 +1011,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.doc.formInputTextCnt = core.doc.formInputTextCnt + 1;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1082,10 +1092,10 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("Unexpected exception"));
+            logController.handleError( core,new Exception("Unexpected exception"));
             //
             return temphtml_GetFormInputTextExpandable2;
         }
@@ -1147,7 +1157,7 @@ namespace Contensive.Core.Controllers {
 
                 core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1196,7 +1206,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
@@ -1233,7 +1243,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_GetFormInputCheckBox2")
@@ -1281,7 +1291,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     if (!fieldFound) {
-                        core.handleException(new Exception("Field [" + FieldName + "] was not found in Content Definition [" + ContentName + "]"));
+                        logController.handleError( core,new Exception("Field [" + FieldName + "] was not found in Content Definition [" + ContentName + "]"));
                     } else {
                         //
                         // main_Get the current value if the record was found
@@ -1469,7 +1479,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -1493,7 +1503,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string getHtmlInputHidden(string name, string value, string htmlId = "") {
+        public string inputHidden(string name, string value, string htmlId = "") {
             string result = "";
             try {
                 result = "<input type=\"hidden\" name=\"" + htmlController.encodeHtml(name) + "\"";
@@ -1510,7 +1520,7 @@ namespace Contensive.Core.Controllers {
                 //
                 result += ">";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1518,13 +1528,13 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string inputHidden(string TagName, bool TagValue, string htmlId = "") {
-            return getHtmlInputHidden(TagName, TagValue.ToString(), htmlId);
+            return inputHidden(TagName, TagValue.ToString(), htmlId);
         }
         //
         //====================================================================================================
         //
         public string inputHidden(string TagName, int TagValue, string htmlId = "") {
-            return getHtmlInputHidden(TagName, TagValue.ToString(), htmlId);
+            return inputHidden(TagName, TagValue.ToString(), htmlId);
         }
         //
         //====================================================================================================
@@ -1753,7 +1763,7 @@ namespace Contensive.Core.Controllers {
                     core.doc.wysiwygAddonList.Add(contentType, result);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2010,7 +2020,7 @@ namespace Contensive.Core.Controllers {
                     result += "[" + list + "]" + SrcSelectorSuffix;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2048,7 +2058,7 @@ namespace Contensive.Core.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnHtml;
@@ -2112,7 +2122,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -2292,14 +2302,14 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Public Site call, must have contentname and recordid
                 //
-                core.handleException(new Exception("invalid content [" + ContentName + "], RecordID [" + RecordID + "]"));
+                logController.handleError( core,new Exception("invalid content [" + ContentName + "], RecordID [" + RecordID + "]"));
             } else {
                 //
                 // ----- Normal Content Edit - find instance in the content
                 //
                 CS = core.db.csOpenRecord(ContentName, RecordID);
                 if (!core.db.csOk(CS)) {
-                    core.handleException(new Exception("No record found with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
+                    logController.handleError( core,new Exception("No record found with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                 } else {
                     if (!string.IsNullOrEmpty(FieldName)) {
                         //
@@ -2344,7 +2354,7 @@ namespace Contensive.Core.Controllers {
                     // Parse out the Addon Name
                     //
                     if (PosACInstanceID == 0) {
-                        core.handleException(new Exception("AC Instance [" + ACInstanceID + "] not found in record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
+                        logController.handleError( core,new Exception("AC Instance [" + ACInstanceID + "] not found in record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                     } else {
                         Copy = activeContentController.optimizeLibraryFileImagesInHtmlContent(core, Copy);
                         ParseOK = false;
@@ -2443,7 +2453,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         if (!ParseOK) {
-                            core.handleException(new Exception("There was a problem parsing AC Instance [" + ACInstanceID + "] record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
+                            logController.handleError( core,new Exception("There was a problem parsing AC Instance [" + ACInstanceID + "] record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                         }
                     }
                 }
@@ -2578,7 +2588,7 @@ namespace Contensive.Core.Controllers {
                 CaptionFieldName = genericController.encodeEmpty(CaptionFieldName, "name");
                 if (string.IsNullOrEmpty(PrimaryContentName) || string.IsNullOrEmpty(SecondaryContentName) || string.IsNullOrEmpty(RulesContentName) || string.IsNullOrEmpty(RulesPrimaryFieldname) || string.IsNullOrEmpty(RulesSecondaryFieldName)) {
                     returnHtml = "[Checklist not configured]";
-                    core.handleException(new Exception("Creating checklist, all required fields were not supplied, Caption=[" + CaptionFieldName + "], PrimaryContentName=[" + PrimaryContentName + "], SecondaryContentName=[" + SecondaryContentName + "], RulesContentName=[" + RulesContentName + "], RulesPrimaryFieldName=[" + RulesPrimaryFieldname + "], RulesSecondaryFieldName=[" + RulesSecondaryFieldName + "]"));
+                    logController.handleError( core,new Exception("Creating checklist, all required fields were not supplied, Caption=[" + CaptionFieldName + "], PrimaryContentName=[" + PrimaryContentName + "], SecondaryContentName=[" + SecondaryContentName + "], RulesContentName=[" + RulesContentName + "], RulesPrimaryFieldName=[" + RulesPrimaryFieldname + "], RulesSecondaryFieldName=[" + RulesSecondaryFieldName + "]"));
                 } else {
                     //
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
@@ -2762,7 +2772,7 @@ namespace Contensive.Core.Controllers {
                     core.doc.checkListCnt = core.doc.checkListCnt + 1;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnHtml;
@@ -2856,7 +2866,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
@@ -2897,7 +2907,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
@@ -3052,7 +3062,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
@@ -3346,7 +3356,7 @@ namespace Contensive.Core.Controllers {
                     + cr2 + "</tr>"
                     + "\r</table>";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3424,7 +3434,7 @@ namespace Contensive.Core.Controllers {
                         result += getPanelHeader("Contensive Tools Panel" + helpLink);
                         //
                         ToolsPanel.Add(core.html.formStart(WorkingQueryString));
-                        ToolsPanel.Add(core.html.getHtmlInputHidden("Type", FormTypeToolsPanel));
+                        ToolsPanel.Add(core.html.inputHidden("Type", FormTypeToolsPanel));
                         //
                         if (true) {
                             //
@@ -3655,7 +3665,7 @@ namespace Contensive.Core.Controllers {
                     result = "\r<div class=\"ccCon\">" + genericController.nop(result) + "\r</div>";
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3704,7 +3714,7 @@ namespace Contensive.Core.Controllers {
                     + "\r\n</html>"
                     + "";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3742,7 +3752,7 @@ namespace Contensive.Core.Controllers {
                     result += core.html.getPanelButtons(ButtonList, "Button");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3866,7 +3876,7 @@ namespace Contensive.Core.Controllers {
                     headList.Add(asset.content);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return string.Join("\r", headList);
         }
@@ -3884,7 +3894,7 @@ namespace Contensive.Core.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
 
@@ -3916,7 +3926,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -3947,7 +3957,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -3962,7 +3972,7 @@ namespace Contensive.Core.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -3977,7 +3987,7 @@ namespace Contensive.Core.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -3995,7 +4005,7 @@ namespace Contensive.Core.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -4012,7 +4022,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -4027,7 +4037,7 @@ namespace Contensive.Core.Controllers {
                     });
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -4051,7 +4061,7 @@ namespace Contensive.Core.Controllers {
                     core.doc.editWrapperCnt = core.doc.editWrapperCnt + 1;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -4098,7 +4108,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnCopy;

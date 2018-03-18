@@ -77,11 +77,11 @@ namespace Contensive.Core.Controllers {
                 if (addon == null) {
                     //
                     // -- addon not found
-                    core.handleException(new ArgumentException("AddonExecute called without valid addon, [" + executeContext.errorCaption + "]."));
+                    logController.handleError( core,new ArgumentException("AddonExecute called without valid addon, [" + executeContext.errorCaption + "]."));
                 } else if (executeContext == null) {
                     //
                     // -- context not configured 
-                    core.handleException(new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
+                    logController.handleError( core,new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
                 } else if (!string.IsNullOrEmpty(addon.ObjectProgramID)) {
                     //
                     // -- addons with activeX components are deprecated
@@ -111,7 +111,7 @@ namespace Contensive.Core.Controllers {
                             if (addonRule.IncludedAddonID > 0) {
                                 addonModel dependentAddon = addonModel.create(core, addonRule.IncludedAddonID);
                                 if (dependentAddon == null) {
-                                    core.handleException(new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                                    logController.handleError( core,new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                                 } else {
                                     result += executeDependency(dependentAddon, executeContext);
                                 }
@@ -596,7 +596,7 @@ namespace Contensive.Core.Controllers {
                     debugController.testPoint(core, "execute exit (" + (core.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             } finally {
                 if (addon != null) {
                     //
@@ -957,7 +957,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "integer":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
@@ -966,21 +966,21 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>");
-                                                                            Copy += core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy += core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                         }
                                                                         break;
                                                                     case "float":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "date":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputDate(FieldName, FieldValue);
                                                                         }
@@ -989,7 +989,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "imagefile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (string.IsNullOrEmpty(FieldValue)) {
                                                                                 Copy = core.html.inputFile(FieldName);
@@ -1010,7 +1010,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "currency":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
                                                                                 FieldValue = String.Format("C", FieldValue);
@@ -1021,7 +1021,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "textfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             FieldValue = core.cdnFiles.readFileText(FieldValue);
                                                                             if (FieldHTML) {
@@ -1034,7 +1034,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "cssfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
@@ -1042,7 +1042,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "xmlfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
@@ -1050,7 +1050,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "link":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
@@ -1060,7 +1060,7 @@ namespace Contensive.Core.Controllers {
                                                                         // text
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            string tmp = core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            string tmp = core.html.inputHidden(FieldName, FieldValue);
                                                                             Copy = FieldValue + tmp;
                                                                         } else {
                                                                             if (FieldHTML) {
@@ -1300,7 +1300,7 @@ namespace Contensive.Core.Controllers {
                 Content = null;
 
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1429,7 +1429,7 @@ namespace Contensive.Core.Controllers {
 
                 FastString = null;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1474,7 +1474,7 @@ namespace Contensive.Core.Controllers {
                         if (pos > 0) {
                             EntryPoint = EntryPoint.Substring(0, pos);
                         }
-                        logController.logError(core, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + EntryPoint + "].");
+                        logController.logWarn(core, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + EntryPoint + "].");
                         //WorkingCode = EntryPoint + "\n" + WorkingCode;
                     }
                 } else {
@@ -1559,7 +1559,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnText;
@@ -1631,7 +1631,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -1769,7 +1769,7 @@ namespace Contensive.Core.Controllers {
                                                     // Error in the addon
                                                     //
                                                     string detailedErrorMessage = "There was an error in the addon [" + AddonDisplayName + "]. It could not be executed because there was an error in the addon assembly [" + TestFilePathname + "], in class [" + addonType.FullName.Trim().ToLower() + "]. The error was [" + Ex.ToString() + "]";
-                                                    core.handleException(Ex, detailedErrorMessage);
+                                                    logController.handleError( core,Ex, detailedErrorMessage);
                                                     //Throw New ApplicationException(detailedErrorMessage)
                                                 }
                                             } catch (Exception Ex) {
@@ -1812,7 +1812,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 core.assemblySkipList.Add(TestFilePathname);
                                 string detailedErrorMessage = "A non-load exception occured while loading the addon [" + AddonDisplayName + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "].";
-                                core.handleException(new ApplicationException(detailedErrorMessage));
+                                logController.handleError( core,new ApplicationException(detailedErrorMessage));
                             }
                         }
                     }
@@ -1820,7 +1820,7 @@ namespace Contensive.Core.Controllers {
             } catch (Exception ex) {
                 //
                 // -- this exception should interrupt the caller
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnValue;
@@ -1868,7 +1868,7 @@ namespace Contensive.Core.Controllers {
                     logController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]" );
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2093,7 +2093,7 @@ namespace Contensive.Core.Controllers {
                             }
                             CopyContent = ""
                                 + CopyContent + "</table>"
-                                + core.html.getHtmlInputHidden("Type", FormTypeAddonSettingsEditor) + core.html.getHtmlInputHidden("ContentName", ContentName) + core.html.inputHidden("RecordID", RecordID) + core.html.getHtmlInputHidden("FieldName", FieldName) + core.html.getHtmlInputHidden("ACInstanceID", ACInstanceID);
+                                + core.html.inputHidden("Type", FormTypeAddonSettingsEditor) + core.html.inputHidden("ContentName", ContentName) + core.html.inputHidden("RecordID", RecordID) + core.html.inputHidden("FieldName", FieldName) + core.html.inputHidden("ACInstanceID", ACInstanceID);
                         }
                         //
                         BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
@@ -2126,7 +2126,7 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempgetInstanceBubble;
             } catch (Exception ex) {
-                core.handleException( ex );
+                logController.handleError( core, ex );
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetInstanceBubble")
@@ -2172,7 +2172,7 @@ namespace Contensive.Core.Controllers {
                         CopyContent = ""
                         + CopyContent + "</tr>"
                         + "</table>"
-                        + core.html.getHtmlInputHidden("Type", FormTypeAddonStyleEditor) + core.html.inputHidden("AddonID", addonId) + "";
+                        + core.html.inputHidden("Type", FormTypeAddonStyleEditor) + core.html.inputHidden("AddonID", addonId) + "";
                         //
                         BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
                         QueryString = core.doc.refreshQueryString;
@@ -2199,7 +2199,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2346,7 +2346,7 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempgetHTMLViewerBubble;
             } catch (Exception ex) {
-                core.handleException( ex );
+                logController.handleError( core, ex );
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
@@ -2690,7 +2690,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "integer":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
@@ -2699,21 +2699,21 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>");
-                                                                            Copy += core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy += core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                         }
                                                                         break;
                                                                     case "float":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "date":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputDate(FieldName, FieldValue);
                                                                         }
@@ -2722,7 +2722,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "imagefile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (string.IsNullOrEmpty(FieldValue)) {
                                                                                 Copy = core.html.inputFile(FieldName);
@@ -2743,7 +2743,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "currency":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
                                                                                 FieldValue = String.Format("C", FieldValue);
@@ -2754,7 +2754,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "textfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             FieldValue = core.cdnFiles.readFileText(FieldValue);
                                                                             if (FieldHTML) {
@@ -2767,7 +2767,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "cssfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
@@ -2775,7 +2775,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "xmlfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
@@ -2783,7 +2783,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "link":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = core.html.inputText(FieldName, FieldValue);
                                                                         }
@@ -2793,7 +2793,7 @@ namespace Contensive.Core.Controllers {
                                                                         // text
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + core.html.getHtmlInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + core.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (FieldHTML) {
                                                                                 Copy = core.html.getFormInputHTML(FieldName, FieldValue);
@@ -3022,7 +3022,7 @@ namespace Contensive.Core.Controllers {
                 tempgetFormContent = adminUIController.GetBody(core,Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3152,7 +3152,7 @@ namespace Contensive.Core.Controllers {
 
                 FastString = null;
             } catch (Exception ex) {
-                core.handleException( ex );
+                logController.handleError( core, ex );
             }
             return tempgetFormContent_decodeSelector;
         }
@@ -3294,7 +3294,7 @@ namespace Contensive.Core.Controllers {
                     addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor.Substring(2);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -3387,7 +3387,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                core.handleException( ex );
+                logController.handleError( core, ex );
             }
             return s;
         }
@@ -3423,7 +3423,7 @@ namespace Contensive.Core.Controllers {
                     result = DefaultIfNotFound;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3614,11 +3614,11 @@ namespace Contensive.Core.Controllers {
                         result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
                     }
                 } catch (Exception ex) {
-                    core.handleException(new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
+                    logController.handleError( core,new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
                     AddonStatusOK = false;
                 }
                 if (string.IsNullOrEmpty(result)) {
-                    core.handleException(new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
+                    logController.handleError( core,new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
                     AddonStatusOK = false;
                 }
                 if (!AddonStatusOK) {
@@ -3626,7 +3626,7 @@ namespace Contensive.Core.Controllers {
                     result = AddonMan.GetForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -3695,7 +3695,7 @@ namespace Contensive.Core.Controllers {
                 cs.close();
                 //
             } catch (Exception ex) {
-                core.handleException(ex );
+                logController.handleError( core,ex );
             }
             return returnString;
         }

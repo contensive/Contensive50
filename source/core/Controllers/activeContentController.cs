@@ -823,7 +823,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = workingContent;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -1500,7 +1500,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
             //
@@ -1873,7 +1873,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //result = result;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2198,7 +2198,7 @@ namespace Contensive.Core.Controllers {
                     result = genericController.vbReplace(result, "{{content}}", "<AC type=\"" + ACTypeTemplateContent + "\">", 1, 99, 1);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }

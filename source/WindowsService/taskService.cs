@@ -39,7 +39,7 @@ namespace WindowsService {
                 }
                 logController.logError(cp.core, "Services.OnStart exit");
             } catch (Exception ex) {
-                cp.core.handleException(ex, "taskService.OnStart Exception");
+                logController.handleError(cp.core,ex, "taskService.OnStart Exception");
             }
         }
 
@@ -67,7 +67,7 @@ namespace WindowsService {
                 }
                 logController.logError(cp.core, "Services.OnStop exit");
             } catch (Exception ex) {
-                cp.core.handleException(ex, "taskService.OnStop Exception");
+                logController.handleError(cp.core,ex, "taskService.OnStop Exception");
             }
         }
     }

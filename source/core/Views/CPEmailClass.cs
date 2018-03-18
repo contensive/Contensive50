@@ -72,7 +72,7 @@ namespace Contensive.Core {
                 string sendStatus = "";
                 emailController.queueAdHocEmail(core, ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0, ref sendStatus);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -88,7 +88,7 @@ namespace Contensive.Core {
             try {
                 emailController.queueFormEmail(core, ToAddress, FromAddress, Subject);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -107,7 +107,7 @@ namespace Contensive.Core {
             try {
                 emailController.queueGroupEmail(core, GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }

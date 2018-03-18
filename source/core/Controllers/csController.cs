@@ -62,7 +62,7 @@ namespace Contensive.Core {
                 csPtr = core.db.csInsertRecord(ContentName, openingMemberID);
                 success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -78,7 +78,7 @@ namespace Contensive.Core {
                 csPtr = core.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly,0,false,false,SelectFieldList, pageSize, PageNumber);
                 success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -94,7 +94,7 @@ namespace Contensive.Core {
                 csPtr = core.db.csOpenSql(sql,"Default");
                 success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -108,7 +108,7 @@ namespace Contensive.Core {
                     csPtr = -1;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -148,7 +148,7 @@ namespace Contensive.Core {
                     result = "";
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -245,7 +245,7 @@ namespace Contensive.Core {
                     result = "";
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;

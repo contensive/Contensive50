@@ -176,10 +176,10 @@ namespace Contensive.Core.Controllers {
                 LocalElements = new Contensive.Core.Controllers.htmlParserController.Element[LocalElementCount + 1];
                 return tempLoad;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
             return tempLoad;
         }
         //
@@ -203,7 +203,7 @@ namespace Contensive.Core.Controllers {
                     result = LocalElements[ElementPointer].IsTag;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -223,10 +223,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempText;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
             return tempText;
         }
         //
@@ -245,10 +245,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempTagName;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
             return tempTagName;
         }
         //
@@ -267,10 +267,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempPosition;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
             return tempPosition;
         }
         //
@@ -289,10 +289,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempElementAttributeCount;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
             return tempElementAttributeCount;
         }
         //
@@ -313,10 +313,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempElementAttributeName;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
             return tempElementAttributeName;
         }
         //
@@ -337,10 +337,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempElementAttributeValue;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
             return tempElementAttributeValue;
         }
         //
@@ -372,10 +372,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempElementAttribute;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
             return tempElementAttribute;
         }
         //
@@ -513,10 +513,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
         }
         //
         //====================================================================================================
@@ -541,10 +541,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempGetLesserNonZero;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
             return tempGetLesserNonZero;
         }
         //
@@ -562,10 +562,10 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempPassWhiteSpace;
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("unexpected exception"));
+            logController.handleError( core,new Exception("unexpected exception"));
             return tempPassWhiteSpace;
         }
         //

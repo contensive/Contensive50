@@ -144,7 +144,7 @@ namespace Contensive.Core.Controllers {
                 return;
                 //
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception")); // Call HandleClassError("AddEntry", Err.Number, Err.Source, Err.Description)
@@ -253,7 +253,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -288,7 +288,7 @@ namespace Contensive.Core.Controllers {
                 return null;
                 //
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception")); // Call HandleClassError("GetMenuTreeList", Err.Number, Err.Source, Err.Description)
@@ -355,7 +355,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }

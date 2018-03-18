@@ -70,7 +70,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -92,7 +92,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -116,7 +116,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -132,12 +132,15 @@ namespace Contensive.Core.Controllers {
                 if (!verifyEmailAddress(core, toAddress)) {
                     //
                     returnSendStatus = "Email not sent because the to-address is not valid.";
+                    logController.logInfo(core, "queueAdHocEmail, NOT SENT [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                 } else if (!verifyEmailAddress(core, fromAddress)) {
                     //
                     returnSendStatus = "Email not sent because the from-address is not valid.";
+                    logController.logInfo(core, "queueAdHocEmail, NOT SENT [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                 } else if (0 != genericController.vbInstr(1, getBlockList(core), "\r\n" + toAddress + "\r\n", 1)) {
                     //
                     returnSendStatus = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
+                    logController.logInfo(core, "queueAdHocEmail, NOT SENT [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                 } else {
                     //
                     // Test for from-address / to-address matches
@@ -149,16 +152,19 @@ namespace Contensive.Core.Controllers {
                             //
                             fromAddress = toAddress;
                             returnSendStatus = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering.";
+                            logController.logInfo(core, "queueAdHocEmail, sent with warning [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                         } else if (genericController.vbLCase(fromAddress) == genericController.vbLCase(toAddress)) {
                             //
                             //
                             //
                             returnSendStatus = "The from-address matches the to-address [" + fromAddress + "] . This email was sent, but may be blocked by spam filtering.";
+                            logController.logInfo(core, "queueAdHocEmail, sent with warning [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                         } else {
                             //
                             //
                             //
                             returnSendStatus = "The from-address matches the to-address. The from-address was changed to [" + fromAddress + "] to prevent it from being blocked by spam filtering.";
+                            logController.logInfo(core, "queueAdHocEmail, sent with warning [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                         }
                     }
                     string htmlBody = null;
@@ -189,9 +195,10 @@ namespace Contensive.Core.Controllers {
                         textBody = textBody,
                         toAddress = toAddress
                     });
+                    logController.logInfo(core, "queueAdHocEmail, added to queue, toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -275,7 +282,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -317,7 +324,7 @@ namespace Contensive.Core.Controllers {
                     email.Subject = emailName;
                     email.FromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
                     email.save(core);
-                    core.handleException(new ApplicationException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
+                    logController.handleError( core,new ApplicationException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
                 } else {
                     //
                     // --- collect values needed for send
@@ -423,7 +430,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return returnString;
         }
@@ -591,7 +598,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -632,7 +639,7 @@ namespace Contensive.Core.Controllers {
                 string sendStatus = "";
                 queueAdHocEmail(core, toAddress, fromAddress, emailSubject, Message, "", "", "", false, false, 0, ref sendStatus);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -661,7 +668,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -679,7 +686,7 @@ namespace Contensive.Core.Controllers {
                 record.attempts = email.attempts;
                 record.save(core);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -701,10 +708,12 @@ namespace Contensive.Core.Controllers {
                         log.ToAddress = email.toAddress;
                         log.FromAddress = email.fromAddress;
                         log.Subject = email.subject;
+                        log.body = email.htmlBody;
                         log.SendStatus = "ok";
                         log.LogType = EmailLogTypeImmediateSend;
                         log.EmailID = email.emailId;
                         log.save(core);
+                        logController.logInfo(core, "sendEmailInQueue, send successful, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "]");
                     } else {
                         //
                         // -- fail, retry
@@ -715,21 +724,24 @@ namespace Contensive.Core.Controllers {
                             log.ToAddress = email.toAddress;
                             log.FromAddress = email.fromAddress;
                             log.Subject = email.subject;
+                            log.body = email.htmlBody;
                             log.SendStatus = "failed";
                             log.LogType = EmailLogTypeImmediateSend;
                             log.EmailID = email.emailId;
                             log.save(core);
+                            logController.logInfo(core, "sendEmailInQueue, send FAILED, NOT resent because too many retries, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
                         } else {
                             //
                             // -- fail, add back to end of queue for retry
                             email.attempts += 1;
                             queueEmail(core, false, email);
+                            logController.logInfo(core, "sendEmailInQueue, send FAILED, added to end of queue, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
                         }
                     }
                 }
                 return;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //

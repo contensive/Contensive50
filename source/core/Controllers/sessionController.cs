@@ -146,7 +146,7 @@ namespace Contensive.Core.Controllers {
                 if (core.serverConfig == null) {
                     //
                     // -- application error if no server config
-                    core.handleException(new ApplicationException("authorization context cannot be created without a server configuration."));
+                    logController.handleError( core,new ApplicationException("authorization context cannot be created without a server configuration."));
                 } else {
                     //
                     if (core.appConfig == null) {
@@ -581,7 +581,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             } finally {
                 //
@@ -600,7 +600,7 @@ namespace Contensive.Core.Controllers {
             try {
                 result = visit.VisitAuthenticated & (user.Admin | user.Developer);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -617,7 +617,7 @@ namespace Contensive.Core.Controllers {
             try {
                 result = visit.VisitAuthenticated & (user.Admin | user.Developer);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -676,7 +676,7 @@ namespace Contensive.Core.Controllers {
                     getContentAccessRights(core, ContentName, ref returnIsContentManager, ref notImplemented_allowAdd, ref notImplemented_allowDelete);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnIsContentManager;
@@ -702,7 +702,7 @@ namespace Contensive.Core.Controllers {
                 visitor.MemberID = user.id;
                 visitor.save(core);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -837,7 +837,7 @@ namespace Contensive.Core.Controllers {
                     core.db.csClose(ref CS);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnUserId;
@@ -892,7 +892,7 @@ namespace Contensive.Core.Controllers {
                     core.db.csClose(ref CSPointer);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -950,7 +950,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1051,7 +1051,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1078,7 +1078,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -1106,7 +1106,7 @@ namespace Contensive.Core.Controllers {
                     authContext.visit.save(core);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -1149,7 +1149,7 @@ namespace Contensive.Core.Controllers {
                 sessionContext.user.save(core);
                 result = true;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -1173,7 +1173,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = isMemberOfGroupList(core, "," + groupController.group_GetGroupID(core, genericController.encodeText(GroupName)), iMemberID, true);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -1191,7 +1191,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = isMemberOfGroupIdList(core, checkMemberID, isAuthenticated, GroupIDList, adminReturnsTrue);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -1212,7 +1212,7 @@ namespace Contensive.Core.Controllers {
                 //End If
                 //result = property_user_isMember
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -1319,7 +1319,7 @@ namespace Contensive.Core.Controllers {
                 }
 
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnREsult;
@@ -1393,7 +1393,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -1412,7 +1412,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = core.visitProperty.getBoolean("AllowQuickEditor");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -1432,7 +1432,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = core.visitProperty.getBoolean("AllowAdvancedEditor");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -1494,7 +1494,7 @@ namespace Contensive.Core.Controllers {
                     tempisWorkflowRendering = core.visitProperty.getBoolean("AllowWorkflowRendering");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;

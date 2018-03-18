@@ -232,13 +232,19 @@
         "Entry"
         {
         "MsmKey" = "8:_268B4B71F37A8FCF6E006F8901624385"
-        "OwnerKey" = "8:_94B21571D09E4DFAB404B3E80FBB8CE6"
+        "OwnerKey" = "8:_664A8949A8074597B46F6053F3229DD2"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_268B4B71F37A8FCF6E006F8901624385"
-        "OwnerKey" = "8:_664A8949A8074597B46F6053F3229DD2"
+        "OwnerKey" = "8:_A465724797432B71C2C7F3BDE54972ED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_268B4B71F37A8FCF6E006F8901624385"
+        "OwnerKey" = "8:_94B21571D09E4DFAB404B3E80FBB8CE6"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -251,12 +257,6 @@
         {
         "MsmKey" = "8:_268B4B71F37A8FCF6E006F8901624385"
         "OwnerKey" = "8:_4488CFA803204477B324ACE76BF7EED4"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_268B4B71F37A8FCF6E006F8901624385"
-        "OwnerKey" = "8:_A465724797432B71C2C7F3BDE54972ED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -358,6 +358,12 @@
         "Entry"
         {
         "MsmKey" = "8:_2D6627A66B61489ABCB0D30632A9B5DE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2D73F2DB0EB24834AF90E3BCE447ED19"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -598,12 +604,6 @@
         "Entry"
         {
         "MsmKey" = "8:_5684CCD7AF034F4A85D9B92417024322"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5824DA98DC9B44F799149A1C79A722E5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1660,12 +1660,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_664A8949A8074597B46F6053F3229DD2"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_F6DDB6840E9D4130A9A40386E0ADEDAC"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1750,6 +1744,12 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_664A8949A8074597B46F6053F3229DD2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_604461E6EEFE4FF58C9C076DDECE79E1"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1763,6 +1763,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_28DC45AFDCBA456C81457E2C4695F4FC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_268B4B71F37A8FCF6E006F8901624385"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -2027,12 +2033,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_94B21571D09E4DFAB404B3E80FBB8CE6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_268B4B71F37A8FCF6E006F8901624385"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -3309,6 +3309,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2D73F2DB0EB24834AF90E3BCE447ED19"
+            {
+            "SourcePath" = "8:..\\cc\\NLog.config"
+            "TargetName" = "8:NLog.config"
+            "Tag" = "8:"
+            "Folder" = "8:_E8D21A9100874E8BA5B11574C95E1221"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_2EADD1C0D1F531F2DF8FF2DFD463C51E"
             {
             "AssemblyRegister" = "3:1"
@@ -3805,26 +3825,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5824DA98DC9B44F799149A1C79A722E5"
-            {
-            "SourcePath" = "8:..\\core\\NLog.config"
-            "TargetName" = "8:NLog.config"
-            "Tag" = "8:"
-            "Folder" = "8:_E8D21A9100874E8BA5B11574C95E1221"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5BFC344838598FFB20FB04DB71EA4634"
             {
             "AssemblyRegister" = "3:1"
@@ -3891,7 +3891,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:core, Version=5.0.6620.25420, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:core, Version=5.0.6646.12502, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_604461E6EEFE4FF58C9C076DDECE79E1"
@@ -5707,7 +5707,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:core, Version=5.0.6620.25420, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:core, Version=5.0.6646.12502, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_DD7478A09B722842D55AF1676BEFD82B"

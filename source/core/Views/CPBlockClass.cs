@@ -42,11 +42,11 @@ namespace Contensive.Core {
                 try {
                     htmlDoc = new Controllers.htmlController(core);
                 } catch (Exception ex) {
-                    core.handleException(ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.");
+                    logController.handleError( core,ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.");
                     throw;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -57,7 +57,7 @@ namespace Contensive.Core {
             try {
                 accum = htmlString;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -68,7 +68,7 @@ namespace Contensive.Core {
             try {
                 accum += htmlString;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -79,7 +79,7 @@ namespace Contensive.Core {
             try {
                 accum = "";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -100,7 +100,7 @@ namespace Contensive.Core {
                     s = htmlParseStaticController.getInner(core, a, findSelector);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return s;
@@ -116,7 +116,7 @@ namespace Contensive.Core {
                     s = htmlParseStaticController.getOuter(core, a, findSelector);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return s;
@@ -143,7 +143,7 @@ namespace Contensive.Core {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -171,7 +171,7 @@ namespace Contensive.Core {
                     accum = copy.copy;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -185,7 +185,7 @@ namespace Contensive.Core {
                     accum = cp.wwwFiles.read(wwwFileName);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -213,7 +213,7 @@ namespace Contensive.Core {
                     accum = copy.Layout;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -224,7 +224,7 @@ namespace Contensive.Core {
             try {
                 accum = htmlString + accum;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -235,7 +235,7 @@ namespace Contensive.Core {
             try {
                 accum = htmlParseStaticController.setInner(core, accum, findSelector, htmlString);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -246,7 +246,7 @@ namespace Contensive.Core {
             try {
                 accum = htmlParseStaticController.setOuter(core, accum, findSelector, htmlString);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }

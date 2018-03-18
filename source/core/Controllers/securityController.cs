@@ -31,7 +31,7 @@ namespace Contensive.Core.Controllers {
             try {
                 returnResult = hashEncode.ComputeHash(password, "SHA512", null);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -48,7 +48,7 @@ namespace Contensive.Core.Controllers {
             try {
                 returnResult = hashEncode.VerifyHash(sourceToTest, "SHA512", encryptedTaken);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -84,7 +84,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = Convert.ToBase64String(Buffer);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -122,12 +122,12 @@ namespace Contensive.Core.Controllers {
                         // Transform and return the string.
                         returnResult = System.Text.ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(buffer, 0, buffer.Length));
                     } catch (Exception ex) {
-                        core.handleException(ex);
+                        logController.handleError( core,ex);
                         throw;
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -398,7 +398,7 @@ namespace Contensive.Core.Controllers {
                 string sourceText = keyInteger.ToString() + "\t" + keyDate.ToString();
                 returnToken = twoWayEncrypt(core,sourceText);
             } catch (Exception ex) {
-                core.handleException(ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + keyDate + "]");
+                logController.handleError( core,ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + keyDate + "]");
                 returnToken = "";
             }
             return returnToken;
@@ -421,7 +421,7 @@ namespace Contensive.Core.Controllers {
                     returnDate = genericController.encodeDate(parts[1]);
                 }
             } catch (Exception ex) {
-                core.handleException(ex, "DecodeToken failure. Returning blank result for token [" + token + "]");
+                logController.handleError( core,ex, "DecodeToken failure. Returning blank result for token [" + token + "]");
                 returnNumber = 0;
                 returnDate = DateTime.MinValue;
             }

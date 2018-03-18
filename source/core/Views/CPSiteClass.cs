@@ -253,16 +253,14 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         //
-        public override void ErrorReport(string Cause) { ErrorReport(new ApplicationException("Unexpected exception"), Cause);}
+        public override void ErrorReport(string Message) {
+            logController.handleException(core, new ApplicationException("Unexpected exception"), logController.logLevel.Error, Message, 2);
+        }
         //
         //====================================================================================================
         //
         public override void ErrorReport(System.Exception Ex, string Message = "") {
-            if (string.IsNullOrEmpty(Message)) {
-                core.handleException(Ex, "n/a", 2);
-            } else {
-                core.handleException(Ex, Message, 2);
-            }
+            logController.handleException(core, Ex, logController.logLevel.Error, Message, 2);
         }
         //
         //====================================================================================================
@@ -271,7 +269,7 @@ namespace Contensive.Core {
             try {
                 var ExportCSVAddon = Models.DbModels.addonModel.create(core, addonGuidExportCSV);
                 if (ExportCSVAddon == null) {
-                    core.handleException(new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
+                    logController.handleError( core,new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {
                     var docProperties = new Dictionary<string, string>();
                     docProperties.Add("sql", SQL);
@@ -336,7 +334,7 @@ namespace Contensive.Core {
                 var tmpList = new List<string> { };
                 returnOk = collectionController.installCollectionsFromPrivateFile(core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 if (!core.siteProperties.trapErrors) {
                     throw;
                 }

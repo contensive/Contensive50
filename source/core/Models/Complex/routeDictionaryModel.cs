@@ -44,7 +44,7 @@ namespace Contensive.Core.Models.Complex {
                         string route = genericController.normalizeRoute(remoteMethod.name);
                         if (!string.IsNullOrWhiteSpace(route)) {
                             if (result.ContainsKey(route)) {
-                                core.handleException(new ApplicationException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
+                                logController.handleWarn( core,new ApplicationException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
                             } else {
                                 result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
                                     physicalRoute = physicalFile,
@@ -62,7 +62,7 @@ namespace Contensive.Core.Models.Complex {
                         string route = genericController.normalizeRoute(linkForward.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.ContainsKey(route)) {
-                                core.handleException(new ApplicationException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
+                                logController.handleError( core,new ApplicationException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
                             } else {
                                 result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
                                     physicalRoute = physicalFile,
@@ -80,7 +80,7 @@ namespace Contensive.Core.Models.Complex {
                         string route = genericController.normalizeRoute(linkAlias.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.ContainsKey(route)) {
-                                core.handleException(new ApplicationException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
+                                logController.handleError( core,new ApplicationException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
                             } else {
                                 result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
                                     physicalRoute = physicalFile,
@@ -94,7 +94,7 @@ namespace Contensive.Core.Models.Complex {
                     setCache(core, result);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }

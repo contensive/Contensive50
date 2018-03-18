@@ -40,7 +40,7 @@ namespace Contensive.Core.Controllers {
             try {
                 this.core = core;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -74,7 +74,7 @@ namespace Contensive.Core.Controllers {
                     + "Password=" + core.serverConfig.defaultDataSourcePassword + ";"
                     + "";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnConnString;
@@ -89,7 +89,7 @@ namespace Contensive.Core.Controllers {
             try {
                 executeSql("create database " + catalogName);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -111,7 +111,7 @@ namespace Contensive.Core.Controllers {
                 returnOk = (dt.Rows.Count > 0);
                 dt.Dispose();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -145,7 +145,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing master sql [" + sql + "]", ex);
-                core.handleException(newEx);
+                logController.handleError( core,newEx);
             }
             return returnData;
         }

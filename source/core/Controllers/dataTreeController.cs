@@ -91,7 +91,7 @@ namespace Contensive.Core.Controllers {
                             break;
                     }
                 } catch (Exception ex) {
-                    core.handleException(ex);
+                    logController.handleError( core,ex);
                     loadOK = false;
                 }
                 if (loadOK) {
@@ -192,7 +192,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -269,7 +269,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }

@@ -158,7 +158,7 @@ namespace Contensive.Core.Models.DbModels {
                     result.Add(content.id, content);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;

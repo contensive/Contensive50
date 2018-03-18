@@ -740,7 +740,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                                                 //
                                                                 // Not installed yet
                                                                 //
-                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + core.html.getHtmlInputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + core.html.getHtmlInputHidden("LibraryRowName" + RowPtr, Collectionname);
+                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + core.html.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + core.html.inputHidden("LibraryRowName" + RowPtr, Collectionname);
                                                                 //Cells3(RowPtr, 0) = core.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & core.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & core.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
                                                                 Cells3[RowPtr, 1] = Collectionname + "&nbsp;";
                                                                 Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
@@ -892,7 +892,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                     core.html.addTitle("Add-on Manager");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return addonManager;
@@ -925,7 +925,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                     core.db.deleteContentRecord(cnNavigatorEntries, EntryID);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -965,7 +965,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetXMLAttribute");
@@ -1029,7 +1029,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetParentIDFromNameSpace");

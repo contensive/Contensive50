@@ -182,7 +182,7 @@ namespace Contensive.Core.Addons.Email {
                 //
                 return;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
@@ -370,7 +370,7 @@ namespace Contensive.Core.Addons.Email {
                     core.db.csClose(ref CSEmailBig);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -577,7 +577,7 @@ namespace Contensive.Core.Addons.Email {
             //        core.db.csClose(ref CS);
             //    }
             //} catch (Exception ex) {
-            //    core.handleException(ex);
+            //    logController.handleException( core,ex);
             //    throw
             //}
             //return tempGetEmailTemplate;
@@ -622,7 +622,7 @@ namespace Contensive.Core.Addons.Email {
                     emailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + core.appConfig.domainList[0], ConfirmBody,"","",true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }

@@ -69,7 +69,7 @@ namespace Contensive.Core.Controllers {
                 //
                 this.core = core;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw (ex);
             }
@@ -104,7 +104,7 @@ namespace Contensive.Core.Controllers {
                     main_EditLockMemberName_Local = "";
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return main_EditLockStatus_Local;
@@ -138,7 +138,7 @@ namespace Contensive.Core.Controllers {
                     tempGetEditLockMemberName = main_EditLockMemberName_Local;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return main_EditLockMemberName_Local;
@@ -158,7 +158,7 @@ namespace Contensive.Core.Controllers {
                     returnDate = main_EditLockDateExpires_Local;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnDate;
@@ -538,7 +538,7 @@ namespace Contensive.Core.Controllers {
         //            End If
         //        End If
         //    Catch ex As Exception
-        //        core.handleException(ex); : Throw
+        //        logController.handleException( core,ex); : Throw
         //    End Try
         //End Sub
         //
@@ -681,7 +681,7 @@ namespace Contensive.Core.Controllers {
         //            End If
         //        End If
         //    Catch ex As Exception
-        //        core.handleException(ex); : Throw
+        //        logController.handleException( core,ex); : Throw
         //    End Try
         //End Sub
         //
@@ -701,7 +701,7 @@ namespace Contensive.Core.Controllers {
         //            End If
         //        End If
         //    Catch ex As Exception
-        //        core.handleException(ex); : Throw
+        //        logController.handleException( core,ex); : Throw
         //    End Try
         //End Sub
         //
@@ -721,7 +721,7 @@ namespace Contensive.Core.Controllers {
         //            End If
         //        End If
         //    Catch ex As Exception
-        //        core.handleException(ex); : Throw
+        //        logController.handleException( core,ex); : Throw
         //    End Try
         //End Sub
         //
@@ -740,7 +740,7 @@ namespace Contensive.Core.Controllers {
                 result = core.db.csOk(CS);
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -788,7 +788,7 @@ namespace Contensive.Core.Controllers {
                     result = "(ContentID In (" + Criteria.Substring(1) + "))And(RecordID=" + core.db.encodeSQLNumber(RecordID) + ")And((DateExpires>" + core.db.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -814,7 +814,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -876,7 +876,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -959,7 +959,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -973,7 +973,7 @@ namespace Contensive.Core.Controllers {
             try {
                 setEditLock2(ContentName, RecordID, MemberID, false);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -987,7 +987,7 @@ namespace Contensive.Core.Controllers {
             try {
                 setEditLock2(ContentName, RecordID, MemberID, true);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1083,7 +1083,7 @@ namespace Contensive.Core.Controllers {
                     EditLockCount = DestinationPointer;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1116,7 +1116,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return EditLock2;

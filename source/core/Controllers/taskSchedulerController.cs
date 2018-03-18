@@ -58,7 +58,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    cp.core.handleException(ex);
+                    logController.handleError(cp.core, ex);
                 }
             }
         }
@@ -87,7 +87,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    cp.core.handleException(ex);
+                    logController.handleError(cp.core,ex);
                 }
             }
             return returnStartedOk;
@@ -111,7 +111,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    cp.core.handleException(ex);
+                    logController.handleError(cp.core,ex);
                 }
             } finally {
                 ProcessTimerInProcess = false;
@@ -183,7 +183,6 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // -- Interval is OK but NextRun is 0, just set next run
                                         coreApp.db.csSet(CS, "ProcessNextRun", nextRun);
-                                        coreApp.db.csSave(CS);
                                     }
                                     coreApp.db.csGoNext(CS);
                                 }
@@ -191,14 +190,14 @@ namespace Contensive.Core.Controllers {
                             } catch (Exception ex) {
                                 //
                                 logController.logTrace(coreApp, "scheduleTasks, exception [" + ex.ToString() + "]");
-                                coreApp.handleException(ex);
+                                logController.handleError(coreApp, ex);
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
                 logController.logTrace(coreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
-                coreServer.handleException(ex);
+                logController.handleError(coreServer, ex);
             }
         }
         //
@@ -237,7 +236,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 logController.logTrace(cpSiteCore, "addTaskToQueue, exeception [" + ex.ToString() + "]");
-                cpSiteCore.handleException(ex);
+                logController.handleError(cpSiteCore, ex);
             }
             return returnTaskAdded;
         }

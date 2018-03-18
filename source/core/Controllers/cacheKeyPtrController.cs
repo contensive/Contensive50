@@ -71,7 +71,7 @@ namespace Contensive.Core.Controllers {
                 dataStore.keyPtrIndex = new keyPtrController();
                 core.cache.setObject(cacheName + "-dataList", dataStore.dataList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -98,7 +98,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex, "key[" + key + "]");
+                logController.handleError( core,ex, "key[" + key + "]");
             }
             return returnPtr;
         }
@@ -120,7 +120,7 @@ namespace Contensive.Core.Controllers {
                     returnPtr = dataStore.keyPtrIndex.getNextPtr();
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnPtr;
@@ -148,7 +148,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex, "key[" + key + "]");
+                logController.handleError( core,ex, "key[" + key + "]");
             }
             return returnPtr;
         }
@@ -175,7 +175,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex, "ptr[" + ptr.ToString() + "]");
+                logController.handleError( core,ex, "ptr[" + ptr.ToString() + "]");
             }
             return returnValue;
         }

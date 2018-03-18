@@ -63,7 +63,7 @@ namespace Contensive.Core {
             try {
                 groupController.group_add2(core, GroupNameOrGuid, groupCaption);
             } catch (Exception ex) {
-                core.handleException(ex, "Unexpected error in cp.group.add()");
+                logController.handleError( core,ex, "Unexpected error in cp.group.add()");
             }
         }
         //
@@ -79,7 +79,7 @@ namespace Contensive.Core {
             try {
                 groupController.group_AddUser(core, GroupNameIdOrGuid, UserId, DateExpires);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -89,7 +89,7 @@ namespace Contensive.Core {
             try {
                 groupModel.delete(core, GroupNameIdOrGuid);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -100,7 +100,7 @@ namespace Contensive.Core {
             try {
                 returnInteger = core.db.getRecordID("groups", GroupNameIdOrGuid);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return returnInteger;
         }

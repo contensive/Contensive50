@@ -166,7 +166,7 @@ namespace Contensive.Core {
                     result = IsInGroupList(groupId.ToString(), userId);
                 }
             } catch (Exception ex) {
-                CP.core.handleException(ex);
+                logController.handleError(CP.core,ex);
                 result = false;
             }
             return result;
@@ -184,7 +184,7 @@ namespace Contensive.Core {
                 }
                 result = CP.core.session.isMemberOfGroupIdList(core, userId, IsAuthenticated, GroupIDList, false);
             } catch (Exception ex) {
-                CP.core.handleException(ex);
+                logController.handleError(CP.core,ex);
                 result = false;
             }
             return result;

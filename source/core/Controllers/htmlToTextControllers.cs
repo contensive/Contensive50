@@ -428,7 +428,7 @@
 //                    }
 //                }
 //            } catch (Exception ex) {
-//                core.handleException(ex);
+//                logController.handleException( core,ex);
 //            }
 //            return tempDecodeHTML_RemoveWhiteSpace;
 //        }

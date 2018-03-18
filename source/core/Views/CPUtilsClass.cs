@@ -67,7 +67,7 @@ namespace Contensive.Core {
                 throw new ApplicationException("Installation upgrade through the cp interface is deprecated. Please use the command line tool.");
                 // Controllers.appBuilderController.upgrade(CP.core, isNewApp)
             } catch (Exception ex) {
-                CP.core.handleException(ex);
+                logController.handleError(CP.core,ex);
             }
         }
         //
@@ -223,7 +223,7 @@ namespace Contensive.Core {
             return CP.core.addon.executeAsync(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar());
         }
         [Obsolete("Deprecated, use AppendLog")] public override void AppendLogFile(string Text) {
-            logController.logError(CP.core, Text);
+            logController.logInfo(CP.core, Text);
         }
         //
         // ====================================================================================================
@@ -236,14 +236,14 @@ namespace Contensive.Core {
             if ((!string.IsNullOrWhiteSpace(pathFilename)) & (!string.IsNullOrWhiteSpace(Text))) {
                 pathFilename = genericController.convertToDosSlash(pathFilename);
                 string[] parts = pathFilename.Split('\\');
-                logController.logError(CP.core, "legacy logFile: [" + pathFilename + "]" + Text);
+                logController.logInfo(CP.core, "legacy logFile: [" + pathFilename + "], " + Text);
             }
         }
         //
         // ====================================================================================================
         //
         public override void AppendLog(string Text) {
-            logController.logError(CP.core, Text);
+            logController.logInfo(CP.core, Text);
         }
         //
         // ====================================================================================================

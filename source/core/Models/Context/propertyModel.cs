@@ -170,10 +170,10 @@ namespace Contensive.Core.Models.Context {
                 // ----- Error Trap
                 //
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("Unexpected exception"));
+            logController.handleError( core,new Exception("Unexpected exception"));
         }
         //
         //====================================================================================================
@@ -416,7 +416,7 @@ namespace Contensive.Core.Models.Context {
                     setProperty(propertyName, defaultValue, keyId);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnString;
@@ -456,10 +456,10 @@ namespace Contensive.Core.Models.Context {
                 // ----- Error Trap
                 //
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
-            core.handleException(new Exception("Unexpected exception"));
+            logController.handleError( core,new Exception("Unexpected exception"));
         }
     }
 }

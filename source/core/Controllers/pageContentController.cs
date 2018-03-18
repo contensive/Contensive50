@@ -142,7 +142,7 @@ namespace Contensive.Core.Controllers {
                }
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnBody;
@@ -179,7 +179,7 @@ namespace Contensive.Core.Controllers {
                     core.doc.redirectBecausePageNotFound = true;
                     core.doc.redirectReason = "Redirecting because the page selected could not be found.";
                     core.doc.redirectLink = pageContentController.main_ProcessPageNotFound_GetLink(core, core.doc.redirectReason, "", "", PageID, 0);
-                    core.handleException(new ApplicationException("Page could not be determined. Error message displayed."));
+                    logController.handleError( core,new ApplicationException("Page could not be determined. Error message displayed."));
                     return "<div style=\"width:300px; margin: 100px auto auto auto;text-align:center;\">This page is not valid.</div>";
                 }
                 //PageID = core.docProperties.getInteger(rnPageId)
@@ -299,7 +299,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return returnHtml;
         }
@@ -375,7 +375,7 @@ namespace Contensive.Core.Controllers {
                     //Call core.workflow.publishEdit("Copy Content", genericController.EncodeInteger(core.db.cs_get(CS, "ID")))
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempgetDefaultBlockMessage;
         }
@@ -429,7 +429,7 @@ namespace Contensive.Core.Controllers {
                 //
                 result = Copy;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -459,7 +459,7 @@ namespace Contensive.Core.Controllers {
                 if (domain == null) {
                     //
                     // -- domain is not valid
-                    core.handleException(new ApplicationException("Page could not be determined because the domain was not recognized."));
+                    logController.handleError( core,new ApplicationException("Page could not be determined because the domain was not recognized."));
                 } else {
                     //
                     // -- attempt requested page
@@ -564,7 +564,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         public static int getPageNotFoundPageId(coreController core) {
@@ -578,7 +578,7 @@ namespace Contensive.Core.Controllers {
                     pageId = core.siteProperties.getInteger("PageNotFoundPageID", 0);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return pageId;
@@ -594,7 +594,7 @@ namespace Contensive.Core.Controllers {
                 if (domain == null) {
                     //
                     // -- domain not available
-                    core.handleException(new ApplicationException("Landing page could not be determined because the domain was not recognized."));
+                    logController.handleError( core,new ApplicationException("Landing page could not be determined because the domain was not recognized."));
                 } else {
                     //
                     // -- attempt domain landing page
@@ -633,7 +633,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return landingPage;
@@ -750,7 +750,7 @@ namespace Contensive.Core.Controllers {
                 //
                 result = Link;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -837,7 +837,7 @@ namespace Contensive.Core.Controllers {
                 // -- assemble
                 result = linkprotocol + linkDomain + linkPathPage;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -880,7 +880,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("coreClass.IsChildRecord")
@@ -914,7 +914,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1610,7 +1610,7 @@ namespace Contensive.Core.Controllers {
                     returnHtml = errorController.getDocExceptionHtmlList(core) + returnHtml;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return returnHtml;
         }
@@ -1778,7 +1778,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1873,7 +1873,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1966,14 +1966,14 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 tempgetFormPage = ""
-                + errorController.getUserError(core) + core.html.formStartMultipart() + core.html.inputHidden("ContensiveFormPageID", FormPageID) + core.html.getHtmlInputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + core.html.formEnd();
+                + errorController.getUserError(core) + core.html.formStartMultipart() + core.html.inputHidden("ContensiveFormPageID", FormPageID) + core.html.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + core.html.formEnd();
                 //
                 return tempgetFormPage;
                 //
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError13("main_GetFormPage")
@@ -2435,7 +2435,7 @@ namespace Contensive.Core.Controllers {
                     core.doc.adminWarning = "";
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return returnHtml;
         }
@@ -2480,7 +2480,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2674,7 +2674,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //Call core.db.cs_Close(CS)
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2752,7 +2752,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2768,7 +2768,7 @@ namespace Contensive.Core.Controllers {
             try {
                 tempmain_GetMoreInfo = getMoreInfoHtml(core, genericController.encodeInteger(contactMemberID));
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2895,7 +2895,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }

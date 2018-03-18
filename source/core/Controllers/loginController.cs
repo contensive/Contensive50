@@ -64,7 +64,7 @@ namespace Contensive.Core.Controllers {
                 //bodyTag = TemplateDefaultBodyTag
                 //returnREsult = core.html.getHtmlDoc(Body, bodyTag, True, True, False)
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnREsult;
@@ -164,7 +164,7 @@ namespace Contensive.Core.Controllers {
                         + "\r<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
                         + nop(loginForm) + "\r</table>"
                         + "";
-                    loginForm = loginForm + core.html.getHtmlInputHidden("Type", FormTypeLogin) + core.html.getHtmlInputHidden("email", core.session.user.Email) + core.html.getPanelButtons(ButtonLogin, "Button") + "";
+                    loginForm = loginForm + core.html.inputHidden("Type", FormTypeLogin) + core.html.inputHidden("email", core.session.user.Email) + core.html.getPanelButtons(ButtonLogin, "Button") + "";
                     loginForm = ""
                         + core.html.formStart(QueryString) + nop(loginForm) + "\r</form>"
                         + "";
@@ -189,7 +189,7 @@ namespace Contensive.Core.Controllers {
                         + "";
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnHtml;
@@ -231,7 +231,7 @@ namespace Contensive.Core.Controllers {
                     returnHtml = getLoginForm_Default(core);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnHtml;
@@ -268,7 +268,7 @@ namespace Contensive.Core.Controllers {
                     //
                     //
                     returnResult = ""
-                    + returnResult + core.html.getHtmlInputHidden("Type", FormTypeSendPassword) + "";
+                    + returnResult + core.html.inputHidden("Type", FormTypeSendPassword) + "";
                     foreach (string key in core.docProperties.getKeyList()) {
                         var tempVar = core.docProperties.getProperty(key);
                         if (tempVar.IsForm) {
@@ -281,7 +281,7 @@ namespace Contensive.Core.Controllers {
                                 case "EMAIL":
                                     break;
                                 default:
-                                    returnResult = returnResult + core.html.getHtmlInputHidden(tempVar.Name, tempVar.Value);
+                                    returnResult = returnResult + core.html.inputHidden(tempVar.Name, tempVar.Value);
                                     break;
                             }
                         }
@@ -295,7 +295,7 @@ namespace Contensive.Core.Controllers {
                     + "";
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -334,7 +334,7 @@ namespace Contensive.Core.Controllers {
                 }
 
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnREsult;
@@ -348,7 +348,7 @@ namespace Contensive.Core.Controllers {
                 string returnUserMessage = "";
                 sendPassword(core, core.docProperties.getText("email"), ref returnUserMessage);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -541,7 +541,7 @@ namespace Contensive.Core.Controllers {
                     emailController.queueAdHocEmail(core, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -575,7 +575,7 @@ namespace Contensive.Core.Controllers {
                         if (!(core.doc.debug_iUserError != "")) {
                             CS = core.db.csOpen("people", "ID=" + core.db.encodeSQLNumber(core.session.user.id));
                             if (!core.db.csOk(CS)) {
-                                core.handleException(new Exception("Could not open the current members account to set the username and password."));
+                                logController.handleError( core,new Exception("Could not open the current members account to set the username and password."));
                             } else {
                                 if ((core.db.csGetText(CS, "username") != "") | (core.db.csGetText(CS, "password") != "") | (core.db.csGetBoolean(CS, "admin")) | (core.db.csGetBoolean(CS, "developer"))) {
                                     //
@@ -600,7 +600,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.cache.invalidateAllInContent("People");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }

@@ -147,7 +147,7 @@ namespace Contensive.Core.Models.Context {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex, "exception in serverConfigModel.getObject");
+                logController.handleError( core,ex, "exception in serverConfigModel.getObject");
             }
             return returnModel;
         }
@@ -169,7 +169,7 @@ namespace Contensive.Core.Models.Context {
                     core.serverConfig.saveObject(core);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
     }

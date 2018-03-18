@@ -69,7 +69,7 @@ namespace Contensive.Core.Controllers {
                 prop.Value = value;
                 setProperty(key, prop);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -108,7 +108,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return genericController.encodeNumber(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -119,7 +119,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return genericController.encodeInteger(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -130,7 +130,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return genericController.encodeText(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -141,7 +141,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return activeContentController.processWysiwygResponseForSave(core, genericController.encodeText(getProperty(RequestName).Value));
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -152,7 +152,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return genericController.encodeBoolean(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -163,7 +163,7 @@ namespace Contensive.Core.Controllers {
             try {
                 return genericController.encodeDate(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -179,7 +179,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return new docPropertiesClass();
@@ -200,7 +200,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -245,7 +245,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }

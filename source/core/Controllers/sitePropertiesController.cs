@@ -238,7 +238,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 } catch (Exception ex) {
-                    core.handleException(ex);
+                    logController.handleError( core,ex);
                     throw;
                 }
                 return encodeInteger(_childListAddonID);
@@ -361,7 +361,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -427,7 +427,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnString;
@@ -500,7 +500,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnString;
@@ -599,7 +599,7 @@ namespace Contensive.Core.Controllers {
                 //    End If
                 //    returnString = _dataBuildVersion
                 //Catch ex As Exception
-                //    core.handleException(ex); : Throw
+                //    logController.handleException( core,ex); : Throw
                 //End Try
                 //Return returnString
             }

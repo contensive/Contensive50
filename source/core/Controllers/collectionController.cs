@@ -583,7 +583,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -611,7 +611,7 @@ namespace Contensive.Core.Controllers {
                     returnColl = installCollection_LoadXmlToMiniCollection(core, CollectionData, false, false, isNewBuild, new miniCollectionModel());
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnColl;
@@ -648,7 +648,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnAttr;
@@ -683,7 +683,7 @@ namespace Contensive.Core.Controllers {
                     core.db.insertTableRecord("Default", "ccSortMethods", sqlList);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -701,7 +701,7 @@ namespace Contensive.Core.Controllers {
                 VerifySortMethod(core, "By Date Reverse", "DateAdded Desc");
                 VerifySortMethod(core, "By Alpha Sort Order Then Oldest First", "SortOrder,ID");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -764,7 +764,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Problem
                         //
-                        core.handleException(new ApplicationException("Content Field Types content definition was not found"));
+                        logController.handleError( core,new ApplicationException("Content Field Types content definition was not found"));
                     } else {
                         while (RowsNeeded > 0) {
                             core.db.executeQuery("Insert into ccFieldTypes (active,contentcontrolid)values(1," + CID + ")");
@@ -798,7 +798,7 @@ namespace Contensive.Core.Controllers {
                 core.db.executeQuery("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;");
                 core.db.executeQuery("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -812,7 +812,7 @@ namespace Contensive.Core.Controllers {
                 core.privateFiles.saveFile(privateFilesPathFilename, Content);
                 XML = null;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1011,7 +1011,7 @@ namespace Contensive.Core.Controllers {
                 //End If
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return tempDownloadCollectionFiles;
@@ -1071,7 +1071,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return UpgradeOK;
@@ -1320,7 +1320,7 @@ namespace Contensive.Core.Controllers {
                 //    }
                 //}
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -1345,7 +1345,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -1731,7 +1731,7 @@ namespace Contensive.Core.Controllers {
                 tempBuildLocalCollectionRepoFromFile = (string.IsNullOrEmpty(return_ErrorMessage));
                 return_CollectionGUID = CollectionGuid;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -2614,7 +2614,7 @@ namespace Contensive.Core.Controllers {
             } catch (Exception ex) {
                 //
                 // Log error and exit with failure. This way any other upgrading will still continue
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -2711,7 +2711,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -2725,7 +2725,7 @@ namespace Contensive.Core.Controllers {
                 string Collectionname = "";
                 GetCollectionConfig(core, CollectionGuid, ref result, ref LastChangeDate, ref Collectionname);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -2800,7 +2800,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -2830,7 +2830,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 returnSuccess = false;
                 if (string.IsNullOrEmpty(return_ErrorMessage)) {
                     return_ErrorMessage = "There was an unexpected error installing the collection, details [" + ex.Message + "]";
@@ -2867,7 +2867,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 returnSuccess = false;
                 if (string.IsNullOrEmpty(return_ErrorMessage)) {
                     return_ErrorMessage = "There was an unexpected error installing the collection, details [" + ex.Message + "]";
@@ -2889,7 +2889,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return navId;
@@ -2946,7 +2946,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -2992,7 +2992,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -3459,7 +3459,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             // Bad field name - need to report it somehow
                                             //
-                                            core.handleException(new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + core.db.getRecordName("add-on collections", CollectionID) + "]"));
+                                            logController.handleError( core,new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + core.db.getRecordName("add-on collections", CollectionID) + "]"));
                                         } else {
                                             core.db.csSet(CS, FieldName, FieldValue);
                                         }
@@ -3581,7 +3581,7 @@ namespace Contensive.Core.Controllers {
                     //Call core.db.cs_Close(CS)
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -3702,7 +3702,7 @@ namespace Contensive.Core.Controllers {
                     core.db.csClose(ref CS);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -3741,7 +3741,7 @@ namespace Contensive.Core.Controllers {
                     core.privateFiles.deleteFolder(tmpFolderPath);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -3760,7 +3760,7 @@ namespace Contensive.Core.Controllers {
                 addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
                 installCollection_BuildDbFromMiniCollection(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, forceFullInstall, ref nonCriticalErrorList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -3819,7 +3819,7 @@ namespace Contensive.Core.Controllers {
                     if ((srcXmlDom.DocumentElement.Name.ToLower() != CollectionFileRootNode) & (srcXmlDom.DocumentElement.Name.ToLower() != "contensivecdef")) {
                         //
                         // -- root node must be collection (or legacy contensivecdef)
-                        core.handleException(new ApplicationException("the archive file has a syntax error. Application name must be the first node."));
+                        logController.handleError( core,new ApplicationException("the archive file has a syntax error. Application name must be the first node."));
                     } else {
                         result.isBaseCollection = IsccBaseFile;
                         //
@@ -4260,7 +4260,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -4557,7 +4557,7 @@ namespace Contensive.Core.Controllers {
                     core.siteProperties.setProperty("StylesheetSerialNumber", "-1");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -4597,7 +4597,7 @@ namespace Contensive.Core.Controllers {
                     if (ContentIsBaseContent && !cdef.isBaseContent) {
                         //
                         // -- Can not update a base content with a non-base content
-                        core.handleException(new ApplicationException("Warning: An attempt was made to update Content Definition [" + cdef.name + "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."));
+                        logController.handleError( core,new ApplicationException("Warning: An attempt was made to update Content Definition [" + cdef.name + "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."));
                         cdef.isBaseContent = ContentIsBaseContent;
                     }
                     //
@@ -4665,7 +4665,7 @@ namespace Contensive.Core.Controllers {
                     core.cache.invalidateAll();
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -4720,7 +4720,7 @@ namespace Contensive.Core.Controllers {
                     core.privateFiles.saveFile(collectionFilePathFilename, returnXml);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnXml;
@@ -4784,7 +4784,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOk;

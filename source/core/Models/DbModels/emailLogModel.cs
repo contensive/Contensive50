@@ -35,6 +35,7 @@ namespace Contensive.Core.Models.DbModels {
         public string Subject { get; set; }
         public string ToAddress { get; set; }
         public int VisitID { get; set; }
+        public string body { get; set; }
         //
         //====================================================================================================
         public static emailLogModel add(coreController core) {

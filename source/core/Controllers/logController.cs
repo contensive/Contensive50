@@ -5,6 +5,8 @@ using System.IO;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using System.Diagnostics;
+using System.Collections.Generic;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -292,7 +294,7 @@ namespace Contensive.Core.Controllers {
                 return;
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception"));
@@ -399,32 +401,79 @@ namespace Contensive.Core.Controllers {
                 return;
             } catch (Exception) { }
         }
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Generic handle exception. Determines method name and class of caller from stack. 
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="ex"></param>
+        /// <param name="cause"></param>
+        /// <param name="stackPtr">How far down in the stack to look for the method error. Pass 1 if the method calling has the error, 2 if there is an intermediate routine.</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public static void handleException(coreController core, Exception ex, logLevel level, string cause, int stackPtr) {
+            if (!core._handlingExceptionRecursionBlock) {
+                core._handlingExceptionRecursionBlock = true;
+                StackFrame frame = new StackFrame(stackPtr);
+                System.Reflection.MethodBase method = frame.GetMethod();
+                System.Type type = method.DeclaringType;
+                string methodName = method.Name;
+                string errMsg = type.Name + "." + methodName + ", cause=[" + cause + "], ex=[" + ex.ToString() + "]";
+                //
+                // append to daily trace log
+                //
+                logController.log(core, errMsg, level);
+                //
+                // add to doc exception list to display at top of webpage
+                //
+                if (core.doc.errList == null) {
+                    core.doc.errList = new List<string>();
+                }
+                if (core.doc.errList.Count == 10) {
+                    core.doc.errList.Add("Exception limit exceeded");
+                } else if (core.doc.errList.Count < 10) {
+                    core.doc.errList.Add(errMsg);
+                }
+                //
+                core._handlingExceptionRecursionBlock = false;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public static void handleError(coreController core, Exception ex, string cause) {
+            handleException(core, ex, logLevel.Error, cause, 2);
+        }
+        //
+        //====================================================================================================
+        //
+        public static void handleError(coreController core, Exception ex) {
+            handleException(core, ex, logLevel.Error, "n/a", 2);
+        }
+        //
+        //====================================================================================================
+        //
+        public static void handleWarn(coreController core, Exception ex, string cause) {
+            handleException(core, ex, logLevel.Warn, cause, 2);
+        }
+        //
+        //====================================================================================================
+        //
+        public static void handleWarn(coreController core, Exception ex) {
+            handleException(core, ex, logLevel.Warn, "n/a", 2);
+        }
+        //
+        //====================================================================================================
+        //
+        public static void handleFatal(coreController core, Exception ex, string cause) {
+            handleException(core, ex, logLevel.Fatal, cause, 2);
+        }
+        //
+        //====================================================================================================
+        //
+        public static void handleFatal(coreController core, Exception ex) {
+            handleException(core, ex, logLevel.Fatal, "n/a", 2);
+        }
     }
-//    //
-//    // ====================================================================================================
-//    /// <summary>
-//    /// logging class from https://brutaldev.com/post/logging-setup-in-5-minutes-with-nlog
-//    /// </summary>
-//    internal static class NLogController {
-//        public static Logger loggerInstance { get; private set; }
-//        static NLogController() {
-//// #if DEBUG
-//            // from example - https://github.com/nlog/nlog/wiki/Configuration-API
-//            // and - Setup the logging view for Sentinel - http://sentinel.codeplex.com
-//            var config = new LoggingConfiguration();
-//            var sentinalTarget = new NLogViewerTarget() {
-//                Name = "sentinal",
-//                Address = "udp://127.0.0.1:9999",
-//                IncludeNLogData = false
-//            };
-//            var sentinalRule = new LoggingRule("*", LogLevel.Trace, sentinalTarget);
-//            config.AddTarget("sentinal", sentinalTarget);
-//            config.LoggingRules.Add(sentinalRule);
-//            LogManager.Configuration = config;
-//// #endif
-//            LogManager.ReconfigExistingLoggers();
-//            loggerInstance = LogManager.GetCurrentClassLogger();
-//        }
-
-//    }
 }

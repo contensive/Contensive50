@@ -101,7 +101,7 @@ namespace Contensive.Core {
             try {
                 if (Method.ToLower() == "get") {
                     if (InnerHtml.IndexOf("type=\"file", 0, 1, StringComparison.OrdinalIgnoreCase) >= 0) {
-                        core.handleException(new ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"));
+                        logController.handleError( core,new ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"));
                     }
                     if (string.IsNullOrEmpty(ActionQueryString)) {
                         FormStart = core.html.formStart("", HtmlName, HtmlId, Method);
@@ -224,7 +224,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass = "", string HtmlId = "") {
-            return core.html.getHtmlInputHidden(HtmlName, HtmlValue, HtmlId);
+            return core.html.inputHidden(HtmlName, HtmlValue, HtmlId);
         }
         //
         // ====================================================================================================
@@ -359,7 +359,7 @@ namespace Contensive.Core {
                         + "</div>";
                 }
             } catch (Exception ex) {
-                core.handleException(ex, "Unexpected error in cp.html.adminHint()");
+                logController.handleError( core,ex, "Unexpected error in cp.html.adminHint()");
             }
             return returnString;
         }

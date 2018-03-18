@@ -157,7 +157,7 @@ namespace Contensive.Core.Models.Context {
                     returnModel = json_serializer.Deserialize<serverConfigModel>(JSONTemp);
                 }
             } catch (Exception ex) {
-                core.handleException(ex, "exception in serverConfigModel.getObject");
+                logController.handleError( core,ex, "exception in serverConfigModel.getObject");
             }
             return returnModel;
         }
@@ -187,7 +187,7 @@ namespace Contensive.Core.Models.Context {
         //            }
         //        }
         //    } catch (Exception ex) {
-        //        core.handleException(ex, "exception in serverConfigModel.getObject");
+        //        logController.handleException( core,ex, "exception in serverConfigModel.getObject");
         //    }
         //    return returnModel;
         //}
@@ -203,7 +203,7 @@ namespace Contensive.Core.Models.Context {
                 string jsonTemp = core.json.Serialize(this);
                 core.programDataFiles.saveFile("config.json", jsonTemp);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return 0;
         }

@@ -99,7 +99,7 @@ namespace Contensive.Core {
                     core.cache.setObject(key, Value, invalidationDate, invalidationTagList);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }

@@ -32,8 +32,13 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
             Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", dbController.encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"));
             //
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set a value, close, open, and get it back
+        /// </summary>
         [TestMethod()]
-        public void Controllers_db_csSetGetTest() {
+        public void Controllers_db_csSetCloseOpenGetTest() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
                 // arrange
                 cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
@@ -73,25 +78,65 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         }
         //
         //====================================================================================================
-        //
-        [TestClass()]
-        public class dBControllersTest {
-            //
-            //====================================================================================================
-            //
-            [TestMethod()]
-            public void Controllers_db_csGetRowCount() {
-                using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
-                    // arrange
-                    CPCSBaseClass cs = cp.CSNew();
-                    string impossibleName = cp.Utils.CreateGuid();
-                    // act
-                    cs.Open(Contensive.Core.Models.DbModels.personModel.contentName, "(name=" + cp.Db.EncodeSQLText(impossibleName) + ")");
-                    int resultNoData = cs.GetRowCount();
-                    cs.Close();
-                    // assert
-                    Assert.AreEqual(0, resultNoData);
+        /// <summary>
+        /// set a value and get it back
+        /// </summary>
+        [TestMethod()]
+        public void Controllers_db_csSetGetTest() {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+                // arrange
+                cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
+                //
+                int cs1 = cp.core.db.csInsertRecord("people");
+                if (!cp.core.db.csOk(cs1)) {
+                    Assert.Fail("new people records not valid");
+                } else {
+                    Assert.AreNotEqual("a", cp.core.db.csGet(cs1, "username"));
+                    cp.core.db.csSet(cs1, "username", "a");
+                    Assert.AreEqual("a", cp.core.db.csGet(cs1, "username"));
                 }
+                cp.core.db.csClose(ref cs1);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set a value and get it back
+        /// </summary>
+        [TestMethod()]
+        public void Controllers_db_csSetSaveGetTest() {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+                // arrange
+                cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
+                //
+                int cs1 = cp.core.db.csInsertRecord("people");
+                if (!cp.core.db.csOk(cs1)) {
+                    Assert.Fail("new people records not valid");
+                } else {
+                    Assert.AreNotEqual("a", cp.core.db.csGet(cs1, "username"));
+                    cp.core.db.csSet(cs1, "username", "a");
+                    cp.core.db.csSave(cs1);
+                    string result1 = cp.core.db.csGet(cs1, "username");
+                    Assert.AreEqual("a", result1);
+                }
+                cp.core.db.csClose(ref cs1);
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        [TestMethod()]
+        public void Controllers_db_csGetRowCount() {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+                // arrange
+                CPCSBaseClass cs = cp.CSNew();
+                string impossibleName = cp.Utils.CreateGuid();
+                // act
+                cs.Open(Contensive.Core.Models.DbModels.personModel.contentName, "(name=" + cp.Db.EncodeSQLText(impossibleName) + ")");
+                int resultNoData = cs.GetRowCount();
+                cs.Close();
+                // assert
+                Assert.AreEqual(0, resultNoData);
             }
         }
     }

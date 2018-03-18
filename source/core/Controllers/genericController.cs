@@ -2339,7 +2339,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnList;
@@ -2416,7 +2416,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                     } catch (Exception ex) {
-                        core.handleException(ex);
+                        logController.handleError( core,ex);
                         throw;
                     }
                 }

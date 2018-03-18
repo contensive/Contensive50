@@ -88,7 +88,7 @@
 //                    }
 //                    returnDomainDbList = domainList_local;
 //                } catch (Exception ex) {
-//                    core.handleException(ex);
+//                    logController.handleException( core,ex);
 //                    throw;
 //                }
 //                return returnDomainDbList;

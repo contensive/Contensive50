@@ -205,7 +205,7 @@ namespace Contensive.Core {
                 }
                 cs.close();
             } catch (Exception ex) {
-                core.handleException(ex); // "Unexpected error in getLayout")
+                logController.handleError( core,ex); // "Unexpected error in getLayout")
                 throw;
             }
             return result;
@@ -223,7 +223,7 @@ namespace Contensive.Core {
                 }
                 cs.close();
             } catch (Exception ex) {
-                core.handleException(ex); // "Unexpected error in AddRecord")
+                logController.handleError( core,ex); // "Unexpected error in AddRecord")
                 throw;
             }
             return recordId;
@@ -244,7 +244,7 @@ namespace Contensive.Core {
                 }
                 cs.close();
             } catch (Exception ex) {
-                core.handleException(ex); // "Unexpected error in AddRecord")
+                logController.handleError( core,ex); // "Unexpected error in AddRecord")
                 throw;
             }
             return recordId;
@@ -347,7 +347,7 @@ namespace Contensive.Core {
                     + " align=\"absmiddle\""
                     + "></a>";
             } catch (Exception ex) {
-                core.handleException(ex); // "Unexpected error in GetListLink")
+                logController.handleError( core,ex); // "Unexpected error in GetListLink")
                 throw;
             }
             return returnHtml;

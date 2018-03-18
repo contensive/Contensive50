@@ -77,7 +77,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="remotePathPrefix">If not isLocal, this is added to the remote content path. Ex a\ with content b\c.txt = a\b\c.txt</param>
         public fileController(coreController core, bool isLocal, string rootLocalPath, string remotePathPrefix) {
             if (string.IsNullOrEmpty(rootLocalPath)) {
-                core.handleException(new ArgumentException("Blank file system root path not permitted."));
+                logController.handleError( core,new ArgumentException("Blank file system root path not permitted."));
             } else {
                 this.core = core;
                 this.isLocal = isLocal;
@@ -103,7 +103,7 @@ namespace Contensive.Core.Controllers {
                 //    returnPath = Path.Combine(returnPath, pathFilename);
                 //}
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnPath;
@@ -131,7 +131,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -172,7 +172,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnContent;
@@ -206,7 +206,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnContent;
@@ -259,7 +259,7 @@ namespace Contensive.Core.Controllers {
                         File.WriteAllText(convertToLocalAbsPath(pathFilename), textContent);
                     }
                 } catch (Exception ex) {
-                    core.handleException(ex);
+                    logController.handleError( core,ex);
                     throw;
                 }
                 if (!isLocal) {
@@ -267,7 +267,7 @@ namespace Contensive.Core.Controllers {
                     copyLocalToRemote(pathFilename);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -316,7 +316,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -356,7 +356,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -375,7 +375,7 @@ namespace Contensive.Core.Controllers {
                     verifyPath_remote(path);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -396,7 +396,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -422,7 +422,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -441,7 +441,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -477,7 +477,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -563,7 +563,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -633,7 +633,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnFileList;
@@ -662,7 +662,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnList;
@@ -710,7 +710,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnFolders;
@@ -731,7 +731,7 @@ namespace Contensive.Core.Controllers {
                     returnOK = fileExists_local(pathFilename);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOK;
@@ -748,7 +748,7 @@ namespace Contensive.Core.Controllers {
                 string absDosPathFilename = convertToLocalAbsPath(dosPathFilename);
                 returnOK = File.Exists(absDosPathFilename);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOK;
@@ -778,7 +778,7 @@ namespace Contensive.Core.Controllers {
                 }
                 throw;
             } catch (Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -801,7 +801,7 @@ namespace Contensive.Core.Controllers {
                     return pathExists_local(path);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -818,7 +818,7 @@ namespace Contensive.Core.Controllers {
                 string absPath = convertToLocalAbsPath(path);
                 returnOk = Directory.Exists(absPath);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -849,7 +849,7 @@ namespace Contensive.Core.Controllers {
                 }
                 return true;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -894,7 +894,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -922,7 +922,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnSize;
@@ -968,7 +968,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1013,7 +1013,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1039,7 +1039,7 @@ namespace Contensive.Core.Controllers {
                     copyFolder_srcLocal(joinPath(localAbsRootPath, srcPath), dstPath, dstFileSystem);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1096,7 +1096,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1144,7 +1144,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1164,7 +1164,7 @@ namespace Contensive.Core.Controllers {
                 bool recurse = true;
                 fastZip.CreateZip(convertToLocalAbsPath(archivePathFilename), convertToLocalAbsPath(addPathFilename), recurse, fileFilter);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1189,7 +1189,7 @@ namespace Contensive.Core.Controllers {
                     result = joinPath(localAbsRootPath, normalizedPathFilename);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -1293,7 +1293,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -1374,7 +1374,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return fileSize;
         }
@@ -1412,7 +1412,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1449,7 +1449,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1465,7 +1465,7 @@ namespace Contensive.Core.Controllers {
                     createPath_local(path);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -1495,7 +1495,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -1515,7 +1515,7 @@ namespace Contensive.Core.Controllers {
                     verifyPath_remote(path);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -1536,7 +1536,7 @@ namespace Contensive.Core.Controllers {
                     filename = resultFile.Name;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return filename;
         }

@@ -276,18 +276,18 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     Type instanceType = typeof(T);
                     string contentName = derivedContentName(instanceType);
                     result = create<T>(core, core.db.insertContentRecordGetID(contentName, core.session.user.id), ref callersCacheNameList);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -319,11 +319,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         Type instanceType = typeof(T);
@@ -374,7 +374,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -405,11 +405,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(recordGuid)) {
                         Type instanceType = typeof(T);
@@ -425,7 +425,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -457,11 +457,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(recordName)) {
                         Type instanceType = typeof(T);
@@ -477,7 +477,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -594,7 +594,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return modelInstance;
@@ -611,11 +611,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     csController cs = new csController(core);
                     Type instanceType = this.GetType();
@@ -815,7 +815,7 @@ namespace Contensive.Core.Models.DbModels {
                     core.cache.setObject(Controllers.cacheController.getCacheKey_Entity(tableName, "id", this.id.ToString()), this);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return id;
@@ -832,11 +832,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         Type instanceType = typeof(T);
@@ -847,7 +847,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -863,11 +863,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(ccguid)) {
                         Type instanceType = typeof(T);
@@ -880,7 +880,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -923,11 +923,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     csController cs = new csController(core);
                     string sql = getSelectSql<T>(null, sqlCriteria, sqlOrderBy);
@@ -949,7 +949,7 @@ namespace Contensive.Core.Models.DbModels {
                     cs.close();
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -966,11 +966,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     object instanceType = typeof(T);
                     string tableName = derivedContentTableName((Type)instanceType);
@@ -980,7 +980,7 @@ namespace Contensive.Core.Models.DbModels {
                     core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, "id", "0"));
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -996,11 +996,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         Type instanceType = typeof(T);
@@ -1013,7 +1013,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return "";
         }
@@ -1030,11 +1030,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(ccGuid)) {
                         Type instanceType = typeof(T);
@@ -1047,7 +1047,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return "";
         }
@@ -1064,11 +1064,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(ccGuid)) {
                         Type instanceType = typeof(T);
@@ -1081,7 +1081,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return 0;
         }
@@ -1096,11 +1096,11 @@ namespace Contensive.Core.Models.DbModels {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    core.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     string contentName = derivedContentName(instanceType);
                     Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(core, contentName);
@@ -1138,7 +1138,7 @@ namespace Contensive.Core.Models.DbModels {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return instance;
         }

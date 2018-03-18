@@ -314,7 +314,7 @@ namespace Contensive.Core.Addons.Tools {
                     tempGetForm = Stream.Text;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempGetForm;
         }
@@ -391,7 +391,7 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -438,7 +438,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("</table>");
                 result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result; 
         }
@@ -464,7 +464,7 @@ namespace Contensive.Core.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempGetForm_RootRow;
         }
@@ -685,7 +685,7 @@ namespace Contensive.Core.Addons.Tools {
                 returnHtml = "<div class=\"p-4 bg-light\">" + returnHtml + "</div>";
                 returnHtml = htmlController.openFormTableLegacy(core, ButtonList) + returnHtml + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnHtml;
@@ -776,7 +776,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("</SPAN>");
                 result = adminUIController.GetBody(core,Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1373,7 +1373,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(core.html.inputHidden("ReloadCDef", ReloadCDef));
                 result =  htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1798,7 +1798,7 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1923,7 +1923,7 @@ namespace Contensive.Core.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -2007,7 +2007,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2038,7 +2038,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("</span>");
                 result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2092,7 +2092,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 returnValue = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnValue;
@@ -2134,7 +2134,7 @@ namespace Contensive.Core.Addons.Tools {
                 DiagActionCount = DiagActionCount + 1;
                 result =  core.html.getPanel(Panel);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2339,7 +2339,7 @@ namespace Contensive.Core.Addons.Tools {
                 // Print Start Button
                 result =  htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -2357,7 +2357,7 @@ namespace Contensive.Core.Addons.Tools {
                     tempLocal_GetContentID = genericController.encodeInteger(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempLocal_GetContentID;
         }
@@ -2378,7 +2378,7 @@ namespace Contensive.Core.Addons.Tools {
                     tempLocal_GetContentNameByID = genericController.encodeText(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempLocal_GetContentNameByID;
         }
@@ -2399,7 +2399,7 @@ namespace Contensive.Core.Addons.Tools {
                     tempLocal_GetContentTableName = genericController.encodeText(RS.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempLocal_GetContentTableName;
         }
@@ -2426,7 +2426,7 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 dbController.closeDataTable(RS);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempLocal_GetContentDataSource;
         }
@@ -2683,7 +2683,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3233,7 +3233,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(core.html.inputHidden("ReloadCDef", ReloadCDef));
                 result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3359,7 +3359,7 @@ namespace Contensive.Core.Addons.Tools {
                             IndexName = genericController.encodeText(Rows[5, RowPointer]);
                             if (!string.IsNullOrEmpty(IndexName)) {
                                 result += htmlController.tableRowStart();
-                                Copy = core.html.inputCheckbox("DropIndex." + RowPointer, false) + core.html.getHtmlInputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
+                                Copy = core.html.inputCheckbox("DropIndex." + RowPointer, false) + core.html.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
                                 result += htmlController.tableCell(Copy,"",0, TableRowEven);
                                 result += htmlController.tableCell(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
                                 result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
@@ -3388,7 +3388,7 @@ namespace Contensive.Core.Addons.Tools {
                         RowMax = Rows.GetUpperBound(1);
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             result += htmlController.tableRowStart();
-                            Copy = core.html.inputCheckbox("AddIndex." + RowPointer, false) + core.html.getHtmlInputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
+                            Copy = core.html.inputCheckbox("AddIndex." + RowPointer, false) + core.html.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
                             result += htmlController.tableCell(Copy,"",0, TableRowEven);
                             result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
                             result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
@@ -3412,7 +3412,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 result = htmlController.openFormTableLegacy(core, ButtonList) + result + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3487,7 +3487,7 @@ namespace Contensive.Core.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3509,7 +3509,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 tempGetForm_LogFiles = htmlController.openFormTableLegacy(core, ButtonList) + tempGetForm_LogFiles + (htmlController.closeFormTableLegacy(core, ButtonList));
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempGetForm_LogFiles;
         }
@@ -3645,7 +3645,7 @@ namespace Contensive.Core.Addons.Tools {
                     result += GetTableEnd;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -3719,7 +3719,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -3770,7 +3770,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 tempGetForm_Restart =  htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempGetForm_Restart;
         }
@@ -3856,7 +3856,7 @@ namespace Contensive.Core.Addons.Tools {
                 ButtonList = ButtonCancel + "," + ButtonImportTemplates;
                 result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -4150,7 +4150,7 @@ namespace Contensive.Core.Addons.Tools {
                 string ButtonList = ButtonApply + "," + ButtonCancel;
                 result = adminUIController.GetBody(core,"Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -4174,7 +4174,7 @@ namespace Contensive.Core.Addons.Tools {
                 string ButtonList = ButtonApply + "," + ButtonCancel;
                 result = adminUIController.GetBody(core,"Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -4275,9 +4275,9 @@ namespace Contensive.Core.Addons.Tools {
                     if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
                         RecordID = core.db.csGetInteger(CS, "ID");
                         if (genericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
-                            TopHalf = TopHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, true) + core.html.getHtmlInputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
+                            TopHalf = TopHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, true) + core.html.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
                         } else {
-                            BottomHalf = BottomHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, false) + core.html.getHtmlInputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
+                            BottomHalf = BottomHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, false) + core.html.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
                         }
                     }
                     core.db.csGoNext(CS);
@@ -4288,7 +4288,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 result = htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -4327,7 +4327,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 result = htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonIISReset) + s.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -4352,7 +4352,7 @@ namespace Contensive.Core.Addons.Tools {
                 // Display form
                 result= htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonCreateGUID);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -4376,7 +4376,7 @@ namespace Contensive.Core.Addons.Tools {
         // <param name="ErrDescription"></param>
         // <remarks></remarks>
         //Private Sub handleLegacyClassErrors2(ByVal MethodName As String, ByVal ErrDescription As String)
-        //    fixme-- core.handleException(New ApplicationException("")) ' -----ignoreInteger, "App.EXEName", ErrDescription)
+        //    fixme-- logController.handleException( core,New ApplicationException("")) ' -----ignoreInteger, "App.EXEName", ErrDescription)
         //End Sub
 
 

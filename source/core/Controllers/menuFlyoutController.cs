@@ -117,7 +117,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnHtml;
@@ -167,7 +167,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = GetMenuFlyout(MenuName, MenuStyle, StyleSheetPrefix);
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -216,7 +216,7 @@ namespace Contensive.Core.Controllers {
                 return;
                 //
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
@@ -255,7 +255,7 @@ namespace Contensive.Core.Controllers {
                 return tempReadLine;
                 //
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
@@ -445,7 +445,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -539,7 +539,7 @@ namespace Contensive.Core.Controllers {
                 return tempGetMenuFlyoutPanel;
                 //
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
@@ -611,7 +611,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }

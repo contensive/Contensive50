@@ -49,7 +49,7 @@ namespace Contensive.Core.Controllers {
                     Found = true;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnAttr;

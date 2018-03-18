@@ -571,7 +571,7 @@ namespace Contensive.Core.Models.Complex {
                     setCache(core, contentId, result);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -633,7 +633,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -651,7 +651,7 @@ namespace Contensive.Core.Models.Complex {
                     returnId = core.doc.contentNameIdDictionary[contentName.ToLower()];
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnId;
@@ -671,7 +671,7 @@ namespace Contensive.Core.Models.Complex {
                     returnCdef = getCdef(core, ContentId);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnCdef;
@@ -703,7 +703,7 @@ namespace Contensive.Core.Models.Complex {
                     core.doc.cdefDictionary.Add(contentId.ToString(), returnCdef);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnCdef;
@@ -745,7 +745,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnCriteria;
@@ -780,7 +780,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOK;
@@ -821,7 +821,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnList;
@@ -940,7 +940,7 @@ namespace Contensive.Core.Models.Complex {
                 core.cache.invalidateAll();
                 core.doc.clearMetaData();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -958,7 +958,7 @@ namespace Contensive.Core.Models.Complex {
                     returnTableName = CDef.contentTableName;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnTableName;
@@ -979,7 +979,7 @@ namespace Contensive.Core.Models.Complex {
                     returnDataSource = CDef.contentDataSourceName;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnDataSource;
@@ -1000,7 +1000,7 @@ namespace Contensive.Core.Models.Complex {
                     returnName = cdef.name;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnName;
@@ -1208,7 +1208,7 @@ namespace Contensive.Core.Models.Complex {
                                 //
                                 // installing content definition with matching name, but different guid -- this is an error that needs to be fixed
                                 //
-                                core.handleException(new ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" + contentName + "], newGuid [" + NewGuid + "], installedGuid [" + LcContentGuid + "] "));
+                                logController.handleError( core,new ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" + contentName + "], newGuid [" + NewGuid + "], installedGuid [" + LcContentGuid + "] "));
                             }
                             core.db.updateTableRecord("Default", "ccContent", "ID=" + returnContentId, sqlList);
                             //
@@ -1385,7 +1385,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnContentId;
@@ -1489,7 +1489,7 @@ namespace Contensive.Core.Models.Complex {
                     //
                     // This update is not allowed
                     //
-                    core.handleException(new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
+                    logController.handleError( core,new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
                 }
                 if (true) {
                     //FieldAdminOnly = field.adminOnly
@@ -1710,7 +1710,7 @@ namespace Contensive.Core.Models.Complex {
                 //
                 returnId = RecordID;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnId;
@@ -1730,7 +1730,7 @@ namespace Contensive.Core.Models.Complex {
                     returnOk = cdef.fields.ContainsKey(FieldName.ToLower());
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -1876,7 +1876,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
 
@@ -1981,7 +1981,7 @@ namespace Contensive.Core.Models.Complex {
                     string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
                     result = core.cache.getObject<Models.Complex.cdefModel>(cacheName);
                 } catch (Exception ex) {
-                    core.handleException(ex);
+                    logController.handleError( core,ex);
                 }
             } catch (Exception) {}
             return result;

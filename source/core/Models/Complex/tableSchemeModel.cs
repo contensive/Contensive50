@@ -97,7 +97,7 @@ namespace Contensive.Core.Models.Complex {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return tableSchema;

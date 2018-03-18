@@ -292,7 +292,7 @@ namespace Contensive.Core {
         //
         // -- Default site manage group
         //
-        public const string defaultSiteManagerName = "root";
+        public const string defaultSiteManagerName = "Site Managers";
         public const string defaultSiteManagerGuid = "{0685bd36-fe24-4542-be42-27337af50da8}";
         //
         // -- Request Names
@@ -701,10 +701,10 @@ namespace Contensive.Core {
         public const string ButtonCancelAll = "  Cancel  ";
         public const string ButtonFind = "   Find   ";
         public const string ButtonDelete = "  Delete  ";
-        public const string ButtonDeletePerson = " Delete Person ";
-        public const string ButtonDeleteRecord = " Delete Record ";
-        public const string ButtonDeleteEmail = " Delete Email ";
-        public const string ButtonDeletePage = " Delete Page ";
+        //public const string ButtonDeletePerson = " Delete Person ";
+        //public const string ButtonDeleteRecord = " Delete Record ";
+        //public const string ButtonDeleteEmail = " Delete Email ";
+        //public const string ButtonDeletePage = " Delete Page ";
         public const string ButtonFileChange = "   Upload   ";
         public const string ButtonFileDelete = "    Delete    ";
         public const string ButtonClose = "  Close   ";
@@ -1818,5 +1818,6 @@ namespace Contensive.Core {
         Mitchell = 6,
         Stretch = 7
     }
+
 
 }

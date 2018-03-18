@@ -55,7 +55,7 @@ namespace Contensive.Core {
                     tempGetTitleBar = tempGetTitleBar + "<div>&nbsp;</div><div class=\"ccAdminInfoBar ccPanel3DReverse\">" + Copy + "</div>";
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError(core, ex);
             }
             return tempGetTitleBar + "</div>";
         }
@@ -63,95 +63,30 @@ namespace Contensive.Core {
         /// <summary>
         /// Get the Normal Edit Button Bar String, used on Normal Edit and others
         /// </summary>
-        public static string GetEditButtonBar2(coreController core, int MenuDepth, bool AllowDelete, bool AllowCancel, bool allowSave, bool AllowSpellCheck, bool ignorefalse, bool ignorefalse2, bool ignorefalse3, bool ignorefalse4, bool AllowAdd, bool ignore_AllowReloadCDef, bool HasChildRecords, bool IsPageContent, bool AllowMarkReviewed, bool AllowRefresh, bool AllowCreateDuplicate) {
-            string result = "";
+        public static string GetButtonBarForEdit(coreController core, bool AllowDelete, bool AllowCancel, bool allowSave, bool AllowAdd, bool HasChildRecords, bool IsPageContent, bool AllowMarkReviewed, bool AllowRefresh, bool AllowCreateDuplicate) {
+            string buttonsLeft = "";
+            string buttonsRight = "";
             try {
-                string buttonsLeft = "";
-                //
-                string JSOnClick = null;
-                //
-                buttonsLeft = "";
-                //
-                if (AllowCancel) {
-                    if (MenuDepth == 1) {
-                        //
-                        // Close if this is the root depth of a popup window
-                        //
-                        buttonsLeft += getButtonPrimary(ButtonClose, "window.close();");
-                        //buttonsLeft = buttonsLeft + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonClose + "\" OnClick=\"window.close();\" class=\"btn btn-primary mr-1 btn-sm btn-sm\">";
-                    } else {
-                        //
-                        // Cancel
-                        //
-                        buttonsLeft += getButtonPrimary(ButtonCancel, "return processSubmit(this);");
-                        //buttonsLeft = buttonsLeft + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonCancel + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
-                    }
-                }
+                if (AllowCancel) buttonsLeft += getButtonPrimary(ButtonCancel, "return processSubmit(this);");
+                if (AllowRefresh) buttonsLeft +=  getButtonPrimary(ButtonRefresh);
                 if (allowSave) {
-                    //
-                    // Save
-                    //
-                    buttonsLeft += getButtonPrimary(ButtonSave, "return processSubmit(this);");
-                    //buttonsLeft = buttonsLeft + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonSave + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
-                    //
-                    // OK
-                    //
                     buttonsLeft += getButtonPrimary(ButtonOK, "return processSubmit(this);");
-                    //buttonsLeft = buttonsLeft + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonOK + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
-                    if (AllowAdd) {
-                        //
-                        // OK
-                        //
-                        buttonsLeft += getButtonPrimary(ButtonSaveAddNew, "return processSubmit(this);");
-                        //buttonsLeft = buttonsLeft + "<input TYPE=\"SUBMIT\" NAME=\"BUTTON\" VALUE=\"" + ButtonSaveAddNew + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
-                    }
+                    buttonsLeft += getButtonPrimary(ButtonSave, "return processSubmit(this);");
+                    if (AllowAdd) buttonsLeft += getButtonPrimary(ButtonSaveAddNew, "return processSubmit(this);");
                 }
-                if (AllowDelete) {
-                    //
-                    // Delete
-                    //
-                    if (IsPageContent) {
-                        JSOnClick = "if(!DeletePageCheck())return false;";
-                    } else if (HasChildRecords) {
-                        JSOnClick = "if(!DeleteCheckWithChildren())return false;";
-                    } else {
-                        JSOnClick = "if(!DeleteCheck())return false;";
-                    }
-                    buttonsLeft += getButtonPrimary(ButtonDelete, JSOnClick );
-                    //buttonsLeft = buttonsLeft + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonDelete + "\" onClick=\"" + JSOnClick + "\" class=\"btn btn-primary mr-1 btn-sm\">";
-                } else {
-                    buttonsLeft += getButtonPrimary(ButtonDelete, "", true );
+                if (AllowMarkReviewed) buttonsLeft +=  getButtonPrimary(ButtonMarkReviewed);
+                if (AllowCreateDuplicate) buttonsLeft +=  getButtonPrimary(ButtonCreateDuplicate, "return processSubmit(this)");
+                string JSOnClick = "if(!DeleteCheck())return false;";
+                if (IsPageContent) {
+                    JSOnClick = "if(!DeletePageCheck())return false;";
+                } else if (HasChildRecords) {
+                    JSOnClick = "if(!DeleteCheckWithChildren())return false;";
                 }
-                if (ignore_AllowReloadCDef) {
-                    //
-                    // Reload Content Definitions
-                    //
-                    buttonsLeft = buttonsLeft + getButtonPrimary(ButtonSaveandInvalidateCache);
-                }
-                if (AllowMarkReviewed) {
-                    //
-                    // Reload Content Definitions
-                    //
-                    buttonsLeft = buttonsLeft + getButtonPrimary(ButtonMarkReviewed);
-                }
-                if (AllowRefresh) {
-                    //
-                    // just like a save, but don't save jsut redraw
-                    //
-                    buttonsLeft = buttonsLeft + getButtonPrimary(ButtonRefresh);
-                }
-                if (AllowCreateDuplicate) {
-                    //
-                    // just like a save, but don't save jsut redraw
-                    //
-                    buttonsLeft = buttonsLeft + getButtonPrimary(ButtonCreateDuplicate, "return processSubmit(this)");
-                }
-                //
-                result = GetButtonBar( core, buttonsLeft, "");
+                buttonsRight += getButtonDanger(ButtonDelete, JSOnClick, !AllowDelete);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError(core, ex);
             }
-            return result;
+            return GetButtonBar(core, buttonsLeft, buttonsRight);
         }
         // ====================================================================================================
         /// <summary>
@@ -188,53 +123,83 @@ namespace Contensive.Core {
                     + "";
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError(core, ex);
+            }
+            return s;
+        }
+        public class buttonThing {
+            public string name = "button";
+            public string value = "";
+            public string classList = "";
+            public bool isDelete = false;
+            public bool isCloase = false;
+            public bool isAdd = false;
+        }
+        public static string GetButtonsFromList(coreController core, List<buttonThing> ButtonList, bool AllowDelete, bool AllowAdd) {
+            string s = "";
+            try {
+                foreach (buttonThing button in ButtonList) {
+
+                    if (button.isDelete) {
+                        s += getButtonDanger(button.value, "if(!DeleteCheck()) return false;", !AllowDelete);
+                    } else if (button.isAdd) {
+                        s += getButtonPrimary(button.value, "return processSubmit(this);", !AllowAdd);
+                    } else if (button.isCloase) {
+                        s += getButtonPrimary(button.value, "window.close();");
+                    } else {
+                        s += getButtonPrimary(button.value);
+                    }
+
+                }
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
             }
             return s;
         }
         // ====================================================================================================
         //
         public static string GetButtonsFromList(coreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
-            string s = "";
-            try {
-                string[] Buttons = null;
-                int Ptr = 0;
-                if (!string.IsNullOrEmpty(ButtonList.Trim(' '))) {
-                    Buttons = ButtonList.Split(',');
-                    for (Ptr = 0; Ptr <= Buttons.GetUpperBound(0); Ptr++) {
-                        if (Buttons[Ptr].Trim(' ') == encodeText(ButtonDelete).Trim(' ')) {
-                            if (AllowDelete) {
-                                s += getButtonDanger(Buttons[Ptr], "if(!DeleteCheck()) return false;");
-                                //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" VALUE=\"" + Buttons[Ptr] + "\" onClick=\"if(!DeleteCheck())return false;\" class=\"btn btn-danger mr-1\">";
-                            } else {
-                                s += getButtonDanger(Buttons[Ptr], "if(!DeleteCheck()) return false;",true);
-                                //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" DISABLED VALUE=\"" + Buttons[Ptr] + "\" class=\"btn btn-primary mr-1 btn-sm\">";
-                            }
-                        }
-                        else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonClose).Trim(' ')) {
-                            s += getButtonPrimary(Buttons[Ptr], "window.close();");
-                            //s = s + htmlController.button(Buttons[Ptr], "", "", "window.close();");
-                        }
-                        else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonAdd).Trim(' ')) {
-                            if (AllowAdd) {
-                                s += getButtonPrimary(Buttons[Ptr], "return processSubmit(this);");
-                                //s = s + "<input type=submit name=\"" + ButtonName + "\" value=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
-                            } else {
-                                s += getButtonPrimary(Buttons[Ptr], "return processSubmit(this);",true );
-                                //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" DISABLED VALUE=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
-                            }
-                        } else if (string.IsNullOrEmpty(Buttons[Ptr].Trim(' '))) {
-                            //
-                        } else {
-                            s += getButtonPrimary(Buttons[Ptr]);
-                            //s = s + htmlController.button(Buttons[Ptr], ButtonName);
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                core.handleException(ex);
-            }
-            return s;
+            return GetButtonsFromList(core, buttonStringToButtonList(ButtonList), AllowDelete, AllowAdd);
+            //string s = "";
+            //try {
+            //    string[] Buttons = null;
+            //    int Ptr = 0;
+            //    if (!string.IsNullOrEmpty(ButtonList.Trim(' '))) {
+            //        Buttons = ButtonList.Split(',');
+            //        for (Ptr = 0; Ptr <= Buttons.GetUpperBound(0); Ptr++) {
+            //            if (Buttons[Ptr].Trim(' ') == encodeText(ButtonDelete).Trim(' ')) {
+            //                if (AllowDelete) {
+            //                    s += getButtonDanger(Buttons[Ptr], "if(!DeleteCheck()) return false;");
+            //                    //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" VALUE=\"" + Buttons[Ptr] + "\" onClick=\"if(!DeleteCheck())return false;\" class=\"btn btn-danger mr-1\">";
+            //                } else {
+            //                    s += getButtonDanger(Buttons[Ptr], "if(!DeleteCheck()) return false;",true);
+            //                    //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" DISABLED VALUE=\"" + Buttons[Ptr] + "\" class=\"btn btn-primary mr-1 btn-sm\">";
+            //                }
+            //            }
+            //            else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonClose).Trim(' ')) {
+            //                s += getButtonPrimary(Buttons[Ptr], "window.close();");
+            //                //s = s + htmlController.button(Buttons[Ptr], "", "", "window.close();");
+            //            }
+            //            else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonAdd).Trim(' ')) {
+            //                if (AllowAdd) {
+            //                    s += getButtonPrimary(Buttons[Ptr], "return processSubmit(this);");
+            //                    //s = s + "<input type=submit name=\"" + ButtonName + "\" value=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
+            //                } else {
+            //                    s += getButtonPrimary(Buttons[Ptr], "return processSubmit(this);",true );
+            //                    //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" DISABLED VALUE=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
+            //                }
+            //            } else if (string.IsNullOrEmpty(Buttons[Ptr].Trim(' '))) {
+            //                //
+            //            } else {
+            //                s += getButtonPrimary(Buttons[Ptr]);
+            //                //s = s + htmlController.button(Buttons[Ptr], ButtonName);
+            //            }
+            //        }
+            //    }
+            //} catch (Exception ex) {
+            //    logController.handleError( core,ex);
+            //}
+            //return s;
         }
         /// <summary>
         /// Return a bootstrap button bar
@@ -248,11 +213,45 @@ namespace Contensive.Core {
             } else if (string.IsNullOrWhiteSpace(RightButtons)) {
                 return "<div class=\"border bg-white p-2\">" + LeftButtons + "</div>";
             } else {
-                //
                 return "<div class=\"border bg-white p-2\">" + LeftButtons + "<div class=\"float-right\">" + RightButtons + "</div></div>";
-                //return "<div class=\"container-fluid\"><div class=\"border bg-white p-2 text-right\"><div class=\"row\"><div class=\"col text-left\">" + LeftButtons + "</div><div class=\"col text-right\">" + RightButtons + "</div></div></div></div>";
             }
         }
+
+        public static string getButtonBarForIndex2(coreController core, bool AllowAdd, bool AllowDelete, int pageNumber, int recordsPerPage, int recordCnt) {
+            string LeftButtons = "";
+            string RightButtons = "";
+            LeftButtons = LeftButtons + adminUIController.getButtonPrimary(ButtonCancel);
+            LeftButtons += adminUIController.getButtonPrimary(ButtonRefresh);
+            if (AllowAdd) {
+                LeftButtons += adminUIController.getButtonPrimary(ButtonAdd, "");
+            } else {
+                LeftButtons += adminUIController.getButtonPrimary(ButtonAdd, "", true);
+            }
+            LeftButtons += "<span class=\"custom-divider-vertical\">&nbsp&nbsp&nbsp</span>";
+            if (pageNumber == 1) {
+                LeftButtons += adminUIController.getButtonPrimary(ButtonFirst, "", true);
+                LeftButtons += adminUIController.getButtonPrimary(ButtonPrevious, "", true);
+            } else {
+                LeftButtons += adminUIController.getButtonPrimary(ButtonFirst);
+                LeftButtons += adminUIController.getButtonPrimary(ButtonPrevious);
+            }
+            if (recordCnt > (pageNumber * recordsPerPage)) {
+                LeftButtons += adminUIController.getButtonPrimary(ButtonNext);
+            } else {
+                LeftButtons += adminUIController.getButtonPrimary(ButtonNext, "", true);
+            }
+            if (AllowDelete) {
+                RightButtons += adminUIController.getButtonDanger(ButtonDelete, "if(!DeleteCheck())return false;");
+            } else {
+                RightButtons += adminUIController.getButtonDanger(ButtonDelete, "", true);
+            }
+            int PageCount = 1;
+            if (recordCnt > 1) {
+                PageCount = encodeInteger(1 + encodeInteger(Math.Floor(encodeNumber((recordCnt - 1) / recordsPerPage))));
+            }
+            return adminUIController.GetButtonBarForIndex(core, LeftButtons, RightButtons, pageNumber, recordsPerPage, PageCount);
+        }
+        //
         // ====================================================================================================
         //
         public static string GetButtonBarForIndex(coreController core, string LeftButtons, string RightButtons, int PageNumber, int RecordsPerPage, int PageCount) {
@@ -293,7 +292,7 @@ namespace Contensive.Core {
                     + cr3 + Nav + cr2 + "</ul>"
                     + "\r</div>";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError(core, ex);
             }
             return tempGetButtonBarForIndex;
         }
@@ -327,11 +326,11 @@ namespace Contensive.Core {
                 ContentCell = ""
                 + "\r<div style=\"padding:" + ContentPadding + "px;\">"
                 + nop(Content) + "\r</div>";
-                result += nop(ButtonBar) + nop(GetTitleBar(core,Caption, Description)) + nop(CellContentSummary) + nop(ContentCell) + nop(ButtonBar) + "";
+                result += nop(ButtonBar) + nop(GetTitleBar(core, Caption, Description)) + nop(CellContentSummary) + nop(ContentCell) + nop(ButtonBar) + "";
 
                 result = '\r' + core.html.formStartMultipart() + nop(result) + '\r' + core.html.formEnd();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -371,7 +370,7 @@ namespace Contensive.Core {
                 Copy += "<div class=\"ccEditorHelpCon\"><div class=\"closed\">" + HelpMessage + "</div></div>";
                 tempGetEditRow += "<td class=\"ccEditFieldCon\">" + Copy + "</td></tr>";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError(core, ex);
             }
             return tempGetEditRow;
         }
@@ -405,7 +404,7 @@ namespace Contensive.Core {
                 //
                 result += PanelBody + "</div>";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -528,7 +527,7 @@ namespace Contensive.Core {
                 }
                 result = "\r\n<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -595,7 +594,7 @@ namespace Contensive.Core {
                 //
                 result = GetReport2(core, RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle, ColSortable, 0);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -766,7 +765,7 @@ namespace Contensive.Core {
                 + result + "</td></tr></table>"
                 + PostTableCopy + "";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -782,9 +781,9 @@ namespace Contensive.Core {
         //
         public static string getButtonPrimary(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "", string htmlName = "button") {
             return htmlController.getHtmlInputSubmit(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
-           // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
-           // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
-       }
+            // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
+            // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
+        }
         //
         // ====================================================================================================
         //
@@ -793,5 +792,137 @@ namespace Contensive.Core {
             // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
             // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
         }
+        public static List<buttonThing> buttonStringToButtonList(string ButtonList) {
+            var result = new List<buttonThing>();
+            string[] Buttons = null;
+            if (!string.IsNullOrEmpty(ButtonList.Trim(' '))) {
+                Buttons = ButtonList.Split(',');
+                foreach (string buttonValue in Buttons) {
+                    string buttonValueTrim = buttonValue.Trim();
+                    result.Add(new buttonThing() {
+                        name = "button",
+                        value = buttonValueTrim,
+                        isAdd = buttonValueTrim.Equals(ButtonAdd),
+                        isCloase = buttonValueTrim.Equals(ButtonClose),
+                        isDelete = buttonValueTrim.Equals(ButtonDelete)
+                    });
+                }
+            }
+            return result;
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// The panel at the top of the edit page that describes the content being edited
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="headerInfo"></param>
+        /// <returns></returns>
+        public static string getEditRecordHeader(coreController core, recordEditHeaderInfoClass headerInfo) {
+            string result = "";
+            if (headerInfo.recordId == 0) {
+                result = "<div>New Record</div>";
+            } else {
+                result = ""
+                + "<table border=0 cellpadding=0 cellspacing=0 style=\"width:90%\">";
+                if (!string.IsNullOrEmpty(headerInfo.customDescription)) {
+                    result += "<tr><td colspan=2>" + headerInfo.customDescription + "<div>&nbsp;</div></td></tr>";
+                }
+                result += "<tr><td width=\"50%\">"
+                + "Name: " + headerInfo.recordName + "<br>Record ID: " + headerInfo.recordId + "</td><td width=\"50%\">";
+                //
+                string CreatedCopy = "";
+                CreatedCopy = CreatedCopy + " " + headerInfo.recordDateAdded.ToString();
+                //
+                string CreatedBy = "the system";
+                if (headerInfo.recordAddedById != 0) {
+                    int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + headerInfo.recordAddedById);
+                    if (core.db.csOk(CS)) {
+                        string Name = core.db.csGetText(CS, "name");
+                        bool Active = core.db.csGetBoolean(CS, "active");
+                        if (!Active && (!string.IsNullOrEmpty(Name))) {
+                            CreatedBy = "Inactive user " + Name;
+                        } else if (!Active) {
+                            CreatedBy = "Inactive user #" + headerInfo.recordAddedById;
+                        } else if (string.IsNullOrEmpty(Name)) {
+                            CreatedBy = "Unnamed user #" + headerInfo.recordAddedById;
+                        } else {
+                            CreatedBy = Name;
+                        }
+                    } else {
+                        CreatedBy = "deleted user #" + headerInfo.recordAddedById;
+                    }
+                    core.db.csClose(ref CS);
+                }
+                if (!string.IsNullOrEmpty(CreatedBy)) {
+                    CreatedCopy = CreatedCopy + " by " + CreatedBy;
+                } else {
+                }
+                result += "Created:" + CreatedCopy;
+                //
+                string ModifiedCopy = "";
+                if (headerInfo.recordDateModified == DateTime.MinValue) {
+                    ModifiedCopy = CreatedCopy;
+                } else {
+                    ModifiedCopy = ModifiedCopy + " " + headerInfo.recordDateModified;
+                    CreatedBy = "the system";
+                    if (headerInfo.recordModifiedById != 0) {
+                        int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + headerInfo.recordModifiedById);
+                        if (core.db.csOk(CS)) {
+                            string Name = core.db.csGetText(CS, "name");
+                            bool Active = core.db.csGetBoolean(CS, "active");
+                            if (!Active && (!string.IsNullOrEmpty(Name))) {
+                                CreatedBy = "Inactive user " + Name;
+                            } else if (!Active) {
+                                CreatedBy = "Inactive user #" + headerInfo.recordModifiedById;
+                            } else if (string.IsNullOrEmpty(Name)) {
+                                CreatedBy = "Unnamed user #" + headerInfo.recordModifiedById;
+                            } else {
+                                CreatedBy = Name;
+                            }
+                        } else {
+                            CreatedBy = "deleted user #" + headerInfo.recordModifiedById;
+                        }
+                        core.db.csClose(ref CS);
+                    }
+                    if (!string.IsNullOrEmpty(CreatedBy)) {
+                        ModifiedCopy = ModifiedCopy + " by " + CreatedBy;
+                    } else {
+                    }
+                }
+                result += "<br>Last Modified:" + ModifiedCopy;
+                if ((headerInfo.recordLockExpiresDate == null) | (headerInfo.recordLockExpiresDate < DateTime.Now)) {
+                    //
+                    // Add Edit Locking to right panel
+                    personModel personLock = personModel.create(core, headerInfo.recordLockById);
+                    if (personLock != null) {
+                        result += "<br><b>Record is locked by " + personLock.name + " until " + headerInfo.recordLockExpiresDate + "</b>";
+                    }
+                }
+                //
+                result += "</td></tr>";
+                result += "</table>";
+            }
+            return result;
+        }
+        //
+    }
+    //
+    //====================================================================================================
+    /// <summary>
+    /// structure used in admin edit forms at the top
+    /// </summary>
+    public class recordEditHeaderInfoClass {
+        //public string description;
+        public string recordName;
+        public int recordId;
+        public DateTime recordDateAdded;
+        public DateTime recordDateModified;
+        public int recordAddedById;
+        public int recordModifiedById;
+        public DateTime recordLockExpiresDate;
+        public int recordLockById;
+        public string customDescription;
+
     }
 }

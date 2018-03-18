@@ -139,7 +139,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                     // Do non-optional housekeeping
                     //
                     if (RunServerHousekeep || force) {
-                        if (true) // 3.3.971" Then
                         {
                             //
                             // Move Archived pages from their current parent to their archive parent
@@ -171,7 +170,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                 core.cache.setObject("PCC", emptyData);
                             }
                         }
-                        if (true) {
+                        {
                             //
                             // Delete any daily visit summary duplicates during this period(keep the first)
                             //
@@ -244,41 +243,20 @@ namespace Contensive.Core.Addons.Housekeeping {
                         //
                         // Page View Summary
                         //
-                        if (true) // 4.1.187" Then
                         {
-                            //
-                            // Delete duplicates
-                            //
-                            //SQL = "delete from ccviewingsummary" _
-                            //    & " where id in (" _
-                            //    & " select d.id from ccviewingsummary d,ccviewingsummary f" _
-                            //    & " where f.datenumber=d.datenumber" _
-                            //    & " and f.datenumber>" & encodeSQLDate(OldestVisitSummaryWeCareAbout) _
-                            //    & " and f.datenumber<" & encodeSQLDate(Yesterday) _
-                            //    & " and f.TimeDuration=24" _
-                            //    & " and d.TimeDuration=24" _
-                            //    & " and f.id<d.id" _
-                            //    & ")"
-                            //Call core.app.ExecuteSQL( SQL)
-                            //
-                            // Find the day of the last entry in the viewing summary table as start there
-                            // PageViewSummary should always add at least one entry for each day, even if 0
-                            //
-                            if (true) {
-                                DateTime datePtr = default(DateTime);
-                                SQL = core.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1);
-                                CS = core.db.csOpenSql(SQL,"Default");
-                                if (!core.db.csOk(CS)) {
-                                    datePtr = OldestVisitSummaryWeCareAbout;
-                                } else {
-                                    datePtr = DateTime.MinValue.AddDays(core.db.csGetInteger(CS, "DateNumber"));
-                                }
-                                core.db.csClose(ref CS);
-                                if (datePtr < OldestVisitSummaryWeCareAbout) {
-                                    datePtr = OldestVisitSummaryWeCareAbout;
-                                }
-                                HouseKeep_PageViewSummary(core, datePtr, Yesterday, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                            DateTime datePtr = default(DateTime);
+                            SQL = core.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1);
+                            CS = core.db.csOpenSql(SQL, "Default");
+                            if (!core.db.csOk(CS)) {
+                                datePtr = OldestVisitSummaryWeCareAbout;
+                            } else {
+                                datePtr = DateTime.MinValue.AddDays(core.db.csGetInteger(CS, "DateNumber"));
                             }
+                            core.db.csClose(ref CS);
+                            if (datePtr < OldestVisitSummaryWeCareAbout) {
+                                datePtr = OldestVisitSummaryWeCareAbout;
+                            }
+                            HouseKeep_PageViewSummary(core, datePtr, Yesterday, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                         }
                     }
                     //
@@ -290,10 +268,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                         // Set NextSummaryStartDate based on the last time we ran hourly summarization
                         //
                         DateTime LastTimeSummaryWasRun = VisitArchiveDate;
-                        //LastTimeSummaryWasRun = ALittleWhileAgo
-                        //sql="select top 1 dateadded from ccvisitsummary where (timeduration=1)and(Dateadded>" & encodeSQLDate(ALittleWhileAgo) & ") order by id desc"
                         SQL = core.db.GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + core.db.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1);
-                        //SQL = core.app.csv_GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" & encodeSQLDate(ALittleWhileAgo) & ")", "id Desc", , 1)
                         CS = core.db.csOpenSql(SQL,"Default");
                         if (core.db.csOk(CS)) {
                             LastTimeSummaryWasRun = core.db.csGetDate(CS, "DateAdded");
@@ -310,8 +285,6 @@ namespace Contensive.Core.Addons.Housekeeping {
                         //
                         //   For the past 24 hours, find the oldest visit with the last viewing during the last hour
                         //
-                        //OldestDateAdded = LastTimeSummaryWasRun
-                        //PeriodStep = CDbl(1) / CDbl(24)
                         DateTime StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
                         DateTime OldestDateAdded = StartOfHour;
                         SQL = core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + core.db.encodeSQLDate(StartOfHour), "dateadded", "", 1);
@@ -691,25 +664,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                 }
-                //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
-                ////On Error //Resume Next
-
                 core.db.executeQuery(SQL);
-                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (0 != 0) {
-                    //throw new ApplicationException("Unexpected exception");
-                }
-                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                //Microsoft.VisualBasic.Information.Err().Clear();
-                // moved to upgrade code
-                //    '
-                //    ' Update CreatedByVisit for older records where this field is null
-                //    '
-                //    ////On Error //Resume Next
-                //    SQL = "update ccmembers set createdbyvisit=1 where (createdbyvisit Is Null) And (dateadded<" & encodeSQLDate("1/1/2010") & ") and (username Is Null) And (email Is Null) And ((visits <> 0) And (visits Is Not Null))"
-                //    Call core.app.ExecuteSQL( SQL)
-                //    Err.Clear
-                //    On Error GoTo ErrorTrap
                 //
                 // delete 'guests' Members created before ArchivePeopleAgeDays
                 //
@@ -745,87 +700,19 @@ namespace Contensive.Core.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                 }
-                //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
-                ////On Error //Resume Next
-
                 core.db.executeQuery(SQL);
-                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (0 != 0) {
-                    //throw new ApplicationException("Unexpected exception");
-                }
-                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                //Microsoft.VisualBasic.Information.Err().Clear();
                 //
                 // delete email drops older than archive.
                 //
                 logHousekeeping(core, "Deleting email drops older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
-                //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
-                ////On Error //Resume Next
-
                 core.db.deleteContentRecords("Email drops", "(DateAdded is null)or(DateAdded<=" + core.db.encodeSQLDate(ArchiveEmailDropDate) + ")");
-                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (0 != 0) {
-                    //throw new ApplicationException("Unexpected exception");
-                }
-                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                //Microsoft.VisualBasic.Information.Err().Clear();
                 //
                 // delete email log entries not realted to a drop, older than archive.
                 //
                 logHousekeeping(core, "Deleting non-drop email logs older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
-                //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
-                ////On Error //Resume Next
-
                 core.db.deleteContentRecords("Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" + core.db.encodeSQLDate(ArchiveEmailDropDate) + "))");
-                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (0 != 0) {
-                    //throw new ApplicationException("Unexpected exception");
-                }
-                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                //Microsoft.VisualBasic.Information.Err().Clear();
-                //
-                // delete email log entries without email drops
-                //
-                logHousekeeping(core, "Deleting drop email log entries for drops without a valid drop record.");
-                switch (DataSourceType) {
-                    case DataSourceTypeODBCAccess:
-                        SQL = "delete l.*"
-                            + " from ccemaillog l"
-                            + " left join ccemaildrops d on d.id=l.emaildropid"
-                            + " where l.emaildropid Is Not Null"
-                            + " and d.id is null"
-                            + "";
-                        break;
-                    case DataSourceTypeODBCMySQL:
-                        SQL = "delete l"
-                            + " from ccemaillog l"
-                            + " left join ccemaildrops d on d.id=l.emaildropid"
-                            + " where l.emaildropid Is Not Null"
-                            + " and d.id is null"
-                            + "";
-                        break;
-                    default:
-                        SQL = "delete from ccemaillog"
-                            + " from ccemaillog l"
-                            + " left join ccemaildrops d on d.id=l.emaildropid"
-                            + " where l.emaildropid Is Not Null"
-                            + " and d.id is null"
-                            + "";
-                        break;
-                }
-                //todo  TASK: The '////On Error //Resume Next' statement is not converted by Instant C#:
-                ////On Error //Resume Next
-
-                core.db.executeQuery(SQL);
-                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (0 != 0) {
-                    //throw new ApplicationException("Unexpected exception");
-                }
-                //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                //Microsoft.VisualBasic.Information.Err().Clear();
-
                 //
                 // block duplicate redirect fields (match contentid+fieldtype+caption)
                 //
@@ -1368,7 +1255,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 return;
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -1433,7 +1320,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 return;
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -1473,7 +1360,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 return;
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -1742,7 +1629,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 return;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception");
@@ -1770,7 +1657,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 return;
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -1815,7 +1702,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return loadOK;
         }
@@ -1857,7 +1744,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 int BotPageViews = 0;
                 string SQL = null;
                 if (string.CompareOrdinal(BuildVersion, core.codeVersion()) < 0) {
-                    core.handleException(new ApplicationException("Can not summarize analytics until this site's data needs been upgraded."));
+                    logController.handleError( core,new ApplicationException("Can not summarize analytics until this site's data needs been upgraded."));
                 } else {
                     hint = 1;
                     PeriodStart = StartTimeDate;
@@ -2060,7 +1947,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //
                 return;
             } catch (Exception ex) {
-                core.handleException(ex, "hint [" + hint + "]");
+                logController.handleError( core,ex, "hint [" + hint + "]");
             }
         }
         //

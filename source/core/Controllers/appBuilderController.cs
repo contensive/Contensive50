@@ -50,13 +50,6 @@ namespace Contensive.Core.Controllers {
                     // -- verify base collection
                     logController.logInfo(core, "Install base collection");
                     collectionController.installBaseCollection(core, isNewBuild, forceFullInstall, ref  nonCriticalErrorList);
-                    ////
-                    //// -- Update server config file
-                    //logController.logInfo(core, "Update configuration file");
-                    //if (!core.appConfig.appStatus.Equals(appConfigModel.appStatusEnum.OK)) {
-                    //    core.appConfig.appStatus = appConfigModel.appStatusEnum.OK;
-                    //    core.serverConfig.saveObject(core);
-                    //}
                     //
                     // -- verify iis configuration
                     logController.logInfo(core, "Verify iis configuration");
@@ -65,37 +58,55 @@ namespace Contensive.Core.Controllers {
                     // -- verify root developer
                     logController.logInfo(core, "verify developer user");
                     var root = personModel.create(core, defaultRootUserGuid);
+                    if (root == null) {
+                        logController.logInfo(core, "root user guid not found, test for root username");
+                        var rootList = personModel.createList(core, "(username='root')");
+                        if ( rootList.Count > 0 ) {
+                            logController.logInfo(core, "root username found");
+                            root = rootList.First();
+                        }
+                    }
                     if ( root == null ) {
-                        logController.logInfo(core, "verify root user, no developers found, adding root/contensive");
+                        logController.logInfo(core, "root user not found, adding root/contensive");
                         root = personModel.add(core);
                         root.name = defaultRootUserName;
                         root.FirstName = defaultRootUserName;
                         root.Username = defaultRootUserUsername;
                         root.Password = defaultRootUserPassword;
                         root.Developer = true;
-                        root.save(core);
+                        try {
+                            root.save(core);
+                        } catch (Exception) {
+                            logController.logInfo(core, "error prevented root user update");
+                        }
                     }
                     //
                     // -- verify site managers group
                     logController.logInfo(core, "verify site managers groups");
-                    var group = groupModel.create(core, "{0685bd36-fe24-4542-be42-27337af50da8}");
+                    var group = groupModel.create(core, defaultSiteManagerGuid);
                     if (group == null) {
                         logController.logInfo(core, "verify site manager group");
                         group.name = defaultSiteManagerName;
                         group.Caption = defaultSiteManagerName;
                         group.AllowBulkEmail = true;
                         group.ccguid = defaultSiteManagerGuid;
-                        group.save(core);
+                        try {
+                            group.save(core);
+                        } catch (Exception) {
+                            logController.logInfo(core, "error creating site managers group");
+                        }
                     }
-                    //
-                    // -- verify root is in site managers
-                    var memberRuleList = memberRuleModel.createList(core, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
-                    if ( memberRuleList.Count==0) {
-                        var memberRule = memberRuleModel.add(core);
-                        memberRule.GroupID = group.id;
-                        memberRule.MemberID = root.id;
-                        memberRule.save(core);
-                    }                    
+                    if ((root != null) & (group != null)) {
+                        //
+                        // -- verify root is in site managers
+                        var memberRuleList = memberRuleModel.createList(core, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
+                        if (memberRuleList.Count == 0) {
+                            var memberRule = memberRuleModel.add(core);
+                            memberRule.GroupID = group.id;
+                            memberRule.MemberID = root.id;
+                            memberRule.save(core);
+                        }
+                    }           
                     //
                     //---------------------------------------------------------------------
                     // ----- Convert Database fields for new Db
@@ -425,7 +436,7 @@ namespace Contensive.Core.Controllers {
                                 }
 
                             } catch (Exception ex9) {
-                                core.handleException(ex9);
+                                logController.handleError( core,ex9);
                             }
                         }
                     }
@@ -439,7 +450,7 @@ namespace Contensive.Core.Controllers {
                     core.doc.upgradeInProgress = false;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -466,7 +477,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -498,7 +509,7 @@ namespace Contensive.Core.Controllers {
                     core.db.executeQuery(sql1 + sql2 + sql3);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -516,7 +527,7 @@ namespace Contensive.Core.Controllers {
                 core.cache.invalidateAll();
                 core.doc.clearMetaData();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -532,7 +543,7 @@ namespace Contensive.Core.Controllers {
                 VerifyRecord(core, "Scripting Languages", "VBScript", "", "");
                 VerifyRecord(core, "Scripting Languages", "JScript", "", "");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -549,7 +560,7 @@ namespace Contensive.Core.Controllers {
                 VerifyRecord(core, "Languages", "French", "HTTP_Accept_Language", "'fr'");
                 VerifyRecord(core, "Languages", "Any", "HTTP_Accept_Language", "'any'");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -568,7 +579,7 @@ namespace Contensive.Core.Controllers {
                     VerifyRecord(core, "Library Folders", "Downloads");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -588,7 +599,7 @@ namespace Contensive.Core.Controllers {
                 }
                 rs.Dispose();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnid;
@@ -673,7 +684,7 @@ namespace Contensive.Core.Controllers {
                     VerifyRecord(core, "Library File Types", "Default", "IsFlash", "0", false);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -707,7 +718,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -780,7 +791,7 @@ namespace Contensive.Core.Controllers {
                 VerifyState(core, "West Virginia", "WV", 0.0D, CountryID, "");
                 VerifyState(core, "Wyoming", "WY", 0.0D, CountryID, "");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -807,7 +818,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -830,7 +841,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -851,7 +862,7 @@ namespace Contensive.Core.Controllers {
                 SQL = "Update ccContent Set EditorGroupID=" + core.db.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
                 core.db.executeQuery(SQL);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -961,7 +972,7 @@ namespace Contensive.Core.Controllers {
                     core.db.createSQLTable("Default", "ccFieldTypes");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1024,7 +1035,7 @@ namespace Contensive.Core.Controllers {
                     returnEntry = entry.id;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnEntry;
@@ -1064,7 +1075,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return parentRecordId;

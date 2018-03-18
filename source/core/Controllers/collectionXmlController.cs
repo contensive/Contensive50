@@ -429,7 +429,7 @@ namespace Contensive.Core.Controllers {
                     tempGetXMLContentDefinition3 = "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + "\r\n</" + CollectionFileRootNode + ">";
                 }
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempGetXMLContentDefinition3;
         }
@@ -511,7 +511,7 @@ namespace Contensive.Core.Controllers {
                 core.db.csClose(ref CS);
                 result = sb.ToString();
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -527,7 +527,7 @@ namespace Contensive.Core.Controllers {
                 s = s + GetXMLContentDefinition_AdminMenus_MenuEntries();
                 s = s + GetXMLContentDefinition_AdminMenus_NavigatorEntries();
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return s;
         }
@@ -588,7 +588,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = sb.ToString();
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -625,7 +625,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = sb.ToString();
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -658,7 +658,7 @@ namespace Contensive.Core.Controllers {
         //            }
         //        }
         //    } catch( Exception ex ) {
-        //        core.handleException(ex);
+        //        logController.handleException( core,ex);
         //    }
         //    return sb.ToString();
         //}
@@ -690,7 +690,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempGetTableRecordName;
         }
@@ -766,7 +766,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch( Exception ex ) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return tempgetMenuNameSpace;
         }

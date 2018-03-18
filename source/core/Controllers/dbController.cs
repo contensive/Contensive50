@@ -233,7 +233,7 @@ namespace Contensive.Core.Controllers {
                     connectionStringDict.Add(key, returnConnString);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnConnString;
@@ -297,7 +297,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnConnString;
@@ -337,11 +337,11 @@ namespace Contensive.Core.Controllers {
                 } else if (core.serverConfig == null) {
                     //
                     // -- server config fail
-                    core.handleException(new ApplicationException("Cannot execute Sql in dbController without an application"));
+                    logController.handleError( core,new ApplicationException("Cannot execute Sql in dbController without an application"));
                 } else if (core.appConfig == null) {
                     //
                     // -- server config fail
-                    core.handleException(new ApplicationException("Cannot execute Sql in dbController without an application"));
+                    logController.handleError( core,new ApplicationException("Cannot execute Sql in dbController without an application"));
                 } else {
                     string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
                     //returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(core.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
@@ -367,7 +367,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
-                core.handleException(newEx);
+                logController.handleError( core,newEx);
             }
             return returnData;
         }
@@ -404,7 +404,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
-                core.handleException(newEx);
+                logController.handleError( core,newEx);
                 throw newEx;
             }
             return rs;
@@ -440,7 +440,7 @@ namespace Contensive.Core.Controllers {
                     dbVerified = true;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -467,7 +467,7 @@ namespace Contensive.Core.Controllers {
                     dbVerified = true;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -485,7 +485,7 @@ namespace Contensive.Core.Controllers {
                 string SQL = "update " + TableName + " set " + sqlList.getNameValueList() + " where " + Criteria + ";";
                 executeNonQuery(SQL, DataSourceName);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -507,7 +507,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnId;
@@ -543,7 +543,7 @@ namespace Contensive.Core.Controllers {
                 insertTableRecord(DataSourceName, TableName, sqlList);
                 returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + DateAddedString + ")and(CreateKey=" + CreateKeyString + ")", "ID DESC", "", 1);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnDt;
@@ -564,7 +564,7 @@ namespace Contensive.Core.Controllers {
                     dt.Dispose();
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -600,7 +600,7 @@ namespace Contensive.Core.Controllers {
                 //SQL &= ";"
                 returnDataTable = executeQuery(SQL, DataSourceName, (PageNumber - 1) * PageSize, PageSize);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnDataTable;
@@ -648,7 +648,7 @@ namespace Contensive.Core.Controllers {
                     returnOK = tableSchema.columns.Contains(FieldName.ToLower());
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOK;
@@ -666,7 +666,7 @@ namespace Contensive.Core.Controllers {
             try {
                 ReturnOK = (!(Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null));
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return ReturnOK;
@@ -739,7 +739,7 @@ namespace Contensive.Core.Controllers {
                 }
                 Models.Complex.tableSchemaModel.tableSchemaListClear(core);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -803,7 +803,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -820,7 +820,7 @@ namespace Contensive.Core.Controllers {
                 core.cache.invalidateAll();
                 core.doc.clearMetaData();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -855,7 +855,7 @@ namespace Contensive.Core.Controllers {
                     executeQuery("ALTER TABLE " + TableName + " DROP COLUMN " + FieldName + ";", DataSourceName);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -885,7 +885,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -903,7 +903,7 @@ namespace Contensive.Core.Controllers {
                 }
                 csClose(ref CS);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnRecordName;
@@ -922,7 +922,7 @@ namespace Contensive.Core.Controllers {
                 }
                 cs.close();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnRecordName;
@@ -946,7 +946,7 @@ namespace Contensive.Core.Controllers {
                     csClose(ref cs);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnValue;
@@ -1036,7 +1036,7 @@ namespace Contensive.Core.Controllers {
                         throw new ApplicationException("Can Not proceed because the field being created has an invalid FieldType [" + fieldType + "]");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnType;
@@ -1076,7 +1076,7 @@ namespace Contensive.Core.Controllers {
                 }
 
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1096,7 +1096,7 @@ namespace Contensive.Core.Controllers {
                 tempisCdefField = dbController.isDataTableOk(dt);
                 dt.Dispose();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -1159,7 +1159,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnType;
@@ -1260,7 +1260,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnTypeId;
@@ -1449,7 +1449,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnCs;
@@ -1539,7 +1539,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1585,7 +1585,7 @@ namespace Contensive.Core.Controllers {
                 }
                 csInitData(returnCs);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnCs;
@@ -1644,7 +1644,7 @@ namespace Contensive.Core.Controllers {
                     writeCache = null
                 };
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnCs;
@@ -1678,7 +1678,7 @@ namespace Contensive.Core.Controllers {
                     CSPointer = -1;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1698,6 +1698,7 @@ namespace Contensive.Core.Controllers {
                     throw new ApplicationException("CSPointer Not csv_IsCSOK.");
                 } else {
                     csSave(CSPointer, AsyncSave);
+                    contentSetStore[CSPointer].writeCache = new Dictionary<string, string>();
                     //
                     // Move to next row
                     contentSetStore[CSPointer].readCacheRowPtr = contentSetStore[CSPointer].readCacheRowPtr + 1;
@@ -1714,7 +1715,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1729,10 +1730,11 @@ namespace Contensive.Core.Controllers {
                     throw new ApplicationException("data set is not valid");
                 } else {
                     csSave(CSPointer, AsyncSave);
+                    contentSetStore[CSPointer].writeCache = new Dictionary<string, string>();
                     contentSetStore[CSPointer].readCacheRowPtr = 0;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -1780,7 +1782,7 @@ namespace Contensive.Core.Controllers {
                     contentSet.LastUsed = DateTime.Now;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnValue;
@@ -1802,7 +1804,7 @@ namespace Contensive.Core.Controllers {
                     returnFieldName = csGetNextFieldName(CSPointer);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnFieldName;
@@ -1827,7 +1829,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnFieldName;
@@ -1851,7 +1853,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnFieldTypeid;
@@ -1878,7 +1880,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -1897,7 +1899,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = string.Join(",", contentSetStore[CSPointer].fieldNames);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -1922,7 +1924,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = genericController.isInDelimitedString(CSSelectFieldList, FieldName, ",");
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -2046,7 +2048,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnFilename;
@@ -2120,7 +2122,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -2169,7 +2171,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -2190,7 +2192,7 @@ namespace Contensive.Core.Controllers {
                     result = dr[FieldName].ToString();
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -2218,7 +2220,7 @@ namespace Contensive.Core.Controllers {
                 }
                 csClose(ref CS);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -2246,7 +2248,7 @@ namespace Contensive.Core.Controllers {
                     csClose(ref CSPointer);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -2292,7 +2294,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -2448,7 +2450,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnCs;
@@ -2469,7 +2471,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = csOpen(ContentName, "(ID=" + encodeSQLNumber(RecordID) + ")", "", false, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -2494,7 +2496,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = contentSetStore[CSPointer].IsOpen & (contentSetStore[CSPointer].readCacheRowPtr >= 0) && (contentSetStore[CSPointer].readCacheRowPtr < contentSetStore[CSPointer].readCacheRowCnt);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -2582,7 +2584,7 @@ namespace Contensive.Core.Controllers {
                     csSave(CSDestination);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -2602,7 +2604,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = contentSetStore[CSPointer].Source;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -2821,7 +2823,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return fieldValue;
@@ -2997,7 +2999,7 @@ namespace Contensive.Core.Controllers {
                                         if (genericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                             if (FieldValue.Length > 255) {
-                                                core.handleException(new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for Text field is 255. Save will be attempted"));
+                                                logController.handleError( core,new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for Text field is 255. Save will be attempted"));
                                             }
                                         }
                                         break;
@@ -3009,7 +3011,7 @@ namespace Contensive.Core.Controllers {
                                         if (genericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                             if (FieldValue.Length > 65535) {
-                                                core.handleException(new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
+                                                logController.handleError( core,new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
                                             }
                                         }
                                         break;
@@ -3040,7 +3042,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -3070,7 +3072,7 @@ namespace Contensive.Core.Controllers {
                     contentSetStore[CSPointer].writeCache.Clear();
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -3251,7 +3253,8 @@ namespace Contensive.Core.Controllers {
                         }
                         //
                         // -- clear write cache
-                        contentSet.writeCache = new Dictionary<string, string>();
+                        // 20180314 - no, dont cleare the write cache for now because a subsequent read will replace the original read's value, which may be updated by the save
+                        //contentSet.writeCache = new Dictionary<string, string>();
                         //
                         // ----- Set ModifiedBy,ModifiedDate Fields if an admin visible field has changed
                         //
@@ -3319,7 +3322,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -3356,7 +3359,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -3377,7 +3380,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = (contentSetStore[CSPointer].readCacheRowPtr >= contentSetStore[CSPointer].readCacheRowCnt);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3429,12 +3432,12 @@ namespace Contensive.Core.Controllers {
                         returnResult = encodeSQLText(genericController.encodeText(expression));
                         break;
                     default:
-                        core.handleException(new ApplicationException("Unknown Field Type [" + fieldType + ""));
+                        logController.handleError( core,new ApplicationException("Unknown Field Type [" + fieldType + ""));
                         returnResult = encodeSQLText(genericController.encodeText(expression));
                         break;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3493,7 +3496,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3528,7 +3531,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = SQLTrue;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3581,7 +3584,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3650,7 +3653,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = csOpenSql(SQL,"Default", PageSize, PageNumber);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3674,7 +3677,7 @@ namespace Contensive.Core.Controllers {
                 }
                 dt.Dispose();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3698,7 +3701,7 @@ namespace Contensive.Core.Controllers {
                     DeleteTableRecords(TableName, "ID=" + RecordID, DataSourceName);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -3790,7 +3793,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -3809,7 +3812,7 @@ namespace Contensive.Core.Controllers {
             try {
                 returnResult = contentSetStore[CSPointer].readCache;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3829,7 +3832,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = contentSetStore[CSPointer].readCacheRowCnt;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3856,7 +3859,7 @@ namespace Contensive.Core.Controllers {
                     executeQuery(SQL, DataSourceName);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -3877,7 +3880,7 @@ namespace Contensive.Core.Controllers {
                     returnResult = contentSetStore[CSPointer].ContentName;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3971,7 +3974,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                core.handleException(ex); // "Unexpected exception")
+                logController.handleError( core,ex); // "Unexpected exception")
                 throw;
             }
             return returnFieldTypeName;
@@ -4001,7 +4004,7 @@ namespace Contensive.Core.Controllers {
                     csClose(ref CS);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -4022,7 +4025,7 @@ namespace Contensive.Core.Controllers {
                 csClose(ref CS);
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnRows;
@@ -4076,7 +4079,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnList;
@@ -4097,7 +4100,7 @@ namespace Contensive.Core.Controllers {
                     returnDt = connSQL.GetSchema("Tables", new[] { core.appConfig.name, null, tableName, null });
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnDt;
@@ -4122,7 +4125,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnDt;
@@ -4143,7 +4146,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnDt;
@@ -4166,7 +4169,7 @@ namespace Contensive.Core.Controllers {
                     sqlCriteria = "name=" + encodeSQLText(nameIdOrGuid);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return sqlCriteria;
@@ -4187,7 +4190,7 @@ namespace Contensive.Core.Controllers {
                 }
                 dt.Dispose();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnContentId;
@@ -4314,7 +4317,7 @@ namespace Contensive.Core.Controllers {
                 core.doc.clearMetaData();
                 dt.Dispose();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -4520,7 +4523,7 @@ namespace Contensive.Core.Controllers {
                 }
                 Models.Complex.cdefModel.verifyCDefField_ReturnID(core, ContentName, field);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -4557,7 +4560,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return rows;
@@ -4631,12 +4634,12 @@ namespace Contensive.Core.Controllers {
                     //
                     // records did not delete
                     //
-                    core.handleException(new ApplicationException("Error deleting record chunks. No records were deleted and the process was not complete."));
+                    logController.handleError( core,new ApplicationException("Error deleting record chunks. No records were deleted and the process was not complete."));
                 } else if (LoopCount >= iChunkCount) {
                     //
                     // records did not delete
                     //
-                    core.handleException(new ApplicationException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."));
+                    logController.handleError( core,new ApplicationException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."));
                 }
             }
         }
@@ -4740,7 +4743,7 @@ namespace Contensive.Core.Controllers {
                 //
                 result = genericController.encodeVirtualPath(result, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }

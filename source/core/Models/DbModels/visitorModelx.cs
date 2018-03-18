@@ -70,7 +70,7 @@
 //            try {
 //                result = create(core, core.db.insertContentRecordGetID(primaryContentName, 0), ref cacheNameList);
 //            } catch (Exception ex) {
-//                core.handleException(ex);
+//                logController.handleException( core,ex);
 //                throw;
 //                throw;
 //            }
@@ -96,7 +96,7 @@
 //                    }
 //                }
 //            } catch (Exception ex) {
-//                core.handleException(ex);
+//                logController.handleException( core,ex);
 //                throw;
 //                throw;
 //            }
@@ -121,7 +121,7 @@
 //                    }
 //                }
 //            } catch (Exception ex) {
-//                core.handleException(ex);
+//                logController.handleException( core,ex);
 //                throw;
 //                throw;
 //            }
@@ -178,7 +178,7 @@
 //                }
 //                cs.Close();
 //            } catch (Exception ex) {
-//                core.handleException(ex);
+//                logController.handleException( core,ex);
 //                throw;
 //                throw;
 //            }
@@ -245,7 +245,7 @@
 //                // -- object is here, but the cache was invalidated, setting
 //                core.cache.setObject(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.ID.ToString()), this);
 //            } catch (Exception ex) {
-//                core.handleException(ex);
+//                logController.handleException( core,ex);
 //                throw;
 //                throw;
 //            }
@@ -264,7 +264,7 @@
 //                    core.db.deleteContentRecords(primaryContentName, "id=" + recordId.ToString());
 //                }
 //            } catch (Exception ex) {
-//                core.handleException(ex);
+//                logController.handleException( core,ex);
 //                throw;
 //                throw;
 //            }
@@ -282,7 +282,7 @@
 //                    core.db.deleteContentRecords(primaryContentName, "(ccguid=" + core.db.encodeSQLText(guid) + ")");
 //                }
 //            } catch (Exception ex) {
-//                core.handleException(ex);
+//                logController.handleException( core,ex);
 //                throw;
 //                throw;
 //            }
@@ -312,7 +312,7 @@
 //                }
 //                cs.Close();
 //            } catch (Exception ex) {
-//                core.handleException(ex);
+//                logController.handleException( core,ex);
 //                throw;
 //            }
 //            return result;
@@ -381,7 +381,7 @@
 //                    instance.SortOrder = genericController.encodeText(CDef.fields["SortOrder"].defaultValue);
 //                }
 //            } catch (Exception ex) {
-//                core.handleException(ex);
+//                logController.handleException( core,ex);
 //            }
 //            return instance;
 //        }

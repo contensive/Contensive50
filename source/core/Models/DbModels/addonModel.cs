@@ -200,7 +200,7 @@ namespace Contensive.Core.Models.DbModels {
             try {
                 result = createList(core, "(OnNewVisitEvent<>0)");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -218,7 +218,7 @@ namespace Contensive.Core.Models.DbModels {
             try {
                 result = createList(core, "(OnPageStartEvent<>0)");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -236,7 +236,7 @@ namespace Contensive.Core.Models.DbModels {
             try {
                 result = createList(core, "(remoteMethod=1)");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -247,7 +247,7 @@ namespace Contensive.Core.Models.DbModels {
             try {
                 result = createList(core, "(id in (select addonId from ccAddonPageRules where (pageId=" + pageId + ")))");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -258,7 +258,7 @@ namespace Contensive.Core.Models.DbModels {
             try {
                 result = createList(core, "(id in (select addonId from ccAddonTemplateRules where (templateId=" + templateId + ")))");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;

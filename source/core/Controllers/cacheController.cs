@@ -158,7 +158,7 @@ namespace Contensive.Core.Controllers {
                     //sw.Stop();
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 // 20171222 
                 // -- cache errors should be warnings, not critical errors. Dont take down the application over a cache issue.
                 // -- cache errors likely did not original above the cache api, so failing the caller would not be productive
@@ -198,7 +198,7 @@ namespace Contensive.Core.Controllers {
                             } else {
                                 //
                                 // -- some other error
-                                core.handleException(ex);
+                                logController.handleError( core,ex);
                                 throw;
                             }
                         }
@@ -251,7 +251,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), exit ");
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -275,7 +275,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(key, wrappedContent);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -300,7 +300,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(key, wrappedContent);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -325,7 +325,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(key, wrappedContent);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -350,7 +350,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(key, cacheWrapper);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -378,7 +378,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(key, cacheWrapper);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -396,7 +396,7 @@ namespace Contensive.Core.Controllers {
             try {
                 setObject(key, content, new List<string> { dependantKey });
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -421,7 +421,7 @@ namespace Contensive.Core.Controllers {
                 };
                 setWrappedContent(keyAlias, cacheWrapper);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -436,7 +436,7 @@ namespace Contensive.Core.Controllers {
                 setWrappedContent(key, new cacheWrapperClass { saveDate = DateTime.Now });
                 _globalInvalidationDate = null;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -467,7 +467,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -486,7 +486,7 @@ namespace Contensive.Core.Controllers {
                 invalidate(ContentName);
                 invalidate(Models.Complex.cdefModel.getContentTablename(core, ContentName));
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -502,7 +502,7 @@ namespace Contensive.Core.Controllers {
                 string key = Regex.Replace(dbTableName, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
                 invalidate(key);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -519,7 +519,7 @@ namespace Contensive.Core.Controllers {
                     invalidate(key);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }
@@ -716,7 +716,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //

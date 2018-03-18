@@ -294,7 +294,7 @@ namespace Contensive.Core.Controllers {
             try {
                 result = main_OpenCSContentWatchList(core, "What's New", SortFieldList, ActiveOnly, PageSize, PageNumber);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -372,7 +372,7 @@ namespace Contensive.Core.Controllers {
                     this.core.db.csClose(ref CS);
                 }
             } catch (Exception ex) {
-                this.core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -414,7 +414,7 @@ namespace Contensive.Core.Controllers {
                 }
                 this.core.db.csClose(ref CSPointer);
             } catch (Exception ex) {
-                this.core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -463,7 +463,7 @@ namespace Contensive.Core.Controllers {
                     result = this.core.html.getEditWrapper("Watch List [" + ListName + "]", result);
                 }
             } catch (Exception ex) {
-                this.core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -658,7 +658,7 @@ namespace Contensive.Core.Controllers {
                 // Form Wrapper
                 //
                 result = ""
-                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + core.html.getHtmlInputHidden("Type", FormTypePageAuthoring) + '\r' + core.html.inputHidden("ID", pageController.page.id) + '\r' + core.html.getHtmlInputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + core.html.formEnd();
+                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + core.html.inputHidden("Type", FormTypePageAuthoring) + '\r' + core.html.inputHidden("ID", pageController.page.id) + '\r' + core.html.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + core.html.formEnd();
 
                 //& cr & core.html.main_GetPanelHeader("Contensive Quick Editor") _
 
@@ -666,7 +666,7 @@ namespace Contensive.Core.Controllers {
                     + "\r<div class=\"ccCon\">"
                     + genericController.nop(result) + "\r</div>";
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1089,7 +1089,7 @@ namespace Contensive.Core.Controllers {
                     result = "[Child Page List with no pages]</p><p>" + result;
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1126,7 +1126,7 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempbypassContentBlock;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             ////throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError13("IsContentBlocked")
@@ -1198,7 +1198,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1402,7 +1402,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             ////throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
@@ -1436,7 +1436,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             ////throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
@@ -1453,7 +1453,7 @@ namespace Contensive.Core.Controllers {
                 string ContentRecordKey = Models.Complex.cdefModel.getContentId(core, genericController.encodeText(ContentName)) + "." + genericController.encodeInteger(RecordID);
                 result = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             return result;
         }
@@ -1487,7 +1487,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             ////throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_GetContentWatchLinkByKey")
@@ -1516,7 +1516,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return sectionId;
@@ -1555,7 +1555,7 @@ namespace Contensive.Core.Controllers {
                 return tempmain_GetPageDynamicLink_GetTemplateID;
                 //
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
             //ErrorTrap:
             ////throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError13("main_GetPageDynamicLink_GetTemplateID")
@@ -1650,7 +1650,7 @@ namespace Contensive.Core.Controllers {
                 }
                 resultLink = genericController.encodeVirtualPath(resultLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return resultLink;
@@ -1705,7 +1705,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -1745,7 +1745,7 @@ namespace Contensive.Core.Controllers {
                     refreshQueryString = genericController.modifyQueryString(core.doc.refreshQueryString, Name, Value, true);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
 
@@ -2061,7 +2061,7 @@ namespace Contensive.Core.Controllers {
                     core.db.executeQuery(SQL + " where id=" + RecordID, DataSourceName);
                 }
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
             }
         }
         //
@@ -2141,7 +2141,7 @@ namespace Contensive.Core.Controllers {
                 contentNameIdDictionaryClear();
                 contentIdDictClear();
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
         }

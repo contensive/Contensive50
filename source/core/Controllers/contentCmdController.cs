@@ -329,7 +329,7 @@ namespace Contensive.Core.Controllers {
                 //
                 returnValue = dst;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnValue;
@@ -403,7 +403,7 @@ namespace Contensive.Core.Controllers {
                         try {
                             cmdDictionary = core.json.Deserialize<Dictionary<string, object>>(cmdSrc);
                         } catch (Exception ex) {
-                            core.handleException(ex);
+                            logController.handleError( core,ex);
                             throw;
                         }
                         //
@@ -888,7 +888,7 @@ namespace Contensive.Core.Controllers {
                                     };
                                     addonModel addon = addonModel.createByName(core, addonName);
                                     if (addon == null) {
-                                        core.handleException(new ApplicationException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
+                                        logController.handleError( core,new ApplicationException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
                                     } else {
                                         CmdAccumulator = core.addon.execute(addon, executeContext);
                                     }
@@ -976,7 +976,7 @@ namespace Contensive.Core.Controllers {
                 //
                 returnValue = CmdAccumulator;
             } catch (Exception ex) {
-                core.handleException(ex);
+                logController.handleError( core,ex);
                 throw;
             }
             return returnValue;

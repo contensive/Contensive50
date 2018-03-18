@@ -129,7 +129,7 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    cp.core.handleException(ex);
+                    logController.handleError(cp.core,ex);
                 }
             }
         }
@@ -201,14 +201,14 @@ namespace Contensive.Core.Controllers {
                                     appCore.db.csClose(ref CS);
                                 } while (recordsRemaining);
                             } catch (Exception ex) {
-                                appCore.handleException(ex);
+                                logController.handleError(appCore, ex);
                             }
                         }
                     }
                 }
                 Console.WriteLine("runTasks, exit (" + sw.ElapsedMilliseconds + "ms)");
             } catch (Exception ex) {
-                serverCore.handleException(ex);
+                logController.handleError(serverCore, ex);
             }
         }
         #region  IDisposable Support 

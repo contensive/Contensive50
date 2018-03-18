@@ -69,6 +69,10 @@ namespace Contensive.Core.Controllers {
         /// when enable, use MS trace logging. An attempt to stop file append permission issues
         /// </summary>
         public bool useNlog = true;
+        /// <summary>
+        /// tmp, block to prevent core.handleException recursion. Will refactor out
+        /// </summary>
+        public bool _handlingExceptionRecursionBlock = false;
         //
         //===================================================================================================
         /// <summary>
@@ -752,7 +756,7 @@ namespace Contensive.Core.Controllers {
                                     // -- admin site
                                     addonModel addon = addonModel.create(this, addonGuidAdminSite);
                                     if (addon == null) {
-                                        handleException(new ApplicationException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
+                                        logController.handleError( this,new ApplicationException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
                                         return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -u )";
                                     } else {
                                         return this.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
@@ -763,7 +767,7 @@ namespace Contensive.Core.Controllers {
                                     // -- remote method
                                     addonModel addon = addonCache.getAddonById(route.remoteMethodAddonId);
                                     if (addon == null) {
-                                        handleException(new ApplicationException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
+                                        logController.handleError( this,new ApplicationException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
                                         return "";
                                     } else { 
                                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
@@ -853,7 +857,7 @@ namespace Contensive.Core.Controllers {
                     result = "<p>This site is not configured for website traffic. Please set the default route.</p>";
                 }
             } catch (Exception ex) {
-                handleException(ex);
+                logController.handleError( this,ex);
             } finally {
                 //
             }
@@ -870,7 +874,7 @@ namespace Contensive.Core.Controllers {
         public string executeRoute_ProcessAjaxData() {
             string result = "";
             try {
-                handleException(new ApplicationException("executeRoute_ProcessAjaxData deprecated"));
+                logController.handleError( this,new ApplicationException("executeRoute_ProcessAjaxData deprecated"));
                 //string RemoteKey = docProperties.getText("key");
                 //string EncodedArgs = docProperties.getText("args");
                 //int PageSize = docProperties.getInteger("pagesize");
@@ -1060,74 +1064,6 @@ namespace Contensive.Core.Controllers {
                 throw (ex);
             }
             return result;
-        }
-        //
-        //==========================================================================================
-        /// <summary>
-        /// Generic handle exception. Determines method name and class of caller from stack. 
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="ex"></param>
-        /// <param name="cause"></param>
-        /// <param name="stackPtr">How far down in the stack to look for the method error. Pass 1 if the method calling has the error, 2 if there is an intermediate routine.</param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public void handleException(Exception ex, string cause, int stackPtr) {
-            if (!_handlingExceptionRecursionBlock) {
-                _handlingExceptionRecursionBlock = true;
-                StackFrame frame = new StackFrame(stackPtr);
-                System.Reflection.MethodBase method = frame.GetMethod();
-                System.Type type = method.DeclaringType;
-                string methodName = method.Name;
-                string errMsg = type.Name + "." + methodName + ", cause=[" + cause + "], ex=[" + ex.ToString() + "]";
-                //
-                // append to application event log
-                //
-                string sSource = "Contensive";
-                int eventId = 1001;
-                try {
-                    //
-                    // if command line has been run on this server, this will work. Otherwise skip
-                    //
-                    EventLog.WriteEntry(sSource, errMsg, EventLogEntryType.Error, eventId);
-                } catch (Exception) {
-                    // ignore error. Can be caused if source has not been created. It is created automatically in command line installation util.
-                }
-                //
-                // append to daily trace log
-                //
-                logController.logError(this, errMsg);
-                //
-                // add to doc exception list to display at top of webpage
-                //
-                if (doc.errList == null) {
-                    doc.errList = new List<string>();
-                }
-                if (doc.errList.Count == 10) {
-                    doc.errList.Add("Exception limit exceeded");
-                } else if (doc.errList.Count < 10) {
-                    doc.errList.Add(errMsg);
-                }
-                //
-                // write consol for debugging
-                //
-                Console.WriteLine(errMsg);
-                //
-                _handlingExceptionRecursionBlock = false;
-            }
-        }
-        private bool _handlingExceptionRecursionBlock = false;
-        //
-        //====================================================================================================
-        //
-        public void handleException(Exception ex, string cause) {
-            handleException(ex, cause, 2);
-        }
-        //
-        //====================================================================================================
-        //
-        public void handleException(Exception ex) {
-            handleException(ex, "n/a", 2);
         }
         //
         //====================================================================================================
