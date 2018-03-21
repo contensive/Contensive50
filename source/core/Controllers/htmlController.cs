@@ -4314,8 +4314,29 @@ namespace Contensive.Core.Controllers {
         /// <param name="htmlClass"></param>
         /// <param name="htmlId"></param>
         /// <returns></returns>
-        public static string div(string innerHtml, string htmlName = "", string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("div", innerHtml, htmlName, htmlClass, htmlId);
+        public static string div(string innerHtml, string htmlClass = "", string htmlId = "") {
+            return genericBlockTag("div", innerHtml, "", htmlClass, htmlId);
+        }
+        public static string p(string innerHtml, string htmlClass = "", string htmlId = "") {
+            return genericBlockTag("p", innerHtml, "", htmlClass, htmlId);
+        }
+        public static string h1(string innerHtml, string htmlClass = "", string htmlId = "") {
+            return genericBlockTag("h1", innerHtml, "", htmlClass, htmlId);
+        }
+        public static string h2(string innerHtml, string htmlClass = "", string htmlId = "") {
+            return genericBlockTag("h2", innerHtml, "", htmlClass, htmlId);
+        }
+        public static string h3(string innerHtml, string htmlClass = "", string htmlId = "") {
+            return genericBlockTag("h3", innerHtml, "", htmlClass, htmlId);
+        }
+        public static string h4(string innerHtml, string htmlClass = "", string htmlId = "") {
+            return genericBlockTag("h4", innerHtml, "", htmlClass, htmlId);
+        }
+        public static string h5(string innerHtml, string htmlClass = "", string htmlId = "") {
+            return genericBlockTag("h5", innerHtml, "", htmlClass, htmlId);
+        }
+        public static string h6(string innerHtml, string htmlClass = "", string htmlId = "") {
+            return genericBlockTag("h6", innerHtml, "", htmlClass, htmlId);
         }
         //
         // ====================================================================================================

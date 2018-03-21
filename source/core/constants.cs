@@ -994,6 +994,13 @@ namespace Contensive.Core {
         //   Common RequestName Variables
         //------------------------------------------------------------------------
         //
+        public const string RequestNameAdminDepth = "ad";
+        public const string rnAdminForm = "af";
+        public const string rnAdminSourceForm = "asf";
+        public const string rnAdminAction = "aa";
+        public const string RequestNameTitleExtension = "tx";
+        //
+        //
         public const string RequestNameDynamicFormID = "dformid";
         //
         public const string RequestNameRunAddon = "addonid";

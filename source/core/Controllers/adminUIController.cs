@@ -37,27 +37,20 @@ namespace Contensive.Core {
         /// <param name="Description"></param>
         /// <returns></returns>
         public static string GetTitleBar(coreController core, string Title, string Description) {
-            string tempGetTitleBar = null;
+            string result = "";
             try {
-                //
-                string Copy = null;
-                //
-                tempGetTitleBar = "<div class=\"ccAdminTitleBar\">" + Title;
-                Copy = Description;
-                //
-                // Add Errors
-                //
+                result = Title;
                 if (core.doc.debug_iUserError != "") {
-                    Copy += "<div>" + errorController.getUserError(core) + "</div>";
+                    Description += htmlController.div( errorController.getUserError(core));
                 }
-                //
-                if (!string.IsNullOrEmpty(Copy)) {
-                    tempGetTitleBar = tempGetTitleBar + "<div>&nbsp;</div><div class=\"ccAdminInfoBar ccPanel3DReverse\">" + Copy + "</div>";
+                if (!string.IsNullOrEmpty(Description)) {
+                    result += htmlController.div( Description, "ccAdminInfoBar ccPanel3DReverse");
                 }
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
-            return tempGetTitleBar + "</div>";
+            result = htmlController.div(result, "ccAdminTitleBar");
+            return result;
         }
         // ====================================================================================================
         /// <summary>
@@ -818,16 +811,12 @@ namespace Contensive.Core {
         /// <param name="core"></param>
         /// <param name="headerInfo"></param>
         /// <returns></returns>
-        public static string getEditRecordHeader(coreController core, recordEditHeaderInfoClass headerInfo) {
+        public static string getTitleBarDetails(coreController core, recordEditHeaderInfoClass headerInfo) {
             string result = "";
             if (headerInfo.recordId == 0) {
                 result = "<div>New Record</div>";
             } else {
-                result = ""
-                + "<table border=0 cellpadding=0 cellspacing=0 style=\"width:90%\">";
-                if (!string.IsNullOrEmpty(headerInfo.customDescription)) {
-                    result += "<tr><td colspan=2>" + headerInfo.customDescription + "<div>&nbsp;</div></td></tr>";
-                }
+                result = "<table border=0 cellpadding=0 cellspacing=0 style=\"width:90%\">";
                 result += "<tr><td width=\"50%\">"
                 + "Name: " + headerInfo.recordName + "<br>Record ID: " + headerInfo.recordId + "</td><td width=\"50%\">";
                 //
@@ -922,7 +911,5 @@ namespace Contensive.Core {
         public int recordModifiedById;
         public DateTime recordLockExpiresDate;
         public int recordLockById;
-        public string customDescription;
-
     }
 }

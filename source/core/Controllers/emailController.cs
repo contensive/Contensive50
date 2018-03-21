@@ -700,8 +700,8 @@ namespace Contensive.Core.Controllers {
                 foreach (emailQueueModel queueRecord in queue) {
                     emailQueueModel.delete(core, queueRecord.id);
                     emailClass email = Newtonsoft.Json.JsonConvert.DeserializeObject<emailClass>(queueRecord.content);
-                    string ignoreMessage = "";
-                    if (smtpController.sendSmtp(core, email, ref ignoreMessage)) {
+                    string reasonForFail = "";
+                    if (smtpController.sendSmtp(core, email, ref reasonForFail)) {
                         //
                         // -- success, log the send
                         var log = emailLogModel.add(core);
@@ -725,17 +725,26 @@ namespace Contensive.Core.Controllers {
                             log.FromAddress = email.fromAddress;
                             log.Subject = email.subject;
                             log.body = email.htmlBody;
-                            log.SendStatus = "failed";
+                            log.SendStatus = "failed after 3 retries, reason [" + reasonForFail + "]";
                             log.LogType = EmailLogTypeImmediateSend;
                             log.EmailID = email.emailId;
                             log.save(core);
-                            logController.logInfo(core, "sendEmailInQueue, send FAILED, NOT resent because too many retries, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
+                            logController.logInfo(core, "sendEmailInQueue, send FAILED [" + reasonForFail + "], NOT resent because too many retries, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
                         } else {
                             //
                             // -- fail, add back to end of queue for retry
                             email.attempts += 1;
+                            var log = emailLogModel.add(core);
+                            log.ToAddress = email.toAddress;
+                            log.FromAddress = email.fromAddress;
+                            log.Subject = email.subject;
+                            log.body = email.htmlBody;
+                            log.SendStatus = "failed attempt (" + email.attempts.ToString() + " of 3), reason [" + reasonForFail + "]";
+                            log.LogType = EmailLogTypeImmediateSend;
+                            log.EmailID = email.emailId;
+                            log.save(core);
                             queueEmail(core, false, email);
-                            logController.logInfo(core, "sendEmailInQueue, send FAILED, added to end of queue, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
+                            logController.logInfo(core, "sendEmailInQueue, failed attempt (" + email.attempts.ToString() + " of 3), reason [" + reasonForFail + "], added to end of queue, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
                         }
                     }
                 }
