@@ -572,7 +572,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     Copy = core.html.inputTextExpandable("KeywordList", "", 10);
                     Copy += "<div>Paste your Meta Keywords into this text box, separated by either commas or enter keys. When you hit Save or OK, Meta Keyword records will be made out of each word. These can then be checked on any content page.</div>";
-                    Content.Add(adminUIController.GetEditRow(core, Copy, "Paste Meta Keywords", "", false, false, ""));
+                    Content.Add(adminUIController.getEditRowLegacy(core, Copy, "Paste Meta Keywords", "", false, false, ""));
                     //
                     // Buttons
                     //
@@ -6133,7 +6133,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool IsEmptyHelp = false;
                 string HelpMsg = null;
                 int CS = 0;
-                string EditorStyleModifier = null;
+                //string EditorStyleModifier = null;
                 string HelpClosedContentID = null;
                 bool AllowHelpRow = false;
                 string EditorHelp = null;
@@ -6151,7 +6151,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool FieldReadOnly = false;
                 string NonEncodedLink = null;
                 string EncodedLink = null;
-                string Caption = null;
+                string fieldCaption = null;
                 string[] lookups = null;
                 int CSPointer = 0;
                 string FieldName = null;
@@ -6217,20 +6217,21 @@ namespace Contensive.Core.Addons.AdminSite {
                         FieldValueText = genericController.encodeText(FieldValueObject);
                         FieldRows = 1;
                         FieldPreferenceHTML = field.htmlContent;
+                        string fieldHtmlId = FieldName + field.id.ToString();
                         //
-                        Caption = field.caption;
+                        fieldCaption = field.caption;
                         if (field.uniqueName) {
-                            Caption = "&nbsp;**" + Caption;
+                            fieldCaption = "&nbsp;**" + fieldCaption;
                         } else {
                             if (field.nameLc.ToLower() == "email") {
                                 if ((adminContent.contentTableName.ToLower() == "ccmembers") && ((core.siteProperties.getBoolean("allowemaillogin", false)))) {
-                                    Caption = "&nbsp;***" + Caption;
+                                    fieldCaption = "&nbsp;***" + fieldCaption;
                                     needUniqueEmailMessage = true;
                                 }
                             }
                         }
                         if (field.required) {
-                            Caption = "&nbsp;*" + Caption;
+                            fieldCaption = "&nbsp;*" + fieldCaption;
                         }
                         IsBaseField = field.blockAccess; // field renamed
                         FormInputCount = FormInputCount + 1;
@@ -6293,7 +6294,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 FieldValueText = "0";
                             }
                         }
-                        EditorStyleModifier = genericController.vbLCase(core.db.getFieldTypeNameFromFieldTypeId(fieldTypeId));
+                        //EditorStyleModifier = genericController.vbLCase(core.db.getFieldTypeNameFromFieldTypeId(fieldTypeId));
                         EditorString = "";
                         editorReadOnly = (RecordReadOnly || field.readOnly | (editRecord.id != 0 & field.notEditable) || (FieldReadOnly));
                         //
@@ -6350,7 +6351,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             if (useEditorAddon) {
                                 //
                                 // -- editor worked
-                                return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                return_NewFieldList +=  "," + FieldName;
                             } else {
                                 //
                                 // -- editor failed, determine if it is missing (or inactive). If missing, remove it from the members preferences
@@ -6417,25 +6418,21 @@ namespace Contensive.Core.Addons.AdminSite {
                                 if (!string.IsNullOrEmpty(WhyReadOnlyMsg)) {
                                     WhyReadOnlyMsg = "<span class=\"ccDisabledReason\">" + WhyReadOnlyMsg + "</span>";
                                 }
-                                EditorStyleModifier = "";
+                                //EditorStyleModifier = "";
                                 switch (fieldTypeId) {
                                     case FieldTypeIdBoolean:
                                         //
                                         // ----- Boolean ReadOnly
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
-                                        FieldValueBoolean = genericController.encodeBoolean(FieldValueObject);
-                                        EditorString += (core.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueBoolean)));
-                                        EditorString += (core.html.inputCheckbox(FormFieldLCaseName, FieldValueBoolean, "", true, "checkBox form-control"));
-                                        EditorString += WhyReadOnlyMsg;
-                                        //
+                                        EditorString += adminUIController.getDefaultEditor_Bool(core, FormFieldLCaseName, genericController.encodeBoolean(FieldValueObject), true, fieldHtmlId);
+                                        return_NewFieldList +=  "," + FieldName;
                                         break;
                                     case FieldTypeIdFile:
                                     case FieldTypeIdFileImage:
                                         //
                                         // ----- File ReadOnly
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         NonEncodedLink = genericController.getCdnFileLink(core, FieldValueText);
                                         //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValueText);
@@ -6456,7 +6453,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Lookup ReadOnly
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueInteger = genericController.encodeInteger(FieldValueObject);
                                         EditorString += (core.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)));
                                         //Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
@@ -6495,7 +6492,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Member Select ReadOnly
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueInteger = genericController.encodeInteger(FieldValueObject);
                                         EditorString += (core.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)));
                                         if (FieldValueInteger == 0) {
@@ -6531,7 +6528,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Currency ReadOnly
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueNumber = genericController.encodeNumber(FieldValueObject);
                                         EditorString += (core.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueNumber)));
                                         EditorString += (core.html.inputText(FormFieldLCaseName, FieldValueNumber.ToString(), -1, -1, "", false, true, "text form-control"));
@@ -6543,7 +6540,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- date
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueDate = genericController.encodeDateMinValue(genericController.encodeDate(FieldValueObject));
                                         if (FieldValueDate == DateTime.MinValue) {
                                             FieldValueText = "";
@@ -6561,7 +6558,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- number
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         EditorString += (core.html.inputHidden(FormFieldLCaseName, FieldValueText));
                                         EditorString += (core.html.inputText(FormFieldLCaseName, FieldValueText, -1, -1, "", false, true, "number form-control"));
@@ -6577,21 +6574,21 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             // edit html as html (see the code)
                                             //
-                                            return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                            return_NewFieldList +=  "," + FieldName;
                                             FieldValueText = genericController.encodeText(FieldValueObject);
                                             EditorString += core.html.inputHidden(FormFieldLCaseName, FieldValueText);
-                                            EditorStyleModifier = "textexpandable";
+                                            //EditorStyleModifier = "textexpandable";
                                             FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
                                             EditorString += core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "", FormFieldLCaseName, false, true, "form-control");
                                         } else {
                                             //
                                             // edit html as wysiwyg
                                             //
-                                            return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                            return_NewFieldList +=  "," + FieldName;
                                             FieldValueText = genericController.encodeText(FieldValueObject);
                                             EditorString += core.html.inputHidden(FormFieldLCaseName, FieldValueText);
                                             //
-                                            EditorStyleModifier = "text";
+                                            //EditorStyleModifier = "text";
                                             FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".PixelHeight", 500));
                                             //EditorString &=  core.main_GetFormInputHTML(FormFieldLCaseName, FieldValueText)
                                             //
@@ -6605,32 +6602,19 @@ namespace Contensive.Core.Addons.AdminSite {
                                     case FieldTypeIdLink:
                                     case FieldTypeIdResourceLink:
                                         //
-                                        // ----- FieldTypeText
-                                        //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorString += core.html.inputHidden(FormFieldLCaseName, FieldValueText);
-                                        if (field.password) {
-                                            //
-                                            // Password forces simple text box
-                                            //
-                                            EditorString += core.html.inputText(FormFieldLCaseName, "*****", 0, 0, "", true, true, "password form-control");
-                                        } else {
-                                            //
-                                            // non-password
-                                            //
-                                            EditorString += core.html.inputText(FormFieldLCaseName, FieldValueText, 1, 0, "", false, true, "text form-control");
-                                        }
+                                        // ----- Text Type
+                                        EditorString += adminUIController.getDefaultEditor_Text(core, FormFieldLCaseName, genericController.encodeText(FieldValueObject), true, fieldHtmlId, field.password);
+                                        return_NewFieldList += "," + FieldName;
                                         break;
                                     case FieldTypeIdLongText:
                                     case FieldTypeIdFileText:
                                         //
                                         // ----- LongText, TextFile
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         EditorString += core.html.inputHidden(FormFieldLCaseName, FieldValueText);
-                                        EditorStyleModifier = "textexpandable";
+                                        //EditorStyleModifier = "textexpandable";
                                         FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
                                         EditorString += core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "", FormFieldLCaseName, false, true, " form-control");
                                         break;
@@ -6638,7 +6622,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Legacy text type -- not used unless something was missed
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         EditorString += core.html.inputHidden(FormFieldLCaseName, FieldValueText);
                                         if (field.password) {
@@ -6659,14 +6643,14 @@ namespace Contensive.Core.Addons.AdminSite {
                                                 //
                                                 // longer text data, or text that contains a CR
                                                 //
-                                                EditorStyleModifier = "textexpandable";
+                                                //EditorStyleModifier = "textexpandable";
                                                 EditorString += core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, 10, "", "", false, true, " form-control");
                                             }
                                         } else if (field.htmlContent && FieldPreferenceHTML) {
                                             //
                                             // HTMLContent true, and prefered
                                             //
-                                            EditorStyleModifier = "text";
+                                            //EditorStyleModifier = "text";
                                             FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".PixelHeight", 500));
                                             EditorString += core.html.getFormInputHTML(FormFieldLCaseName, FieldValueText, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
                                             //innovaEditor = New innovaEditorAddonClassFPO
@@ -6676,7 +6660,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             // HTMLContent true, but text editor selected
                                             //
-                                            EditorStyleModifier = "textexpandable";
+                                            //EditorStyleModifier = "textexpandable";
                                             FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
                                             EditorString += core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "100%", FormFieldLCaseName, false, true);
                                             //EditorString = core.main_GetFormInputTextExpandable(FormFieldLCaseName, encodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False)
@@ -6693,20 +6677,15 @@ namespace Contensive.Core.Addons.AdminSite {
                                     case FieldTypeIdBoolean:
                                         //
                                         // ----- Boolean
-                                        //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
-                                        FieldValueBoolean = genericController.encodeBoolean(FieldValueObject);
-                                        //s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
-                                        EditorString += (core.html.inputCheckbox(FormFieldLCaseName, FieldValueBoolean, "", false, "checkBox form-control"));
-                                        //s.Add( "&nbsp;</span></nobr></td>")
-                                        //
+                                        EditorString += adminUIController.getDefaultEditor_Bool(core, FormFieldLCaseName, genericController.encodeBoolean(FieldValueObject), false, fieldHtmlId);
+                                        return_NewFieldList +=  "," + FieldName;
                                         break;
                                     case FieldTypeIdFile:
                                     case FieldTypeIdFileImage:
                                         //
                                         // ----- File
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         //Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                         if (string.IsNullOrEmpty(FieldValueText)) {
@@ -6734,7 +6713,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             LookupContentName = genericController.encodeText(cdefModel.getContentNameByID(core, field.lookupContentID));
                                         }
                                         if (!string.IsNullOrEmpty(LookupContentName)) {
-                                            return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                            return_NewFieldList +=  "," + FieldName;
                                             if (!field.required) {
                                                 EditorString += (core.html.selectFromContent(FormFieldLCaseName, FieldValueInteger, LookupContentName, "", "None", "", ref IsEmptyList, "select form-control"));
                                             } else {
@@ -6749,7 +6728,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             }
                                             EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + field.lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
                                         } else if (field.lookupList != "") {
-                                            return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                            return_NewFieldList +=  "," + FieldName;
                                             if (!field.required) {
                                                 EditorString += core.html.selectFromList(FormFieldLCaseName, FieldValueInteger, field.lookupList, "Select One", "", "select form-control");
                                             } else {
@@ -6767,7 +6746,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Member Select
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueInteger = genericController.encodeInteger(FieldValueObject);
                                         //s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                         if (!field.required) {
@@ -6806,7 +6785,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Date
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueDate = genericController.encodeDateMinValue(genericController.encodeDate(FieldValueObject));
                                         if (FieldValueDate == DateTime.MinValue) {
                                             FieldValueText = "";
@@ -6823,7 +6802,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Others that simply print
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         //s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                         if (field.password) {
@@ -6846,7 +6825,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Link (href value
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         EditorString = ""
                                             + core.html.inputText(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + FormFieldLCaseName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
@@ -6857,7 +6836,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Resource Link (src value)
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         EditorString = ""
                                             + core.html.inputText(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + FormFieldLCaseName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
@@ -6866,39 +6845,15 @@ namespace Contensive.Core.Addons.AdminSite {
                                     case FieldTypeIdText:
                                         //
                                         // ----- Text Type
-                                        //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        if (field.password) {
-                                            //
-                                            // Password forces simple text box
-                                            //
-                                            EditorString = core.html.inputText(FormFieldLCaseName, FieldValueText, -1, -1, "", true, false, "password form-control");
-                                        } else {
-                                            //
-                                            // non-password
-                                            //
-                                            if ((FieldValueText.IndexOf("\n") == -1) && (FieldValueText.Length < 40)) {
-                                                //
-                                                // text field shorter then 40 characters without a CR
-                                                //
-                                                EditorString = core.html.inputText(FormFieldLCaseName, FieldValueText, 1, -1, "", false, false, "text form-control");
-                                            } else {
-                                                //
-                                                // longer text data, or text that contains a CR
-                                                //
-                                                EditorStyleModifier = "textexpandable";
-                                                EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, 10, "100%", "", false, false, "text form-control");
-                                            }
-                                        }
-                                        //
+                                        EditorString += adminUIController.getDefaultEditor_Text(core, FormFieldLCaseName, genericController.encodeText(FieldValueObject), false, fieldHtmlId,field.password);
+                                        return_NewFieldList += "," + FieldName;
                                         break;
                                     case FieldTypeIdHTML:
                                     case FieldTypeIdFileHTML:
                                         //
                                         // content is html
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         //
                                         // 9/7/2012 -- added this to support:
@@ -6909,7 +6864,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             // View the content as Html, not wysiwyg
                                             //
-                                            EditorStyleModifier = "textexpandable";
+                                            //EditorStyleModifier = "textexpandable";
                                             EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, 10, "100%", "", false, false, "text form-control");
                                         } else {
                                             //
@@ -6921,7 +6876,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                 //
                                                 FieldValueText = HTMLEditorDefaultCopyNoCr;
                                             }
-                                            EditorStyleModifier = "htmleditor";
+                                            //EditorStyleModifier = "htmleditor";
                                             FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".PixelHeight", 500));
                                             EditorString += core.html.getFormInputHTML(FormFieldLCaseName, FieldValueText, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
                                             //innovaEditor = New innovaEditorAddonClassFPO
@@ -6935,10 +6890,10 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // -- Long Text, use text editor
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         //
-                                        EditorStyleModifier = "textexpandable";
+                                        //EditorStyleModifier = "textexpandable";
                                         FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
                                         EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "100%", FormFieldLCaseName, false, false, "text form-control");
                                         //
@@ -6947,9 +6902,9 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- CSS field
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorStyleModifier = "textexpandable";
+                                        //EditorStyleModifier = "textexpandable";
                                         FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
                                         EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, 10, "100%", "", false, false, "styles form-control");
                                         break;
@@ -6957,9 +6912,9 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Javascript field
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorStyleModifier = "textexpandable";
+                                        //EditorStyleModifier = "textexpandable";
                                         FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
                                         EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "100%", FormFieldLCaseName, false, false, "text form-control");
                                         //
@@ -6968,9 +6923,9 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- xml field
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorStyleModifier = "textexpandable";
+                                        //EditorStyleModifier = "textexpandable";
                                         FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
                                         EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "100%", FormFieldLCaseName, false, false, "text form-control");
                                         //
@@ -6979,7 +6934,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Legacy text type -- not used unless something was missed
                                         //
-                                        return_NewFieldList = return_NewFieldList + "," + FieldName;
+                                        return_NewFieldList +=  "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         if (field.password) {
                                             //
@@ -6999,7 +6954,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                 //
                                                 // longer text data, or text that contains a CR
                                                 //
-                                                EditorStyleModifier = "textexpandable";
+                                                //EditorStyleModifier = "textexpandable";
                                                 EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, 10, "100%", "", false, false, "text form-control");
                                             }
                                         } else if (field.htmlContent && FieldPreferenceHTML) {
@@ -7012,7 +6967,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                                 //
                                                 FieldValueText = HTMLEditorDefaultCopyNoCr;
                                             }
-                                            EditorStyleModifier = "htmleditor";
+                                            //EditorStyleModifier = "htmleditor";
                                             FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".PixelHeight", 500));
                                             EditorString += core.html.getFormInputHTML(FormFieldLCaseName, FieldValueText, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
                                             //innovaEditor = New innovaEditorAddonClassFPO
@@ -7022,7 +6977,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             // HTMLContent true, but text editor selected
                                             //
-                                            EditorStyleModifier = "textexpandable";
+                                            //EditorStyleModifier = "textexpandable";
                                             FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
                                             EditorString = core.html.inputTextExpandable(FormFieldLCaseName, htmlController.encodeHtml(FieldValueText), FieldRows, "600px", FormFieldLCaseName, false, false, "text");
                                         }
@@ -7223,16 +7178,12 @@ namespace Contensive.Core.Addons.AdminSite {
                                 + "";
                         }
                         //
-                        // assemble the help line
+                        // assemble the editor row
                         //
-                        string editorHelpRow = "<small id=\"emailHelp\" class=\"form-text text-muted\">" + field.helpDefault + "</small>";
-                        string editorRow = htmlController.div(htmlController.h4(Caption) + htmlController.div(EditorString, "ml-4") + htmlController.div(editorHelpRow, "ml-4"), "p-2 " + EditorStyleModifier);
+                        string fieldHelp = "<small id=\"emailHelp\" class=\"form-text text-muted\">" + field.helpDefault + "</small>";
+                        //string editorRowContent = htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div(editorHelpRow, "ml-5"));
+                        string editorRow = adminUIController.getEditRow( core, EditorString, fieldCaption, fieldHelp, field.required, false, fieldHtmlId);
                         resultBody.Add("<tr><td colspan=2>" + editorRow + "</td></tr>");
-                        //resultBody.Add("<tr><td class=\"ccEditCaptionCon\"><div class=\"" + EditorStyleModifier + "\">" + Caption + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"15\" ></div></td><td class=\"ccEditFieldCon\"><div class=\"ccEditorCon\">" + EditorString + "</div>");
-                        //if (AllowHelpRow) {
-                        //    resultBody.Add("<div class=\"ccEditorHelpCon\">" + EditorHelp + "</div>");
-                        //}
-                        //resultBody.Add("</td></tr>");
                     }
                     //
                     // ----- add the *Required Fields footer
@@ -7246,12 +7197,12 @@ namespace Contensive.Core.Addons.AdminSite {
                     // ----- close the panel
                     //
                     if (string.IsNullOrEmpty(EditTab)) {
-                        Caption = "Content Fields";
+                        fieldCaption = "Content Fields";
                     } else {
-                        Caption = "Content Fields - " + EditTab;
+                        fieldCaption = "Content Fields - " + EditTab;
                     }
                     EditSectionPanelCount = EditSectionPanelCount + 1;
-                    returnHtml = adminUIController.GetEditPanel(core, (!allowAdminTabs), Caption, "", adminUIController.EditTableOpen + resultBody.Text + adminUIController.EditTableClose);
+                    returnHtml = adminUIController.GetEditPanel(core, (!allowAdminTabs), fieldCaption, "", adminUIController.EditTableOpen + resultBody.Text + adminUIController.EditTableClose);
                     EditSectionPanelCount = EditSectionPanelCount + 1;
                     resultBody = null;
                 }
@@ -7326,7 +7277,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 }
                             }
                             //
-                            FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Include in " + core.db.csGet(CSLists, "name"), "When true, this Content Record can be included in the '" + core.db.csGet(CSLists, "name") + "' list", false, false, ""));
+                            FastString.Add(adminUIController.getEditRowLegacy(core, HTMLFieldString, "Include in " + core.db.csGet(CSLists, "name"), "When true, this Content Record can be included in the '" + core.db.csGet(CSLists, "name") + "' list", false, false, ""));
                             core.db.csGoNext(CSLists);
                             RecordCount = RecordCount + 1;
                         }
@@ -7339,7 +7290,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             HTMLFieldString = core.html.inputText("ContentWatchLinkLabel", ContentWatchLinkLabel, 1, core.siteProperties.defaultFormInputWidth);
                             //HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchLinkLabel"" cols=""" & core.app.SiteProperty_DefaultFormInputWidth & """>" & ContentWatchLinkLabel & "</textarea>"
                         }
-                        FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Caption", "This caption is displayed on all Content Watch Lists, linked to the location on the web site where this content is displayed. RSS feeds created from Content Watch Lists will use this caption as the record title if not other field is selected in the Content Definition.", false, true, "ContentWatchLinkLabel"));
+                        FastString.Add(adminUIController.getEditRowLegacy(core, HTMLFieldString, "Caption", "This caption is displayed on all Content Watch Lists, linked to the location on the web site where this content is displayed. RSS feeds created from Content Watch Lists will use this caption as the record title if not other field is selected in the Content Definition.", false, true, "ContentWatchLinkLabel"));
                         //
                         // ----- Whats New Expiration
                         //
@@ -7353,7 +7304,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             HTMLFieldString = core.html.inputDate("ContentWatchExpires", Copy, core.siteProperties.defaultFormInputWidth.ToString());
                             //HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchExpires"" cols=""" & core.app.SiteProperty_DefaultFormInputWidth & """>" & Copy & "</textarea>"
                         }
-                        FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
+                        FastString.Add(adminUIController.getEditRowLegacy(core, HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
                         //
                         // ----- Public Link (read only)
                         //
@@ -7361,7 +7312,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         if (string.IsNullOrEmpty(HTMLFieldString)) {
                             HTMLFieldString = "(must first be viewed on public site)";
                         }
-                        FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Location on Site", "The public site URL where this content was last viewed.", false, false, ""));
+                        FastString.Add(adminUIController.getEditRowLegacy(core, HTMLFieldString, "Location on Site", "The public site URL where this content was last viewed.", false, false, ""));
                         //
                         // removed 11/27/07 - RSS clicks not counted, rc/ri method of counting link clicks is not reliable.
                         //            '
@@ -7391,8 +7342,6 @@ namespace Contensive.Core.Addons.AdminSite {
         }
         //
         //========================================================================
-        //   Display field in the admin/edit
-        //========================================================================
         //
         private string GetForm_Edit_Control(cdefModel adminContent, editRecordClass editRecord) {
             string result = null;
@@ -7401,7 +7350,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (string.IsNullOrEmpty(adminContent.name)) {
                     //
                     // Content not found or not loaded
-                    //
                     if (adminContent.id == 0) {
                         //
                         handleLegacyClassError("GetForm_Edit_Control", "No content definition was specified for this page");
@@ -7412,10 +7360,8 @@ namespace Contensive.Core.Addons.AdminSite {
                         handleLegacyClassError("GetForm_Edit_Control", "The content definition specified for this page [" + adminContent.id + "] was not found");
                         return htmlController.p("No content was specified.");
                     }
-                } else {
                 }
                 //
-                bool Checked = false;
                 //
                 // ----- Authoring status
                 //
@@ -7430,26 +7376,25 @@ namespace Contensive.Core.Addons.AdminSite {
                     HTMLFieldString = genericController.encodeText(editRecord.id);
                 }
                 HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Record Number", FieldHelp, true, false, ""));
+                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Record Number", FieldHelp, true, false, ""));
                 //
                 // -- Active
                 string Copy = "When unchecked, add-ons can ignore this record as if it was temporarily deleted.";
                 HTMLFieldString = core.html.inputCheckbox("active", editRecord.active);
-                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Active", Copy, false, false, ""));
+                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Active", Copy, false, false, ""));
                 //
                 // ----- If Page Content , check if this is the default PageNotFound page
-                //
                 if (adminContent.contentTableName.ToLower() == "ccpagecontent") {
                     //
                     // Landing Page
                     Copy = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docore.main_";
-                    Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("LandingPageID", 0))));
+                    bool Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("LandingPageID", 0))));
                     if (core.session.isAuthenticatedAdmin(core)) {
                         HTMLFieldString = core.html.inputCheckbox("LandingPageID", Checked);
                     } else {
                         HTMLFieldString = "<b>" + genericController.getYesNo(Checked) + "</b>" + core.html.inputHidden("LandingPageID", Checked);
                     }
-                    FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Set Default Landing Page", Copy, false, false, ""));
+                    FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Set Default Landing Page", Copy, false, false, ""));
                     //
                     // Page Not Found
                     Copy = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked.";
@@ -7459,7 +7404,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     } else {
                         HTMLFieldString = "<b>" + genericController.getYesNo(Checked) + "</b>" + core.html.inputHidden("PageNotFound", Checked);
                     }
-                    FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Set Page Not Found", Copy, false, false, ""));
+                    FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Set Page Not Found", Copy, false, false, ""));
                 }
                 //
                 // ----- Last Known Public Site URL
@@ -7472,7 +7417,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     } else {
                         HTMLFieldString = "<a href=\"" + htmlController.encodeHtml(Copy) + "\" target=\"_blank\">" + Copy + "</a>";
                     }
-                    FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Last Known Public URL", FieldHelp, false, false, ""));
+                    FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Last Known Public URL", FieldHelp, false, false, ""));
                 }
                 //
                 // ----- Widget Code
@@ -7489,7 +7434,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         FieldHelp = "If you wish to use this add-on as a widget, enable 'Is Remote Method' on the 'Placement' tab and save the record. The necessary html code, or 'embed code' will be created here for you to cut-and-paste into the website.";
                         HTMLFieldString = "";
                         HTMLFieldString = core.html.inputTextExpandable("ignore", HTMLFieldString, 1, "100%", "", false, true);
-                        FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
+                        FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
                     } else {
                         FieldHelp = "If you wish to use this add-on as a widget, cut and paste the 'Widget Code' into the website content. If any code appears in the 'Widget Head', this will need to be pasted into the head section of the website.";
                         HTMLFieldString = ""
@@ -7499,7 +7444,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             + "\r\ndocument.write(unescape(\"%3Cscript src='\" + ccProto + \"" + core.webServer.requestDomain + "/" + genericController.encodeURL(editRecord.nameLc) + "?requestjsform=1' type='text/javascript'%3E%3C/script%3E\"));"
                             + "\r\n</SCRIPT>";
                         HTMLFieldString = core.html.inputTextExpandable("ignore", HTMLFieldString, 8);
-                        FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
+                        FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
                     }
                 }
                 //
@@ -7522,7 +7467,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             HTMLFieldString = core.html.inputText("ccguid", HTMLFieldString, -1, -1, "", false, true) + core.html.inputHidden("ccguid", HTMLFieldString);
                         }
                     }
-                    FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "GUID", FieldHelp, false, false, ""));
+                    FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "GUID", FieldHelp, false, false, ""));
                 }
                 //
                 // ----- EID (Encoded ID)
@@ -7545,7 +7490,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         FieldHelp = FieldHelp + " To enable, disable or modify this feature, use the security tab on the Preferences page.";
                     }
                     HTMLFieldString = core.html.inputText("ignore", HTMLFieldString);
-                    FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Member Link Login EID", FieldHelp, true, false, ""));
+                    FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Member Link Login EID", FieldHelp, true, false, ""));
                 }
                 //
                 // ----- Controlling Content
@@ -7630,7 +7575,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (string.IsNullOrEmpty(HTMLFieldString)) {
                     HTMLFieldString = editRecord.contentControlId_Name;
                 }
-                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Controlling Content", FieldHelp, FieldRequired, false, ""));
+                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Controlling Content", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Created By
                 FieldHelp = "The people account of the user who created this record.";
@@ -7651,7 +7596,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                 }
                 HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Created By", FieldHelp, FieldRequired, false, ""));
+                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Created By", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Created Date
                 FieldHelp = "The date and time when this record was originally created.";
@@ -7664,7 +7609,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                 }
                 HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Created Date", FieldHelp, FieldRequired, false, ""));
+                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Created Date", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Modified By
                 FieldHelp = "The people account of the last user who modified this record.";
@@ -7682,7 +7627,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                 }
                 HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Modified By", FieldHelp, FieldRequired, false, ""));
+                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Modified By", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Modified Date
                 FieldHelp = "The date and time when this record was last modified";
@@ -7695,7 +7640,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                 }
                 HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, "Modified Date", FieldHelp, false, false, ""));
+                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Modified Date", FieldHelp, false, false, ""));
                 string s = ""
                     + adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose;
                 result = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Control Information", "", s);
@@ -7859,7 +7804,7 @@ namespace Contensive.Core.Addons.AdminSite {
 
                     //HTMLFieldString = core.main_GetFormInputText2( genericController.vbLCase(FieldName), VAlue)
                 }
-                FastString.Add(adminUIController.GetEditRow(core, HTMLFieldString, SitePropertyName, "", false, false, ""));
+                FastString.Add(adminUIController.getEditRowLegacy(core, HTMLFieldString, SitePropertyName, "", false, false, ""));
                 tempGetForm_Edit_SiteProperties = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Control Information", "", adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
                 FastString = null;
@@ -8410,9 +8355,9 @@ namespace Contensive.Core.Addons.AdminSite {
                 string Copy = null;
                 //adminUIController Adminui = new adminUIController(core);
                 //
-                f.Add(adminUIController.GetEditRow(core, "<a href=?" + rnAdminForm + "=28 target=_blank>Open in New Window</a>", "Email Control", "The settings in this section can be modified with the Email Control page."));
-                f.Add(adminUIController.GetEditRow(core, core.siteProperties.getText("EmailBounceAddress", ""), "Bounce Email Address", "All bounced emails will be sent to this address automatically. This must be a valid email account, and you should either use Contensive Bounce processing to capture the emails, or manually remove them from the account yourself."));
-                f.Add(adminUIController.GetEditRow(core, genericController.getYesNo(genericController.encodeBoolean(core.siteProperties.getBoolean("AllowEmailBounceProcessing", false))), "Allow Bounce Email Processing", "If checked, Contensive will periodically retrieve all the email from the POP email account and take action on the membefr account that sent the email."));
+                f.Add(adminUIController.getEditRowLegacy(core, "<a href=?" + rnAdminForm + "=28 target=_blank>Open in New Window</a>", "Email Control", "The settings in this section can be modified with the Email Control page."));
+                f.Add(adminUIController.getEditRowLegacy(core, core.siteProperties.getText("EmailBounceAddress", ""), "Bounce Email Address", "All bounced emails will be sent to this address automatically. This must be a valid email account, and you should either use Contensive Bounce processing to capture the emails, or manually remove them from the account yourself."));
+                f.Add(adminUIController.getEditRowLegacy(core, genericController.getYesNo(genericController.encodeBoolean(core.siteProperties.getBoolean("AllowEmailBounceProcessing", false))), "Allow Bounce Email Processing", "If checked, Contensive will periodically retrieve all the email from the POP email account and take action on the membefr account that sent the email."));
                 switch (core.siteProperties.getText("EMAILBOUNCEPROCESSACTION", "0")) {
                     case "1":
                         Copy = "Clear the Allow Group Email field for all members with a matching Email address";
@@ -8427,8 +8372,8 @@ namespace Contensive.Core.Addons.AdminSite {
                         Copy = "Do Nothing";
                         break;
                 }
-                f.Add(adminUIController.GetEditRow(core, Copy, "Bounce Email Action", "When an email is determined to be a bounce, this action will taken against member with that email address."));
-                f.Add(adminUIController.GetEditRow(core, core.siteProperties.getText("POPServerStatus"), "Last Email Retrieve Status", "This is the status of the last POP email retrieval attempted."));
+                f.Add(adminUIController.getEditRowLegacy(core, Copy, "Bounce Email Action", "When an email is determined to be a bounce, this action will taken against member with that email address."));
+                f.Add(adminUIController.getEditRowLegacy(core, core.siteProperties.getText("POPServerStatus"), "Last Email Retrieve Status", "This is the status of the last POP email retrieval attempted."));
                 //
                 tempGetForm_Edit_EmailBounceStatus = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Bounced Email Handling", "", adminUIController.EditTableOpen + f.Text + adminUIController.EditTableClose);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
@@ -11297,14 +11242,14 @@ namespace Contensive.Core.Addons.AdminSite {
                         FieldValue = FieldValue + "</select>";
                         //FieldValue = core.htmldoc.main_GetFormInputSelect2("ParentContentID", CStr(ParentContentID), "Content", "(AllowContentChildTool<>0)")
 
-                        Content.Add(adminUIController.GetEditRow(core, FieldValue, "Parent Content Name", "", false, false, ""));
+                        Content.Add(adminUIController.getEditRowLegacy(core, FieldValue, "Parent Content Name", "", false, false, ""));
                         //
                         FieldValue = core.html.inputText("ChildContentName", ChildContentName, 1, 40);
-                        Content.Add(adminUIController.GetEditRow(core, FieldValue, "New Child Content Name", "", false, false, ""));
+                        Content.Add(adminUIController.getEditRowLegacy(core, FieldValue, "New Child Content Name", "", false, false, ""));
                         //
                         FieldValue = core.html.inputRadio("NewGroup", false.ToString(), NewGroup.ToString()) + core.html.selectFromContent("GroupID", GroupID, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
                             + "<br>" + core.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + core.html.inputText("NewGroupName", NewGroupName) + "(Create a new group)";
-                        Content.Add(adminUIController.GetEditRow(core, FieldValue, "Content Manager Group", "", false, false, ""));
+                        Content.Add(adminUIController.getEditRowLegacy(core, FieldValue, "Content Manager Group", "", false, false, ""));
                         //            '
                         //            FieldValue = core.main_GetFormInputCheckBox2("AddAdminMenuEntry", AddAdminMenuEntry) & "(Add Navigator Entry under Manager Site Content &gt; Advanced)"
                         //            Call Content.Add(adminUIController.GetEditRow(core, FieldValue, "Add Menu Entry", "", False, False, ""))
@@ -11479,7 +11424,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         PagesTotal = core.db.csGetInteger(CSServers, "Result");
                     }
                     core.db.csClose(ref CSServers);
-                    Content.Add(adminUIController.GetEditRow(core, SpanClassAdminNormal + PagesTotal, "Visits Found", "", false, false, ""));
+                    Content.Add(adminUIController.getEditRowLegacy(core, SpanClassAdminNormal + PagesTotal, "Visits Found", "", false, false, ""));
                     //
                     // ----- Oldest Visit
                     //
@@ -11497,7 +11442,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                     }
                     core.db.csClose(ref CSServers);
-                    Content.Add(adminUIController.GetEditRow(core, SpanClassAdminNormal + Copy + " (" + AgeInDays + " days)", "Oldest Visit", "", false, false, ""));
+                    Content.Add(adminUIController.getEditRowLegacy(core, SpanClassAdminNormal + Copy + " (" + AgeInDays + " days)", "Oldest Visit", "", false, false, ""));
                     //
                     // ----- Viewings Found
                     //
@@ -11508,21 +11453,21 @@ namespace Contensive.Core.Addons.AdminSite {
                         PagesTotal = core.db.csGetInteger(CSServers, "Result");
                     }
                     core.db.csClose(ref CSServers);
-                    Content.Add(adminUIController.GetEditRow(core, SpanClassAdminNormal + PagesTotal, "Viewings Found", "", false, false, ""));
+                    Content.Add(adminUIController.getEditRowLegacy(core, SpanClassAdminNormal + PagesTotal, "Viewings Found", "", false, false, ""));
                     //
                     Content.Add(htmlController.tableRowStart() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Options</b>" + tableCellEnd + kmaEndTableRow);
                     //
                     Caption = "Archive Age";
                     Copy = core.html.inputText("ArchiveRecordAgeDays", ArchiveRecordAgeDays.ToString(), -1, 20) + "&nbsp;Number of days to keep visit records. 0 disables housekeeping.";
-                    Content.Add(adminUIController.GetEditRow(core, Copy, Caption));
+                    Content.Add(adminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
                     Caption = "Housekeeping Time";
                     Copy = core.html.inputText("ArchiveTimeOfDay", ArchiveTimeOfDay, -1, 20) + "&nbsp;The time of day when record deleting should start.";
-                    Content.Add(adminUIController.GetEditRow(core, Copy, Caption));
+                    Content.Add(adminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
                     Caption = "Purge Content Files";
                     Copy = core.html.inputCheckbox("ArchiveAllowFileClean", ArchiveAllowFileClean) + "&nbsp;Delete Contensive content files with no associated database record.";
-                    Content.Add(adminUIController.GetEditRow(core, Copy, Caption));
+                    Content.Add(adminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
                     Content.Add(adminUIController.EditTableClose);
                     Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminformHousekeepingControl));
@@ -12826,7 +12771,7 @@ namespace Contensive.Core.Addons.AdminSite {
 
                     Copy = core.html.inputCheckbox("AllowAutoLogin", AllowAutoLogin);
                     Copy += "<div>When checked, returning users are automatically logged-in, without requiring a username or password. This is very convenient, but creates a high security risk. Each time you login, you will be given the option to not allow Auto-Login from that computer.</div>";
-                    Content.Add(adminUIController.GetEditRow(core, Copy, "Allow Auto Login", "", false, false, ""));
+                    Content.Add(adminUIController.getEditRowLegacy(core, Copy, "Allow Auto Login", "", false, false, ""));
                     //
                     // Buttons
                     //
@@ -14244,5 +14189,6 @@ namespace Contensive.Core.Addons.AdminSite {
             //
             return SpanClassAdminNormal + Title + "</span>";
         }
+
     }
 }

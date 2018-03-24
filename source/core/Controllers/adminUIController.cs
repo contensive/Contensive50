@@ -327,48 +327,6 @@ namespace Contensive.Core {
             }
             return result;
         }
-        // ====================================================================================================
-        //
-        public static string GetEditRow(coreController core, string HTMLFieldString, string Caption, string HelpMessage = "", bool FieldRequired = false, bool AllowActiveEdit = false, string ignore0 = "") {
-            string tempGetEditRow = null;
-            try {
-                //
-                stringBuilderLegacyController FastString = new stringBuilderLegacyController();
-                string Copy = null;
-                //
-                // Left Side
-                //
-                Copy = Caption;
-                if (string.IsNullOrEmpty(Copy)) {
-                    Copy = "&nbsp;";
-                }
-                tempGetEditRow = "<tr><td class=\"ccEditCaptionCon\"><nobr>" + Copy + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=15 >";
-                //GetEditRow = "<tr><td class=""ccAdminEditCaption""><nobr>" & Copy & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=15 >"
-                //If core.visitProperty.getboolean("AllowHelpIcon") Then
-                //    'If HelpMessage <> "" Then
-                //        GetEditRow = GetEditRow & "&nbsp;" & core.main_GetHelpLinkEditable(0, Caption, HelpMessage, FormInputName)
-                //    'Else
-                //    '    GetEditRow = GetEditRow & "&nbsp;<img alt=""space"" src=""/ccLib/images/spacer.gif"" " & IconWidthHeight & ">"
-                //    'End If
-                //End If
-                tempGetEditRow = tempGetEditRow + "</nobr></td>";
-                //
-                // Right Side
-                //
-                Copy = HTMLFieldString;
-                if (string.IsNullOrEmpty(Copy)) {
-                    Copy = "&nbsp;";
-                }
-                Copy = "<div class=\"ccEditorCon\">" + Copy + "</div>";
-                Copy += "<div class=\"ccEditorHelpCon\"><div class=\"closed\">" + HelpMessage + "</div></div>";
-                tempGetEditRow += "<td class=\"ccEditFieldCon\">" + Copy + "</td></tr>";
-            } catch (Exception ex) {
-                logController.handleError(core, ex);
-            }
-            return tempGetEditRow;
-        }
-        // ====================================================================================================
-        //
         public static string GetEditSubheadRow(coreController core, string Caption) {
             return "<tr><td colspan=2 class=\"ccAdminEditSubHeader\">" + Caption + "</td></tr>";
         }
@@ -894,6 +852,92 @@ namespace Contensive.Core {
             }
             return result;
         }
+        // ====================================================================================================
+        /// <summary>
+        /// return the default admin editor for this field type
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
+        public static string getDefaultEditor_Bool(coreController core, string htmlName, bool htmlValue, bool disabled, string htmlId) {
+            return htmlController.div(core.html.inputCheckbox(htmlName, htmlValue, htmlId, disabled), "checkbox");
+        }
+        // ====================================================================================================
+        /// <summary>
+        /// return the default admin editor for this field type
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="disabled"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="isPassword"></param>
+        /// <returns></returns>
+        public static string getDefaultEditor_Text(coreController core, string htmlName, string htmlValue, bool disabled, string htmlId, bool isPassword ) {
+            if (isPassword) {
+                //
+                // Password forces simple text box
+                return core.html.inputText(htmlName, htmlValue, -1, -1, "", true, false, "password form-control",255);
+            } else {
+                //
+                // non-password
+                if ((htmlValue.IndexOf("\n") == -1) && (htmlValue.Length < 40)) {
+                    //
+                    // text field shorter then 40 characters without a CR
+                    return core.html.inputText(htmlName, htmlValue, 1, -1, "", false, false, "text form-control",255);
+                } else {
+                    //
+                    // longer text data, or text that contains a CR
+                    return core.html.inputTextExpandable(htmlName, htmlValue, 10, "100%", "", false, false, "text form-control");
+                }
+            }
+        }
+        // ====================================================================================================
+        /// <summary>
+        /// return an admin edit page row for one field in a list of fields within a tab
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Caption"></param>
+        /// <param name="fieldHtmlId"></param>
+        /// <param name="EditorString"></param>
+        /// <param name="editorHelpRow"></param>
+        /// <returns></returns>
+        public static string getEditRow(coreController core, string EditorString, string Caption, string editorHelpRow, bool fieldRequired = false, bool ignore = false, string fieldHtmlId = "") {
+            return htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div(editorHelpRow, "ml-5"), "p-2 ");
+        }
+        // ====================================================================================================
+        //
+        public static string getEditRowLegacy(coreController core, string HTMLFieldString, string Caption, string HelpMessage = "", bool FieldRequired = false, bool AllowActiveEdit = false, string ignore0 = "") {
+            string tempGetEditRow = null;
+            try {
+                stringBuilderLegacyController FastString = new stringBuilderLegacyController();
+                string Copy = null;
+                //
+                // Left Side
+                //
+                Copy = Caption;
+                if (string.IsNullOrEmpty(Copy)) {
+                    Copy = "&nbsp;";
+                }
+                tempGetEditRow = "<tr><td class=\"ccEditCaptionCon\"><nobr>" + Copy + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=15 >";
+                tempGetEditRow = tempGetEditRow + "</nobr></td>";
+                //
+                // Right Side
+                //
+                Copy = HTMLFieldString;
+                if (string.IsNullOrEmpty(Copy)) {
+                    Copy = "&nbsp;";
+                }
+                Copy = "<div class=\"ccEditorCon\">" + Copy + "</div>";
+                Copy += "<div class=\"ccEditorHelpCon\"><div class=\"closed\">" + HelpMessage + "</div></div>";
+                tempGetEditRow += "<td class=\"ccEditFieldCon\">" + Copy + "</td></tr>";
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
+            }
+            return tempGetEditRow;
+        }
+        // ====================================================================================================
         //
     }
     //

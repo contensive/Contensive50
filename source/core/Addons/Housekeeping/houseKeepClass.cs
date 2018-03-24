@@ -19,8 +19,6 @@ using System.IO;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 //
 namespace Contensive.Core.Addons.Housekeeping {
-    //
-    //====================================================================================================
     /// <summary>
     /// support for housekeeping functions
     /// </summary>
@@ -44,8 +42,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                 cp.Site.ErrorReport(ex);
             }
             return result;
-        }        //
+        }
         //
+        //====================================================================================================
         //
         public void HouseKeep(coreController core, bool force) {
             try {
@@ -375,7 +374,7 @@ namespace Contensive.Core.Addons.Housekeeping {
             }
         }
         //
-        //
+        //====================================================================================================
         //
         private void HouseKeep_App_Daily(coreController core, int VisitArchiveAgeDays, int GuestArchiveAgeDays, int EmailDropArchiveAgeDays, string DefaultMemberName, string BuildVersion) {
             try {
@@ -1259,7 +1258,7 @@ namespace Contensive.Core.Addons.Housekeeping {
             }
         }
         //
-        //
+        //====================================================================================================
         //
         private void HouseKeep_App_Daily_RemoveVisitRecords(coreController core, DateTime DeleteBeforeDate, int DataSourceType) {
             try {
@@ -1324,7 +1323,7 @@ namespace Contensive.Core.Addons.Housekeeping {
             }
         }
         //
-        //
+        //====================================================================================================
         //
         private void HouseKeep_App_Daily_RemoveGuestRecords(coreController core, DateTime DeleteBeforeDate, int DataSourceType) {
             try {
@@ -1635,12 +1634,10 @@ namespace Contensive.Core.Addons.Housekeeping {
             //throw new ApplicationException("Unexpected exception");
         }
         //
-        //======================================================================================
-        //   Log a reported error
-        //======================================================================================
+        //====================================================================================================
         //
         public void logHousekeeping(coreController core, string LogCopy) {
-            logController.logError(core, "housekeeping: " + LogCopy);
+            logController.logInfo(core, "housekeeping: " + LogCopy);
         }
         //
         //====================================================================================================
@@ -1707,13 +1704,16 @@ namespace Contensive.Core.Addons.Housekeeping {
             return loadOK;
         }
         //
-        //=========================================================================================
-        // Summarize the page views
-        //   excludes non-cookie visits
-        //   excludes administrator and developer visits
-        //   excludes authenticated users with ExcludeFromReporting
-        //
-        //=========================================================================================
+        //====================================================================================================
+        /// <summary>
+        /// Summarize the page views, excludes non-cookie visits, excludes administrator and developer visits, excludes authenticated users with ExcludeFromReporting
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="StartTimeDate"></param>
+        /// <param name="EndTimeDate"></param>
+        /// <param name="HourDuration"></param>
+        /// <param name="BuildVersion"></param>
+        /// <param name="OldestVisitSummaryWeCareAbout"></param>
         //
         public void HouseKeep_PageViewSummary(coreController core, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
             int hint = 0;
@@ -1952,6 +1952,7 @@ namespace Contensive.Core.Addons.Housekeeping {
         }
         //
         //====================================================================================================
+        //
         public void housekeepAddonFolder(coreController core) {
             try {
                 string RegisterPathList = null;

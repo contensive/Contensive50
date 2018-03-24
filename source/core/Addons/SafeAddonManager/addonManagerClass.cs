@@ -844,9 +844,9 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 } else {
                                     Body.Add(adminUIController.EditTableOpen);
                                     if (core.session.isAuthenticatedDeveloper(core)) {
-                                        Body.Add(adminUIController.GetEditRow(core,core.html.inputCheckbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
+                                        Body.Add(adminUIController.getEditRowLegacy(core,core.html.inputCheckbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
                                     }
-                                    Body.Add(adminUIController.GetEditRow(core,core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
+                                    Body.Add(adminUIController.getEditRowLegacy(core,core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
                                     FormInput = ""
                                         + "<table id=\"UploadInsert\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
                                         + "</table>"
@@ -854,7 +854,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         + "<tr><td align=\"left\"><a href=\"#\" onClick=\"InsertUpload(); return false;\">+ Add more files</a></td></tr>"
                                         + "</table>"
                                         + core.html.inputHidden("UploadCount", 1, "UploadCount") + "";
-                                    Body.Add(adminUIController.GetEditRow(core,FormInput, "&nbsp;", "", true, false, ""));
+                                    Body.Add(adminUIController.getEditRowLegacy(core,FormInput, "&nbsp;", "", true, false, ""));
                                     Body.Add(adminUIController.EditTableClose);
                                 }
                                 core.doc.menuLiveTab.AddEntry("Add&nbsp;Manually", adminUIController.GetEditPanel(core,true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");

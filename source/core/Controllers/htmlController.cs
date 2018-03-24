@@ -970,13 +970,13 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string inputText(string TagName, string DefaultValue = "", string Height = "", string Width = "", string Id = "", bool PasswordField = false) {
-            return inputText(TagName, DefaultValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), Id, PasswordField, false);
+        public string inputText(string htmlName, string DefaultValue = "", string Height = "", string Width = "", string Id = "", bool PasswordField = false) {
+            return inputText(htmlName, DefaultValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), Id, PasswordField, false);
         }
         //
         //====================================================================================================
         //
-        public string inputText(string htmlName, string defaultValue, int height, int width, string htmlId = "", bool passwordField = false, bool disabled = false, string htmlClass = "") {
+        public string inputText(string htmlName, string defaultValue, int height, int width, string htmlId = "", bool passwordField = false, bool disabled = false, string htmlClass = "", int maxLength = 0) {
             string result = "";
             try {
                 defaultValue = htmlController.encodeHtml(defaultValue);
@@ -1000,6 +1000,10 @@ namespace Contensive.Core.Controllers {
                 string TagDisabled = "";
                 if (disabled) {
                     TagDisabled = " disabled=\"disabled\"";
+                }
+                string tagMaxLength = "";
+                if (maxLength>0) {
+                    tagMaxLength = " maxlength=" + maxLength.ToString();
                 }
                 //
                 if (passwordField) {
@@ -4337,6 +4341,19 @@ namespace Contensive.Core.Controllers {
         }
         public static string h6(string innerHtml, string htmlClass = "", string htmlId = "") {
             return genericBlockTag("h6", innerHtml, "", htmlClass, htmlId);
+        }
+        public static string label(string innerHtml, string forHtmlId = "", string htmlClass = "", string htmlId = "") {
+            string s = "";
+            if (!string.IsNullOrEmpty(forHtmlId)) {
+                s += " for=\"" + forHtmlId + "\"";
+            }
+            if (!string.IsNullOrEmpty(htmlClass)) {
+                s += " class=\"" + htmlClass + "\"";
+            }
+            if (!string.IsNullOrEmpty(htmlId)) {
+                s += " id=\"" + htmlId + "\"";
+            }
+            return "<label " + s + ">" + innerHtml + "</label>";
         }
         //
         // ====================================================================================================

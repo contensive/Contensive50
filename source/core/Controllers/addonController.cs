@@ -1072,7 +1072,7 @@ namespace Contensive.Core.Controllers {
                                                                         break;
                                                                 }
                                                             }
-                                                            TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "copycontent":
@@ -1121,7 +1121,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 Copy = core.html.inputTextExpandable(FieldName, FieldValue);
                                                             }
-                                                            TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "filecontent":
@@ -1145,7 +1145,7 @@ namespace Contensive.Core.Controllers {
                                                                 Copy = core.html.inputTextExpandable(FieldName, Copy, 10);
                                                             }
                                                         }
-                                                        TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                     case "dbquery":
                                                     case "querydb":
@@ -1262,7 +1262,7 @@ namespace Contensive.Core.Controllers {
                                                                 }
                                                             }
                                                         }
-                                                        TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                 }
                                             }
@@ -2804,7 +2804,7 @@ namespace Contensive.Core.Controllers {
                                                                         break;
                                                                 }
                                                             }
-                                                            TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "copycontent":
@@ -2853,7 +2853,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 Copy = core.html.inputTextExpandable(FieldName, FieldValue);
                                                             }
-                                                            TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "filecontent":
@@ -2877,7 +2877,7 @@ namespace Contensive.Core.Controllers {
                                                                 Copy = core.html.inputTextExpandable(FieldName, Copy, 10);
                                                             }
                                                         }
-                                                        TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                     case "dbquery":
                                                     case "querydb":
@@ -2990,7 +2990,7 @@ namespace Contensive.Core.Controllers {
                                                                 }
                                                             }
                                                         }
-                                                        TabCell.Add(adminUIController.GetEditRow(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                 }
                                             }
