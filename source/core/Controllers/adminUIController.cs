@@ -321,7 +321,7 @@ namespace Contensive.Core {
                 + nop(Content) + "\r</div>";
                 result += nop(ButtonBar) + nop(GetTitleBar(core, Caption, Description)) + nop(CellContentSummary) + nop(ContentCell) + nop(ButtonBar) + "";
 
-                result = '\r' + core.html.formStartMultipart() + nop(result) + '\r' + core.html.formEnd();
+                result = '\r' + core.html.formStartMultipart() + nop(result) + '\r' + htmlController.formEnd();
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }

@@ -2217,7 +2217,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Assemble LiveWindowTable
                             //
-                            //Stream.Add(core.html.formStart("", "adminForm"));
+                            //Stream.Add(htmlController.formStart( core,"", "adminForm"));
                             Stream.Add(ButtonBar);
                             Stream.Add(adminUIController.GetTitleBar(core, titleRow, ""));
                             Stream.Add(formContent);
@@ -2234,7 +2234,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //End If
                     //
                 }
-                result = core.html.form(Stream.Text, "", "adminForm");
+                result = htmlController.form(core,Stream.Text, "", "adminForm");
                 //
             } catch (Exception ex) {
                 logController.handleError(core, ex);
@@ -7947,11 +7947,12 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // --- Start a form to make a refresh button
                 //
-                Stream.Add(core.html.formStart());
+                Stream.Add(htmlController.formStart(core));
                 Stream.Add(core.html.getPanelButtons(ButtonCancel + "," + ButtonRefresh, "" + RequestNameButton + ""));
                 Stream.Add("<input TYPE=\"hidden\" NAME=\"asf\" VALUE=\"" + AdminFormQuickStats + "\">");
                 Stream.Add(core.html.getPanel(" "));
                 //
+
                 // --- Indented part (Title Area plus page)
                 //
                 Stream.Add("<table border=\"0\" cellpadding=\"20\" cellspacing=\"0\" width=\"100%\"><tr><td>" + SpanClassAdminNormal);
@@ -8058,7 +8059,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     Stream.Add(core.html.getPanel(Panel, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 0));
                 }
                 Stream.Add("</td></tr></table>");
-                Stream.Add(core.html.formEnd());
+                Stream.Add(htmlController.formEnd());
                 //
                 tempGetForm_QuickStats = Stream.Text;
                 core.html.addTitle("Quick Stats");
@@ -14012,7 +14013,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 Content = returnForm;
                 //
                 // Assemble LiveWindowTable
-                Stream.Add("\r\n" + core.html.formStart());
+                Stream.Add("\r\n" + htmlController.formStart( core));
                 Stream.Add(ButtonBar);
                 Stream.Add(TitleBar);
                 Stream.Add(Content);

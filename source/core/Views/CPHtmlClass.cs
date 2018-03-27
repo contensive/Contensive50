@@ -104,9 +104,9 @@ namespace Contensive.Core {
                         logController.handleError( core,new ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"));
                     }
                     if (string.IsNullOrEmpty(ActionQueryString)) {
-                        FormStart = core.html.formStart("", HtmlName, HtmlId, Method);
+                        FormStart = htmlController.formStart(core, "", HtmlName, HtmlId, Method);
                     } else {
-                        FormStart = core.html.formStart(ActionQueryString, HtmlName, HtmlId, Method);
+                        FormStart = htmlController.formStart(core, ActionQueryString, HtmlName, HtmlId, Method);
                     }
 
                 } else {
@@ -128,8 +128,7 @@ namespace Contensive.Core {
             } catch (Exception) {
 
             }
-            return ""
-                    + FormStart + InnerHtml + "</form>";
+            return FormStart + InnerHtml + "</form>";
         }
         //
         // ==========================================================================================

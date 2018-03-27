@@ -880,15 +880,15 @@ namespace Contensive.Core.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="htmlMethod"></param>
         /// <returns></returns>
-        public string form( string innerHtml, string actionQueryString = "", string htmlName = "", string htmlId = "", string htmlMethod = "" ) {
-            return formStart(actionQueryString, htmlName, htmlId, htmlMethod) + innerHtml + formEnd();
+        public static string form( coreController core,  string innerHtml, string actionQueryString = "", string htmlName = "", string htmlId = "", string htmlMethod = "" ) {
+            return formStart(core, actionQueryString, htmlName, htmlId, htmlMethod) + innerHtml + formEnd();
         }
         //
         //====================================================================================================
         /// <summary>
         /// </summary>
         [Obsolete("use form()", false)]
-        public string formStart(string ActionQueryString = null, string htmlName = "", string htmlId = "", string htmlMethod = "") {
+        public static string formStart(coreController core, string ActionQueryString = null, string htmlName = "", string htmlId = "", string htmlMethod = "") {
             string temphtml_GetFormStart = null;
             try {
                 //
@@ -964,7 +964,7 @@ namespace Contensive.Core.Controllers {
         /// <returns></returns>
         //
         [Obsolete("use form()", false)]
-        public string formEnd() {
+        public static  string formEnd() {
             return "</form>";
         }
         //
@@ -3437,7 +3437,7 @@ namespace Contensive.Core.Controllers {
                         //helpLink = main_GetHelpLink("2", "Contensive Tools Panel", BubbleCopy)
                         result += getPanelHeader("Contensive Tools Panel" + helpLink);
                         //
-                        ToolsPanel.Add(core.html.formStart(WorkingQueryString));
+                        ToolsPanel.Add(htmlController.formStart( core,WorkingQueryString));
                         ToolsPanel.Add(core.html.inputHidden("Type", FormTypeToolsPanel));
                         //
                         if (true) {
@@ -3621,7 +3621,7 @@ namespace Contensive.Core.Controllers {
                         + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
                         + genericController.nop(Copy) + "\r</table>";
                         ToolsPanel.Add(getPanelInput(Copy));
-                        ToolsPanel.Add(core.html.formEnd());
+                        ToolsPanel.Add(htmlController.formEnd());
                         result += getPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         //
                         result += getPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
@@ -3751,7 +3751,7 @@ namespace Contensive.Core.Controllers {
             string result = "";
             try {
 
-                result = core.html.formStart();
+                result = htmlController.formStart( core);
                 if (!string.IsNullOrEmpty(ButtonList)) {
                     result += core.html.getPanelButtons(ButtonList, "Button");
                 }

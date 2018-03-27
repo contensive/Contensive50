@@ -234,6 +234,11 @@
     <Compile Include="Models\DbModels\memberRuleModel.cs" />
     <Compile Include="Models\DbModels\emailModel.cs" />
     <Compile Include="Models\DbModels\siteSectionModel.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Views\CPAddonClass.cs" />
     <Compile Include="Views\CPBlockClass.cs" />
     <Compile Include="Views\CPCacheClass.cs" />
@@ -314,6 +319,9 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Models\dataModelFields.txt" />
+    <Content Include="Resources\defaultLoginEmailHtml.txt" />
+    <Content Include="Resources\defaultForgetPasswordHtml.txt" />
+    <Content Include="Resources\defaultLoginHtml.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\View\" />
@@ -338,6 +346,12 @@
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.S3.3.3.17\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

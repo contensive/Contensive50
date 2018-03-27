@@ -1966,7 +1966,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 tempgetFormPage = ""
-                + errorController.getUserError(core) + core.html.formStartMultipart() + core.html.inputHidden("ContensiveFormPageID", FormPageID) + core.html.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + core.html.formEnd();
+                + errorController.getUserError(core) + core.html.formStartMultipart() + core.html.inputHidden("ContensiveFormPageID", FormPageID) + core.html.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + htmlController.formEnd();
                 //
                 return tempgetFormPage;
                 //

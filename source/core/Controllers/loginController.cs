@@ -16,6 +16,7 @@ using static Contensive.Core.constants;
 //
 // todo -- should not be here
 using Contensive.BaseClasses;
+using System.Xml.Linq;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -28,121 +29,84 @@ namespace Contensive.Core.Controllers {
         /// <param name="forceDefaultLogin"></param>
         /// <returns></returns>
         public static string getLoginPage(coreController core, bool forceDefaultLogin) {
-            string returnREsult = "";
+            string result = "";
             try {
-                string Body = null;
-                //Dim head As String
-                //Dim bodyTag As String
-                //
-                // ----- Default Login
-                //
                 if (forceDefaultLogin) {
-                    Body = getLoginForm_Default(core);
+                    result = getLoginForm_Default(core);
                 } else {
-                    Body = getLoginForm(core);
+                    result = getLoginForm(core);
                 }
-                Body = ""
-                    + "\r<p class=\"ccAdminNormal\">You are attempting to enter an access controlled area. Continue only if you have authority to enter this area. Information about your visit will be recorded for security purposes.</p>"
-                    + Body + "";
-                //
-                Body = ""
-                    + core.html.getPanel(Body, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) + "\r<p>&nbsp;</p>"
-                    + "\r<p>&nbsp;</p>"
-                    + "\r<p style=\"text-align:center\"><a href=\"http://www.Contensive.com\" target=\"_blank\"><img src=\"/ccLib/images/ccLibLogin.GIF\" width=\"80\" height=\"33\" border=\"0\" alt=\"Contensive Content Control\" ></A></p>"
-                    + "\r<p style=\"text-align:center\" class=\"ccAdminSmall\">The content on this web site is managed and delivered by the Contensive Site Management Server. If you do not have member access, please use your back button to return to the public area.</p>"
-                    + "";
-                //
-                // --- create an outer table to hold the form
-                //
-                Body = ""
-                    + "\r<div class=\"ccCon\" style=\"width:400px;margin:100px auto 0 auto;\">"
-                    + nop(core.html.getPanelHeader("Login")) + nop(Body) + "</div>";
-                //
-                returnREsult = Body;
-                //Call core.doc.setMetaContent(0, 0)
-                //Call core.html.addTitle("Login", "loginPage")
-                //bodyTag = TemplateDefaultBodyTag
-                //returnREsult = core.html.getHtmlDoc(Body, bodyTag, True, True, False)
+                result = ""
+                    + "\r<div class=\"ccCon bg-light\" style=\"width:400px;margin:100px auto 0 auto;\">"
+                    + nop(core.html.getPanelHeader("Login")) + nop(result) + "</div>";
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
             }
-            return returnREsult;
+            return result;
         }
         //
-        //========================================================================
-        //   default login form
-        //========================================================================
-        //
+        // ====================================================================================================
+        /// <summary>
+        /// process and return the default login form. If processing is successful, a blank response is returned
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
         public static string getLoginForm_Default(coreController core) {
-            string returnHtml = "";
+            string result = "";
             try {
-                string Panel = null;
-                string usernameMsg = null;
-                string QueryString = null;
-                string loginForm = null;
-                string Caption = null;
-                string formType = null;
-                bool needLoginForm;
                 //
-                // ----- process the previous form, if login OK, return blank (signal for page refresh)
-                //
-                needLoginForm = true;
-                formType = core.docProperties.getText("type");
+                bool needLoginForm = true;
+                string formType = core.docProperties.getText("type");
                 if (formType == FormTypeLogin) {
                     if (processFormLoginDefault(core)) {
-                        returnHtml = "";
+                        result = "";
                         needLoginForm = false;
                     }
                 }
                 if (needLoginForm) {
-                    //
-                    // ----- When page loads, set focus on login username
-                    //
                     core.doc.addRefreshQueryString("method", "");
-                    loginForm = "";
-                    core.html.addScriptCode_onLoad("document.getElementById('LoginUsernameInput').focus()", "login");
+                    string loginForm;
                     //
-                    // ----- Error Messages
-                    //
+                    string usernameMsg = "";
                     if (genericController.encodeBoolean(core.siteProperties.getBoolean("allowEmailLogin", false))) {
-                        usernameMsg = "<b>To login, enter your username or email address with your password.</b></p>";
+                        loginForm = Properties.Resources.defaultLoginEmailHtml;
+                        // usernameMsg = "<b>To login, enter your username or email address with your password.</b></p>";
                     } else {
-                        usernameMsg = "<b>To login, enter your username and password.</b></p>";
+                        loginForm = Properties.Resources.defaultLoginHtml;
+                        //usernameMsg = "<b>To login, enter your username and password.</b></p>";
                     }
                     //
-                    QueryString = core.webServer.requestQueryString;
+                    string QueryString = core.webServer.requestQueryString;
                     QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                     QueryString = genericController.modifyQueryString(QueryString, "requestbinary", "", false);
+                    ////
+                    //// ----- Username
+                    //string Caption = "";
+                    //if (genericController.encodeBoolean(core.siteProperties.getBoolean("allowEmailLogin", false))) {
+                    //    Caption = "Username&nbsp;or&nbsp;Email";
+                    //} else {
+                    //    Caption = "Username";
+                    //}
                     //
-                    // ----- Username
-                    //
-                    if (genericController.encodeBoolean(core.siteProperties.getBoolean("allowEmailLogin", false))) {
-                        Caption = "Username&nbsp;or&nbsp;Email";
-                    } else {
-                        Caption = "Username";
-                    }
-                    //
-                    loginForm = loginForm + "\r<tr>"
-                    + cr2 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + Caption + "&nbsp;</span></td>"
-                    + cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input ID=\"LoginUsernameInput\" NAME=\"username\" VALUE=\"\" SIZE=\"20\" MAXLENGTH=\"50\" ></td>"
-                    + "\r</tr>";
+                    //loginForm = loginForm + "\r<tr>"
+                    //+ cr2 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + Caption + "&nbsp;</span></td>"
+                    //+ cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input ID=\"LoginUsernameInput\" NAME=\"username\" VALUE=\"\" SIZE=\"20\" MAXLENGTH=\"50\" ></td>"
+                    //+ "\r</tr>";
                     //
                     // ----- Password
-                    //
-                    if (genericController.encodeBoolean(core.siteProperties.getBoolean("allowNoPasswordLogin", false))) {
-                        Caption = "Password&nbsp;(optional)";
-                    } else {
-                        Caption = "Password";
-                    }
-                    loginForm = loginForm + "\r<tr>"
-                    + cr2 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\">" + SpanClassAdminNormal + Caption + "&nbsp;</span></td>"
-                    + cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\" ><input NAME=\"password\" VALUE=\"\" SIZE=\"20\" MAXLENGTH=\"50\" type=\"password\"></td>"
-                    + "\r</tr>"
-                    + "";
+                    //if (genericController.encodeBoolean(core.siteProperties.getBoolean("allowNoPasswordLogin", false))) {
+                    //    Caption = "Password&nbsp;(optional)";
+                    //} else {
+                    //    Caption = "Password";
+                    //}
+                    //loginForm = loginForm + "\r<tr>"
+                    //+ cr2 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\">" + SpanClassAdminNormal + Caption + "&nbsp;</span></td>"
+                    //+ cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\" ><input NAME=\"password\" VALUE=\"\" SIZE=\"20\" MAXLENGTH=\"50\" type=\"password\"></td>"
+                    //+ "\r</tr>"
+                    //+ "";
                     //
                     // ----- autologin support
-                    //
                     if (genericController.encodeBoolean(core.siteProperties.getBoolean("AllowAutoLogin", false))) {
                         loginForm = loginForm + "\r<tr>"
                         + cr2 + "<td align=\"right\">&nbsp;</td>"
@@ -164,26 +128,21 @@ namespace Contensive.Core.Controllers {
                         + "\r<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
                         + nop(loginForm) + "\r</table>"
                         + "";
-                    loginForm = loginForm + core.html.inputHidden("Type", FormTypeLogin) + core.html.inputHidden("email", core.session.user.Email) + core.html.getPanelButtons(ButtonLogin, "Button") + "";
-                    loginForm = ""
-                        + core.html.formStart(QueryString) + nop(loginForm) + "\r</form>"
-                        + "";
-
-                    //-------
-
-                    Panel = ""
-                        + errorController.getUserError(core) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
+                    loginForm += core.html.inputHidden("Type", FormTypeLogin) 
+                        + core.html.inputHidden("email", core.session.user.Email);
+                    loginForm = htmlController.form(core, loginForm, QueryString);
+                    string Panel = errorController.getUserError(core) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
                     //
                     // ----- Password Form
-                    //
-                    if (genericController.encodeBoolean(core.siteProperties.getBoolean("allowPasswordEmail", true))) {
-                        Panel = ""
-                            + Panel + "\r<p class=\"ccAdminNormal\"><b>Forget your password?</b></p>"
-                            + "\r<p class=\"ccAdminNormal\">If you are a member of the system and can not remember your password, enter your email address below and we will email your matching username and password.</p>"
-                            + getSendPasswordForm(core) + "";
+                    if (core.siteProperties.getBoolean("allowPasswordEmail", true)) {
+                        Panel += getSendPasswordForm(core);
+                        //Panel += ""
+                        //    + htmlController.h5( "Forget your password?", "ccAdminNormal")
+                        //    + htmlController.p( "If you are a member of the system and cannot remember your password, enter your email address below and we will email your matching username(s) and password(s).","ccAdminNormal")
+                        //    + getSendPasswordForm(core) + "";
                     }
                     //
-                    returnHtml = ""
+                    result = ""
                         + "\r<div class=\"ccLoginFormCon\">"
                         + nop(Panel) + "\r</div>"
                         + "";
@@ -192,7 +151,7 @@ namespace Contensive.Core.Controllers {
                 logController.handleError( core,ex);
                 throw;
             }
-            return returnHtml;
+            return result;
         }
         //
         //=============================================================================
@@ -248,21 +207,22 @@ namespace Contensive.Core.Controllers {
                 string QueryString = null;
                 //
                 if (core.siteProperties.getBoolean("allowPasswordEmail", true)) {
-                    returnResult = ""
-                    + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                    + cr2 + "<tr>"
-                    + cr3 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + "Email</span></td>"
-                    + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"email\" VALUE=\"" + htmlController.encodeHtml(core.session.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
-                    + cr2 + "</tr>"
-                    + cr2 + "<tr>"
-                    + cr3 + "<td colspan=\"2\">&nbsp;</td>"
-                    + cr2 + "</tr>"
-                    + cr2 + "<tr>"
-                    + cr3 + "<td colspan=\"2\">"
-                    + nop(nop(core.html.getPanelButtons(ButtonSendPassword, "Button"))) + cr3 + "</td>"
-                    + cr2 + "</tr>"
-                    + "\r</table>"
-                    + "";
+                    returnResult = Properties.Resources.defaultForgetPasswordHtml;
+                    //returnResult = ""
+                    //+ "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
+                    //+ cr2 + "<tr>"
+                    //+ cr3 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + "Email</span></td>"
+                    //+ cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"email\" VALUE=\"" + htmlController.encodeHtml(core.session.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
+                    //+ cr2 + "</tr>"
+                    //+ cr2 + "<tr>"
+                    //+ cr3 + "<td colspan=\"2\">&nbsp;</td>"
+                    //+ cr2 + "</tr>"
+                    //+ cr2 + "<tr>"
+                    //+ cr3 + "<td colspan=\"2\">"
+                    //+ nop(nop(core.html.getPanelButtons(ButtonSendPassword, "Button"))) + cr3 + "</td>"
+                    //+ cr2 + "</tr>"
+                    //+ "\r</table>"
+                    //+ "";
                     //
                     // write out all of the form input (except state) to hidden fields so they can be read after login
                     //
@@ -290,9 +250,7 @@ namespace Contensive.Core.Controllers {
                     QueryString = core.doc.refreshQueryString;
                     QueryString = genericController.modifyQueryString(QueryString, "S", "");
                     QueryString = genericController.modifyQueryString(QueryString, "ccIPage", "");
-                    returnResult = ""
-                    + core.html.formStart(QueryString) + nop(returnResult) + "\r</form>"
-                    + "";
+                    returnResult = htmlController.form( core,returnResult,QueryString);
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);

@@ -658,7 +658,7 @@ namespace Contensive.Core.Controllers {
                 // Form Wrapper
                 //
                 result = ""
-                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + core.html.inputHidden("Type", FormTypePageAuthoring) + '\r' + core.html.inputHidden("ID", pageController.page.id) + '\r' + core.html.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + core.html.formEnd();
+                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + core.html.inputHidden("Type", FormTypePageAuthoring) + '\r' + core.html.inputHidden("ID", pageController.page.id) + '\r' + core.html.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + htmlController.formEnd();
 
                 //& cr & core.html.main_GetPanelHeader("Contensive Quick Editor") _
 

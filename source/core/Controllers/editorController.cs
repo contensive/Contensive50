@@ -122,7 +122,7 @@ namespace Contensive.Core.Controllers {
             }
             Stream = Stream + core.html.getPanelHeader("Contensive Active Content Editor");
             Stream = Stream + core.html.getPanel(EditorPanel);
-            Stream = core.html.formStart() + Stream + core.html.formEnd();
+            Stream = htmlController.form(core, Stream );
             return Stream;
         }
         //
