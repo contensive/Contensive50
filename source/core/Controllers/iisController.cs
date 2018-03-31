@@ -563,111 +563,14 @@ namespace Contensive.Core.Controllers {
                 string s = null;
                 //
                 if (core.doc.continueProcessing) {
-                    //If core.doc.continueProcessing And core.doc.outputBufferEnabled Then
-                    if (false) {
-                        //
-                        // no domain provided, new mode
-                        //   - write cookie for current domains
-                        //   - write an iframe that called the cross-Site login
-                        //   - http://127.0.0.1/ccLib/clientside/cross.html?v=1&vPath=%2F&vExpires=1%2F1%2F2012
-                        //
-                        //domainListSplit = Split(core.main_ServerDomainCrossList, ",")
-                        //For Ptr = 0 To UBound(domainListSplit)
-                        //    domainSet = Trim(domainListSplit[Ptr])
-                        //    If (domainSet <> "") And (InStr(1, "," & usedDomainList & ",", "," & domainSet & ",", vbTextCompare) = 0) Then
-                        //        usedDomainList = usedDomainList & "," & domainSet
-                        //        '
-                        //        ' valid, non-repeat domain
-                        //        '
-                        //        If genericController.vbLCase(domainSet) = genericController.vbLCase(requestDomain) Then
-                        //            '
-                        //            ' current domain, set cookie
-                        //            '
-                        //            If (iisContext IsNot Nothing) Then
-                        //                '
-                        //                ' Pass cookie to asp (compatibility)
-                        //                '
-                        //                iisContext.Response.Cookies[iCookieName].Value = iCookieValue
-                        //                If Not isMinDate(DateExpires) Then
-                        //                    iisContext.Response.Cookies[iCookieName].Expires = DateExpires
-                        //                End If
-                        //                'main_ASPResponse.Cookies[iCookieName].domain = domainSet
-                        //                If Not isMissing(Path) Then
-                        //                    iisContext.Response.Cookies[iCookieName].Path = genericController.encodeText(Path)
-                        //                End If
-                        //                If Not isMissing(Secure) Then
-                        //                    iisContext.Response.Cookies[iCookieName].Secure = Secure
-                        //                End If
-                        //            Else
-                        //                '
-                        //                ' Pass Cookie to non-asp parent
-                        //                '   crlf delimited list of name,value,expires,domain,path,secure
-                        //                '
-                        //                If webServerIO_bufferCookies <> "" Then
-                        //                    webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf
-                        //                End If
-                        //                webServerIO_bufferCookies = webServerIO_bufferCookies & CookieName
-                        //                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & iCookieValue
-                        //                '
-                        //                s = ""
-                        //                If Not isMinDate(DateExpires) Then
-                        //                    s = DateExpires.ToString
-                        //                End If
-                        //                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
-                        //                ' skip bc this is exactly the current domain and /rfc2109 requires a leading dot if explicit
-                        //                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf
-                        //                'responseBufferCookie = responseBufferCookie & vbCrLf & domainSet
-                        //                '
-                        //                s = "/"
-                        //                If Not isMissing(Path) Then
-                        //                    s = genericController.encodeText(Path)
-                        //                End If
-                        //                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
-                        //                '
-                        //                s = "false"
-                        //                If genericController.EncodeBoolean(Secure) Then
-                        //                    s = "true"
-                        //                End If
-                        //                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
-                        //            End If
-                        //        Else
-                        //            '
-                        //            ' other domain, add iframe
-                        //            '
-                        //            Dim C As String
-                        //            Link = "http://" & domainSet & "/ccLib/clientside/cross.html"
-                        //            Link = Link & "?n=" & EncodeRequestVariable(iCookieName)
-                        //            Link = Link & "&v=" & EncodeRequestVariable(iCookieValue)
-                        //            If Not isMissing(Path) Then
-                        //                C = genericController.encodeText(Path)
-                        //                C = EncodeRequestVariable(C)
-                        //                C = genericController.vbReplace(C, "/", "%2F")
-                        //                Link = Link & "&p=" & C
-                        //            End If
-                        //            If Not isMinDate(DateExpires) Then
-                        //                C = genericController.encodeText(DateExpires)
-                        //                C = EncodeRequestVariable(C)
-                        //                C = genericController.vbReplace(C, "/", "%2F")
-                        //                Link = Link & "&e=" & C
-                        //            End If
-                        //            Link = core.htmlDoc.html_EncodeHTML(Link)
-                        //            core.htmlDoc.htmlForEndOfBody = core.htmlDoc.htmlForEndOfBody & vbCrLf & vbTab & "<iframe style=""display:none;"" width=""0"" height=""0"" src=""" & Link & """></iframe>"
-                        //        End If
-                        //    End If
-                        //Next
-                    } else {
-                        //
-                        // Legacy mode - if no domain given just leave it off
-                        //
+                    {
                         if (iisContext != null) {
                             //
-                            // Pass cookie to asp (compatibility)
-                            //
+                            // Pass cookie to iis
                             iisContext.Response.Cookies[cookieName].Value = iCookieValue;
                             if (!isMinDate(DateExpires)) {
                                 iisContext.Response.Cookies[cookieName].Expires = DateExpires;
                             }
-                            //main_ASPResponse.Cookies[iCookieName].domain = domainSet
                             if (!isMissing(Path)) {
                                 iisContext.Response.Cookies[cookieName].Path = genericController.encodeText(Path);
                             }
@@ -676,9 +579,7 @@ namespace Contensive.Core.Controllers {
                             }
                         } else {
                             //
-                            // Pass Cookie to non-asp parent
-                            //   crlf delimited list of name,value,expires,domain,path,secure
-                            //
+                            // Pass Cookie to non-asp parent crlf delimited list of name,value,expires,domain,path,secure
                             if (bufferCookies != "") {
                                 bufferCookies = bufferCookies + "\r\n";
                             }
@@ -720,37 +621,44 @@ namespace Contensive.Core.Controllers {
         //
         //
         public void setResponseStatus(string status) {
-            bufferResponseStatus = status;
+            if (core.doc.continueProcessing) {
+                if (iisContext != null) {
+                    // add header to response
+                    iisContext.Response.Status = status;
+                }
+                bufferResponseStatus = status;
+            }
         }
         //
         //
         //
-        public void setResponseContentType(object ContentType) {
-            bufferContentType = encodeText(ContentType);
+        public void setResponseContentType(string ContentType) {
+            if (core.doc.continueProcessing) {
+                if (iisContext != null) {
+                    // add header to response
+                    iisContext.Response.ContentType = ContentType;
+                }
+                bufferContentType = ContentType;
+            }
         }
         //
         //
         //
-        public void addResponseHeader(object HeaderName, object HeaderValue) {
+        public void addResponseHeader(string HeaderName, string HeaderValue) {
             try {
-                //
                 if (core.doc.continueProcessing) {
+                    if (iisContext != null) {
+                        // add header to response
+                        iisContext.Response.AddHeader(HeaderName, HeaderValue);
+                    }
                     if (bufferResponseHeader != "") {
                         bufferResponseHeader = bufferResponseHeader + "\r\n";
                     }
-                    bufferResponseHeader = bufferResponseHeader + genericController.vbReplace(genericController.encodeText(HeaderName), "\r\n", "") + "\r\n" + genericController.vbReplace(genericController.encodeText(HeaderValue), "\r\n", "");
+                    bufferResponseHeader = bufferResponseHeader + genericController.vbReplace(HeaderName, "\r\n", "") + "\r\n" + genericController.vbReplace(genericController.encodeText(HeaderValue), "\r\n", "");
                 }
-                //
-                return;
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 logController.handleError( core,ex);
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_SetStreamHeader")
-                                                                    //
+            }  
         }
         //
         //===========================================================================================
@@ -1191,6 +1099,7 @@ namespace Contensive.Core.Controllers {
             return "";
         }
         public void clearResponseBuffer() {
+            iisContext.Response.ClearHeaders();
             bufferRedirect = "";
             bufferResponseHeader = "";
         }

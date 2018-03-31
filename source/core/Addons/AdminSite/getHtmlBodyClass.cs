@@ -165,6 +165,9 @@ namespace Contensive.Core.Addons.AdminSite {
                 core.html.addScriptCode_onLoad("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive");
                 core.doc.setMetaContent(0, 0);
                 //
+                // turn off chrome protection against submitting html content
+                core.webServer.addResponseHeader("X-XSS-Protection", "0");
+                //
                 //-------------------------------------------------------------------------------
                 // check for member login, if logged in and no admin, lock out
                 // Do CheckMember here because we need to know who is there to create proper blocked menu
