@@ -36,9 +36,16 @@ namespace Contensive.Core.Controllers {
                 } else {
                     result = getLoginForm(core);
                 }
+                //result = htmlController.div(result, "ccCon bg-light");
                 result = ""
-                    + "\r<div class=\"ccCon bg-light\" style=\"width:400px;margin:100px auto 0 auto;\">"
-                    + nop(core.html.getPanelHeader("Login")) + nop(result) + "</div>";
+                    + "<div class=\"ccCon bg-light pt-2 pb-4\" style=\"width:400px;margin:100px auto 0 auto;\">"
+                    + result
+                    + "</div>";
+                //result = ""
+                //    + "\r<div class=\"ccCon bg-light\" style=\"width:400px;margin:100px auto 0 auto;\">"
+                //    + nop(core.html.getPanelHeader("Login"))
+                //    + nop(result)
+                //    + "</div>";
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;

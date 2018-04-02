@@ -916,7 +916,7 @@ namespace Contensive.Core {
         /// <param name="fieldRequired"></param>
         /// <param name="IsEmptyList"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_LookupContent( coreController core, string fieldName, int fieldValue, int lookupContentID, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired, ref bool IsEmptyList) {
+        public static string getDefaultEditor_LookupContent( coreController core, string fieldName, int fieldValue, int lookupContentID, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired, ref bool IsEmptyList, string sqlFilter = "") {
             string result = "";
             string LookupContentName = "";
             if (lookupContentID != 0) LookupContentName = genericController.encodeText(Models.Complex.cdefModel.getContentNameByID(core, lookupContentID));
@@ -943,11 +943,8 @@ namespace Contensive.Core {
             } else {
                 //
                 // -- not readonly
-                if (!fieldRequired) {
-                    result += (core.html.selectFromContent(fieldName, fieldValue, LookupContentName, "", "None", "", ref IsEmptyList, "select form-control"));
-                } else {
-                    result += (core.html.selectFromContent(fieldName, fieldValue, LookupContentName, "", "", "", ref IsEmptyList, "select form-control"));
-                }
+                string nonLabel = (fieldRequired) ? "" : "None";
+                result += core.html.selectFromContent(fieldName, fieldValue, LookupContentName, sqlFilter, nonLabel, "", ref IsEmptyList, "select form-control");
                 if (fieldValue != 0) {
                     int CSPointer = core.db.csOpen2(LookupContentName, fieldValue, false, false, "ID");
                     if (core.db.csOk(CSPointer)) {

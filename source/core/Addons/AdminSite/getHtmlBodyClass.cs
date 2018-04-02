@@ -7375,7 +7375,13 @@ namespace Contensive.Core.Addons.AdminSite {
                             if (core.session.isAuthenticatedAdmin(core) && (LimitContentSelectToThisID == 0)) {
                                 //
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
-                                HTMLFieldString = HTMLFieldString + core.html.selectFromContent("ContentControlID", FieldValueInteger, "Content", "ContentTableID=" + TableID, "", "", ref IsEmptyList);
+                                //HTMLFieldString = HTMLFieldString + core.html.selectFromContent("ContentControlID", FieldValueInteger, "Content", "ContentTableID=" + TableID, "", "", ref IsEmptyList);
+
+                                bool ignoreBool = false;
+                                string sqlFilter = "(ContentTableID=" + TableID +")";
+                                int contentCID = core.db.getRecordID(Models.DbModels.contentModel.contentName, Models.DbModels.contentModel.contentName);
+                                HTMLFieldString += adminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid",FieldValueInteger,contentCID, false, "", "", true, ref ignoreBool, sqlFilter );
+
                                 FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
                             } else {
                                 //
@@ -7397,7 +7403,14 @@ namespace Contensive.Core.Addons.AdminSite {
                                 core.db.csClose(ref CSPointer);
                                 if (!string.IsNullOrEmpty(CIDList)) {
                                     CIDList = CIDList.Substring(1);
-                                    HTMLFieldString = core.html.selectFromContent("ContentControlID", FieldValueInteger, "Content", "id in (" + CIDList + ")", "", "", ref IsEmptyList);
+                                    //HTMLFieldString = core.html.selectFromContent("ContentControlID", FieldValueInteger, "Content", "id in (" + CIDList + ")", "", "", ref IsEmptyList);
+
+                                    bool ignoreBool = false;
+                                    string sqlFilter = "(id in (" + CIDList + "))";
+                                    int contentCID = core.db.getRecordID(Models.DbModels.contentModel.contentName, Models.DbModels.contentModel.contentName);
+                                    HTMLFieldString += adminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, false, "", "", true, ref ignoreBool, sqlFilter);
+
+
                                     FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited. This record includes a Parent field, so your choices for controlling content are limited to those compatible with the parent of this record.)";
                                 }
                             }
@@ -7412,78 +7425,82 @@ namespace Contensive.Core.Addons.AdminSite {
                 // ----- Created By
                 {
                     string FieldHelp = "The people account of the user who created this record.";
-                    string HTMLFieldString = "";
+                    string fieldValue = "";
                     if (editRecord.id == 0) {
-                        HTMLFieldString = "(available after save)";
+                        fieldValue = "(available after save)";
                     } else {
                         int FieldValueInteger = editRecord.createByMemberId;
                         if (FieldValueInteger == 0) {
-                            HTMLFieldString = "unknown";
+                            fieldValue = "unknown";
                         } else {
                             int CSPointer = core.db.csOpen2("people", FieldValueInteger, true);
                             if (!core.db.csOk(CSPointer)) {
-                                HTMLFieldString = "unknown";
+                                fieldValue = "unknown";
                             } else {
-                                HTMLFieldString = core.db.csGet(CSPointer, "name");
+                                fieldValue = core.db.csGet(CSPointer, "name");
                             }
                             core.db.csClose(ref CSPointer);
                         }
                     }
-                    HTMLFieldString = htmlController.inputText( core,"ignore", HTMLFieldString, -1, -1, "", false, true);
-                    tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Created By", FieldHelp, FieldRequired, false, ""));
+                    //string fieldEditor = htmlController.inputText( core,"ignore", fieldValue, -1, -1, "", false, true);
+                    string fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_createdBy", fieldValue, true, "");
+                    tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Created By", FieldHelp, FieldRequired, false, ""));
                 }
                 //
                 // ----- Created Date
                 {
                     string FieldHelp = "The date and time when this record was originally created.";
-                    string HTMLFieldString = "";
+                    string fieldValue = "";
                     if (editRecord.id == 0) {
-                        HTMLFieldString = "(available after save)";
+                        fieldValue = "(available after save)";
                     } else {
-                        HTMLFieldString = genericController.encodeText(genericController.encodeDate(editRecord.dateAdded));
-                        if (HTMLFieldString == "12:00:00 AM") {
-                            HTMLFieldString = "unknown";
+                        fieldValue = genericController.encodeText(genericController.encodeDate(editRecord.dateAdded));
+                        if (fieldValue == "12:00:00 AM") {
+                            fieldValue = "unknown";
                         }
                     }
-                    HTMLFieldString = htmlController.inputText( core,"ignore", HTMLFieldString, -1, -1, "", false, true);
-                    tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Created Date", FieldHelp, FieldRequired, false, ""));
+                    string fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_createdDate", fieldValue, true, "");
+                    //string fieldEditor = htmlController.inputText( core,"ignore", fieldValue, -1, -1, "", false, true);
+                    tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Created Date", FieldHelp, FieldRequired, false, ""));
                 }
                 //
                 // ----- Modified By
                 {
                     string FieldHelp = "The people account of the last user who modified this record.";
-                    string HTMLFieldString = "";
+                    string fieldValue = "";
                     if (editRecord.id == 0) {
-                        HTMLFieldString = "(available after save)";
+                        fieldValue = "(available after save)";
                     } else {
                         int FieldValueInteger = editRecord.modifiedByMemberID;
-                        HTMLFieldString = "unknown";
+                        fieldValue = "unknown";
                         if (FieldValueInteger > 0) {
                             int CSPointer = core.db.csOpen2("people", FieldValueInteger, true, false, "name");
                             if (core.db.csOk(CSPointer)) {
-                                HTMLFieldString = core.db.csGet(CSPointer, "name");
+                                fieldValue = core.db.csGet(CSPointer, "name");
                             }
                             core.db.csClose(ref CSPointer);
                         }
                     }
-                    HTMLFieldString = htmlController.inputText( core,"ignore", HTMLFieldString, -1, -1, "", false, true);
-                    tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Modified By", FieldHelp, FieldRequired, false, ""));
+                    string fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_modifiedBy", fieldValue, true, "");
+                    //string fieldEditor = htmlController.inputText( core,"ignore", fieldValue, -1, -1, "", false, true);
+                    tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Modified By", FieldHelp, FieldRequired, false, ""));
                 }
                 //
                 // ----- Modified Date
                 {
                     string FieldHelp = "The date and time when this record was last modified";
-                    string HTMLFieldString = "";
+                    string fieldValue = "";
                     if (editRecord.id == 0) {
-                        HTMLFieldString = "(available after save)";
+                        fieldValue = "(available after save)";
                     } else {
-                        HTMLFieldString = genericController.encodeText(genericController.encodeDate(editRecord.modifiedDate));
-                        if (HTMLFieldString == "12:00:00 AM") {
-                            HTMLFieldString = "unknown";
+                        fieldValue = genericController.encodeText(genericController.encodeDate(editRecord.modifiedDate));
+                        if (fieldValue == "12:00:00 AM") {
+                            fieldValue = "unknown";
                         }
                     }
-                    HTMLFieldString = htmlController.inputText( core,"ignore", HTMLFieldString, -1, -1, "", false, true);
-                    tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Modified Date", FieldHelp, false, false, ""));
+                    string fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_modifiedBy", fieldValue, true, "");
+                    //string fieldEditor = htmlController.inputText( core,"ignore", fieldValue, -1, -1, "", false, true);
+                    tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Modified Date", FieldHelp, false, false, ""));
 
                 }
                 string s = adminUIController.EditTableOpen + tabPanel.Text + adminUIController.EditTableClose;
