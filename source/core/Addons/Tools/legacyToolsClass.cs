@@ -669,17 +669,17 @@ namespace Contensive.Core.Addons.Tools {
                 if (IsNull(PageSize)) {
                     PageSize = 100;
                 }
-                Stream.Add("<div class=\"p-1\">Page Size:<br>" + core.html.inputText("PageSize", PageSize.ToString()) + "</div>");
+                Stream.Add("<div class=\"p-1\">Page Size:<br>" + htmlController.inputText( core,"PageSize", PageSize.ToString()) + "</div>");
                 //
                 if (IsNull(PageNumber)) {
                     PageNumber = 1;
                 }
-                Stream.Add("<div class=\"p-1\">Page Number:<br>" + core.html.inputText("PageNumber", PageNumber.ToString()) + "</div>");
+                Stream.Add("<div class=\"p-1\">Page Number:<br>" + htmlController.inputText( core,"PageNumber", PageNumber.ToString()) + "</div>");
                 //
                 if (IsNull(Timeout)) {
                     Timeout = 30;
                 }
-                Stream.Add("<div class=\"p-1\">Timeout (sec):<br>" + core.html.inputText("Timeout", Timeout.ToString()) + "</div>");
+                Stream.Add("<div class=\"p-1\">Timeout (sec):<br>" + htmlController.inputText( core,"Timeout", Timeout.ToString()) + "</div>");
                 //
                 returnHtml = Stream.Text;
                 returnHtml = "<div class=\"p-4 bg-light\">" + returnHtml + "</div>";
@@ -768,10 +768,10 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(core.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
                 Stream.Add("<br><br>");
                 Stream.Add("Content Name<br>");
-                Stream.Add(core.html.inputText("ContentName", ContentName, 1, 40));
+                Stream.Add(htmlController.inputText( core,"ContentName", ContentName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("Table Name<br>");
-                Stream.Add(core.html.inputText("TableName", TableName, 1, 40));
+                Stream.Add(htmlController.inputText( core,"TableName", TableName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("</SPAN>");
                 result = adminUIController.GetBody(core,Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
@@ -1370,7 +1370,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(core.html.getPanel(FormPanel));
                 //
                 core.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
-                Stream.Add(core.html.inputHidden("ReloadCDef", ReloadCDef));
+                Stream.Add(htmlController.inputHidden("ReloadCDef", ReloadCDef));
                 result =  htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -1785,7 +1785,7 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         // ----- Done with diagnostics
                         //
-                        Stream.Add(core.html.inputHidden("DiagActionCount", DiagActionCount));
+                        Stream.Add(htmlController.inputHidden("DiagActionCount", DiagActionCount));
                     }
                 }
                 //
@@ -1995,7 +1995,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Child Content Name<br>");
-                Stream.Add(core.html.inputText("ChildContentName", ChildContentName, 1, 40));
+                Stream.Add(htmlController.inputText( core,"ChildContentName", ChildContentName, 1, 40));
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Add Admin Menu Entry under Parent's Menu Entry<br>");
@@ -2672,7 +2672,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 Stream.Add("<br>");
                 Stream.Add("Table Name<br>");
-                Stream.Add(core.html.inputText("Tablename", TableName));
+                Stream.Add(htmlController.inputText( core,"Tablename", TableName));
                 //
                 Stream.Add("<br><br>");
                 Stream.Add("Data Source<br>");
@@ -3020,7 +3020,7 @@ namespace Contensive.Core.Addons.Tools {
                             // put the menu into the current menu format
                             //
                             formFieldId = fieldsort.field.id;
-                            streamRow.Add(core.html.inputHidden("dtfaID." + RecordCount, formFieldId));
+                            streamRow.Add(htmlController.inputHidden("dtfaID." + RecordCount, formFieldId));
                             streamRow.Add("<tr>");
                             //
                             // edit button
@@ -3074,7 +3074,7 @@ namespace Contensive.Core.Addons.Tools {
                             } else if (FieldLocked) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.nameLc + "&nbsp;</SPAN><input type=hidden name=dtfaName." + RecordCount + " value=\"" + fieldsort.field.nameLc + "\">");
                             } else {
-                                streamRow.Add(core.html.inputText("dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
+                                streamRow.Add(htmlController.inputText( core,"dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3084,7 +3084,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.caption + "</SPAN>");
                             } else {
-                                streamRow.Add(core.html.inputText("dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
+                                streamRow.Add(htmlController.inputText( core,"dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3094,7 +3094,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.editTabName + "</SPAN>");
                             } else {
-                                streamRow.Add(core.html.inputText("dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
+                                streamRow.Add(htmlController.inputText( core,"dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3104,7 +3104,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + genericController.encodeText(fieldsort.field.defaultValue) + "</SPAN>");
                             } else {
-                                streamRow.Add(core.html.inputText("dtfaDefaultValue." + RecordCount, genericController.encodeText(fieldsort.field.defaultValue), 1, 10));
+                                streamRow.Add(htmlController.inputText( core,"dtfaDefaultValue." + RecordCount, genericController.encodeText(fieldsort.field.defaultValue), 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3121,7 +3121,7 @@ namespace Contensive.Core.Addons.Tools {
                                 }
                                 core.db.csClose(ref CSPointer);
                             } else if (FieldLocked) {
-                                streamRow.Add(core.db.getRecordName("content field types", fieldsort.field.fieldTypeId) + core.html.inputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
+                                streamRow.Add(core.db.getRecordName("content field types", fieldsort.field.fieldTypeId) + htmlController.inputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
                             } else {
                                 TypeSelect = TypeSelectTemplate;
                                 TypeSelect = genericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
@@ -3136,7 +3136,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.editSortPriority + "</SPAN>");
                             } else {
-                                streamRow.Add(core.html.inputText("dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
+                                streamRow.Add(htmlController.inputText( core,"dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3200,7 +3200,7 @@ namespace Contensive.Core.Addons.Tools {
                             }
                         }
                         Stream.Add(StreamValidRows.Text);
-                        Stream.Add(core.html.inputHidden("dtfaRecordCount", RecordCount));
+                        Stream.Add(htmlController.inputHidden("dtfaRecordCount", RecordCount));
                     }
                     Stream.Add("</table>");
                     //Stream.Add( core.htmldoc.main_GetPanelButtons(ButtonList, "Button"))
@@ -3218,7 +3218,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Save the content selection
                     //
-                    Stream.Add(core.html.inputHidden(RequestNameToolContentID, ContentID));
+                    Stream.Add(htmlController.inputHidden(RequestNameToolContentID, ContentID));
                 } else {
                     //
                     // content tables that have edit forms to Configure
@@ -3230,7 +3230,7 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add(core.html.getPanel(FormPanel));
                 }
                 //
-                Stream.Add(core.html.inputHidden("ReloadCDef", ReloadCDef));
+                Stream.Add(htmlController.inputHidden("ReloadCDef", ReloadCDef));
                 result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -3337,7 +3337,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Add/Drop Indexes form
                     //
-                    result += core.html.inputHidden("PreviousTableID", TableID);
+                    result += htmlController.inputHidden("PreviousTableID", TableID);
                     //
                     // Drop Indexes
                     //
@@ -3359,7 +3359,7 @@ namespace Contensive.Core.Addons.Tools {
                             IndexName = genericController.encodeText(Rows[5, RowPointer]);
                             if (!string.IsNullOrEmpty(IndexName)) {
                                 result += htmlController.tableRowStart();
-                                Copy = core.html.inputCheckbox("DropIndex." + RowPointer, false) + core.html.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
+                                Copy = core.html.inputCheckbox("DropIndex." + RowPointer, false) + htmlController.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
                                 result += htmlController.tableCell(Copy,"",0, TableRowEven);
                                 result += htmlController.tableCell(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
                                 result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
@@ -3367,7 +3367,7 @@ namespace Contensive.Core.Addons.Tools {
                                 TableRowEven = !TableRowEven;
                             }
                         }
-                        result += core.html.inputHidden("DropCount", RowMax + 1);
+                        result += htmlController.inputHidden("DropCount", RowMax + 1);
                     }
                     //
                     // Add Indexes
@@ -3388,14 +3388,14 @@ namespace Contensive.Core.Addons.Tools {
                         RowMax = Rows.GetUpperBound(1);
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             result += htmlController.tableRowStart();
-                            Copy = core.html.inputCheckbox("AddIndex." + RowPointer, false) + core.html.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
+                            Copy = core.html.inputCheckbox("AddIndex." + RowPointer, false) + htmlController.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
                             result += htmlController.tableCell(Copy,"",0, TableRowEven);
                             result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
                             result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
                             result += kmaEndTableRow;
                             TableRowEven = !TableRowEven;
                         }
-                        result += core.html.inputHidden("AddCount", RowMax + 1);
+                        result += htmlController.inputHidden("AddCount", RowMax + 1);
                     }
                     //
                     // Spacers
@@ -4275,16 +4275,16 @@ namespace Contensive.Core.Addons.Tools {
                     if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
                         RecordID = core.db.csGetInteger(CS, "ID");
                         if (genericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
-                            TopHalf = TopHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, true) + core.html.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
+                            TopHalf = TopHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, true) + htmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
                         } else {
-                            BottomHalf = BottomHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, false) + core.html.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
+                            BottomHalf = BottomHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, false) + htmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
                         }
                     }
                     core.db.csGoNext(CS);
                     RowPtr = RowPtr + 1;
                 }
                 core.db.csClose(ref CS);
-                Stream.Add(TopHalf + BottomHalf + core.html.inputHidden("CDefRowCnt", RowPtr));
+                Stream.Add(TopHalf + BottomHalf + htmlController.inputHidden("CDefRowCnt", RowPtr));
                 //
                 result = htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
@@ -4347,7 +4347,7 @@ namespace Contensive.Core.Addons.Tools {
                 // Process the form
                 Button = core.docProperties.getText("button");
                 //
-                s.Add(core.html.inputText("GUID", Guid.NewGuid().ToString(), 1, 80));
+                s.Add(htmlController.inputText( core,"GUID", Guid.NewGuid().ToString(), 1, 80));
                 //
                 // Display form
                 result= htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonCreateGUID);

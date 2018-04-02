@@ -65,7 +65,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Close Tables
                     //
                     Content.Add(adminUIController.EditTableClose);
-                    Content.Add(core.html.inputHidden(constants.rnAdminSourceForm, constants.AdminFormClearCache));
+                    Content.Add(htmlController.inputHidden(constants.rnAdminSourceForm, constants.AdminFormClearCache));
                 }
                 //
                 Description = "Hit Apply or OK to clear all current content caches";

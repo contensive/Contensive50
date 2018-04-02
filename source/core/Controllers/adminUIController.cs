@@ -56,26 +56,30 @@ namespace Contensive.Core {
         /// <summary>
         /// Get the Normal Edit Button Bar String, used on Normal Edit and others
         /// </summary>
-        public static string GetButtonBarForEdit(coreController core, bool AllowDelete, bool AllowCancel, bool allowSave, bool AllowAdd, bool HasChildRecords, bool IsPageContent, bool AllowMarkReviewed, bool AllowRefresh, bool AllowCreateDuplicate) {
+        public static string GetButtonBarForEdit(coreController core, editButtonBarInfoClass info) {
             string buttonsLeft = "";
             string buttonsRight = "";
             try {
-                if (AllowCancel) buttonsLeft += getButtonPrimary(ButtonCancel, "return processSubmit(this);");
-                if (AllowRefresh) buttonsLeft +=  getButtonPrimary(ButtonRefresh);
-                if (allowSave) {
+                if (info.allowCancel) buttonsLeft += getButtonPrimary(ButtonCancel, "return processSubmit(this);");
+                if (info.allowRefresh) buttonsLeft +=  getButtonPrimary(ButtonRefresh);
+                if (info.allowSave) {
                     buttonsLeft += getButtonPrimary(ButtonOK, "return processSubmit(this);");
                     buttonsLeft += getButtonPrimary(ButtonSave, "return processSubmit(this);");
-                    if (AllowAdd) buttonsLeft += getButtonPrimary(ButtonSaveAddNew, "return processSubmit(this);");
+                    if (info.allowAdd) buttonsLeft += getButtonPrimary(ButtonSaveAddNew, "return processSubmit(this);");
                 }
-                if (AllowMarkReviewed) buttonsLeft +=  getButtonPrimary(ButtonMarkReviewed);
-                if (AllowCreateDuplicate) buttonsLeft +=  getButtonPrimary(ButtonCreateDuplicate, "return processSubmit(this)");
+                if (info.allowSendTest) buttonsLeft += getButtonPrimary(ButtonSendTest, "Return processSubmit(this)");
+                if (info.allowSend) buttonsLeft += getButtonPrimary(ButtonSendTest, "Return processSubmit(this)");
+                if (info.allowMarkReviewed) buttonsLeft +=  getButtonPrimary(ButtonMarkReviewed);
+                if (info.allowCreateDuplicate) buttonsLeft += getButtonPrimary(ButtonCreateDuplicate, "return processSubmit(this)");
+                if (info.allowActivate) buttonsLeft += getButtonPrimary(ButtonActivate, "return processSubmit(this)");
+                if (info.allowDeactivate) buttonsLeft += getButtonPrimary(ButtonDeactivate, "return processSubmit(this)");
                 string JSOnClick = "if(!DeleteCheck())return false;";
-                if (IsPageContent) {
+                if (info.isPageContent) {
                     JSOnClick = "if(!DeletePageCheck())return false;";
-                } else if (HasChildRecords) {
+                } else if (info.hasChildRecords) {
                     JSOnClick = "if(!DeleteCheckWithChildren())return false;";
                 }
-                buttonsRight += getButtonDanger(ButtonDelete, JSOnClick, !AllowDelete);
+                buttonsRight += getButtonDanger(ButtonDelete, JSOnClick, !info.allowDelete);
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
@@ -120,24 +124,24 @@ namespace Contensive.Core {
             }
             return s;
         }
-        public class buttonThing {
+        public class buttonMetadata {
             public string name = "button";
             public string value = "";
             public string classList = "";
             public bool isDelete = false;
-            public bool isCloase = false;
+            public bool isClose = false;
             public bool isAdd = false;
         }
-        public static string GetButtonsFromList(coreController core, List<buttonThing> ButtonList, bool AllowDelete, bool AllowAdd) {
+        public static string GetButtonsFromList(coreController core, List<buttonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
             string s = "";
             try {
-                foreach (buttonThing button in ButtonList) {
+                foreach (buttonMetadata button in ButtonList) {
 
                     if (button.isDelete) {
                         s += getButtonDanger(button.value, "if(!DeleteCheck()) return false;", !AllowDelete);
                     } else if (button.isAdd) {
                         s += getButtonPrimary(button.value, "return processSubmit(this);", !AllowAdd);
-                    } else if (button.isCloase) {
+                    } else if (button.isClose) {
                         s += getButtonPrimary(button.value, "window.close();");
                     } else {
                         s += getButtonPrimary(button.value);
@@ -743,18 +747,18 @@ namespace Contensive.Core {
             // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
             // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
         }
-        public static List<buttonThing> buttonStringToButtonList(string ButtonList) {
-            var result = new List<buttonThing>();
+        public static List<buttonMetadata> buttonStringToButtonList(string ButtonList) {
+            var result = new List<buttonMetadata>();
             string[] Buttons = null;
             if (!string.IsNullOrEmpty(ButtonList.Trim(' '))) {
                 Buttons = ButtonList.Split(',');
                 foreach (string buttonValue in Buttons) {
                     string buttonValueTrim = buttonValue.Trim();
-                    result.Add(new buttonThing() {
+                    result.Add(new buttonMetadata() {
                         name = "button",
-                        value = buttonValueTrim,
+                        value = buttonValue,
                         isAdd = buttonValueTrim.Equals(ButtonAdd),
-                        isCloase = buttonValueTrim.Equals(ButtonClose),
+                        isClose = buttonValueTrim.Equals(ButtonClose),
                         isDelete = buttonValueTrim.Equals(ButtonDelete)
                     });
                 }
@@ -860,39 +864,199 @@ namespace Contensive.Core {
         /// <param name="htmlName"></param>
         /// <param name="htmlValue"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Bool(coreController core, string htmlName, bool htmlValue, bool disabled, string htmlId) {
-            return htmlController.div(core.html.inputCheckbox(htmlName, htmlValue, htmlId, disabled), "checkbox");
+        public static string getDefaultEditor_Bool(coreController core, string htmlName, bool htmlValue, bool readOnly, string htmlId) {
+            return htmlController.div(core.html.inputCheckbox(htmlName, htmlValue, htmlId, readOnly), "checkbox");
         }
         // ====================================================================================================
         /// <summary>
         /// return the default admin editor for this field type
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="htmlName"></param>
-        /// <param name="htmlValue"></param>
-        /// <param name="disabled"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="fieldValue"></param>
+        /// <param name="readOnly"></param>
         /// <param name="htmlId"></param>
         /// <param name="isPassword"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Text(coreController core, string htmlName, string htmlValue, bool disabled, string htmlId, bool isPassword ) {
-            if (isPassword) {
+        public static string getDefaultEditor_Text(coreController core, string fieldName, string fieldValue, bool readOnly, string htmlId) {
+            if ((fieldValue.IndexOf("\n") == -1) && (fieldValue.Length < 80)) {
                 //
-                // Password forces simple text box
-                return core.html.inputText(htmlName, htmlValue, -1, -1, "", true, false, "password form-control",255);
+                // text field shorter then 40 characters without a CR
+                return htmlController.inputText( core,fieldName, fieldValue, 1, -1, htmlId, false, readOnly, "text form-control", 255);
             } else {
                 //
-                // non-password
-                if ((htmlValue.IndexOf("\n") == -1) && (htmlValue.Length < 40)) {
-                    //
-                    // text field shorter then 40 characters without a CR
-                    return core.html.inputText(htmlName, htmlValue, 1, -1, "", false, false, "text form-control",255);
-                } else {
-                    //
-                    // longer text data, or text that contains a CR
-                    return core.html.inputTextExpandable(htmlName, htmlValue, 10, "100%", "", false, false, "text form-control");
-                }
+                // longer text data, or text that contains a CR
+                return htmlController.inputTextarea( core,fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false, 255);
             }
         }
+        // ====================================================================================================
+        /// <summary>
+        /// return an admin edit page row for one field in a list of fields within a tab
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="fieldValue"></param>
+        /// <param name="readOnly"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
+        public static string getDefaultEditor_Password(coreController core, string fieldName, string fieldValue, bool readOnly, string htmlId) {
+            return htmlController.inputText( core,fieldName, fieldValue, -1, -1, htmlId, true, readOnly, "password form-control", 255);
+        }
+        // ====================================================================================================
+        /// <summary>
+        /// admin editor for a lookup field into a content table
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="fieldValue"></param>
+        /// <param name="lookupContentID"></param>
+        /// <param name="readOnly"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="WhyReadOnlyMsg"></param>
+        /// <param name="fieldRequired"></param>
+        /// <param name="IsEmptyList"></param>
+        /// <returns></returns>
+        public static string getDefaultEditor_LookupContent( coreController core, string fieldName, int fieldValue, int lookupContentID, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired, ref bool IsEmptyList) {
+            string result = "";
+            string LookupContentName = "";
+            if (lookupContentID != 0) LookupContentName = genericController.encodeText(Models.Complex.cdefModel.getContentNameByID(core, lookupContentID));
+            if (readOnly) {
+                //
+                // ----- Lookup ReadOnly
+                result += (htmlController.inputHidden(fieldName, genericController.encodeText(fieldValue)));
+                if (!string.IsNullOrEmpty(LookupContentName)) {
+                    int CSLookup = core.db.csOpen2(LookupContentName, fieldValue, false, false, "Name,ContentControlID");
+                    if (core.db.csOk(CSLookup)) {
+                        if (core.db.csGet(CSLookup, "Name") == "") {
+                            result += ("No Name");
+                        } else {
+                            result += (htmlController.encodeHtml(core.db.csGet(CSLookup, "Name")));
+                        }
+                        result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
+                    } else {
+                        result += ("None");
+                    }
+                    core.db.csClose(ref CSLookup);
+                    result += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
+                }
+                result += WhyReadOnlyMsg;
+            } else {
+                //
+                // -- not readonly
+                if (!fieldRequired) {
+                    result += (core.html.selectFromContent(fieldName, fieldValue, LookupContentName, "", "None", "", ref IsEmptyList, "select form-control"));
+                } else {
+                    result += (core.html.selectFromContent(fieldName, fieldValue, LookupContentName, "", "", "", ref IsEmptyList, "select form-control"));
+                }
+                if (fieldValue != 0) {
+                    int CSPointer = core.db.csOpen2(LookupContentName, fieldValue, false, false, "ID");
+                    if (core.db.csOk(CSPointer)) {
+                        result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">Details</a>]");
+                    }
+                    core.db.csClose(ref CSPointer);
+                }
+                result += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
+
+            }
+            return result;
+        }
+        // ====================================================================================================
+        /// <summary>
+        /// admin editor for a lookup field into a static list
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="fieldValue"></param>
+        /// <param name="lookups"></param>
+        /// <param name="readOnly"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="WhyReadOnlyMsg"></param>
+        /// <param name="fieldRequired"></param>
+        /// <returns></returns>
+        public static string getDefaultEditor_LookupList(coreController core, string fieldName, int fieldValue, string[] lookups, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired) {
+            string result = "";
+            if (readOnly) {
+                //
+                // ----- Lookup ReadOnly
+                result += (htmlController.inputHidden(fieldName, genericController.encodeText(fieldValue)));
+                if (fieldValue < 1) {
+                    result += ("None");
+                } else if (fieldValue > (lookups.GetUpperBound(0) + 1)) {
+                    result += ("None");
+                } else {
+                    result += lookups[fieldValue - 1];
+                }
+                result += WhyReadOnlyMsg;
+            } else {
+                if (!fieldRequired) {
+                    result += core.html.selectFromList(fieldName, fieldValue, lookups, "Select One", "", "select form-control");
+                } else {
+                    result += core.html.selectFromList(fieldName, fieldValue, lookups, "", "", "select form-control");
+                }
+
+            }
+            return result;
+        }
+        // ====================================================================================================
+        public static string getDefaultEditor_Date( coreController core, string fieldName, DateTime FieldValueDate, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg) {
+            string result = "";
+            string fieldValue_text = "";
+            if (FieldValueDate == DateTime.MinValue) {
+                fieldValue_text = "";
+            } else {
+                fieldValue_text = encodeText(FieldValueDate);
+            }
+            if (readOnly) {
+                //
+                // -- readOnly
+                result += htmlController.inputHidden(fieldName, fieldValue_text);
+                result += htmlController.inputText( core,fieldName, fieldValue_text, -1, -1, "", false, true, "date form-control");
+                result += WhyReadOnlyMsg;
+            } else {
+                //
+                // -- editable
+                result += htmlController.inputDate( core,fieldName, encodeDate(fieldValue_text),"",htmlId, "date form-control", readOnly, fieldRequired);
+            }
+            return result;
+        }
+        // ====================================================================================================
+        //
+        public static string getDefaultEditor_memberSelect(coreController core, string htmlName, int selectedRecordId, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg, int groupId, string groupName) {
+            string EditorString = "";
+            if (readOnly) {
+                //
+                // -- readOnly
+                EditorString += htmlController.inputHidden(htmlName, selectedRecordId.ToString() );
+                if (selectedRecordId == 0) {
+                    EditorString += "None";
+                } else {
+                    var selectedUser = personModel.create(core, selectedRecordId);
+                    if ( selectedUser==null) {
+                        EditorString += "Deleted";
+                    } else {
+                        EditorString += (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : htmlController.encodeHtml(selectedUser.name);
+                        EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\" target=\"_blank\">View details in new window</a>]");
+                    }
+                }
+                EditorString += WhyReadOnlyMsg;
+            } else {
+                //
+                // -- editable
+                EditorString += core.html.selectUserFromGroup(htmlName, selectedRecordId, groupId, "", (fieldRequired) ? "" : "None", htmlId, "select form-control");
+                if (selectedRecordId != 0) {
+                    var selectedUser = personModel.create(core, selectedRecordId);
+                    if (selectedUser == null) {
+                        EditorString += "Deleted";
+                    } else {
+                        string recordName = (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : htmlController.encodeHtml(selectedUser.name);
+                        EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + htmlController.encodeHtml( recordName ) + "</a>]";
+                    }
+                }
+                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + Models.Complex.cdefModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
+            }
+            return EditorString;
+        }
+
         // ====================================================================================================
         /// <summary>
         /// return an admin edit page row for one field in a list of fields within a tab
@@ -909,33 +1073,34 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public static string getEditRowLegacy(coreController core, string HTMLFieldString, string Caption, string HelpMessage = "", bool FieldRequired = false, bool AllowActiveEdit = false, string ignore0 = "") {
-            string tempGetEditRow = null;
-            try {
-                stringBuilderLegacyController FastString = new stringBuilderLegacyController();
-                string Copy = null;
-                //
-                // Left Side
-                //
-                Copy = Caption;
-                if (string.IsNullOrEmpty(Copy)) {
-                    Copy = "&nbsp;";
-                }
-                tempGetEditRow = "<tr><td class=\"ccEditCaptionCon\"><nobr>" + Copy + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=15 >";
-                tempGetEditRow = tempGetEditRow + "</nobr></td>";
-                //
-                // Right Side
-                //
-                Copy = HTMLFieldString;
-                if (string.IsNullOrEmpty(Copy)) {
-                    Copy = "&nbsp;";
-                }
-                Copy = "<div class=\"ccEditorCon\">" + Copy + "</div>";
-                Copy += "<div class=\"ccEditorHelpCon\"><div class=\"closed\">" + HelpMessage + "</div></div>";
-                tempGetEditRow += "<td class=\"ccEditFieldCon\">" + Copy + "</td></tr>";
-            } catch (Exception ex) {
-                logController.handleError(core, ex);
-            }
-            return tempGetEditRow;
+            return getEditRow(core, HTMLFieldString, Caption, HelpMessage, FieldRequired, AllowActiveEdit, ignore0);
+            //string tempGetEditRow = null;
+            //try {
+            //    stringBuilderLegacyController FastString = new stringBuilderLegacyController();
+            //    string Copy = null;
+            //    //
+            //    // Left Side
+            //    //
+            //    Copy = Caption;
+            //    if (string.IsNullOrEmpty(Copy)) {
+            //        Copy = "&nbsp;";
+            //    }
+            //    tempGetEditRow = "<tr><td class=\"ccEditCaptionCon\"><nobr>" + Copy + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=15 >";
+            //    tempGetEditRow = tempGetEditRow + "</nobr></td>";
+            //    //
+            //    // Right Side
+            //    //
+            //    Copy = HTMLFieldString;
+            //    if (string.IsNullOrEmpty(Copy)) {
+            //        Copy = "&nbsp;";
+            //    }
+            //    Copy = "<div class=\"ccEditorCon\">" + Copy + "</div>";
+            //    Copy += "<div class=\"ccEditorHelpCon\"><div class=\"closed\">" + HelpMessage + "</div></div>";
+            //    tempGetEditRow += "<td class=\"ccEditFieldCon\">" + Copy + "</td></tr>";
+            //} catch (Exception ex) {
+            //    logController.handleError(core, ex);
+            //}
+            //return tempGetEditRow;
         }
         // ====================================================================================================
         //
@@ -955,5 +1120,21 @@ namespace Contensive.Core {
         public int recordModifiedById;
         public DateTime recordLockExpiresDate;
         public int recordLockById;
+    }
+    //
+    public class editButtonBarInfoClass {
+        public bool allowDelete = false;
+        public bool allowCancel = false;
+        public bool allowSave = false;
+        public bool allowAdd = false;
+        public bool allowActivate = false;
+        public bool allowSendTest = false;
+        public bool allowSend = false;
+        public bool hasChildRecords = false;
+        public bool isPageContent = false;
+        public bool allowMarkReviewed = false;
+        public bool allowRefresh = false;
+        public bool allowCreateDuplicate = false;
+        public bool allowDeactivate = false;
     }
 }

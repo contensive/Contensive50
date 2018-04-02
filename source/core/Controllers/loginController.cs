@@ -59,93 +59,51 @@ namespace Contensive.Core.Controllers {
                 bool needLoginForm = true;
                 string formType = core.docProperties.getText("type");
                 if (formType == FormTypeLogin) {
+                    //
+                    // -- process a previous login for instance, and return blank if it is successful (legacy workflow)
                     if (processFormLoginDefault(core)) {
                         result = "";
                         needLoginForm = false;
                     }
                 }
                 if (needLoginForm) {
-                    core.doc.addRefreshQueryString("method", "");
                     string loginForm;
                     //
-                    string usernameMsg = "";
-                    if (genericController.encodeBoolean(core.siteProperties.getBoolean("allowEmailLogin", false))) {
-                        loginForm = Properties.Resources.defaultLoginEmailHtml;
-                        // usernameMsg = "<b>To login, enter your username or email address with your password.</b></p>";
+                    // -- select the correct html from resources
+                    bool allowAutoLogin = core.siteProperties.getBoolean("AllowAutoLogin", false);
+                    if (core.siteProperties.getBoolean("allowEmailLogin", false)) {
+                        if (allowAutoLogin) {
+                            loginForm = Properties.Resources.defaultLogin_email_autoLogin_html;
+                        } else {
+                            loginForm = Properties.Resources.defaultLogin_email_html;
+                        }
                     } else {
-                        loginForm = Properties.Resources.defaultLoginHtml;
-                        //usernameMsg = "<b>To login, enter your username and password.</b></p>";
+                        if (allowAutoLogin) {
+                            loginForm = Properties.Resources.defaultLogin_autoLogin_html;
+                        } else {
+                            loginForm = Properties.Resources.defaultLogin_html;
+                        }
                     }
                     //
-                    string QueryString = core.webServer.requestQueryString;
-                    QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+                    // -- add user errors
+                    loginForm = loginForm.Replace("{message}", errorController.getUserError(core));
+                    if (!core.doc.errorCount.Equals(0)) {
+                    }
+                    //
+                    // -- create the action query
+                    string QueryString = genericController.modifyQueryString(core.webServer.requestQueryString, RequestNameHardCodedPage, "", false);
                     QueryString = genericController.modifyQueryString(QueryString, "requestbinary", "", false);
-                    ////
-                    //// ----- Username
-                    //string Caption = "";
-                    //if (genericController.encodeBoolean(core.siteProperties.getBoolean("allowEmailLogin", false))) {
-                    //    Caption = "Username&nbsp;or&nbsp;Email";
-                    //} else {
-                    //    Caption = "Username";
-                    //}
-                    //
-                    //loginForm = loginForm + "\r<tr>"
-                    //+ cr2 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + Caption + "&nbsp;</span></td>"
-                    //+ cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input ID=\"LoginUsernameInput\" NAME=\"username\" VALUE=\"\" SIZE=\"20\" MAXLENGTH=\"50\" ></td>"
-                    //+ "\r</tr>";
-                    //
-                    // ----- Password
-                    //if (genericController.encodeBoolean(core.siteProperties.getBoolean("allowNoPasswordLogin", false))) {
-                    //    Caption = "Password&nbsp;(optional)";
-                    //} else {
-                    //    Caption = "Password";
-                    //}
-                    //loginForm = loginForm + "\r<tr>"
-                    //+ cr2 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\">" + SpanClassAdminNormal + Caption + "&nbsp;</span></td>"
-                    //+ cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\" ><input NAME=\"password\" VALUE=\"\" SIZE=\"20\" MAXLENGTH=\"50\" type=\"password\"></td>"
-                    //+ "\r</tr>"
-                    //+ "";
-                    //
-                    // ----- autologin support
-                    if (genericController.encodeBoolean(core.siteProperties.getBoolean("AllowAutoLogin", false))) {
-                        loginForm = loginForm + "\r<tr>"
-                        + cr2 + "<td align=\"right\">&nbsp;</td>"
-                        + cr2 + "<td align=\"left\" >"
-                        + cr3 + "<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
-                        + cr4 + "<tr>"
-                        + cr5 + "<td valign=\"top\" width=\"20\"><input type=\"checkbox\" name=\"autologin\" value=\"ON\" checked></td>"
-                        + cr5 + "<td valign=\"top\" width=\"100%\">" + SpanClassAdminNormal + "Login automatically from this computer</span></td>"
-                        + cr4 + "</tr>"
-                        + cr3 + "</table>"
-                        + cr2 + "</td>"
-                        + "\r</tr>";
-                    }
-                    loginForm = loginForm + "\r<tr>"
-                        + cr2 + "<td colspan=\"2\">&nbsp;</td>"
-                        + "\r</tr>"
-                        + "";
-                    loginForm = ""
-                        + "\r<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
-                        + nop(loginForm) + "\r</table>"
-                        + "";
-                    loginForm += core.html.inputHidden("Type", FormTypeLogin) 
-                        + core.html.inputHidden("email", core.session.user.Email);
-                    loginForm = htmlController.form(core, loginForm, QueryString);
-                    string Panel = errorController.getUserError(core) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
+                    loginForm += htmlController.inputHidden("Type", FormTypeLogin);
+                    loginForm += htmlController.inputHidden("email", core.session.user.Email);
+                    result = htmlController.form(core, loginForm, QueryString);
+                    //string Panel = errorController.getUserError(core) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
                     //
                     // ----- Password Form
                     if (core.siteProperties.getBoolean("allowPasswordEmail", true)) {
-                        Panel += getSendPasswordForm(core);
-                        //Panel += ""
-                        //    + htmlController.h5( "Forget your password?", "ccAdminNormal")
-                        //    + htmlController.p( "If you are a member of the system and cannot remember your password, enter your email address below and we will email your matching username(s) and password(s).","ccAdminNormal")
-                        //    + getSendPasswordForm(core) + "";
+                        result += getSendPasswordForm(core);
                     }
                     //
-                    result = ""
-                        + "\r<div class=\"ccLoginFormCon\">"
-                        + nop(Panel) + "\r</div>"
-                        + "";
+                    result = htmlController.div(result, "ccLoginFormCon"); 
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -207,28 +165,11 @@ namespace Contensive.Core.Controllers {
                 string QueryString = null;
                 //
                 if (core.siteProperties.getBoolean("allowPasswordEmail", true)) {
-                    returnResult = Properties.Resources.defaultForgetPasswordHtml;
-                    //returnResult = ""
-                    //+ "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                    //+ cr2 + "<tr>"
-                    //+ cr3 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + "Email</span></td>"
-                    //+ cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"email\" VALUE=\"" + htmlController.encodeHtml(core.session.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
-                    //+ cr2 + "</tr>"
-                    //+ cr2 + "<tr>"
-                    //+ cr3 + "<td colspan=\"2\">&nbsp;</td>"
-                    //+ cr2 + "</tr>"
-                    //+ cr2 + "<tr>"
-                    //+ cr3 + "<td colspan=\"2\">"
-                    //+ nop(nop(core.html.getPanelButtons(ButtonSendPassword, "Button"))) + cr3 + "</td>"
-                    //+ cr2 + "</tr>"
-                    //+ "\r</table>"
-                    //+ "";
+                    returnResult = Properties.Resources.defaultForgetPassword_html;
                     //
                     // write out all of the form input (except state) to hidden fields so they can be read after login
-                    //
-                    //
                     returnResult = ""
-                    + returnResult + core.html.inputHidden("Type", FormTypeSendPassword) + "";
+                    + returnResult + htmlController.inputHidden("Type", FormTypeSendPassword) + "";
                     foreach (string key in core.docProperties.getKeyList()) {
                         var tempVar = core.docProperties.getProperty(key);
                         if (tempVar.IsForm) {
@@ -241,12 +182,11 @@ namespace Contensive.Core.Controllers {
                                 case "EMAIL":
                                     break;
                                 default:
-                                    returnResult = returnResult + core.html.inputHidden(tempVar.Name, tempVar.Value);
+                                    returnResult = returnResult + htmlController.inputHidden(tempVar.Name, tempVar.Value);
                                     break;
                             }
                         }
                     }
-                    //
                     QueryString = core.doc.refreshQueryString;
                     QueryString = genericController.modifyQueryString(QueryString, "S", "");
                     QueryString = genericController.modifyQueryString(QueryString, "ccIPage", "");

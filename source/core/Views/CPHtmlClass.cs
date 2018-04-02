@@ -197,7 +197,7 @@ namespace Contensive.Core {
         //
         public override string SelectList(string HtmlName, string HtmlValue, string OptionList, string NoneCaption = "", string HtmlClass = "", string HtmlId = "") {
             string tempSelectList = null;
-            tempSelectList = core.html.selectFromList(HtmlName, HtmlValue, OptionList, NoneCaption, HtmlId);
+            tempSelectList = core.html.selectFromList(HtmlName, genericController.encodeInteger( HtmlValue ), OptionList.Split(','), NoneCaption, HtmlId);
             if (!string.IsNullOrEmpty(HtmlClass)) {
                 tempSelectList = tempSelectList.Replace("<select ", "<select class=\"" + HtmlClass + "\" ");
             }
@@ -223,18 +223,13 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass = "", string HtmlId = "") {
-            return core.html.inputHidden(HtmlName, HtmlValue, HtmlId);
+            return htmlController.inputHidden(HtmlName, HtmlValue, HtmlId);
         }
         //
         // ====================================================================================================
         //
         public override string InputDate(string HtmlName, string HtmlValue = "", string Width = "", string HtmlClass = "", string HtmlId = "") {
-            string returnValue = "";
-            returnValue = core.html.inputDate(HtmlName, HtmlValue, Width, HtmlId);
-            if (!string.IsNullOrEmpty(HtmlClass)) {
-                returnValue = returnValue.Replace(">", " class=\"" + HtmlClass + "\">");
-            }
-            return returnValue;
+            return htmlController.inputDate(core, HtmlName, encodeDate(HtmlValue), Width, HtmlId, HtmlClass);
         }
         //
         // ====================================================================================================
@@ -246,15 +241,19 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string InputText(string HtmlName, string HtmlValue = "", string Height = "", string Width = "", bool IsPassword = false, string HtmlClass = "", string HtmlId = "") {
-            string returnValue = core.html.inputText(HtmlName, HtmlValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), HtmlId, IsPassword, false, HtmlClass);
+            string returnValue = htmlController.inputText( core,HtmlName, HtmlValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), HtmlId, IsPassword, false, HtmlClass);
             returnValue = returnValue.Replace(" SIZE=\"60\"", "");
             return returnValue;
         }
         //
         // ====================================================================================================
         //
-        public override string InputTextExpandable(string HtmlName, string HtmlValue = "", int Rows = 0, string StyleWidth = "", bool IsPassword = false, string HtmlClass = "", string HtmlId = "") {
-            return core.html.inputTextExpandable(HtmlName, HtmlValue, Rows, StyleWidth, HtmlId, IsPassword);
+        public override string InputTextExpandable(string HtmlName, string HtmlValue = "", int Rows = 0, string StyleWidth = "", bool ignore = false, string HtmlClass = "", string HtmlId = "") {
+            string result = htmlController.inputTextarea( core,HtmlName, HtmlValue, Rows, 20, HtmlId, ignore,false,HtmlClass);
+            if (!string.IsNullOrEmpty(StyleWidth)) {
+                result = result.Replace(">", " style=\"width:" + StyleWidth + "\">");
+            }
+            return result;
         }
         //
         // ====================================================================================================

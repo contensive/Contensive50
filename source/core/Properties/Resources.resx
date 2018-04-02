@@ -118,13 +118,19 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="defaultForgetPasswordHtml" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\defaultforgetpasswordhtml.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  <data name="defaultForgetPassword_html" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\defaultforgetpassword_html.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="defaultLoginEmailHtml" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\defaultloginemailhtml.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  <data name="defaultLogin_autoLogin_html" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\defaultlogin_autologin_html.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="defaultLoginHtml" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\defaultloginhtml.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  <data name="defaultLogin_email_autoLogin_html" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\defaultlogin_email_autologin_html.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="defaultLogin_email_html" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\defaultlogin_email_html.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="defaultLogin_html" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\defaultlogin_html.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

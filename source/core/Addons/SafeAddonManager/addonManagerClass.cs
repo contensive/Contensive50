@@ -740,7 +740,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                                                 //
                                                                 // Not installed yet
                                                                 //
-                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + core.html.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + core.html.inputHidden("LibraryRowName" + RowPtr, Collectionname);
+                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + htmlController.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + htmlController.inputHidden("LibraryRowName" + RowPtr, Collectionname);
                                                                 //Cells3(RowPtr, 0) = core.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & core.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & core.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
                                                                 Cells3[RowPtr, 1] = Collectionname + "&nbsp;";
                                                                 Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
@@ -768,7 +768,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     + "<div style=\"width:100%\">" + adminUIController.GetReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells3, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>"
                                     + "";
                                     BodyHTML = adminUIController.GetEditPanel(core,true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
-                                    BodyHTML = BodyHTML + core.html.inputHidden("AOCnt", RowPtr);
+                                    BodyHTML = BodyHTML + htmlController.inputHidden("AOCnt", RowPtr);
                                     core.doc.menuLiveTab.AddEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
                                 }
                                 //
@@ -817,7 +817,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 Cells = tempVar3;
                                 RowPtr = 0;
                                 while (core.db.csOk(CS)) {
-                                    Cells[RowPtr, 0] = core.html.inputCheckbox("AC" + RowPtr) + core.html.inputHidden("ACID" + RowPtr, core.db.csGetInteger(CS, "ID"));
+                                    Cells[RowPtr, 0] = core.html.inputCheckbox("AC" + RowPtr) + htmlController.inputHidden("ACID" + RowPtr, core.db.csGetInteger(CS, "ID"));
                                     //Cells(RowPtr, 1) = "<a href=""" & core.app.SiteProperty_AdminURL & "?id=" & core.app.cs_getInteger(CS, "ID") & "&cid=" & core.app.cs_getInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
                                     Cells[RowPtr, 1] = core.db.csGetText(CS, "name");
                                     if (DisplaySystem) {
@@ -831,7 +831,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 core.db.csClose(ref CS);
                                 BodyHTML = "<div style=\"width:100%\">" + adminUIController.GetReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
                                 BodyHTML = adminUIController.GetEditPanel(core,true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
-                                BodyHTML = BodyHTML + core.html.inputHidden("accnt", RowPtr);
+                                BodyHTML = BodyHTML + htmlController.inputHidden("accnt", RowPtr);
                                 core.doc.menuLiveTab.AddEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
@@ -853,7 +853,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
                                         + "<tr><td align=\"left\"><a href=\"#\" onClick=\"InsertUpload(); return false;\">+ Add more files</a></td></tr>"
                                         + "</table>"
-                                        + core.html.inputHidden("UploadCount", 1, "UploadCount") + "";
+                                        + htmlController.inputHidden("UploadCount", 1, "UploadCount") + "";
                                     Body.Add(adminUIController.getEditRowLegacy(core,FormInput, "&nbsp;", "", true, false, ""));
                                     Body.Add(adminUIController.EditTableClose);
                                 }
@@ -866,7 +866,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 Content.Add(core.doc.menuLiveTab.GetTabs(core));
                                 //
                                 ButtonList = ButtonCancel + "," + ButtonOK;
-                                Content.Add(core.html.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));
+                                Content.Add(htmlController.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));
                             }
                         }
                     }

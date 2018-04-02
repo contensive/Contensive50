@@ -601,7 +601,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result += "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:10px;\">Name</td>"
-                    + cr2 + "<td class=\"qeRow qeRight\">" + core.html.inputText("name", pageController.page.name, 1, 0, "", false, readOnlyField) + "</td>"
+                    + cr2 + "<td class=\"qeRow qeRight\">" + htmlController.inputText( core,"name", pageController.page.name, 1, 0, "", false, readOnlyField) + "</td>"
                     + "\r</tr>"
                     + "";
                 //
@@ -658,7 +658,7 @@ namespace Contensive.Core.Controllers {
                 // Form Wrapper
                 //
                 result = ""
-                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + core.html.inputHidden("Type", FormTypePageAuthoring) + '\r' + core.html.inputHidden("ID", pageController.page.id) + '\r' + core.html.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + htmlController.formEnd();
+                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + htmlController.inputHidden("Type", FormTypePageAuthoring) + '\r' + htmlController.inputHidden("ID", pageController.page.id) + '\r' + htmlController.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + htmlController.formEnd();
 
                 //& cr & core.html.main_GetPanelHeader("Contensive Quick Editor") _
 

@@ -13,41 +13,17 @@ using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using System.Text;
 //
 namespace Contensive.Core.Controllers {
     public class stringBuilderLegacyController {
-        //
-        private int iSize;
-        private const int iChunk = 100;
-        private int iCount;
-        private string[] Holder;
-        //
-        //==========================================================================================
-        /// <summary>
-        /// add a string to the stringbuilder
-        /// </summary>
-        /// <param name="NewString"></param>
+        private StringBuilder builder = new StringBuilder();
         public void Add(string NewString) {
-            try {
-                if (iCount >= iSize) {
-                    iSize = iSize + iChunk;
-                    Array.Resize(ref Holder, iSize + 1);
-                }
-                Holder[iCount] = NewString;
-                iCount = iCount + 1;
-            } catch (Exception ex) {
-                throw new ApplicationException("Exception in coreFastString.Add()", ex);
-            }
+            builder.Append(NewString);
         }
-        //
-        //==========================================================================================
-        /// <summary>
-        /// read the string out of the string builder
-        /// </summary>
-        /// <returns></returns>
         public string Text {
             get {
-                return string.Join("", Holder) + "";
+                return builder.ToString();
             }
         }
     }

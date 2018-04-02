@@ -1966,7 +1966,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 tempgetFormPage = ""
-                + errorController.getUserError(core) + core.html.formStartMultipart() + core.html.inputHidden("ContensiveFormPageID", FormPageID) + core.html.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + htmlController.formEnd();
+                + errorController.getUserError(core) + core.html.formStartMultipart() + htmlController.inputHidden("ContensiveFormPageID", FormPageID) + htmlController.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + htmlController.formEnd();
                 //
                 return tempgetFormPage;
                 //
@@ -2879,7 +2879,7 @@ namespace Contensive.Core.Controllers {
                         //
                         Copy = "";
                         Panel = Panel + "<td align=\"right\" width=\"100\" valign=\"top\"><p>Feedback</p></td>";
-                        Panel = Panel + "<td>" + core.html.inputText("NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
+                        Panel = Panel + "<td>" + htmlController.inputText( core,"NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
                         //Panel = Panel & "<td><textarea ID=""TextArea"" rows=""4"" cols=""40"" name=""NoteCopy"">" & Copy & "</textarea></td>"
                         Panel = Panel + "</tr><tr>";
                         //

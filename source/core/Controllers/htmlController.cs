@@ -212,7 +212,7 @@ namespace Contensive.Core.Controllers {
                         logController.handleError( core,new Exception("Error creating select list from content [" + ContentName + "] called [" + MenuName + "]. Selection of [" + RowCnt + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property SelectFieldLimit."));
                         result += inputHidden(MenuNameFPO, CurrentValue);
                         if (CurrentValue == 0) {
-                            result = inputText(MenuName, "0");
+                            result = inputText(core, MenuName, "0");
                         } else {
                             CSPointer = core.db.csOpenRecord(ContentName, CurrentValue);
                             if (core.db.csOk(CSPointer)) {
@@ -656,12 +656,12 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //
-        //====================================================================================================
-        //
-        public string selectFromList(string MenuName, string CurrentValue, string SelectList, string NoneCaption = "", string htmlId = "") {
-            return selectFromList(genericController.encodeText(MenuName), genericController.encodeInteger(CurrentValue), genericController.encodeText(SelectList), genericController.encodeText(NoneCaption), genericController.encodeText(htmlId));
-        }
+        ////
+        ////====================================================================================================
+        ////
+        //public string selectFromList(string MenuName, string CurrentValue, string[] lookups, string NoneCaption = "", string htmlId = "") {
+        //    return selectFromList(genericController.encodeText(MenuName), CurrentValue, genericController.encodeText(SelectList), genericController.encodeText(NoneCaption), genericController.encodeText(htmlId));
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -674,12 +674,12 @@ namespace Contensive.Core.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="HtmlClass"></param>
         /// <returns></returns>
-        public string selectFromList(string MenuName, int CurrentValue, string SelectList, string NoneCaption, string htmlId, string HtmlClass = "") {
+        public string selectFromList(string MenuName, int CurrentValue, string[] lookups, string NoneCaption, string htmlId, string HtmlClass = "") {
             string result = "";
             try {
                 //
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
-                string[] lookups = null;
+                //string[] lookups = null;
                 int Ptr = 0;
                 int RecordID = 0;
                 string Copy = null;
@@ -701,7 +701,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- select values
                 //
-                lookups = SelectList.Split(',');
+                //lookups = SelectList.Split(',');
                 for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
                     RecordID = Ptr + 1;
                     Copy = lookups[Ptr];
@@ -967,53 +967,37 @@ namespace Contensive.Core.Controllers {
         public static  string formEnd() {
             return "</form>";
         }
+        ////
+        ////====================================================================================================
+        ////
+        //public string inputText(string htmlName, string defaultValue = "", string Height = "", string Width = "", string Id = "", bool PasswordField = false) {
+        //    return inputText(htmlName, defaultValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), Id, PasswordField, false);
+        //}
         //
         //====================================================================================================
         //
-        public string inputText(string htmlName, string DefaultValue = "", string Height = "", string Width = "", string Id = "", bool PasswordField = false) {
-            return inputText(htmlName, DefaultValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), Id, PasswordField, false);
-        }
-        //
-        //====================================================================================================
-        //
-        public string inputText(string htmlName, string defaultValue, int height, int width, string htmlId = "", bool passwordField = false, bool disabled = false, string htmlClass = "", int maxLength = 0) {
+        public static string inputText( coreController core, string htmlName, string defaultValue, int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false ) {
             string result = "";
             try {
-                defaultValue = htmlController.encodeHtml(defaultValue);
-                string TagID = "";
-                if (!string.IsNullOrEmpty(htmlId)) {
-                    TagID = TagID + " id=\"" + genericController.encodeEmpty(htmlId, "") + "\"";
-                }
-                //
-                if (!string.IsNullOrEmpty(htmlClass)) {
-                    TagID = TagID + " class=\"" + htmlClass + "\"";
-                }
-                //
-                if (width <= 0) {
-                    width = core.siteProperties.defaultFormInputWidth;
-                }
-                //
-                if (height <= 0) {
-                    height = core.siteProperties.defaultFormInputTextHeight;
-                }
-                //
-                string TagDisabled = "";
-                if (disabled) {
-                    TagDisabled = " disabled=\"disabled\"";
-                }
-                string tagMaxLength = "";
-                if (maxLength>0) {
-                    tagMaxLength = " maxlength=" + maxLength.ToString();
-                }
-                //
-                if (passwordField) {
-                    result = "<input TYPE=\"password\" NAME=\"" + htmlName + "\" SIZE=\"" + width + "\" VALUE=\"" + defaultValue + "\"" + TagID + TagDisabled + ">";
-                } else if (height == 1) {
-                    result = "<input TYPE=\"Text\" NAME=\"" + htmlName + "\" SIZE=\"" + width.ToString() + "\" VALUE=\"" + defaultValue + "\"" + TagID + TagDisabled + ">";
+                if ((heightRows>0) & !passwordField) {
+                    result = inputTextarea(core, htmlName, defaultValue, heightRows, widthCharacters, htmlId, true, readOnly, htmlClass, disabled, maxLength);
                 } else {
-                    result = "<textarea NAME=\"" + htmlName + "\" ROWS=\"" + height.ToString() + "\" COLS=\"" + width.ToString() + "\"" + TagID + TagDisabled + ">" + defaultValue + "</TEXTAREA>";
+                    defaultValue = htmlController.encodeHtml(defaultValue);
+                    string attrList = " name=\"" + htmlName + "\"";
+                    attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+                    attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+                    attrList += (!readOnly) ? "" : " readonly";
+                    attrList += (!disabled) ? "" : " disabled";
+                    attrList += (maxLength <= 0) ? "" : " maxlength=" + maxLength.ToString();
+                    if (passwordField) {
+                        attrList += (widthCharacters <= 0) ? " size=\"" + core.siteProperties.defaultFormInputWidth.ToString() + "\"" : " size=\"" + widthCharacters.ToString() + "\"";
+                        result = "<input type=\"password\" value=\"" + defaultValue + "\"" + attrList + ">";
+                    } else {
+                        attrList += (widthCharacters <= 0) ? " size=\"" + core.siteProperties.defaultFormInputWidth.ToString() + "\"" : " size=\"" + widthCharacters.ToString() + "\"";
+                        result = "<input TYPE=\"Text\" value=\"" + defaultValue + "\"" + attrList + ">";
+                    }
+                    core.doc.formInputTextCnt += 1;
                 }
-                core.doc.formInputTextCnt = core.doc.formInputTextCnt + 1;
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -1024,142 +1008,85 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// HTML Form text input (or text area), added disabled case
         /// </summary>
-        /// <param name="TagName"></param>
-        /// <param name="Value"></param>
-        /// <param name="Rows"></param>
-        /// <param name="styleWidth"></param>
-        /// <param name="Id"></param>
-        /// <param name="PasswordField"></param>
-        /// <param name="Disabled"></param>
-        /// <param name="HtmlClass"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="heightRows"></param>
+        /// <param name="widthCharacters"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="ignore"></param>
+        /// <param name="disabled"></param>
+        /// <param name="htmlClass"></param>
         /// <returns></returns>
-        public string inputTextExpandable(string TagName, string Value = "", int Rows = 0, string styleWidth = "100%", string Id = "", bool PasswordField = false, bool Disabled = false, string HtmlClass = "") {
-            string temphtml_GetFormInputTextExpandable2 = null;
+        public static string inputTextarea( coreController core, string htmlName, string defaultValue = "", int heightRows = 4, int widthCharacters = -1, string htmlId = "", bool ignore = false, bool readOnly = false, string htmlClass = "", bool disabled = false, int maxLength = 0) {
+            string result = "";
             try {
-                //
-                //If Not (true) Then Exit Function
-                //
-                string AttrDisabled = "";
-                string Value_Local = null;
-                string StyleWidth_Local = null;
-                int Rows_Local = 0;
-                string IDRoot = null;
-                string EditorClosed = null;
-                string EditorOpened = null;
-                //
-                Value_Local = htmlController.encodeHtml(Value);
-                IDRoot = Id;
-                if (string.IsNullOrEmpty(IDRoot)) {
-                    IDRoot = "TextArea" + core.doc.formInputTextCnt;
-                }
-                //
-                StyleWidth_Local = styleWidth;
-                if (string.IsNullOrEmpty(StyleWidth_Local)) {
-                    StyleWidth_Local = "100%";
-                }
-                //
-                Rows_Local = Rows;
-                if (Rows_Local == 0) {
-                    //
-                    // need a default for this -- it should be different from a text, it should be for a textarea -- bnecause it is used differently
-                    //
-                    //Rows_Local = app.SiteProperty_DefaultFormInputTextHeight
-                    if (Rows_Local == 0) {
-                        Rows_Local = 10;
-                    }
-                }
-                if (Disabled) {
-                    AttrDisabled = " disabled=\"disabled\"";
-                }
-                //
-                EditorClosed = ""
-                    + "\r<div class=\"ccTextAreaHead\" ID=\"" + IDRoot + "Head\">"
-                    + cr2 + "<a href=\"#\" onClick=\"OpenTextArea('" + IDRoot + "');return false\"><img src=\"/ccLib/images/OpenUpRev1313.gif\" width=13 height=13 border=0>&nbsp;Full Screen</a>"
-                    + "\r</div>"
-                    + "\r<div class=\"ccTextArea\">"
-                    + cr2 + "<textarea ID=\"" + IDRoot + "\" NAME=\"" + TagName + "\" ROWS=\"" + Rows_Local + "\" Style=\"width:" + StyleWidth_Local + ";\"" + AttrDisabled + " onkeydown=\"return cj.encodeTextAreaKey(this, event);\">" + Value_Local + "</TEXTAREA>"
-                    + "\r</div>"
-                    + "";
-                //
-                EditorOpened = ""
-                    + "\r<div class=\"ccTextAreaHeCursorTypeEnum.ADOPENed\" style=\"display:none;\" ID=\"" + IDRoot + "HeCursorTypeEnum.ADOPENed\">"
-                    + "\r<a href=\"#\" onClick=\"CloseTextArea('" + IDRoot + "');return false\"><img src=\"/ccLib/images/OpenDownRev1313.gif\" width=13 height=13 border=0>&nbsp;Full Screen</a>"
-                    + cr2 + "</div>"
-                    + "\r<textarea class=\"ccTextAreaOpened\" style=\"display:none;\" ID=\"" + IDRoot + "Opened\" NAME=\"" + IDRoot + "Opened\"" + AttrDisabled + " onkeydown=\"return cj.encodeTextAreaKey(this, event);\"></TEXTAREA>";
-                //
-                temphtml_GetFormInputTextExpandable2 = ""
-                    + "<div class=\"" + HtmlClass + "\">"
-                    + genericController.nop(EditorClosed) + genericController.nop(EditorOpened) + "</div>";
-                core.doc.formInputTextCnt = core.doc.formInputTextCnt + 1;
-                return temphtml_GetFormInputTextExpandable2;
-                //
-                // ----- Error Trap
-                //
+                defaultValue = htmlController.encodeHtml(defaultValue);
+                string attrList = " name=\"" + htmlName + "\"";
+                attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+                attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+                attrList += (!readOnly) ? "" : " readonly";
+                attrList += (!disabled) ? "" : " disabled";
+                attrList += (maxLength <= 0) ? "" : " maxlength=" + maxLength.ToString();
+                attrList += (widthCharacters==-1) ? "" : " cols=" + widthCharacters.ToString();
+                attrList += " rows=" + heightRows.ToString();
+                result = "<textarea" + attrList + ">" + defaultValue + "</textarea>";
+                core.doc.formInputTextCnt += 1;
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
-            //ErrorTrap:
-            logController.handleError( core,new Exception("Unexpected exception"));
-            //
-            return temphtml_GetFormInputTextExpandable2;
+            return result;
+        }
+        //
+        public static string inputDateTime(coreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
+            string result = "";
+            try {
+                // {0:s}
+                // yyyy-MM-dd
+                core.doc.formInputTextCnt += 1;
+                core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
+                string attrList = " type=\"date\"  name=\"" + htmlController.encodeHtml(htmlName) + "\"";
+                if ((htmlValue != null) & (htmlValue > DateTime.MinValue)) attrList += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
+                attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+                attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+                attrList += (!readOnly) ? "" : " readonly";
+                attrList += (!disabled) ? "" : " disabled";
+                attrList += (!required) ? "" : " required";
+                return "<input" + attrList + ">";
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
+            }
+            return result;
         }
         //
         //====================================================================================================
-        //
-        public string inputDate(string TagName, string DefaultValue = "", string Width = "", string Id = "") {
+        /// <summary>
+        /// input for date
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="Width"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="htmlClass"></param>
+        /// <param name="readOnly"></param>
+        /// <param name="required"></param>
+        /// <param name="disabled"></param>
+        /// <returns></returns>
+        public static string inputDate( coreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
             string result = "";
             try {
-                string DateString = "";
-                DateTime DateValue = default(DateTime);
-                string iDefaultValue = null;
-                int iWidth = 0;
-                string iTagName = null;
-                string TagID = null;
-                string CalendarObjName = null;
-                string AnchorName = null;
-                //
-                iTagName = genericController.encodeText(TagName);
-                iDefaultValue = genericController.encodeEmpty(DefaultValue, "");
-                if ((iDefaultValue == "0") || (iDefaultValue == "12:00:00 AM")) {
-                    iDefaultValue = "";
-                } else {
-                    iDefaultValue = htmlController.encodeHtml(iDefaultValue);
-                }
-                if (genericController.encodeEmpty(Id, "") != "") {
-                    TagID = " ID=\"" + genericController.encodeEmpty(Id, "") + "\"";
-                }
-                //
-                iWidth = genericController.encodeEmptyInteger(Width, 20);
-                if (iWidth == 0) {
-                    iWidth = 20;
-                }
-                //
-                CalendarObjName = "Cal" + core.doc.inputDateCnt;
-                AnchorName = "ACal" + core.doc.inputDateCnt;
-
-                if (core.doc.inputDateCnt == 0) {
-                    addScriptLinkSrc("/ccLib/mktree/CalendarPopup.js", "Calendar Popup");
-                    addScriptCode("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup");
-                }
-
-                if (dateController.IsDate(iDefaultValue)) {
-                    DateValue = genericController.encodeDate(iDefaultValue);
-                    if (DateValue.Month < 10) {
-                        DateString = DateString + "0";
-                    }
-                    DateString = DateString + DateValue.Month + "/";
-                    if (DateValue.Day < 10) {
-                        DateString = DateString + "0";
-                    }
-                    DateString = DateString + DateValue.Day + "/" + DateValue.Year;
-                }
-
-
-                result += "\r\n<input TYPE=\"text\" NAME=\"" + iTagName + "\" ID=\"" + iTagName + "\" VALUE=\"" + iDefaultValue + "\"  SIZE=\"" + iWidth + "\">"
-                + "\r\n<a HREF=\"#\" Onclick = \"cal.select(document.getElementById('" + iTagName + "'),'" + AnchorName + "','MM/dd/yyyy','" + DateString + "'); return false;\" NAME=\"" + AnchorName + "\" ID=\"" + AnchorName + "\"><img title=\"Select a date\" alt=\"Select a date\" src=\"/ccLib/images/table.jpg\" width=12 height=10 border=0></A>"
-                + "\r\n";
-
+                // {0:s} 
+                // yyyy-MM-dd
+                core.doc.formInputTextCnt += 1;
                 core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
+                string attrList = " type=date name=\"" + htmlController.encodeHtml(htmlName) + "\"";
+                if ((htmlValue!=null) & (htmlValue > DateTime.MinValue)) attrList += " value=\"" + encodeDate( htmlValue ).ToString("yyyy-MM-dd") + "\"";              
+                attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+                attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+                attrList += (!readOnly) ? "" : " readonly";
+                attrList += (!disabled) ? "" : " disabled";
+                attrList += (!required) ? "" : " required";
+                return "<input" + attrList + ">";
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -1309,7 +1236,7 @@ namespace Contensive.Core.Controllers {
                             // Handle Password Fields
                             //
                             FieldValueText = genericController.encodeText(FieldValueVariant);
-                            returnResult = inputText(FieldName, FieldValueText, Height, Width, "", true);
+                            returnResult = inputText(core, FieldName, FieldValueText, Height, Width, "", true);
                         } else {
                             //
                             // Non Password field by fieldtype
@@ -1353,7 +1280,7 @@ namespace Contensive.Core.Controllers {
                                         returnResult = FieldValueText;
                                     } else {
                                         //Height = encodeEmptyInteger(Height, 4)
-                                        returnResult = inputText(FieldName, FieldValueText, Height, Width);
+                                        returnResult = inputText(core,FieldName, FieldValueText, Height, Width);
                                     }
                                     //
                                     // text public files, read from core.cdnFiles and use text editor
@@ -1370,7 +1297,7 @@ namespace Contensive.Core.Controllers {
                                         returnResult = FieldValueText;
                                     } else {
                                         //Height = encodeEmptyInteger(Height, 4)
-                                        returnResult = inputText(FieldName, FieldValueText, Height, Width);
+                                        returnResult = inputText(core, FieldName, FieldValueText, Height, Width);
                                     }
                                     //
                                     //
@@ -1399,7 +1326,7 @@ namespace Contensive.Core.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = genericController.encodeText(FieldValueVariant);
                                     } else {
-                                        returnResult = inputText(FieldName, genericController.encodeText(FieldValueVariant), Height, Width);
+                                        returnResult = inputText(core, FieldName, genericController.encodeText(FieldValueVariant), Height, Width);
                                     }
                                     //
                                     //
@@ -1447,12 +1374,12 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // Lookup into LookupList
                                         //
-                                        returnResult = selectFromList(FieldName, FieldValueInteger, FieldLookupList, "", "");
+                                        returnResult = selectFromList(FieldName, FieldValueInteger, FieldLookupList.Split(','), "", "");
                                     } else {
                                         //
                                         // Just call it text
                                         //
-                                        returnResult = inputText(FieldName, FieldValueInteger.ToString(), Height, Width);
+                                        returnResult = inputText(core, FieldName, FieldValueInteger.ToString(), Height, Width);
                                     }
                                     //
                                     //
@@ -1474,7 +1401,7 @@ namespace Contensive.Core.Controllers {
                                             returnResult = getFormInputHTML(FieldName, FieldValueText, Height.ToString(), Width.ToString(), FieldReadOnly, false);
                                             //main_GetFormInputCS = main_GetFormInputActiveContent(fieldname, FieldValueText, height, width)
                                         } else {
-                                            returnResult = inputText(FieldName, FieldValueText, Height, Width);
+                                            returnResult = inputText(core, FieldName, FieldValueText, Height, Width);
                                         }
                                     }
                                     break;
@@ -1507,37 +1434,29 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string inputHidden(string name, string value, string htmlId = "") {
-            string result = "";
-            try {
-                result = "<input type=\"hidden\" name=\"" + htmlController.encodeHtml(name) + "\"";
-                //
-                string iTagValue = htmlController.encodeHtml(value);
-                if (!string.IsNullOrEmpty(iTagValue)) {
-                    result += " VALUE=\"" + iTagValue + "\"";
-                }
-                //
-                string ihtmlId = genericController.encodeText(htmlId);
-                if (!string.IsNullOrEmpty(ihtmlId)) {
-                    result += " ID=\"" + htmlController.encodeHtml(ihtmlId) + "\"";
-                }
-                //
-                result += ">";
-            } catch (Exception ex) {
-                logController.handleError( core,ex);
+        public static string inputHidden(string name, string value, string htmlId = "") {
+            string result = "<input type=\"hidden\" name=\"" + htmlController.encodeHtml(name) + "\"";
+            string iTagValue = htmlController.encodeHtml(value);
+            if (!string.IsNullOrEmpty(iTagValue)) {
+                result += " VALUE=\"" + iTagValue + "\"";
             }
+            string ihtmlId = genericController.encodeText(htmlId);
+            if (!string.IsNullOrEmpty(ihtmlId)) {
+                result += " ID=\"" + htmlController.encodeHtml(ihtmlId) + "\"";
+            }
+            result += ">";
             return result;
         }
         //
         //====================================================================================================
         //
-        public string inputHidden(string TagName, bool TagValue, string htmlId = "") {
+        public static string inputHidden(string TagName, bool TagValue, string htmlId = "") {
             return inputHidden(TagName, TagValue.ToString(), htmlId);
         }
         //
         //====================================================================================================
         //
-        public string inputHidden(string TagName, int TagValue, string htmlId = "") {
+        public static string inputHidden(string TagName, int TagValue, string htmlId = "") {
             return inputHidden(TagName, TagValue.ToString(), htmlId);
         }
         //
@@ -2040,7 +1959,7 @@ namespace Contensive.Core.Controllers {
                 if (FieldTypeDefaultEditorAddonId == 0) {
                     //
                     //    use default wysiwyg
-                    returnHtml = inputTextExpandable(htmlName, DefaultValue);
+                    returnHtml = inputTextarea(core, htmlName, DefaultValue);
                 } else {
                     //
                     // use addon editor
@@ -2757,7 +2676,7 @@ namespace Contensive.Core.Controllers {
                                         returnHtml += "</td><td style=\"vertical-align:top;padding-top:4px;\">";
                                         returnHtml += SpanClassAdminNormal + optionCaptionHtmlEncoded;
                                         if (AllowRuleCopy) {
-                                            returnHtml += ", " + RuleCopyCaption + "&nbsp;" + inputText(TagName + "." + CheckBoxCnt + ".RuleCopy", RuleCopy, 1, 20);
+                                            returnHtml += ", " + RuleCopyCaption + "&nbsp;" + inputText(core, TagName + "." + CheckBoxCnt + ".RuleCopy", RuleCopy, 1, 20);
                                         }
                                         returnHtml += "</td></tr></table>";
                                         CheckBoxCnt = CheckBoxCnt + 1;
@@ -3438,7 +3357,7 @@ namespace Contensive.Core.Controllers {
                         result += getPanelHeader("Contensive Tools Panel" + helpLink);
                         //
                         ToolsPanel.Add(htmlController.formStart( core,WorkingQueryString));
-                        ToolsPanel.Add(core.html.inputHidden("Type", FormTypeToolsPanel));
+                        ToolsPanel.Add(htmlController.inputHidden("Type", FormTypeToolsPanel));
                         //
                         if (true) {
                             //
@@ -3574,7 +3493,7 @@ namespace Contensive.Core.Controllers {
                         TagID = "Username";
                         LoginPanel = LoginPanel + ""
                         + "\r<div class=\"ccAdminSmall\">"
-                        + cr2 + "<LABEL for=\"" + TagID + "\">" + core.html.inputText(TagID, "", 1, 30, TagID, false) + "&nbsp;" + Caption + "</LABEL>"
+                        + cr2 + "<LABEL for=\"" + TagID + "\">" + htmlController.inputText( core,TagID, "", 1, 30, TagID, false) + "&nbsp;" + Caption + "</LABEL>"
                         + "\r</div>";
                         //
                         // Username
@@ -3587,7 +3506,7 @@ namespace Contensive.Core.Controllers {
                         TagID = "Password";
                         LoginPanel = LoginPanel + ""
                         + "\r<div class=\"ccAdminSmall\">"
-                        + cr2 + "<LABEL for=\"" + TagID + "\">" + core.html.inputText(TagID, "", 1, 30, TagID, true) + "&nbsp;" + Caption + "</LABEL>"
+                        + cr2 + "<LABEL for=\"" + TagID + "\">" + htmlController.inputText( core,TagID, "", 1, 30, TagID, true) + "&nbsp;" + Caption + "</LABEL>"
                         + "\r</div>";
                         //
                         // Autologin checkbox
@@ -3936,7 +3855,7 @@ namespace Contensive.Core.Controllers {
         //
         //=========================================================================================================
         //
-        public void addScriptLinkSrc(string scriptLinkSrc, string addedByMessage, bool forceHead = false, int sourceAddonId = 0) {
+        public void addScriptLinkSrc( string scriptLinkSrc, string addedByMessage, bool forceHead = false, int sourceAddonId = 0) {
             try {
                 if (!string.IsNullOrWhiteSpace(scriptLinkSrc)) {
                     htmlAssetClass asset = null;

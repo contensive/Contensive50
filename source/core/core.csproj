@@ -319,9 +319,11 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Models\dataModelFields.txt" />
-    <Content Include="Resources\defaultLoginEmailHtml.txt" />
-    <Content Include="Resources\defaultForgetPasswordHtml.txt" />
-    <Content Include="Resources\defaultLoginHtml.txt" />
+    <Content Include="Resources\defaultLogin_email_html.txt" />
+    <Content Include="Resources\defaultForgetPassword_html.txt" />
+    <Content Include="Resources\defaultLogin_email_autoLogin_html.txt" />
+    <Content Include="Resources\defaultLogin_html.txt" />
+    <Content Include="Resources\defaultLogin_autoLogin_html.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\View\" />

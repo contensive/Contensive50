@@ -573,7 +573,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // KeywordList
                     //
-                    Copy = core.html.inputTextExpandable("KeywordList", "", 10);
+                    Copy = htmlController.inputTextarea( core,"KeywordList", "", 10);
                     Copy += "<div>Paste your Meta Keywords into this text box, separated by either commas or enter keys. When you hit Save or OK, Meta Keyword records will be made out of each word. These can then be checked on any content page.</div>";
                     Content.Add(adminUIController.getEditRowLegacy(core, Copy, "Paste Meta Keywords", "", false, false, ""));
                     //
@@ -584,7 +584,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Close Tables
                     //
                     Content.Add(adminUIController.EditTableClose);
-                    Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminFormSecurityControl));
+                    Content.Add(htmlController.inputHidden(rnAdminSourceForm, AdminFormSecurityControl));
                 }
                 //
                 Description = "Use this tool to enter multiple Meta Keywords";
@@ -2226,10 +2226,10 @@ namespace Contensive.Core.Addons.AdminSite {
                             Stream.Add(formContent);
                             Stream.Add(ButtonBar);
                             Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\", height=\"10\" >"));
-                            Stream.Add(core.html.inputHidden(rnAdminSourceForm, AdminFormIndex));
-                            Stream.Add(core.html.inputHidden("cid", adminContent.id));
-                            Stream.Add(core.html.inputHidden("indexGoToPage", ""));
-                            Stream.Add(core.html.inputHidden("Columncnt", IndexConfig.Columns.Count));
+                            Stream.Add(htmlController.inputHidden(rnAdminSourceForm, AdminFormIndex));
+                            Stream.Add(htmlController.inputHidden("cid", adminContent.id));
+                            Stream.Add(htmlController.inputHidden("indexGoToPage", ""));
+                            Stream.Add(htmlController.inputHidden("Columncnt", IndexConfig.Columns.Count));
                             //Stream.Add("</form>");
                             core.html.addTitle(adminContent.name);
                         }
@@ -5196,25 +5196,6 @@ namespace Contensive.Core.Addons.AdminSite {
             }
             return return_formIndexCell;
         }
-        ////
-        ////========================================================================
-        //// Get the Normal Edit Button Bar String
-        ////
-        ////   used on Normal Edit and others
-        ////========================================================================
-        ////
-        //private string GetForm_Edit_ButtonBar(cdefModel adminContent, editRecordClass editRecord, bool AllowDelete, bool allowSave, bool AllowAdd, bool AllowRefresh = false) {
-        //    string result = "";
-        //    try {
-        //        bool IsPageContent = cdefModel.isWithinContent(core, adminContent.id, cdefModel.getContentId(core, "Page Content"));
-        //        bool HasChildRecords = cdefModel.isContentFieldSupported(core, adminContent.name, "parentid");
-        //        bool AllowMarkReviewed = core.db.isSQLTableField("default", adminContent.contentTableName, "DateReviewed");
-        //        return adminUIController.GetButtonBarForEdit(core,  AllowDelete && editRecord.AllowDelete, editRecord.AllowCancel, (allowSave && editRecord.AllowSave), (AllowAdd && adminContent.allowAdd & editRecord.AllowInsert), HasChildRecords, IsPageContent, AllowMarkReviewed, AllowRefresh, (allowSave && editRecord.AllowSave & (editRecord.id != 0)));
-        //    } catch (Exception ex) {
-        //        logController.handleError( core,ex);
-        //    }
-        //    return result;
-        //}
         //
         // ====================================================================================================
         /// <summary>
@@ -5321,24 +5302,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 bool IsLandingSection = false;
                 bool IsLandingPageTemp = false;
-                if ((!IsLandingPage) && (IsPageContentTable || IsSectionTable)) {
-                    //
-                    // ----- special case, Is this page a LandingPageParent (Parent of the landing page), or is this section the landing page section
-                    //
-                    //TestPageID = core.siteProperties.landingPageID
-                    //Do While LoopPtr < 20 And (TestPageID <> 0)
-                    //    IsLandingPageParent = IsPageContentTable And (editRecord.id = TestPageID)
-                    //    IsLandingSection = IsSectionTable And (EditRecordRootPageID = TestPageID)
-                    //    If IsLandingPageParent Or IsLandingSection Then
-                    //        Exit Do
-                    //    End If
-                    //    PCCPtr = core.pages.cache_pageContent_getPtr(TestPageID, False, False)
-                    //    If PCCPtr >= 0 Then
-                    //        TestPageID = genericController.EncodeInteger(PCC(PCC_ParentID, PCCPtr))
-                    //    End If
-                    //    LoopPtr = LoopPtr + 1
-                    //Loop
-                }
                 //
                 // ----- special case messages
                 //
@@ -5378,7 +5341,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool allowCMAdd = false;
                 bool allowCMDelete = false;
                 core.session.getContentAccessRights(core, adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
-                bool AllowAdd = adminContent.allowAdd && allowCMAdd;
+                bool allowAdd = adminContent.allowAdd && allowCMAdd;
                 bool AllowDelete = adminContent.allowDelete & allowCMDelete & (editRecord.id != 0);
                 bool allowSave = allowCMEdit;
                 bool AllowRefresh = true;
@@ -5467,11 +5430,21 @@ namespace Contensive.Core.Addons.AdminSite {
                         // Must be admin
                         Stream.Add(GetForm_Error("This edit form requires administrator access.", ""));
                     } else {
-                        bool IsPageContent = false;
-                        bool HasChildRecords = false;
-                        bool AllowMarkReviewed = false;
-                        string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, AllowDelete && editRecord.AllowDelete, editRecord.AllowCancel, (allowSave && editRecord.AllowSave), (AllowAdd && adminContent.allowAdd & editRecord.AllowInsert), HasChildRecords, IsPageContent, AllowMarkReviewed, AllowRefresh, (allowSave && editRecord.AllowSave & (editRecord.id != 0)));
-                        Stream.Add(EditSectionButtonBar);
+                        string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, new editButtonBarInfoClass() {
+                            allowActivate = false,
+                            allowAdd = (allowAdd && adminContent.allowAdd & editRecord.AllowInsert),
+                            allowCancel = editRecord.AllowCancel,
+                            allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
+                            allowDelete = AllowDelete && editRecord.AllowDelete,
+                            allowMarkReviewed = false,
+                            allowRefresh = AllowRefresh,
+                            allowSave = (allowSave && editRecord.AllowSave),
+                            allowSend = false,
+                            allowSendTest = false,
+                            hasChildRecords = false,
+                            isPageContent = false
+                        });
+                        Stream.Add(EditSectionButtonBar);                        
                         Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), titleBarDetails));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(GetForm_Edit_AddTab("Groups", GetForm_Edit_MemberGroups(adminContent, editRecord), allowAdminTabs));
@@ -5504,28 +5477,20 @@ namespace Contensive.Core.Addons.AdminSite {
                                 editRecord.fieldsLc["testmemberid"].value = core.session.user.id;
                             }
                         }
-
-
-
-                        string EditSectionButtonBar = "";
-                        //EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd, true);
-                        if (ignore_legacyMenuDepth > 0) {
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonClose, "window.close();");
-                        } else {
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCancel, "Return processSubmit(this)");
-                        }
-                        if ((!EmailSubmitted) && (!EmailSent)) {
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSave, "Return processSubmit(this)");
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonOK, "Return processSubmit(this)");
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSendTest, "Return processSubmit(this)");
-                        } else if (AllowAdd) {
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCreateDuplicate, "Return processSubmit(this)");
-                        }
-                        if ((AllowDelete) && (core.session.isAuthenticatedDeveloper(core))) {
-                            EditSectionButtonBar += adminUIController.getButtonDanger(ButtonDelete, "If(!DeleteCheck())Return False;");
-                        }
-                        EditSectionButtonBar = htmlController.div(EditSectionButtonBar, "border bg-white p-2");
-                        //
+                        string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, new editButtonBarInfoClass() {
+                            allowActivate = false,
+                            allowAdd = (allowAdd && adminContent.allowAdd & editRecord.AllowInsert),
+                            allowCancel = editRecord.AllowCancel,
+                            allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
+                            allowDelete = AllowDelete && editRecord.AllowDelete && core.session.isAuthenticatedDeveloper(core),
+                            allowMarkReviewed = false,
+                            allowRefresh = AllowRefresh,
+                            allowSave = (allowSave && editRecord.AllowSave && (!EmailSubmitted) && (!EmailSent)),
+                            allowSend = false,
+                            allowSendTest = ((!EmailSubmitted) && (!EmailSent)),
+                            hasChildRecords = false,
+                            isPageContent = false
+                        });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), titleBarDetails));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
@@ -5540,32 +5505,23 @@ namespace Contensive.Core.Addons.AdminSite {
                         // Conditional Email
                         EmailSubmitted = false;
                         if (editRecord.id != 0) {
-                            if (editRecord.fieldsLc.ContainsKey("testmemberid")) editRecord.fieldsLc["testmemberid"].value = core.session.user.id;
                             if (editRecord.fieldsLc.ContainsKey("submitted")) EmailSubmitted = genericController.encodeBoolean(editRecord.fieldsLc["submitted"].value);
                         }
-                        string EditSectionButtonBar = "";
-                        if (ignore_legacyMenuDepth > 0) {
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonClose, "window.close();");
-                        } else {
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCancel, "Return processSubmit(this)");
-                        }
-                        if (!EmailSubmitted) {
-                            //
-                            // Not Submitted
-                            //
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSave, "Return processSubmit(this)");
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonOK, "Return processSubmit(this)");
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonActivate, "Return processSubmit(this)", (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest));
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSendTest, "Return processSubmit(this)");
-                        } else {
-                            //
-                            // Submitted
-                            //
-                            if (AllowAdd) EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCreateDuplicate, "Return processSubmit(this)");
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonDeactivate, "Return processSubmit(this)");
-                        }
-                        if (AllowDelete) EditSectionButtonBar += adminUIController.getButtonDanger(ButtonDelete, "If(!DeleteCheck())Return False;");
-                        EditSectionButtonBar = htmlController.div(EditSectionButtonBar, "border bg-white p-2");
+                        string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, new editButtonBarInfoClass() {
+                            allowActivate = !EmailSubmitted & (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest),
+                            allowDeactivate = EmailSubmitted,
+                            allowAdd = allowAdd && adminContent.allowAdd & editRecord.AllowInsert,
+                            allowCancel = editRecord.AllowCancel,
+                            allowCreateDuplicate = allowAdd && (editRecord.id != 0),
+                            allowDelete = AllowDelete && editRecord.AllowDelete && core.session.isAuthenticatedDeveloper(core),
+                            allowMarkReviewed = false,
+                            allowRefresh = AllowRefresh,
+                            allowSave = allowSave && editRecord.AllowSave && !EmailSubmitted,
+                            allowSend = false,
+                            allowSendTest = !EmailSubmitted,
+                            hasChildRecords = false,
+                            isPageContent = false
+                        });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), titleBarDetails));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only || EmailSubmitted, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
@@ -5578,29 +5534,24 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // Group Email
                         if (editRecord.id != 0) {
-                            if (editRecord.fieldsLc.ContainsKey("testmemberid")) editRecord.fieldsLc["testmemberid"].value = core.session.user.id;
-                            if (editRecord.fieldsLc.ContainsKey("submitted")) EmailSubmitted = genericController.encodeBoolean(editRecord.fieldsLc["submitted"].value);
-                            if (editRecord.fieldsLc.ContainsKey("sent")) EmailSent = genericController.encodeBoolean(editRecord.fieldsLc["sent"].value);
+                            EmailSubmitted = encodeBoolean(editRecord.fieldsLc["submitted"].value);
+                            EmailSent = encodeBoolean(editRecord.fieldsLc["sent"].value);
                         }
-                        string EditSectionButtonBar = "";
-                        if (ignore_legacyMenuDepth > 0) {
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonClose, "window.close();");
-                        } else {
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCancel, "Return processSubmit(this)");
-                        }
-                        if (EmailSubmitted || EmailSent) {
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonCreateDuplicate, "Return processSubmit(this)");
-                        } else {
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSave, "Return processSubmit(this)");
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonOK, "Return processSubmit(this)");
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSend, "Return processSubmit(this)", (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest));
-                            EditSectionButtonBar += adminUIController.getButtonPrimary(ButtonSendTest, "Return processSubmit(this)");
-                        }
-                        if (editRecord.id != 0) {
-                            EditSectionButtonBar += adminUIController.getButtonDanger(ButtonDelete, "If(!DeleteCheck())Return False;");
-                        }
-                        EditSectionButtonBar = htmlController.div(EditSectionButtonBar, "border bg-white p-2");
-                        //
+                        string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, new editButtonBarInfoClass() {
+                            allowActivate = !EmailSubmitted & (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest),
+                            allowDeactivate = EmailSubmitted,
+                            allowAdd = allowAdd && adminContent.allowAdd & editRecord.AllowInsert,
+                            allowCancel = editRecord.AllowCancel,
+                            allowCreateDuplicate = allowAdd && (editRecord.id != 0),
+                            allowDelete = AllowDelete && editRecord.AllowDelete && core.session.isAuthenticatedDeveloper(core),
+                            allowMarkReviewed = false,
+                            allowRefresh = AllowRefresh,
+                            allowSave = allowSave && editRecord.AllowSave && !EmailSubmitted,
+                            allowSend = false,
+                            allowSendTest = !EmailSubmitted,
+                            hasChildRecords = false,
+                            isPageContent = false
+                        });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), titleBarDetails));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only | EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
@@ -5618,10 +5569,20 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         Stream.Add(GetForm_Error("This edit form requires Member Administration access.", "This edit form requires Member Administration access."));
                     } else {
-                        bool IsPageContent = false;
-                        bool HasChildRecords = false;
-                        bool AllowMarkReviewed = false;
-                        string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, AllowDelete && editRecord.AllowDelete, editRecord.AllowCancel, (allowSave && editRecord.AllowSave), (AllowAdd && adminContent.allowAdd & editRecord.AllowInsert), HasChildRecords, IsPageContent, AllowMarkReviewed, AllowRefresh, (allowSave && editRecord.AllowSave & (editRecord.id != 0)));
+                        string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, new editButtonBarInfoClass() {
+                            allowActivate = false,
+                            allowAdd = (allowAdd && adminContent.allowAdd & editRecord.AllowInsert),
+                            allowCancel = editRecord.AllowCancel,
+                            allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
+                            allowDelete = AllowDelete && editRecord.AllowDelete,
+                            allowMarkReviewed = false,
+                            allowRefresh = AllowRefresh,
+                            allowSave = (allowSave && editRecord.AllowSave),
+                            allowSend = false,
+                            allowSendTest = false,
+                            hasChildRecords = false,
+                            isPageContent = false
+                        });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), titleBarDetails));
                         Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
@@ -5639,10 +5600,20 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Page Content
                     //
                     int TableID = core.db.getRecordID("Tables", "ccPageContent");
-                    bool IsPageContent = true;
-                    bool HasChildRecords = true;
-                    bool AllowMarkReviewed = true;
-                    string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, AllowDelete && editRecord.AllowDelete, editRecord.AllowCancel, (allowSave && editRecord.AllowSave), (AllowAdd && adminContent.allowAdd & editRecord.AllowInsert), HasChildRecords, IsPageContent, AllowMarkReviewed, AllowRefresh, (allowSave && editRecord.AllowSave & (editRecord.id != 0)));
+                    string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, new editButtonBarInfoClass() {
+                        allowActivate = false,
+                        allowAdd = (allowAdd && adminContent.allowAdd & editRecord.AllowInsert),
+                        allowCancel = editRecord.AllowCancel,
+                        allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
+                        allowDelete = AllowDelete && editRecord.AllowDelete,
+                        allowMarkReviewed = false,
+                        allowRefresh = AllowRefresh,
+                        allowSave = (allowSave && editRecord.AllowSave),
+                        allowSend = false,
+                        allowSendTest = false,
+                        hasChildRecords = false,
+                        isPageContent = false
+                    });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), titleBarDetails));
                     Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingPage || IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
@@ -5708,10 +5679,20 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // Groups
                     //
-                    bool IsPageContent = false;
-                    bool HasChildRecords = false;
-                    bool AllowMarkReviewed = false;
-                    string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, AllowDelete && editRecord.AllowDelete, editRecord.AllowCancel, (allowSave && editRecord.AllowSave), (AllowAdd && adminContent.allowAdd & editRecord.AllowInsert), HasChildRecords, IsPageContent, AllowMarkReviewed, AllowRefresh, (allowSave && editRecord.AllowSave & (editRecord.id != 0)));
+                    string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, new editButtonBarInfoClass() {
+                        allowActivate = false,
+                        allowAdd = (allowAdd && adminContent.allowAdd & editRecord.AllowInsert),
+                        allowCancel = editRecord.AllowCancel,
+                        allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
+                        allowDelete = AllowDelete && editRecord.AllowDelete,
+                        allowMarkReviewed = false,
+                        allowRefresh = AllowRefresh,
+                        allowSave = (allowSave && editRecord.AllowSave),
+                        allowSend = false,
+                        allowSendTest = false,
+                        hasChildRecords = false,
+                        isPageContent = false
+                    });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), titleBarDetails));
                     Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
@@ -5725,10 +5706,20 @@ namespace Contensive.Core.Addons.AdminSite {
                 } else if (adminContentTableNameLower == layoutModel.contentTableName.ToLower()) {
                     //
                     // LAYOUTS
-                    bool IsPageContent = false;
-                    bool HasChildRecords = false;
-                    bool AllowMarkReviewed = false;
-                    string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, AllowDelete && editRecord.AllowDelete, editRecord.AllowCancel, (allowSave && editRecord.AllowSave), (AllowAdd && adminContent.allowAdd & editRecord.AllowInsert), HasChildRecords, IsPageContent, AllowMarkReviewed, AllowRefresh, (allowSave && editRecord.AllowSave & (editRecord.id != 0)));
+                    string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, new editButtonBarInfoClass() {
+                        allowActivate = false,
+                        allowAdd = (allowAdd && adminContent.allowAdd & editRecord.AllowInsert),
+                        allowCancel = editRecord.AllowCancel,
+                        allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
+                        allowDelete = AllowDelete && editRecord.AllowDelete,
+                        allowMarkReviewed = false,
+                        allowRefresh = AllowRefresh,
+                        allowSave = (allowSave && editRecord.AllowSave),
+                        allowSend = false,
+                        allowSendTest = false,
+                        hasChildRecords = false,
+                        isPageContent = false
+                    });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), titleBarDetails));
                     Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
@@ -5744,7 +5735,20 @@ namespace Contensive.Core.Addons.AdminSite {
                     bool IsPageContent = cdefModel.isWithinContent(core, adminContent.id, cdefModel.getContentId(core, "Page Content"));
                     bool HasChildRecords = cdefModel.isContentFieldSupported(core, adminContent.name, "parentid");
                     bool AllowMarkReviewed = core.db.isSQLTableField("default", adminContent.contentTableName, "DateReviewed");
-                    string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, AllowDelete && editRecord.AllowDelete, editRecord.AllowCancel, (allowSave && editRecord.AllowSave), (AllowAdd && adminContent.allowAdd & editRecord.AllowInsert), HasChildRecords, IsPageContent, AllowMarkReviewed, AllowRefresh, (allowSave && editRecord.AllowSave & (editRecord.id != 0)));
+                    string EditSectionButtonBar = adminUIController.GetButtonBarForEdit(core, new editButtonBarInfoClass() {
+                        allowActivate = false,
+                        allowAdd = (allowAdd && adminContent.allowAdd & editRecord.AllowInsert),
+                        allowCancel = editRecord.AllowCancel,
+                        allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
+                        allowDelete = AllowDelete && editRecord.AllowDelete,
+                        allowMarkReviewed = AllowMarkReviewed,
+                        allowRefresh = AllowRefresh,
+                        allowSave = (allowSave && editRecord.AllowSave),
+                        allowSend = false,
+                        allowSendTest = false,
+                        hasChildRecords = HasChildRecords,
+                        isPageContent = IsPageContent
+                    });
                     Stream.Add(EditSectionButtonBar);
                     Stream.Add(adminUIController.GetTitleBar(core, GetForm_EditTitle(adminContent, editRecord), titleBarDetails));
                     Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
@@ -5945,7 +5949,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             // Publish Checkbox
                                             //
-                                            Body += ("<td align=\"center\" valign=\"top\" " + RowColor + ">" + core.html.inputCheckbox("row" + RecordCount, false) + core.html.inputHidden("rowid" + RecordCount, RecordID) + core.html.inputHidden("rowcontentname" + RecordCount, ContentName) + "</td>");
+                                            Body += ("<td align=\"center\" valign=\"top\" " + RowColor + ">" + core.html.inputCheckbox("row" + RecordCount, false) + htmlController.inputHidden("rowid" + RecordCount, RecordID) + htmlController.inputHidden("rowcontentname" + RecordCount, ContentName) + "</td>");
                                             //
                                             // Submitted
                                             //
@@ -6075,7 +6079,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         Body += "\r<tr><td width=\"100%\" colspan=\"9\" class=\"ccAdminSmall\">** To view these records on the public site you must disable Rendering Mode because they are deleted records that have not been published.</td></tr>";
                     }
                     Body += "\r</table>";
-                    Body += core.html.inputHidden("RowCnt", RecordCount);
+                    Body += htmlController.inputHidden("RowCnt", RecordCount);
                     Body = "<div style=\"Background-color:white;\">" + Body + "</div>";
                     //
                     // Headers, etc
@@ -6091,7 +6095,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // Assemble Page
                     //
-                    Body += core.html.inputHidden(rnAdminSourceForm, AdminFormPublishing);
+                    Body += htmlController.inputHidden(rnAdminSourceForm, AdminFormPublishing);
                 }
                 //
                 Caption = SpanClassAdminNormal + "<strong>Workflow Publishing</strong></span>";
@@ -6111,7 +6115,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //   Generate the content of a tab in the Edit Screen
         //========================================================================
         //
-        private string GetForm_Edit_Tab(cdefModel adminContent, editRecordClass editRecord, int RecordID, int ContentID, bool ForceReadOnly, bool IsLandingPage, bool IsRootPage, string EditTab, contentTypeEnum EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, keyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        private string GetForm_Edit_Tab(cdefModel adminContent, editRecordClass editRecord, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, contentTypeEnum EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, keyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 //
@@ -6130,7 +6134,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 string HelpMsgCustom = null;
                 string HelpMsgDefault = null;
                 //
-                DateTime FieldValueDate = default(DateTime);
                 string WhyReadOnlyMsg = null;
                 bool IsLongHelp = false;
                 bool IsEmptyHelp = false;
@@ -6151,26 +6154,20 @@ namespace Contensive.Core.Addons.AdminSite {
                 string RecordName = null;
                 string GroupName = null;
                 bool IsBaseField = false;
-                bool FieldReadOnly = false;
+                bool field_readOnly = false;
                 string NonEncodedLink = null;
                 string EncodedLink = null;
                 string fieldCaption = null;
                 string[] lookups = null;
                 int CSPointer = 0;
-                string FieldName = null;
-                string FieldValueText = null;
-                int FieldValueInteger = 0;
+                string fieldValue_text = null;
+                //int FieldValueInteger = 0;
                 double FieldValueNumber = 0;
                 bool FieldValueBoolean = false;
                 int fieldTypeId = 0;
-                object FieldValueObject = null;
-                bool FieldPreferenceHTML = false;
-                int CSLookup = 0;
+                object fieldValue_object = null;
                 string RedirectPath = null;
-                string LookupContentName = null;
                 stringBuilderLegacyController resultBody = new stringBuilderLegacyController();
-                bool RecordReadOnly = false;
-                string FormFieldLCaseName = null;
                 int FieldRows = 0;
                 string EditorString = null;
                 string MTMContent0 = null;
@@ -6179,23 +6176,17 @@ namespace Contensive.Core.Addons.AdminSite {
                 string MTMRuleField0 = null;
                 string MTMRuleField1 = null;
                 string AlphaSort = null;
-                //adminUIController Adminui = new adminUIController(core);
                 bool needUniqueEmailMessage = false;
                 //
                 // ----- Open the panel
-                //
                 if (adminContent.fields.Count <= 0) {
                     //
                     // There are no visible fiels, return empty
-                    //
-                    logController.handleError(core, new ApplicationException("The content definition for this record is invalid. It contains no valid fields."));
+                    logController.handleError(core, new ApplicationException("There is no metadata for this field."));
                 } else {
-                    RecordReadOnly = ForceReadOnly;
                     //
                     // ----- Build an index to sort the fields by EditSortOrder
-                    //
                     Dictionary<string, cdefFieldModel> sortingFields = new Dictionary<string, cdefFieldModel>();
-                    //
                     foreach (var keyValuePair in adminContent.fields) {
                         cdefFieldModel field = keyValuePair.Value;
                         if (field.editTabName.ToLower() == EditTab.ToLower()) {
@@ -6213,14 +6204,11 @@ namespace Contensive.Core.Addons.AdminSite {
                         cdefFieldModel field = kvp.Value;
                         fieldId = field.id;
                         WhyReadOnlyMsg = "";
-                        FieldName = field.nameLc;
-                        FormFieldLCaseName = genericController.vbLCase(FieldName);
                         fieldTypeId = field.fieldTypeId;
-                        FieldValueObject = editRecord.fieldsLc[field.nameLc].value;
-                        FieldValueText = genericController.encodeText(FieldValueObject);
+                        fieldValue_object = editRecord.fieldsLc[field.nameLc].value;
+                        fieldValue_text = genericController.encodeText(fieldValue_object);
                         FieldRows = 1;
-                        FieldPreferenceHTML = field.htmlContent;
-                        string fieldHtmlId = FieldName + field.id.ToString();
+                        string fieldHtmlId = field.nameLc + field.id.ToString();
                         //
                         fieldCaption = field.caption;
                         if (field.uniqueName) {
@@ -6238,7 +6226,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                         IsBaseField = field.blockAccess; // field renamed
                         FormInputCount = FormInputCount + 1;
-                        FieldReadOnly = false;
+                        field_readOnly = false;
                         //
                         // Read only Special Cases
                         //
@@ -6248,8 +6236,8 @@ namespace Contensive.Core.Addons.AdminSite {
                                     //
                                     // if active, it is read only -- if inactive, let them set it active.
                                     //
-                                    FieldReadOnly = (genericController.encodeBoolean(FieldValueObject));
-                                    if (FieldReadOnly) {
+                                    field_readOnly = (genericController.encodeBoolean(fieldValue_object));
+                                    if (field_readOnly) {
                                         WhyReadOnlyMsg = "&nbsp;(disabled because you can not mark the landing page inactive)";
                                     }
                                     break;
@@ -6261,7 +6249,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     //
                                     // These fields are read only on landing pages
                                     //
-                                    FieldReadOnly = true;
+                                    field_readOnly = true;
                                     WhyReadOnlyMsg = "&nbsp;(disabled for the landing page)";
                                     break;
                             }
@@ -6273,14 +6261,14 @@ namespace Contensive.Core.Addons.AdminSite {
                                 case "pubdate":
                                 case "datearchive":
                                 case "archiveparentid":
-                                    FieldReadOnly = true;
+                                    field_readOnly = true;
                                     WhyReadOnlyMsg = "&nbsp;(disabled for root pages)";
                                     break;
                                 case "allowinmenus":
                                 case "allowinchildlists":
                                     FieldValueBoolean = true;
-                                    FieldValueObject = "1";
-                                    FieldReadOnly = true;
+                                    fieldValue_object = "1";
+                                    field_readOnly = true;
                                     WhyReadOnlyMsg = "&nbsp;(disabled for root pages)";
                                     break;
                             }
@@ -6288,18 +6276,18 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // Special Case - ccemail table Alloweid should be disabled if siteproperty AllowLinkLogin is false
                         //
-                        if (genericController.vbLCase(adminContent.contentTableName) == "ccemail" && genericController.vbLCase(FieldName) == "allowlinkeid") {
+                        if (genericController.vbLCase(adminContent.contentTableName) == "ccemail" && genericController.vbLCase(field.nameLc) == "allowlinkeid") {
                             if (!(core.siteProperties.getBoolean("AllowLinkLogin", true))) {
                                 //.ValueVariant = "0"
-                                FieldValueObject = "0";
-                                FieldReadOnly = true;
+                                fieldValue_object = "0";
+                                field_readOnly = true;
                                 FieldValueBoolean = false;
-                                FieldValueText = "0";
+                                fieldValue_text = "0";
                             }
                         }
                         //EditorStyleModifier = genericController.vbLCase(core.db.getFieldTypeNameFromFieldTypeId(fieldTypeId));
                         EditorString = "";
-                        editorReadOnly = (RecordReadOnly || field.readOnly | (editRecord.id != 0 & field.notEditable) || (FieldReadOnly));
+                        editorReadOnly = (record_readOnly || field.readOnly | (editRecord.id != 0 & field.notEditable) || (field_readOnly));
                         //
                         // Determine the editor: Contensive editor, field type default, or add-on preference
                         //
@@ -6330,8 +6318,8 @@ namespace Contensive.Core.Addons.AdminSite {
                             // generate the style list on demand
                             // note: &editorFieldType should be deprecated
                             //
-                            core.docProperties.setProperty("editorName", FormFieldLCaseName);
-                            core.docProperties.setProperty("editorValue", FieldValueText);
+                            core.docProperties.setProperty("editorName", field.nameLc);
+                            core.docProperties.setProperty("editorValue", fieldValue_text);
                             core.docProperties.setProperty("editorFieldId", fieldId);
                             core.docProperties.setProperty("editorFieldType", fieldTypeId);
                             core.docProperties.setProperty("editorReadOnly", editorReadOnly);
@@ -6354,7 +6342,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             if (useEditorAddon) {
                                 //
                                 // -- editor worked
-                                return_NewFieldList +=  "," + FieldName;
+                                return_NewFieldList +=  "," + field.nameLc;
                             } else {
                                 //
                                 // -- editor failed, determine if it is missing (or inactive). If missing, remove it from the members preferences
@@ -6423,107 +6411,60 @@ namespace Contensive.Core.Addons.AdminSite {
                                 }
                                 //EditorStyleModifier = "";
                                 switch (fieldTypeId) {
+                                    case FieldTypeIdText:
+                                    case FieldTypeIdLink:
+                                    case FieldTypeIdResourceLink:
+                                        //
+                                        // ----- Text Type
+                                        EditorString += adminUIController.getDefaultEditor_Text(core, field.nameLc, fieldValue_text, true, fieldHtmlId);
+                                        return_NewFieldList += "," + field.nameLc;
+                                        break;
                                     case FieldTypeIdBoolean:
                                         //
                                         // ----- Boolean ReadOnly
-                                        //
-                                        EditorString += adminUIController.getDefaultEditor_Bool(core, FormFieldLCaseName, genericController.encodeBoolean(FieldValueObject), true, fieldHtmlId);
-                                        return_NewFieldList +=  "," + FieldName;
-                                        break;
-                                    case FieldTypeIdFile:
-                                    case FieldTypeIdFileImage:
-                                        //
-                                        // ----- File ReadOnly
-                                        //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        NonEncodedLink = genericController.getCdnFileLink(core, FieldValueText);
-                                        //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValueText);
-                                        EncodedLink = genericController.encodeURL(NonEncodedLink);
-                                        EditorString += (core.html.inputHidden(FormFieldLCaseName, ""));
-                                        if (string.IsNullOrEmpty(FieldValueText)) {
-                                            EditorString += ("[no file]");
-                                        } else {
-                                            string filename = "";
-                                            string path = "";
-                                            core.cdnFiles.splitDosPathFilename(FieldValueText, ref path, ref filename);
-                                            EditorString += ("&nbsp;<a href=\"http://" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
-                                        }
-                                        EditorString += WhyReadOnlyMsg;
-                                        //
+                                        EditorString += adminUIController.getDefaultEditor_Bool(core, field.nameLc, genericController.encodeBoolean(fieldValue_object), true, fieldHtmlId);
+                                        return_NewFieldList +=  "," + field.nameLc;
                                         break;
                                     case FieldTypeIdLookup:
                                         //
-                                        // ----- Lookup ReadOnly
-                                        //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueInteger = genericController.encodeInteger(FieldValueObject);
-                                        EditorString += (core.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)));
-                                        //Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
-                                        LookupContentName = "";
-                                        if (field.lookupContentID != 0) {
-                                            LookupContentName = genericController.encodeText(cdefModel.getContentNameByID(core, field.lookupContentID));
-                                        }
-                                        if (!string.IsNullOrEmpty(LookupContentName)) {
-                                            CSLookup = core.db.csOpen2(LookupContentName, FieldValueInteger, false, false, "Name,ContentControlID");
-                                            if (core.db.csOk(CSLookup)) {
-                                                if (core.db.csGet(CSLookup, "Name") == "") {
-                                                    EditorString += ("No Name");
-                                                } else {
-                                                    EditorString += (htmlController.encodeHtml(core.db.csGet(CSLookup, "Name")));
-                                                }
-                                                EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + field.lookupContentID + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">View details in new window</a>]");
-                                            } else {
-                                                EditorString += ("None");
-                                            }
-                                            core.db.csClose(ref CSLookup);
-                                            EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + field.lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
+                                        // ----- Lookup, readonly
+                                        if (field.lookupContentID!=0) {
+                                            EditorString = adminUIController.getDefaultEditor_LookupContent(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupContentID, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required, ref IsEmptyList);
+                                            return_NewFieldList += "," + field.nameLc;
                                         } else if (field.lookupList != "") {
-                                            lookups = field.lookupList.Split(',');
-                                            if (FieldValueInteger < 1) {
-                                                EditorString += ("None");
-                                            } else if (FieldValueInteger > (lookups.GetUpperBound(0) + 1)) {
-                                                EditorString += ("None");
-                                            } else {
-                                                EditorString += (lookups[FieldValueInteger - 1]);
-                                            }
+                                            EditorString = adminUIController.getDefaultEditor_LookupList(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupList.Split(','), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                            return_NewFieldList += "," + field.nameLc;
+                                        } else {
+                                            //
+                                            // -- log exception but dont throw
+                                            logController.handleWarn(core, new ApplicationException("Field [" + adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
+                                            EditorString += "[Selection not configured]";
                                         }
-                                        EditorString += WhyReadOnlyMsg;
+                                        break;
+                                    case FieldTypeIdDate:
                                         //
+                                        // ----- date, readonly
+                                        return_NewFieldList += "," + field.nameLc;
+                                        EditorString = adminUIController.getDefaultEditor_Date(core, field.nameLc, genericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required,WhyReadOnlyMsg);
                                         break;
                                     case FieldTypeIdMemberSelect:
                                         //
                                         // ----- Member Select ReadOnly
                                         //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueInteger = genericController.encodeInteger(FieldValueObject);
-                                        EditorString += (core.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)));
-                                        if (FieldValueInteger == 0) {
-                                            EditorString += ("None");
-                                        } else {
-                                            RecordName = core.db.getRecordName("people", FieldValueInteger);
-                                            if (string.IsNullOrEmpty(RecordName)) {
-                                                EditorString += ("No Name");
-                                            } else {
-                                                EditorString += (htmlController.encodeHtml(RecordName));
-                                            }
-                                            EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + cdefModel.getContentId(core, "people") + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">View details in new window</a>]");
-                                        }
-                                        EditorString += WhyReadOnlyMsg;
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        EditorString = adminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg, field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core));
                                         //
                                         break;
                                     case FieldTypeIdManyToMany:
                                         //
                                         //   Placeholder
                                         //
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
                                         MTMContent0 = cdefModel.getContentNameByID(core, field.contentId);
                                         MTMContent1 = cdefModel.getContentNameByID(core, field.manyToManyContentID);
                                         MTMRuleContent = cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
                                         MTMRuleField0 = field.ManyToManyRulePrimaryField;
                                         MTMRuleField1 = field.ManyToManyRuleSecondaryField;
                                         EditorString += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1);
-                                        //EditorString &= (core.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , True, MTMContent1))
                                         EditorString += WhyReadOnlyMsg;
                                         //
                                         break;
@@ -6531,27 +6472,11 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Currency ReadOnly
                                         //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueNumber = genericController.encodeNumber(FieldValueObject);
-                                        EditorString += (core.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueNumber)));
-                                        EditorString += (core.html.inputText(FormFieldLCaseName, FieldValueNumber.ToString(), -1, -1, "", false, true, "text form-control"));
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        FieldValueNumber = genericController.encodeNumber(fieldValue_object);
+                                        EditorString += (htmlController.inputHidden(field.nameLc, genericController.encodeText(FieldValueNumber)));
+                                        EditorString += (htmlController.inputText( core,field.nameLc, FieldValueNumber.ToString(), -1, -1, "", false, true, "text form-control"));
                                         EditorString += (string.Format("{0:C}", FieldValueNumber));
-                                        EditorString += WhyReadOnlyMsg;
-                                        //
-                                        break;
-                                    case FieldTypeIdDate:
-                                        //
-                                        // ----- date
-                                        //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueDate = genericController.encodeDateMinValue(genericController.encodeDate(FieldValueObject));
-                                        if (FieldValueDate == DateTime.MinValue) {
-                                            FieldValueText = "";
-                                        } else {
-                                            FieldValueText = encodeText(FieldValueDate);
-                                        }
-                                        EditorString += (core.html.inputHidden(FormFieldLCaseName, FieldValueText));
-                                        EditorString += (core.html.inputText(FormFieldLCaseName, FieldValueText, -1, -1, "", false, true, "date form-control"));
                                         EditorString += WhyReadOnlyMsg;
                                         //
                                         break;
@@ -6561,10 +6486,9 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- number
                                         //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorString += (core.html.inputHidden(FormFieldLCaseName, FieldValueText));
-                                        EditorString += (core.html.inputText(FormFieldLCaseName, FieldValueText, -1, -1, "", false, true, "number form-control"));
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        EditorString += (htmlController.inputHidden(field.nameLc, fieldValue_text));
+                                        EditorString += (htmlController.inputText( core,field.nameLc, fieldValue_text, -1, -1, "", false, true, "number form-control"));
                                         EditorString += WhyReadOnlyMsg;
                                         //
                                         break;
@@ -6577,85 +6501,94 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             // edit html as html (see the code)
                                             //
-                                            return_NewFieldList +=  "," + FieldName;
-                                            FieldValueText = genericController.encodeText(FieldValueObject);
-                                            EditorString += core.html.inputHidden(FormFieldLCaseName, FieldValueText);
+                                            return_NewFieldList +=  "," + field.nameLc;
+                                            EditorString += htmlController.inputHidden(field.nameLc, fieldValue_text);
                                             //EditorStyleModifier = "textexpandable";
-                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
-                                            EditorString += core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "", FormFieldLCaseName, false, true, "form-control");
+                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                            EditorString += htmlController.inputTextarea( core,field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, true, "form-control");
                                         } else {
                                             //
                                             // edit html as wysiwyg
                                             //
-                                            return_NewFieldList +=  "," + FieldName;
-                                            FieldValueText = genericController.encodeText(FieldValueObject);
-                                            EditorString += core.html.inputHidden(FormFieldLCaseName, FieldValueText);
+                                            return_NewFieldList +=  "," + field.nameLc;
+                                            EditorString += htmlController.inputHidden(field.nameLc, fieldValue_text);
                                             //
                                             //EditorStyleModifier = "text";
-                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".PixelHeight", 500));
+                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
                                             //EditorString &=  core.main_GetFormInputHTML(FormFieldLCaseName, FieldValueText)
                                             //
-                                            EditorString += core.html.getFormInputHTML(FormFieldLCaseName, FieldValueText, "500", "", true, true, editorAddonListJSON, styleList, styleOptionList);
+                                            EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", true, true, editorAddonListJSON, styleList, styleOptionList);
                                             //innovaEditor = New innovaEditorAddonClassFPO
                                             //EditorString &=  innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, True, TemplateIDForStyles, emailIdForStyles)
                                             EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
                                         }
-                                        break;
-                                    case FieldTypeIdText:
-                                    case FieldTypeIdLink:
-                                    case FieldTypeIdResourceLink:
-                                        //
-                                        // ----- Text Type
-                                        EditorString += adminUIController.getDefaultEditor_Text(core, FormFieldLCaseName, genericController.encodeText(FieldValueObject), true, fieldHtmlId, field.password);
-                                        return_NewFieldList += "," + FieldName;
                                         break;
                                     case FieldTypeIdLongText:
                                     case FieldTypeIdFileText:
                                         //
                                         // ----- LongText, TextFile
                                         //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorString += core.html.inputHidden(FormFieldLCaseName, FieldValueText);
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        EditorString += htmlController.inputHidden(field.nameLc, fieldValue_text);
                                         //EditorStyleModifier = "textexpandable";
-                                        FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
-                                        EditorString += core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "", FormFieldLCaseName, false, true, " form-control");
+                                        FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                        EditorString += htmlController.inputTextarea( core,field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, true, " form-control");
+                                        break;
+                                    case FieldTypeIdFile:
+                                    case FieldTypeIdFileImage:
+                                        //
+                                        // ----- File ReadOnly
+                                        //
+                                        return_NewFieldList += "," + field.nameLc;
+                                        NonEncodedLink = genericController.getCdnFileLink(core, fieldValue_text);
+                                        //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValueText);
+                                        EncodedLink = genericController.encodeURL(NonEncodedLink);
+                                        EditorString += (htmlController.inputHidden(field.nameLc, ""));
+                                        if (string.IsNullOrEmpty(fieldValue_text)) {
+                                            EditorString += ("[no file]");
+                                        } else {
+                                            string filename = "";
+                                            string path = "";
+                                            core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
+                                            EditorString += ("&nbsp;<a href=\"http://" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
+                                        }
+                                        EditorString += WhyReadOnlyMsg;
+                                        //
                                         break;
                                     default:
                                         //
                                         // ----- Legacy text type -- not used unless something was missed
                                         //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorString += core.html.inputHidden(FormFieldLCaseName, FieldValueText);
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        EditorString += htmlController.inputHidden(field.nameLc, fieldValue_text);
                                         if (field.password) {
                                             //
                                             // Password forces simple text box
                                             //
-                                            EditorString += core.html.inputText(FormFieldLCaseName, "*****", 0, 0, "", true, true, "password form-control");
+                                            EditorString += htmlController.inputText( core,field.nameLc, "*****", 0, 0, "", true, true, "password form-control");
                                         } else if (!field.htmlContent) {
                                             //
                                             // not HTML capable, textarea with resizing
                                             //
-                                            if ((fieldTypeId == FieldTypeIdText) && (FieldValueText.IndexOf("\n") == -1) && (FieldValueText.Length < 40)) {
+                                            if ((fieldTypeId == FieldTypeIdText) && (fieldValue_text.IndexOf("\n") == -1) && (fieldValue_text.Length < 40)) {
                                                 //
                                                 // text field shorter then 40 characters without a CR
                                                 //
-                                                EditorString += core.html.inputText(FormFieldLCaseName, FieldValueText, 1, 0, "", false, true, "text form-control");
+                                                EditorString += htmlController.inputText( core,field.nameLc, fieldValue_text, 1, 0, "", false, true, "text form-control");
                                             } else {
                                                 //
                                                 // longer text data, or text that contains a CR
                                                 //
                                                 //EditorStyleModifier = "textexpandable";
-                                                EditorString += core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, 10, "", "", false, true, " form-control");
+                                                EditorString += htmlController.inputTextarea( core,field.nameLc, fieldValue_text, 10, -1, "", false, true, " form-control");
                                             }
-                                        } else if (field.htmlContent && FieldPreferenceHTML) {
+                                        } else if (field.htmlContent) {
                                             //
                                             // HTMLContent true, and prefered
                                             //
                                             //EditorStyleModifier = "text";
-                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".PixelHeight", 500));
-                                            EditorString += core.html.getFormInputHTML(FormFieldLCaseName, FieldValueText, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
+                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
+                                            EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
                                             //innovaEditor = New innovaEditorAddonClassFPO
                                             //EditorString &=  innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, True, TemplateIDForStyles, emailIdForStyles)
                                             EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
@@ -6664,139 +6597,91 @@ namespace Contensive.Core.Addons.AdminSite {
                                             // HTMLContent true, but text editor selected
                                             //
                                             //EditorStyleModifier = "textexpandable";
-                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
-                                            EditorString += core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "100%", FormFieldLCaseName, false, true);
+                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                            EditorString += htmlController.inputTextarea( core,field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, true);
                                             //EditorString = core.main_GetFormInputTextExpandable(FormFieldLCaseName, encodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False)
                                         }
                                         break;
                                 }
                             } else {
                                 //
-                                //--------------------------------------------------------------------------------------------
-                                //   Not Read Only - Display fields as form elements to be modified
-                                //--------------------------------------------------------------------------------------------
-                                //
+                                // -- Not Read Only - Display fields as form elements to be modified
                                 switch (fieldTypeId) {
+                                    case FieldTypeIdText:
+                                        //
+                                        // ----- Text Type
+                                        if (field.password) {
+                                            EditorString += adminUIController.getDefaultEditor_Password(core, field.nameLc, fieldValue_text, false, fieldHtmlId);
+                                        } else {
+                                            EditorString += adminUIController.getDefaultEditor_Text(core, field.nameLc, fieldValue_text, false, fieldHtmlId);
+                                        }
+                                        return_NewFieldList += "," + field.nameLc;
+                                        break;
                                     case FieldTypeIdBoolean:
                                         //
                                         // ----- Boolean
-                                        EditorString += adminUIController.getDefaultEditor_Bool(core, FormFieldLCaseName, genericController.encodeBoolean(FieldValueObject), false, fieldHtmlId);
-                                        return_NewFieldList +=  "," + FieldName;
-                                        break;
-                                    case FieldTypeIdFile:
-                                    case FieldTypeIdFileImage:
-                                        //
-                                        // ----- File
-                                        //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        //Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
-                                        if (string.IsNullOrEmpty(FieldValueText)) {
-                                            EditorString += (core.html.inputFile(FormFieldLCaseName, "", "file form-control"));
-                                        } else {
-                                            NonEncodedLink = genericController.getCdnFileLink(core, FieldValueText);
-                                            //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValueText);
-                                            EncodedLink = htmlController.encodeHtml(NonEncodedLink);
-                                            string filename = "";
-                                            string path = "";
-                                            core.cdnFiles.splitDosPathFilename(FieldValueText, ref path, ref filename);
-                                            EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
-                                            EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(FormFieldLCaseName + ".DeleteFlag", false));
-                                            EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FormFieldLCaseName, "", "file form-control"));
-                                        }
-                                        //
+                                        EditorString += adminUIController.getDefaultEditor_Bool(core, field.nameLc, genericController.encodeBoolean(fieldValue_object), false, fieldHtmlId);
+                                        return_NewFieldList +=  "," + field.nameLc;
                                         break;
                                     case FieldTypeIdLookup:
                                         //
                                         // ----- Lookup
-                                        //
-                                        FieldValueInteger = genericController.encodeInteger(FieldValueObject);
-                                        LookupContentName = "";
-                                        if (field.lookupContentID != 0) {
-                                            LookupContentName = genericController.encodeText(cdefModel.getContentNameByID(core, field.lookupContentID));
-                                        }
-                                        if (!string.IsNullOrEmpty(LookupContentName)) {
-                                            return_NewFieldList +=  "," + FieldName;
-                                            if (!field.required) {
-                                                EditorString += (core.html.selectFromContent(FormFieldLCaseName, FieldValueInteger, LookupContentName, "", "None", "", ref IsEmptyList, "select form-control"));
-                                            } else {
-                                                EditorString += (core.html.selectFromContent(FormFieldLCaseName, FieldValueInteger, LookupContentName, "", "", "", ref IsEmptyList, "select form-control"));
-                                            }
-                                            if (FieldValueInteger != 0) {
-                                                CSPointer = core.db.csOpen2(LookupContentName, FieldValueInteger, false, false, "ID");
-                                                if (core.db.csOk(CSPointer)) {
-                                                    EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + field.lookupContentID + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">Details</a>]");
-                                                }
-                                                core.db.csClose(ref CSPointer);
-                                            }
-                                            EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + field.lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
+                                        if (field.lookupContentID!=0) {
+                                            EditorString = adminUIController.getDefaultEditor_LookupContent(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupContentID, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required, ref IsEmptyList);
+                                            return_NewFieldList += "," + field.nameLc;
                                         } else if (field.lookupList != "") {
-                                            return_NewFieldList +=  "," + FieldName;
-                                            if (!field.required) {
-                                                EditorString += core.html.selectFromList(FormFieldLCaseName, FieldValueInteger, field.lookupList, "Select One", "", "select form-control");
-                                            } else {
-                                                EditorString += core.html.selectFromList(FormFieldLCaseName, FieldValueInteger, field.lookupList, "", "", "select form-control");
-                                            }
+                                            EditorString = adminUIController.getDefaultEditor_LookupList(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupList.Split(','), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                            return_NewFieldList += "," + field.nameLc;
                                         } else {
                                             //
                                             // -- log exception but dont throw
-                                            logController.handleWarn(core, new ApplicationException("Field [" + adminContent.name + "." + FieldName + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
+                                            logController.handleWarn(core, new ApplicationException("Field [" + adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
                                             EditorString += "[Selection not configured]";
                                         }
+                                        break;
+                                    case FieldTypeIdDate:
                                         //
+                                        // ----- Date
+                                        return_NewFieldList += "," + field.nameLc;
+                                        EditorString = adminUIController.getDefaultEditor_Date(core, field.nameLc, genericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
                                         break;
                                     case FieldTypeIdMemberSelect:
                                         //
                                         // ----- Member Select
                                         //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueInteger = genericController.encodeInteger(FieldValueObject);
-                                        //s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
-                                        if (!field.required) {
-                                            EditorString += (core.html.selectUserFromGroup(FormFieldLCaseName, FieldValueInteger, field.memberSelectGroupId_get(core), "", "None", "select form-control"));
+                                        return_NewFieldList += "," + field.nameLc;
+                                        EditorString = adminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg, field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core));
+                                        break;
+                                    case FieldTypeIdFile:
+                                    case FieldTypeIdFileImage:
+                                        //
+                                        // ----- File
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                         if (string.IsNullOrEmpty(fieldValue_text)) {
+                                            EditorString += (core.html.inputFile(field.nameLc, "", "file form-control"));
                                         } else {
-                                            EditorString += (core.html.selectUserFromGroup(FormFieldLCaseName, FieldValueInteger, field.memberSelectGroupId_get(core), "", "", "select form-control"));
+                                            NonEncodedLink = genericController.getCdnFileLink(core, fieldValue_text);
+                                            //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValueText);
+                                            EncodedLink = htmlController.encodeHtml(NonEncodedLink);
+                                            string filename = "";
+                                            string path = "";
+                                            core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
+                                            EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
+                                            EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(field.nameLc + ".DeleteFlag", false));
+                                            EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(field.nameLc, "", "file form-control"));
                                         }
-                                        if (FieldValueInteger != 0) {
-                                            CSPointer = core.db.csOpen2("people", FieldValueInteger, false, false, "ID");
-                                            if (core.db.csOk(CSPointer)) {
-                                                EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + cdefModel.getContentId(core, "people") + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">Details</a>]");
-                                            }
-                                            core.db.csClose(ref CSPointer);
-                                        }
-                                        GroupName = field.memberSelectGroupName_get(core);
-                                        EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + cdefModel.getContentId(core, "groups") + "\" target=\"_blank\">Select from members of " + GroupName + "</a>]");
-                                        //s.Add( "</span></nobr></td>")
                                         //
                                         break;
                                     case FieldTypeIdManyToMany:
                                         //
                                         //   Placeholder
-                                        //
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        //Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
-                                        //
                                         MTMContent0 = cdefModel.getContentNameByID(core, field.contentId);
                                         MTMContent1 = cdefModel.getContentNameByID(core, field.manyToManyContentID);
                                         MTMRuleContent = cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
                                         MTMRuleField0 = field.ManyToManyRulePrimaryField;
                                         MTMRuleField1 = field.ManyToManyRuleSecondaryField;
-                                        EditorString += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, FieldValueText);
+                                        EditorString += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, fieldValue_text);
                                         //EditorString &= (core.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, FieldValueText))
-                                        break;
-                                    case FieldTypeIdDate:
-                                        //
-                                        // ----- Date
-                                        //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueDate = genericController.encodeDateMinValue(genericController.encodeDate(FieldValueObject));
-                                        if (FieldValueDate == DateTime.MinValue) {
-                                            FieldValueText = "";
-                                        } else {
-                                            FieldValueText = encodeText(FieldValueDate);
-                                        }
-                                        EditorString += (core.html.inputDate(FormFieldLCaseName, FieldValueText));
-                                        //s.Add( "&nbsp;</span></nobr></td>")
                                         break;
                                     case FieldTypeIdAutoIdIncrement:
                                     case FieldTypeIdCurrency:
@@ -6804,86 +6689,57 @@ namespace Contensive.Core.Addons.AdminSite {
                                     case FieldTypeIdInteger:
                                         //
                                         // ----- Others that simply print
-                                        //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        //s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
+                                        return_NewFieldList +=  "," + field.nameLc;
                                         if (field.password) {
-                                            EditorString += (core.html.inputText(FormFieldLCaseName, FieldValueText, -1, -1, "", true, false, "password form-control"));
+                                            EditorString += (htmlController.inputText( core,field.nameLc, fieldValue_text, -1, -1, "", true, false, "password form-control"));
                                         } else {
-                                            if (string.IsNullOrEmpty(FieldValueText)) {
-                                                EditorString += (core.html.inputText(FormFieldLCaseName, "", -1, -1, "", false, false, "text form-control"));
+                                            if (string.IsNullOrEmpty(fieldValue_text)) {
+                                                EditorString += (htmlController.inputText( core,field.nameLc, "", -1, -1, "", false, false, "text form-control"));
                                             } else {
-                                                if (encodeBoolean(FieldValueText.IndexOf("\n") + 1) || (FieldValueText.Length > 40)) {
-                                                    EditorString += (core.html.inputText(FormFieldLCaseName, FieldValueText, -1, -1, "", false, false, "text form-control"));
+                                                if (encodeBoolean(fieldValue_text.IndexOf("\n") + 1) || (fieldValue_text.Length > 40)) {
+                                                    EditorString += (htmlController.inputText( core,field.nameLc, fieldValue_text, -1, -1, "", false, false, "text form-control"));
                                                 } else {
-                                                    EditorString += (core.html.inputText(FormFieldLCaseName, FieldValueText, 1, -1, "", false, false, "text form-control"));
+                                                    EditorString += (htmlController.inputText( core,field.nameLc, fieldValue_text, 1, -1, "", false, false, "text form-control"));
                                                 }
                                             }
-                                            //s.Add( "&nbsp;</span></nobr></td>")
                                         }
-                                        //
                                         break;
                                     case FieldTypeIdLink:
                                         //
                                         // ----- Link (href value
                                         //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
+                                        return_NewFieldList +=  "," + field.nameLc;
                                         EditorString = ""
-                                            + core.html.inputText(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + FormFieldLCaseName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
-                                            + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + FormFieldLCaseName + "' ) ;return false;\"><img src=\"/ccLib/images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
-                                        //s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
+                                            + htmlController.inputText( core,field.nameLc, fieldValue_text, 1, 80, field.nameLc, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
+                                            + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ccLib/images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
                                         break;
                                     case FieldTypeIdResourceLink:
                                         //
                                         // ----- Resource Link (src value)
                                         //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorString = ""
-                                            + core.html.inputText(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + FormFieldLCaseName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
-                                        //
-                                        break;
-                                    case FieldTypeIdText:
-                                        //
-                                        // ----- Text Type
-                                        EditorString += adminUIController.getDefaultEditor_Text(core, FormFieldLCaseName, genericController.encodeText(FieldValueObject), false, fieldHtmlId,field.password);
-                                        return_NewFieldList += "," + FieldName;
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        EditorString = htmlController.inputText( core,field.nameLc, fieldValue_text, 1, 80, field.nameLc, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
                                         break;
                                     case FieldTypeIdHTML:
                                     case FieldTypeIdFileHTML:
                                         //
                                         // content is html
                                         //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        //
-                                        // 9/7/2012 -- added this to support:
-                                        //   html fields types mean they hold html
-                                        //   .htmlContent means edit it with text editor (so you edit the html)
-                                        //
-                                        if (field.htmlContent && FieldPreferenceHTML) {
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        if (field.htmlContent) {
                                             //
                                             // View the content as Html, not wysiwyg
-                                            //
-                                            //EditorStyleModifier = "textexpandable";
-                                            EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, 10, "100%", "", false, false, "text form-control");
+                                            EditorString = htmlController.inputTextarea( core,field.nameLc, fieldValue_text, 10, -1, "", false, false, "text form-control");
                                         } else {
                                             //
                                             // wysiwyg editor
-                                            //
-                                            if (string.IsNullOrEmpty(FieldValueText)) {
+                                            if (string.IsNullOrEmpty(fieldValue_text)) {
                                                 //
                                                 // editor needs a starting p tag to setup correctly
-                                                //
-                                                FieldValueText = HTMLEditorDefaultCopyNoCr;
+                                                fieldValue_text = HTMLEditorDefaultCopyNoCr;
                                             }
-                                            //EditorStyleModifier = "htmleditor";
-                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".PixelHeight", 500));
-                                            EditorString += core.html.getFormInputHTML(FormFieldLCaseName, FieldValueText, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
-                                            //innovaEditor = New innovaEditorAddonClassFPO
-                                            //EditorString = innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, False, TemplateIDForStyles, emailIdForStyles)
+                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
+                                            EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
                                             EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
                                         }
                                         //
@@ -6892,87 +6748,72 @@ namespace Contensive.Core.Addons.AdminSite {
                                     case FieldTypeIdFileText:
                                         //
                                         // -- Long Text, use text editor
-                                        //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        //
-                                        //EditorStyleModifier = "textexpandable";
-                                        FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
-                                        EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "100%", FormFieldLCaseName, false, false, "text form-control");
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                        EditorString = htmlController.inputTextarea( core,field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, false, "text form-control");
                                         //
                                         break;
                                     case FieldTypeIdFileCSS:
                                         //
                                         // ----- CSS field
-                                        //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        //EditorStyleModifier = "textexpandable";
-                                        FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
-                                        EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, 10, "100%", "", false, false, "styles form-control");
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                        EditorString = htmlController.inputTextarea( core,field.nameLc, fieldValue_text, 10, -1, "", false, false, "styles form-control");
                                         break;
                                     case FieldTypeIdFileJavascript:
                                         //
                                         // ----- Javascript field
-                                        //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        //EditorStyleModifier = "textexpandable";
-                                        FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
-                                        EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "100%", FormFieldLCaseName, false, false, "text form-control");
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                        EditorString = htmlController.inputTextarea( core,field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, false, "text form-control");
                                         //
                                         break;
                                     case FieldTypeIdFileXML:
                                         //
                                         // ----- xml field
-                                        //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
-                                        //EditorStyleModifier = "textexpandable";
-                                        FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
-                                        EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, FieldRows, "100%", FormFieldLCaseName, false, false, "text form-control");
+                                        return_NewFieldList +=  "," + field.nameLc;
+                                        FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                        EditorString = htmlController.inputTextarea( core,field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, false, "text form-control");
                                         //
                                         break;
                                     default:
                                         //
                                         // ----- Legacy text type -- not used unless something was missed
                                         //
-                                        return_NewFieldList +=  "," + FieldName;
-                                        FieldValueText = genericController.encodeText(FieldValueObject);
+                                        return_NewFieldList +=  "," + field.nameLc;
                                         if (field.password) {
                                             //
                                             // Password forces simple text box
-                                            //
-                                            EditorString = core.html.inputText(FormFieldLCaseName, FieldValueText, -1, -1, "", true, false, "password form-control");
+                                            EditorString = htmlController.inputText( core,field.nameLc, fieldValue_text, -1, -1, "", true, false, "password form-control");
                                         } else if (!field.htmlContent) {
                                             //
                                             // not HTML capable, textarea with resizing
                                             //
-                                            if ((fieldTypeId == FieldTypeIdText) && (FieldValueText.IndexOf("\n") == -1) && (FieldValueText.Length < 40)) {
+                                            if ((fieldTypeId == FieldTypeIdText) && (fieldValue_text.IndexOf("\n") == -1) && (fieldValue_text.Length < 40)) {
                                                 //
                                                 // text field shorter then 40 characters without a CR
                                                 //
-                                                EditorString = core.html.inputText(FormFieldLCaseName, FieldValueText, 1, -1, "", false, false, "text form-control");
+                                                EditorString = htmlController.inputText( core,field.nameLc, fieldValue_text, 1, -1, "", false, false, "text form-control");
                                             } else {
                                                 //
                                                 // longer text data, or text that contains a CR
                                                 //
                                                 //EditorStyleModifier = "textexpandable";
-                                                EditorString = core.html.inputTextExpandable(FormFieldLCaseName, FieldValueText, 10, "100%", "", false, false, "text form-control");
+                                                EditorString = htmlController.inputTextarea( core,field.nameLc, fieldValue_text, 10, -1, "", false, false, "text form-control");
                                             }
-                                        } else if (field.htmlContent && FieldPreferenceHTML) {
+                                        } else if (field.htmlContent) {
                                             //
                                             // HTMLContent true, and prefered
                                             //
-                                            if (string.IsNullOrEmpty(FieldValueText)) {
+                                            if (string.IsNullOrEmpty(fieldValue_text)) {
                                                 //
                                                 // editor needs a starting p tag to setup correctly
                                                 //
-                                                FieldValueText = HTMLEditorDefaultCopyNoCr;
+                                                fieldValue_text = HTMLEditorDefaultCopyNoCr;
                                             }
                                             //EditorStyleModifier = "htmleditor";
-                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".PixelHeight", 500));
-                                            EditorString += core.html.getFormInputHTML(FormFieldLCaseName, FieldValueText, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
+                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
+                                            EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
                                             //innovaEditor = New innovaEditorAddonClassFPO
                                             //EditorString = innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, False, TemplateIDForStyles, emailIdForStyles)
                                             EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
@@ -6981,8 +6822,8 @@ namespace Contensive.Core.Addons.AdminSite {
                                             // HTMLContent true, but text editor selected
                                             //
                                             //EditorStyleModifier = "textexpandable";
-                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + FieldName + ".RowHeight", 10));
-                                            EditorString = core.html.inputTextExpandable(FormFieldLCaseName, htmlController.encodeHtml(FieldValueText), FieldRows, "600px", FormFieldLCaseName, false, false, "text");
+                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".RowHeight", 10));
+                                            EditorString = htmlController.inputTextarea( core,field.nameLc, htmlController.encodeHtml(fieldValue_text), FieldRows, -1, field.nameLc, false, false, "text");
                                         }
                                         //s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
                                         break;
@@ -7290,22 +7131,17 @@ namespace Contensive.Core.Addons.AdminSite {
                         if (editRecord.Read_Only) {
                             HTMLFieldString = htmlController.encodeHtml(ContentWatchLinkLabel);
                         } else {
-                            HTMLFieldString = core.html.inputText("ContentWatchLinkLabel", ContentWatchLinkLabel, 1, core.siteProperties.defaultFormInputWidth);
+                            HTMLFieldString = htmlController.inputText( core,"ContentWatchLinkLabel", ContentWatchLinkLabel, 1, core.siteProperties.defaultFormInputWidth);
                             //HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchLinkLabel"" cols=""" & core.app.SiteProperty_DefaultFormInputWidth & """>" & ContentWatchLinkLabel & "</textarea>"
                         }
                         FastString.Add(adminUIController.getEditRowLegacy(core, HTMLFieldString, "Caption", "This caption is displayed on all Content Watch Lists, linked to the location on the web site where this content is displayed. RSS feeds created from Content Watch Lists will use this caption as the record title if not other field is selected in the Content Definition.", false, true, "ContentWatchLinkLabel"));
                         //
                         // ----- Whats New Expiration
                         //
-                        Copy = ContentWatchExpires.ToString();
-                        if (Copy == "12:00:00 AM") {
-                            Copy = "";
-                        }
                         if (editRecord.Read_Only) {
-                            HTMLFieldString = htmlController.encodeHtml(Copy);
+                            HTMLFieldString = adminUIController.getDefaultEditor_Date(core, "ContentWatchExpires", ContentWatchExpires, true, "", false, "");
                         } else {
-                            HTMLFieldString = core.html.inputDate("ContentWatchExpires", Copy, core.siteProperties.defaultFormInputWidth.ToString());
-                            //HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchExpires"" cols=""" & core.app.SiteProperty_DefaultFormInputWidth & """>" & Copy & "</textarea>"
+                            HTMLFieldString = adminUIController.getDefaultEditor_Date( core, "ContentWatchExpires", ContentWatchExpires, false, "", false, "");
                         }
                         FastString.Add(adminUIController.getEditRowLegacy(core, HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
                         //
@@ -7330,7 +7166,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         // ----- close the panel
                         //
                         string s = ""
-                        + adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose + core.html.inputHidden("WhatsNewResponse", "-1") + core.html.inputHidden("contentwatchrecordid", ContentWatchRecordID.ToString());
+                        + adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose + htmlController.inputHidden("WhatsNewResponse", "-1") + htmlController.inputHidden("contentwatchrecordid", ContentWatchRecordID.ToString());
                         tempGetForm_Edit_ContentTracking = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Content Tracking", "Include in Content Watch Lists", s);
                         EditSectionPanelCount = EditSectionPanelCount + 1;
                         //
@@ -7349,7 +7185,7 @@ namespace Contensive.Core.Addons.AdminSite {
         private string GetForm_Edit_Control(cdefModel adminContent, editRecordClass editRecord) {
             string result = null;
             try {
-                var FastString = new stringBuilderLegacyController();
+                var tabPanel = new stringBuilderLegacyController();
                 if (string.IsNullOrEmpty(adminContent.name)) {
                     //
                     // Content not found or not loaded
@@ -7371,284 +7207,289 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool FieldRequired = false;
                 //
                 // ----- RecordID
-                string FieldHelp = "This is the unique number that identifies this record within this content.";
-                string HTMLFieldString;
-                if (editRecord.id == 0) {
-                    HTMLFieldString = "(available after save)";
-                } else {
-                    HTMLFieldString = genericController.encodeText(editRecord.id);
+                {
+                    string fieldValue = (editRecord.id == 0)? "(available after save)" : editRecord.id.ToString();
+                    string fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore", fieldValue, true, "");
+                    string fieldHelp = "This is the unique number that identifies this record within this content.";
+                    tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Record Number", fieldHelp, true, false, ""));
                 }
-                HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Record Number", FieldHelp, true, false, ""));
                 //
                 // -- Active
-                string Copy = "When unchecked, add-ons can ignore this record as if it was temporarily deleted.";
-                HTMLFieldString = core.html.inputCheckbox("active", editRecord.active);
-                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Active", Copy, false, false, ""));
+                {
+                    string fieldEditor = core.html.inputCheckbox("active", editRecord.active);
+                    string fieldHelp = "When unchecked, add-ons can ignore this record as if it was temporarily deleted.";
+                    tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Active", fieldHelp, false, false, ""));
+                }
                 //
                 // ----- If Page Content , check if this is the default PageNotFound page
                 if (adminContent.contentTableName.ToLower() == "ccpagecontent") {
                     //
                     // Landing Page
-                    Copy = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docore.main_";
-                    bool Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("LandingPageID", 0))));
-                    if (core.session.isAuthenticatedAdmin(core)) {
-                        HTMLFieldString = core.html.inputCheckbox("LandingPageID", Checked);
-                    } else {
-                        HTMLFieldString = "<b>" + genericController.getYesNo(Checked) + "</b>" + core.html.inputHidden("LandingPageID", Checked);
+                    {
+                        string fieldHelp = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docore.main_";
+                        bool Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("LandingPageID", 0))));
+                        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? core.html.inputCheckbox("LandingPageID", Checked) : "<b>" + genericController.getYesNo(Checked) + "</b>" + htmlController.inputHidden("LandingPageID", Checked);
+                        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Set Default Landing Page", fieldHelp, false, false, ""));
                     }
-                    FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Set Default Landing Page", Copy, false, false, ""));
                     //
                     // Page Not Found
-                    Copy = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked.";
-                    Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("PageNotFoundPageID", 0))));
-                    if (core.session.isAuthenticatedAdmin(core)) {
-                        HTMLFieldString = core.html.inputCheckbox("PageNotFound", Checked);
-                    } else {
-                        HTMLFieldString = "<b>" + genericController.getYesNo(Checked) + "</b>" + core.html.inputHidden("PageNotFound", Checked);
+                    {
+                        string fieldHelp = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked.";
+                        bool isPageNotFoundRecord = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("PageNotFoundPageID", 0))));
+                        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? core.html.inputCheckbox("PageNotFound", isPageNotFoundRecord) : "<b>" + genericController.getYesNo(isPageNotFoundRecord) + "</b>" + htmlController.inputHidden("PageNotFound", isPageNotFoundRecord);
+                        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Set Page Not Found", fieldHelp, false, false, ""));
                     }
-                    FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Set Page Not Found", Copy, false, false, ""));
-                }
-                //
-                // ----- Last Known Public Site URL
-                //
-                if ((adminContent.contentTableName.ToUpper() == "CCPAGECONTENT") || (adminContent.contentTableName.ToUpper() == "ITEMS")) {
-                    FieldHelp = "This is the URL where this record was last displayed on the site. It may be blank if the record has not been displayed yet.";
-                    Copy = core.doc.getContentWatchLinkByKey(editRecord.contentControlId + "." + editRecord.id, "", false);
-                    if (string.IsNullOrEmpty(Copy)) {
-                        HTMLFieldString = "unknown";
-                    } else {
-                        HTMLFieldString = "<a href=\"" + htmlController.encodeHtml(Copy) + "\" target=\"_blank\">" + Copy + "</a>";
-                    }
-                    FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Last Known Public URL", FieldHelp, false, false, ""));
-                }
-                //
-                // ----- Widget Code
-                //
-                if (genericController.vbLCase(adminContent.contentTableName) == "ccaggregatefunctions") {
                     //
-                    // ----- Add-ons
-                    //
-                    bool AllowWidget = false;
-                    if (editRecord.fieldsLc.ContainsKey("remotemethod")) {
-                        AllowWidget = genericController.encodeBoolean(editRecord.fieldsLc["remotemethod"].value);
-                    }
-                    if (!AllowWidget) {
-                        FieldHelp = "If you wish to use this add-on as a widget, enable 'Is Remote Method' on the 'Placement' tab and save the record. The necessary html code, or 'embed code' will be created here for you to cut-and-paste into the website.";
-                        HTMLFieldString = "";
-                        HTMLFieldString = core.html.inputTextExpandable("ignore", HTMLFieldString, 1, "100%", "", false, true);
-                        FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
-                    } else {
-                        FieldHelp = "If you wish to use this add-on as a widget, cut and paste the 'Widget Code' into the website content. If any code appears in the 'Widget Head', this will need to be pasted into the head section of the website.";
-                        HTMLFieldString = ""
-                            + "<SCRIPT type=text/javascript>"
-                            + "\r\nvar ccProto=(('https:'==document.location.protocol) ? 'https:// : 'http://);"
-                            + "\r\ndocument.write(unescape(\"%3Cscript src='\" + ccProto + \"" + core.webServer.requestDomain + "/ccLib/ClientSide/Core.js' type='text/javascript'%3E%3C/script%3E\"));"
-                            + "\r\ndocument.write(unescape(\"%3Cscript src='\" + ccProto + \"" + core.webServer.requestDomain + "/" + genericController.encodeURL(editRecord.nameLc) + "?requestjsform=1' type='text/javascript'%3E%3C/script%3E\"));"
-                            + "\r\n</SCRIPT>";
-                        HTMLFieldString = core.html.inputTextExpandable("ignore", HTMLFieldString, 8);
-                        FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
+                    // ----- Last Known Public Site URL
+                    {
+                        string FieldHelp = "This is the URL where this record was last displayed on the site. It may be blank if the record has not been displayed yet.";
+                        string fieldValue = linkAliasController.getLinkAlias(core, editRecord.id, "", "");
+                        string fieldEditor = (string.IsNullOrEmpty(fieldValue)) ? "unknown" : "<a href=\"" + htmlController.encodeHtml(fieldValue) + "\" target=\"_blank\">" + fieldValue + "</a>";
+                        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Last Known Public URL", FieldHelp, false, false, ""));
                     }
                 }
-                //
+                ////
+                //// ----- Add-on remote method widget code
+                //if (adminContent.contentTableName.ToLower() == "ccaggregatefunctions") {
+                //    //
+                //    // ----- Widget Code
+                //    if (!genericController.encodeBoolean(editRecord.fieldsLc["remotemethod"].value)) {
+                //        FieldHelp = "If you wish to use this add-on as a widget, enable 'Is Remote Method' on the 'Placement' tab and save the record. The necessary html code, or 'embed code' will be created here for you to cut-and-paste into the website.";
+                //        HTMLFieldString = "";
+                //        HTMLFieldString = core.html.inputTextExpandable("ignore", HTMLFieldString, 1, "100%", "", false, true);
+                //        tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
+                //    } else {
+                //        FieldHelp = "If you wish to use this add-on as a widget, cut and paste the 'Widget Code' into the website content. If any code appears in the 'Widget Head', this will need to be pasted into the head section of the website.";
+                //        HTMLFieldString = ""
+                //            + "<SCRIPT type=text/javascript>"
+                //            + "\r\nvar ccProto=(('https:'==document.location.protocol) ? 'https:// : 'http://);"
+                //            + "\r\ndocument.write(unescape(\"%3Cscript src='\" + ccProto + \"" + core.webServer.requestDomain + "/ccLib/ClientSide/Core.js' type='text/javascript'%3E%3C/script%3E\"));"
+                //            + "\r\ndocument.write(unescape(\"%3Cscript src='\" + ccProto + \"" + core.webServer.requestDomain + "/" + genericController.encodeURL(editRecord.nameLc) + "?requestjsform=1' type='text/javascript'%3E%3C/script%3E\"));"
+                //            + "\r\n</SCRIPT>";
+                //        HTMLFieldString = core.html.inputTextExpandable("ignore", HTMLFieldString, 8);
+                //        tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
+                //    }
+                //}
+                ////
                 // ----- GUID
-                if (editRecord.fieldsLc.ContainsKey("ccguid")) {
-                    cdefFieldModel contentField = adminContent.fields["ccguid"];
-                    HTMLFieldString = genericController.encodeText(editRecord.fieldsLc["ccguid"].value);
-                    FieldHelp = "This is a unique number that identifies this record globally. A GUID is not required, but when set it should never be changed. GUIDs are used to synchronize records. When empty, you can create a new guid. Only Developers can modify the guid.";
-                    if (string.IsNullOrEmpty(HTMLFieldString)) {
+                {
+                    string fieldValue = genericController.encodeText(editRecord.fieldsLc["ccguid"].value);
+                    string FieldHelp = "This is a unique number that identifies this record globally. A GUID is not required, but when set it should never be changed. GUIDs are used to synchronize records. When empty, you can create a new guid. Only Developers can modify the guid.";
+                    string fieldEditor = "";
+                    if (string.IsNullOrEmpty(fieldValue)) {
                         //
                         // add a set button
-                        string ccGuid = "{" + Guid.NewGuid().ToString() + "}";
-                        HTMLFieldString = core.html.inputText("ccguid", HTMLFieldString, -1, -1, "ccguid", false, false) + "<input type=button value=set onclick=\"var e=document.getElementById('ccguid');e.value='" + ccGuid + "';this.disabled=true;\">";
+                        string fieldId = "setGuid" + genericController.GetRandomInteger(core).ToString();
+                        string buttonCell = htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='{" + Guid.NewGuid().ToString() + "}';this.disabled=true;}"), "col-xs-1");
+                        string inputCell = htmlController.div(adminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId), "col-xs-11");
+                        fieldEditor = htmlController.div(htmlController.div(buttonCell + inputCell, "row"), "container");
+                        //fieldEditor = htmlController.div(htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + fieldValue + "';this.disabled=true;}")));
+                        //sfieldEditor = adminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId) + htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + fieldValue + "';this.disabled=true;}"));
                     } else {
                         //
                         // field is read-only except for developers
-                        if (core.session.isAuthenticatedDeveloper(core)) {
-                            HTMLFieldString = core.html.inputText("ccguid", HTMLFieldString, -1, -1, "", false, false) + "";
-                        } else {
-                            HTMLFieldString = core.html.inputText("ccguid", HTMLFieldString, -1, -1, "", false, true) + core.html.inputHidden("ccguid", HTMLFieldString);
-                        }
+                        fieldEditor = adminUIController.getDefaultEditor_Text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(core),"");
+                        //if (core.session.isAuthenticatedDeveloper(core)) {
+                        //    fieldEditor = htmlController.inputText( core,"ccguid", fieldValue, -1, -1, "", false, false) + "";
+                        //} else {
+                        //    fieldEditor = htmlController.inputText( core,"ccguid_disabled", fieldValue, -1, -1, "", false, true) + htmlController.inputHidden("ccguid", fieldValue);
+                        //}
                     }
-                    FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "GUID", FieldHelp, false, false, ""));
+                    tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "GUID", FieldHelp, false, false, ""));
                 }
                 //
                 // ----- EID (Encoded ID)
-                FieldHelp = "";
+                {
+
+                }
                 if (genericController.vbUCase(adminContent.contentTableName) == genericController.vbUCase("ccMembers")) {
                     bool AllowEID = (core.siteProperties.getBoolean("AllowLinkLogin", true)) | (core.siteProperties.getBoolean("AllowLinkRecognize", true));
+                    string fieldHelp = "";
+                    string fieldEditor = "";
                     if (!AllowEID) {
-                        HTMLFieldString = "(link login and link recognize are disabled in security preferences)";
+                        fieldEditor = "(link login and link recognize are disabled in security preferences)";
                     } else if (editRecord.id == 0) {
-                        HTMLFieldString = "(available after save)";
+                        fieldEditor = "(available after save)";
                     } else {
-                        string EID = genericController.encodeText(Core.Controllers.securityController.encodeToken(core, editRecord.id, core.doc.profileStartTime));
+                        string fieldValue = genericController.encodeText(Core.Controllers.securityController.encodeToken(core, editRecord.id, core.doc.profileStartTime));
                         if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
-                            HTMLFieldString = EID;
-                            FieldHelp = "Any visitor who hits the site with eid=" + EID + " will be logged in as this member.";
+                            fieldHelp = "Any visitor who hits the site with eid=" + fieldValue + " will be logged in as this member.";
                         } else {
-                            FieldHelp = "Any visitor who hits the site with eid=" + EID + " will be recognized as this member, but not logged in.";
-                            HTMLFieldString = EID;
+                            fieldHelp = "Any visitor who hits the site with eid=" + fieldValue + " will be recognized as this member, but not logged in.";
                         }
-                        FieldHelp = FieldHelp + " To enable, disable or modify this feature, use the security tab on the Preferences page.";
+                        fieldHelp += " To enable, disable or modify this feature, use the security tab on the Preferences page.";
+                        fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_eid", fieldValue, true, "");
                     }
-                    HTMLFieldString = core.html.inputText("ignore", HTMLFieldString);
-                    FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Member Link Login EID", FieldHelp, true, false, ""));
+                    tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Member Link Login EID", fieldHelp, true, false, ""));
                 }
                 //
                 // ----- Controlling Content
-                HTMLFieldString = "";
-                FieldHelp = "The content in which this record is stored. This is similar to a database table.";
-                cdefFieldModel field = null;
-                if (adminContent.fields.ContainsKey("contentcontrolid")) {
-                    field = adminContent.fields["contentcontrolid"];
-                    //
-                    // if this record has a parent id, only include CDefs compatible with the parent record - otherwise get all for the table
-                    FieldHelp = genericController.encodeText(field.helpMessage);
-                    FieldRequired = genericController.encodeBoolean(field.required);
-                    int FieldValueInteger = editRecord.contentControlId;
-                    if (!core.session.isAuthenticatedAdmin(core)) {
-                        HTMLFieldString = HTMLFieldString + core.html.inputHidden("ContentControlID", FieldValueInteger);
-                    } else {
-                        string RecordContentName = editRecord.contentControlId_Name;
-                        string TableName2 = cdefModel.getContentTablename(core, RecordContentName);
-                        int TableID = core.db.getRecordID("Tables", TableName2);
+                {
+                    string HTMLFieldString = "";
+                    string FieldHelp = "The content in which this record is stored. This is similar to a database table.";
+                    cdefFieldModel field = null;
+                    if (adminContent.fields.ContainsKey("contentcontrolid")) {
+                        field = adminContent.fields["contentcontrolid"];
                         //
-                        // Test for parentid
-                        int ParentID = 0;
-                        bool ContentSupportsParentID = false;
-                        if (editRecord.id > 0) {
-                            int CS = core.db.csOpenRecord(RecordContentName, editRecord.id);
-                            if (core.db.csOk(CS)) {
-                                ContentSupportsParentID = core.db.csIsFieldSupported(CS, "ParentID");
-                                if (ContentSupportsParentID) {
-                                    ParentID = core.db.csGetInteger(CS, "ParentID");
-                                }
-                            }
-                            core.db.csClose(ref CS);
-                        }
-                        //
-                        int LimitContentSelectToThisID = 0;
-                        if (ContentSupportsParentID) {
-                            //
-                            // Parentid - restrict CDefs to those compatible with the parentid
-                            if (ParentID != 0) {
-                                //
-                                // This record has a parent, set LimitContentSelectToThisID to the parent's CID
-                                int CSPointer = core.db.csOpenRecord(RecordContentName, ParentID, false, false, "ContentControlID");
-                                if (core.db.csOk(CSPointer)) {
-                                    LimitContentSelectToThisID = core.db.csGetInteger(CSPointer, "ContentControlID");
-                                }
-                                core.db.csClose(ref CSPointer);
-                            }
-
-                        }
-                        bool IsEmptyList = false;
-                        if (core.session.isAuthenticatedAdmin(core) && (LimitContentSelectToThisID == 0)) {
-                            //
-                            // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
-                            HTMLFieldString = HTMLFieldString + core.html.selectFromContent("ContentControlID", FieldValueInteger, "Content", "ContentTableID=" + TableID, "", "", ref IsEmptyList);
-                            FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
+                        // if this record has a parent id, only include CDefs compatible with the parent record - otherwise get all for the table
+                        FieldHelp = genericController.encodeText(field.helpMessage);
+                        FieldRequired = genericController.encodeBoolean(field.required);
+                        int FieldValueInteger = editRecord.contentControlId;
+                        if (!core.session.isAuthenticatedAdmin(core)) {
+                            HTMLFieldString = HTMLFieldString + htmlController.inputHidden("ContentControlID", FieldValueInteger);
                         } else {
+                            string RecordContentName = editRecord.contentControlId_Name;
+                            string TableName2 = cdefModel.getContentTablename(core, RecordContentName);
+                            int TableID = core.db.getRecordID("Tables", TableName2);
                             //
-                            // Limit the list to only those cdefs that are within the record's parent contentid
-                            RecordContentName = editRecord.contentControlId_Name;
-                            TableName2 = cdefModel.getContentTablename(core, RecordContentName);
-                            TableID = core.db.getRecordID("Tables", TableName2);
-                            int CSPointer = core.db.csOpen("Content", "ContentTableID=" + TableID, "", true, 0, false, false, "ContentControlID");
-                            string CIDList = "";
-                            while (core.db.csOk(CSPointer)) {
-                                int ChildCID = core.db.csGetInteger(CSPointer, "ID");
-                                if (cdefModel.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
-                                    if ((core.session.isAuthenticatedAdmin(core)) | (core.session.isAuthenticatedContentManager(core, cdefModel.getContentNameByID(core, ChildCID)))) {
-                                        CIDList = CIDList + "," + ChildCID;
+                            // Test for parentid
+                            int ParentID = 0;
+                            bool ContentSupportsParentID = false;
+                            if (editRecord.id > 0) {
+                                int CS = core.db.csOpenRecord(RecordContentName, editRecord.id);
+                                if (core.db.csOk(CS)) {
+                                    ContentSupportsParentID = core.db.csIsFieldSupported(CS, "ParentID");
+                                    if (ContentSupportsParentID) {
+                                        ParentID = core.db.csGetInteger(CS, "ParentID");
                                     }
                                 }
-                                core.db.csGoNext(CSPointer);
+                                core.db.csClose(ref CS);
                             }
-                            core.db.csClose(ref CSPointer);
-                            if (!string.IsNullOrEmpty(CIDList)) {
-                                CIDList = CIDList.Substring(1);
-                                HTMLFieldString = core.html.selectFromContent("ContentControlID", FieldValueInteger, "Content", "id in (" + CIDList + ")", "", "", ref IsEmptyList);
-                                FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited. This record includes a Parent field, so your choices for controlling content are limited to those compatible with the parent of this record.)";
+                            //
+                            int LimitContentSelectToThisID = 0;
+                            if (ContentSupportsParentID) {
+                                //
+                                // Parentid - restrict CDefs to those compatible with the parentid
+                                if (ParentID != 0) {
+                                    //
+                                    // This record has a parent, set LimitContentSelectToThisID to the parent's CID
+                                    int CSPointer = core.db.csOpenRecord(RecordContentName, ParentID, false, false, "ContentControlID");
+                                    if (core.db.csOk(CSPointer)) {
+                                        LimitContentSelectToThisID = core.db.csGetInteger(CSPointer, "ContentControlID");
+                                    }
+                                    core.db.csClose(ref CSPointer);
+                                }
+
+                            }
+                            bool IsEmptyList = false;
+                            if (core.session.isAuthenticatedAdmin(core) && (LimitContentSelectToThisID == 0)) {
+                                //
+                                // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
+                                HTMLFieldString = HTMLFieldString + core.html.selectFromContent("ContentControlID", FieldValueInteger, "Content", "ContentTableID=" + TableID, "", "", ref IsEmptyList);
+                                FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
+                            } else {
+                                //
+                                // Limit the list to only those cdefs that are within the record's parent contentid
+                                RecordContentName = editRecord.contentControlId_Name;
+                                TableName2 = cdefModel.getContentTablename(core, RecordContentName);
+                                TableID = core.db.getRecordID("Tables", TableName2);
+                                int CSPointer = core.db.csOpen("Content", "ContentTableID=" + TableID, "", true, 0, false, false, "ContentControlID");
+                                string CIDList = "";
+                                while (core.db.csOk(CSPointer)) {
+                                    int ChildCID = core.db.csGetInteger(CSPointer, "ID");
+                                    if (cdefModel.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
+                                        if ((core.session.isAuthenticatedAdmin(core)) | (core.session.isAuthenticatedContentManager(core, cdefModel.getContentNameByID(core, ChildCID)))) {
+                                            CIDList = CIDList + "," + ChildCID;
+                                        }
+                                    }
+                                    core.db.csGoNext(CSPointer);
+                                }
+                                core.db.csClose(ref CSPointer);
+                                if (!string.IsNullOrEmpty(CIDList)) {
+                                    CIDList = CIDList.Substring(1);
+                                    HTMLFieldString = core.html.selectFromContent("ContentControlID", FieldValueInteger, "Content", "id in (" + CIDList + ")", "", "", ref IsEmptyList);
+                                    FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited. This record includes a Parent field, so your choices for controlling content are limited to those compatible with the parent of this record.)";
+                                }
                             }
                         }
                     }
+                    if (string.IsNullOrEmpty(HTMLFieldString)) {
+                        HTMLFieldString = editRecord.contentControlId_Name;
+                    }
+                    tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Controlling Content", FieldHelp, FieldRequired, false, ""));
                 }
-                if (string.IsNullOrEmpty(HTMLFieldString)) {
-                    HTMLFieldString = editRecord.contentControlId_Name;
-                }
-                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Controlling Content", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Created By
-                FieldHelp = "The people account of the user who created this record.";
-                if (editRecord.id == 0) {
-                    HTMLFieldString = "(available after save)";
-                } else {
-                    int FieldValueInteger = editRecord.createByMemberId;
-                    if (FieldValueInteger == 0) {
-                        HTMLFieldString = "unknown";
+                {
+                    string FieldHelp = "The people account of the user who created this record.";
+                    string HTMLFieldString = "";
+                    if (editRecord.id == 0) {
+                        HTMLFieldString = "(available after save)";
                     } else {
-                        int CSPointer = core.db.csOpen2("people", FieldValueInteger, true);
-                        if (!core.db.csOk(CSPointer)) {
+                        int FieldValueInteger = editRecord.createByMemberId;
+                        if (FieldValueInteger == 0) {
                             HTMLFieldString = "unknown";
                         } else {
-                            HTMLFieldString = core.db.csGet(CSPointer, "name");
+                            int CSPointer = core.db.csOpen2("people", FieldValueInteger, true);
+                            if (!core.db.csOk(CSPointer)) {
+                                HTMLFieldString = "unknown";
+                            } else {
+                                HTMLFieldString = core.db.csGet(CSPointer, "name");
+                            }
+                            core.db.csClose(ref CSPointer);
                         }
-                        core.db.csClose(ref CSPointer);
                     }
+                    HTMLFieldString = htmlController.inputText( core,"ignore", HTMLFieldString, -1, -1, "", false, true);
+                    tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Created By", FieldHelp, FieldRequired, false, ""));
                 }
-                HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Created By", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Created Date
-                FieldHelp = "The date and time when this record was originally created.";
-                if (editRecord.id == 0) {
-                    HTMLFieldString = "(available after save)";
-                } else {
-                    HTMLFieldString = genericController.encodeText(genericController.encodeDate(editRecord.dateAdded));
-                    if (HTMLFieldString == "12:00:00 AM") {
-                        HTMLFieldString = "unknown";
+                {
+                    string FieldHelp = "The date and time when this record was originally created.";
+                    string HTMLFieldString = "";
+                    if (editRecord.id == 0) {
+                        HTMLFieldString = "(available after save)";
+                    } else {
+                        HTMLFieldString = genericController.encodeText(genericController.encodeDate(editRecord.dateAdded));
+                        if (HTMLFieldString == "12:00:00 AM") {
+                            HTMLFieldString = "unknown";
+                        }
                     }
+                    HTMLFieldString = htmlController.inputText( core,"ignore", HTMLFieldString, -1, -1, "", false, true);
+                    tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Created Date", FieldHelp, FieldRequired, false, ""));
                 }
-                HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Created Date", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Modified By
-                FieldHelp = "The people account of the last user who modified this record.";
-                if (editRecord.id == 0) {
-                    HTMLFieldString = "(available after save)";
-                } else {
-                    int FieldValueInteger = editRecord.modifiedByMemberID;
-                    HTMLFieldString = "unknown";
-                    if (FieldValueInteger > 0) {
-                        int CSPointer = core.db.csOpen2("people", FieldValueInteger, true, false, "name");
-                        if (core.db.csOk(CSPointer)) {
-                            HTMLFieldString = core.db.csGet(CSPointer, "name");
+                {
+                    string FieldHelp = "The people account of the last user who modified this record.";
+                    string HTMLFieldString = "";
+                    if (editRecord.id == 0) {
+                        HTMLFieldString = "(available after save)";
+                    } else {
+                        int FieldValueInteger = editRecord.modifiedByMemberID;
+                        HTMLFieldString = "unknown";
+                        if (FieldValueInteger > 0) {
+                            int CSPointer = core.db.csOpen2("people", FieldValueInteger, true, false, "name");
+                            if (core.db.csOk(CSPointer)) {
+                                HTMLFieldString = core.db.csGet(CSPointer, "name");
+                            }
+                            core.db.csClose(ref CSPointer);
                         }
-                        core.db.csClose(ref CSPointer);
                     }
+                    HTMLFieldString = htmlController.inputText( core,"ignore", HTMLFieldString, -1, -1, "", false, true);
+                    tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Modified By", FieldHelp, FieldRequired, false, ""));
                 }
-                HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Modified By", FieldHelp, FieldRequired, false, ""));
                 //
                 // ----- Modified Date
-                FieldHelp = "The date and time when this record was last modified";
-                if (editRecord.id == 0) {
-                    HTMLFieldString = "(available after save)";
-                } else {
-                    HTMLFieldString = genericController.encodeText(genericController.encodeDate(editRecord.modifiedDate));
-                    if (HTMLFieldString == "12:00:00 AM") {
-                        HTMLFieldString = "unknown";
+                {
+                    string FieldHelp = "The date and time when this record was last modified";
+                    string HTMLFieldString = "";
+                    if (editRecord.id == 0) {
+                        HTMLFieldString = "(available after save)";
+                    } else {
+                        HTMLFieldString = genericController.encodeText(genericController.encodeDate(editRecord.modifiedDate));
+                        if (HTMLFieldString == "12:00:00 AM") {
+                            HTMLFieldString = "unknown";
+                        }
                     }
+                    HTMLFieldString = htmlController.inputText( core,"ignore", HTMLFieldString, -1, -1, "", false, true);
+                    tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Modified Date", FieldHelp, false, false, ""));
+
                 }
-                HTMLFieldString = core.html.inputText("ignore", HTMLFieldString, -1, -1, "", false, true);
-                FastString.Add(adminUIController.getEditRow(core, HTMLFieldString, "Modified Date", FieldHelp, false, false, ""));
-                string s = ""
-                    + adminUIController.EditTableOpen + FastString.Text + adminUIController.EditTableClose;
+                string s = adminUIController.EditTableOpen + tabPanel.Text + adminUIController.EditTableClose;
                 result = adminUIController.GetEditPanel(core, (!allowAdminTabs), "Control Information", "", s);
                 EditSectionPanelCount = EditSectionPanelCount + 1;
-                FastString = null;
+                tabPanel = null;
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
@@ -7702,7 +7543,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (string.IsNullOrEmpty(SitePropertyName)) {
                     HTMLFieldString = "This Site Property is not defined";
                 } else {
-                    HTMLFieldString = core.html.inputHidden("name", SitePropertyName);
+                    HTMLFieldString = htmlController.inputHidden("name", SitePropertyName);
                     Dictionary<string, string> instanceOptions = new Dictionary<string, string>();
                     Dictionary<string, string> addonInstanceProperties = new Dictionary<string, string>();
                     instanceOptions.Add(SitePropertyName, SitePropertyValue);
@@ -7801,7 +7642,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
 
                         selector = genericController.decodeNvaArgument(selector);
-                        HTMLFieldString = core.html.inputText(SitePropertyName, selector, 1, 20);
+                        HTMLFieldString = htmlController.inputText( core,SitePropertyName, selector, 1, 20);
                     }
                     //--------------
 
@@ -8247,7 +8088,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (readOnlyField) {
                         f.Add(linkAlias);
                     } else {
-                        f.Add(core.html.inputText("LinkAlias", linkAlias));
+                        f.Add(htmlController.inputText( core,"LinkAlias", linkAlias));
                     }
                     f.Add("</span></td></tr>");
                     //
@@ -8484,8 +8325,8 @@ namespace Contensive.Core.Addons.AdminSite {
                             body.Add("<tr><td class=\"ccAdminEditCaption\">" + Caption + "</td>");
                             body.Add("<td class=\"ccAdminEditField\">");
                             body.Add("<table border=0 cellpadding=0 cellspacing=0 width=\"100%\" ><tr>");
-                            body.Add("<td width=\"40%\">" + core.html.inputHidden("Memberrules." + GroupCount + ".ID", GroupID) + core.html.inputCheckbox("MemberRules." + GroupCount, GroupActive) + GroupCaption + "</td>");
-                            body.Add("<td width=\"30%\"> Expires " + core.html.inputText("MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20) + "</td>");
+                            body.Add("<td width=\"40%\">" + htmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID) + core.html.inputCheckbox("MemberRules." + GroupCount, GroupActive) + GroupCaption + "</td>");
+                            body.Add("<td width=\"30%\"> Expires " + htmlController.inputText( core,"MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20) + "</td>");
                             body.Add("<td width=\"30%\">" + ReportLink + "</td>");
                             body.Add("</tr></table>");
                             body.Add("</td></tr>");
@@ -10187,7 +10028,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             RecordID = core.db.csGetInteger(CS, "ID");
                             DateCompleted = core.db.csGetDate(CS, "DateCompleted");
                             ResultMessage = core.db.csGetText(CS, "ResultMessage");
-                            Cells[RowPointer, 0] = core.html.inputCheckbox("Row" + RowPointer) + core.html.inputHidden("RowID" + RowPointer, RecordID);
+                            Cells[RowPointer, 0] = core.html.inputCheckbox("Row" + RowPointer) + htmlController.inputHidden("RowID" + RowPointer, RecordID);
                             Cells[RowPointer, 1] = core.db.csGetText(CS, "name");
                             Cells[RowPointer, 2] = core.db.csGetText(CS, "CreatedByName");
                             Cells[RowPointer, 3] = core.db.csGetDate(CS, "DateAdded").ToShortDateString();
@@ -10231,7 +10072,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                     }
                     core.db.csClose(ref CS);
-                    Tab0.Add(core.html.inputHidden("RowCnt", RowPointer));
+                    Tab0.Add(htmlController.inputHidden("RowCnt", RowPointer));
                     Cell = adminUIController.GetReport(core, RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
                     Tab0.Add(Cell);
                     //Tab0.Add( "<div style=""height:200px;"">" & Cell & "</div>"
@@ -10269,7 +10110,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     ButtonListLeft = ButtonCancel + "," + ButtonRefresh + "," + ButtonDelete;
                     //ButtonListLeft = ButtonCancel & "," & ButtonRefresh & "," & ButtonDelete & "," & ButtonRequestDownload
                     ButtonListRight = "";
-                    Content = Content + core.html.inputHidden(rnAdminSourceForm, AdminFormDownloads);
+                    Content = Content + htmlController.inputHidden(rnAdminSourceForm, AdminFormDownloads);
                 }
                 //
                 Caption = "Download Manager";
@@ -10444,7 +10285,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // moved this to GetEditTabContent - so one is added for each tab.
                 //
-                returnHtml += core.html.inputHidden("FormFieldList", FormFieldList);
+                returnHtml += htmlController.inputHidden("FormFieldList", FormFieldList);
             } catch (Exception ex) {
                 logController.handleError(core, ex);
                 throw;
@@ -10646,7 +10487,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         while (core.db.csOk(CS) && (RowPointer < PageSize)) {
                             RecordID = core.db.csGetInteger(CS, "ID");
                             //DateCompleted = core.db.cs_getDate(CS, "DateCompleted")
-                            Cells[RowPointer, 0] = core.html.inputCheckbox("Row" + RowPointer) + core.html.inputHidden("RowID" + RowPointer, RecordID);
+                            Cells[RowPointer, 0] = core.html.inputCheckbox("Row" + RowPointer) + htmlController.inputHidden("RowID" + RowPointer, RecordID);
                             Cells[RowPointer, 1] = core.db.csGetText(CS, "name");
                             Cells[RowPointer, 2] = core.db.csGet(CS, "CreatedBy");
                             Cells[RowPointer, 3] = core.db.csGetDate(CS, "DateAdded").ToShortDateString();
@@ -10657,7 +10498,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                     core.db.csClose(ref CS);
                     string Cell = null;
-                    Tab0.Add(core.html.inputHidden("RowCnt", RowPointer));
+                    Tab0.Add(htmlController.inputHidden("RowCnt", RowPointer));
                     //adminUIController Adminui = new adminUIController(core);
                     Cell = adminUIController.GetReport(core, RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
                     Tab0.Add("<div>" + Cell + "</div>");
@@ -10670,12 +10511,12 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     Tab1.Add("<tr>");
                     Tab1.Add("<td align=right>Name</td>");
-                    Tab1.Add("<td>" + core.html.inputText("Name", "", 1, 40) + "</td>");
+                    Tab1.Add("<td>" + htmlController.inputText( core,"Name", "", 1, 40) + "</td>");
                     Tab1.Add("</tr>");
                     //
                     Tab1.Add("<tr>");
                     Tab1.Add("<td align=right>SQL Query</td>");
-                    Tab1.Add("<td>" + core.html.inputText(SQLFieldName, "", 8, 40) + "</td>");
+                    Tab1.Add("<td>" + htmlController.inputText( core,SQLFieldName, "", 8, 40) + "</td>");
                     Tab1.Add("</tr>");
                     //
                     Tab1.Add("<tr><td width=\"120\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"120\" height=\"1\"></td><td width=\"100%\">&nbsp;</td></tr></table>");
@@ -11248,11 +11089,11 @@ namespace Contensive.Core.Addons.AdminSite {
 
                         Content.Add(adminUIController.getEditRowLegacy(core, FieldValue, "Parent Content Name", "", false, false, ""));
                         //
-                        FieldValue = core.html.inputText("ChildContentName", ChildContentName, 1, 40);
+                        FieldValue = htmlController.inputText( core,"ChildContentName", ChildContentName, 1, 40);
                         Content.Add(adminUIController.getEditRowLegacy(core, FieldValue, "New Child Content Name", "", false, false, ""));
                         //
                         FieldValue = core.html.inputRadio("NewGroup", false.ToString(), NewGroup.ToString()) + core.html.selectFromContent("GroupID", GroupID, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
-                            + "<br>" + core.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + core.html.inputText("NewGroupName", NewGroupName) + "(Create a new group)";
+                            + "<br>" + core.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + htmlController.inputText( core,"NewGroupName", NewGroupName) + "(Create a new group)";
                         Content.Add(adminUIController.getEditRowLegacy(core, FieldValue, "Content Manager Group", "", false, false, ""));
                         //            '
                         //            FieldValue = core.main_GetFormInputCheckBox2("AddAdminMenuEntry", AddAdminMenuEntry) & "(Add Navigator Entry under Manager Site Content &gt; Advanced)"
@@ -11263,7 +11104,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         ButtonList = ButtonOK + "," + ButtonCancel;
                     }
-                    Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminFormContentChildTool));
+                    Content.Add(htmlController.inputHidden(rnAdminSourceForm, AdminFormContentChildTool));
                 }
                 //
                 Caption = "Create Content Definition";
@@ -11462,11 +11303,11 @@ namespace Contensive.Core.Addons.AdminSite {
                     Content.Add(htmlController.tableRowStart() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Options</b>" + tableCellEnd + kmaEndTableRow);
                     //
                     Caption = "Archive Age";
-                    Copy = core.html.inputText("ArchiveRecordAgeDays", ArchiveRecordAgeDays.ToString(), -1, 20) + "&nbsp;Number of days to keep visit records. 0 disables housekeeping.";
+                    Copy = htmlController.inputText( core,"ArchiveRecordAgeDays", ArchiveRecordAgeDays.ToString(), -1, 20) + "&nbsp;Number of days to keep visit records. 0 disables housekeeping.";
                     Content.Add(adminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
                     Caption = "Housekeeping Time";
-                    Copy = core.html.inputText("ArchiveTimeOfDay", ArchiveTimeOfDay, -1, 20) + "&nbsp;The time of day when record deleting should start.";
+                    Copy = htmlController.inputText( core,"ArchiveTimeOfDay", ArchiveTimeOfDay, -1, 20) + "&nbsp;The time of day when record deleting should start.";
                     Content.Add(adminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
                     Caption = "Purge Content Files";
@@ -11474,7 +11315,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     Content.Add(adminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
                     Content.Add(adminUIController.EditTableClose);
-                    Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminformHousekeepingControl));
+                    Content.Add(htmlController.inputHidden(rnAdminSourceForm, AdminformHousekeepingControl));
                     ButtonList = ButtonCancel + ",Refresh," + ButtonSave + "," + ButtonOK;
                 }
                 //
@@ -11716,7 +11557,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         Content = ""
                             + "<p>You must be a content manager of " + adminContent.name + " to use this tool. Hit Cancel to return to main admin page.</p>"
-                            + core.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
+                            + htmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                         ButtonList = ButtonCancelAll;
                     } else {
                         IsRecordLimitSet = false;
@@ -11787,7 +11628,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 Content = ""
                                     + "<p>This selection has no records.. Hit Cancel to return to the " + adminContent.name + " list page.</p>"
-                                    + core.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
+                                    + htmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 ButtonList = ButtonCancel;
                             } else if (Button == ButtonRequestDownload) {
                                 //
@@ -11832,7 +11673,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 Content = ""
                                     + "<p>Your export has been requested and will be available shortly in the <a href=\"?" + rnAdminForm + "=" + AdminFormDownloads + "\">Download Manager</a>. Hit Cancel to return to the " + adminContent.name + " list page.</p>"
-                                    + core.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
+                                    + htmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 //
                                 ButtonList = ButtonCancel;
                             } else {
@@ -11841,19 +11682,19 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 Content = Content + "\r<tr>"
                                     + cr2 + "<td class=\"exportTblCaption\">Export Name</td>"
-                                    + cr2 + "<td class=\"exportTblInput\">" + core.html.inputText("ExportName", ExportName) + "</td>"
+                                    + cr2 + "<td class=\"exportTblInput\">" + htmlController.inputText( core,"ExportName", ExportName) + "</td>"
                                     + "\r</tr>";
                                 Content = Content + "\r<tr>"
                                     + cr2 + "<td class=\"exportTblCaption\">Export Format</td>"
-                                    + cr2 + "<td class=\"exportTblInput\">" + core.html.selectFromList("ExportType", ExportType, "Comma Delimited,XML", "", "") + "</td>"
+                                    + cr2 + "<td class=\"exportTblInput\">" + core.html.selectFromList("ExportType", ExportType, new String[] { "Comma Delimited,XML" }, "", "") + "</td>"
                                     + "\r</tr>";
                                 Content = Content + "\r<tr>"
                                     + cr2 + "<td class=\"exportTblCaption\">Records Found</td>"
-                                    + cr2 + "<td class=\"exportTblInput\">" + core.html.inputText("RecordCnt", recordCnt.ToString(), -1, -1, "", false, true) + "</td>"
+                                    + cr2 + "<td class=\"exportTblInput\">" + htmlController.inputText( core,"RecordCnt", recordCnt.ToString(), -1, -1, "", false, true) + "</td>"
                                     + "\r</tr>";
                                 Content = Content + "\r<tr>"
                                     + cr2 + "<td class=\"exportTblCaption\">Record Limit</td>"
-                                    + cr2 + "<td class=\"exportTblInput\">" + core.html.inputText("RecordLimit", RecordLimitText) + "</td>"
+                                    + cr2 + "<td class=\"exportTblInput\">" + htmlController.inputText( core,"RecordLimit", RecordLimitText) + "</td>"
                                     + "\r</tr>";
                                 if (core.session.isAuthenticatedDeveloper(core)) {
                                     Content = Content + "\r<tr>"
@@ -11873,7 +11714,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     + cr2 + ".exportTblCaption {width:100px;}"
                                     + cr2 + ".exportTblInput {}"
                                     + "\r</style>"
-                                    + Content + core.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
+                                    + Content + htmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 ButtonList = ButtonCancel + "," + ButtonRequestDownload;
                                 if (core.session.isAuthenticatedDeveloper(core)) {
                                     ButtonList = ButtonList + "," + ButtonRefresh;
@@ -12445,7 +12286,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //Stream.Add( core.main_GetFormInputHidden("NeedToReloadConfig", NeedToReloadConfig))
 
                 Content = ""
-                    + Stream.Text + core.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns) + "";
+                    + Stream.Text + htmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns) + "";
                 tempGetForm_Index_SetColumns = adminUIController.GetBody(core, Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
                 //
                 //
@@ -12695,14 +12536,14 @@ namespace Contensive.Core.Addons.AdminSite {
                             }
                             Copy = ""
                                 + "\r\n<div><b>body background style color</b> (default='white')</div>"
-                                + "\r\n<div>" + core.html.inputText("editorbackgroundcolor", core.siteProperties.getText("Editor Background Color", "white")) + "</div>"
+                                + "\r\n<div>" + htmlController.inputText( core,"editorbackgroundcolor", core.siteProperties.getText("Editor Background Color", "white")) + "</div>"
                                 + "\r\n<div>&nbsp;</div>"
                                 + "\r\n<div><b>Toolbar features available</b></div>"
                                 + "\r\n<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"500px\" align=left>" + genericController.nop(Copy) + "\r\n" + kmaEndTable;
                             Copy = "\r\n" + htmlController.tableStart(20, 0, 0) + "<tr><td>" + genericController.nop(Copy) + "</td></tr>\r\n" + kmaEndTable;
                             Content.Add(Copy);
                             ButtonList = ButtonCancel + "," + ButtonRefresh + "," + ButtonSave + "," + ButtonOK;
-                            Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminFormEditorConfig));
+                            Content.Add(htmlController.inputHidden(rnAdminSourceForm, AdminFormEditorConfig));
                             core.html.addTitle("Editor Settings");
                             tempGetForm_EditConfig = adminUIController.GetBody(core, "Editor Configuration", ButtonList, "", true, true, Description, "", 0, Content.Text);
                         }
@@ -12784,7 +12625,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Close Tables
                     //
                     Content.Add(adminUIController.EditTableClose);
-                    Content.Add(core.html.inputHidden(rnAdminSourceForm, AdminFormBuilderCollection));
+                    Content.Add(htmlController.inputHidden(rnAdminSourceForm, AdminFormBuilderCollection));
                 }
                 //
                 Description = "Use this tool to modify the site security settings";
@@ -13619,7 +13460,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         private string GetFormInputWithFocus2(string ElementName, string CurrentValue = "", int Height = -1, int Width = -1, string ElementID = "", string OnFocusJavascript = "", string HtmlClass = "") {
             string tempGetFormInputWithFocus2 = null;
-            tempGetFormInputWithFocus2 = core.html.inputText(ElementName, CurrentValue, Height, Width, ElementID);
+            tempGetFormInputWithFocus2 = htmlController.inputText( core,ElementName, CurrentValue, Height, Width, ElementID);
             if (!string.IsNullOrEmpty(OnFocusJavascript)) {
                 tempGetFormInputWithFocus2 = genericController.vbReplace(tempGetFormInputWithFocus2, ">", " onFocus=\"" + OnFocusJavascript + "\">");
             }
@@ -13627,32 +13468,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 tempGetFormInputWithFocus2 = genericController.vbReplace(tempGetFormInputWithFocus2, ">", " class=\"" + HtmlClass + "\">");
             }
             return tempGetFormInputWithFocus2;
-        }
-        //
-        //
-        //
-        private string GetFormInputWithFocus(string ElementName, string CurrentValue, int Height, int Width, string ElementID, string OnFocus) {
-            return GetFormInputWithFocus2(ElementName, CurrentValue, Height, Width, ElementID, OnFocus);
-        }
-        //
-        //
-        //
-        private string GetFormInputDateWithFocus2(string ElementName, string CurrentValue = "", string Width = "", string ElementID = "", string OnFocusJavascript = "", string HtmlClass = "") {
-            string tempGetFormInputDateWithFocus2 = null;
-            tempGetFormInputDateWithFocus2 = core.html.inputDate(ElementName, CurrentValue, Width, ElementID);
-            if (!string.IsNullOrEmpty(OnFocusJavascript)) {
-                tempGetFormInputDateWithFocus2 = genericController.vbReplace(tempGetFormInputDateWithFocus2, ">", " onFocus=\"" + OnFocusJavascript + "\">");
-            }
-            if (!string.IsNullOrEmpty(HtmlClass)) {
-                tempGetFormInputDateWithFocus2 = genericController.vbReplace(tempGetFormInputDateWithFocus2, ">", " class=\"" + HtmlClass + "\">");
-            }
-            return tempGetFormInputDateWithFocus2;
-        }
-        //
-        //
-        //
-        private string GetFormInputDateWithFocus(string ElementName, string CurrentValue, string Width, string ElementID, string OnFocus) {
-            return GetFormInputDateWithFocus2(ElementName, CurrentValue, Width, ElementID, OnFocus);
         }
         //
         //=================================================================================
@@ -13887,29 +13702,32 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 RowPointer = 0;
                 for (FieldPtr = 0; FieldPtr < FieldCnt; FieldPtr++) {
-                    returnForm = returnForm + core.html.inputHidden("fieldname" + FieldPtr, FieldNames[FieldPtr]);
+                    returnForm = returnForm + htmlController.inputHidden("fieldname" + FieldPtr, FieldNames[FieldPtr]);
                     RowEven = ((RowPointer % 2) == 0);
                     FieldMatchOption = FieldMatchOptions[FieldPtr];
                     switch (fieldTypeId[FieldPtr]) {
                         case FieldTypeIdDate:
                             //
                             // Date
-                            //
+
                             returnForm = returnForm + "<tr>"
-                            + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
-                            + "<td class=\"ccAdminEditField\">"
-                            + "<div style=\"display:block;float:left;width:800px;\">"
-                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                            + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
-                            + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEquals).ToString(), FieldMatchOption.ToString(), "") + "=</div>"
-                            + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
-                            + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
-                            + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputDateWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], "5", "", "", "ccAdvSearchText") + "</div>"
-                            + "</div>"
-                            + "</td>"
-                            + "</tr>";
+                                + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
+                                + "<td class=\"ccAdminEditField\">"
+                                + "<div style=\"display:block;float:left;width:800px;\">"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                                + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchEquals).ToString(), FieldMatchOption.ToString(), "") + "=</div>"
+                                + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
+                                + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, encodeInteger(FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
+                                + "<div style=\"display:block;float:left;width:300px;\">" + htmlController.inputDate(core,"fieldvalue" + FieldPtr, encodeDate( FieldValue[FieldPtr])).Replace(">", " onFocus=\"ccAdvSearchText\">") + "</div>"
+                                + "</div>"
+                                + "</td>"
+                                + "</tr>";
                             break;
+
+
+                        //genericController.vbReplace(result, ">", ">")
                         case FieldTypeIdCurrency:
                         case FieldTypeIdFloat:
                         case FieldTypeIdInteger:

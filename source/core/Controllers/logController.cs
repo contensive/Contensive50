@@ -182,6 +182,8 @@ namespace Contensive.Core.Controllers {
                         // -- log to Nlog
                         logWithoutConfig(message, level);
                     } else {
+                        //
+                        // -- legacy logging
                         string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
                         string logContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\t" + level.ToString() + "\tthread:" + threadName + "\t" + message;
                         //
