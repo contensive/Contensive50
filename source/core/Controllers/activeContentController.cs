@@ -328,7 +328,8 @@ namespace Contensive.Core.Controllers {
                                                                         personalizationAuthenticated = personalizationIsAuthenticated,
                                                                         personalizationPeopleId = personalizationPeopleId,
                                                                         instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
-                                                                        instanceGuid = ACInstanceID
+                                                                        instanceGuid = ACInstanceID,
+                                                                        errorContextMessage = "rendering addon found in active content within an email"
                                                                     };
                                                                     addonModel addon = addonModel.createByName(core, ACName);
                                                                     Copy = core.addon.execute(addon, executeContext);
@@ -1632,7 +1633,8 @@ namespace Contensive.Core.Controllers {
                                                     },
                                                     personalizationAuthenticated = personalizationIsAuthenticated,
                                                     personalizationPeopleId = personalizationPeopleId,
-                                                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString)
+                                                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString),
+                                                    errorContextMessage = "rendering a dynamic form found in active content"
                                                 };
                                                 addonModel addon = addonModel.create(core, addonGuidDynamicForm);
                                                 result += core.addon.execute(addon, executeContext);
@@ -1751,7 +1753,8 @@ namespace Contensive.Core.Controllers {
                                         personalizationAuthenticated = personalizationIsAuthenticated,
                                         personalizationPeopleId = personalizationPeopleId,
                                         instanceGuid = ACInstanceID,
-                                        instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString)
+                                        instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString),
+                                        errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
                                     };
                                     if (!string.IsNullOrEmpty(AddonGuid)) {
                                         Copy = core.addon.execute(Models.DbModels.addonModel.create(core, AddonGuid), executeContext);

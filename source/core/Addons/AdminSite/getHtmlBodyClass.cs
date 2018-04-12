@@ -71,8 +71,8 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // --- must be authenticated to continue. Force a local login
                     //
-                    returnHtml = core.addon.execute(Contensive.Core.Models.DbModels.addonModel.create(core, addonGuidLoginPage), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
-                        errorCaption = "Login Page",
+                    returnHtml = core.addon.execute(addonGuidLoginPage, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                        errorContextMessage = "get Login Page for Html Body",
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                     });
                 } else if (!core.session.isAuthenticatedContentManager(core)) {
@@ -175,7 +175,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 if (core.doc.continueProcessing) {
                     if (string.Compare(core.siteProperties.dataBuildVersion, cp.Version) > 0) {
-                        logController.handleError(core, new ApplicationException("Application code version is newer than Db version. Upgrade site code."));
+                        logController.handleError(core, new ApplicationException("Application code version (" + cp.Version + ") is newer than Db version (" + core.siteProperties.dataBuildVersion + "). Upgrade site code."));
                     }
                     //
                     //-------------------------------------------------------------------------------
@@ -358,16 +358,16 @@ namespace Contensive.Core.Addons.AdminSite {
                         } else if (AdminForm == AdminFormMetaKeywordTool) {
                             ContentCell = GetForm_MetaKeywordTool();
                         } else if ((AdminForm == AdminFormMobileBrowserControl) || (AdminForm == AdminFormPageControl) || (AdminForm == AdminFormEmailControl)) {
-                            ContentCell = core.addon.execute(addonModel.create(core, AddonGuidPreferences), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                            ContentCell = core.addon.execute(AddonGuidPreferences, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                                errorCaption = "Preferences"
+                                errorContextMessage = "get Preferences for Admin"
                             });
                         } else if (AdminForm == AdminFormClearCache) {
                             ContentCell = adminClearCacheToolAddon.GetForm_ClearCache(core);
                         } else if (AdminForm == AdminFormSpiderControl) {
                             ContentCell = core.addon.execute(addonModel.createByName(core, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                                errorCaption = "Content Spider Control"
+                                errorContextMessage = "get Content Spider Control for Admin"
                             });
                         } else if (AdminForm == AdminFormResourceLibrary) {
                             ContentCell = core.html.getResourceLibrary("", false, "", "", true);
@@ -397,16 +397,16 @@ namespace Contensive.Core.Addons.AdminSite {
                         } else if (AdminForm == AdminformRSSControl) {
                             ContentCell = core.webServer.redirect("?cid=" + cdefModel.getContentId(core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
                         } else if (AdminForm == AdminFormImportWizard) {
-                            ContentCell = core.addon.execute(addonModel.create(core, addonGuidImportWizard), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                            ContentCell = core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                                errorCaption = "Import Wizard"
+                                errorContextMessage = "get Import Wizard for Admin"
                             });
                         } else if (AdminForm == AdminFormCustomReports) {
                             ContentCell = GetForm_CustomReports();
                         } else if (AdminForm == AdminFormFormWizard) {
-                            ContentCell = core.addon.execute(addonModel.create(core, addonGuidFormWizard), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                            ContentCell = core.addon.execute(addonGuidFormWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                                errorCaption = "Form Wizard"
+                                errorContextMessage = "get Form Wizard for Admin"
                             });
                         } else if (AdminForm == AdminFormLegacyAddonManager) {
                             ContentCell = addonController.GetAddonManager(core);
@@ -429,15 +429,15 @@ namespace Contensive.Core.Addons.AdminSite {
                             addonModel addon = null;
                             string executeContextErrorCaption = "unknown";
                             if (addonId != 0) {
-                                executeContextErrorCaption = "id:" + addonId;
+                                executeContextErrorCaption = " addon id:" + addonId + " for Admin";
                                 core.doc.addRefreshQueryString("addonid", addonId.ToString());
                                 addon = addonModel.create(core, addonId);
                             } else if (!string.IsNullOrEmpty(AddonGuid)) {
-                                executeContextErrorCaption = "guid:" + AddonGuid;
+                                executeContextErrorCaption = "addon guid:" + AddonGuid + " for Admin";
                                 core.doc.addRefreshQueryString("addonguid", AddonGuid);
                                 addon = addonModel.create(core, AddonGuid);
                             } else if (!string.IsNullOrEmpty(AddonName)) {
-                                executeContextErrorCaption = AddonName;
+                                executeContextErrorCaption = "addon name:" + AddonName + " for Admin";
                                 core.doc.addRefreshQueryString("addonname", AddonName);
                                 addon = addonModel.createByName(core, AddonName);
                             }
@@ -454,7 +454,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 instanceGuid = adminSiteInstanceId,
                                 instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
                                 wrapperID = DefaultWrapperID,
-                                errorCaption = executeContextErrorCaption
+                                errorContextMessage = executeContextErrorCaption
                             });
                             if (string.IsNullOrEmpty(ContentCell)) {
                                 //
@@ -473,7 +473,10 @@ namespace Contensive.Core.Addons.AdminSite {
                     // include fancybox if it was needed
                     //
                     if (includeFancyBox) {
-                        core.addon.executeDependency(addonModel.create(core, addonGuidjQueryFancyBox), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() { addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin });
+                        core.addon.executeDependency(addonModel.create(core, addonGuidjQueryFancyBox), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                            addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
+                            errorContextMessage = "adding fancybox dependency in Admin"
+                        });
                         //Call core.addon.execute_legacy4(addonGuidjQueryFancyBox)
                         core.html.addScriptCode_onLoad(fancyBoxHeadJS, "");
                     }
@@ -489,9 +492,10 @@ namespace Contensive.Core.Addons.AdminSite {
                     Stream.Add('\r' + AdminFormBottom);
                     JavaScriptString += "\rButtonObjectCount = " + ButtonObjectCount + ";";
                     core.html.addScriptCode(JavaScriptString, "Admin Site");
+                    result = Stream.Text;
                 }
                 if (core.session.user.Developer) {
-                    result = errorController.getDocExceptionHtmlList(core) + Stream.Text;
+                    result = errorController.getDocExceptionHtmlList(core) + result;
                 }
             } catch (Exception ex) {
                 logController.handleError(core, ex);
@@ -1589,8 +1593,8 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         // SpellCheck Features
         //
-        private bool SpellCheckSupported; // if true, spell checking is supported
-        private bool SpellCheckRequest; // If true, send the spell check form to the browser
+        //private bool SpellCheckSupported; // if true, spell checking is supported
+        //private bool SpellCheckRequest; // If true, send the spell check form to the browser
         //
         //=============================================================================
         // preferences
@@ -2215,14 +2219,14 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // ----- ButtonBar
                             //
-                            string ButtonBar = adminUIController.getButtonBarForIndex2(core, AllowAdd, AllowDelete, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt);
+                            string ButtonBar = adminUIController.getButtonBarForIndex2(core, AllowAdd, AllowDelete, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, adminContent.name);
                             string titleRow = getTitleRowForIndex(core, IndexConfig, adminContent, recordCnt, ContentAccessLimitMessage);
                             //
                             // Assemble LiveWindowTable
                             //
                             //Stream.Add(htmlController.formStart( core,"", "adminForm"));
                             Stream.Add(ButtonBar);
-                            Stream.Add(adminUIController.GetTitleBar(core, titleRow, ""));
+                            //Stream.Add(adminUIController.GetTitleBar(core, titleRow, ""));
                             Stream.Add(formContent);
                             Stream.Add(ButtonBar);
                             Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\", height=\"10\" >"));
@@ -2873,8 +2877,8 @@ namespace Contensive.Core.Addons.AdminSite {
                 }
                 //
                 // --- Spell Check
-                SpellCheckSupported = false;
-                SpellCheckRequest = false;
+                //SpellCheckSupported = false;
+                //SpellCheckRequest = false;
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
@@ -4925,7 +4929,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //MTMRuleContent = cdefmodel.getContentNameByID(core,.manyToManyRuleContentID)
                                             //MTMRuleField0 = .ManyToManyRulePrimaryField
                                             //MTMRuleField1 = .ManyToManyRuleSecondaryField
-                                            core.html.processCheckList("ManyToMany" + field.id, cdefModel.getContentNameByID(core, field.contentId), encodeText(editRecord.id), cdefModel.getContentNameByID(core, field.manyToManyContentID), cdefModel.getContentNameByID(core, field.manyToManyRuleContentID), field.ManyToManyRulePrimaryField, field.ManyToManyRuleSecondaryField);
+                                            core.html.processCheckList("field" + field.id, cdefModel.getContentNameByID(core, field.contentId), encodeText(editRecord.id), cdefModel.getContentNameByID(core, field.manyToManyContentID), cdefModel.getContentNameByID(core, field.manyToManyRuleContentID), field.ManyToManyRulePrimaryField, field.ManyToManyRuleSecondaryField);
                                             break;
                                         }
                                     default: {
@@ -5207,7 +5211,6 @@ namespace Contensive.Core.Addons.AdminSite {
         private string GetForm_Edit(cdefModel adminContent, editRecordClass editRecord) {
             string returnHtml = "";
             try {
-                string CustomDescription = "";
                 bool AllowajaxTabs = (core.siteProperties.getBoolean("AllowAjaxEditTabBeta", false));
                 //
                 if ((core.doc.debug_iUserError != "") & editRecord.Loaded) {
@@ -5305,6 +5308,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // ----- special case messages
                 //
+                string CustomDescription = "";
                 if (IsLandingSection) {
                     CustomDescription = "<div>This is the default Landing Section for this website. This section is displayed when no specific page is requested. It should not be deleted, renamed, marked inactive, blocked or hidden.</div>";
                 } else if (IsLandingPageTemp) {
@@ -6139,9 +6143,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 bool IsEmptyHelp = false;
                 string HelpMsg = null;
                 int CS = 0;
-                //string EditorStyleModifier = null;
                 string HelpClosedContentID = null;
-                bool AllowHelpRow = false;
                 string EditorHelp = null;
                 string HelpEditorID = null;
                 string HelpOpenedReadID = null;
@@ -6151,19 +6153,18 @@ namespace Contensive.Core.Addons.AdminSite {
                 string HelpMsgClosed = null;
                 string HelpMsgOpenedRead = null;
                 string HelpMsgOpenedEdit = null;
-                string RecordName = null;
-                string GroupName = null;
+                //string RecordName = null;
+                //string GroupName = null;
                 bool IsBaseField = false;
                 bool field_readOnly = false;
                 string NonEncodedLink = null;
                 string EncodedLink = null;
                 string fieldCaption = null;
-                string[] lookups = null;
-                int CSPointer = 0;
+                //string[] lookups = null;
+                //int CSPointer = 0;
                 string fieldValue_text = null;
                 //int FieldValueInteger = 0;
                 double FieldValueNumber = 0;
-                bool FieldValueBoolean = false;
                 int fieldTypeId = 0;
                 object fieldValue_object = null;
                 string RedirectPath = null;
@@ -6266,7 +6267,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     break;
                                 case "allowinmenus":
                                 case "allowinchildlists":
-                                    FieldValueBoolean = true;
+                                    //FieldValueBoolean = true;
                                     fieldValue_object = "1";
                                     field_readOnly = true;
                                     WhyReadOnlyMsg = "&nbsp;(disabled for root pages)";
@@ -6281,7 +6282,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //.ValueVariant = "0"
                                 fieldValue_object = "0";
                                 field_readOnly = true;
-                                FieldValueBoolean = false;
+                                //FieldValueBoolean = false;
                                 fieldValue_text = "0";
                             }
                         }
@@ -6333,11 +6334,10 @@ namespace Contensive.Core.Addons.AdminSite {
                                 core.docProperties.setProperty("editorStyles", styleList);
                                 core.docProperties.setProperty("editorStyleOptions", styleOptionList);
                             }
-                            EditorString = core.addon.execute(addonModel.create(core, editorAddonID), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                            EditorString = core.addon.execute(editorAddonID, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor,
-                                errorCaption = "field editor id:" + editorAddonID
+                                errorContextMessage = "field editor id:" + editorAddonID
                             });
-                            //EditorString = core.addon.execute_legacy6(editorAddonID, "", addonOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", 0, False)
                             useEditorAddon = !string.IsNullOrEmpty(EditorString);
                             if (useEditorAddon) {
                                 //
@@ -6459,14 +6459,15 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         //   Placeholder
                                         //
-                                        MTMContent0 = cdefModel.getContentNameByID(core, field.contentId);
-                                        MTMContent1 = cdefModel.getContentNameByID(core, field.manyToManyContentID);
-                                        MTMRuleContent = cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
-                                        MTMRuleField0 = field.ManyToManyRulePrimaryField;
-                                        MTMRuleField1 = field.ManyToManyRuleSecondaryField;
-                                        EditorString += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1);
-                                        EditorString += WhyReadOnlyMsg;
-                                        //
+                                        EditorString = adminUIController.getDefaultEditor_manyToMany(core, field, "field" + field.id, fieldValue_text, editRecord.id, editorReadOnly, WhyReadOnlyMsg);
+                                        //MTMContent0 = cdefModel.getContentNameByID(core, field.contentId);
+                                        //MTMContent1 = cdefModel.getContentNameByID(core, field.manyToManyContentID);
+                                        //MTMRuleContent = cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
+                                        //MTMRuleField0 = field.ManyToManyRulePrimaryField;
+                                        //MTMRuleField1 = field.ManyToManyRuleSecondaryField;
+                                        //EditorString += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1);
+                                        //EditorString += WhyReadOnlyMsg;
+                                        ////
                                         break;
                                     case FieldTypeIdCurrency:
                                         //
@@ -6652,6 +6653,18 @@ namespace Contensive.Core.Addons.AdminSite {
                                         return_NewFieldList += "," + field.nameLc;
                                         EditorString = adminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg, field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core));
                                         break;
+                                    case FieldTypeIdManyToMany:
+                                        //
+                                        //   Placeholder
+                                        EditorString = adminUIController.getDefaultEditor_manyToMany(core, field, "field" + field.id, fieldValue_text,  editRecord.id, false,  WhyReadOnlyMsg);
+                                        //MTMContent0 = cdefModel.getContentNameByID(core, field.contentId);
+                                        //MTMContent1 = cdefModel.getContentNameByID(core, field.manyToManyContentID);
+                                        //MTMRuleContent = cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
+                                        //MTMRuleField0 = field.ManyToManyRulePrimaryField;
+                                        //MTMRuleField1 = field.ManyToManyRuleSecondaryField;
+                                        //EditorString += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, fieldValue_text);
+                                        ////EditorString &= (core.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, FieldValueText))
+                                        break;
                                     case FieldTypeIdFile:
                                     case FieldTypeIdFileImage:
                                         //
@@ -6671,17 +6684,6 @@ namespace Contensive.Core.Addons.AdminSite {
                                             EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(field.nameLc, "", "file form-control"));
                                         }
                                         //
-                                        break;
-                                    case FieldTypeIdManyToMany:
-                                        //
-                                        //   Placeholder
-                                        MTMContent0 = cdefModel.getContentNameByID(core, field.contentId);
-                                        MTMContent1 = cdefModel.getContentNameByID(core, field.manyToManyContentID);
-                                        MTMRuleContent = cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
-                                        MTMRuleField0 = field.ManyToManyRulePrimaryField;
-                                        MTMRuleField1 = field.ManyToManyRuleSecondaryField;
-                                        EditorString += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, fieldValue_text);
-                                        //EditorString &= (core.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, FieldValueText))
                                         break;
                                     case FieldTypeIdAutoIdIncrement:
                                     case FieldTypeIdCurrency:
@@ -6841,27 +6843,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         if (AllowHelpMsgCustom) {
                             HelpMsgDefault = field.helpDefault;
                             HelpMsgCustom = field.helpCustom;
-                            //HelpPtr = helpIdIndex.getPtr(CStr(.id))
-                            //If HelpPtr >= 0 Then
-                            //    FieldHelpFound = True
-                            //    HelpMsgDefault = helpDefaultCache(HelpPtr)
-                            //    HelpMsgCustom = HelpCustomCache(HelpPtr)
-                            //End If
                         }
-                        //
-                        // 12/4/2016 - REFACTOR - this is from the old system. Delete this after we varify it is no longer needed
-                        //
-                        //If Not FieldHelpFound Then
-                        //    Call getFieldHelpMsgs(adminContent.parentID, .nameLc, HelpMsgDefault, HelpMsgCustom)
-                        //    CS = core.app.csInsertRecord("Content Field Help")
-                        //    If core.app.csOk(CS) Then
-                        //        Call core.app.setCS(CS, "fieldid", fieldId)
-                        //        Call core.app.setCS(CS, "name", adminContent.Name & "." & .nameLc)
-                        //        Call core.app.setCS(CS, "HelpDefault", HelpMsgDefault)
-                        //        Call core.app.setCS(CS, "HelpCustom", HelpMsgCustom)
-                        //    End If
-                        //    Call core.app.csClose(ref CS)
-                        //End If
                         if (!string.IsNullOrEmpty(HelpMsgCustom)) {
                             HelpMsg = HelpMsgCustom;
                         } else {
@@ -6881,7 +6863,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         HelpOpenedEditID = "HelpOpenedEditID" + fieldId;
                         HelpClosedID = "helpClosedId" + fieldId;
                         HelpClosedContentID = "helpClosedContentId" + fieldId;
-                        AllowHelpRow = true;
+                        //AllowHelpRow = true;
                         //
                         //------------------------------------------------------------------------------------------------------------
                         // editor preferences form - a fancybox popup that interfaces with a hardcoded ajax function in init() to set a member property
@@ -7013,7 +6995,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 // no help
                                 //
-                                AllowHelpRow = false;
+                                //AllowHelpRow = false;
                                 HelpMsgClosed = ""
                                     + "";
                             }
@@ -7757,7 +7739,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                     returnHtml += core.addon.execute(addonModel.create(core, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                        errorCaption = "id:" + addonId
+                        errorContextMessage = "executing addon id:" + addonId + " set as Admin Root addon"
                     });
                     //returnHtml = returnHtml & core.addon.execute_legacy4(CStr(addonId), "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                 }
@@ -8915,7 +8897,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // -- Admin Navigator
                     AdminNavFull = core.addon.execute(addonModel.create(core, AdminNavigatorGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                        errorCaption = "Admin Navigator"
+                        errorContextMessage = "executing Admin Navigator in Admin"
                     });
                     //AdminNavFull = core.addon.execute_legacy4(AdminNavigatorGuid)
                     Stream.Add("\r<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + genericController.nop(AdminNavFull) + "\r</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");

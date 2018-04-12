@@ -39,7 +39,10 @@ namespace Contensive.Core.Addons.Primitives {
                     core.doc.addRefreshQueryString("LinkObjectName", LinkObjectName);
                     core.html.addTitle("Site Explorer");
                     core.doc.setMetaContent(0, 0);
-                    string copy = core.addon.execute(addonModel.createByName(core, "Site Explorer"), new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextPage });
+                    string copy = core.addon.execute(addonModel.createByName(core, "Site Explorer"), new CPUtilsBaseClass.addonExecuteContext() {
+                        addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                        errorContextMessage = "processing site explorer response"
+                    });
                     core.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Site Explorer");
                     string htmlBodyTag = "<body class=\"ccBodyAdmin ccCon\" style=\"overflow:scroll\">";
                     string htmlBody = ""

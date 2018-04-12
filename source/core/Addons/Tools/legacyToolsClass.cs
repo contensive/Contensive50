@@ -4144,7 +4144,7 @@ namespace Contensive.Core.Addons.Tools {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                     instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
                     instanceGuid = "-2",
-                    errorCaption = "File Manager"
+                    errorContextMessage = "executing File Manager addon within Content File Manager"
                 });
                 string Description = "Manage files and folders within the virtual content file area.";
                 string ButtonList = ButtonApply + "," + ButtonCancel;
@@ -4168,7 +4168,7 @@ namespace Contensive.Core.Addons.Tools {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                     instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
                     instanceGuid = "-2",
-                    errorCaption = "File Manager"
+                    errorContextMessage = "executing File Manager within website file manager"
                 });
                 string Description = "Manage files and folders within the Website's file area.";
                 string ButtonList = ButtonApply + "," + ButtonCancel;

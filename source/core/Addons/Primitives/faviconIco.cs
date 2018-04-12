@@ -33,7 +33,7 @@ namespace Contensive.Core.Addons.Primitives {
                     //
                     // no favicon, 404 the call
                     //
-                    core.webServer.setResponseStatus("404 Not Found");
+                    core.webServer.setResponseStatus(iisController.httpResponseStatus404);
                     core.webServer.setResponseContentType("image/gif");
                     core.doc.continueProcessing = false;
                     return string.Empty;

@@ -979,7 +979,7 @@ namespace Contensive.Core.Controllers {
         public static string inputText( coreController core, string htmlName, string defaultValue, int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false ) {
             string result = "";
             try {
-                if ((heightRows>0) & !passwordField) {
+                if ((heightRows>1) & !passwordField) {
                     result = inputTextarea(core, htmlName, defaultValue, heightRows, widthCharacters, htmlId, true, readOnly, htmlClass, disabled, maxLength);
                 } else {
                     defaultValue = htmlController.encodeHtml(defaultValue);
@@ -1961,6 +1961,7 @@ namespace Contensive.Core.Controllers {
                     //    use default wysiwyg
                     returnHtml = inputTextarea(core, htmlName, DefaultValue);
                 } else {
+                    // todo ----- move this (defaulteditor override) to AdminUI
                     //
                     // use addon editor
                     Dictionary<string, string> arguments = new Dictionary<string, string>();
@@ -1977,7 +1978,8 @@ namespace Contensive.Core.Controllers {
                     arguments.Add("editorStyleOptions", styleOptionList);
                     returnHtml = core.addon.execute(addonModel.create(core, FieldTypeDefaultEditorAddonId), new CPUtilsBaseClass.addonExecuteContext() {
                         addonType = CPUtilsBaseClass.addonContext.ContextEditor,
-                        instanceArguments = arguments
+                        instanceArguments = arguments,
+                        errorContextMessage = "calling editor addon for text field type, addon [" + FieldTypeDefaultEditorAddonId  + "]"
                     });
                 }
             } catch (Exception ex) {
@@ -2445,7 +2447,7 @@ namespace Contensive.Core.Controllers {
         ///       RulesPrimaryFieldName = "MemberID"
         ///       RulesSecondaryFieldName = "GroupID"
         /// </summary>
-        /// <param name="TagName"></param>
+        /// <param name="htmlNamePrefix"></param>
         /// <param name="PrimaryContentName"></param>
         /// <param name="PrimaryRecordID"></param>
         /// <param name="SecondaryContentName"></param>
@@ -2458,7 +2460,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="IncludeContentFolderDivs"></param>
         /// <param name="DefaultSecondaryIDList"></param>
         /// <returns></returns>
-        public string getCheckList(string TagName, string PrimaryContentName, int PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectCriteria = "", string CaptionFieldName = "", bool readOnlyfield = false, bool IncludeContentFolderDivs = false, string DefaultSecondaryIDList = "") {
+        public string getCheckList(string htmlNamePrefix, string PrimaryContentName, int PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectCriteria = "", string CaptionFieldName = "", bool readOnlyfield = false, bool IncludeContentFolderDivs = false, string DefaultSecondaryIDList = "") {
             string returnHtml = "";
             try {
                 string[] main_MemberShipText = null;
@@ -2494,17 +2496,17 @@ namespace Contensive.Core.Controllers {
                 string SingularPrefixHtmlEncoded = null;
                 bool IsRuleCopySupported = false;
                 bool AllowRuleCopy = false;
-                //
-                // IsRuleCopySupported - if true, the rule records include an allow button, and copy
-                //   This is for a checkbox like [ ] Other [enter other copy here]
-                //
-                IsRuleCopySupported = Models.Complex.cdefModel.isContentFieldSupported(core, RulesContentName, "RuleCopy");
-                if (IsRuleCopySupported) {
-                    IsRuleCopySupported = IsRuleCopySupported && Models.Complex.cdefModel.isContentFieldSupported(core, SecondaryContentName, "AllowRuleCopy");
-                    if (IsRuleCopySupported) {
-                        IsRuleCopySupported = IsRuleCopySupported && Models.Complex.cdefModel.isContentFieldSupported(core, SecondaryContentName, "RuleCopyCaption");
-                    }
-                }
+                ////
+                //// IsRuleCopySupported - if true, the rule records include an allow button, and copy
+                ////   This is for a checkbox like [ ] Other [enter other copy here]
+                ////
+                //IsRuleCopySupported = Models.Complex.cdefModel.isContentFieldSupported(core, RulesContentName, "RuleCopy");
+                //if (IsRuleCopySupported) {
+                //    IsRuleCopySupported = IsRuleCopySupported && Models.Complex.cdefModel.isContentFieldSupported(core, SecondaryContentName, "AllowRuleCopy");
+                //    if (IsRuleCopySupported) {
+                //        IsRuleCopySupported = IsRuleCopySupported && Models.Complex.cdefModel.isContentFieldSupported(core, SecondaryContentName, "RuleCopyCaption");
+                //    }
+                //}
                 if (string.IsNullOrEmpty(CaptionFieldName)) {
                     CaptionFieldName = "name";
                 }
@@ -2560,11 +2562,12 @@ namespace Contensive.Core.Controllers {
                             // ----- Determine main_MemberShip (which secondary records are associated by a rule)
                             // ----- (exclude new record issue ID=0)
                             //
-                            if (IsRuleCopySupported) {
-                                SQL = "SELECT " + SecondaryTablename + ".ID AS ID," + rulesTablename + ".RuleCopy";
-                            } else {
-                                SQL = "SELECT " + SecondaryTablename + ".ID AS ID,'' as RuleCopy";
-                            }
+                            SQL = "SELECT " + SecondaryTablename + ".ID AS ID,'' as RuleCopy";
+                            //if (IsRuleCopySupported) {
+                            //    SQL = "SELECT " + SecondaryTablename + ".ID AS ID," + rulesTablename + ".RuleCopy";
+                            //} else {
+                            //    SQL = "SELECT " + SecondaryTablename + ".ID AS ID,'' as RuleCopy";
+                            //}
                             SQL += ""
                             + " FROM " + SecondaryTablename + " LEFT JOIN"
                             + " " + rulesTablename + " ON " + SecondaryTablename + ".ID = " + rulesTablename + "." + RulesSecondaryFieldName + " WHERE "
@@ -2600,19 +2603,20 @@ namespace Contensive.Core.Controllers {
                         // ----- Gather all the Secondary Records, sorted by ContentName
                         //
                         SQL = "SELECT " + SecondaryTablename + ".ID AS ID, " + SecondaryTablename + "." + CaptionFieldName + " AS OptionCaption, " + SecondaryTablename + ".name AS OptionName, " + SecondaryTablename + ".SortOrder";
-                        if (IsRuleCopySupported) {
-                            SQL += "," + SecondaryTablename + ".AllowRuleCopy," + SecondaryTablename + ".RuleCopyCaption";
-                        } else {
-                            SQL += ",0 as AllowRuleCopy,'' as RuleCopyCaption";
-                        }
+                        SQL += ",0 as AllowRuleCopy,'' as RuleCopyCaption";
+                        //if (IsRuleCopySupported) {
+                        //    SQL += "," + SecondaryTablename + ".AllowRuleCopy," + SecondaryTablename + ".RuleCopyCaption";
+                        //} else {
+                        //    SQL += ",0 as AllowRuleCopy,'' as RuleCopyCaption";
+                        //}
                         SQL += " from " + SecondaryTablename + " where (1=1)";
                         if (!string.IsNullOrEmpty(SecondaryContentSelectCriteria)) {
                             SQL += "AND(" + SecondaryContentSelectCriteria + ")";
                         }
                         SQL += " GROUP BY " + SecondaryTablename + ".ID, " + SecondaryTablename + "." + CaptionFieldName + ", " + SecondaryTablename + ".name, " + SecondaryTablename + ".SortOrder";
-                        if (IsRuleCopySupported) {
-                            SQL += ", " + SecondaryTablename + ".AllowRuleCopy," + SecondaryTablename + ".RuleCopyCaption";
-                        }
+                        //if (IsRuleCopySupported) {
+                        //    SQL += ", " + SecondaryTablename + ".AllowRuleCopy," + SecondaryTablename + ".RuleCopyCaption";
+                        //}
                         SQL += " ORDER BY ";
                         SQL += SecondaryTablename + "." + CaptionFieldName;
                         CS = core.db.csOpenSql(SQL);
@@ -2624,7 +2628,7 @@ namespace Contensive.Core.Controllers {
                                 CheckBoxCnt = 0;
                                 DivCheckBoxCnt = 0;
                                 CanSeeHiddenFields = core.session.isAuthenticatedDeveloper(core);
-                                DivName = TagName + ".All";
+                                DivName = htmlNamePrefix + ".All";
                                 while (core.db.csOk(CS)) {
                                     OptionName = core.db.csGetText(CS, "OptionName");
                                     if ((OptionName.Left(1) != "_") || CanSeeHiddenFields) {
@@ -2645,7 +2649,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                         if (DivCheckBoxCnt != 0) {
                                             // leave this between checkboxes - it is searched in the admin page
-                                            returnHtml += "<br>\r\n";
+                                            //returnHtml += "<br>\r\n";
                                         }
                                         RuleCopy = "";
                                         Found = false;
@@ -2660,32 +2664,36 @@ namespace Contensive.Core.Controllers {
                                             }
                                         }
                                         // must leave the first hidden with the value in this form - it is searched in the admin pge
-                                        returnHtml += "\r\n";
-                                        returnHtml += "<table><tr><td style=\"vertical-align:top;margin-top:0;width:20px;\">";
-                                        returnHtml += "<input type=hidden name=\"" + TagName + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
+                                        //returnHtml += "\r\n";
+                                        //returnHtml += "<table><tr><td style=\"vertical-align:top;margin-top:0;width:20px;\">";
+                                        returnHtml += "<input type=hidden name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".id\" value=" + RecordID + ">";
                                         if (readOnlyfield && !Found) {
-                                            returnHtml += "<input type=checkbox disabled>";
+                                            returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                            //returnHtml += "<input type=checkbox disabled>";
                                         } else if (readOnlyfield) {
-                                            returnHtml += "<input type=checkbox disabled checked>";
-                                            returnHtml += "<input type=\"hidden\" name=\"" + TagName + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
+                                            returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                            //returnHtml += "<input type=checkbox disabled checked>";
+                                            returnHtml += "<input type=\"hidden\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
                                         } else if (Found) {
-                                            returnHtml += "<input type=checkbox name=\"" + TagName + "." + CheckBoxCnt + "\" checked>";
+                                            returnHtml += "<div class=\"checkbox\"><label><input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                            //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" checked>";
                                         } else {
-                                            returnHtml += "<input type=checkbox name=\"" + TagName + "." + CheckBoxCnt + "\">";
+                                            returnHtml += "<div class=\"checkbox\"><label><input type=\"checkbox\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"\">&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                            //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\">";
                                         }
-                                        returnHtml += "</td><td style=\"vertical-align:top;padding-top:4px;\">";
-                                        returnHtml += SpanClassAdminNormal + optionCaptionHtmlEncoded;
-                                        if (AllowRuleCopy) {
-                                            returnHtml += ", " + RuleCopyCaption + "&nbsp;" + inputText(core, TagName + "." + CheckBoxCnt + ".RuleCopy", RuleCopy, 1, 20);
-                                        }
-                                        returnHtml += "</td></tr></table>";
+                                        //returnHtml += "</td><td style=\"vertical-align:top;padding-top:4px;\">";
+                                        //returnHtml += SpanClassAdminNormal + optionCaptionHtmlEncoded;
+                                        //if (AllowRuleCopy) {
+                                        //    returnHtml += ", " + RuleCopyCaption + "&nbsp;" + inputText(core, htmlNamePrefix + "." + CheckBoxCnt + ".RuleCopy", RuleCopy, 1, 20);
+                                        //}
+                                        //returnHtml += "</td></tr></table>";
                                         CheckBoxCnt = CheckBoxCnt + 1;
                                         DivCheckBoxCnt = DivCheckBoxCnt + 1;
                                     }
                                     core.db.csGoNext(CS);
                                 }
                                 returnHtml += EndDiv;
-                                returnHtml += "<input type=\"hidden\" name=\"" + TagName + ".RowCount\" value=\"" + CheckBoxCnt + "\">\r\n";
+                                returnHtml += inputHidden( htmlNamePrefix + ".RowCount", CheckBoxCnt );
                             }
                         }
                         core.db.csClose(ref CS);
@@ -4049,7 +4057,8 @@ namespace Contensive.Core.Controllers {
             arguments.Add("AllowGroupAdd", AllowGroupAdd.ToString());
             return core.addon.execute(addonModel.create(core, addonGuidResourceLibrary), new CPUtilsBaseClass.addonExecuteContext() {
                 addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
-                instanceArguments = arguments
+                instanceArguments = arguments,
+                errorContextMessage = "calling resource library addon [" + addonGuidResourceLibrary + "] from internal method"
             });
        }
         //

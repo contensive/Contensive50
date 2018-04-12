@@ -38,7 +38,8 @@ namespace Contensive.Core.Addons.Primitives {
                 return core.addon.execute(addonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
                     instanceArguments = addonArguments,
-                    forceHtmlDocument = true
+                    forceHtmlDocument = true,
+                     errorContextMessage = "get field editor preference remote"
                 });
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

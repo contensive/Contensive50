@@ -467,23 +467,26 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //
-        //==========================================================================
-        //   returns the site structure xml
-        //==========================================================================
-        //
-        //todo  NOTE: C# does not support parameterized properties - the following property has been rewritten as a function:
-        //ORIGINAL LINE: Public ReadOnly Property main_SiteStructure(core As coreClass) As String
-        public string get_main_SiteStructure(coreController core) {
-            if (!siteStructure_LocalLoaded) {
-                addonModel addon = addonModel.create(core, addonGuidSiteStructureGuid);
-                siteStructure = this.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextSimple });
-                //siteStructure = Me.core.addon.execute_legacy2(0, addonGuidSiteStructureGuid, "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
-                siteStructure_LocalLoaded = true;
-            }
-            return siteStructure;
+        ////
+        ////==========================================================================
+        ////   returns the site structure xml
+        ////==========================================================================
+        ////
+        ////todo  NOTE: C# does not support parameterized properties - the following property has been rewritten as a function:
+        ////ORIGINAL LINE: Public ReadOnly Property main_SiteStructure(core As coreClass) As String
+        //public string get_main_SiteStructure(coreController core) {
+        //    if (!siteStructure_LocalLoaded) {
+        //        addonModel addon = addonModel.create(core, addonGuidSiteStructureGuid);
+        //        siteStructure = this.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+        //            addonType = CPUtilsBaseClass.addonContext.ContextSimple,
+        //            errorContextMessage = "calling site structure addon [" + defaultAddonId + "] from legacy method"
+        //        });
+        //        //siteStructure = Me.core.addon.execute_legacy2(0, addonGuidSiteStructureGuid, "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
+        //        siteStructure_LocalLoaded = true;
+        //    }
+        //    return siteStructure;
 
-        }
+        //}
         //
         //=============================================================================
         //   Content Page Authoring
@@ -637,7 +640,8 @@ namespace Contensive.Core.Controllers {
                         recordId = pageController.page.id
                     },
                     instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, pageController.page.ChildListInstanceOptions),
-                    instanceGuid = PageChildListInstanceID
+                    instanceGuid = PageChildListInstanceID,
+                    errorContextMessage = "calling child page addon [" + core.siteProperties.childListAddonID + "] in quick editing editor"
                 };
                 PageList = core.addon.execute(addon, executeContext);
                 //PageList = core.addon.execute_legacy2(core.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)

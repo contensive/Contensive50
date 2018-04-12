@@ -176,16 +176,16 @@ namespace Contensive.Core {
         //
         // ====================================================================================================
         //
-        private string ExecuteAddon(string IdGuidOrName, addonExecuteContext executeConext) {
+        private string ExecuteAddon(string IdGuidOrName, addonExecuteContext executeContext) {
             if (IdGuidOrName.IsNumeric()) {
-                executeConext.errorCaption = "id:" + IdGuidOrName;
-                return CP.core.addon.execute(Models.DbModels.addonModel.create(CP.core, genericController.encodeInteger(IdGuidOrName)), executeConext);
+                executeContext.errorContextMessage += " addon id:" + IdGuidOrName;
+                return CP.core.addon.execute(Models.DbModels.addonModel.create(CP.core, genericController.encodeInteger(IdGuidOrName)), executeContext);
             } else if (genericController.isGuid(IdGuidOrName)) {
-                executeConext.errorCaption = "guid:" + IdGuidOrName;
-                return CP.core.addon.execute(Models.DbModels.addonModel.create(CP.core, IdGuidOrName), executeConext);
+                executeContext.errorContextMessage += " addon guid:" + IdGuidOrName;
+                return CP.core.addon.execute(Models.DbModels.addonModel.create(CP.core, IdGuidOrName), executeContext);
             } else {
-                executeConext.errorCaption = IdGuidOrName;
-                return CP.core.addon.execute(Models.DbModels.addonModel.createByName(CP.core, IdGuidOrName), executeConext);
+                executeContext.errorContextMessage += "addon " + IdGuidOrName;
+                return CP.core.addon.execute(Models.DbModels.addonModel.createByName(CP.core, IdGuidOrName), executeContext);
             }
         }
         //

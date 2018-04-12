@@ -42,8 +42,8 @@ namespace Contensive.Core.Controllers {
                 }
                 if (logging) {
                     message = message.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
-                    message = DateTime.Now.ToString("") + "\t" + (ElapsedTime).ToString("00.000") + "\t" + core.session.visit.id + "\t" + message;
-                    logController.logError(core, "debugController_testPoint: " + message);
+                    message = (ElapsedTime).ToString("00.000") + "\t" + core.session.visit.id + "\t" + message;
+                    logController.logDebug(core, message);
                 }
             }
         }

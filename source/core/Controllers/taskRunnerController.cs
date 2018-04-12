@@ -191,9 +191,9 @@ namespace Contensive.Core.Controllers {
                                                 appCore.addon.execute(Models.DbModels.addonModel.create(appCore, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                                     backgroundProcess = true,
                                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
-                                                    instanceArguments = cmdDetail.docProperties
+                                                    instanceArguments = cmdDetail.docProperties,
+                                                    errorContextMessage = "running task, addon [" + cmdDetail.addonId + "]"
                                                 });
-                                                //Call cpSite.core.addon.execute_legacy7(cmdDetail.addonId, cmdDetail.docProperties, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple)
                                                 break;
                                         }
                                         appCore.db.csSet(CS, "datecompleted", DateTime.Now);

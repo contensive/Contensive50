@@ -1525,12 +1525,12 @@ namespace Contensive.Core.Models.Complex {
                         //
                         // Content Definition not found
                         //
-                        throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because Content Definition [" + ContentName + "] was Not found In ccContent Table."));
+                        throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] was Not found In ccContent Table."));
                     } else if (TableID <= 0) {
                         //
                         // Content Definition not found
                         //
-                        throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because Content Definition [" + ContentName + "] has no associated Content Table."));
+                        throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] has no associated Content Table."));
                     } else if (fieldTypeId <= 0) {
                         //
                         // invalid field type

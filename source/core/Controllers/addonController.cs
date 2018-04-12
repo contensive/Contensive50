@@ -60,6 +60,32 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
+        public string execute(string addonGuid, CPUtilsBaseClass.addonExecuteContext executeContext) {
+            var addon = addonModel.create(core, addonGuid);
+            if (addon == null) {
+                //
+                // -- addon not found
+                logController.handleError(core, new ArgumentException("AddonExecute called without valid guid [" + addonGuid + "] from context [" + executeContext.errorContextMessage + "]."));
+                return "";
+            } else {
+                return execute(addon, executeContext);
+            }
+        }
+        //
+        //====================================================================================================
+        public string execute(int addonId, CPUtilsBaseClass.addonExecuteContext executeContext) {
+            var addon = addonModel.create(core, addonId);
+            if (addon == null) {
+                //
+                // -- addon not found
+                logController.handleError(core, new ArgumentException("AddonExecute called without valid id [" + addonId + "] from context [" + executeContext.errorContextMessage + "]."));
+                return "";
+            } else {
+                return execute(addon, executeContext);
+            }
+        }
+        //
+        //====================================================================================================
         /// <summary>
         /// execute addon
         /// </summary>
@@ -68,548 +94,552 @@ namespace Contensive.Core.Controllers {
         /// <returns></returns>
         public string execute(Models.DbModels.addonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
             string result = "";
+            //
+            // -- setup values that have to be in finalize
             bool rootLevelAddon = core.doc.addonsCurrentlyRunningIdList.Count.Equals(0);
             bool save_forceJavascriptToHead = executeContext.forceJavascriptToHead;
-            try {
+            long addonStart = core.doc.appStopWatch.ElapsedMilliseconds;
+            if (addon == null) {
                 //
-                // -- test point message
-                long addonStart = core.doc.appStopWatch.ElapsedMilliseconds;
-                if (addon == null) {
-                    //
-                    // -- addon not found
-                    logController.handleError( core,new ArgumentException("AddonExecute called without valid addon, [" + executeContext.errorCaption + "]."));
-                } else if (executeContext == null) {
-                    //
-                    // -- context not configured 
-                    logController.handleError( core,new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
-                } else if (!string.IsNullOrEmpty(addon.ObjectProgramID)) {
-                    //
-                    // -- addons with activeX components are deprecated
-                    string addonDescription = getAddonDescription(core, addon);
-                    throw new ApplicationException("Addon is no longer supported because it contains an active-X component, add-on " + addonDescription + ".");
-                } else if (core.doc.addonsCurrentlyRunningIdList.Contains(addon.id)) {
-                    //
-                    // -- cannot call an addon within an addon
-                    throw new ApplicationException("Addon cannot be called by itself [#" + addon.id + ", " + addon.name + "].");
-                } else {
-                    //
-                    // -- ok to execute
-                    debugController.testPoint(core, "execute enter [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
-                    core.doc.addonModelStack.Push(addon);
-                    
-                    string parentInstanceId = core.docProperties.getText("instanceId");
-                    core.docProperties.setProperty("instanceId", executeContext.instanceGuid);
-                    core.doc.addonsCurrentlyRunningIdList.Add(addon.id);
-                    //
-                    // -- if the addon's javascript is required in the head, set it in the executeContext now so it will propigate into the dependant addons as well
-                    executeContext.forceJavascriptToHead = executeContext.forceJavascriptToHead || addon.javascriptForceHead;
-                    //
-                    // -- run included add-ons before their parent
-                    List<Models.DbModels.addonIncludeRuleModel> addonIncludeRules = addonIncludeRuleModel.createList(core, "(addonid=" + addon.id + ")");
-                    if (addonIncludeRules.Count > 0) {
-                        foreach (Models.DbModels.addonIncludeRuleModel addonRule in addonIncludeRules) {
-                            if (addonRule.IncludedAddonID > 0) {
-                                addonModel dependentAddon = addonModel.create(core, addonRule.IncludedAddonID);
-                                if (dependentAddon == null) {
-                                    logController.handleError( core,new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
-                                } else {
-                                    result += executeDependency(dependentAddon, executeContext);
-                                }
-                            }
-                        }
-                    }
-                    //
-                    // -- properties referenced multiple time 
-                    bool allowAdvanceEditor = core.visitProperty.getBoolean("AllowAdvancedEditor");
-                    //
-                    // -- add addon record arguments to doc properties
-                    if (!string.IsNullOrWhiteSpace(addon.ArgumentList)) {
-                        foreach (var addon_argument in addon.ArgumentList.Replace("\r\n", "\r").Replace("\n", "\r").Split(Convert.ToChar("\r"))) {
-                            if (!string.IsNullOrEmpty(addon_argument)) {
-                                string[] nvp = addon_argument.Split('=');
-                                if (!string.IsNullOrEmpty(nvp[0])) {
-                                    string nvpValue = "";
-                                    if (nvp.Length > 1) {
-                                        nvpValue = nvp[1];
-                                    }
-                                    if (nvpValue.IndexOf("[") >= 0) {
-                                        nvpValue = nvpValue.Left(nvpValue.IndexOf("["));
-                                    }
-                                    core.docProperties.setProperty(nvp[0], nvpValue);
-                                }
-                            }
-                        }
-                    }
-                    //
-                    // -- add instance properties to doc properties
-                    string ContainerCssID = "";
-                    string ContainerCssClass = "";
-                    foreach (var kvp in executeContext.instanceArguments) {
-                        switch (kvp.Key.ToLower()) {
-                            case "wrapper":
-                                executeContext.wrapperID = genericController.encodeInteger(kvp.Value);
-                                break;
-                            case "as ajax":
-                                addon.AsAjax = genericController.encodeBoolean(kvp.Value);
-                                break;
-                            case "css container id":
-                                ContainerCssID = kvp.Value;
-                                break;
-                            case "css container class":
-                                ContainerCssClass = kvp.Value;
-                                break;
-                        }
-                        core.docProperties.setProperty(kvp.Key, kvp.Value);
-                    }
-                    //
-                    // Preprocess arguments into OptionsForCPVars, and set generic instance values wrapperid and asajax
-                    if (addon.InFrame & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                // -- addon not found
+                logController.handleError(core, new ArgumentException("AddonExecute called without valid addon [" + executeContext.errorContextMessage + "]."));
+            } else {
+                try {
+                    if (executeContext == null) {
                         //
-                        // -- inframe execution, deliver iframe with link back to remote method
-                        result = "TBD - inframe";
-                        //Link = core.webServer.requestProtocol & core.webServer.requestDomain & requestAppRootPath & core.siteProperties.serverPageDefault
-                        //If genericController.vbInstr(1, Link, "?") = 0 Then
-                        //    Link = Link & "?"
-                        //Else
-                        //    Link = Link & "&"
-                        //End If
-                        //Link = Link _
-                        //        & "nocache=" & Rnd() _
-                        //        & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
-                        //        & "&HostRecordID=" & HostRecordID _
-                        //        & "&remotemethodaddon=" & EncodeURL(addon.id.ToString) _
-                        //        & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
-                        //        & ""
-                        //FrameID = "frame" & GetRandomInteger(core)
-                        //returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
-                        //        & cr & "<script language=javascript type=""text/javascript"">" _
-                        //        & cr & "// Safari and Opera need a kick-start." _
-                        //        & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
-                        //        & cr & "</script>"
-                    } else if (addon.AsAjax & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                        // -- context not configured 
+                        logController.handleError(core, new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
+                    } else if (!string.IsNullOrEmpty(addon.ObjectProgramID)) {
                         //
-                        // -- asajax execution, deliver div with ajax callback
+                        // -- addons with activeX components are deprecated
+                        string addonDescription = getAddonDescription(core, addon);
+                        throw new ApplicationException("Addon is no longer supported because it contains an active-X component, add-on " + addonDescription + ".");
+                    } else if (core.doc.addonsCurrentlyRunningIdList.Contains(addon.id)) {
                         //
-                        result = "TBD - asajax";
-                        //-----------------------------------------------------------------
-                        // AsAjax and this is NOT the callback - setup the ajax callback
-                        // js,styles and other features from the addon record are added to the host page
-                        // during the remote method, these are blocked, but if any are added during
-                        //   DLL processing, they have to be handled
-                        //-----------------------------------------------------------------
-                        //
-                        //If True Then
-                        //    AsAjaxID = "asajax" & GetRandomInteger(core)
-                        //    QS = "" _
-                        //& RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(addon.id.ToString()) _
-                        //& "&HostContentName=" & EncodeRequestVariable(HostContentName) _
-                        //& "&HostRecordID=" & HostRecordID _
-                        //& "&HostRQS=" & EncodeRequestVariable(core.doc.refreshQueryString) _
-                        //& "&HostQS=" & EncodeRequestVariable(core.webServer.requestQueryString) _
-                        //& "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
-                        //& ""
-                        //    '
-                        //    ' -- exception made here. AsAjax is not used often, and this can create a QS too long
-                        //    '& "&HostForm=" & EncodeRequestVariable(core.webServer.requestFormString) _
-                        //    If IsInline Then
-                        //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
-                        //    Else
-                        //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
-                        //    End If
-                        //    returnVal = returnVal _
-                        //& cr & "<script Language=""javaScript"" type=""text/javascript"">" _
-                        //& cr & "cj.ajax.qs('" & QS & "','','" & AsAjaxID & "');AdminNavPop=true;" _
-                        //& cr & "</script>"
-                        //    '
-                        //    ' Problem - AsAjax addons must add styles, js and meta to the head
-                        //    '   Adding them to the host page covers most cases, but sometimes the DLL itself
-                        //    '   adds styles, etc during processing. These have to be added during the remote method processing.
-                        //    '   appending the .innerHTML of the head works for FF, but ie blocks it.
-                        //    '   using .createElement works in ie, but the tag system right now not written
-                        //    '   to save links, etc, it is written to store the entire tag.
-                        //    '   Also, OtherHeadTags can not be added this was.
-                        //    '
-                        //    ' Short Term Fix
-                        //    '   For Ajax, Add javascript and style features to head of host page
-                        //    '   Then during remotemethod, clear these strings before dll processing. Anything
-                        //    '   that is added must have come from the dll. So far, the only addons we have that
-                        //    '   do this load styles, so instead of putting in the the head (so ie fails), add styles inline.
-                        //    '
-                        //    '   This is because ie does not allow innerHTML updates to head tag
-                        //    '   scripts and js could be handled with .createElement if only the links were saved, but
-                        //    '   otherhead could not.
-                        //    '   The case this does not cover is if the addon itself manually adds one of these entries.
-                        //    '   In no case can ie handle the OtherHead, however, all the others can be done with .createElement.
-                        //    ' Long Term Fix
-                        //    '   Convert js, style, and meta tag system to use .createElement during remote method processing
-                        //    '
-                        //    Call core.html.doc_AddPagetitle2(PageTitle, AddedByName)
-                        //    Call core.html.doc_addMetaDescription2(MetaDescription, AddedByName)
-                        //    Call core.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                        //    Call core.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
-                        //    If Not blockJavascriptAndCss Then
-                        //        '
-                        //        ' add javascript and styles if it has not run already
-                        //        '
-                        //        Call core.html.addOnLoadJavascript(JSOnLoad, AddedByName)
-                        //        Call core.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
-                        //        Call core.html.addJavaScriptLinkHead(JSFilename, AddedByName)
-                        //        If addon.StylesFilename.filename <> "" Then
-                        //            Call core.html.addStyleLink(core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, addon.StylesFilename.filename), addon.name & " default")
-                        //        End If
-                        //        'If CustomStylesFilename <> "" Then
-                        //        '    Call core.html.addStyleLink(core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, CustomStylesFilename), AddonName & " custom")
-                        //        'End If
-                        //    End If
-                        //End If
+                        // -- cannot call an addon within an addon
+                        throw new ApplicationException("Addon cannot be called by itself [#" + addon.id + ", " + addon.name + "].");
                     } else {
                         //
-                        //-----------------------------------------------------------------
-                        // otherwise - produce the content from the addon
-                        //   setup RQS as needed - RQS provides the querystring for add-ons to create links that return to the same page
-                        //-----------------------------------------------------------------------------------------------------
+                        // -- ok to execute
+                        debugController.testPoint(core, "execute enter [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
+                        core.doc.addonModelStack.Push(addon);
+
+                        string parentInstanceId = core.docProperties.getText("instanceId");
+                        core.docProperties.setProperty("instanceId", executeContext.instanceGuid);
+                        core.doc.addonsCurrentlyRunningIdList.Add(addon.id);
                         //
+                        // -- if the addon's javascript is required in the head, set it in the executeContext now so it will propigate into the dependant addons as well
+                        executeContext.forceJavascriptToHead = executeContext.forceJavascriptToHead || addon.javascriptForceHead;
+                        //
+                        // -- run included add-ons before their parent
+                        List<Models.DbModels.addonIncludeRuleModel> addonIncludeRules = addonIncludeRuleModel.createList(core, "(addonid=" + addon.id + ")");
+                        if (addonIncludeRules.Count > 0) {
+                            string addonContextMessage = executeContext.errorContextMessage;
+                            foreach (Models.DbModels.addonIncludeRuleModel addonRule in addonIncludeRules) {
+                                if (addonRule.IncludedAddonID > 0) {
+                                    addonModel dependentAddon = addonModel.create(core, addonRule.IncludedAddonID);
+                                    if (dependentAddon == null) {
+                                        logController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                                    } else {
+                                        executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + addonContextMessage + "]";
+                                        result += executeDependency(dependentAddon, executeContext);
+                                    }
+                                }
+                            }
+                            executeContext.errorContextMessage = addonContextMessage;
+                        }
+                        //
+                        // -- properties referenced multiple time 
+                        bool allowAdvanceEditor = core.visitProperty.getBoolean("AllowAdvancedEditor");
+                        //
+                        // -- add addon record arguments to doc properties
+                        if (!string.IsNullOrWhiteSpace(addon.ArgumentList)) {
+                            foreach (var addon_argument in addon.ArgumentList.Replace("\r\n", "\r").Replace("\n", "\r").Split(Convert.ToChar("\r"))) {
+                                if (!string.IsNullOrEmpty(addon_argument)) {
+                                    string[] nvp = addon_argument.Split('=');
+                                    if (!string.IsNullOrEmpty(nvp[0])) {
+                                        string nvpValue = "";
+                                        if (nvp.Length > 1) {
+                                            nvpValue = nvp[1];
+                                        }
+                                        if (nvpValue.IndexOf("[") >= 0) {
+                                            nvpValue = nvpValue.Left(nvpValue.IndexOf("["));
+                                        }
+                                        core.docProperties.setProperty(nvp[0], nvpValue);
+                                    }
+                                }
+                            }
+                        }
+                        //
+                        // -- add instance properties to doc properties
+                        string ContainerCssID = "";
+                        string ContainerCssClass = "";
+                        foreach (var kvp in executeContext.instanceArguments) {
+                            switch (kvp.Key.ToLower()) {
+                                case "wrapper":
+                                    executeContext.wrapperID = genericController.encodeInteger(kvp.Value);
+                                    break;
+                                case "as ajax":
+                                    addon.AsAjax = genericController.encodeBoolean(kvp.Value);
+                                    break;
+                                case "css container id":
+                                    ContainerCssID = kvp.Value;
+                                    break;
+                                case "css container class":
+                                    ContainerCssClass = kvp.Value;
+                                    break;
+                            }
+                            core.docProperties.setProperty(kvp.Key, kvp.Value);
+                        }
+                        //
+                        // Preprocess arguments into OptionsForCPVars, and set generic instance values wrapperid and asajax
+                        if (addon.InFrame & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                            //
+                            // -- inframe execution, deliver iframe with link back to remote method
+                            result = "TBD - inframe";
+                            //Link = core.webServer.requestProtocol & core.webServer.requestDomain & requestAppRootPath & core.siteProperties.serverPageDefault
+                            //If genericController.vbInstr(1, Link, "?") = 0 Then
+                            //    Link = Link & "?"
+                            //Else
+                            //    Link = Link & "&"
+                            //End If
+                            //Link = Link _
+                            //        & "nocache=" & Rnd() _
+                            //        & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
+                            //        & "&HostRecordID=" & HostRecordID _
+                            //        & "&remotemethodaddon=" & EncodeURL(addon.id.ToString) _
+                            //        & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
+                            //        & ""
+                            //FrameID = "frame" & GetRandomInteger(core)
+                            //returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
+                            //        & cr & "<script language=javascript type=""text/javascript"">" _
+                            //        & cr & "// Safari and Opera need a kick-start." _
+                            //        & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
+                            //        & cr & "</script>"
+                        } else if (addon.AsAjax & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                            //
+                            // -- asajax execution, deliver div with ajax callback
+                            //
+                            result = "TBD - asajax";
+                            //-----------------------------------------------------------------
+                            // AsAjax and this is NOT the callback - setup the ajax callback
+                            // js,styles and other features from the addon record are added to the host page
+                            // during the remote method, these are blocked, but if any are added during
+                            //   DLL processing, they have to be handled
+                            //-----------------------------------------------------------------
+                            //
+                            //If True Then
+                            //    AsAjaxID = "asajax" & GetRandomInteger(core)
+                            //    QS = "" _
+                            //& RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(addon.id.ToString()) _
+                            //& "&HostContentName=" & EncodeRequestVariable(HostContentName) _
+                            //& "&HostRecordID=" & HostRecordID _
+                            //& "&HostRQS=" & EncodeRequestVariable(core.doc.refreshQueryString) _
+                            //& "&HostQS=" & EncodeRequestVariable(core.webServer.requestQueryString) _
+                            //& "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
+                            //& ""
+                            //    '
+                            //    ' -- exception made here. AsAjax is not used often, and this can create a QS too long
+                            //    '& "&HostForm=" & EncodeRequestVariable(core.webServer.requestFormString) _
+                            //    If IsInline Then
+                            //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
+                            //    Else
+                            //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
+                            //    End If
+                            //    returnVal = returnVal _
+                            //& cr & "<script Language=""javaScript"" type=""text/javascript"">" _
+                            //& cr & "cj.ajax.qs('" & QS & "','','" & AsAjaxID & "');AdminNavPop=true;" _
+                            //& cr & "</script>"
+                            //    '
+                            //    ' Problem - AsAjax addons must add styles, js and meta to the head
+                            //    '   Adding them to the host page covers most cases, but sometimes the DLL itself
+                            //    '   adds styles, etc during processing. These have to be added during the remote method processing.
+                            //    '   appending the .innerHTML of the head works for FF, but ie blocks it.
+                            //    '   using .createElement works in ie, but the tag system right now not written
+                            //    '   to save links, etc, it is written to store the entire tag.
+                            //    '   Also, OtherHeadTags can not be added this was.
+                            //    '
+                            //    ' Short Term Fix
+                            //    '   For Ajax, Add javascript and style features to head of host page
+                            //    '   Then during remotemethod, clear these strings before dll processing. Anything
+                            //    '   that is added must have come from the dll. So far, the only addons we have that
+                            //    '   do this load styles, so instead of putting in the the head (so ie fails), add styles inline.
+                            //    '
+                            //    '   This is because ie does not allow innerHTML updates to head tag
+                            //    '   scripts and js could be handled with .createElement if only the links were saved, but
+                            //    '   otherhead could not.
+                            //    '   The case this does not cover is if the addon itself manually adds one of these entries.
+                            //    '   In no case can ie handle the OtherHead, however, all the others can be done with .createElement.
+                            //    ' Long Term Fix
+                            //    '   Convert js, style, and meta tag system to use .createElement during remote method processing
+                            //    '
+                            //    Call core.html.doc_AddPagetitle2(PageTitle, AddedByName)
+                            //    Call core.html.doc_addMetaDescription2(MetaDescription, AddedByName)
+                            //    Call core.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
+                            //    Call core.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
+                            //    If Not blockJavascriptAndCss Then
+                            //        '
+                            //        ' add javascript and styles if it has not run already
+                            //        '
+                            //        Call core.html.addOnLoadJavascript(JSOnLoad, AddedByName)
+                            //        Call core.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
+                            //        Call core.html.addJavaScriptLinkHead(JSFilename, AddedByName)
+                            //        If addon.StylesFilename.filename <> "" Then
+                            //            Call core.html.addStyleLink(core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, addon.StylesFilename.filename), addon.name & " default")
+                            //        End If
+                            //        'If CustomStylesFilename <> "" Then
+                            //        '    Call core.html.addStyleLink(core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, CustomStylesFilename), AddonName & " custom")
+                            //        'End If
+                            //    End If
+                            //End If
+                        } else {
+                            //
+                            //-----------------------------------------------------------------
+                            // otherwise - produce the content from the addon
+                            //   setup RQS as needed - RQS provides the querystring for add-ons to create links that return to the same page
+                            //-----------------------------------------------------------------------------------------------------
+                            //
+                            if (addon.InFrame && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
+                                //
+                                // -- remote method called from inframe execution
+                                result = "TBD - remotemethod inframe";
+                                // Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
+                                //If True Then
+                                //    Call core.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, addon.id.ToString)
+                                //    Call core.doc.addRefreshQueryString("optionstring", WorkingOptionString)
+                                //End If
+                            } else if (addon.AsAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
+                                //
+                                // -- remotemethod called from asajax execution
+                                result = "TBD - remotemethod ajax";
+                                //
+                                // Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
+                                // restore form values
+                                //
+                                //If True Then
+                                //    QS = core.docProperties.getText("Hostform")
+                                //    If QS <> "" Then
+                                //        Call core.docProperties.addQueryString(QS)
+                                //    End If
+                                //    '
+                                //    ' restore refresh querystring values
+                                //    '
+                                //    QS = core.docProperties.getText("HostRQS")
+                                //    QSSplit = Split(QS, "&")
+                                //    For Ptr = 0 To UBound(QSSplit)
+                                //        NVPair = QSSplit[Ptr]
+                                //        If NVPair <> "" Then
+                                //            NVSplit = Split(NVPair, "=")
+                                //            If UBound(NVSplit) > 0 Then
+                                //                Call core.doc.addRefreshQueryString(NVSplit(0), NVSplit(1))
+                                //            End If
+                                //        End If
+                                //    Next
+                                //    '
+                                //    ' restore query string
+                                //    '
+                                //    QS = core.docProperties.getText("HostQS")
+                                //    Call core.docProperties.addQueryString(QS)
+                                //    '
+                                //    ' Clear the style,js and meta features that were delivered to the host page
+                                //    ' After processing, if these strings are not empty, they must have been added by the DLL
+                                //    '
+                                //    '
+                                //    JSOnLoad = ""
+                                //    JSBodyEnd = ""
+                                //    PageTitle = ""
+                                //    MetaDescription = ""
+                                //    MetaKeywordList = ""
+                                //    OtherHeadTags = ""
+                                //    addon.StylesFilename.filename = ""
+                                //    '  CustomStylesFilename = ""
+                                //End If
+                            }
+                            //
+                            //-----------------------------------------------------------------
+                            // Do replacements from Option String and Pick out WrapperID, and AsAjax
+                            //-----------------------------------------------------------------
+                            //
+                            string testString = (addon.Copy + addon.CopyText + addon.PageTitle + addon.MetaDescription + addon.MetaKeywordList + addon.OtherHeadTags + addon.FormXML).ToLower();
+                            if (!string.IsNullOrWhiteSpace(testString)) {
+                                foreach (var key in core.docProperties.getKeyList()) {
+                                    if (testString.Contains(("$" + key + "$").ToLower())) {
+                                        string ReplaceSource = "$" + key + "$";
+                                        string ReplaceValue = core.docProperties.getText(key);
+                                        addon.Copy = addon.Copy.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                        addon.CopyText = addon.CopyText.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                        addon.PageTitle = addon.PageTitle.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                        addon.MetaDescription = addon.MetaDescription.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                        addon.MetaKeywordList = addon.MetaKeywordList.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                        addon.OtherHeadTags = addon.OtherHeadTags.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                        addon.FormXML = addon.FormXML.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                    }
+                                }
+                            }
+                            //
+                            // -- text components
+                            result += addon.CopyText + addon.Copy;
+                            if (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) {
+                                //
+                                // not editor, encode the content parts of the addon
+                                //
+                                result = addon.CopyText + addon.Copy;
+                                switch (executeContext.addonType) {
+                                    case CPUtilsBaseClass.addonContext.ContextEditor:
+                                        result = activeContentController.renderHtmlForWysiwygEditor(core, result);
+                                        break;
+                                    case CPUtilsBaseClass.addonContext.ContextEmail:
+                                        result = activeContentController.renderHtmlForEmail(core, result, executeContext.personalizationPeopleId, "");
+                                        break;
+                                    case CPUtilsBaseClass.addonContext.ContextFilter:
+                                    case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
+                                    case CPUtilsBaseClass.addonContext.ContextOnBodyStart:
+                                    //case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
+                                    case CPUtilsBaseClass.addonContext.ContextOnPageEnd:
+                                    case CPUtilsBaseClass.addonContext.ContextOnPageStart:
+                                    case CPUtilsBaseClass.addonContext.ContextPage:
+                                    case CPUtilsBaseClass.addonContext.ContextTemplate:
+                                    case CPUtilsBaseClass.addonContext.ContextAdmin:
+                                    case CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml:
+                                        //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
+                                        result = activeContentController.renderHtmlForWeb(core, result, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                        break;
+                                    case CPUtilsBaseClass.addonContext.ContextOnContentChange:
+                                    case CPUtilsBaseClass.addonContext.ContextSimple:
+                                        //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
+                                        result = activeContentController.renderHtmlForWeb(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                        break;
+                                    case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
+                                        //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
+                                        result = activeContentController.renderJSONForRemoteMethod(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
+                                        break;
+                                    default:
+                                        //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
+                                        result = activeContentController.renderHtmlForWeb(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                        break;
+                                }
+                            }
+                            //
+                            // -- Scripting code
+                            if (addon.ScriptingCode != "") {
+                                //
+                                // Get Language
+                                string ScriptingLanguage = "";
+                                if (addon.ScriptingLanguageID != 0) {
+                                    ScriptingLanguage = core.db.getRecordName("Scripting Languages", addon.ScriptingLanguageID);
+                                }
+                                if (string.IsNullOrEmpty(ScriptingLanguage)) {
+                                    ScriptingLanguage = "VBScript";
+                                }
+                                try {
+                                    result += execute_Script(ref addon, ScriptingLanguage, addon.ScriptingCode, addon.ScriptingEntryPoint, encodeInteger(addon.ScriptingTimeout), "Addon [" + addon.name + "]");
+                                } catch (Exception ex) {
+                                    string addonDescription = getAddonDescription(core, addon);
+                                    throw new ApplicationException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
+                                }
+                            }
+                            //
+                            // -- DotNet
+                            if (addon.DotNetClass != "") {
+                                result += execute_assembly(executeContext, addon, AddonCollectionModel.create(core, addon.CollectionID));
+                            }
+                            //
+                            // -- RemoteAssetLink
+                            if (addon.RemoteAssetLink != "") {
+                                string RemoteAssetLink = addon.RemoteAssetLink;
+                                if (RemoteAssetLink.IndexOf("://") < 0) {
+                                    //
+                                    // use request object to build link
+                                    if (RemoteAssetLink.Left(1) == "/") {
+                                        RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + RemoteAssetLink;
+                                    } else {
+                                        RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + core.webServer.requestVirtualFilePath + RemoteAssetLink;
+                                    }
+                                }
+                                int PosStart = 0;
+                                httpRequestController kmaHTTP = new httpRequestController();
+                                string RemoteAssetContent = kmaHTTP.getURL(ref RemoteAssetLink);
+                                int Pos = genericController.vbInstr(1, RemoteAssetContent, "<body", 1);
+                                if (Pos > 0) {
+                                    Pos = genericController.vbInstr(Pos, RemoteAssetContent, ">");
+                                    if (Pos > 0) {
+                                        PosStart = Pos + 1;
+                                        Pos = genericController.vbInstr(Pos, RemoteAssetContent, "</body", 1);
+                                        if (Pos > 0) {
+                                            RemoteAssetContent = RemoteAssetContent.Substring(PosStart - 1, Pos - PosStart);
+                                        }
+                                    }
+                                }
+                                result += RemoteAssetContent;
+                            }
+                            //
+                            // --  FormXML
+                            if (addon.FormXML != "") {
+                                bool ExitAddonWithBlankResponse = false;
+                                result += execute_formContent(null, addon.FormXML, ref ExitAddonWithBlankResponse, "addon [" + addon.name + "]");
+                                if (ExitAddonWithBlankResponse) {
+                                    return string.Empty;
+                                }
+                            }
+                            //
+                            // -- Script Callback
+                            if (addon.Link != "") {
+                                string callBackLink = encodeVirtualPath(addon.Link, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                                foreach (var key in core.docProperties.getKeyList()) {
+                                    callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(key), encodeRequestVariable(core.docProperties.getText(key)), true);
+                                }
+                                foreach (var kvp in executeContext.instanceArguments) {
+                                    callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(kvp.Key), encodeRequestVariable(core.docProperties.getText(kvp.Value)), true);
+                                }
+                                result += "<SCRIPT LANGUAGE=\"JAVASCRIPT\" SRC=\"" + callBackLink + "\"></SCRIPT>";
+                            }
+                            string AddedByName = addon.name + " addon";
+                            //
+                            // -- js head links
+                            if (addon.JSHeadScriptSrc != "") {
+                                core.html.addScriptLinkSrc(addon.JSHeadScriptSrc, AddedByName + " Javascript Head Src", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
+                            }
+                            //
+                            // -- js head code
+                            if (addon.JSFilename.filename != "") {
+                                string scriptFilename = genericController.getCdnFileLink(core, addon.JSFilename.filename);
+                                //string scriptFilename = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, addon.JSFilename.filename);
+                                core.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
+                            }
+                            //
+                            // -- non-js html assets (styles,head tags), set flag to block duplicates 
+                            if (!core.doc.addonIdListRunInThisDoc.Contains(addon.id)) {
+                                core.doc.addonIdListRunInThisDoc.Add(addon.id);
+                                core.html.addTitle(addon.PageTitle, AddedByName);
+                                core.html.addMetaDescription(addon.MetaDescription, AddedByName);
+                                core.html.addMetaKeywordList(addon.MetaKeywordList, AddedByName);
+                                core.html.addHeadTag(addon.OtherHeadTags, AddedByName);
+                                ////
+                                //// -- js body links
+                                //if (addon.JSBodyScriptSrc != "") {
+                                //    core.html.addScriptLink_Body(addon.JSBodyScriptSrc, AddedByName + " Javascript Body Src");
+                                //}
+                                ////
+                                //// -- js body code
+                                //core.html.addScriptCode_body(addon.JavaScriptBodyEnd, AddedByName + " Javascript Body Code");
+                                //
+                                // -- styles
+                                if (addon.StylesFilename.filename != "") {
+                                    core.html.addStyleLink(genericController.getCdnFileLink(core, addon.StylesFilename.filename), addon.name + " Stylesheet");
+                                }
+                                //
+                                // -- link to stylesheet
+                                if (addon.StylesLinkHref != "") {
+                                    core.html.addStyleLink(addon.StylesLinkHref, addon.name + " Stylesheet Link");
+                                }
+                            }
+                            //
+                            // -- Add Css containers
+                            if (!string.IsNullOrEmpty(ContainerCssID) | !string.IsNullOrEmpty(ContainerCssClass)) {
+                                if (addon.IsInline) {
+                                    result = "\r<span id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
+                                } else {
+                                    result = "\r<div id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\">" + nop(result) + "\r</div>";
+                                }
+                            }
+                        }
+                        //
+                        //   Add Wrappers to content
                         if (addon.InFrame && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
                             //
-                            // -- remote method called from inframe execution
-                            result = "TBD - remotemethod inframe";
-                            // Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
-                            //If True Then
-                            //    Call core.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, addon.id.ToString)
-                            //    Call core.doc.addRefreshQueryString("optionstring", WorkingOptionString)
-                            //End If
-                        } else if (addon.AsAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
+                            // -- iFrame content, framed in content, during the remote method call, add in the rest of the html page
+                            core.doc.setMetaContent(0, 0);
+                            result = ""
+                                + core.siteProperties.docTypeDeclaration + "\r\n<html>"
+                                + "\r\n<head>"
+                                + core.html.getHtmlHead()
+                                + "\r\n</head>"
+                                + "\r\n" + TemplateDefaultBodyTag
+                                + "\r\n</body>"
+                                + "\r\n</html>";
+                        } else if (addon.AsAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
                             //
-                            // -- remotemethod called from asajax execution
-                            result = "TBD - remotemethod ajax";
+                            // -- as ajax content, AsAjax addon, during the Ajax callback, need to create an onload event that runs everything appended to onload within this content
+                        } else if ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) || (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
                             //
-                            // Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
-                            // restore form values
+                            // -- non-ajax/non-Iframe remote method content (no wrapper)
+                        } else if (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextEmail) {
                             //
-                            //If True Then
-                            //    QS = core.docProperties.getText("Hostform")
-                            //    If QS <> "" Then
-                            //        Call core.docProperties.addQueryString(QS)
-                            //    End If
-                            //    '
-                            //    ' restore refresh querystring values
-                            //    '
-                            //    QS = core.docProperties.getText("HostRQS")
-                            //    QSSplit = Split(QS, "&")
-                            //    For Ptr = 0 To UBound(QSSplit)
-                            //        NVPair = QSSplit[Ptr]
-                            //        If NVPair <> "" Then
-                            //            NVSplit = Split(NVPair, "=")
-                            //            If UBound(NVSplit) > 0 Then
-                            //                Call core.doc.addRefreshQueryString(NVSplit(0), NVSplit(1))
-                            //            End If
-                            //        End If
-                            //    Next
-                            //    '
-                            //    ' restore query string
-                            //    '
-                            //    QS = core.docProperties.getText("HostQS")
-                            //    Call core.docProperties.addQueryString(QS)
-                            //    '
-                            //    ' Clear the style,js and meta features that were delivered to the host page
-                            //    ' After processing, if these strings are not empty, they must have been added by the DLL
-                            //    '
-                            //    '
-                            //    JSOnLoad = ""
-                            //    JSBodyEnd = ""
-                            //    PageTitle = ""
-                            //    MetaDescription = ""
-                            //    MetaKeywordList = ""
-                            //    OtherHeadTags = ""
-                            //    addon.StylesFilename.filename = ""
-                            //    '  CustomStylesFilename = ""
-                            //End If
-                        }
-                        //
-                        //-----------------------------------------------------------------
-                        // Do replacements from Option String and Pick out WrapperID, and AsAjax
-                        //-----------------------------------------------------------------
-                        //
-                        string testString = (addon.Copy + addon.CopyText + addon.PageTitle + addon.MetaDescription + addon.MetaKeywordList + addon.OtherHeadTags + addon.FormXML).ToLower();
-                        if (!string.IsNullOrWhiteSpace(testString)) {
-                            foreach (var key in core.docProperties.getKeyList()) {
-                                if (testString.Contains(("$" + key + "$").ToLower())) {
-                                    string ReplaceSource = "$" + key + "$";
-                                    string ReplaceValue = core.docProperties.getText(key);
-                                    addon.Copy = addon.Copy.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                    addon.CopyText = addon.CopyText.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                    addon.PageTitle = addon.PageTitle.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                    addon.MetaDescription = addon.MetaDescription.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                    addon.MetaKeywordList = addon.MetaKeywordList.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                    addon.OtherHeadTags = addon.OtherHeadTags.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                    addon.FormXML = addon.FormXML.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                }
-                            }
-                        }
-                        //
-                        // -- text components
-                        result += addon.CopyText + addon.Copy;
-                        if (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) {
+                            // -- return Email context (no wrappers)
+                        } else if (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextSimple) {
                             //
-                            // not editor, encode the content parts of the addon
+                            // -- add-on called by another add-on, subroutine style (no wrappers)
+                        } else {
                             //
-                            result = addon.CopyText + addon.Copy;
-                            switch (executeContext.addonType) {
-                                case CPUtilsBaseClass.addonContext.ContextEditor:
-                                    result = activeContentController.renderHtmlForWysiwygEditor(core, result);
-                                    break;
-                                case CPUtilsBaseClass.addonContext.ContextEmail:
-                                    result = activeContentController.renderHtmlForEmail(core, result, executeContext.personalizationPeopleId, "");
-                                    break;
-                                case CPUtilsBaseClass.addonContext.ContextFilter:
-                                case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
-                                case CPUtilsBaseClass.addonContext.ContextOnBodyStart:
-                                //case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
-                                case CPUtilsBaseClass.addonContext.ContextOnPageEnd:
-                                case CPUtilsBaseClass.addonContext.ContextOnPageStart:
-                                case CPUtilsBaseClass.addonContext.ContextPage:
-                                case CPUtilsBaseClass.addonContext.ContextTemplate:
-                                case CPUtilsBaseClass.addonContext.ContextAdmin:
-                                case CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml:
-                                    //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
-                                    result = activeContentController.renderHtmlForWeb(core, result, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
-                                    break;
-                                case CPUtilsBaseClass.addonContext.ContextOnContentChange:
-                                case CPUtilsBaseClass.addonContext.ContextSimple:
-                                    //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
-                                    result = activeContentController.renderHtmlForWeb(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
-                                    break;
-                                case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
-                                    //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
-                                    result = activeContentController.renderJSONForRemoteMethod(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
-                                    break;
-                                default:
-                                    //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
-                                    result = activeContentController.renderHtmlForWeb(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
-                                    break;
-                            }
-                        }
-                        //
-                        // -- Scripting code
-                        if (addon.ScriptingCode != "") {
-                            //
-                            // Get Language
-                            string ScriptingLanguage = "";
-                            if (addon.ScriptingLanguageID != 0) {
-                                ScriptingLanguage = core.db.getRecordName("Scripting Languages", addon.ScriptingLanguageID);
-                            }
-                            if (string.IsNullOrEmpty(ScriptingLanguage)) {
-                                ScriptingLanguage = "VBScript";
-                            }
-                            try {
-                                result += execute_Script(ref addon, ScriptingLanguage, addon.ScriptingCode, addon.ScriptingEntryPoint, encodeInteger(addon.ScriptingTimeout), "Addon [" + addon.name + "]");
-                            } catch (Exception ex) {
-                                string addonDescription = getAddonDescription(core, addon);
-                                throw new ApplicationException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
-                            }
-                        }
-                        //
-                        // -- DotNet
-                        if (addon.DotNetClass != "") {
-                            result += execute_assembly( executeContext, addon, AddonCollectionModel.create(core, addon.CollectionID));
-                        }
-                        //
-                        // -- RemoteAssetLink
-                        if (addon.RemoteAssetLink != "") {
-                            string RemoteAssetLink = addon.RemoteAssetLink;
-                            if (RemoteAssetLink.IndexOf("://") < 0) {
-                                //
-                                // use request object to build link
-                                if (RemoteAssetLink.Left( 1) == "/") {
-                                    RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + RemoteAssetLink;
-                                } else {
-                                    RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + core.webServer.requestVirtualFilePath + RemoteAssetLink;
-                                }
-                            }
-                            int PosStart = 0;
-                            httpRequestController kmaHTTP = new httpRequestController();
-                            string RemoteAssetContent = kmaHTTP.getURL(ref RemoteAssetLink);
-                            int Pos = genericController.vbInstr(1, RemoteAssetContent, "<body", 1);
-                            if (Pos > 0) {
-                                Pos = genericController.vbInstr(Pos, RemoteAssetContent, ">");
-                                if (Pos > 0) {
-                                    PosStart = Pos + 1;
-                                    Pos = genericController.vbInstr(Pos, RemoteAssetContent, "</body", 1);
-                                    if (Pos > 0) {
-                                        RemoteAssetContent = RemoteAssetContent.Substring(PosStart - 1, Pos - PosStart);
+                            // -- Return all other types, Enable Edit Wrapper for Page Content edit mode
+                            bool IncludeEditWrapper = (!addon.BlockEditTools) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) & (!executeContext.isIncludeAddon);
+                            if (IncludeEditWrapper) {
+                                IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || core.session.isEditing(executeContext.hostRecord.contentName)));
+                                if (IncludeEditWrapper) {
+                                    //
+                                    // Edit Icon
+                                    string EditWrapperHTMLID = "eWrapper" + core.doc.addonInstanceCnt;
+                                    string DialogList = "";
+                                    string HelpIcon = getHelpBubble(addon.id, addon.Help, addon.CollectionID, ref DialogList);
+                                    if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
+                                        string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
+                                        string AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
+                                        AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + cdefModel.getContentId(core, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
+                                        string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
+                                        string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
+                                        string SiteStylesEditIcon = ""; // ?????
+                                        string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
+                                        ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
+                                        result = core.html.getEditWrapper("<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
+                                    } else if (core.visitProperty.getBoolean("AllowEditing")) {
+                                        result = core.html.getEditWrapper("<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
                                     }
                                 }
                             }
-                            result += RemoteAssetContent;
-                        }
-                        //
-                        // --  FormXML
-                        if (addon.FormXML != "") {
-                            bool ExitAddonWithBlankResponse = false;
-                            result += execute_formContent(null, addon.FormXML, ref ExitAddonWithBlankResponse);
-                            if (ExitAddonWithBlankResponse) {
-                                return string.Empty;
-                            }
-                        }
-                        //
-                        // -- Script Callback
-                        if (addon.Link != "") {
-                            string callBackLink = encodeVirtualPath(addon.Link, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
-                            foreach (var key in core.docProperties.getKeyList()) {
-                                callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(key), encodeRequestVariable(core.docProperties.getText(key)), true);
-                            }
-                            foreach (var kvp in executeContext.instanceArguments) {
-                                callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(kvp.Key), encodeRequestVariable(core.docProperties.getText(kvp.Value)), true);
-                            }
-                            result += "<SCRIPT LANGUAGE=\"JAVASCRIPT\" SRC=\"" + callBackLink + "\"></SCRIPT>";
-                        }
-                        string AddedByName = addon.name + " addon";
-                        //
-                        // -- js head links
-                        if (addon.JSHeadScriptSrc != "") {
-                            core.html.addScriptLinkSrc(addon.JSHeadScriptSrc, AddedByName + " Javascript Head Src", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
-                        }
-                        //
-                        // -- js head code
-                        if (addon.JSFilename.filename != "") {
-                            string scriptFilename = genericController.getCdnFileLink(core, addon.JSFilename.filename);
-                            //string scriptFilename = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, addon.JSFilename.filename);
-                            core.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead),addon.id);
-                        }
-                        //
-                        // -- non-js html assets (styles,head tags), set flag to block duplicates 
-                        if (!core.doc.addonIdListRunInThisDoc.Contains(addon.id)) {
-                            core.doc.addonIdListRunInThisDoc.Add(addon.id);
-                            core.html.addTitle(addon.PageTitle, AddedByName);
-                            core.html.addMetaDescription(addon.MetaDescription, AddedByName);
-                            core.html.addMetaKeywordList(addon.MetaKeywordList, AddedByName);
-                            core.html.addHeadTag(addon.OtherHeadTags, AddedByName);
-                            ////
-                            //// -- js body links
-                            //if (addon.JSBodyScriptSrc != "") {
-                            //    core.html.addScriptLink_Body(addon.JSBodyScriptSrc, AddedByName + " Javascript Body Src");
-                            //}
-                            ////
-                            //// -- js body code
-                            //core.html.addScriptCode_body(addon.JavaScriptBodyEnd, AddedByName + " Javascript Body Code");
                             //
-                            // -- styles
-                            if (addon.StylesFilename.filename != "") {
-                                core.html.addStyleLink(genericController.getCdnFileLink(core, addon.StylesFilename.filename), addon.name + " Stylesheet");
-                            }
-                            //
-                            // -- link to stylesheet
-                            if (addon.StylesLinkHref != "") {
-                                core.html.addStyleLink(addon.StylesLinkHref, addon.name + " Stylesheet Link");
-                            }
-                        }
-                        //
-                        // -- Add Css containers
-                        if (!string.IsNullOrEmpty(ContainerCssID) | !string.IsNullOrEmpty(ContainerCssClass)) {
-                            if (addon.IsInline) {
-                                result = "\r<span id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
-                            } else {
-                                result = "\r<div id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\">" + nop(result) + "\r</div>";
-                            }
-                        }
-                    }
-                    //
-                    //   Add Wrappers to content
-                    if (addon.InFrame && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
-                        //
-                        // -- iFrame content, framed in content, during the remote method call, add in the rest of the html page
-                        core.doc.setMetaContent(0, 0);
-                        result = ""
-                            + core.siteProperties.docTypeDeclaration + "\r\n<html>"
-                            + "\r\n<head>"
-                            + core.html.getHtmlHead() 
-                            + "\r\n</head>"
-                            + "\r\n" + TemplateDefaultBodyTag 
-                            + "\r\n</body>"
-                            + "\r\n</html>";
-                    } else if (addon.AsAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
-                        //
-                        // -- as ajax content, AsAjax addon, during the Ajax callback, need to create an onload event that runs everything appended to onload within this content
-                    } else if ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) || (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
-                        //
-                        // -- non-ajax/non-Iframe remote method content (no wrapper)
-                    } else if (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextEmail) {
-                        //
-                        // -- return Email context (no wrappers)
-                    } else if (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextSimple) {
-                        //
-                        // -- add-on called by another add-on, subroutine style (no wrappers)
-                    } else {
-                        //
-                        // -- Return all other types, Enable Edit Wrapper for Page Content edit mode
-                        bool IncludeEditWrapper = (!addon.BlockEditTools) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) & (!executeContext.isIncludeAddon);
-                        if (IncludeEditWrapper) {
-                            IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || core.session.isEditing(executeContext.hostRecord.contentName)));
-                            if (IncludeEditWrapper) {
-                                //
-                                // Edit Icon
-                                string EditWrapperHTMLID = "eWrapper" + core.doc.addonInstanceCnt;
-                                string DialogList = "";
-                                string HelpIcon = getHelpBubble(addon.id, addon.Help, addon.CollectionID, ref DialogList);
-                                if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
-                                    string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
-                                    string AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
-                                    AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + cdefModel.getContentId(core, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
-                                    string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
-                                    string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
-                                    string SiteStylesEditIcon = ""; // ?????
-                                    string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
-                                    ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
-                                    result = core.html.getEditWrapper("<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
-                                } else if (core.visitProperty.getBoolean("AllowEditing")) {
-                                    result = core.html.getEditWrapper("<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
+                            // -- Add Comment wrapper, to help debugging except email, remote methods and admin (empty is used to detect no result)
+                            if (true && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextAdmin) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple)) {
+                                if (core.visitProperty.getBoolean("AllowDebugging")) {
+                                    string AddonCommentName = genericController.vbReplace(addon.name, "-->", "..>");
+                                    if (addon.IsInline) {
+                                        result = "<!-- Add-on " + AddonCommentName + " -->" + result + "<!-- /Add-on " + AddonCommentName + " -->";
+                                    } else {
+                                        result = "\r<!-- Add-on " + AddonCommentName + " -->" + nop(result) + "\r<!-- /Add-on " + AddonCommentName + " -->";
+                                    }
                                 }
                             }
-                        }
-                        //
-                        // -- Add Comment wrapper, to help debugging except email, remote methods and admin (empty is used to detect no result)
-                        if (true && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextAdmin) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple)) {
-                            if (core.visitProperty.getBoolean("AllowDebugging")) {
-                                string AddonCommentName = genericController.vbReplace(addon.name, "-->", "..>");
-                                if (addon.IsInline) {
-                                    result = "<!-- Add-on " + AddonCommentName + " -->" + result + "<!-- /Add-on " + AddonCommentName + " -->";
-                                } else {
-                                    result = "\r<!-- Add-on " + AddonCommentName + " -->" + nop(result) + "\r<!-- /Add-on " + AddonCommentName + " -->";
-                                }
+                            //
+                            // -- Add Design Wrapper
+                            if ((!string.IsNullOrEmpty(result)) & (!addon.IsInline) && (executeContext.wrapperID > 0)) {
+                                result = addWrapperToResult(result, executeContext.wrapperID, "for Add-on " + addon.name);
                             }
-                        }
-                        //
-                        // -- Add Design Wrapper
-                        if ((!string.IsNullOrEmpty(result)) & (!addon.IsInline) && (executeContext.wrapperID > 0)) {
-                            result = addWrapperToResult(result, executeContext.wrapperID, "for Add-on " + addon.name);
+                            // -- restore the parent's instanceId
+                            core.docProperties.setProperty("instanceId", parentInstanceId);
                         }
                     }
+                } catch (Exception ex) {
+                    logController.handleError(core, ex);
+                } finally {
                     //
                     // -- this completes the execute of this core.addon. remove it from the 'running' list
-                    // -- restore the parent's instanceId
-                    core.docProperties.setProperty("instanceId", parentInstanceId);
                     core.doc.addonsCurrentlyRunningIdList.Remove(addon.id);
                     core.doc.addonInstanceCnt = core.doc.addonInstanceCnt + 1;
-                    //
-                    // -- pop modelstack and test point message
-                    core.doc.addonModelStack.Pop();
-                    debugController.testPoint(core, "execute exit (" + (core.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
-                }
-            } catch (Exception ex) {
-                logController.handleError( core,ex);
-            } finally {
-                if (addon != null) {
                     //
                     // -- restore the forceJavascriptToHead value of the caller
                     executeContext.forceJavascriptToHead = save_forceJavascriptToHead;
                     //
                     // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
                     if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
+                        debugController.testPoint(core, "root level addon is html, build document around result");
                         result = core.html.getHtmlDoc(result, "<body>");
                         if (!core.doc.visitPropertyAllowDebugging) {
                             result = NUglify.Uglify.Html(result).Code;
                         }
                     }
+                    //
+                    // -- pop modelstack and test point message
+                    core.doc.addonModelStack.Pop();
+                    debugController.testPoint(core, "execute exit (" + (core.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                 }
             }
             return result;
@@ -623,7 +653,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="FormXML"></param>
         /// <param name="return_ExitAddonBlankWithResponse"></param>
         /// <returns></returns>
-        private string execute_formContent(object nothingObject, string FormXML, ref bool return_ExitAddonBlankWithResponse) {
+        private string execute_formContent(object nothingObject, string FormXML, ref bool return_ExitAddonBlankWithResponse, string contextErrorMessage) {
             string result = "";
             try {
                 //
@@ -941,7 +971,8 @@ namespace Contensive.Core.Controllers {
                                                                 addonModel addon = addonModel.createByName(core, FieldAddon);
                                                                 Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                                                                     addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
-                                                                    instanceArguments = arguments
+                                                                    instanceArguments = arguments,
+                                                                    errorContextMessage = "executing field addon [" + FieldAddon + "] for " + contextErrorMessage
                                                                 });
                                                                 //Copy = execute_legacy5(0, FieldAddon, OptionString, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
                                                             } else if (!string.IsNullOrEmpty(FieldSelector)) {
@@ -959,7 +990,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputText( core,FieldName, FieldValue);
+                                                                            Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "boolean":
@@ -975,7 +1006,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputText( core,FieldName, FieldValue);
+                                                                            Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "date":
@@ -1015,7 +1046,7 @@ namespace Contensive.Core.Controllers {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
                                                                                 FieldValue = String.Format("C", FieldValue);
                                                                             }
-                                                                            Copy = htmlController.inputText( core,FieldName, FieldValue);
+                                                                            Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "textfile":
@@ -1027,7 +1058,7 @@ namespace Contensive.Core.Controllers {
                                                                             if (FieldHTML) {
                                                                                 Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = htmlController.inputTextarea( core,FieldName, FieldValue, 5);
+                                                                                Copy = htmlController.inputTextarea(core, FieldName, FieldValue, 5);
                                                                             }
                                                                         }
                                                                         break;
@@ -1036,7 +1067,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputTextarea( core,FieldName, FieldValue, 5);
+                                                                            Copy = htmlController.inputTextarea(core, FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "xmlfile":
@@ -1044,7 +1075,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputTextarea( core,FieldName, FieldValue, 5);
+                                                                            Copy = htmlController.inputTextarea(core, FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "link":
@@ -1052,7 +1083,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputText( core,FieldName, FieldValue);
+                                                                            Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     default:
@@ -1066,13 +1097,13 @@ namespace Contensive.Core.Controllers {
                                                                             if (FieldHTML) {
                                                                                 Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = htmlController.inputText( core,FieldName, FieldValue);
+                                                                                Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                                             }
                                                                         }
                                                                         break;
                                                                 }
                                                             }
-                                                            TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "copycontent":
@@ -1119,9 +1150,9 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // Text edit
                                                                 //
-                                                                Copy = htmlController.inputTextarea( core,FieldName, FieldValue);
+                                                                Copy = htmlController.inputTextarea(core, FieldName, FieldValue);
                                                             }
-                                                            TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "filecontent":
@@ -1142,10 +1173,10 @@ namespace Contensive.Core.Controllers {
                                                                 Copy = core.cdnFiles.readFileText(fieldfilename);
                                                             }
                                                             if (!FieldReadOnly) {
-                                                                Copy = htmlController.inputTextarea( core,FieldName, Copy, 10);
+                                                                Copy = htmlController.inputTextarea(core, FieldName, Copy, 10);
                                                             }
                                                         }
-                                                        TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                     case "dbquery":
                                                     case "querydb":
@@ -1172,7 +1203,7 @@ namespace Contensive.Core.Controllers {
                                                                 dt = core.db.executeQuery(FieldSQL, FieldDataSource, 0, SQLPageSize);
                                                                 //RS = app.csv_ExecuteSQLCommand(FieldDataSource, FieldSQL, 30, SQLPageSize, 1)
 
-                                                            } catch (Exception) {                                                                
+                                                            } catch (Exception) {
                                                                 ErrorNumber = 0;
                                                                 loadOK = false;
                                                             }
@@ -1205,13 +1236,13 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 if (dt.Rows.Count > 0) {
                                                                     if (dt.Rows.Count == 1 && dt.Columns.Count == 1) {
-                                                                        Copy = htmlController.inputText( core,"result", genericController.encodeText(something[0, 0]), 0, 0, "", false, true);
+                                                                        Copy = htmlController.inputText(core, "result", genericController.encodeText(something[0, 0]), 0, 0, "", false, true);
                                                                     } else {
                                                                         foreach (DataRow dr in dt.Rows) {
                                                                             //
                                                                             // Build headers
                                                                             //
-                                                                            FieldCount =  dr.ItemArray.Length;
+                                                                            FieldCount = dr.ItemArray.Length;
                                                                             Copy += ("\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;\">");
                                                                             Copy += ("\r\t<tr>");
                                                                             foreach (DataColumn dc in dr.ItemArray) {
@@ -1267,7 +1298,7 @@ namespace Contensive.Core.Controllers {
                                                         break;
                                                 }
                                             }
-                                            Copy = adminUIController.GetEditPanel(core,true, TabHeading, TabDescription, adminUIController.EditTableOpen + TabCell.Text + adminUIController.EditTableClose);
+                                            Copy = adminUIController.GetEditPanel(core, true, TabHeading, TabDescription, adminUIController.EditTableOpen + TabCell.Text + adminUIController.EditTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 core.doc.menuLiveTab.AddEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
@@ -1297,11 +1328,11 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 //
-                result = adminUIController.GetBody(core,Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
+                result = adminUIController.GetBody(core, Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
 
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -1336,7 +1367,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // List of Options, might be select, radio or checkbox
                     //
-                    LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Left( Pos - 1));
+                    LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Left(Pos - 1));
                     int PosEqual = genericController.vbInstr(1, LCaseOptionDefault, "=");
 
                     if (PosEqual > 0) {
@@ -1350,7 +1381,7 @@ namespace Contensive.Core.Controllers {
                         if (Pos < ExpandedSelector.Length) {
                             OptionSuffix = genericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
                         }
-                        ExpandedSelector = ExpandedSelector.Left( Pos - 1);
+                        ExpandedSelector = ExpandedSelector.Left(Pos - 1);
                     }
                     OptionValues = ExpandedSelector.Split('|');
                     result = "";
@@ -1363,7 +1394,7 @@ namespace Contensive.Core.Controllers {
                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
                                 OptionCaption = OptionValue;
                             } else {
-                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left( Pos - 1));
+                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
                             }
                             switch (OptionSuffix) {
@@ -1425,12 +1456,12 @@ namespace Contensive.Core.Controllers {
                     //
 
                     selector = genericController.decodeNvaArgument(selector);
-                    result = htmlController.inputText( core,SitePropertyName, selector, 1, 20);
+                    result = htmlController.inputText(core, SitePropertyName, selector, 1, 20);
                 }
 
                 FastString = null;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -1460,9 +1491,9 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(EntryPoint)) {
                     //
                     // -- compatibility mode, if no entry point given, if the code starts with "function myFuncton()" and add "call myFunction()"
-                    int pos = WorkingCode.IndexOf("function",StringComparison.CurrentCultureIgnoreCase);
+                    int pos = WorkingCode.IndexOf("function", StringComparison.CurrentCultureIgnoreCase);
                     if (pos >= 0) {
-                        EntryPoint = WorkingCode.Substring(pos + 8);
+                        EntryPoint = WorkingCode.Substring(pos + 9);
                         pos = EntryPoint.IndexOf("\r");
                         if (pos > 0) {
                             EntryPoint = EntryPoint.Substring(0, pos);
@@ -1475,7 +1506,8 @@ namespace Contensive.Core.Controllers {
                         if (pos > 0) {
                             EntryPoint = EntryPoint.Substring(0, pos);
                         }
-                        logController.logWarn(core, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + EntryPoint + "].");
+                        // normal behavior, if no entry it provided, go to the first function main()
+                        //logController.logWarn(core, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + EntryPoint + "].");
                         //WorkingCode = EntryPoint + "\n" + WorkingCode;
                     }
                 } else {
@@ -1560,7 +1592,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
                 throw;
             }
             return returnText;
@@ -1587,7 +1619,7 @@ namespace Contensive.Core.Controllers {
                     // -- application path (background from program files, forground from appRoot)
                     // -- purpose is to allow add-ons to be included in the website's (wwwRoot) assembly. So a website's custom addons are within the wwwRoot build, not separate
                     string appPath = "";
-                    if ( executeContext.backgroundProcess ) {
+                    if (executeContext.backgroundProcess) {
                         //
                         // -- background - program files installation folder
                         appPath = core.programFiles.localAbsRootPath;
@@ -1609,7 +1641,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- try addon folder
                         // -- purpose is to have a repository where addons can be stored for now web and non-web apps, and allow permissions to be installed with online upload
-                        if ( addonCollection == null ) {
+                        if (addonCollection == null) {
                             throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the addon has no collection set.");
                         } else if (string.IsNullOrEmpty(addonCollection.ccguid)) {
                             throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the addon collection [" + addonCollection.name + "] has no guid.");
@@ -1632,7 +1664,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
                 throw;
             }
             return result;
@@ -1770,7 +1802,7 @@ namespace Contensive.Core.Controllers {
                                                     // Error in the addon
                                                     //
                                                     string detailedErrorMessage = "There was an error in the addon [" + AddonDisplayName + "]. It could not be executed because there was an error in the addon assembly [" + TestFilePathname + "], in class [" + addonType.FullName.Trim().ToLower() + "]. The error was [" + Ex.ToString() + "]";
-                                                    logController.handleError( core,Ex, detailedErrorMessage);
+                                                    logController.handleError(core, Ex, detailedErrorMessage);
                                                     //Throw New ApplicationException(detailedErrorMessage)
                                                 }
                                             } catch (Exception Ex) {
@@ -1813,7 +1845,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 core.assemblySkipList.Add(TestFilePathname);
                                 string detailedErrorMessage = "A non-load exception occured while loading the addon [" + AddonDisplayName + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "].";
-                                logController.handleError( core,new ApplicationException(detailedErrorMessage));
+                                logController.handleError(core, new ApplicationException(detailedErrorMessage));
                             }
                         }
                     }
@@ -1821,7 +1853,7 @@ namespace Contensive.Core.Controllers {
             } catch (Exception ex) {
                 //
                 // -- this exception should interrupt the caller
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
                 throw;
             }
             return returnValue;
@@ -1866,10 +1898,10 @@ namespace Contensive.Core.Controllers {
                     cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString);
                     taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
-                    logController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]" );
+                    logController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -1960,7 +1992,7 @@ namespace Contensive.Core.Controllers {
                                     if (Pos < OptionName.Length) {
                                         OptionSelector = (OptionName.Substring(Pos)).Trim(' ');
                                     }
-                                    OptionName = (OptionName.Left( Pos - 1)).Trim(' ');
+                                    OptionName = (OptionName.Left(Pos - 1)).Trim(' ');
                                 }
                                 OptionName = genericController.decodeNvaArgument(OptionName);
                                 Pos = genericController.vbInstr(1, OptionSelector, "[");
@@ -1968,7 +2000,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // List of Options, might be select, radio, checkbox, resourcelink
                                     //
-                                    OptionDefault = OptionSelector.Left( Pos - 1);
+                                    OptionDefault = OptionSelector.Left(Pos - 1);
                                     OptionDefault = genericController.decodeNvaArgument(OptionDefault);
                                     LCaseOptionDefault = genericController.vbLCase(OptionDefault);
                                     //LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault)
@@ -1979,7 +2011,7 @@ namespace Contensive.Core.Controllers {
                                         if (Pos < OptionSelector.Length) {
                                             OptionSuffix = genericController.vbLCase((OptionSelector.Substring(Pos)).Trim(' '));
                                         }
-                                        OptionSelector = OptionSelector.Left( Pos - 1);
+                                        OptionSelector = OptionSelector.Left(Pos - 1);
                                     }
                                     OptionValues = OptionSelector.Split('|');
                                     FormInput = "";
@@ -1992,7 +2024,7 @@ namespace Contensive.Core.Controllers {
                                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
                                                 OptionCaption = OptionValue;
                                             } else {
-                                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left( Pos - 1));
+                                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
                                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
                                             }
                                             switch (OptionSuffix) {
@@ -2059,7 +2091,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             OptionDefault = genericController.decodeNvaArgument(OptionDefault);
                                             FormInput = ""
-                                                + htmlController.inputText( core,OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+                                                + htmlController.inputText(core, OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
                                             //EditorString = core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
                                             break;
                                         case "checkbox":
@@ -2085,7 +2117,7 @@ namespace Contensive.Core.Controllers {
                                     //
 
                                     OptionSelector = genericController.decodeNvaArgument(OptionSelector);
-                                    FormInput = htmlController.inputText( core,OptionName, OptionSelector, 1, 20);
+                                    FormInput = htmlController.inputText(core, OptionName, OptionSelector, 1, 20);
                                 }
                                 CopyContent = CopyContent + "<tr>"
                                     + "<td class=\"bbLeft\">" + OptionName + "</td>"
@@ -2114,7 +2146,7 @@ namespace Contensive.Core.Controllers {
                             + GetIconSprite("", 0, "/ccLib/images/toolsettings.png", 22, 22, "Edit options used just for this instance of the " + AddonName + " Add-on", "Edit options used just for this instance of the " + AddonName + " Add-on", "", true, "") + "</a>"
                             + ""
                             + "";
-                        core.doc.helpCodes.Add( new docController.helpStuff() {
+                        core.doc.helpCodes.Add(new docController.helpStuff() {
                             caption = AddonName,
                             code = LocalCode
                         });
@@ -2127,7 +2159,7 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempgetInstanceBubble;
             } catch (Exception ex) {
-                logController.handleError( core, ex );
+                logController.handleError(core, ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetInstanceBubble")
@@ -2164,7 +2196,7 @@ namespace Contensive.Core.Controllers {
                             + ""
                             + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                             + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccContentCon ccAdminSmall\">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</td></tr>"
-                            + "<tr><td style=\"padding-bottom:5px;\" class=\"ccContentCon ccAdminSmall\"><b>Custom Stylesheet</b>" + htmlController.inputTextarea( core,"CustomStyles", addon.StylesFilename.content, 10) + "</td></tr>";
+                            + "<tr><td style=\"padding-bottom:5px;\" class=\"ccContentCon ccAdminSmall\"><b>Custom Stylesheet</b>" + htmlController.inputTextarea(core, "CustomStyles", addon.StylesFilename.content, 10) + "</td></tr>";
                         //If DefaultStylesheet = "" Then
                         //    CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>There are no default styles for this add-on.</td></tr>"
                         //Else
@@ -2200,7 +2232,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -2290,7 +2322,7 @@ namespace Contensive.Core.Controllers {
             string tempgetHTMLViewerBubble = null;
             try {
                 //
-               string QueryString = null;
+                string QueryString = null;
                 string LocalCode = "";
                 string CopyHeader = "";
                 string CopyContent = null;
@@ -2315,7 +2347,7 @@ namespace Contensive.Core.Controllers {
                         CopyContent = ""
                             + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                             + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">This is the HTML produced by this add-on. Carrage returns and tabs have been added or modified to enhance readability.</td></tr>"
-                            + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + htmlController.inputTextarea( core,"DefaultStyles", "", 10, -1, HTMLViewerBubbleID + "_dst",false, false) + "</td></tr>"
+                            + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + htmlController.inputTextarea(core, "DefaultStyles", "", 10, -1, HTMLViewerBubbleID + "_dst", false, false) + "</td></tr>"
                             + "</tr>"
                             + "</table>"
                             + "";
@@ -2347,7 +2379,7 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempgetHTMLViewerBubble;
             } catch (Exception ex) {
-                logController.handleError( core, ex );
+                logController.handleError(core, ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
@@ -2531,7 +2563,7 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = encodeNumber(FieldValue).ToString();
-                                                                        FieldValue = String.Format("C", FieldValue); 
+                                                                        FieldValue = String.Format("C", FieldValue);
                                                                     }
                                                                     core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -2673,7 +2705,10 @@ namespace Contensive.Core.Controllers {
                                                                 Dictionary<string, string> arguments = new Dictionary<string, string>();
                                                                 arguments.Add("FieldName", FieldName);
                                                                 arguments.Add("FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue));
-                                                                CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin };
+                                                                CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                                                    addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
+                                                                    errorContextMessage = "executing editor addon [" + FieldAddon + "] for field [" + FieldName + "]"
+                                                                };
                                                                 addonModel addon = addonModel.createByName(core, FieldAddon);
                                                                 Copy = core.addon.execute(addon, executeContext);
                                                                 //Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(core.siteProperties.getText(FieldName, FieldDefaultValue))
@@ -2693,7 +2728,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputText( core,FieldName, FieldValue);
+                                                                            Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "boolean":
@@ -2709,14 +2744,14 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputText( core,FieldName, FieldValue);
+                                                                            Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "date":
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputDate( core,FieldName, encodeDate(FieldValue) );
+                                                                            Copy = htmlController.inputDate(core, FieldName, encodeDate(FieldValue));
                                                                         }
                                                                         break;
                                                                     case "file":
@@ -2733,7 +2768,7 @@ namespace Contensive.Core.Controllers {
                                                                                 EncodedLink = encodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
-                                                                                core.privateFiles.splitDosPathFilename(FieldValue,  ref FieldValuePath, ref FieldValuefilename);
+                                                                                core.privateFiles.splitDosPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
                                                                                 Copy = ""
                                                                                 + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
                                                                                 + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FieldName);
@@ -2749,7 +2784,7 @@ namespace Contensive.Core.Controllers {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
                                                                                 FieldValue = String.Format("C", FieldValue);
                                                                             }
-                                                                            Copy = htmlController.inputText( core,FieldName, FieldValue);
+                                                                            Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "textfile":
@@ -2761,7 +2796,7 @@ namespace Contensive.Core.Controllers {
                                                                             if (FieldHTML) {
                                                                                 Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = htmlController.inputTextarea( core,FieldName, FieldValue, 5);
+                                                                                Copy = htmlController.inputTextarea(core, FieldName, FieldValue, 5);
                                                                             }
                                                                         }
                                                                         break;
@@ -2770,7 +2805,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputTextarea( core,FieldName, FieldValue, 5);
+                                                                            Copy = htmlController.inputTextarea(core, FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "xmlfile":
@@ -2778,7 +2813,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputTextarea( core,FieldName, FieldValue, 5);
+                                                                            Copy = htmlController.inputTextarea(core, FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "link":
@@ -2786,7 +2821,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = htmlController.inputText( core,FieldName, FieldValue);
+                                                                            Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     default:
@@ -2799,13 +2834,13 @@ namespace Contensive.Core.Controllers {
                                                                             if (FieldHTML) {
                                                                                 Copy = core.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = htmlController.inputText( core,FieldName, FieldValue);
+                                                                                Copy = htmlController.inputText(core, FieldName, FieldValue);
                                                                             }
                                                                         }
                                                                         break;
                                                                 }
                                                             }
-                                                            TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "copycontent":
@@ -2822,7 +2857,7 @@ namespace Contensive.Core.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
-                                                            CS = core.db.csOpen("Copy Content", "Name=" + core.db.encodeSQLText(FieldName), "ID",true,0,false,false, "Copy");
+                                                            CS = core.db.csOpen("Copy Content", "Name=" + core.db.encodeSQLText(FieldName), "ID", true, 0, false, false, "Copy");
                                                             if (!core.db.csOk(CS)) {
                                                                 core.db.csClose(ref CS);
                                                                 CS = core.db.csInsertRecord("Copy Content");
@@ -2852,9 +2887,9 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // Text edit
                                                                 //
-                                                                Copy = htmlController.inputTextarea( core,FieldName, FieldValue);
+                                                                Copy = htmlController.inputTextarea(core, FieldName, FieldValue);
                                                             }
-                                                            TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                            TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
                                                         break;
                                                     case "filecontent":
@@ -2875,10 +2910,10 @@ namespace Contensive.Core.Controllers {
                                                                 Copy = core.cdnFiles.readFileText(fieldfilename);
                                                             }
                                                             if (!FieldReadOnly) {
-                                                                Copy = htmlController.inputTextarea( core,FieldName, Copy, 10);
+                                                                Copy = htmlController.inputTextarea(core, FieldName, Copy, 10);
                                                             }
                                                         }
-                                                        TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                     case "dbquery":
                                                     case "querydb":
@@ -2903,7 +2938,7 @@ namespace Contensive.Core.Controllers {
 
                                                         if (!string.IsNullOrEmpty(FieldSQL)) {
                                                             try {
-                                                                dt = core.db.executeQuery(FieldSQL, FieldDataSource,1, SQLPageSize);
+                                                                dt = core.db.executeQuery(FieldSQL, FieldDataSource, 1, SQLPageSize);
                                                             } catch (Exception ex) {
                                                                 ErrorDescription = ex.ToString();
                                                                 loadOK = false;
@@ -2944,7 +2979,7 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     // Single result, display with no table
                                                                     //
-                                                                    Copy = htmlController.inputText( core,"result", genericController.encodeText(dataArray[0, 0]),-1,-1,"",false, true);
+                                                                    Copy = htmlController.inputText(core, "result", genericController.encodeText(dataArray[0, 0]), -1, -1, "", false, true);
                                                                 } else {
                                                                     //
                                                                     // Build headers
@@ -2991,11 +3026,11 @@ namespace Contensive.Core.Controllers {
                                                                 }
                                                             }
                                                         }
-                                                        TabCell.Add(adminUIController.getEditRowLegacy(core,Copy, FieldCaption, FieldDescription, false, false, ""));
+                                                        TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         break;
                                                 }
                                             }
-                                            Copy = adminUIController.GetEditPanel(core,true, TabHeading, TabDescription, adminUIController.EditTableOpen + TabCell.Text + adminUIController.EditTableClose);
+                                            Copy = adminUIController.GetEditPanel(core, true, TabHeading, TabDescription, adminUIController.EditTableOpen + TabCell.Text + adminUIController.EditTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 core.doc.menuLiveTab.AddEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
@@ -3020,10 +3055,10 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 //
-                tempgetFormContent = adminUIController.GetBody(core,Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
+                tempgetFormContent = adminUIController.GetBody(core, Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -3059,7 +3094,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // List of Options, might be select, radio or checkbox
                     //
-                    LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Left( Pos - 1));
+                    LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Left(Pos - 1));
                     int PosEqual = genericController.vbInstr(1, LCaseOptionDefault, "=");
 
                     if (PosEqual > 0) {
@@ -3073,7 +3108,7 @@ namespace Contensive.Core.Controllers {
                         if (Pos < ExpandedSelector.Length) {
                             OptionSuffix = genericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
                         }
-                        ExpandedSelector = ExpandedSelector.Left( Pos - 1);
+                        ExpandedSelector = ExpandedSelector.Left(Pos - 1);
                     }
                     OptionValues = ExpandedSelector.Split('|');
                     tempgetFormContent_decodeSelector = "";
@@ -3086,7 +3121,7 @@ namespace Contensive.Core.Controllers {
                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
                                 OptionCaption = OptionValue;
                             } else {
-                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left( Pos - 1));
+                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
                             }
                             switch (OptionSuffix) {
@@ -3148,12 +3183,12 @@ namespace Contensive.Core.Controllers {
                     //
 
                     selector = genericController.decodeNvaArgument(selector);
-                    tempgetFormContent_decodeSelector = htmlController.inputText( core,SitePropertyName, selector, 1, 20);
+                    tempgetFormContent_decodeSelector = htmlController.inputText(core, SitePropertyName, selector, 1, 20);
                 }
 
                 FastString = null;
             } catch (Exception ex) {
-                logController.handleError( core, ex );
+                logController.handleError(core, ex);
             }
             return tempgetFormContent_decodeSelector;
         }
@@ -3215,11 +3250,11 @@ namespace Contensive.Core.Controllers {
                         Pos = genericController.vbInstr(1, ConstructorName, "=");
                         if (Pos > 1) {
                             ConstructorValue = ConstructorName.Substring(Pos);
-                            ConstructorName = (ConstructorName.Left( Pos - 1)).Trim(' ');
+                            ConstructorName = (ConstructorName.Left(Pos - 1)).Trim(' ');
                             Pos = genericController.vbInstr(1, ConstructorValue, "[");
                             if (Pos > 0) {
                                 ConstructorSelector = ConstructorValue.Substring(Pos - 1);
-                                ConstructorValue = ConstructorValue.Left( Pos - 1);
+                                ConstructorValue = ConstructorValue.Left(Pos - 1);
                             }
                         }
                         if (!string.IsNullOrEmpty(ConstructorName)) {
@@ -3295,7 +3330,7 @@ namespace Contensive.Core.Controllers {
                     addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor.Substring(2);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
             }
         }
         //
@@ -3346,7 +3381,7 @@ namespace Contensive.Core.Controllers {
                 //
                 s = Content;
                 SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString";
-                CS = core.db.csOpenRecord("Wrappers", WrapperID,false,false, SelectFieldList);
+                CS = core.db.csOpenRecord("Wrappers", WrapperID, false, false, SelectFieldList);
                 if (core.db.csOk(CS)) {
                     Wrapper = core.db.csGetText(CS, "copytext");
                     wrapperName = core.db.csGetText(CS, "name");
@@ -3368,7 +3403,7 @@ namespace Contensive.Core.Controllers {
                     Copy = core.db.csGetText(CS, "stylesfilename");
                     if (!string.IsNullOrEmpty(Copy)) {
                         if (genericController.vbInstr(1, Copy, "://") != 0) {
-                        } else if (Copy.Left( 1) == "/") {
+                        } else if (Copy.Left(1) == "/") {
                         } else {
                             Copy = genericController.getCdnFileLink(core, Copy);
                         }
@@ -3388,7 +3423,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                logController.handleError( core, ex );
+                logController.handleError(core, ex);
             }
             return s;
         }
@@ -3424,7 +3459,7 @@ namespace Contensive.Core.Controllers {
                     result = DefaultIfNotFound;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
             }
             return result;
         }
@@ -3453,7 +3488,7 @@ namespace Contensive.Core.Controllers {
             ArgumentList = genericController.vbReplace(ArgumentList, "\r\n", "\r");
             ArgumentList = genericController.vbReplace(ArgumentList, "\n", "\r");
             ArgumentList = genericController.vbReplace(ArgumentList, "\r", "\r\n");
-            if (ArgumentList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase)  == -1) {
+            if (ArgumentList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) == -1) {
                 //
                 // Add in default constructors, like wrapper
                 //
@@ -3491,7 +3526,7 @@ namespace Contensive.Core.Controllers {
                         if (Pos == 0) {
                             OptionName = NameValue;
                         } else {
-                            OptionName = NameValue.Left( Pos - 1);
+                            OptionName = NameValue.Left(Pos - 1);
                             OptionValue = NameValue.Substring(Pos);
                         }
                         OptionName = genericController.vbReplace(OptionName, "\r\n", "\\=");
@@ -3503,7 +3538,7 @@ namespace Contensive.Core.Controllers {
                         Pos = genericController.vbInstr(1, OptionValue, "[");
                         if (Pos != 0) {
                             OptionSelector = OptionValue.Substring(Pos - 1);
-                            OptionValue = OptionValue.Left( Pos - 1);
+                            OptionValue = OptionValue.Left(Pos - 1);
                         }
                         OptionValue = genericController.vbReplace(OptionValue, "\r\n", "\\[");
                         OptionSelector = genericController.vbReplace(OptionSelector, "\r\n", "\\[");
@@ -3568,12 +3603,12 @@ namespace Contensive.Core.Controllers {
                 for (Ptr = 0; Ptr <= Options.GetUpperBound(0); Ptr++) {
                     Pos = genericController.vbInstr(1, Options[Ptr], "=");
                     if (Pos > 0) {
-                        TestName = genericController.vbLCase((Options[Ptr].Left( Pos - 1)).Trim(' '));
-                        while ((!string.IsNullOrEmpty(TestName)) && (TestName.Left( 1) == "\t")) {
+                        TestName = genericController.vbLCase((Options[Ptr].Left(Pos - 1)).Trim(' '));
+                        while ((!string.IsNullOrEmpty(TestName)) && (TestName.Left(1) == "\t")) {
                             TestName = TestName.Substring(1).Trim(' ');
                         }
                         while ((!string.IsNullOrEmpty(TestName)) && (TestName.Substring(TestName.Length - 1) == "\t")) {
-                            TestName = (TestName.Left( TestName.Length - 1)).Trim(' ');
+                            TestName = (TestName.Left(TestName.Length - 1)).Trim(' ');
                         }
                         if (TestName == TargetName) {
                             result = genericController.decodeNvaArgument((Options[Ptr].Substring(Pos)).Trim(' '));
@@ -3611,15 +3646,18 @@ namespace Contensive.Core.Controllers {
                 bool AddonStatusOK = true;
                 try {
                     addonModel addon = addonModel.create(core, addonGuidAddonManager);
-                    if ( addon != null ){
-                        result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
+                    if (addon != null) {
+                        result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                            addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
+                            errorContextMessage = "calling addon manager guid for GetAddonManager method"
+                        });
                     }
                 } catch (Exception ex) {
-                    logController.handleError( core,new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
+                    logController.handleError(core, new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
                     AddonStatusOK = false;
                 }
                 if (string.IsNullOrEmpty(result)) {
-                    logController.handleError( core,new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
+                    logController.handleError(core, new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
                     AddonStatusOK = false;
                 }
                 if (!AddonStatusOK) {
@@ -3627,7 +3665,7 @@ namespace Contensive.Core.Controllers {
                     result = AddonMan.GetForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
                 throw;
             }
             return result;
@@ -3652,7 +3690,7 @@ namespace Contensive.Core.Controllers {
                     + " where ";
                 if (eventNameIdOrGuid.IsNumeric()) {
                     sql += "e.id=" + core.db.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
-                } else if ( genericController.isGuid(eventNameIdOrGuid)) {
+                } else if (genericController.isGuid(eventNameIdOrGuid)) {
                     sql += "e.ccGuid=" + core.db.encodeSQLText(eventNameIdOrGuid);
                 } else {
                     sql += "e.name=" + core.db.encodeSQLText(eventNameIdOrGuid);
@@ -3665,7 +3703,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // can not create an id
                         //
-                    } else if ( genericController.isGuid(eventNameIdOrGuid)) {
+                    } else if (genericController.isGuid(eventNameIdOrGuid)) {
                         //
                         // create event with Guid and id for name
                         //
@@ -3687,7 +3725,8 @@ namespace Contensive.Core.Controllers {
                         if (addonid != 0) {
                             var addon = addonModel.create(core, addonid);
                             returnString += core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
-                                 addonType = CPUtilsBaseClass.addonContext.ContextSimple,
+                                addonType = CPUtilsBaseClass.addonContext.ContextSimple,
+                                errorContextMessage = "calling handler addon id [" + addonid + "] for event [" + eventNameIdOrGuid + "]"
                             });
                         }
                         cs.goNext();
@@ -3696,7 +3735,7 @@ namespace Contensive.Core.Controllers {
                 cs.close();
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex );
+                logController.handleError(core, ex);
             }
             return returnString;
         }

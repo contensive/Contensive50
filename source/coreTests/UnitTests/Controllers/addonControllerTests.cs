@@ -29,7 +29,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                     backgroundProcess = false,
                     cssContainerClass = "",
                     cssContainerId = "",
-                    errorCaption = "",
+                    errorContextMessage = "",
                     forceHtmlDocument = false,
                     forceJavascriptToHead = false,
                     hostRecord = new BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext() {
@@ -70,7 +70,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                     backgroundProcess = false,
                     cssContainerClass = "",
                     cssContainerId = "",
-                    errorCaption = "",
+                    errorContextMessage = "",
                     forceHtmlDocument = false,
                     forceJavascriptToHead = false,
                     hostRecord = new BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext() {

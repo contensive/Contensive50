@@ -537,6 +537,9 @@ namespace Contensive.Core.Controllers {
                 debugController.testPoint(this, "executeRoute enter");
                 if (appConfig != null) {
                     //
+                    // -- test fix for 404 response during routing - could it be a response left over from processing before we are called
+                    webServer.setResponseStatus(iisController.httpResponseStatus200);
+                    //
                     // -- execute intercept methods first, like login, that run before the route that returns the page
                     // -- intercept routes should be addons alos
                     //
@@ -759,7 +762,10 @@ namespace Contensive.Core.Controllers {
                                         logController.handleError( this,new ApplicationException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
                                         return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -u )";
                                     } else {
-                                        return this.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
+                                        return this.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                                            addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
+                                            errorContextMessage = "calling admin route [" + addonGuidAdminSite + "] during execute route method"
+                                        });
                                     }
                                 }
                             case CPSiteBaseClass.routeTypeEnum.remoteMethod: {
@@ -780,7 +786,8 @@ namespace Contensive.Core.Controllers {
                                                 recordId = docProperties.getInteger("HostRecordID")
                                             },
                                             personalizationAuthenticated = session.isAuthenticated,
-                                            personalizationPeopleId = session.user.id
+                                            personalizationPeopleId = session.user.id,
+                                            errorContextMessage = "calling remote method addon [" + route.remoteMethodAddonId + "] during execute route method"
                                         };
                                         return this.addon.execute(addon, executeContext);
                                     }
@@ -848,7 +855,8 @@ namespace Contensive.Core.Controllers {
                                 recordId = 0
                             },
                             personalizationAuthenticated = session.visit.VisitAuthenticated,
-                            personalizationPeopleId = session.user.id
+                            personalizationPeopleId = session.user.id,
+                            errorContextMessage = "calling default route addon [" + defaultAddonId + "] during execute route method"
                         };
                         return this.addon.execute(Models.DbModels.addonModel.create(this, defaultAddonId), executeContext);
                     }

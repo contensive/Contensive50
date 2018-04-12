@@ -35,9 +35,10 @@ namespace Contensive.Core.Addons.Primitives {
                 core.doc.continueProcessing = false;
                 Dictionary<string, string> addonArguments = new Dictionary<string, string>();
                 addonArguments.Add("Force Default Login", "true");
-                return core.addon.execute(addonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
+                return core.addon.execute(addonGuidLoginPage, new CPUtilsBaseClass.addonExecuteContext() {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                    instanceArguments = addonArguments
+                    instanceArguments = addonArguments,
+                    errorContextMessage = "processing field editor preference remote"
                 });
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

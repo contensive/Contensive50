@@ -873,6 +873,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     addonArgDict.Add("cmdAccumulator", CmdAccumulator);
+                                    addonModel addon = addonModel.createByName(core, addonName);
                                     var executeContext = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                         addonType = Context,
                                         cssContainerClass = "",
@@ -884,9 +885,9 @@ namespace Contensive.Core.Controllers {
                                         },
                                         personalizationAuthenticated = personalizationIsAuthenticated,
                                         personalizationPeopleId = personalizationPeopleId,
-                                        instanceArguments = addonArgDict
+                                        instanceArguments = addonArgDict,
+                                        errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
-                                    addonModel addon = addonModel.createByName(core, addonName);
                                     if (addon == null) {
                                         logController.handleError( core,new ApplicationException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
                                     } else {
@@ -927,7 +928,8 @@ namespace Contensive.Core.Controllers {
                                         },
                                         personalizationAuthenticated = personalizationIsAuthenticated,
                                         personalizationPeopleId = personalizationPeopleId,
-                                        instanceArguments = addonArgDict
+                                        instanceArguments = addonArgDict,
+                                        errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
                                     addonModel addon = addonModel.createByName(core, addonName);
                                     CmdAccumulator = core.addon.execute(addon, executeContext);

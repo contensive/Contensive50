@@ -35,7 +35,10 @@ namespace Contensive.Core.Addons.Primitives {
                 core.doc.continueProcessing = false;
                 Dictionary<string, string> addonArguments = new Dictionary<string, string>();
                 addonArguments.Add("Force Default Login", "false");
-                return core.addon.execute(addonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextPage });
+                return core.addon.execute(addonGuidLoginPage, new CPUtilsBaseClass.addonExecuteContext() {
+                    addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                    errorContextMessage = "processing logout/login method"
+                });
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

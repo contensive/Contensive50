@@ -568,9 +568,11 @@ namespace Contensive.Core.Controllers {
                         }
                         resultSessionContext.visit_initialized = true;
                         if ((AllowOnNewVisitEvent) && (true)) {
-                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextOnNewVisit };
                             foreach (addonModel addon in addonModel.createList_OnNewVisitEvent(core, new List<string>())) {
-                                executeContext.errorCaption = addon.name;
+                                CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                    addonType = CPUtilsBaseClass.addonContext.ContextOnNewVisit,
+                                    errorContextMessage = "new visit event running addon  [" + addon.name +"]"
+                                };
                                 core.addon.execute(addon, executeContext);
                             }
                         }

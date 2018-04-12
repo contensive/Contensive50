@@ -2593,7 +2593,8 @@ namespace Contensive.Core.Controllers {
                                                     var addon = Models.DbModels.addonModel.create(core, onInstallAddonGuid);
                                                     if ( addon != null) {
                                                         var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
-                                                            addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple
+                                                            addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
+                                                            errorContextMessage = "calling onInstall Addon [" + addon.name + "] for collection [" + collection.name + "]"
                                                         };
                                                         core.addon.execute(addon, executeContext);
                                                     }

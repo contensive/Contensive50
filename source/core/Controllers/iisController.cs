@@ -24,6 +24,10 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class iisController {
         //
+        // enum this, not consts --  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+        public const string httpResponseStatus200 = "200 OK";
+        public const string httpResponseStatus404 = "404 Not Found";
+        //
         private coreController core;
         //
         // if this instance is a webRole, retain pointer for callbacks
@@ -553,11 +557,16 @@ namespace Contensive.Core.Controllers {
                 value = cookieValue
             });
         }
-        //
-        //========================================================================
-        // Write a cookie to the stream
-        //========================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// set cookie in iis response
+        /// </summary>
+        /// <param name="cookieName"></param>
+        /// <param name="iCookieValue"></param>
+        /// <param name="DateExpires"></param>
+        /// <param name="domain"></param>
+        /// <param name="Path"></param>
+        /// <param name="Secure"></param>
         public void addResponseCookie(string cookieName, string iCookieValue, DateTime DateExpires = default(DateTime), string domain = "", string Path = "", bool Secure = false) {
             try {
                 string s = null;
@@ -617,11 +626,14 @@ namespace Contensive.Core.Controllers {
                 throw;
             }
         }
-        //
-        //
-        //
+        //====================================================================================================
+        /// <summary>
+        /// Set iis response status
+        /// </summary>
+        /// <param name="status">A string starting with the response number (like 200 or 404) followed by the response message</param>
         public void setResponseStatus(string status) {
             if (core.doc.continueProcessing) {
+                logController.logTrace(core, "setResponseStatus [" + status + "]");
                 if (iisContext != null) {
                     // add header to response
                     iisContext.Response.Status = status;
@@ -734,7 +746,7 @@ namespace Contensive.Core.Controllers {
                             // -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink;
                         } else {
-                            setResponseStatus("404 Not Found");
+                            setResponseStatus(iisController.httpResponseStatus404);
                         }
                     } else {
 

@@ -134,7 +134,10 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- Custom Login
                         addonModel addon = addonModel.create(core, loginAddonID);
-                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextPage };
+                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                            addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                            errorContextMessage = "calling login form addon [" + loginAddonID + "] from internal method"
+                        };
                         returnHtml = core.addon.execute(addon, executeContext);
                         //returnHtml = core.addon.execute_legacy2(loginAddonID, "", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", False, Nothing)
                         if (string.IsNullOrEmpty(returnHtml)) {

@@ -67,8 +67,11 @@ namespace Contensive.Core.Controllers {
                 bool blockSiteWithLogin = false;
                 //
                 // -- OnBodyStart add-ons
-                CPUtilsBaseClass.addonExecuteContext bodyStartContext = new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextOnBodyStart };
                 foreach (addonModel addon in core.addonCache.getOnBodyStartAddonList()) {
+                    CPUtilsBaseClass.addonExecuteContext bodyStartContext = new CPUtilsBaseClass.addonExecuteContext() {
+                        addonType = CPUtilsBaseClass.addonContext.ContextOnBodyStart,
+                        errorContextMessage = "calling onBodyStart addon [" + addon.name + "] in HtmlBodyTemplate"
+                    };
                     returnBody += core.addon.execute(addon, bodyStartContext);
                 }
                 //
@@ -132,8 +135,11 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- OnBodyEnd add-ons
                     //
-                    CPUtilsBaseClass.addonExecuteContext bodyEndContext = new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextFilter };
                     foreach (var addon in core.addonCache.getOnBodyEndAddonList()) {
+                        CPUtilsBaseClass.addonExecuteContext bodyEndContext = new CPUtilsBaseClass.addonExecuteContext() {
+                            addonType = CPUtilsBaseClass.addonContext.ContextFilter,
+                            errorContextMessage = "calling onBodyEnd addon [" + addon.name + "] in HtmlBodyTemplate"
+                        };
                         core.doc.docBodyFilter = returnBody;
                         AddonReturn = core.addon.execute(addon, bodyEndContext);
                         //AddonReturn = core.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", False, Nothing)
@@ -996,14 +1002,24 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- execute template Dependencies
                     List<Models.DbModels.addonModel> templateAddonList = addonModel.createList_templateDependencies(core, core.doc.pageController.template.id);
-                    foreach (addonModel addon in templateAddonList) {
-                        returnHtml += core.addon.executeDependency(addon, executeContext);
-                     }
+                    if (templateAddonList.Count > 0) {
+                        string addonContextMessage = executeContext.errorContextMessage;
+                        foreach (addonModel addon in templateAddonList) {
+                            executeContext.errorContextMessage = "executing template dependency [" + addon.name + "]";
+                            returnHtml += core.addon.executeDependency(addon, executeContext);
+                        }
+                        executeContext.errorContextMessage = addonContextMessage;
+                    }
                     //
                     // -- execute page Dependencies
                     List<Models.DbModels.addonModel> pageAddonList = addonModel.createList_pageDependencies(core, core.doc.pageController.page.id);
-                    foreach (addonModel addon in pageAddonList) {
-                        returnHtml += core.addon.executeDependency(addon, executeContext);
+                    if ( pageAddonList.Count> 0 ) {
+                        string addonContextMessage = executeContext.errorContextMessage;
+                        foreach (addonModel addon in pageAddonList) {
+                            executeContext.errorContextMessage = "executing page dependency [" + addon.name + "]";
+                            returnHtml += core.addon.executeDependency(addon, executeContext);
+                        }
+                        executeContext.errorContextMessage = addonContextMessage;
                     }
                     //
                     core.doc.adminWarning = core.docProperties.getText("main_AdminWarningMsg");
@@ -1427,7 +1443,10 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // -- block with login
                                     core.doc.continueProcessing = false;
-                                    return core.addon.execute(addonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextPage });
+                                    return core.addon.execute(addonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
+                                        addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                        errorContextMessage = "calling login page addon [" + addonGuidLoginPage + "] because page is blocked"
+                                    });
                                 case 2:
                                     //
                                     // -- block with custom content
@@ -1596,7 +1615,7 @@ namespace Contensive.Core.Controllers {
                     // new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                     //
                     logController.addSiteWarning(core, "Page Not Found", "Page Not Found", "", 0, "Page Not Found from [" + core.webServer.requestUrlSource + "]", "Page Not Found", "Page Not Found");
-                    core.webServer.setResponseStatus("404 Not Found");
+                    core.webServer.setResponseStatus(iisController.httpResponseStatus404);
                     core.docProperties.setProperty(rnPageId, getPageNotFoundPageId(core));
                     //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
                     if (core.session.isAuthenticatedAdmin(core)) {
@@ -2136,13 +2155,19 @@ namespace Contensive.Core.Controllers {
                                         // -- not recognized
                                         BlockForm = ""
                                             + "<p>This content has limited access. If you have an account, please login using this form.</p>"
-                                            + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext { addonType = CPUtilsBaseClass.addonContext.ContextPage }) + "";
+                                            + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                                addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                                errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user not recognized"
+                                            });
                                     } else {
                                         //
                                         // -- recognized, not authenticated
                                         BlockForm = ""
                                             + "<p>This content has limited access. You were recognized as \"<b>" + core.session.user.name + "</b>\", but you need to login to continue. To login to this account or another, please use this form.</p>"
-                                            + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext { addonType = CPUtilsBaseClass.addonContext.ContextPage }) + "";
+                                            + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                                addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                                errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user not authenticated"
+                                            });
                                     }
                                 } else {
                                     //
@@ -2150,7 +2175,10 @@ namespace Contensive.Core.Controllers {
                                     BlockForm = ""
                                         + "<p>You are currently logged in as \"<b>" + core.session.user.name + "</b>\". If this is not you, please <a href=\"?" + core.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
                                         + "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>"
-                                        + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext { addonType = CPUtilsBaseClass.addonContext.ContextPage }) + "";
+                                        + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                            addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                            errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user does not have access to content"
+                                        });
                                 }
                                 returnHtml = ""
                                     + "<div style=\"margin: 100px, auto, auto, auto;text-align:left;\">"
@@ -2168,7 +2196,10 @@ namespace Contensive.Core.Controllers {
                                     BlockForm = ""
                                         + "<p>This content has limited access. If you have an account, please login using this form.</p>"
                                         + "<p>If you do not have an account, <a href=?" + core.doc.refreshQueryString + "&subform=0>click here to register</a>.</p>"
-                                        + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext { addonType = CPUtilsBaseClass.addonContext.ContextPage }) + "";
+                                        + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                            addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                            errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked for registration"
+                                        });
                                 } else {
                                     //
                                     // Register Form
@@ -2390,27 +2421,32 @@ namespace Contensive.Core.Controllers {
                     //
                     Dictionary<string, string> instanceArguments = new Dictionary<string, string>();
                     instanceArguments.Add("CSPage", "-1");
-                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                        instanceGuid = "-1",
-                        instanceArguments = instanceArguments
-                    };
                     //
                     // -- OnPageStartEvent
                     core.doc.bodyContent = returnHtml;
-                    executeContext.addonType = CPUtilsBaseClass.addonContext.ContextOnPageStart;
                     List<addonModel> addonList = addonModel.createList_OnPageStartEvent(core, new List<string>());
                     foreach (Models.DbModels.addonModel addon in addonList) {
-                        core.doc.bodyContent = core.addon.execute(addon, executeContext) + core.doc.bodyContent;
-                        //AddonContent = core.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                        CPUtilsBaseClass.addonExecuteContext pageStartContext = new CPUtilsBaseClass.addonExecuteContext() {
+                            instanceGuid = "-1",
+                            instanceArguments = instanceArguments,
+                            addonType = CPUtilsBaseClass.addonContext.ContextOnPageStart,
+                            errorContextMessage = "calling start page addon [" + addon.name + "]"
+                        };
+                        core.doc.bodyContent = core.addon.execute(addon, pageStartContext) + core.doc.bodyContent;
                     }
                     returnHtml = core.doc.bodyContent;
                     //
                     // -- OnPageEndEvent / filter
                     core.doc.bodyContent = returnHtml;
-                    executeContext.addonType = CPUtilsBaseClass.addonContext.ContextOnPageEnd;
                     foreach (addonModel addon in core.addonCache.getOnPageEndAddonList()) {
-                        core.doc.bodyContent += core.addon.execute(addon, executeContext);
-                        //core.doc.bodyContent &= core.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                        CPUtilsBaseClass.addonExecuteContext pageEndContext = new CPUtilsBaseClass.addonExecuteContext() {
+                            instanceGuid = "-1",
+                            instanceArguments = instanceArguments,
+                            addonType = CPUtilsBaseClass.addonContext.ContextOnPageEnd,
+                            errorContextMessage = "calling start page addon [" + addon.name + "]"
+                        };
+
+                        core.doc.bodyContent += core.addon.execute(addon, pageEndContext);
                     }
                     returnHtml = core.doc.bodyContent;
                     //
@@ -2602,7 +2638,8 @@ namespace Contensive.Core.Controllers {
                             },
                             instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.ChildListInstanceOptions),
                             instanceGuid = PageChildListInstanceID,
-                            wrapperID = core.siteProperties.defaultWrapperID
+                            wrapperID = core.siteProperties.defaultWrapperID,
+                            errorContextMessage = "executing child list addon for page [" + core.doc.pageController.page.id + "]"
                         };
                         Cell += core.addon.execute(addon, executeContext);
                         //Cell = Cell & core.addon.execute_legacy2(core.siteProperties.childListAddonID, "", core.doc.pageController.page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, core.doc.pageController.page.id, "", PageChildListInstanceID, False, core.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)

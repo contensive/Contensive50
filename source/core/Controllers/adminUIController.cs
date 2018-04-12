@@ -9,6 +9,7 @@ using Contensive.Core.Models.DbModels;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using Contensive.Core.Models.Complex;
 //
 namespace Contensive.Core {
     //
@@ -214,7 +215,7 @@ namespace Contensive.Core {
             }
         }
 
-        public static string getButtonBarForIndex2(coreController core, bool AllowAdd, bool AllowDelete, int pageNumber, int recordsPerPage, int recordCnt) {
+        public static string getButtonBarForIndex2(coreController core, bool AllowAdd, bool AllowDelete, int pageNumber, int recordsPerPage, int recordCnt, string contentName) {
             string LeftButtons = "";
             string RightButtons = "";
             LeftButtons = LeftButtons + adminUIController.getButtonPrimary(ButtonCancel);
@@ -246,26 +247,19 @@ namespace Contensive.Core {
             if (recordCnt > 1) {
                 PageCount = encodeInteger(1 + encodeInteger(Math.Floor(encodeNumber((recordCnt - 1) / recordsPerPage))));
             }
-            return adminUIController.GetButtonBarForIndex(core, LeftButtons, RightButtons, pageNumber, recordsPerPage, PageCount);
+            return adminUIController.GetButtonBarForIndex(core, LeftButtons, RightButtons, pageNumber, recordsPerPage, PageCount, recordCnt, contentName);
         }
         //
         // ====================================================================================================
         //
-        public static string GetButtonBarForIndex(coreController core, string LeftButtons, string RightButtons, int PageNumber, int RecordsPerPage, int PageCount) {
-            string tempGetButtonBarForIndex = null;
+        public static string GetButtonBarForIndex(coreController core, string LeftButtons, string RightButtons, int PageNumber, int RecordsPerPage, int PageCount, int recordCnt, string contentName) {
+            string result = null;
             try {
-                //
-                int Ptr = 0;
-                string Nav = "";
-                int NavStart = 0;
-                int NavEnd = 0;
-                //
-                tempGetButtonBarForIndex = GetButtonBar(core, LeftButtons, RightButtons);
-                NavStart = PageNumber - 9;
+                int NavStart = PageNumber - 9;
                 if (NavStart < 1) {
                     NavStart = 1;
                 }
-                NavEnd = NavStart + 20;
+                int NavEnd = NavStart + 20;
                 if (NavEnd > PageCount) {
                     NavEnd = PageCount;
                     NavStart = NavEnd - 20;
@@ -273,25 +267,28 @@ namespace Contensive.Core {
                         NavStart = 1;
                     }
                 }
+                string Nav = "";
                 if (NavStart > 1) {
                     Nav = Nav + "<li onclick=\"bbj(this);\">1</li><li class=\"delim\">&#171;</li>";
                 }
-                for (Ptr = NavStart; Ptr <= NavEnd; Ptr++) {
+                for (int Ptr = NavStart; Ptr <= NavEnd; Ptr++) {
                     Nav = Nav + "<li onclick=\"bbj(this);\">" + Ptr + "</li>";
                 }
                 if (NavEnd < PageCount) {
                     Nav = Nav + "<li class=\"delim\">&#187;</li><li onclick=\"bbj(this);\">" + PageCount + "</li>";
                 }
                 Nav = genericController.vbReplace(Nav, ">" + PageNumber + "<", " class=\"hit\">" + PageNumber + "<");
-                tempGetButtonBarForIndex = tempGetButtonBarForIndex + "\r<script language=\"javascript\">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>"
+                Nav = "" + "\r<script language=\"javascript\">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>"
                     + "\r<div class=\"ccJumpCon\">"
-                    + cr2 + "<ul><li class=\"caption\">Page</li>"
+                    + cr2 + "<ul><li class=\"caption\">" + contentName + ", " + recordCnt + " records, page</li>"
                     + cr3 + Nav + cr2 + "</ul>"
                     + "\r</div>";
+                result = GetButtonBar(core, LeftButtons, RightButtons);
+                result += Nav; 
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
-            return tempGetButtonBarForIndex;
+            return result;
         }
         // ====================================================================================================
         //
@@ -1052,6 +1049,20 @@ namespace Contensive.Core {
                 EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + Models.Complex.cdefModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
             }
             return EditorString;
+        }
+
+        public static string getDefaultEditor_manyToMany(coreController core, cdefFieldModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly, string WhyReadOnlyMsg ) {
+            string result = "";
+            //
+            string MTMContent0 =   cdefModel.getContentNameByID(core, field.contentId);
+            string MTMContent1 = cdefModel.getContentNameByID(core, field.manyToManyContentID);
+            string MTMRuleContent = cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
+            string MTMRuleField0 = field.ManyToManyRulePrimaryField;
+            string MTMRuleField1 = field.ManyToManyRuleSecondaryField;
+            result += core.html.getCheckList(htmlName, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, currentValueCommaList);
+            //result += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1);
+            result += WhyReadOnlyMsg;
+            return result;
         }
 
         // ====================================================================================================

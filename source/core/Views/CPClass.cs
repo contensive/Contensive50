@@ -160,7 +160,7 @@ namespace Contensive.Core {
                     } else {
                         result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                             addonType = addonContext,
-                            errorCaption = addonNameOrGuid
+                            errorContextMessage = "external call to execute addon [" + addonNameOrGuid + "]"
                         });
                     }
                 } else {
@@ -170,7 +170,7 @@ namespace Contensive.Core {
                         // -- call by name
                         result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                             addonType = addonContext,
-                            errorCaption = addonNameOrGuid
+                            errorContextMessage = "external call to execute addon [" + addonNameOrGuid + "]"
                         });
                     } else if (addonNameOrGuid.IsNumeric() ) {
                         //
@@ -203,7 +203,7 @@ namespace Contensive.Core {
                 } else {
                     result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                         addonType = addonContext,
-                        errorCaption = "id:" + addonId.ToString()
+                        errorContextMessage = "external call to execute addon [" + addonId + "]"
                     });
                 }
             } catch (Exception ex) {

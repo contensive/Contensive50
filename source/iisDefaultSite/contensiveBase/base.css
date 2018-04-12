@@ -10,7 +10,7 @@ body {overflow:auto;}
 .ccBodyWeb{}
 .ccBodyPrint{}
 .ccBodyEmail{}
-.ccBodyAdmin {margin:0;padding:0;COLOR:black;BACKGROUND-COLOR:#C3D9FF;min-height:100vh;}
+.ccBodyAdmin {margin:0;padding:0;COLOR:black;BACKGROUND-COLOR:rgb(240,240,240);min-height:100vh;}
 /*
     container resets 
 */
@@ -29,25 +29,25 @@ body {overflow:auto;}
 /*
     adminSite
 */
-#desktop { color:#222;Background-color:#C3D9FF}
-.ccCon .ccHeaderCon {width:100%;COLOR:white;BACKGROUND-COLOR:#1F70BD;clear:both;vertical-align:middle;}
-.ccCon .ccHeaderCon .cchLeft {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;}
-.ccCon .ccHeaderCon .cchRight {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;}
-.ccCon .ccHeaderCon .cchSingle {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;vertical-align:middle;}
-.ccCon .ccHeaderCon .cchClosed {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px}
-.ccCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
-.ccCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
+#desktop { color:#222;Background-color:rgb(240,240,240)}
+.ccCon .ccHeaderCon {width:100%;COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);clear:both;vertical-align:middle;}
+.ccCon .ccHeaderCon .cchLeft {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;}
+.ccCon .ccHeaderCon .cchRight {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;}
+.ccCon .ccHeaderCon .cchSingle {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left;padding:5px;vertical-align:middle;}
+.ccCon .ccHeaderCon .cchClosed {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:right;padding:5px}
+.ccCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
+.ccCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
 /**/
 .ccCon .ccToolsCon {margin:0;padding:0;Background-color:white;border-right:1px solid black;min-height:100vh;}
-.ccCon .ccToolsCon .ccHeaderCon {COLOR:white;BACKGROUND-COLOR:#1F70BD;}
-.ccCon .ccToolsCon .ccHeaderCon .closed {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;}
-.ccCon .ccToolsCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left}
-.ccCon .ccToolsCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right}
+.ccCon .ccToolsCon .ccHeaderCon {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);}
+.ccCon .ccToolsCon .ccHeaderCon .closed {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left;padding:5px;}
+.ccCon .ccToolsCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left}
+.ccCon .ccToolsCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:right}
 .ccCon .ccToolsCon .ccContentCon {width:100%;margin:0;Background-color:white;min-height:100vh;}
 .ccCon .ccToolsCon .ccContentCon .opened {width:100%;margin:0;Background-color:white;min-height:100vh;padding-top:10px;padding-bottom:20px;}
 .ccCon .ccToolsCon .ccContentCon .closed {width:100%;margin:0;Background-color:white;min-height:100vh;}
 /**/
-.ccCon .ccContentCon {margin:0;padding:0;Background-color:#C3D9FF;width:100%;min-height:100vh;}
+.ccCon .ccContentCon {margin:0;padding:0;Background-color:rgb(240,240,240);width:100%;min-height:100vh;}
 .ccCon .ccControlsCon {color:black;background-color:#fff8d0;padding:5px ! important;border-top:1px solid #808080;border-left:1px solid #808080;border-bottom:1px solid #f8f8f8;border-right:1px solid #f8f8f8;}
 .ccCon .ccControlsCon .left {text-align:right;}
 .ccCon .ccControlsCon .right {text-align:right;}
@@ -78,16 +78,16 @@ body {overflow:auto;}
 .ccCon .ccAdminEditHeading {padding:6px;COLOR:black;}
 .ccCon .ccAdminEditSubHeader {margin-left:20px;border-bottom:1px solid black;padding:6px;COLOR:black;}
 .ccCon .ccAdminEditDescription {COLOR:black;padding:10px;}
-.ccCon .ccAdminEditBody {BACKGROUND-COLOR:#E8EEF7;padding:5px;}
+.ccCon .ccAdminEditBody {BACKGROUND-COLOR:rgb(248,248,250);padding:5px;}
 .ccCon .ccAdminEditCaption {COLOR:black;WHITE-SPACE:nowrap;TEXT-ALIGN:right;}
 .ccCon .ccAdminEditField {border-top:1px solid #FFFDF1;border-bottom:1px solid #DAD4B2;COLOR:black;Background-color:#fff8d0;TEXT-ALIGN:left;vertical-align:baseline;}
-.ccCon .ccAdminListCaption {padding:4px;background-color:#669ACC;COLOR:white;border-right:1px solid white;border-bottom:1px solid black;border-top:0px solid white; ! important;}
+.ccCon .ccAdminListCaption {padding:4px;background-color:rgb(140,140,140);COLOR:white;border-right:1px solid white;border-bottom:1px solid black;border-top:0px solid white; ! important;}
 .ccCon A.ccAdminListCaption {Display:block;COLOR:white;border:0px;padding:0px;}
 .ccCon A.ccAdminListCaption:Hover {}
 .ccCon A.ccAdminListCaption:Visited {}
-.ccCon .ccAdminListRowEven {BACKGROUND-COLOR:#E8EEF7;padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
+.ccCon .ccAdminListRowEven {BACKGROUND-COLOR:rgb(248,248,250);padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
 .ccCon .ccAdminListRowOdd {BACKGROUND-COLOR:#ffffff;padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
-.ccCon .ccAdminTab {background-color:#669ACC;color:white;white-space:nowrap;}
+.ccCon .ccAdminTab {background-color:rgb(180,180,180);color:white;white-space:nowrap;}
 .ccCon A.ccAdminTabLink {color:white;}
 .ccCon A.ccAdminTabLink:visited {color:white;}
 .ccCon A.ccAdminTabLink:hover {color:white;}
@@ -125,25 +125,25 @@ body {overflow:auto;}
 styles used publicly by Contensive 
 */
 .ccButtonCon {COLOR:black;Background-color:#567694;Padding:5px ! important;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
-div.ccJumpCon {Background-color:#579;Padding:2px;margin:0;}
-.ccJumpCon ul {vertical-align:middle;text-align:right;white-space:nowrap;COLOR:#fff;Padding:5px;margin:0;}
-.ccJumpCon ul li {display:inline;width:30px;vertical-align:middle;text-align:center;cursor:pointer;list-style:none inside none;Padding:5px ! important;color:#ccc;Background-Color:#68a;border-left:1px solid #579;}
-.ccJumpCon ul li:hover {color:#fff;}
-.ccJumpCon ul li.caption {Background-Color:transparent;color:#ccc;border:0;cursor:default;}
-.ccJumpCon ul li.delim {Background-Color:transparent;color:#ccc;border:0;cursor:default;}
-.ccJumpCon ul li.hit {cursor:default;Background-Color:#468;color:#fff;border:1px solid #fff;}
-.ccBubbleCon {position:absolute; border: 2px solid #1F70BD;margin:0;padding:0;Background-color:#C3D9FF;z-index:1;}
-.ccBubbleCon .ccHeaderCon {position:static;width:100%;COLOR:white;BACKGROUND-COLOR:#1F70BD;}
-.ccBubbleCon .ccHeaderCon .bbLeft {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;white-space:nowrap;width:99%}
-.ccBubbleCon .ccHeaderCon .bbRight {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:23px}
+div.ccJumpCon {Padding:2px;margin:0;}
+.ccJumpCon ul {vertical-align:middle;white-space:nowrap;Padding:5px;margin:0;}
+.ccJumpCon ul li {display:inline;width:30px;vertical-align:middle;text-align:center;cursor:pointer;list-style:none inside none;Padding:5px ! important;color:#444;Background-Color:#ccc;}
+.ccJumpCon ul li:hover {color:#000;}
+.ccJumpCon ul li.caption {Background-Color:transparent;border:0;cursor:default;}
+.ccJumpCon ul li.delim {Background-Color:transparent;border:0;cursor:default;}
+.ccJumpCon ul li.hit {cursor:default;Background-Color:#666;color:#ddd;}
+.ccBubbleCon {position:absolute; border: 2px solid rgb(140,140,140);margin:0;padding:0;Background-color:rgb(240,240,240);z-index:1;}
+.ccBubbleCon .ccHeaderCon {position:static;width:100%;COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);}
+.ccBubbleCon .ccHeaderCon .bbLeft {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left;padding:5px;white-space:nowrap;width:99%}
+.ccBubbleCon .ccHeaderCon .bbRight {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:right;padding:5px;width:23px}
 .ccBubbleCon .ccButtonCon {margin:0;padding:0;BACKGROUND-COLOR:#567694;Border-Top:1px solid #246;Border-Left:1px solid #246;Border-Bottom:1px solid #8be;Border-right:1px solid #8be;}
-.ccBubbleCon .ccContentCon {margin:0;padding:10px;Background-color:#C3D9FF;vertical-align:middle;}
+.ccBubbleCon .ccContentCon {margin:0;padding:10px;Background-color:rgb(240,240,240);vertical-align:middle;}
 .ccBubbleCon .ccContentCon td {margin:0;padding:5px;vertical-align:middle;}
 .ccBubbleCon .ccContentCon td.bbLeft {text-align:right;white-space:nowrap;}
 .ccBubbleCon .ccContentCon td.bbRight {text-align:left;}
-.ccDialogCon {margin:0;padding:0;Background-color:#C3D9FF;}
+.ccDialogCon {margin:0;padding:0;Background-color:rgb(240,240,240);}
 .ccDialogCon .ccButtonCon {margin:0;padding:0;BACKGROUND-COLOR:#567694;Border-Top:1px solid #246;Border-Left:1px solid #246;Border-Bottom:1px solid #8be;Border-right:1px solid #8be;}
-.ccDialogCon .ccContentCon {margin:0;padding:10px;Background-color:#C3D9FF;vertical-align:middle;}
+.ccDialogCon .ccContentCon {margin:0;padding:10px;Background-color:rgb(240,240,240);vertical-align:middle;}
 .ccDialogCon .ccContentCon td {margin:0;padding:5px;vertical-align:middle;}
 .ccDialogCon .ccContentCon td.left {text-align:right;white-space:nowrap;}
 .ccDialogCon .ccContentCon td.right {text-align:left;}
@@ -188,7 +188,7 @@ ul.ccFilterList li a { ! important;color:black ! important;}
 .ccAdminMsg {padding:10px;margin:10px;background-color:white;border:1px solid #888}
 .ccAdminButtonBar {COLOR:black;Background-color:#567694;Padding:5px}
 .ccCon  div.ccAdminTitleBar {COLOR:black;Background-color:transparent;Padding:10px}
-.ccAdminInfoBar {COLOR:black;Background-color:#E8EEF7;Padding:10px;Margin:10px;Margin-Top:0px;}
+.ccAdminInfoBar {COLOR:black;Background-color:rgb(248,248,250);Padding:10px;Margin:10px;Margin-Top:0px;}
 .ccAuthoringLink {COLOR:#ffffff;BACKGROUND-COLOR:#89ab22;}
 .ccNavLink {text-indent:-19px;margin-left:29px;margin-right:10px;white-space:nowrap;margin-top:3px;}
 .ccNavLinkEmpty {text-indent:-19px;margin-left:29px;margin-right:10px;white-space:nowrap;}
@@ -223,22 +223,22 @@ ul.ccFilterList li a { ! important;color:black ! important;}
 .ccPanelRowOdd {BACKGROUND-COLOR:#ffffff}
 .ccFlyoutButton {MARGIN:0px;PADDING-RIGHT:0px;PADDING-LEFT:0px;PADDING-BOTTOM:4px;PADDING-TOP:4px;white-space:nowrap;}
 A.ccFlyoutButton {MARGIN:0px;PADDING-RIGHT:6px;PADDING-LEFT:6px;PADDING-BOTTOM:4px;PADDING-TOP:4px;Z-INDEX:100;COLOR:black;white-space:nowrap;}
-A.ccFlyoutButton:hover {color:white;Background-color:#669ACC;}
+A.ccFlyoutButton:hover {color:white;Background-color:rgb(140,140,140);}
 A.ccFlyoutButton:visited {}
-A.ccFlyoutButtonDown {color:white;Background-color:#669ACC;}
+A.ccFlyoutButtonDown {color:white;Background-color:rgb(140,140,140);}
 A.ccFlyoutButtonDown:hover {}
 A.ccFlyoutButtonDown:visited {}
 .ccFlyoutDelimiter {color:#808080;padding:0px;margin:0px;}
 .ccFlyoutPanel {BORDER:white 1px solid;Z-INDEX:101;VISIBILITY:hidden;POSITION:absolute;BACKGROUND-COLOR:#e0e0e0;}
 A.ccFlyoutPanelButton {DISPLAY:block;BORDER-BOTTOM:#f0f0f0 1px solid;PADDING:4px;PADDING-LEFT:10px;PADDING-RIGHT:10px;WHITE-SPACE:nowrap;COLOR:black;}
-A.ccFlyoutPanelButton:hover {COLOR:white;BACKGROUND-COLOR:#669ACC;}
+A.ccFlyoutPanelButton:hover {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);}
 A.ccFlyoutPanelButton:visited {}
-A.ccFlyoutPanelButtonDown {COLOR:white;BACKGROUND-COLOR:#669ACC;}
+A.ccFlyoutPanelButtonDown {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);}
 .ccReport {padding:20px;Background-Color:white;Border-bottom:1px solid black;Border-left:1px solid black;Border-right:1px solid black;} 
 .ccReportRowTop {padding:4px;Background-Color:white;} 
 .ccReportRowOdd {padding:4px;Border-top:1px solid black;Background-Color:#F0F0F0;} 
 .ccReportRowEven {padding:4px;Border-top:1px solid black;Background-Color:white;} 
-.ccTab {background-color:#1F70BD;color:white;}
+.ccTab {background-color:rgb(140,140,140);color:white;}
 A.ccTabLink:Link {color:white;}
 A.ccTabLink:visited {color:white;}
 A.ccTabLink:hover {color:white;}
@@ -265,16 +265,16 @@ A.ccLiveTabHitLink:hover {color:black;}
 .ccLiveTabHitSpacer { width: 5px; }
 .ccLiveTabHitFiller { width: 100%; }
 .ccLiveTabBodyCollectionWrap { position:relative;background-color:white;}
-.ccWizardHeader{COLOR:white;BACKGROUND-COLOR:#1F70BD;Padding:5px;Border-Top:1px solid #1330c0;Border-Left:1px solid #1330c0;Border-Bottom:1px solid #0210a0;Border-right:1px solid #0210a0;}
-.ccWizardPanel{COLOR:black;BACKGROUND-COLOR:#E8EEF7;Border-Top:1px solid #ffffff;Border-Left:1px solid #ffffff;Border-Bottom:1px solid #808080;Border-right:1px solid #808080;}
+.ccWizardHeader{COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);Padding:5px;Border-Top:1px solid #1330c0;Border-Left:1px solid #1330c0;Border-Bottom:1px solid #0210a0;Border-right:1px solid #0210a0;}
+.ccWizardPanel{COLOR:black;BACKGROUND-COLOR:rgb(248,248,250);Border-Top:1px solid #ffffff;Border-Left:1px solid #ffffff;Border-Bottom:1px solid #808080;Border-right:1px solid #808080;}
 .ccTextArea {width:100%;overflow:auto;}
 .ccTextArea textarea {padding:0;margin:0;border:none}
 .ccTextAreaOpened {position:absolute;top:24px;left:0px;width:100%;overflow:auto;}
-.ccTextAreaHead {COLOR:white;BACKGROUND-COLOR:#669ACC;padding:5px;}
+.ccTextAreaHead {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);padding:5px;}
 div.ccTextAreaHead A:link {COLOR:white;}
 div.ccTextAreaHead A:visited {COLOR:white;}
 div.ccTextAreaHead A:hover {COLOR:white;}
-.ccTextAreaHeadOpened {position:absolute;top:0px;left:0px;height:24px;width:100%;background-color:#669ACC;margin:0px;padding:5px;border-bottom:2px solid #d0d0d0;}
+.ccTextAreaHeadOpened {position:absolute;top:0px;left:0px;height:24px;width:100%;background-color:rgb(140,140,140);margin:0px;padding:5px;border-bottom:2px solid #d0d0d0;}
 div.ccTextAreaHeadOpened A:link {COLOR:white;}
 div.ccTextAreaHeadOpened A:visited {COLOR:white;}
 div.ccTextAreaHeadOpened A:hover {COLOR:white;}

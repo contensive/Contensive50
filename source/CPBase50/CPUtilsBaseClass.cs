@@ -53,7 +53,7 @@ namespace Contensive.BaseClasses
 			/// This caption is used if the addon cannot be executed.
 			/// </summary>
 			/// <returns></returns>
-			public string errorCaption {get; set;}
+			public string errorContextMessage {get; set;}
 			/// <summary>
 			/// select enumeration option the describes the environment in which the addon is being executed (in an email, on a page, as a remote method, etc)
 			/// </summary>
