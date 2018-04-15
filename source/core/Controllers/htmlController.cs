@@ -2675,10 +2675,10 @@ namespace Contensive.Core.Controllers {
                                             //returnHtml += "<input type=checkbox disabled checked>";
                                             returnHtml += "<input type=\"hidden\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
                                         } else if (Found) {
-                                            returnHtml += "<div class=\"checkbox\"><label><input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                            returnHtml += "<div class=\"checkbox\"><label><input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\" checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
                                             //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" checked>";
                                         } else {
-                                            returnHtml += "<div class=\"checkbox\"><label><input type=\"checkbox\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"\">&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                            returnHtml += "<div class=\"checkbox\"><label><input type=\"checkbox\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\">&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
                                             //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\">";
                                         }
                                         //returnHtml += "</td><td style=\"vertical-align:top;padding-top:4px;\">";

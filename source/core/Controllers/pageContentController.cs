@@ -1523,32 +1523,32 @@ namespace Contensive.Core.Controllers {
                 //   - this code is in initApp right now but should be migrated here.
                 //   - if all other routes fail, use the defaultRoute (page manager at first)
                 //
-                if (true) {
-                    // --- not reall sure what to do with this - was in appInit() and I am just sure it does not go there.
-                    //
-                    //--------------------------------------------------------------------------
-                    // ----- check if the custom404pathpage matches the defaultdoc
-                    //       in this case, the 404 hit is a direct result of a 404 I justreturned to IIS
-                    //       currently, I am redirecting to the page-not-found page with a 404 - wrong
-                    //       I should realize here that this is a 404 caused by the page in the 404 custom string
-                    //           and display the 404 page. Even if all I can say is "the page was not found"
-                    //
-                    //--------------------------------------------------------------------------
-                    //
-                    if (genericController.vbLCase(core.webServer.requestPathPage) == genericController.vbLCase(requestAppRootPath + core.siteProperties.serverPageDefault)) {
-                        //
-                        // This is a 404 caused by Contensive returning a 404
-                        //   possibly because the pageid was not found or was inactive.
-                        //   contensive returned a 404 error, and the IIS custom error handler is hitting now
-                        //   what we returned as an error cause is lost
-                        //   ( because the Custom404Source page is the default page )
-                        //   send it to the 404 page
-                        //
-                        core.webServer.requestPathPage = core.webServer.requestPathPage;
-                        IsPageNotFound = true;
-                        PageNotFoundReason = "The page could not be displayed. The record may have been deleted, marked inactive. The page's parent pages or section may be invalid.";
-                    }
-                }
+                //if (true) {
+                //    // --- not reall sure what to do with this - was in appInit() and I am just sure it does not go there.
+                //    //
+                //    //--------------------------------------------------------------------------
+                //    // ----- check if the custom404pathpage matches the defaultdoc
+                //    //       in this case, the 404 hit is a direct result of a 404 I justreturned to IIS
+                //    //       currently, I am redirecting to the page-not-found page with a 404 - wrong
+                //    //       I should realize here that this is a 404 caused by the page in the 404 custom string
+                //    //           and display the 404 page. Even if all I can say is "the page was not found"
+                //    //
+                //    //--------------------------------------------------------------------------
+                //    //
+                //    if (genericController.vbLCase(core.webServer.requestPathPage) == genericController.vbLCase(requestAppRootPath + core.siteProperties.serverPageDefault)) {
+                //        //
+                //        // This is a 404 caused by Contensive returning a 404
+                //        //   possibly because the pageid was not found or was inactive.
+                //        //   contensive returned a 404 error, and the IIS custom error handler is hitting now
+                //        //   what we returned as an error cause is lost
+                //        //   ( because the Custom404Source page is the default page )
+                //        //   send it to the 404 page
+                //        //
+                //        core.webServer.requestPathPage = core.webServer.requestPathPage;
+                //        IsPageNotFound = true;
+                //        PageNotFoundReason = "The page could not be displayed. The record may have been deleted, marked inactive. The page's parent pages or section may be invalid.";
+                //    }
+                //}
                 //if (false) {
                 //    //
                 //    //todo consider if we will keep this. It is not straightforward, and and more straightforward method may exist

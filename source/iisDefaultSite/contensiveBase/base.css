@@ -3,14 +3,21 @@
     contensive base: adminSite, pageManager, etc
     20180323 - removed typography references to focus on bootstrap defaults
 */
-body {overflow:auto;}
 /*
     Body Class Selectors 
 */
 .ccBodyWeb{}
 .ccBodyPrint{}
 .ccBodyEmail{}
-.ccBodyAdmin {margin:0;padding:0;COLOR:black;BACKGROUND-COLOR:rgb(240,240,240);min-height:100vh;}
+.ccBodyAdmin {
+    overflow: auto;
+    font-family: 'Catamaran', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #444;
+    BACKGROUND-COLOR: rgb(240,240,240);
+    min-height: 100vh;
+}
 /*
     container resets 
 */
@@ -127,7 +134,7 @@ styles used publicly by Contensive
 .ccButtonCon {COLOR:black;Background-color:#567694;Padding:5px ! important;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
 div.ccJumpCon {padding:0;margin:0;}
 .ccJumpCon ul {vertical-align:middle;white-space:nowrap;padding:0;margin:0;}
-.ccJumpCon ul li {display:inline;width:30px;vertical-align:middle;text-align:center;cursor:pointer;list-style:none inside none;margin:0;padding:0 5px ! important;color:#444;Background-Color:#ccc;}
+.ccJumpCon ul li {display:inline;width:30px;vertical-align:middle;text-align:center;cursor:pointer;list-style:none inside none;margin:0;padding:2px 5px ! important;color:#444;Background-Color:#ccc;}
 .ccJumpCon ul li:hover {color:#000;}
 .ccJumpCon ul li.caption {Background-Color:transparent;border:0;cursor:default;}
 .ccJumpCon ul li.delim {Background-Color:transparent;border:0;cursor:default;}

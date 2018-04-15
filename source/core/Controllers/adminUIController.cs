@@ -1276,19 +1276,17 @@ namespace Contensive.Core {
                     }
                 }
             }
-            Title = adminContent.name;
             string pageNavigation = getForm_index_pageNavigation(core, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, adminContent.name);
-            Title = "<div>"
-                + "<span style=\"float:left;\"><strong>" + Title + "</strong></span>"
-                + "<span style=\"float:right;\">" + pageNavigation + "</span>"
-                + "</div>";
+            Title = htmlController.div("<strong>" + adminContent.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
             int TitleRows = 0;
             if (!string.IsNullOrEmpty(filterLine)) {
-                Title +=  "<div style=\"clear:both\">Filter: " + htmlController.encodeHtml(filterLine.Substring(2)) + "</div>";
+                string link = "/" + core.appConfig.adminRoute + "?cid=" + adminContent.id + "&af=1&IndexFilterRemoveAll=1";
+                Title += htmlController.div(getIconRemove(link) + "&nbsp;Filter: " + htmlController.encodeHtml(filterLine.Substring(2)));
                 TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(sortLine)) {
-                Title +=  "<div style=\"clear:both\">Sort: " + htmlController.encodeHtml(sortLine.Substring(6)) + "</div>";
+                string link = "/" + core.appConfig.adminRoute + "?cid=" + adminContent.id + "&af=1&IndexSortRemoveAll=1";
+                Title += htmlController.div(getIconRemove(link) + "&nbsp;Sort: " + htmlController.encodeHtml(sortLine.Substring(6)));
                 TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(ContentAccessLimitMessage)) {
@@ -1298,6 +1296,24 @@ namespace Contensive.Core {
             return Title;
         }
 
+        //====================================================================================================
+        /// <summary>
+        /// get linked icon for remove (red x)
+        /// </summary>
+        /// <param name="link"></param>
+        /// <returns></returns>
+        public static string getIconRemove(string link, string cssColor = "red") {
+            return "<a href=\"" + link + "\"><span class=\"fa fa-remove\" style=\"color:" + cssColor + ";\"></span></a>";
+        }
+        //====================================================================================================
+        /// <summary>
+        /// get linked icon for refresh (green refresh)
+        /// </summary>
+        /// <param name="link"></param>
+        /// <returns></returns>
+        public static  string getIconRefresh(string link, string cssColor = "green") {
+            return "<a href=\"" + link + "\"><span class=\"fa fa-refresh\" style=\"color:" + cssColor + ";\"></span></a>";
+        }
     }
     //
     //====================================================================================================

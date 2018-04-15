@@ -1457,6 +1457,8 @@
 		</record>
 	</data>
 	<ImportCollection name="JQuery">{A435BF70-041B-43D1-8A8D-5D9D59A7FCD0}</ImportCollection>
+	<ImportCollection name="Bootstrap">{2d3f9a21-9602-4549-b5df-5e09a9dae57e}</ImportCollection>
+	<ImportCollection name="Font Awesome">{3db6a433-59ca-43d1-9fb6-a539b6b947f2}</ImportCollection>
 	<ImportCollection name="Primitives">{4D357C85-ABE2-4370-B1D9-2C859BF7762F}</ImportCollection>
 	<ImportCollection name="Personalization">{1339F712-17F7-408A-B021-92DF846BD486}</ImportCollection>
 	<ImportCollection name="Site Explorer">{5426E6D5-05A8-4A87-B535-CD0FABA04F29}</ImportCollection>

@@ -97,13 +97,15 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     core.doc.setMetaContent(0, 0);
                     core.html.addTitle("Unauthorized Access", "adminSite");
-                    returnHtml = "<div class=\"ccBodyAdmin ccCon\">" + returnHtml + "</div>";
+                    returnHtml = htmlController.div( returnHtml, "container-fluid ccBodyAdmin ccCon");
                     //returnHtml = core.html.getHtmlDoc(returnHtml, "<body class=""ccBodyAdmin ccCon"">", True, True, False)
                 } else {
                     //
                     // get admin content
                     //
-                    returnHtml = "<div class=\"ccBodyAdmin ccCon\">" + getAdminBody() + "</div>";
+                    returnHtml = getAdminBody();
+                    returnHtml = htmlController.div(returnHtml, "container-fluid ccBodyAdmin ccCon");
+                    //returnHtml = "<div class=\"ccBodyAdmin ccCon\">" + getAdminBody() + "</div>";
                     //returnHtml = core.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False)
                 }
             } catch (Exception ex) {
@@ -2277,7 +2279,8 @@ namespace Contensive.Core.Addons.AdminSite {
                     QS = RQS;
                     QS = genericController.modifyQueryString(QS, "IndexFilterRemoveAll", "1");
                     Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                    returnContent += "<div class=\"ccFilterSubHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;Remove All</a></div>";
+                    returnContent += htmlController.div( getIconRemove(Link) + "&nbsp; Remove All", "ccFilterSubHead");
+                    //returnContent += "<div class=\"ccFilterSubHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;Remove All</a></div>";
                     //
                     // Last Edited Edited by me
                     //
@@ -7207,7 +7210,8 @@ namespace Contensive.Core.Addons.AdminSite {
                         string fieldId = "setGuid" + genericController.GetRandomInteger(core).ToString();
                         string buttonCell = htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='{" + Guid.NewGuid().ToString() + "}';this.disabled=true;}"), "col-xs-1");
                         string inputCell = htmlController.div(adminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId), "col-xs-11");
-                        fieldEditor = htmlController.div(htmlController.div(buttonCell + inputCell, "row"), "container");
+                        fieldEditor = htmlController.div(htmlController.div(buttonCell + inputCell, "row"));
+                        //fieldEditor = htmlController.div(htmlController.div(buttonCell + inputCell, "row"), "container");
                         //fieldEditor = htmlController.div(htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + fieldValue + "';this.disabled=true;}")));
                         //sfieldEditor = adminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId) + htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + fieldValue + "';this.disabled=true;}"));
                     } else {
@@ -8766,53 +8770,14 @@ namespace Contensive.Core.Addons.AdminSite {
         //========================================================================
         //
         private string GetForm_Top(string BackgroundColor = "") {
-            string return_formTop = "";
+            string result = "";
             try {
-                const string AdminNavigatorGuid = "{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}";
-                string AdminNavFull = null;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                string LeftSide = null;
-                string RightSide = null;
-                string QS = null;
-                //adminUIController Adminui = new adminUIController(core);
-                //
-                // create the with-menu version
-                //
-                LeftSide = core.siteProperties.getText("AdminHeaderHTML", "Contensive Administration Site");
-                RightSide = core.doc.profileStartTime + "&nbsp;";
-                //
-                // AdminTabs
-                //
-                QS = core.doc.refreshQueryString;
-                if (allowAdminTabs) {
-                    QS = genericController.modifyQueryString(QS, "tabs", "0", true);
-                    RightSide = RightSide + getActiveImage(core.appConfig.adminRoute + "?" + QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "");
-                } else {
-                    QS = genericController.modifyQueryString(QS, "tabs", "1", true);
-                    RightSide = RightSide + getActiveImage(core.appConfig.adminRoute + "?" + QS, "Enable Tabs", "LibButtonTabs.GIF", "LibButtonTabsRev.GIF", "Enable Tabs", "16", "16", "", "", "");
-                }
-                //
-                // Menu Mode
-                //
-                QS = core.doc.refreshQueryString;
-                if (ignore_legacyMenuDepth == 0) {
-                    RightSide = RightSide + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"16\" >";
-                    if (AdminMenuModeID == AdminMenuModeTop) {
-                        QS = genericController.modifyQueryString(QS, "mm", "1", true);
-                        RightSide = RightSide + getActiveImage(core.appConfig.adminRoute + "?" + QS, "Use Navigator", "LibButtonMenuTop.GIF", "LibButtonMenuTopOver.GIF", "Use Navigator", "16", "16", "", "", "");
-                    } else {
-                        QS = genericController.modifyQueryString(QS, "mm", "2", true);
-                        RightSide = RightSide + getActiveImage(core.appConfig.adminRoute + "?" + QS, "Use Dropdown Menus", "LibButtonMenuLeft.GIF", "LibButtonMenuLeftOver.GIF", "Use Dropdown Menus", "16", "16", "", "", "");
-                    }
-                }
-                //
-                // Refresh Button
-                //
-                RightSide = RightSide + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"16\" >";
-                RightSide = RightSide + getActiveImage(core.appConfig.adminRoute + "?" + core.doc.refreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "");
+                string LeftSide = core.siteProperties.getText("AdminHeaderHTML", "Contensive Administration Site");
+                string RightSide = core.doc.profileStartTime + "&nbsp;" + getIconRefresh("?" + core.doc.refreshQueryString, "white");
                 //
                 // Assemble header
                 //
+                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 Stream.Add(adminUIController.GetHeader(core, LeftSide, RightSide));
                 //
                 // Menuing
@@ -8836,9 +8801,10 @@ namespace Contensive.Core.Addons.AdminSite {
                     //Stream.Add( "<div id=""ccContentCon"">")
                     AdminFormBottom = AdminFormBottom + "\r</div>";
                 } else {
+                    const string AdminNavigatorGuid = "{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}";
                     //
                     // -- Admin Navigator
-                    AdminNavFull = core.addon.execute(addonModel.create(core, AdminNavigatorGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                    string AdminNavFull = core.addon.execute(addonModel.create(core, AdminNavigatorGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                         addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                         errorContextMessage = "executing Admin Navigator in Admin"
                     });
@@ -8847,62 +8813,15 @@ namespace Contensive.Core.Addons.AdminSite {
                     AdminFormBottom = AdminFormBottom + "</td></tr></table>";
                 }
                 //
-                return_formTop = Stream.Text;
-            } catch (Exception ex) {
-                logController.handleError(core, ex);
-                throw;
-            }
-            return return_formTop;
-        }
-        //
-        //========================================================================
-        // Create a string with an admin style button
-        //========================================================================
-        //
-        private string getActiveImage(string HRef, string StatusText, string Image, string ImageOver, string AltText, string Width, string Height, string BGColor, string BGColorOver, string OnClick) {
-            string result = "";
-            try {
-                string ButtonObject = "Button" + ButtonObjectCount;
-                ButtonObjectCount = ButtonObjectCount + 1;
-                //
-                // ----- Output the button image
-                string Panel = "";
-                if (!string.IsNullOrEmpty(HRef)) {
-                    Panel = Panel + "<a href=\"" + HRef + "\" ";
-                    if (!string.IsNullOrEmpty(OnClick)) {
-                        Panel = Panel + " onclick=\"" + OnClick + "\"";
-                    }
-                    Panel = Panel + " onmouseOver=\""
-                        + " document['" + ButtonObject + "'].imgRolln=document['" + ButtonObject + "'].src;"
-                        + " document['" + ButtonObject + "'].src=document['" + ButtonObject + "'].lowsrc;"
-                        + " window.status='" + StatusText + "';"
-                        + " return true;\"";
-                    Panel = Panel + " onmouseOut=\""
-                        + " document['" + ButtonObject + "'].src=document['" + ButtonObject + "'].imgRolln;"
-                        + " window.status='';"
-                        + " return true;\">";
-                }
-                Panel = Panel + "<img"
-                    + " src=\"/ccLib/images/" + Image + "\""
-                    + " alt=\"" + AltText + "\""
-                    + " title=\"" + AltText + "\""
-                    + " id=\"" + ButtonObject + "\""
-                    + " name=\"" + ButtonObject + "\""
-                    + " lowsrc=\"/ccLib/images/" + ImageOver + "\""
-                    + " border=0"
-                    + " width=\"" + Width + "\""
-                    + " height=\"" + Height + "\" >";
-                if (!string.IsNullOrEmpty(HRef)) {
-                    Panel = Panel + "</A>";
-                }
-                result = Panel;
+                result = Stream.Text;
             } catch (Exception ex) {
                 logController.handleError(core, ex);
                 throw;
             }
             return result;
         }
-        //
+
+
         //========================================================================
         // Get sql for menu
         //   if MenuContentName is blank, it will select values from either cdef
@@ -13144,119 +13063,28 @@ namespace Contensive.Core.Addons.AdminSite {
                         IndexConfig.Open = genericController.encodeBoolean(VarText);
                         IndexConfig.PageNumber = 1;
                     }
-                    //
-                    // SortField
-                    //
-                    VarText = core.docProperties.getText("SetSortField").ToLower();
-                    if (!string.IsNullOrEmpty(VarText)) {
-                        if (IndexConfig.Sorts.ContainsKey(VarText)) {
-                            IndexConfig.Sorts.Remove(VarText);
-                        }
-                        int sortDirection = core.docProperties.getInteger("SetSortDirection");
-                        if (sortDirection > 0) {
-                            IndexConfig.Sorts.Add(VarText, new indexConfigSortClass {
-                                fieldName = VarText,
-                                direction = sortDirection
-                            });
+                    if (core.docProperties.getBoolean("IndexSortRemoveAll")) {
+                        //
+                        // Remove all filters
+                        IndexConfig.Sorts  = new Dictionary<string, indexConfigSortClass>();
+                    } else {
+                        //
+                        // SortField
+                        VarText = core.docProperties.getText("SetSortField").ToLower();
+                        if (!string.IsNullOrEmpty(VarText)) {
+                            if (IndexConfig.Sorts.ContainsKey(VarText)) {
+                                IndexConfig.Sorts.Remove(VarText);
+                            }
+                            int sortDirection = core.docProperties.getInteger("SetSortDirection");
+                            if (sortDirection > 0) {
+                                IndexConfig.Sorts.Add(VarText, new indexConfigSortClass {
+                                    fieldName = VarText,
+                                    direction = sortDirection
+                                });
+                            }
                         }
                     }
-                    //
-                    // Build FindWordList
-                    //
-                    //.FindWordList = ""
-                    //If .findwords.count > 0 Then
-                    //    For Ptr = 0 To .findwords.count - 1
-                    //        If .FindWords[Ptr].Value <> "" Then
-                    //            .FindWordList = .FindWordList & vbCrLf & .FindWords[Ptr].Name & "=" & .FindWords[Ptr].Value
-                    //        End If
-                    //    Next
-                    //End If
                 }
-                //            Criteria = "(active<>0)and(ContentID=" & core.main_GetContentID("people") & ")and(authorable<>0)"
-                //            CS = core.app.csOpen("Content Fields", Criteria, "EditSortPriority")
-                //            Do While core.app.csv_IsCSOK(CS)
-                //                FieldName = core.db.cs_getText(CS, "name")
-                //                FieldValue = core.main_GetStreamText2(FieldName)
-                //                FieldType = core.app.cs_getInteger(CS, "Type")
-                //                Select Case FieldType
-                //                    Case FieldTypeCurrency, FieldTypeFloat, FieldTypeInteger
-                //                        NumericOption = core.main_GetStreamText2(FieldName & "_N")
-                //                        If NumericOption <> "" Then
-                //                            '.FindWords(0).MatchOption = 1
-                //                            ContactSearchCriteria = ContactSearchCriteria _
-                //                                & vbCrLf _
-                //                                & FieldName & vbTab _
-                //                                & FieldType & vbTab _
-                //                                & FieldValue & vbTab _
-                //                                & NumericOption
-                //                        End If
-                //                    Case FieldTypeBoolean
-                //                        If FieldValue <> "" Then
-                //                            ContactSearchCriteria = ContactSearchCriteria _
-                //                                & vbCrLf _
-                //                                & FieldName & vbTab _
-                //                                & FieldType & vbTab _
-                //                                & FieldValue & vbTab _
-                //                                & ""
-                //                        End If
-                //                    Case FieldTypeText
-                //                        TextOption = core.main_GetStreamText2(FieldName & "_T")
-                //                        If TextOption <> "" Then
-                //                            ContactSearchCriteria = ContactSearchCriteria _
-                //                                & vbCrLf _
-                //                                & FieldName & vbTab _
-                //                                & CStr(FieldType) & vbTab _
-                //                                & FieldValue & vbTab _
-                //                                & TextOption
-                //                        End If
-                //                    Case FieldTypeLookup
-                //                        If FieldValue <> "" Then
-                //                            ContactSearchCriteria = ContactSearchCriteria _
-                //                                & vbCrLf _
-                //                                & FieldName & vbTab _
-                //                                & FieldType & vbTab _
-                //                                & FieldValue & vbTab _
-                //                                & ""
-                //                        End If
-                //                End Select
-                //                Call core.app.nextCSRecord(CS)
-                //            Loop
-                //            Call core.app.closeCS(CS)
-                //            Call core.main_SetMemberProperty("ContactSearchCriteria", ContactSearchCriteria)
-                //        End If
-
-
-                //
-                // Set field pointers for columns and sorts
-                //
-                //Dim SrcPtr As Integer
-                //If .Columns.Count > 0 Or .SortCnt > 0 Then
-                //    For Each keyValuePair As KeyValuePair(Of String, appServices_metaDataClass.CDefFieldClass) In adminContent.fields
-                //        Dim field As appServices_metaDataClass.CDefFieldClass = keyValuePair.Value
-                //        If .Columns.Count > 0 Then
-                //            For Ptr = 0 To .Columns.Count - 1
-                //                With .Columns[Ptr]
-                //                    If genericController.vbLCase(.Name) = field.Name Then
-                //                        .FieldId = SrcPtr
-                //                        Exit For
-                //                    End If
-                //                End With
-                //            Next
-                //        End If
-                //        '
-                //        If .SortCnt > 0 Then
-                //            For Ptr = 0 To .SortCnt - 1
-                //                With .Sorts[Ptr]
-                //                    If genericController.vbLCase(.FieldName) = field.Name Then
-                //                        .FieldPtr = SrcPtr
-                //                        Exit For
-                //                    End If
-                //                End With
-                //            Next
-                //        End If
-                //    Next
-                //End If
-                //
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }

@@ -44,7 +44,7 @@ namespace Contensive.Core.Addons.Primitives {
                         errorContextMessage = "processing site explorer response"
                     });
                     core.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Site Explorer");
-                    string htmlBodyTag = "<body class=\"ccBodyAdmin ccCon\" style=\"overflow:scroll\">";
+                    string htmlBodyTag = "<body class=\"container-fluid ccBodyAdmin ccCon\" style=\"overflow:scroll\">";
                     string htmlBody = ""
                         + genericController.nop(core.html.getPanelHeader("Contensive Site Explorer")) + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>"
                         + genericController.nop(copy) + "\r</td></tr></table>"
