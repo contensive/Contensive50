@@ -4592,6 +4592,8 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 // -- Update Content Record
+                // 20180412 - emailQueue cdef was there, table created, but cctable record missing and cdef.tableid=0, fixed here
+                cdef.dataChanged = true;
                 if (cdef.dataChanged) {
                     //
                     // -- Content needs to be updated

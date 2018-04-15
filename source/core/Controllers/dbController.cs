@@ -685,6 +685,9 @@ namespace Contensive.Core.Controllers {
         /// <param name="AllowAutoIncrement"></param>
         public void createSQLTable(string DataSourceName, string TableName, bool AllowAutoIncrement = true) {
             try {
+                //
+                logController.logTrace(core, "createSqlTable, DataSourceName [" + DataSourceName + "], TableName [" + TableName + "]");
+                //
                 if (string.IsNullOrEmpty(TableName)) {
                     //
                     // tablename required

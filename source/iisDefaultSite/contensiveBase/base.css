@@ -125,9 +125,9 @@ body {overflow:auto;}
 styles used publicly by Contensive 
 */
 .ccButtonCon {COLOR:black;Background-color:#567694;Padding:5px ! important;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
-div.ccJumpCon {Padding:2px;margin:0;}
-.ccJumpCon ul {vertical-align:middle;white-space:nowrap;Padding:5px;margin:0;}
-.ccJumpCon ul li {display:inline;width:30px;vertical-align:middle;text-align:center;cursor:pointer;list-style:none inside none;Padding:5px ! important;color:#444;Background-Color:#ccc;}
+div.ccJumpCon {padding:0;margin:0;}
+.ccJumpCon ul {vertical-align:middle;white-space:nowrap;padding:0;margin:0;}
+.ccJumpCon ul li {display:inline;width:30px;vertical-align:middle;text-align:center;cursor:pointer;list-style:none inside none;margin:0;padding:0 5px ! important;color:#444;Background-Color:#ccc;}
 .ccJumpCon ul li:hover {color:#000;}
 .ccJumpCon ul li.caption {Background-Color:transparent;border:0;cursor:default;}
 .ccJumpCon ul li.delim {Background-Color:transparent;border:0;cursor:default;}

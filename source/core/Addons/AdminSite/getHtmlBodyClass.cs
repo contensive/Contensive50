@@ -15,6 +15,7 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 using Contensive.Core.Models.Complex;
 using Contensive.Core.Addons.Tools;
+using static Contensive.Core.adminUIController;
 //
 namespace Contensive.Core.Addons.AdminSite {
     public class getHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
@@ -1666,67 +1667,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         private const string IndexConfigPrefix = "IndexConfig:";
         //
-        public enum FindWordMatchEnum {
-            MatchIgnore = 0,
-            MatchEmpty = 1,
-            MatchNotEmpty = 2,
-            MatchGreaterThan = 3,
-            MatchLessThan = 4,
-            matchincludes = 5,
-            MatchEquals = 6,
-            MatchTrue = 7,
-            MatchFalse = 8
-        }
         //
-        //
-        //
-        public class indexConfigSortClass {
-            //Dim FieldPtr As Integer
-            public string fieldName;
-            public int direction; // 1=forward, 2=reverse, 0=ignore/remove this sort
-        }
-        //
-        public class indexConfigFindWordClass {
-            public string Name;
-            public string Value;
-            public int Type;
-            public FindWordMatchEnum MatchOption;
-        }
-        //
-        public class indexConfigColumnClass {
-            public string Name;
-            //Public FieldId As Integer
-            public int Width;
-            public int SortPriority;
-            public int SortDirection;
-        }
-        //
-        public class indexConfigClass {
-            public bool Loaded;
-            public int ContentID;
-            public int PageNumber;
-            public int RecordsPerPage;
-            public int RecordTop;
-
-            //FindWordList As String
-            public Dictionary<string, indexConfigFindWordClass> FindWords = new Dictionary<string, indexConfigFindWordClass>();
-            //Public FindWordCnt As Integer
-            public bool ActiveOnly;
-            public bool LastEditedByMe;
-            public bool LastEditedToday;
-            public bool LastEditedPast7Days;
-            public bool LastEditedPast30Days;
-            public bool Open;
-            //public SortCnt As Integer
-            public Dictionary<string, indexConfigSortClass> Sorts = new Dictionary<string, indexConfigSortClass>();
-            public int GroupListCnt;
-            public string[] GroupList;
-            //public ColumnCnt As Integer
-            public Dictionary<string, indexConfigColumnClass> Columns = new Dictionary<string, indexConfigColumnClass>();
-            //SubCDefs() as integer
-            //SubCDefCnt as integer
-            public int SubCDefID;
-        }
         //
         // Temp
         //
@@ -2185,6 +2126,10 @@ namespace Contensive.Core.Addons.AdminSite {
                                     var tempVar = IndexConfig.FindWords[FieldName];
                                     if ((tempVar.MatchOption == FindWordMatchEnum.matchincludes) || (tempVar.MatchOption == FindWordMatchEnum.MatchEquals)) {
                                         FindWordValue = tempVar.Value;
+                                    } else if (tempVar.MatchOption == FindWordMatchEnum.MatchTrue) {
+                                        FindWordValue = "true";
+                                    } else if (tempVar.MatchOption == FindWordMatchEnum.MatchFalse) {
+                                        FindWordValue = "false";
                                     }
                                 }
                                 DataTable_FindRow += "\r\n<td valign=\"top\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding-top:2px;padding-bottom:2px;\">"
@@ -2219,22 +2164,20 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // ----- ButtonBar
                             //
-                            string ButtonBar = adminUIController.getButtonBarForIndex2(core, AllowAdd, AllowDelete, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, adminContent.name);
-                            string titleRow = getTitleRowForIndex(core, IndexConfig, adminContent, recordCnt, ContentAccessLimitMessage);
+                            string ButtonBar = adminUIController.getForm_Index_ButtonBar(core, AllowAdd, AllowDelete, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, adminContent.name);
+                            string titleRow = adminUIController.getForm_Index_Header(core, IndexConfig, adminContent, recordCnt, ContentAccessLimitMessage);
                             //
                             // Assemble LiveWindowTable
                             //
-                            //Stream.Add(htmlController.formStart( core,"", "adminForm"));
                             Stream.Add(ButtonBar);
-                            //Stream.Add(adminUIController.GetTitleBar(core, titleRow, ""));
+                            Stream.Add(adminUIController.GetTitleBar(core, titleRow, ""));
                             Stream.Add(formContent);
                             Stream.Add(ButtonBar);
-                            Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\", height=\"10\" >"));
+                            //Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\", height=\"10\" >"));
                             Stream.Add(htmlController.inputHidden(rnAdminSourceForm, AdminFormIndex));
                             Stream.Add(htmlController.inputHidden("cid", adminContent.id));
                             Stream.Add(htmlController.inputHidden("indexGoToPage", ""));
                             Stream.Add(htmlController.inputHidden("Columncnt", IndexConfig.Columns.Count));
-                            //Stream.Add("</form>");
                             core.html.addTitle(adminContent.name);
                         }
                     }
@@ -4214,7 +4157,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             } else if (AllowAdminFieldCheck() && (!InResponse) && (!InEmptyFieldList)) {
                                 //
                                 // Was sent out non-blank, and no response back, flag error and leave the current value to a retry
-                                string errorMessage = "There has been an Error reading the response from your browser.The field[" + field.caption + "]" + TabCopy + " was missing. Please Try your change again.If this Error happens repeatedly, please report this problem To your site administrator.";
+                                string errorMessage = "There has been an error reading the response from your browser. The field[" + field.caption + "]" + TabCopy + " was missing. Please Try your change again. If this error happens repeatedly, please report this problem to your site administrator.";
                                 errorController.addUserError(core, errorMessage);
                                 logController.handleError(core, new ApplicationException(errorMessage));
                                 ResponseFieldValueIsOKToSave = false;
@@ -9079,18 +9022,18 @@ namespace Contensive.Core.Addons.AdminSite {
             return tempGetMenuLink;
         }
         //
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="adminContent"></param>
+        /// <param name="editRecord"></param>
         //
         private void ProcessForms(ref cdefModel adminContent, ref editRecordClass editRecord) {
             try {
-                //Dim th as integer
-                //th = profileLogAdminMethodEnter("ProcessForms")
-                //
-                //Dim innovaEditor As innovaEditorAddonClassFPO
-                int CS = 0;
-                string EditorStyleRulesFilename = null;
                 //
                 if (AdminSourceForm != 0) {
+                    int CS = 0;
+                    string EditorStyleRulesFilename = null;
                     switch (AdminSourceForm) {
                         case AdminFormReports:
                             //
@@ -9287,10 +9230,10 @@ namespace Contensive.Core.Addons.AdminSite {
                                     core.cdnFiles.deleteFile(EditorStyleRulesFilename);
                                     //
                                     CS = core.db.csOpenSql_rev("default", "select id from cctemplates");
-                                    while (core.db.csOk(CS)) {
-                                        EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", core.db.csGet(CS, "ID"), 1, 99, 1);
+                                    while (core.db.csOk(0)) {
+                                        EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", core.db.csGet(0, "ID"), 1, 99, 1);
                                         core.cdnFiles.deleteFile(EditorStyleRulesFilename);
-                                        core.db.csGoNext(CS);
+                                        core.db.csGoNext(0);
                                     }
                                     core.db.csClose(ref CS);
                                     break;
@@ -13011,15 +12954,16 @@ namespace Contensive.Core.Addons.AdminSite {
                                                             case FieldTypeIdCurrency:
                                                             case FieldTypeIdFloat:
                                                             case FieldTypeIdInteger:
-                                                            case FieldTypeIdLookup:
                                                             case FieldTypeIdMemberSelect:
-                                                                findWord.MatchOption = FindWordMatchEnum.MatchEquals;
-                                                                break;
                                                             case FieldTypeIdDate:
                                                                 findWord.MatchOption = FindWordMatchEnum.MatchEquals;
                                                                 break;
                                                             case FieldTypeIdBoolean:
-                                                                findWord.MatchOption = FindWordMatchEnum.MatchEquals;
+                                                                if (encodeBoolean(FindValue)) {
+                                                                    findWord.MatchOption = FindWordMatchEnum.MatchTrue;
+                                                                } else {
+                                                                    findWord.MatchOption = FindWordMatchEnum.MatchFalse;
+                                                                }
                                                                 break;
                                                             default:
                                                                 findWord.MatchOption = FindWordMatchEnum.matchincludes;
@@ -13852,164 +13796,5 @@ namespace Contensive.Core.Addons.AdminSite {
             }
             return returnForm;
         }
-        //
-        // ====================================================================================================
-        /// <summary>
-        /// Title Bar for the index page
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="IndexConfig"></param>
-        /// <param name="adminContent"></param>
-        /// <param name="recordCnt"></param>
-        /// <param name="ContentAccessLimitMessage"></param>
-        /// <returns></returns>
-        public static string getTitleRowForIndex(coreController core, indexConfigClass IndexConfig, cdefModel adminContent, int recordCnt, string ContentAccessLimitMessage) {
-            //
-            // ----- TitleBar
-            //
-            string Title = "";
-            string SubTitle = "";
-            string SubTitlePart = "";
-            if (IndexConfig.ActiveOnly) {
-                SubTitle = SubTitle + ", active records";
-            }
-            SubTitlePart = "";
-            if (IndexConfig.LastEditedByMe) {
-                SubTitlePart = SubTitlePart + " by " + core.session.user.name;
-            }
-            if (IndexConfig.LastEditedPast30Days) {
-                SubTitlePart = SubTitlePart + " in the past 30 days";
-            }
-            if (IndexConfig.LastEditedPast7Days) {
-                SubTitlePart = SubTitlePart + " in the week";
-            }
-            if (IndexConfig.LastEditedToday) {
-                SubTitlePart = SubTitlePart + " today";
-            }
-            if (!string.IsNullOrEmpty(SubTitlePart)) {
-                SubTitle = SubTitle + ", last edited" + SubTitlePart;
-            }
-            foreach (var kvp in IndexConfig.FindWords) {
-                indexConfigFindWordClass findWord = kvp.Value;
-                if (!string.IsNullOrEmpty(findWord.Name)) {
-                    string FieldCaption = genericController.encodeText(cdefModel.GetContentFieldProperty(core, adminContent.name, findWord.Name, "caption"));
-                    switch (findWord.MatchOption) {
-                        case FindWordMatchEnum.MatchEmpty:
-                            SubTitle = SubTitle + ", " + FieldCaption + " is empty";
-                            break;
-                        case FindWordMatchEnum.MatchEquals:
-                            SubTitle = SubTitle + ", " + FieldCaption + " = '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.MatchFalse:
-                            SubTitle = SubTitle + ", " + FieldCaption + " is false";
-                            break;
-                        case FindWordMatchEnum.MatchGreaterThan:
-                            SubTitle = SubTitle + ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.matchincludes:
-                            SubTitle = SubTitle + ", " + FieldCaption + " includes '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.MatchLessThan:
-                            SubTitle = SubTitle + ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.MatchNotEmpty:
-                            SubTitle = SubTitle + ", " + FieldCaption + " is not empty";
-                            break;
-                        case FindWordMatchEnum.MatchTrue:
-                            SubTitle = SubTitle + ", " + FieldCaption + " is true";
-                            break;
-                    }
-
-                }
-            }
-            if (IndexConfig.SubCDefID > 0) {
-                string ContentName = cdefModel.getContentNameByID(core, IndexConfig.SubCDefID);
-                if (!string.IsNullOrEmpty(ContentName)) {
-                    SubTitle = SubTitle + ", in Sub-content '" + ContentName + "'";
-                }
-            }
-            //
-            // add groups to caption
-            //
-            if ((adminContent.contentTableName.ToLower() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
-                //If (LCase(AdminContent.ContentTableName) = "ccmembers") And (.GroupListCnt > 0) Then
-                SubTitlePart = "";
-                string GroupList = "";
-                for (int Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                    if (IndexConfig.GroupList[Ptr] != "") {
-                        GroupList += "\t" + IndexConfig.GroupList[Ptr];
-                    }
-                }
-                if (!string.IsNullOrEmpty(GroupList)) {
-                    string[] Groups = GroupList.Split('\t');
-                    if (Groups.GetUpperBound(0) == 0) {
-                        SubTitle = SubTitle + ", in group '" + Groups[0] + "'";
-                    } else if (Groups.GetUpperBound(0) == 1) {
-                        SubTitle = SubTitle + ", in groups '" + Groups[0] + "' and '" + Groups[1] + "'";
-                    } else {
-                        int Ptr;
-                        for (Ptr = 0; Ptr < Groups.GetUpperBound(0); Ptr++) {
-                            SubTitlePart = SubTitlePart + ", '" + Groups[Ptr] + "'";
-                        }
-                        SubTitle = SubTitle + ", in groups" + SubTitlePart.Substring(1) + " and '" + Groups[Ptr] + "'";
-                    }
-
-                }
-            }
-            //
-            // add sort details to caption
-            //
-            SubTitlePart = "";
-            foreach (var kvp in IndexConfig.Sorts) {
-                indexConfigSortClass sort = kvp.Value;
-                if (sort.direction > 0) {
-                    SubTitlePart = SubTitlePart + ", then " + adminContent.fields[sort.fieldName].caption;
-                    if (sort.direction > 1) {
-                        SubTitlePart += " reverse";
-                    }
-                }
-            }
-            if (!string.IsNullOrEmpty(SubTitlePart)) {
-                SubTitle += ", sorted by" + SubTitlePart.Substring(6);
-            }
-            //
-            Title = adminContent.name;
-            string TitleExtension = "";
-            if (TitleExtension != "") {
-                Title = Title + " " + TitleExtension;
-            }
-            string RightCopy = "";
-            switch (recordCnt) {
-                case 0:
-                    RightCopy = "no records found";
-                    break;
-                case 1:
-                    RightCopy = "1 record found";
-                    break;
-                default:
-                    RightCopy = recordCnt + " records found";
-                    break;
-            }
-            RightCopy = RightCopy + ", page " + IndexConfig.PageNumber;
-            Title = "<div>"
-                + "<span style=\"float:left;\"><strong>" + Title + "</strong></span>"
-                + "<span style=\"float:right;\">" + RightCopy + "</span>"
-                + "</div>";
-            int TitleRows = 0;
-            if (!string.IsNullOrEmpty(SubTitle)) {
-                Title = Title + "<div style=\"clear:both\">Filter: " + htmlController.encodeHtml(SubTitle.Substring(2)) + "</div>";
-                TitleRows = TitleRows + 1;
-            }
-            if (!string.IsNullOrEmpty(ContentAccessLimitMessage)) {
-                Title = Title + "<div style=\"clear:both\">" + ContentAccessLimitMessage + "</div>";
-                TitleRows = TitleRows + 1;
-            }
-            if (TitleRows == 0) {
-                Title = Title + "<div style=\"clear:both\">&nbsp;</div>";
-            }
-            //
-            return SpanClassAdminNormal + Title + "</span>";
-        }
-
     }
 }

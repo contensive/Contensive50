@@ -1015,6 +1015,8 @@ namespace Contensive.Core.Models.Complex {
             int returnContentId = 0;
             try {
                 //
+                logController.logTrace(core, "addContent, contentName [" + contentName + "], tableName [" + TableName + "]");
+                //
                 bool ContentIsBaseContent = false;
                 string NewGuid = null;
                 string LcContentGuid = null;
@@ -1098,9 +1100,11 @@ namespace Contensive.Core.Models.Complex {
                         //
                         // Block non-base update of a base field
                         //
-                        if (ContentIsBaseContent && !IsBaseContent) {
-                            throw new ApplicationException("Attempt to update a Base Content Definition [" + contentName + "] as non-base. This is not allowed.");
-                        } else {
+                        // 20180412 - odd case where emailQueue cctable entry was not made during a repair. temp fix
+                        { 
+                        //if (ContentIsBaseContent && !IsBaseContent) {
+                        //    throw new ApplicationException("Attempt to update a Base Content Definition [" + contentName + "] as non-base. This is not allowed.");
+                        //} else {
                             CDefFound = (returnContentId != 0);
                             if (!CDefFound) {
                                 //
@@ -1114,6 +1118,9 @@ namespace Contensive.Core.Models.Complex {
                             SQL = "SELECT ID from ccTables where (active<>0) and (name=" + core.db.encodeSQLText(TableName) + ");";
                             dt = core.db.executeQuery(SQL);
                             if (dt.Rows.Count <= 0) {
+                                //
+                                logController.logTrace(core, "addContent, create ccTable record, tableName [" + TableName + "]");
+                                //
                                 //
                                 // ----- no table definition found, create one
                                 //

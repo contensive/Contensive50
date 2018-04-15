@@ -37,6 +37,12 @@ namespace Contensive.CLI {
                     if (cp.core.serverConfig.productionEnvironment) { defaultValue = "y"; } else { defaultValue = "n"; }
                     cp.core.serverConfig.productionEnvironment = Equals(cliController.promptForReply(prompt, defaultValue).ToLower(), "y");
                     //
+                    // -- enable logging
+                    Console.WriteLine("\n\nWith logging disabled, the server log at c:\\ProgramData\\Contensive\\Logs only includes Error and Fatal level entries. With logging enabled, these logs are verbose and can be large.");
+                    prompt = "Enable Logging (y/n)?";
+                    if (cp.core.serverConfig.enableLogging) { defaultValue = "y"; } else { defaultValue = "n"; }
+                    cp.core.serverConfig.enableLogging = Equals(cliController.promptForReply(prompt, defaultValue).ToLower(), "y");
+                    //
                     // -- local or multiserver mode
                     Console.WriteLine("\n\nLocal or Remote File System");
                     Console.WriteLine("Local File System stores content files on the webserver. Remote File System store content in an Amazon AWS S3 bucket, using the webserver to cache files for read and write.");

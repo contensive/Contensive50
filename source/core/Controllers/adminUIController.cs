@@ -22,12 +22,82 @@ namespace Contensive.Core {
     public class adminUIController {
         //
         //========================================================================
-        //
+        /// <summary>
+        /// admin filter methods (includes, equals, greaterthan, etc)
+        /// </summary>
+        public enum FindWordMatchEnum {
+            MatchIgnore = 0,
+            MatchEmpty = 1,
+            MatchNotEmpty = 2,
+            MatchGreaterThan = 3,
+            MatchLessThan = 4,
+            matchincludes = 5,
+            MatchEquals = 6,
+            MatchTrue = 7,
+            MatchFalse = 8
+        }
         private enum SortingStateEnum {
             NotSortable = 0,
             SortableSetAZ = 1,
             SortableSetza = 2,
             SortableNotSet = 3
+        }
+        //
+        //
+        public class indexConfigSortClass {
+            //Dim FieldPtr As Integer
+            public string fieldName;
+            public int direction; // 1=forward, 2=reverse, 0=ignore/remove this sort
+        }
+        //
+        public class indexConfigFindWordClass {
+            public string Name;
+            public string Value;
+            public int Type;
+            public FindWordMatchEnum MatchOption;
+        }
+        //
+        public class indexConfigColumnClass {
+            public string Name;
+            //Public FieldId As Integer
+            public int Width;
+            public int SortPriority;
+            public int SortDirection;
+        }
+        //
+        public class indexConfigClass {
+            public bool Loaded;
+            public int ContentID;
+            public int PageNumber;
+            public int RecordsPerPage;
+            public int RecordTop;
+
+            //FindWordList As String
+            public Dictionary<string, indexConfigFindWordClass> FindWords = new Dictionary<string, indexConfigFindWordClass>();
+            //Public FindWordCnt As Integer
+            public bool ActiveOnly;
+            public bool LastEditedByMe;
+            public bool LastEditedToday;
+            public bool LastEditedPast7Days;
+            public bool LastEditedPast30Days;
+            public bool Open;
+            //public SortCnt As Integer
+            public Dictionary<string, indexConfigSortClass> Sorts = new Dictionary<string, indexConfigSortClass>();
+            public int GroupListCnt;
+            public string[] GroupList;
+            //public ColumnCnt As Integer
+            public Dictionary<string, indexConfigColumnClass> Columns = new Dictionary<string, indexConfigColumnClass>();
+            //SubCDefs() as integer
+            //SubCDefCnt as integer
+            public int SubCDefID;
+        }
+        public class buttonMetadata {
+            public string name = "button";
+            public string value = "";
+            public string classList = "";
+            public bool isDelete = false;
+            public bool isClose = false;
+            public bool isAdd = false;
         }
         // ====================================================================================================
         /// <summary>
@@ -125,14 +195,6 @@ namespace Contensive.Core {
             }
             return s;
         }
-        public class buttonMetadata {
-            public string name = "button";
-            public string value = "";
-            public string classList = "";
-            public bool isDelete = false;
-            public bool isClose = false;
-            public bool isAdd = false;
-        }
         public static string GetButtonsFromList(coreController core, List<buttonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
             string s = "";
             try {
@@ -158,47 +220,8 @@ namespace Contensive.Core {
         //
         public static string GetButtonsFromList(coreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
             return GetButtonsFromList(core, buttonStringToButtonList(ButtonList), AllowDelete, AllowAdd);
-            //string s = "";
-            //try {
-            //    string[] Buttons = null;
-            //    int Ptr = 0;
-            //    if (!string.IsNullOrEmpty(ButtonList.Trim(' '))) {
-            //        Buttons = ButtonList.Split(',');
-            //        for (Ptr = 0; Ptr <= Buttons.GetUpperBound(0); Ptr++) {
-            //            if (Buttons[Ptr].Trim(' ') == encodeText(ButtonDelete).Trim(' ')) {
-            //                if (AllowDelete) {
-            //                    s += getButtonDanger(Buttons[Ptr], "if(!DeleteCheck()) return false;");
-            //                    //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" VALUE=\"" + Buttons[Ptr] + "\" onClick=\"if(!DeleteCheck())return false;\" class=\"btn btn-danger mr-1\">";
-            //                } else {
-            //                    s += getButtonDanger(Buttons[Ptr], "if(!DeleteCheck()) return false;",true);
-            //                    //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" DISABLED VALUE=\"" + Buttons[Ptr] + "\" class=\"btn btn-primary mr-1 btn-sm\">";
-            //                }
-            //            }
-            //            else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonClose).Trim(' ')) {
-            //                s += getButtonPrimary(Buttons[Ptr], "window.close();");
-            //                //s = s + htmlController.button(Buttons[Ptr], "", "", "window.close();");
-            //            }
-            //            else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonAdd).Trim(' ')) {
-            //                if (AllowAdd) {
-            //                    s += getButtonPrimary(Buttons[Ptr], "return processSubmit(this);");
-            //                    //s = s + "<input type=submit name=\"" + ButtonName + "\" value=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
-            //                } else {
-            //                    s += getButtonPrimary(Buttons[Ptr], "return processSubmit(this);",true );
-            //                    //s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" DISABLED VALUE=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\" class=\"btn btn-primary mr-1 btn-sm\">";
-            //                }
-            //            } else if (string.IsNullOrEmpty(Buttons[Ptr].Trim(' '))) {
-            //                //
-            //            } else {
-            //                s += getButtonPrimary(Buttons[Ptr]);
-            //                //s = s + htmlController.button(Buttons[Ptr], ButtonName);
-            //            }
-            //        }
-            //    }
-            //} catch (Exception ex) {
-            //    logController.handleError( core,ex);
-            //}
-            //return s;
         }
+        // ====================================================================================================
         /// <summary>
         /// Return a bootstrap button bar
         /// </summary>
@@ -214,8 +237,20 @@ namespace Contensive.Core {
                 return "<div class=\"border bg-white p-2\">" + LeftButtons + "<div class=\"float-right\">" + RightButtons + "</div></div>";
             }
         }
-
-        public static string getButtonBarForIndex2(coreController core, bool AllowAdd, bool AllowDelete, int pageNumber, int recordsPerPage, int recordCnt, string contentName) {
+        // ====================================================================================================
+        /// <summary>
+        /// get button bar for the index form
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="AllowAdd"></param>
+        /// <param name="AllowDelete"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="recordsPerPage"></param>
+        /// <param name="recordCnt"></param>
+        /// <param name="contentName"></param>
+        /// <returns></returns>
+        public static string getForm_Index_ButtonBar(coreController core, bool AllowAdd, bool AllowDelete, int pageNumber, int recordsPerPage, int recordCnt, string contentName) {
+            string result = "";
             string LeftButtons = "";
             string RightButtons = "";
             LeftButtons = LeftButtons + adminUIController.getButtonPrimary(ButtonCancel);
@@ -243,18 +278,21 @@ namespace Contensive.Core {
             } else {
                 RightButtons += adminUIController.getButtonDanger(ButtonDelete, "", true);
             }
-            int PageCount = 1;
-            if (recordCnt > 1) {
-                PageCount = encodeInteger(1 + encodeInteger(Math.Floor(encodeNumber((recordCnt - 1) / recordsPerPage))));
-            }
-            return adminUIController.GetButtonBarForIndex(core, LeftButtons, RightButtons, pageNumber, recordsPerPage, PageCount, recordCnt, contentName);
+            result = GetButtonBar(core, LeftButtons, RightButtons);
+            return result;
+            //return adminUIController.getForm_index_pageNavigation(core, LeftButtons, RightButtons, pageNumber, recordsPerPage, PageCount, recordCnt, contentName);
         }
         //
         // ====================================================================================================
         //
-        public static string GetButtonBarForIndex(coreController core, string LeftButtons, string RightButtons, int PageNumber, int RecordsPerPage, int PageCount, int recordCnt, string contentName) {
+        public static string getForm_index_pageNavigation(coreController core, int PageNumber, int recordsPerPage, int recordCnt, string contentName) {
             string result = null;
             try {
+                int PageCount = 1;
+                if (recordCnt > 1) {
+                    PageCount = encodeInteger(1 + encodeInteger(Math.Floor(encodeNumber((recordCnt - 1) / recordsPerPage))));
+                }
+
                 int NavStart = PageNumber - 9;
                 if (NavStart < 1) {
                     NavStart = 1;
@@ -278,13 +316,24 @@ namespace Contensive.Core {
                     Nav = Nav + "<li class=\"delim\">&#187;</li><li onclick=\"bbj(this);\">" + PageCount + "</li>";
                 }
                 Nav = genericController.vbReplace(Nav, ">" + PageNumber + "<", " class=\"hit\">" + PageNumber + "<");
+                string recordDetails = "";
+                switch (recordCnt) {
+                    case 0:
+                        recordDetails = "no records found";
+                        break;
+                    case 1:
+                        recordDetails = "1 record found";
+                        break;
+                    default:
+                        recordDetails = recordCnt + " records found";
+                        break;
+                }
                 Nav = "" + "\r<script language=\"javascript\">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>"
                     + "\r<div class=\"ccJumpCon\">"
-                    + cr2 + "<ul><li class=\"caption\">" + contentName + ", " + recordCnt + " records, page</li>"
+                    + cr2 + "<ul><li class=\"caption\">" + recordDetails + ", page</li>"
                     + cr3 + Nav + cr2 + "</ul>"
                     + "\r</div>";
-                result = GetButtonBar(core, LeftButtons, RightButtons);
-                result += Nav; 
+                 result += Nav;
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
@@ -862,7 +911,9 @@ namespace Contensive.Core {
         /// <param name="htmlValue"></param>
         /// <returns></returns>
         public static string getDefaultEditor_Bool(coreController core, string htmlName, bool htmlValue, bool readOnly, string htmlId) {
-            return htmlController.div(core.html.inputCheckbox(htmlName, htmlValue, htmlId, readOnly), "checkbox");
+            string result = htmlController.div(core.html.inputCheckbox(htmlName, htmlValue, htmlId, readOnly), "checkbox");
+            if (readOnly)  result += htmlController.inputHidden(htmlName, htmlValue);
+            return result;
         }
         // ====================================================================================================
         /// <summary>
@@ -1110,8 +1161,143 @@ namespace Contensive.Core {
             //}
             //return tempGetEditRow;
         }
-        // ====================================================================================================
         //
+        // ====================================================================================================
+        /// <summary>
+        /// Title Bar for the index page
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="IndexConfig"></param>
+        /// <param name="adminContent"></param>
+        /// <param name="recordCnt"></param>
+        /// <param name="ContentAccessLimitMessage"></param>
+        /// <returns></returns>
+        public static string getForm_Index_Header(coreController core, indexConfigClass IndexConfig, cdefModel adminContent, int recordCnt, string ContentAccessLimitMessage) {
+            //
+            // ----- TitleBar
+            //
+            string Title = "";
+            string filterLine = "";
+            if (IndexConfig.ActiveOnly) {
+                filterLine = filterLine + ", active records";
+            }
+            string filterLastEdited = "";
+            if (IndexConfig.LastEditedByMe) {
+                filterLastEdited = filterLastEdited + " by " + core.session.user.name;
+            }
+            if (IndexConfig.LastEditedPast30Days) {
+                filterLastEdited = filterLastEdited + " in the past 30 days";
+            }
+            if (IndexConfig.LastEditedPast7Days) {
+                filterLastEdited = filterLastEdited + " in the week";
+            }
+            if (IndexConfig.LastEditedToday) {
+                filterLastEdited = filterLastEdited + " today";
+            }
+            if (!string.IsNullOrEmpty(filterLastEdited)) {
+                filterLine = filterLine + ", last edited" + filterLastEdited;
+            }
+            foreach (var kvp in IndexConfig.FindWords) {
+                indexConfigFindWordClass findWord = kvp.Value;
+                if (!string.IsNullOrEmpty(findWord.Name)) {
+                    string FieldCaption = cdefModel.GetContentFieldProperty(core, adminContent.name, findWord.Name, "caption");
+                    switch (findWord.MatchOption) {
+                        case FindWordMatchEnum.MatchEmpty:
+                            filterLine = filterLine + ", " + FieldCaption + " is empty";
+                            break;
+                        case FindWordMatchEnum.MatchEquals:
+                            filterLine = filterLine + ", " + FieldCaption + " = '" + findWord.Value + "'";
+                            break;
+                        case FindWordMatchEnum.MatchFalse:
+                            filterLine = filterLine + ", " + FieldCaption + " is false";
+                            break;
+                        case FindWordMatchEnum.MatchGreaterThan:
+                            filterLine = filterLine + ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
+                            break;
+                        case FindWordMatchEnum.matchincludes:
+                            filterLine = filterLine + ", " + FieldCaption + " includes '" + findWord.Value + "'";
+                            break;
+                        case FindWordMatchEnum.MatchLessThan:
+                            filterLine = filterLine + ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
+                            break;
+                        case FindWordMatchEnum.MatchNotEmpty:
+                            filterLine = filterLine + ", " + FieldCaption + " is not empty";
+                            break;
+                        case FindWordMatchEnum.MatchTrue:
+                            filterLine = filterLine + ", " + FieldCaption + " is true";
+                            break;
+                    }
+
+                }
+            }
+            if (IndexConfig.SubCDefID > 0) {
+                string ContentName = cdefModel.getContentNameByID(core, IndexConfig.SubCDefID);
+                if (!string.IsNullOrEmpty(ContentName)) {
+                    filterLine = filterLine + ", in Sub-content '" + ContentName + "'";
+                }
+            }
+            //
+            // add groups to caption
+            //
+            if ((adminContent.contentTableName.ToLower() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
+                string GroupList = "";
+                for (int Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
+                    if (IndexConfig.GroupList[Ptr] != "") {
+                        GroupList += "\t" + IndexConfig.GroupList[Ptr];
+                    }
+                }
+                if (!string.IsNullOrEmpty(GroupList)) {
+                    string[] Groups = GroupList.Split('\t');
+                    if (Groups.GetUpperBound(0) == 0) {
+                        filterLine = filterLine + ", in group '" + Groups[0] + "'";
+                    } else if (Groups.GetUpperBound(0) == 1) {
+                        filterLine = filterLine + ", in groups '" + Groups[0] + "' and '" + Groups[1] + "'";
+                    } else {
+                        int Ptr;
+                        string filterGroups = "";
+                        for (Ptr = 0; Ptr < Groups.GetUpperBound(0); Ptr++) {
+                            filterGroups += ", '" + Groups[Ptr] + "'";
+                        }
+                        filterLine = filterLine + ", in groups" + filterGroups.Substring(1) + " and '" + Groups[Ptr] + "'";
+                    }
+
+                }
+            }
+            //
+            // add sort details to caption
+            //
+            string sortLine = "";
+            foreach (var kvp in IndexConfig.Sorts) {
+                indexConfigSortClass sort = kvp.Value;
+                if (sort.direction > 0) {
+                    sortLine = sortLine + ", then " + adminContent.fields[sort.fieldName].caption;
+                    if (sort.direction > 1) {
+                        sortLine += " reverse";
+                    }
+                }
+            }
+            Title = adminContent.name;
+            string pageNavigation = getForm_index_pageNavigation(core, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, adminContent.name);
+            Title = "<div>"
+                + "<span style=\"float:left;\"><strong>" + Title + "</strong></span>"
+                + "<span style=\"float:right;\">" + pageNavigation + "</span>"
+                + "</div>";
+            int TitleRows = 0;
+            if (!string.IsNullOrEmpty(filterLine)) {
+                Title +=  "<div style=\"clear:both\">Filter: " + htmlController.encodeHtml(filterLine.Substring(2)) + "</div>";
+                TitleRows = TitleRows + 1;
+            }
+            if (!string.IsNullOrEmpty(sortLine)) {
+                Title +=  "<div style=\"clear:both\">Sort: " + htmlController.encodeHtml(sortLine.Substring(6)) + "</div>";
+                TitleRows = TitleRows + 1;
+            }
+            if (!string.IsNullOrEmpty(ContentAccessLimitMessage)) {
+                Title +=  "<div style=\"clear:both\">" + ContentAccessLimitMessage + "</div>";
+                TitleRows = TitleRows + 1;
+            }
+            return Title;
+        }
+
     }
     //
     //====================================================================================================
