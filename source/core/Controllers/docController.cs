@@ -213,7 +213,7 @@ namespace Contensive.Core.Controllers {
         internal Dictionary<string, Models.Complex.cdefModel> cdefDictionary { get; set; }
         //
         // -- persistant store for tableSchema complex mode
-        internal Dictionary<string, Models.Complex.tableSchemaModel> tableSchemaDictionary { get; set; }
+        internal Dictionary<string, Models.Complex.TableSchemaModel> tableSchemaDictionary { get; set; }
         //
         // -- Email Block List - these are people who have asked to not have email sent to them from this site, Loaded ondemand by csv_GetEmailBlockList
         public string emailBlockListStore { get; set; } = "";
@@ -662,7 +662,7 @@ namespace Contensive.Core.Controllers {
                 // Form Wrapper
                 //
                 result = ""
-                    + '\r' + core.html.formStartMultipart(core.webServer.requestQueryString) + '\r' + htmlController.inputHidden("Type", FormTypePageAuthoring) + '\r' + htmlController.inputHidden("ID", pageController.page.id) + '\r' + htmlController.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + htmlController.formEnd();
+                    + '\r' + htmlController.formStartMultipart(core.webServer.requestQueryString,"","ccForm") + '\r' + htmlController.inputHidden("Type", FormTypePageAuthoring) + '\r' + htmlController.inputHidden("ID", pageController.page.id) + '\r' + htmlController.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + htmlController.formEnd();
 
                 //& cr & core.html.main_GetPanelHeader("Contensive Quick Editor") _
 

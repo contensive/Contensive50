@@ -126,7 +126,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <param name="level"></param>
-        public static void logWithoutConfig(string message, logLevel level ) {
+        public static void forceNLog(string message, logLevel level ) {
             try {
                 string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("00000000");
                 string logContent = level.ToString() + "\tthread:" + threadName + "\t" + message;
@@ -180,7 +180,7 @@ namespace Contensive.Core.Controllers {
                     if (core.useNlog) {
                         //
                         // -- log to Nlog
-                        logWithoutConfig(message, level);
+                        forceNLog(message, level);
                     } else {
                         //
                         // -- legacy logging

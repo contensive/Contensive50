@@ -3,6 +3,7 @@
 <script runat="server">
 
     Sub Page_Load()
+        Contensive.Core.Controllers.logController.forceNLog("configurationClass, loadRouteMap", Contensive.Core.Controllers.logController.logLevel.Trace)
         '
         ' -- two possible initialization methods 
         Dim sw As System.Diagnostics.Stopwatch = System.Diagnostics.Stopwatch.StartNew()

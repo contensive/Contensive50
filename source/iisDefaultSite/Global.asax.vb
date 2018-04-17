@@ -4,6 +4,7 @@ Option Strict On
 
 Imports System.Web.SessionState
 Imports System.Web.Routing
+Imports Contensive.Core.Controllers
 
 Public Class Global_asax
     Inherits System.Web.HttpApplication
@@ -18,43 +19,43 @@ Public Class Global_asax
     ''' <param name="e"></param>
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         Try
-            Trace.WriteLine(getAppDescription("Application_Start"))
+            logController.forceNLog("Global.asax, Application_Start", logController.logLevel.Trace)
             Using cp As New Contensive.Core.CPClass(DefaultSite.configurationClass.getAppName())
                 DefaultSite.configurationClass.loadRouteMap(cp)
             End Using
         Catch ex As Exception
-            Contensive.Core.Controllers.logController.logWithoutConfig(getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Core.Controllers.logController.logLevel.Fatal)
+            Contensive.Core.Controllers.logController.forceNLog(getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Core.Controllers.logController.logLevel.Fatal)
         End Try
     End Sub
 
     Sub Session_Start(ByVal sender As Object, ByVal e As EventArgs)
         ' Fires when the session is started
-        Trace.WriteLine(getAppDescription("Session_Start"))
+        logController.forceNLog("Global.asax, Session_Start [" + e.ToString() + "]", logController.logLevel.Trace)
     End Sub
 
     Sub Application_BeginRequest(ByVal sender As Object, ByVal e As EventArgs)
         ' Fires at the beginning of each request
-        Trace.WriteLine(getAppDescription("Application_BeginRequest"))
+        logController.forceNLog("Global.asax, Application_BeginRequest [" + e.ToString() + "]", logController.logLevel.Trace)
     End Sub
 
     Sub Application_AuthenticateRequest(ByVal sender As Object, ByVal e As EventArgs)
         ' Fires upon attempting to authenticate the use
-        Trace.WriteLine(getAppDescription("Application_AuthenticateRequest"))
+        logController.forceNLog("Global.asax, Application_AuthenticateRequest [" + e.ToString() + "]", logController.logLevel.Trace)
     End Sub
 
     Sub Application_Error(ByVal sender As Object, ByVal e As EventArgs)
         ' Fires when an error occurs
-        Trace.WriteLine(getAppDescription("Application_Error"))
+        logController.forceNLog("Global.asax, Application_Error [" + e.ToString() + "]", logController.logLevel.Error)
     End Sub
 
     Sub Session_End(ByVal sender As Object, ByVal e As EventArgs)
         ' Fires when the session ends
-        Trace.WriteLine(getAppDescription("Session_End"))
+        logController.forceNLog("Global.asax, Session_End [" + e.ToString() + "]", logController.logLevel.Trace)
     End Sub
 
     Sub Application_End(ByVal sender As Object, ByVal e As EventArgs)
         ' Fires when the application ends
-        Trace.WriteLine(getAppDescription("Application_End"))
+        logController.forceNLog("Global.asax, Application_End [" + e.ToString() + "]", logController.logLevel.Trace)
     End Sub
     '
     '

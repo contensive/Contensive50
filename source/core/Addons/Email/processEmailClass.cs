@@ -437,7 +437,7 @@ namespace Contensive.Core.Addons.Email {
                     if (core.db.csOk(CSPeople)) {
                         emailToAddress = core.db.csGet(CSPeople, "Email");
                         emailToName = core.db.csGet(CSPeople, "Name");
-                        defaultPage = core.siteProperties.getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue);
+                        defaultPage = core.siteProperties.serverPageDefault;
                         urlProtocolDomainSlash = protocolHostLink + requestAppRootPath;
                         if (emailDropID != 0) {
                             switch (core.siteProperties.getInteger("GroupEmailOpenTriggerMethod", 0)) {

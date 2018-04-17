@@ -643,9 +643,9 @@ namespace Contensive.Core.Controllers {
         public bool isSQLTableField(string DataSourceName, string TableName, string FieldName) {
             bool returnOK = false;
             try {
-                Models.Complex.tableSchemaModel tableSchema = Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                Models.Complex.TableSchemaModel tableSchema = Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (tableSchema != null) {
-                    returnOK = tableSchema.columns.Contains(FieldName.ToLower());
+                    returnOK = (null != tableSchema.columns.Find(x => x.COLUMN_NAME.ToLower() == FieldName.ToLower()));
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -664,7 +664,7 @@ namespace Contensive.Core.Controllers {
         public bool isSQLTable(string DataSourceName, string TableName) {
             bool ReturnOK = false;
             try {
-                ReturnOK = (!(Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null));
+                ReturnOK = (!(Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null));
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -702,7 +702,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Local table -- create if not in schema
                     //
-                    if (Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null) {
+                    if (Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null) {
                         if (!AllowAutoIncrement) {
                             string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) + ");";
                             executeQuery(SQL, DataSourceName).Dispose();
@@ -740,7 +740,7 @@ namespace Contensive.Core.Controllers {
                     createSQLIndex(DataSourceName, TableName, TableName + "ModifiedDate", "MODIFIEDDATE");
                     createSQLIndex(DataSourceName, TableName, TableName + "ccGuid", "CCGUID");
                 }
-                Models.Complex.tableSchemaModel.tableSchemaListClear(core);
+                Models.Complex.TableSchemaModel.tableSchemaListClear(core);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -842,7 +842,7 @@ namespace Contensive.Core.Controllers {
                     //
                     //   Delete any indexes that use this column
                     // refactor -- need to finish this
-                    DataTable tableScheme = getIndexSchemaData(TableName);
+                    //DataTable tableScheme = getIndexSchemaData(TableName);
                     //With cdefCache.tableSchema(SchemaPointer)
                     //    If .IndexCount > 0 Then
                     //        For IndexPointer = 0 To .IndexCount - 1
@@ -874,12 +874,12 @@ namespace Contensive.Core.Controllers {
         /// <param name="clearMetaCache"></param>
         public void createSQLIndex(string DataSourceName, string TableName, string IndexName, string FieldNames, bool clearMetaCache = false) {
             try {
-                Models.Complex.tableSchemaModel ts = null;
+                Models.Complex.TableSchemaModel ts = null;
                 if (!(string.IsNullOrEmpty(TableName) && string.IsNullOrEmpty(IndexName) & string.IsNullOrEmpty(FieldNames))) {
-                    ts = Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                    ts = Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                     if (ts != null) {
-                        if (!ts.indexes.Contains(IndexName.ToLower())) {
-                            executeQuery("CREATE INDEX " + IndexName + " ON " + TableName + "( " + FieldNames + " );", DataSourceName);
+                        if (null == ts.indexes.Find(x => x.index_name.ToLower() == IndexName.ToLower())) {
+                            executeQuery("CREATE INDEX [" + IndexName + "] ON [" + TableName + "]( " + FieldNames + " );", DataSourceName);
                             if (clearMetaCache) {
                                 core.cache.invalidateAll();
                                 core.doc.clearMetaData();
@@ -973,7 +973,8 @@ namespace Contensive.Core.Controllers {
                         returnType = "Float NULL";
                         break;
                     case constants.FieldTypeIdDate:
-                        returnType = "DateTime NULL";
+                        // 20180416 - ms recommends using new, higher precision. Code requires 3 digits so 7 is more than enough
+                        returnType = "DateTime2(7) NULL";
                         break;
                     case constants.FieldTypeIdFloat:
                         returnType = "Float NULL";
@@ -1054,13 +1055,13 @@ namespace Contensive.Core.Controllers {
         /// <param name="IndexName"></param>
         public void deleteSqlIndex(string DataSourceName, string TableName, string IndexName) {
             try {
-                Models.Complex.tableSchemaModel ts = null;
+                Models.Complex.TableSchemaModel ts = null;
                 int DataSourceType = 0;
                 string sql = null;
                 //
-                ts = Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                ts = Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (ts != null) {
-                    if (ts.indexes.Contains(IndexName.ToLower())) {
+                    if (null != ts.indexes.Find(x => x.index_name.ToLower() == IndexName.ToLower())) {
                         DataSourceType = getDataSourceType(DataSourceName);
                         switch (DataSourceType) {
                             case constants.DataSourceTypeODBCAccess:
@@ -1069,7 +1070,7 @@ namespace Contensive.Core.Controllers {
                             case constants.DataSourceTypeODBCMySQL:
                                 throw new NotImplementedException("mysql");
                             default:
-                                sql = "DROP INDEX " + TableName + "." + IndexName + ";";
+                                sql = "DROP INDEX [" + TableName + "].[" + IndexName + "];";
                                 break;
                         }
                         executeQuery(sql, DataSourceName);
@@ -3482,20 +3483,22 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         ///    encodeSQLDate
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expressionDate"></param>
         /// <returns></returns>
         //
-        public string encodeSQLDate(DateTime expression) {
+        public string encodeSQLDate(DateTime expressionDate) {
             string returnResult = "";
             try {
-                if (Convert.IsDBNull(expression)) {
+                if (Convert.IsDBNull(expressionDate)) {
                     returnResult = "null";
                 } else {
-                    DateTime expressionDate = genericController.encodeDate(expression);
+                    // 20180416 - not needed, type is already datetime
+                    //DateTime expressionDate = genericController.encodeDate(expression);
                     if (expressionDate == DateTime.MinValue) {
                         returnResult = "null";
                     } else {
-                        returnResult = "'" + expressionDate.Year + ("0" + expressionDate.Month).Substring(("0" + expressionDate.Month).Length - 2) + ("0" + expressionDate.Day).Substring(("0" + expressionDate.Day).Length - 2) + " " + ("0" + expressionDate.Hour).Substring(("0" + expressionDate.Hour).Length - 2) + ":" + ("0" + expressionDate.Minute).Substring(("0" + expressionDate.Minute).Length - 2) + ":" + ("0" + expressionDate.Second).Substring(("0" + expressionDate.Second).Length - 2) + ":" + ("00" + expressionDate.Millisecond).Substring(("00" + expressionDate.Millisecond).Length - 3) + "'";
+                        returnResult = "'" + expressionDate.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
+                        //returnResult = "'" + expressionDate.Year + ("0" + expressionDate.Month).Substring(("0" + expressionDate.Month).Length - 2) + ("0" + expressionDate.Day).Substring(("0" + expressionDate.Day).Length - 2) + " " + ("0" + expressionDate.Hour).Substring(("0" + expressionDate.Hour).Length - 2) + ":" + ("0" + expressionDate.Minute).Substring(("0" + expressionDate.Minute).Length - 2) + ":" + ("0" + expressionDate.Second).Substring(("0" + expressionDate.Second).Length - 2) + ":" + ("00" + expressionDate.Millisecond).Substring(("00" + expressionDate.Millisecond).Length - 3) + "'";
                     }
                 }
             } catch (Exception ex) {
@@ -4072,10 +4075,10 @@ namespace Contensive.Core.Controllers {
         public string getSQLIndexList(string DataSourceName, string TableName) {
             string returnList = "";
             try {
-                Models.Complex.tableSchemaModel ts = Models.Complex.tableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                Models.Complex.TableSchemaModel ts = Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (ts != null) {
-                    foreach (string entry in ts.indexes) {
-                        returnList += "," + entry;
+                    foreach ( TableSchemaModel.IndexSchemaModel index in ts.indexes) {
+                        returnList += "," + index.index_name;
                     }
                     if (returnList.Length > 0) {
                         returnList = returnList.Substring(2);
@@ -4148,6 +4151,9 @@ namespace Contensive.Core.Controllers {
                         returnDt = connSQL.GetSchema("Indexes", new[] { core.appConfig.name, null, tableName, null });
                     }
                 }
+                //
+                returnDt = executeQuery("sys.sp_helpindex @objname = N'" + tableName + "'");
+                // EXEC sys.sp_helpindex @objname = N'cccontent' returns index_name, index_keys (comma delimited field list)
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -4209,27 +4215,10 @@ namespace Contensive.Core.Controllers {
         //
         public void createContentFromSQLTable(dataSourceModel DataSource, string TableName, string ContentName) {
             try {
-                string SQL = null;
-                DataTable dtFields = null;
-                string DateAddedString = null;
-                string CreateKeyString = null;
-                int ContentID = 0;
-                //Dim DataSourceID As Integer
-                bool ContentFieldFound = false;
-                int RecordID = 0;
+                string DateAddedString = core.db.encodeSQLDate(DateTime.Now);
+                string CreateKeyString = core.db.encodeSQLNumber(genericController.GetRandomInteger(core));
                 //
-                //----------------------------------------------------------------
-                // ----- lookup datasource ID, if default, ID is -1
-                //----------------------------------------------------------------
-                //
-                //DataSourceID = core.db.GetDataSourceID(DataSourceName)
-                DateAddedString = core.db.encodeSQLDate(DateTime.Now);
-                CreateKeyString = core.db.encodeSQLNumber(genericController.GetRandomInteger(core));
-                //
-                //----------------------------------------------------------------
-                // ----- Read in a record from the table to get fields
-                //----------------------------------------------------------------
-                //
+                // Read in a record from the table to get fields
                 DataTable dt = core.db.openTable(DataSource.Name, TableName, "", "", "", 1);
                 if (dt.Rows.Count == 0) {
                     dt.Dispose();
@@ -4238,10 +4227,12 @@ namespace Contensive.Core.Controllers {
                     //
                     dt = core.db.insertTableRecordGetDataTable(DataSource.Name, TableName, core.session.user.id);
                     if (dt.Rows.Count > 0) {
-                        RecordID = genericController.encodeInteger(dt.Rows[0]["ID"]);
+                        int RecordID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                         core.db.executeQuery("Update " + TableName + " Set active=0 where id=" + RecordID + ";", DataSource.Name);
                     }
                 }
+                string SQL = "";
+                int ContentID = 0;
                 if (dt.Rows.Count == 0) {
                     throw new ApplicationException("Could Not add a record To table [" + TableName + "].");
                 } else {
@@ -4277,16 +4268,14 @@ namespace Contensive.Core.Controllers {
                     // ----- locate the field in the content field table
                     //
                     SQL = "Select name from ccFields where ContentID=" + ContentID + ";";
-                    dtFields = core.db.executeQuery(SQL);
+                    DataTable dtFields = core.db.executeQuery(SQL);
                     //
                     // ----- verify all the table fields
-                    //
                     foreach (DataColumn dcTableColumns in dt.Columns) {
                         //
                         // ----- see if the field is already in the content fields
-                        //
                         string UcaseTableColumnName = genericController.vbUCase(dcTableColumns.ColumnName);
-                        ContentFieldFound = false;
+                        bool ContentFieldFound = false;
                         foreach (DataRow drContentRecords in dtFields.Rows) {
                             if (genericController.vbUCase(genericController.encodeText(drContentRecords["name"])) == UcaseTableColumnName) {
                                 ContentFieldFound = true;

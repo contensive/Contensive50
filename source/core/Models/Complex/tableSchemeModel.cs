@@ -18,20 +18,31 @@ namespace Contensive.Core.Models.Complex {
     //
     // ----- Table Schema caching to speed up update
     //
-    public class tableSchemaModel {
+    public class TableSchemaModel {
+        public class ColumnSchemaModel {
+            public string COLUMN_NAME;
+            public string DATA_TYPE;
+            public int DATETIME_PRECISION;
+            public int CHARACTER_MAXIMUM_LENGTH;
+        }
+        public class IndexSchemaModel {
+            public string index_name;
+            public string index_keys;
+            public List<string> indexKeyList;
+        }
         public string TableName { get; set; }
         public bool Dirty { get; set; }
-        public List<string> columns { get; set; }
+        public List<ColumnSchemaModel> columns { get; set; }
         // list of all indexes, with the field it covers
-        public List<string> indexes { get; set; }
+        public List<IndexSchemaModel> indexes { get; set; }
         //
         //=================================================================================
         // Returns a pointer into the cdefCache.tableSchema() array for the table that matches
         //   returns -1 if the table is not found
         //=================================================================================
         //
-        public static Models.Complex.tableSchemaModel getTableSchema(coreController core, string TableName, string DataSourceName) {
-            Models.Complex.tableSchemaModel tableSchema = null;
+        public static Models.Complex.TableSchemaModel getTableSchema(coreController core, string TableName, string DataSourceName) {
+            Models.Complex.TableSchemaModel tableSchema = null;
             try {
                 DataTable dt = null;
                 bool isInCache = false;
@@ -46,7 +57,7 @@ namespace Contensive.Core.Models.Complex {
                     if (!string.IsNullOrEmpty(TableName)) {
                         lowerTablename = TableName.ToLower();
                         if ((core.doc.tableSchemaDictionary) == null) {
-                            core.doc.tableSchemaDictionary = new Dictionary<string, Models.Complex.tableSchemaModel>();
+                            core.doc.tableSchemaDictionary = new Dictionary<string, Models.Complex.TableSchemaModel>();
                         } else {
                             isInCache = core.doc.tableSchemaDictionary.TryGetValue(lowerTablename, out tableSchema);
                         }
@@ -63,9 +74,9 @@ namespace Contensive.Core.Models.Complex {
                                 tableSchema = null;
                             } else {
                                 isInDb = true;
-                                tableSchema = new Models.Complex.tableSchemaModel();
-                                tableSchema.columns = new List<string>();
-                                tableSchema.indexes = new List<string>();
+                                tableSchema = new Models.Complex.TableSchemaModel();
+                                tableSchema.columns = new List<ColumnSchemaModel>();
+                                tableSchema.indexes = new List<IndexSchemaModel>();
                                 tableSchema.TableName = lowerTablename;
                                 //
                                 // load columns
@@ -73,7 +84,12 @@ namespace Contensive.Core.Models.Complex {
                                 dt = core.db.getColumnSchemaData(TableName);
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
-                                        tableSchema.columns.Add(genericController.encodeText(row["COLUMN_NAME"]).ToLower());
+                                        tableSchema.columns.Add( new ColumnSchemaModel() {
+                                            COLUMN_NAME = genericController.encodeText(row["COLUMN_NAME"]).ToLower(),
+                                            DATA_TYPE = genericController.encodeText(row["DATA_TYPE"]).ToLower(),
+                                            CHARACTER_MAXIMUM_LENGTH = genericController.encodeInteger( row["CHARACTER_MAXIMUM_LENGTH"] ),
+                                            DATETIME_PRECISION= genericController.encodeInteger(row["DATETIME_PRECISION"])
+                                        });
                                     }
                                 }
                                 //
@@ -82,7 +98,12 @@ namespace Contensive.Core.Models.Complex {
                                 dt = core.db.getIndexSchemaData(TableName);
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
-                                        tableSchema.indexes.Add(genericController.encodeText(row["INDEX_NAME"]).ToLower());
+                                        string index_keys = genericController.encodeText(row["index_keys"]).ToLower();
+                                        tableSchema.indexes.Add(new IndexSchemaModel() {
+                                             index_name = genericController.encodeText(row["INDEX_NAME"]).ToLower(),
+                                             index_keys = index_keys,
+                                             indexKeyList = index_keys.Split(',').Select(s => s.Trim()).ToList()
+                                        });
                                     }
                                 }
                             }

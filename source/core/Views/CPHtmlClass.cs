@@ -85,7 +85,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string CheckBox(string HtmlName, bool HtmlValue = false, string HtmlClass = "", string HtmlId = "") {
-            return core.html.inputCheckbox(HtmlName, HtmlValue, HtmlId, false, HtmlClass);
+            return htmlController.checkbox(HtmlName, HtmlValue, HtmlId, false, HtmlClass);
         }
         //
         // ====================================================================================================
@@ -110,11 +110,11 @@ namespace Contensive.Core {
                     }
 
                 } else {
-                    if (string.IsNullOrEmpty(ActionQueryString)) {
-                        FormStart = core.html.formStartMultipart();
-                    } else {
-                        FormStart = core.html.formStartMultipart(ActionQueryString);
-                    }
+                    FormStart = htmlController.formStartMultipart(ActionQueryString, HtmlName, HtmlClass, HtmlId);
+                    //if (string.IsNullOrEmpty(ActionQueryString)) {
+                    //    FormStart = core.html.formStartMultipart();
+                    //} else {
+                    //}
                     if (!string.IsNullOrEmpty(HtmlName)) {
                         FormStart = FormStart.Replace(">", " name=\"" + HtmlName + "\">");
                     }

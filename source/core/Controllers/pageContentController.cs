@@ -1968,7 +1968,7 @@ namespace Contensive.Core.Controllers {
                             //
                             GroupValue = core.session.isMemberOfGroup(core, tempVar.GroupName);
                             Body = f.RepeatCell;
-                            Body = genericController.vbReplace(Body, "{{CAPTION}}", core.html.inputCheckbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
+                            Body = genericController.vbReplace(Body, "{{CAPTION}}", htmlController.checkbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
                             Body = genericController.vbReplace(Body, "{{FIELD}}", tempVar.Caption);
                             RepeatBody = RepeatBody + Body;
                             GroupRowPtr = GroupRowPtr + 1;
@@ -1985,7 +1985,11 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 tempgetFormPage = ""
-                + errorController.getUserError(core) + core.html.formStartMultipart() + htmlController.inputHidden("ContensiveFormPageID", FormPageID) + htmlController.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + htmlController.formEnd();
+                + errorController.getUserError(core) 
+                + htmlController.formStartMultipart(core.doc.refreshQueryString,"", "ccForm") 
+                + htmlController.inputHidden("ContensiveFormPageID", FormPageID) 
+                + htmlController.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat 
+                + htmlController.formEnd();
                 //
                 return tempgetFormPage;
                 //

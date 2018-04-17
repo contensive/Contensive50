@@ -20,7 +20,7 @@ namespace Contensive.Core.Controllers {
         // 
         //=========================================================================
         //
-        public static void upgrade(coreController core, bool isNewBuild, bool forceFullInstall) {
+        public static void upgrade(coreController core, bool isNewBuild, bool repair) {
             try {
                 if (core.doc.upgradeInProgress) {
                     // leftover from 4.1
@@ -47,9 +47,13 @@ namespace Contensive.Core.Controllers {
                         core.serverConfig.saveObject(core);
                     }
                     //
+                    // verify current database meets minimum field requirements (before installing base collection)
+                    logController.logInfo(core, "Verify existing database fields meet requirements");
+                    VerifySqlfieldCompatibility(core);
+                    //
                     // -- verify base collection
                     logController.logInfo(core, "Install base collection");
-                    collectionController.installBaseCollection(core, isNewBuild, forceFullInstall, ref  nonCriticalErrorList);
+                    collectionController.installBaseCollection(core, isNewBuild, repair, ref  nonCriticalErrorList);
                     //
                     // -- verify iis configuration
                     logController.logInfo(core, "Verify iis configuration");
@@ -152,8 +156,15 @@ namespace Contensive.Core.Controllers {
                     //---------------------------------------------------------------------
                     //
                     logController.logInfo(core, "Verify Site Properties");
+                    if (repair) {
+                        //
+                        // -- repair, set values to what the default system uses
+                        core.siteProperties.setProperty(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue);
+                        core.siteProperties.setProperty("AdminURL", "/" + core.appConfig.adminRoute);
+                    }
+                    //
                     // todo remove site properties not used, put all in preferences
-                    core.siteProperties.getText("AllowAutoHomeSectionOnce", genericController.encodeText(isNewBuild));
+                    //core.siteProperties.getText("AllowAutoHomeSectionOnce", genericController.encodeText(isNewBuild));
                     core.siteProperties.getText("AllowAutoLogin", "False");
                     core.siteProperties.getText("AllowBake", "True");
                     core.siteProperties.getText("AllowChildMenuHeadline", "True");
@@ -164,8 +175,8 @@ namespace Contensive.Core.Controllers {
                     core.siteProperties.getText("ConvertContentText2HTML", "False");
                     core.siteProperties.getText("AllowMemberJoin", "False");
                     core.siteProperties.getText("AllowPasswordEmail", "True");
-                    core.siteProperties.getText("AllowPathBlocking", "True");
-                    core.siteProperties.getText("AllowPopupErrors", "True");
+                    //core.siteProperties.getText("AllowPathBlocking", "True");
+                    //core.siteProperties.getText("AllowPopupErrors", "True");
                     core.siteProperties.getText("AllowTestPointLogging", "False");
                     core.siteProperties.getText("AllowTestPointPrinting", "False");
                     core.siteProperties.getText("AllowTransactionLog", "False");
@@ -285,7 +296,7 @@ namespace Contensive.Core.Controllers {
                             //RegisterList = ""
                             logController.logInfo(core, "Upgrading All Local Collections to new server build.");
                             string tmpString = "";
-                            bool UpgradeOK = collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, forceFullInstall, ref  nonCriticalErrorList);
+                            bool UpgradeOK = collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, repair, ref  nonCriticalErrorList);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
                                 throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             } else if (!UpgradeOK) {
@@ -415,7 +426,7 @@ namespace Contensive.Core.Controllers {
                                                         ErrorMessage = "";
                                                         if (!localCollectionFound) {
                                                             logController.logInfo(core, "...site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
-                                                            bool addonInstallOk = collectionController.installCollectionFromRemoteRepo(core, CollectionGuid, ref  ErrorMessage, "", isNewBuild, forceFullInstall, ref nonCriticalErrorList);
+                                                            bool addonInstallOk = collectionController.installCollectionFromRemoteRepo(core, CollectionGuid, ref  ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList);
                                                             if (!addonInstallOk) {
                                                                 //
                                                                 // this may be OK so log, but do not call it an error
@@ -425,7 +436,7 @@ namespace Contensive.Core.Controllers {
                                                         } else {
                                                             if (upgradeCollection) {
                                                                 logController.logInfo(core, "...upgrading collection");
-                                                                collectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, forceFullInstall, ref nonCriticalErrorList);
+                                                                collectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList);
                                                             }
                                                         }
                                                     }
@@ -515,8 +526,71 @@ namespace Contensive.Core.Controllers {
         }
         //
         //========================================================================
-        // ----- Upgrade Conversion
+        /// <summary>
+        /// gaurantee db fields meet minimum requirements. Like dateTime precision
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="DataBuildVersion"></param>
+        private static void VerifySqlfieldCompatibility(coreController core) {
+            try {
+                //
+                // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
+                var tableList = Models.DbModels.tableModel.createList(core, "");
+                foreach (tableModel table in tableList) {
+                    var tableSchema = Models.Complex.TableSchemaModel.getTableSchema(core, table.name, "");
+                    if (tableSchema != null) {
+                        foreach (Models.Complex.TableSchemaModel.ColumnSchemaModel column in tableSchema.columns) {
+                            if ((column.DATA_TYPE.ToLower() == "datetime2") & (column.DATETIME_PRECISION < 3)) {
+                                //
+                                logController.logInfo(core, "verifySqlFieldCompatibility, conversion required, table [" + table.name + "], field [" + column.COLUMN_NAME + "], reason [datetime precision too low (" + column.DATETIME_PRECISION.ToString() + ")]");
+                                //
+                                // drop any indexes that use this field
+                                bool indexDropped = false;
+                                foreach( Models.Complex.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
+                                    if ( index.indexKeyList.Contains(column.COLUMN_NAME) ) {
+                                        //
+                                        logController.logInfo(core, "verifySqlFieldCompatibility, index [" + index.index_name + "] must be dropped");
+                                        core.db.deleteSqlIndex("", table.name, index.index_name);
+                                        indexDropped = true;
+                                        //
+                                    }
+                                }
+                                //
+                                // -- datetime2(0)...datetime2(2) need to be converted to datetime2(7)
+                                // -- rename column to tempName
+                                string tempName = "tempDateTime" + genericController.GetRandomInteger(core).ToString();
+                                core.db.executeNonQuery("sp_rename '" + table.name + "." + column.COLUMN_NAME + "', '" + tempName + "', 'COLUMN';");
+                                core.db.executeNonQuery("ALTER TABLE " + table.name + " ADD " + column.COLUMN_NAME + " DateTime2(7) NULL;");
+                                core.db.executeNonQuery("update " + table.name + " set " + column.COLUMN_NAME + "=" + tempName + " ");
+                                core.db.executeNonQuery("ALTER TABLE " + table.name + " DROP COLUMN " + tempName + ";");
+                                //
+                                // recreate dropped indexes
+                                if (indexDropped) {
+                                    foreach (Models.Complex.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
+                                        if (index.indexKeyList.Contains(column.COLUMN_NAME)) {
+                                            //
+                                            logController.logInfo(core, "verifySqlFieldCompatibility, recreating index [" + index.index_name + "]");
+                                            core.db.createSQLIndex("", table.name, index.index_name, index.index_keys);
+                                            //
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
+                throw;
+            }
+        }
         //
+        //========================================================================
+        /// <summary>
+        /// when breaking changes are required for data, update them here
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="DataBuildVersion"></param>
         private static void Upgrade_Conversion(coreController core, string DataBuildVersion) {
             try {
                 //

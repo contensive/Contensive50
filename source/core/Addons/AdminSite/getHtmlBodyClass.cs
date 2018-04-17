@@ -2242,8 +2242,6 @@ namespace Contensive.Core.Addons.AdminSite {
         public string GetForm_IndexFilterContent(cdefModel adminContent) {
             string returnContent = "";
             try {
-                int RecordID = 0;
-                string Name = null;
                 string TableName = null;
                 string FieldCaption = null;
                 string ContentName = null;
@@ -2276,38 +2274,36 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Remove Filters
                     //
                     returnContent += "<div class=\"ccFilterHead\">Remove&nbsp;Filters</div>";
-                    QS = RQS;
-                    QS = genericController.modifyQueryString(QS, "IndexFilterRemoveAll", "1");
-                    Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                    returnContent += htmlController.div( getIconRemove(Link) + "&nbsp; Remove All", "ccFilterSubHead");
-                    //returnContent += "<div class=\"ccFilterSubHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;Remove All</a></div>";
+                    Link = "/" + core.appConfig.adminRoute + "?" + genericController.modifyQueryString(RQS, "IndexFilterRemoveAll", "1");
+                    returnContent += htmlController.div( getIconRemove(Link) + "&nbsp;Remove All", "ccFilterSubHead");
                     //
                     // Last Edited Edited by me
                     //
                     SubFilterList = "";
                     if (IndexConfig.LastEditedByMe) {
-                        QS = RQS;
-                        QS = genericController.modifyQueryString(QS, "IndexFilterLastEditedByMe", 0.ToString(), true);
-                        Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">By&nbsp;Me</a></div>";
+                        Link = "/" + core.appConfig.adminRoute + "?" + genericController.modifyQueryString(RQS, "IndexFilterLastEditedByMe", 0.ToString(), true);
+                        SubFilterList += htmlController.div(getIconRemove(Link) + "&nbsp;By&nbsp;Me", "ccFilterIndent ccFilterList");
                     }
                     if (IndexConfig.LastEditedToday) {
                         QS = RQS;
                         QS = genericController.modifyQueryString(QS, "IndexFilterLastEditedToday", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Today</a></div>";
+                        SubFilterList += htmlController.div(getIconRemove(Link) + "&nbsp;Today", "ccFilterIndent ccFilterList");
+                        //SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Today</a></div>";
                     }
                     if (IndexConfig.LastEditedPast7Days) {
                         QS = RQS;
                         QS = genericController.modifyQueryString(QS, "IndexFilterLastEditedPast7Days", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Past Week</a></div>";
+                        SubFilterList += htmlController.div(getIconRemove(Link) + "&nbsp;Past Week", "ccFilterIndent ccFilterList");
+                        //SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Past Week</a></div>";
                     }
                     if (IndexConfig.LastEditedPast30Days) {
                         QS = RQS;
                         QS = genericController.modifyQueryString(QS, "IndexFilterLastEditedPast30Days", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Past 30 Days</a></div>";
+                        SubFilterList += htmlController.div(getIconRemove(Link) + "&nbsp;Past 30 Days", "ccFilterIndent ccFilterList");
+                        //SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Past 30 Days</a></div>";
                     }
                     if (!string.IsNullOrEmpty(SubFilterList)) {
                         returnContent += "<div class=\"ccFilterSubHead\">Last&nbsp;Edited</div>" + SubFilterList;
@@ -2322,7 +2318,8 @@ namespace Contensive.Core.Addons.AdminSite {
                         QS = RQS;
                         QS = genericController.modifyQueryString(QS, "IndexFilterRemoveCDef", encodeText(IndexConfig.SubCDefID));
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">" + SubContentName + "</a></div>";
+                        SubFilterList += htmlController.div(getIconRemove(Link) + "&nbsp;" + SubContentName + "", "ccFilterIndent");
+                        //SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">" + SubContentName + "</a></div>";
                     }
                     if (!string.IsNullOrEmpty(SubFilterList)) {
                         returnContent += "<div class=\"ccFilterSubHead\">In Sub-content</div>" + SubFilterList;
@@ -2342,7 +2339,8 @@ namespace Contensive.Core.Addons.AdminSite {
                                 QS = RQS;
                                 QS = genericController.modifyQueryString(QS, "IndexFilterRemoveGroup", IndexConfig.GroupList[Ptr]);
                                 Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                                SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">" + GroupName + "</a></div>";
+                                SubFilterList += htmlController.div(getIconRemove(Link) + "&nbsp;" + GroupName + "", "ccFilterIndent");
+                                //SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">" + GroupName + "</a></div>";
                             }
                         }
                     }
@@ -2357,7 +2355,8 @@ namespace Contensive.Core.Addons.AdminSite {
                         QS = RQS;
                         QS = genericController.modifyQueryString(QS, "IndexFilterActiveOnly", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Active&nbsp;Only</a></div>";
+                        SubFilterList += htmlController.div(getIconRemove(Link) + "&nbsp;Active&nbsp;Only", "ccFilterIndent ccFilterList");
+                        //SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Active&nbsp;Only</a></div>";
                     }
                     if (!string.IsNullOrEmpty(SubFilterList)) {
                         returnContent += "<div class=\"ccFilterSubHead\">Other</div>" + SubFilterList;
@@ -2373,28 +2372,36 @@ namespace Contensive.Core.Addons.AdminSite {
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         switch (findWord.MatchOption) {
                             case FindWordMatchEnum.matchincludes:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'</a></div>";
+                                returnContent += htmlController.div(getIconRemove(Link) + "&nbsp;" + FieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                //returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'</a></div>";
                                 break;
                             case FindWordMatchEnum.MatchEmpty:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;is&nbsp;empty</a></div>";
+                                returnContent += htmlController.div(getIconRemove(Link) + "&nbsp;" + FieldCaption + "&nbsp;is&nbsp;empty", "ccFilterIndent");
+                                //returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\"></a></div>";
                                 break;
                             case FindWordMatchEnum.MatchEquals:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;=&nbsp;'" + findWord.Value + "'</a></div>";
+                                returnContent += htmlController.div(getIconRemove(Link) + "&nbsp;" + FieldCaption + "&nbsp;=&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                //returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\"></a></div>";
                                 break;
                             case FindWordMatchEnum.MatchFalse:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;is&nbsp;false</a></div>";
+                                returnContent += htmlController.div(getIconRemove(Link) + "&nbsp;" + FieldCaption + "&nbsp;is&nbsp;false", "ccFilterIndent");
+                                //returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\"></a></div>";
                                 break;
                             case FindWordMatchEnum.MatchGreaterThan:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;&gt;&nbsp;'" + findWord.Value + "'</a></div>";
+                                returnContent += htmlController.div(getIconRemove(Link) + "&nbsp;" + FieldCaption + "&nbsp;&gt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                //returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\"></a></div>";
                                 break;
                             case FindWordMatchEnum.MatchLessThan:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;&lt;&nbsp;'" + findWord.Value + "'</a></div>";
+                                returnContent += htmlController.div(getIconRemove(Link) + "&nbsp;" + FieldCaption + "&nbsp;&lt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                //returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\"></a></div>";
                                 break;
                             case FindWordMatchEnum.MatchNotEmpty:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;is&nbsp;not&nbsp;empty</a></div>";
+                                returnContent += htmlController.div(getIconRemove(Link) + "&nbsp;" + FieldCaption + "&nbsp;is&nbsp;not&nbsp;empty", "ccFilterIndent");
+                                //returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\"></a></div>";
                                 break;
                             case FindWordMatchEnum.MatchTrue:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;is&nbsp;true</a></div>";
+                                returnContent += htmlController.div(getIconRemove(Link) + "&nbsp;" + FieldCaption + "&nbsp;is&nbsp;true", "ccFilterIndent");
+                                //returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\"></a></div>";
                                 break;
                         }
                     }
@@ -2474,7 +2481,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     SQL = core.db.GetSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");
                     CS = core.db.csOpenSql(SQL, "Default");
                     while (core.db.csOk(CS)) {
-                        Name = core.db.csGetText(CS, "Name");
+                        string Name = core.db.csGetText(CS, "Name");
                         Ptr = 0;
                         if (IndexConfig.GroupListCnt > 0) {
                             for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
@@ -2484,7 +2491,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             }
                         }
                         if (Ptr == IndexConfig.GroupListCnt) {
-                            RecordID = core.db.csGetInteger(CS, "ID");
+                            int RecordID = core.db.csGetInteger(CS, "ID");
                             Caption = core.db.csGetText(CS, "Caption");
                             if (string.IsNullOrEmpty(Caption)) {
                                 Caption = Name;
@@ -5899,7 +5906,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             // Publish Checkbox
                                             //
-                                            Body += ("<td align=\"center\" valign=\"top\" " + RowColor + ">" + core.html.inputCheckbox("row" + RecordCount, false) + htmlController.inputHidden("rowid" + RecordCount, RecordID) + htmlController.inputHidden("rowcontentname" + RecordCount, ContentName) + "</td>");
+                                            Body += ("<td align=\"center\" valign=\"top\" " + RowColor + ">" + htmlController.checkbox("row" + RecordCount, false) + htmlController.inputHidden("rowid" + RecordCount, RecordID) + htmlController.inputHidden("rowcontentname" + RecordCount, ContentName) + "</td>");
                                             //
                                             // Submitted
                                             //
@@ -6375,7 +6382,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Lookup, readonly
                                         if (field.lookupContentID!=0) {
-                                            EditorString = adminUIController.getDefaultEditor_LookupContent(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupContentID, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required, ref IsEmptyList);
+                                            EditorString = adminUIController.getDefaultEditor_LookupContent(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupContentID, ref IsEmptyList, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
                                             return_NewFieldList += "," + field.nameLc;
                                         } else if (field.lookupList != "") {
                                             EditorString = adminUIController.getDefaultEditor_LookupList(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupList.Split(','), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
@@ -6398,7 +6405,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         // ----- Member Select ReadOnly
                                         //
                                         return_NewFieldList +=  "," + field.nameLc;
-                                        EditorString = adminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg, field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core));
+                                        EditorString = adminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValue_object), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
                                         //
                                         break;
                                     case FieldTypeIdManyToMany:
@@ -6431,7 +6438,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     case FieldTypeIdFloat:
                                     case FieldTypeIdInteger:
                                         //
-                                        // ----- number
+                                        // ----- number readonly
                                         //
                                         return_NewFieldList +=  "," + field.nameLc;
                                         EditorString += (htmlController.inputHidden(field.nameLc, fieldValue_text));
@@ -6442,7 +6449,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     case FieldTypeIdHTML:
                                     case FieldTypeIdFileHTML:
                                         //
-                                        // ----- HTML types
+                                        // ----- HTML types readonly
                                         //
                                         if (field.htmlContent) {
                                             //
@@ -6455,19 +6462,10 @@ namespace Contensive.Core.Addons.AdminSite {
                                             EditorString += htmlController.inputTextarea( core,field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, true, "form-control");
                                         } else {
                                             //
-                                            // edit html as wysiwyg
+                                            // edit html as wysiwyg readonly
                                             //
                                             return_NewFieldList +=  "," + field.nameLc;
-                                            EditorString += htmlController.inputHidden(field.nameLc, fieldValue_text);
-                                            //
-                                            //EditorStyleModifier = "text";
-                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
-                                            //EditorString &=  core.main_GetFormInputHTML(FormFieldLCaseName, FieldValueText)
-                                            //
-                                            EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", true, true, editorAddonListJSON, styleList, styleOptionList);
-                                            //innovaEditor = New innovaEditorAddonClassFPO
-                                            //EditorString &=  innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, True, TemplateIDForStyles, emailIdForStyles)
-                                            EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
+                                            EditorString += adminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorAddonListJSON, styleList, styleOptionList, true);
                                         }
                                         break;
                                     case FieldTypeIdLongText:
@@ -6574,7 +6572,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         // ----- Lookup
                                         if (field.lookupContentID!=0) {
-                                            EditorString = adminUIController.getDefaultEditor_LookupContent(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupContentID, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required, ref IsEmptyList);
+                                            EditorString = adminUIController.getDefaultEditor_LookupContent(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupContentID, ref IsEmptyList, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
                                             return_NewFieldList += "," + field.nameLc;
                                         } else if (field.lookupList != "") {
                                             EditorString = adminUIController.getDefaultEditor_LookupList(core, field.nameLc, encodeInteger(fieldValue_object), field.lookupList.Split(','), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
@@ -6597,7 +6595,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         // ----- Member Select
                                         //
                                         return_NewFieldList += "," + field.nameLc;
-                                        EditorString = adminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg, field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core));
+                                        EditorString = adminUIController.getDefaultEditor_memberSelect(core, field.nameLc, encodeInteger(fieldValue_object), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
                                         break;
                                     case FieldTypeIdManyToMany:
                                         //
@@ -6626,7 +6624,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             string path = "";
                                             core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
                                             EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
-                                            EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(field.nameLc + ".DeleteFlag", false));
+                                            EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + htmlController.checkbox(field.nameLc + ".DeleteFlag", false));
                                             EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(field.nameLc, "", "file form-control"));
                                         }
                                         //
@@ -6677,18 +6675,21 @@ namespace Contensive.Core.Addons.AdminSite {
                                         if (field.htmlContent) {
                                             //
                                             // View the content as Html, not wysiwyg
-                                            EditorString = htmlController.inputTextarea( core,field.nameLc, fieldValue_text, 10, -1, "", false, false, "text form-control");
+                                            EditorString = adminUIController.getDefaultEditor_TextArea(core, field.nameLc, fieldValue_text, editorReadOnly);
+                                            //EditorString = htmlController.inputTextarea( core,field.nameLc, fieldValue_text, 10, -1, "", false, false, "text form-control");
                                         } else {
                                             //
                                             // wysiwyg editor
-                                            if (string.IsNullOrEmpty(fieldValue_text)) {
-                                                //
-                                                // editor needs a starting p tag to setup correctly
-                                                fieldValue_text = HTMLEditorDefaultCopyNoCr;
-                                            }
-                                            FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
-                                            EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
-                                            EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
+                                            EditorString = adminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorAddonListJSON, styleList, styleOptionList, editorReadOnly);
+
+                                            //if (string.IsNullOrEmpty(fieldValue_text)) {
+                                            //    //
+                                            //    // editor needs a starting p tag to setup correctly
+                                            //    fieldValue_text = HTMLEditorDefaultCopyNoCr;
+                                            //}
+                                            //FieldRows = (core.userProperty.getInteger(adminContent.name + "." + field.nameLc + ".PixelHeight", 500));
+                                            //EditorString += core.html.getFormInputHTML(field.nameLc, fieldValue_text, "500", "", false, true, editorAddonListJSON, styleList, styleOptionList);
+                                            //EditorString = "<div style=\"width:95%\">" + EditorString + "</div>";
                                         }
                                         //
                                         break;
@@ -7038,14 +7039,14 @@ namespace Contensive.Core.Addons.AdminSite {
                                 if (editRecord.Read_Only) {
                                     HTMLFieldString = genericController.encodeText(core.db.csOk(CSRules));
                                 } else {
-                                    HTMLFieldString = core.html.inputCheckbox("ContentWatchList." + core.db.csGet(CSLists, "ID"), core.db.csOk(CSRules));
+                                    HTMLFieldString = htmlController.checkbox("ContentWatchList." + core.db.csGet(CSLists, "ID"), core.db.csOk(CSRules));
                                 }
                                 core.db.csClose(ref CSRules);
                             } else {
                                 if (editRecord.Read_Only) {
                                     HTMLFieldString = genericController.encodeText(false);
                                 } else {
-                                    HTMLFieldString = core.html.inputCheckbox("ContentWatchList." + core.db.csGet(CSLists, "ID"), false);
+                                    HTMLFieldString = htmlController.checkbox("ContentWatchList." + core.db.csGet(CSLists, "ID"), false);
                                 }
                             }
                             //
@@ -7144,7 +7145,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // -- Active
                 {
-                    string fieldEditor = core.html.inputCheckbox("active", editRecord.active);
+                    string fieldEditor = htmlController.checkbox("active", editRecord.active);
                     string fieldHelp = "When unchecked, add-ons can ignore this record as if it was temporarily deleted.";
                     tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Active", fieldHelp, false, false, ""));
                 }
@@ -7156,7 +7157,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     {
                         string fieldHelp = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docore.main_";
                         bool Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("LandingPageID", 0))));
-                        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? core.html.inputCheckbox("LandingPageID", Checked) : "<b>" + genericController.getYesNo(Checked) + "</b>" + htmlController.inputHidden("LandingPageID", Checked);
+                        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? htmlController.checkbox("LandingPageID", Checked) : "<b>" + genericController.getYesNo(Checked) + "</b>" + htmlController.inputHidden("LandingPageID", Checked);
                         tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Set Default Landing Page", fieldHelp, false, false, ""));
                     }
                     //
@@ -7164,7 +7165,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     {
                         string fieldHelp = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked.";
                         bool isPageNotFoundRecord = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("PageNotFoundPageID", 0))));
-                        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? core.html.inputCheckbox("PageNotFound", isPageNotFoundRecord) : "<b>" + genericController.getYesNo(isPageNotFoundRecord) + "</b>" + htmlController.inputHidden("PageNotFound", isPageNotFoundRecord);
+                        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? htmlController.checkbox("PageNotFound", isPageNotFoundRecord) : "<b>" + genericController.getYesNo(isPageNotFoundRecord) + "</b>" + htmlController.inputHidden("PageNotFound", isPageNotFoundRecord);
                         tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Set Page Not Found", fieldHelp, false, false, ""));
                     }
                     //
@@ -7304,13 +7305,9 @@ namespace Contensive.Core.Addons.AdminSite {
                             if (core.session.isAuthenticatedAdmin(core) && (LimitContentSelectToThisID == 0)) {
                                 //
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
-                                //HTMLFieldString = HTMLFieldString + core.html.selectFromContent("ContentControlID", FieldValueInteger, "Content", "ContentTableID=" + TableID, "", "", ref IsEmptyList);
-
-                                bool ignoreBool = false;
                                 string sqlFilter = "(ContentTableID=" + TableID +")";
                                 int contentCID = core.db.getRecordID(Models.DbModels.contentModel.contentName, Models.DbModels.contentModel.contentName);
-                                HTMLFieldString += adminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid",FieldValueInteger,contentCID, false, "", "", true, ref ignoreBool, sqlFilter );
-
+                                HTMLFieldString += adminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid",FieldValueInteger,contentCID, ref IsEmptyList, false, "", "", true, sqlFilter );
                                 FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
                             } else {
                                 //
@@ -7332,14 +7329,9 @@ namespace Contensive.Core.Addons.AdminSite {
                                 core.db.csClose(ref CSPointer);
                                 if (!string.IsNullOrEmpty(CIDList)) {
                                     CIDList = CIDList.Substring(1);
-                                    //HTMLFieldString = core.html.selectFromContent("ContentControlID", FieldValueInteger, "Content", "id in (" + CIDList + ")", "", "", ref IsEmptyList);
-
-                                    bool ignoreBool = false;
                                     string sqlFilter = "(id in (" + CIDList + "))";
                                     int contentCID = core.db.getRecordID(Models.DbModels.contentModel.contentName, Models.DbModels.contentModel.contentName);
-                                    HTMLFieldString += adminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, false, "", "", true, ref ignoreBool, sqlFilter);
-
-
+                                    HTMLFieldString += adminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
                                     FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited. This record includes a Parent field, so your choices for controlling content are limited to those compatible with the parent of this record.)";
                                 }
                             }
@@ -8045,7 +8037,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (readOnlyField) {
                         f.Add("No");
                     } else {
-                        f.Add(core.html.inputCheckbox("OverrideDuplicate", false));
+                        f.Add(htmlController.checkbox("OverrideDuplicate", false));
                     }
                     f.Add("</span></td></tr>");
                     //
@@ -8271,7 +8263,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             body.Add("<tr><td class=\"ccAdminEditCaption\">" + Caption + "</td>");
                             body.Add("<td class=\"ccAdminEditField\">");
                             body.Add("<table border=0 cellpadding=0 cellspacing=0 width=\"100%\" ><tr>");
-                            body.Add("<td width=\"40%\">" + htmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID) + core.html.inputCheckbox("MemberRules." + GroupCount, GroupActive) + GroupCaption + "</td>");
+                            body.Add("<td width=\"40%\">" + htmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID) + htmlController.checkbox("MemberRules." + GroupCount, GroupActive) + GroupCaption + "</td>");
                             body.Add("<td width=\"30%\"> Expires " + htmlController.inputText( core,"MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20) + "</td>");
                             body.Add("<td width=\"30%\">" + ReportLink + "</td>");
                             body.Add("</tr></table>");
@@ -8551,13 +8543,13 @@ namespace Contensive.Core.Addons.AdminSite {
                             FastString.Add("<input type=\"hidden\" name=\"GroupID" + GroupCount + "\" value=\"" + core.db.csGet(CS, "ID") + "\">");
                             FastString.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"400\"><tr>");
                             if (GroupFound) {
-                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + core.html.inputCheckbox("Group" + GroupCount, true) + GroupName + "</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + core.html.inputCheckbox("GroupRuleAllowAdd" + GroupCount, GroupRules[GroupRulesPointer].AllowAdd) + " Allow Add</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + core.html.inputCheckbox("GroupRuleAllowDelete" + GroupCount, GroupRules[GroupRulesPointer].AllowDelete) + " Allow Delete</span></td>");
+                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + htmlController.checkbox("Group" + GroupCount, true) + GroupName + "</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + htmlController.checkbox("GroupRuleAllowAdd" + GroupCount, GroupRules[GroupRulesPointer].AllowAdd) + " Allow Add</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + htmlController.checkbox("GroupRuleAllowDelete" + GroupCount, GroupRules[GroupRulesPointer].AllowDelete) + " Allow Delete</span></td>");
                             } else {
-                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + core.html.inputCheckbox("Group" + GroupCount, false) + GroupName + "</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + core.html.inputCheckbox("GroupRuleAllowAdd" + GroupCount, false) + " Allow Add</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + core.html.inputCheckbox("GroupRuleAllowDelete" + GroupCount, false) + " Allow Delete</span></td>");
+                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + htmlController.checkbox("Group" + GroupCount, false) + GroupName + "</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + htmlController.checkbox("GroupRuleAllowAdd" + GroupCount, false) + " Allow Add</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + htmlController.checkbox("GroupRuleAllowDelete" + GroupCount, false) + " Allow Delete</span></td>");
                             }
                             FastString.Add("</tr></table>");
                             FastString.Add("</span></td>");
@@ -8668,13 +8660,13 @@ namespace Contensive.Core.Addons.AdminSite {
                             FastString.Add("<input type=\"hidden\" name=\"ContentID" + ContentCount + "\" value=\"" + core.db.csGet(CS, "ID") + "\">");
                             FastString.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"400\"><tr>");
                             if (ContentFound) {
-                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + core.html.inputCheckbox("Content" + ContentCount, true) + ContentName + "</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + core.html.inputCheckbox("ContentGroupRuleAllowAdd" + ContentCount, ContentGroupRules[ContentGroupRulesPointer].AllowAdd) + " Allow Add</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + core.html.inputCheckbox("ContentGroupRuleAllowDelete" + ContentCount, ContentGroupRules[ContentGroupRulesPointer].AllowDelete) + " Allow Delete</span></td>");
+                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + htmlController.checkbox("Content" + ContentCount, true) + ContentName + "</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + htmlController.checkbox("ContentGroupRuleAllowAdd" + ContentCount, ContentGroupRules[ContentGroupRulesPointer].AllowAdd) + " Allow Add</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + htmlController.checkbox("ContentGroupRuleAllowDelete" + ContentCount, ContentGroupRules[ContentGroupRulesPointer].AllowDelete) + " Allow Delete</span></td>");
                             } else {
-                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + core.html.inputCheckbox("Content" + ContentCount, false) + ContentName + "</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + core.html.inputCheckbox("ContentGroupRuleAllowAdd" + ContentCount, false) + " Allow Add</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + core.html.inputCheckbox("ContentGroupRuleAllowDelete" + ContentCount, false) + " Allow Delete</span></td>");
+                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + htmlController.checkbox("Content" + ContentCount, false) + ContentName + "</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + htmlController.checkbox("ContentGroupRuleAllowAdd" + ContentCount, false) + " Allow Add</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + htmlController.checkbox("ContentGroupRuleAllowDelete" + ContentCount, false) + " Allow Delete</span></td>");
                             }
                             FastString.Add("</tr></table>");
                             FastString.Add("</span></td>");
@@ -9214,10 +9206,8 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 core.html.addScriptCode("var docLoaded=false", "Form loader");
                 core.html.addScriptCode_onLoad("docLoaded=true;", "Form loader");
-                s = core.html.formStartMultipart();
-                s = genericController.vbReplace(s, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\">");
-                s = genericController.vbReplace(s, ">", " autocomplete=\"off\">");
-                s = genericController.vbReplace(s, ">", " id=\"adminEditForm\">");
+                s = htmlController.formStartMultipart(core.doc.refreshQueryString,"","ccForm", "adminEditForm");
+                s = genericController.vbReplace(s, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\" autocomplete=\"off\">");
                 s += "\r\n<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
                 s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
                 s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + TitleExtension + "\">";
@@ -9889,7 +9879,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             RecordID = core.db.csGetInteger(CS, "ID");
                             DateCompleted = core.db.csGetDate(CS, "DateCompleted");
                             ResultMessage = core.db.csGetText(CS, "ResultMessage");
-                            Cells[RowPointer, 0] = core.html.inputCheckbox("Row" + RowPointer) + htmlController.inputHidden("RowID" + RowPointer, RecordID);
+                            Cells[RowPointer, 0] = htmlController.checkbox("Row" + RowPointer) + htmlController.inputHidden("RowID" + RowPointer, RecordID);
                             Cells[RowPointer, 1] = core.db.csGetText(CS, "name");
                             Cells[RowPointer, 2] = core.db.csGetText(CS, "CreatedByName");
                             Cells[RowPointer, 3] = core.db.csGetDate(CS, "DateAdded").ToShortDateString();
@@ -10348,7 +10338,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         while (core.db.csOk(CS) && (RowPointer < PageSize)) {
                             RecordID = core.db.csGetInteger(CS, "ID");
                             //DateCompleted = core.db.cs_getDate(CS, "DateCompleted")
-                            Cells[RowPointer, 0] = core.html.inputCheckbox("Row" + RowPointer) + htmlController.inputHidden("RowID" + RowPointer, RecordID);
+                            Cells[RowPointer, 0] = htmlController.checkbox("Row" + RowPointer) + htmlController.inputHidden("RowID" + RowPointer, RecordID);
                             Cells[RowPointer, 1] = core.db.csGetText(CS, "name");
                             Cells[RowPointer, 2] = core.db.csGet(CS, "CreatedBy");
                             Cells[RowPointer, 3] = core.db.csGetDate(CS, "DateAdded").ToShortDateString();
@@ -11172,7 +11162,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     Content.Add(adminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
                     Caption = "Purge Content Files";
-                    Copy = core.html.inputCheckbox("ArchiveAllowFileClean", ArchiveAllowFileClean) + "&nbsp;Delete Contensive content files with no associated database record.";
+                    Copy = htmlController.checkbox("ArchiveAllowFileClean", ArchiveAllowFileClean) + "&nbsp;Delete Contensive content files with no associated database record.";
                     Content.Add(adminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
                     Content.Add(adminUIController.EditTableClose);
@@ -12388,9 +12378,9 @@ namespace Contensive.Core.Addons.AdminSite {
                                     AllowPublic = genericController.encodeBoolean("," + PublicList + ",".IndexOf("," + FeatureName + ",", System.StringComparison.OrdinalIgnoreCase) + 1);
                                     Copy += "\r\n<tr>"
                                         + TDLeft + FeatureName + "</td>"
-                                        + TDCenter + core.html.inputCheckbox(FeatureName + ".admin", AllowAdmin) + "</td>"
-                                        + TDCenter + core.html.inputCheckbox(FeatureName + ".cm", AllowCM) + "</td>"
-                                        + TDCenter + core.html.inputCheckbox(FeatureName + ".public", AllowPublic) + "</td>"
+                                        + TDCenter + htmlController.checkbox(FeatureName + ".admin", AllowAdmin) + "</td>"
+                                        + TDCenter + htmlController.checkbox(FeatureName + ".cm", AllowCM) + "</td>"
+                                        + TDCenter + htmlController.checkbox(FeatureName + ".public", AllowPublic) + "</td>"
                                         + "</tr>";
                                     RowPtr = RowPtr + 1;
                                 }
@@ -12475,7 +12465,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // List Add-ons to include
                     //
 
-                    Copy = core.html.inputCheckbox("AllowAutoLogin", AllowAutoLogin);
+                    Copy = htmlController.checkbox("AllowAutoLogin", AllowAutoLogin);
                     Copy += "<div>When checked, returning users are automatically logged-in, without requiring a username or password. This is very convenient, but creates a high security risk. Each time you login, you will be given the option to not allow Auto-Login from that computer.</div>";
                     Content.Add(adminUIController.getEditRowLegacy(core, Copy, "Allow Auto Login", "", false, false, ""));
                     //

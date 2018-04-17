@@ -6,9 +6,15 @@
 /*
     Body Class Selectors 
 */
-.ccBodyWeb{}
-.ccBodyPrint{}
-.ccBodyEmail{}
+.ccBodyWeb {
+}
+
+.ccBodyPrint {
+}
+
+.ccBodyEmail {
+}
+
 .ccBodyAdmin {
     overflow: auto;
     font-family: 'Catamaran', sans-serif;
@@ -19,317 +25,1452 @@
     min-height: 100vh;
 }
 /*
+    edit form tweeks
+*/
+
+.ccForm label {
+    font-weight: 600;
+    color: #444;
+}
+/*
     container resets 
 */
-.ccCon div,.ccCon p,.ccCon td,.ccCon ul,.ccCon li {color:#222;}
-.ccCon p {margin:1.12em 0;}
-.ccCon li {margin:0.3em 0;}
-.ccCon ul {list-style:disc outside;margin:0;padding-left:20px}
-.ccCon ol {list-style:decimal inside;margin:0;padding-left:20px}
-.ccCon td {vertical-align:top;}
-.ccCon h1,.ccCon H2,.ccCon H3,.ccCon H4,.ccCon H5,.ccCon H6 {MARGIN-TOP:15PX;MARGIN-BOTTOM:10PX;PADDING:0PX;}
-.ccCon h2 {}
-.ccCon h2 {}
-.ccCon h3 {}
-.ccCon h4 {}
-.ccCon h5,.ccCon h6 {}
+.ccCon div, .ccCon p, .ccCon td, .ccCon ul, .ccCon li {
+    color: #222;
+}
+
+.ccCon p {
+    margin: 1.12em 0;
+}
+
+.ccCon li {
+    margin: 0.3em 0;
+}
+
+.ccCon ul {
+    list-style: disc outside;
+    margin: 0;
+    padding-left: 20px
+}
+
+.ccCon ol {
+    list-style: decimal inside;
+    margin: 0;
+    padding-left: 20px
+}
+
+.ccCon td {
+    vertical-align: top;
+}
+
+.ccCon h1, .ccCon H2, .ccCon H3, .ccCon H4, .ccCon H5, .ccCon H6 {
+    MARGIN-TOP: 15PX;
+    MARGIN-BOTTOM: 10PX;
+    PADDING: 0PX;
+}
+
+.ccCon h2 {
+}
+
+.ccCon h2 {
+}
+
+.ccCon h3 {
+}
+
+.ccCon h4 {
+}
+
+.ccCon h5, .ccCon h6 {
+}
 /*
     adminSite
 */
-#desktop { color:#222;Background-color:rgb(240,240,240)}
-.ccCon .ccHeaderCon {width:100%;COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);clear:both;vertical-align:middle;}
-.ccCon .ccHeaderCon .cchLeft {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;}
-.ccCon .ccHeaderCon .cchRight {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;}
-.ccCon .ccHeaderCon .cchSingle {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left;padding:5px;vertical-align:middle;}
-.ccCon .ccHeaderCon .cchClosed {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:right;padding:5px}
-.ccCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
-.ccCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
+#desktop {
+    color: #222;
+    Background-color: rgb(240,240,240)
+}
+
+.ccCon .ccHeaderCon {
+    width: 100%;
+    COLOR: white;
+    BACKGROUND-COLOR: rgb(140,140,140);
+    clear: both;
+    vertical-align: middle;
+}
+
+    .ccCon .ccHeaderCon .cchLeft {
+        COLOR: white;
+        BACKGROUND-COLOR: rgb(140,140,140);
+        text-align: left;
+        padding: 5px;
+        width: 50%;
+        vertical-align: middle;
+        Float: none;
+    }
+
+    .ccCon .ccHeaderCon .cchRight {
+        COLOR: white;
+        BACKGROUND-COLOR: rgb(140,140,140);
+        text-align: right;
+        padding: 5px;
+        width: 50%;
+        vertical-align: middle;
+        Float: none;
+    }
+
+    .ccCon .ccHeaderCon .cchSingle {
+        COLOR: white;
+        BACKGROUND-COLOR: rgb(140,140,140);
+        text-align: left;
+        padding: 5px;
+        vertical-align: middle;
+    }
+
+    .ccCon .ccHeaderCon .cchClosed {
+        COLOR: white;
+        BACKGROUND-COLOR: rgb(140,140,140);
+        text-align: right;
+        padding: 5px
+    }
+
+    .ccCon .ccHeaderCon .left {
+        COLOR: white;
+        BACKGROUND-COLOR: rgb(140,140,140);
+        text-align: left;
+        padding: 5px;
+        width: 50%;
+        vertical-align: middle;
+        Float: none;
+    }
+    /*legacy*/
+    .ccCon .ccHeaderCon .right {
+        COLOR: white;
+        BACKGROUND-COLOR: rgb(140,140,140);
+        text-align: right;
+        padding: 5px;
+        width: 50%;
+        vertical-align: middle;
+        Float: none;
+    }
+/*legacy*/
 /**/
-.ccCon .ccToolsCon {margin:0;padding:0;Background-color:white;border-right:1px solid black;min-height:100vh;}
-.ccCon .ccToolsCon .ccHeaderCon {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);}
-.ccCon .ccToolsCon .ccHeaderCon .closed {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left;padding:5px;}
-.ccCon .ccToolsCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left}
-.ccCon .ccToolsCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:right}
-.ccCon .ccToolsCon .ccContentCon {width:100%;margin:0;Background-color:white;min-height:100vh;}
-.ccCon .ccToolsCon .ccContentCon .opened {width:100%;margin:0;Background-color:white;min-height:100vh;padding-top:10px;padding-bottom:20px;}
-.ccCon .ccToolsCon .ccContentCon .closed {width:100%;margin:0;Background-color:white;min-height:100vh;}
+.ccCon .ccToolsCon {
+    margin: 0;
+    padding: 0;
+    Background-color: white;
+    border-right: 1px solid black;
+    min-height: 100vh;
+}
+
+    .ccCon .ccToolsCon .ccHeaderCon {
+        COLOR: white;
+        BACKGROUND-COLOR: rgb(140,140,140);
+    }
+
+        .ccCon .ccToolsCon .ccHeaderCon .closed {
+            COLOR: white;
+            BACKGROUND-COLOR: rgb(140,140,140);
+            text-align: left;
+            padding: 5px;
+        }
+
+        .ccCon .ccToolsCon .ccHeaderCon .left {
+            COLOR: white;
+            BACKGROUND-COLOR: rgb(140,140,140);
+            text-align: left
+        }
+
+        .ccCon .ccToolsCon .ccHeaderCon .right {
+            COLOR: white;
+            BACKGROUND-COLOR: rgb(140,140,140);
+            text-align: right
+        }
+
+    .ccCon .ccToolsCon .ccContentCon {
+        width: 100%;
+        margin: 0;
+        Background-color: white;
+        min-height: 100vh;
+    }
+
+        .ccCon .ccToolsCon .ccContentCon .opened {
+            width: 100%;
+            margin: 0;
+            Background-color: white;
+            min-height: 100vh;
+            padding-top: 10px;
+            padding-bottom: 20px;
+        }
+
+        .ccCon .ccToolsCon .ccContentCon .closed {
+            width: 100%;
+            margin: 0;
+            Background-color: white;
+            min-height: 100vh;
+        }
 /**/
-.ccCon .ccContentCon {margin:0;padding:0;Background-color:rgb(240,240,240);width:100%;min-height:100vh;}
-.ccCon .ccControlsCon {color:black;background-color:#fff8d0;padding:5px ! important;border-top:1px solid #808080;border-left:1px solid #808080;border-bottom:1px solid #f8f8f8;border-right:1px solid #f8f8f8;}
-.ccCon .ccControlsCon .left {text-align:right;}
-.ccCon .ccControlsCon .right {text-align:right;}
-.ccCon .ccEditCaptionCon {color:black;white-space:nowrap;text-align:right;vertical-align:top;padding-top:4px;}
-.ccCon .ccEditCaptionCon {padding-top:5px;}
-.ccCon .ccEditCaptionCon .textexpandable {padding-top:25px;}
-.ccCon .ccEditCaptionCon .htmleditor {padding-top:100px;}
-.ccCon .ccEditFieldCon {padding:5px;border-top:1px solid #fffdf1;border-bottom:1px solid #dad4b2;color:black;background-color:#fff8d0;text-align:left;vertical-align:baseline;}
-.ccCon .ccEditFieldCon .ccEditorCon {}
-.ccCon .ccEditFieldCon .ccEditorCon .checkBox {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .text {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .select {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .file {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .date {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .number {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .password {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .styles {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .link {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .resourceLink {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorHelpCon {color:#888;padding:10px;width:80%;}
-.ccCon .ccEditFieldCon .ccEditorHelpCon .opened {display:none;}
-.ccCon .ccEditFieldCon .ccEditorHelpCon .opened .header {padding-top:5px;color:#444;}
-.ccCon .ccEditFieldCon .ccEditorHelpCon .opened .body {color:#444;}
-.ccCon .ccHelpCon {width:95%;padding:10px;margin:10px;border: 2px solid #808080;background-color:white}
-.ccCon .ccHelpCon .title {color:black;}
-.ccCon .ccHelpCon .byline {color:#606060;padding-top:5px;padding-bottom:1px;}
-.ccCon .ccHelpCon .body {color:#404040;padding-top:5px;border-top:1px solid #808080}
-.ccCon .ccAdminEditHeading {padding:6px;COLOR:black;}
-.ccCon .ccAdminEditSubHeader {margin-left:20px;border-bottom:1px solid black;padding:6px;COLOR:black;}
-.ccCon .ccAdminEditDescription {COLOR:black;padding:10px;}
-.ccCon .ccAdminEditBody {BACKGROUND-COLOR:rgb(248,248,250);padding:5px;}
-.ccCon .ccAdminEditCaption {COLOR:black;WHITE-SPACE:nowrap;TEXT-ALIGN:right;}
-.ccCon .ccAdminEditField {border-top:1px solid #FFFDF1;border-bottom:1px solid #DAD4B2;COLOR:black;Background-color:#fff8d0;TEXT-ALIGN:left;vertical-align:baseline;}
-.ccCon .ccAdminListCaption {padding:4px;background-color:rgb(140,140,140);COLOR:white;border-right:1px solid white;border-bottom:1px solid black;border-top:0px solid white; ! important;}
-.ccCon A.ccAdminListCaption {Display:block;COLOR:white;border:0px;padding:0px;}
-.ccCon A.ccAdminListCaption:Hover {}
-.ccCon A.ccAdminListCaption:Visited {}
-.ccCon .ccAdminListRowEven {BACKGROUND-COLOR:rgb(248,248,250);padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
-.ccCon .ccAdminListRowOdd {BACKGROUND-COLOR:#ffffff;padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
-.ccCon .ccAdminTab {background-color:rgb(180,180,180);color:white;white-space:nowrap;}
-.ccCon A.ccAdminTabLink {color:white;}
-.ccCon A.ccAdminTabLink:visited {color:white;}
-.ccCon A.ccAdminTabLink:hover {color:white;}
-.ccCon .ccAdminTabHit {background-color:white;color:black;white-space:nowrap;}
-.ccCon A.ccAdminTabHitLink {color:black;}
-.ccCon A.ccAdminTabHitLink:visited {color:black;}
-.ccCon A.ccAdminTabHitLink:hover {color:black;}
-.ccCon .ccAdminTabEnd {width:100%;border-bottom:1px solid black;} 
-.ccCon .ccAdminTabEdge {background-color:black;} 
-.ccCon .ccAdminTabBodyCollectionWrap{}
-.ccCon .ccAdminTabBodyWrapShow { display:block;}
-.ccCon .ccAdminTabBodyWrapHide { display:none;}
-.ccCon .ccAdminTabBodyWrap{}
-.ccCon .ccAdminTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;}
-.ccCon .ccAdminTabHitSpacer { width: 5px; }
-.ccCon .ccAdminTabHitFiller { width: 100%; }
-.ccCon A.ccAdminButton {COLOR:#000000;BACKGROUND-COLOR:#e0e0e0;}
-.ccCon A.ccAdminButton:hover {COLOR:#000000;BACKGROUND-COLOR:#ffffff;}
-.ccCon .ccAdminNormal {COLOR:#000000;}
-.ccCon .ccAdminSmall {COLOR:#000000;}
-.ccCon A.ccAdminNormal {COLOR:blue;}
-.ccCon A.ccAdminSmall {COLOR:blue;}
-.ccCon A.ccAdminSmall:hover {COLOR:blue;}
-.ccCon A.ccAdminSmall:visited {COLOR:blue;}
-.ccCon A.ccAdminLink {COLOR:blue;}
-.ccCon A.ccAdminLink:hover {COLOR:blue;}
-.ccCon A.ccAdminLink:visited{COLOR:blue;}
-.ccCon .ccAdvSearchText {width:250px}
-.ccCon .ccEditorPreferenceCon {width:400px;height:400px;padding:20px;border: 1px solid #ccc;}
-.ccCon .ccEditorPreferenceCon h1 {}
-.ccCon .ccEditorPreferenceCon p {}
-.ccCon .ccEditorPreferenceCon  .radioCon {padding:0 0 0 10px}
-.ccCon .ccEditorPreferenceCon .buttonCon {padding:20px 0 20px 0}
+.ccCon .ccContentCon {
+    margin: 0;
+    padding: 0;
+    Background-color: rgb(240,240,240);
+    width: 100%;
+    min-height: 100vh;
+}
+
+.ccCon .ccControlsCon {
+    color: black;
+    background-color: #fff8d0;
+    padding: 5px !important;
+    border-top: 1px solid #808080;
+    border-left: 1px solid #808080;
+    border-bottom: 1px solid #f8f8f8;
+    border-right: 1px solid #f8f8f8;
+}
+
+    .ccCon .ccControlsCon .left {
+        text-align: right;
+    }
+
+    .ccCon .ccControlsCon .right {
+        text-align: right;
+    }
+
+.ccCon .ccEditCaptionCon {
+    color: black;
+    white-space: nowrap;
+    text-align: right;
+    vertical-align: top;
+    padding-top: 4px;
+}
+
+.ccCon .ccEditCaptionCon {
+    padding-top: 5px;
+}
+
+    .ccCon .ccEditCaptionCon .textexpandable {
+        padding-top: 25px;
+    }
+
+    .ccCon .ccEditCaptionCon .htmleditor {
+        padding-top: 100px;
+    }
+
+.ccCon .ccEditFieldCon {
+    padding: 5px;
+    border-top: 1px solid #fffdf1;
+    border-bottom: 1px solid #dad4b2;
+    color: black;
+    background-color: #fff8d0;
+    text-align: left;
+    vertical-align: baseline;
+}
+
+    .ccCon .ccEditFieldCon .ccEditorCon {
+    }
+
+        .ccCon .ccEditFieldCon .ccEditorCon .checkBox {
+            border: 1px solid #ccc;
+            padding: 4px;
+        }
+
+        .ccCon .ccEditFieldCon .ccEditorCon .text {
+            border: 1px solid #ccc;
+            padding: 4px;
+        }
+
+        .ccCon .ccEditFieldCon .ccEditorCon .select {
+            border: 1px solid #ccc;
+            padding: 4px;
+        }
+
+        .ccCon .ccEditFieldCon .ccEditorCon .file {
+            border: 1px solid #ccc;
+            padding: 4px;
+        }
+
+        .ccCon .ccEditFieldCon .ccEditorCon .date {
+            border: 1px solid #ccc;
+            padding: 4px;
+        }
+
+        .ccCon .ccEditFieldCon .ccEditorCon .number {
+            border: 1px solid #ccc;
+            padding: 4px;
+        }
+
+        .ccCon .ccEditFieldCon .ccEditorCon .password {
+            border: 1px solid #ccc;
+            padding: 4px;
+        }
+
+        .ccCon .ccEditFieldCon .ccEditorCon .styles {
+            border: 1px solid #ccc;
+            padding: 4px;
+        }
+
+        .ccCon .ccEditFieldCon .ccEditorCon .link {
+            border: 1px solid #ccc;
+            padding: 4px;
+        }
+
+        .ccCon .ccEditFieldCon .ccEditorCon .resourceLink {
+            border: 1px solid #ccc;
+            padding: 4px;
+        }
+
+    .ccCon .ccEditFieldCon .ccEditorHelpCon {
+        color: #888;
+        padding: 10px;
+        width: 80%;
+    }
+
+        .ccCon .ccEditFieldCon .ccEditorHelpCon .opened {
+            display: none;
+        }
+
+            .ccCon .ccEditFieldCon .ccEditorHelpCon .opened .header {
+                padding-top: 5px;
+                color: #444;
+            }
+
+            .ccCon .ccEditFieldCon .ccEditorHelpCon .opened .body {
+                color: #444;
+            }
+
+.ccCon .ccHelpCon {
+    width: 95%;
+    padding: 10px;
+    margin: 10px;
+    border: 2px solid #808080;
+    background-color: white
+}
+
+    .ccCon .ccHelpCon .title {
+        color: black;
+    }
+
+    .ccCon .ccHelpCon .byline {
+        color: #606060;
+        padding-top: 5px;
+        padding-bottom: 1px;
+    }
+
+    .ccCon .ccHelpCon .body {
+        color: #404040;
+        padding-top: 5px;
+        border-top: 1px solid #808080
+    }
+
+.ccCon .ccAdminEditHeading {
+    padding: 0 6px;
+    COLOR: black;
+}
+
+.ccCon .ccAdminEditSubHeader {
+    margin-left: 20px;
+    border-bottom: 1px solid black;
+    padding: 6px;
+    COLOR: black;
+}
+
+.ccCon .ccAdminEditDescription {
+    COLOR: black;
+    padding: 0 10px;
+}
+
+.ccCon .ccAdminEditBody {
+    BACKGROUND-COLOR: rgb(248,248,250);
+    padding: 5px;
+}
+
+.ccCon .ccAdminEditCaption {
+    COLOR: black;
+    WHITE-SPACE: nowrap;
+    TEXT-ALIGN: right;
+}
+
+.ccCon .ccAdminEditField {
+    border-top: 1px solid #FFFDF1;
+    border-bottom: 1px solid #DAD4B2;
+    COLOR: black;
+    Background-color: #fff8d0;
+    TEXT-ALIGN: left;
+    vertical-align: baseline;
+}
+
+.ccCon .ccAdminListCaption {
+    padding: 4px;
+    background-color: rgb(140,140,140);
+    COLOR: white;
+    border-right: 1px solid white;
+    border-bottom: 1px solid black;
+    border-top: 0px solid white;
+    !important;
+}
+
+.ccCon A.ccAdminListCaption {
+    Display: block;
+    COLOR: white;
+    border: 0px;
+    padding: 0px;
+}
+
+    .ccCon A.ccAdminListCaption:Hover {
+    }
+
+    .ccCon A.ccAdminListCaption:Visited {
+    }
+
+.ccCon .ccAdminListRowEven {
+    BACKGROUND-COLOR: rgb(248,248,250);
+    padding: 4px;
+    border: 0px;
+    border-right: 1px solid white;
+    vertical-align: middle;
+}
+
+.ccCon .ccAdminListRowOdd {
+    BACKGROUND-COLOR: #ffffff;
+    padding: 4px;
+    border: 0px;
+    border-right: 1px solid white;
+    vertical-align: middle;
+}
+
+.ccCon .ccAdminTab {
+    background-color: rgb(180,180,180);
+    color: white;
+    white-space: nowrap;
+}
+
+.ccCon A.ccAdminTabLink {
+    color: white;
+}
+
+    .ccCon A.ccAdminTabLink:visited {
+        color: white;
+    }
+
+    .ccCon A.ccAdminTabLink:hover {
+        color: white;
+    }
+
+.ccCon .ccAdminTabHit {
+    background-color: white;
+    color: black;
+    white-space: nowrap;
+}
+
+.ccCon A.ccAdminTabHitLink {
+    color: black;
+}
+
+    .ccCon A.ccAdminTabHitLink:visited {
+        color: black;
+    }
+
+    .ccCon A.ccAdminTabHitLink:hover {
+        color: black;
+    }
+
+.ccCon .ccAdminTabEnd {
+    width: 100%;
+    border-bottom: 1px solid black;
+}
+
+.ccCon .ccAdminTabEdge {
+    background-color: black;
+}
+
+.ccCon .ccAdminTabBodyCollectionWrap {
+}
+
+.ccCon .ccAdminTabBodyWrapShow {
+    display: block;
+}
+
+.ccCon .ccAdminTabBodyWrapHide {
+    display: none;
+}
+
+.ccCon .ccAdminTabBodyWrap {
+}
+
+.ccCon .ccAdminTabBody {
+    background-color: white;
+    padding: 10px;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+.ccCon .ccAdminTabHitSpacer {
+    width: 5px;
+}
+
+.ccCon .ccAdminTabHitFiller {
+    width: 100%;
+}
+
+.ccCon A.ccAdminButton {
+    COLOR: #000000;
+    BACKGROUND-COLOR: #e0e0e0;
+}
+
+    .ccCon A.ccAdminButton:hover {
+        COLOR: #000000;
+        BACKGROUND-COLOR: #ffffff;
+    }
+
+.ccCon .ccAdminNormal {
+    COLOR: #000000;
+}
+
+.ccCon .ccAdminSmall {
+    COLOR: #000000;
+}
+
+.ccCon A.ccAdminNormal {
+    COLOR: blue;
+}
+
+.ccCon A.ccAdminSmall {
+    COLOR: blue;
+}
+
+    .ccCon A.ccAdminSmall:hover {
+        COLOR: blue;
+    }
+
+    .ccCon A.ccAdminSmall:visited {
+        COLOR: blue;
+    }
+
+.ccCon A.ccAdminLink {
+    COLOR: blue;
+}
+
+    .ccCon A.ccAdminLink:hover {
+        COLOR: blue;
+    }
+
+    .ccCon A.ccAdminLink:visited {
+        COLOR: blue;
+    }
+
+.ccCon .ccAdvSearchText {
+    width: 250px
+}
+
+.ccCon .ccEditorPreferenceCon {
+    width: 400px;
+    height: 400px;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+    .ccCon .ccEditorPreferenceCon h1 {
+    }
+
+    .ccCon .ccEditorPreferenceCon p {
+    }
+
+    .ccCon .ccEditorPreferenceCon .radioCon {
+        padding: 0 0 0 10px
+    }
+
+    .ccCon .ccEditorPreferenceCon .buttonCon {
+        padding: 20px 0 20px 0
+    }
 /*
 styles used publicly by Contensive 
 */
-.ccButtonCon {COLOR:black;Background-color:#567694;Padding:5px ! important;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
-div.ccJumpCon {padding:0;margin:0;}
-.ccJumpCon ul {vertical-align:middle;white-space:nowrap;padding:0;margin:0;}
-.ccJumpCon ul li {display:inline;width:30px;vertical-align:middle;text-align:center;cursor:pointer;list-style:none inside none;margin:0;padding:2px 5px ! important;color:#444;Background-Color:#ccc;}
-.ccJumpCon ul li:hover {color:#000;}
-.ccJumpCon ul li.caption {Background-Color:transparent;border:0;cursor:default;}
-.ccJumpCon ul li.delim {Background-Color:transparent;border:0;cursor:default;}
-.ccJumpCon ul li.hit {cursor:default;Background-Color:#666;color:#ddd;}
-.ccBubbleCon {position:absolute; border: 2px solid rgb(140,140,140);margin:0;padding:0;Background-color:rgb(240,240,240);z-index:1;}
-.ccBubbleCon .ccHeaderCon {position:static;width:100%;COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);}
-.ccBubbleCon .ccHeaderCon .bbLeft {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:left;padding:5px;white-space:nowrap;width:99%}
-.ccBubbleCon .ccHeaderCon .bbRight {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);text-align:right;padding:5px;width:23px}
-.ccBubbleCon .ccButtonCon {margin:0;padding:0;BACKGROUND-COLOR:#567694;Border-Top:1px solid #246;Border-Left:1px solid #246;Border-Bottom:1px solid #8be;Border-right:1px solid #8be;}
-.ccBubbleCon .ccContentCon {margin:0;padding:10px;Background-color:rgb(240,240,240);vertical-align:middle;}
-.ccBubbleCon .ccContentCon td {margin:0;padding:5px;vertical-align:middle;}
-.ccBubbleCon .ccContentCon td.bbLeft {text-align:right;white-space:nowrap;}
-.ccBubbleCon .ccContentCon td.bbRight {text-align:left;}
-.ccDialogCon {margin:0;padding:0;Background-color:rgb(240,240,240);}
-.ccDialogCon .ccButtonCon {margin:0;padding:0;BACKGROUND-COLOR:#567694;Border-Top:1px solid #246;Border-Left:1px solid #246;Border-Bottom:1px solid #8be;Border-right:1px solid #8be;}
-.ccDialogCon .ccContentCon {margin:0;padding:10px;Background-color:rgb(240,240,240);vertical-align:middle;}
-.ccDialogCon .ccContentCon td {margin:0;padding:5px;vertical-align:middle;}
-.ccDialogCon .ccContentCon td.left {text-align:right;white-space:nowrap;}
-.ccDialogCon .ccContentCon td.right {text-align:left;}
-.ccAddonFrameCon {width:100%;border:0;overflow:auto;}
-.ccAddonAjaxCon {}
-.ccAddonEditCaption {white-space:nowrap;clear:left;padding:2px;}
-.ccAddonEditTools {clear:left;padding:0px;}
-.ccHelpIcon a {cursor:help}
-ul.ccChildList {text-align:left}
-ul.ccChildList li.ccListItem {text-align:left}
-ul.ccChildList li.ccListItem a {}
-ul.ccChildList li.ccListItem a:hover {}
-ul.ccChildList li.ccListItem a:visited {}
-ul.ccChildListInactive {text-align:left;border-top:1px solid #444;}
-ul.ccChildListInactive li.ccListItem {text-align:left}
-ul.ccChildListInactive li.ccListItem a {}
-ul.ccChildListInactive li.ccListItem a:hover {}
-ul.ccChildListInactive li.ccListItem a:visited {}
-.ccImgA {width:18px;height:18px;border:0;vertical-align:middle;}
-.ccCategoryListCon {}
-.ccCategoryListCon .caption {padding-top:5px;}
-.ccCategoryListCon .caption a {}
-.ccCategoryListCon UL {margin:0;padding:0;padding-left:20px;}
-.ccCategoryListCon ul li {margin:0;padding:0;padding-left:2px;padding-top:5px;}
-.ccFilterHead {margin-top:10px;color:black}
-.ccFilterSubHead {margin-top:10px;color:black}
-.ccFilterList {color:black;}
-A.ccFilterLink { ! important;color:black ! important;}
-.ccFilterIndent {margin-left:10px;}
-ul.ccFilterList {list-style:none;margin:0;padding:0;}
-ul.ccFilterList li {margin:0;padding:0;padding-left:10px;}
-ul.ccFilterList li a { ! important;color:black ! important;}
-.ccRecordLinkCon { position: absolute; z-index: 999; }
-.ccListItem .ccRecordLinkCon { position: static; }
-.ccRecordLinkCon a.ccRecordEditLink { }
-.ccRecordLinkCon a.ccRecordCutLink { }
-.ccEditWrapper {border:1px dashed #808080;}
-.ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;color:black;background-color:#4c4;}
-.ccEditWrapperContent{padding:4px;}
-.ccDisabledReason {color:gray;}
-.ccEditorTextROCon {padding:20px;background-color:#fff;border:1px solid #aaa;}
-.ccAdminMsg {padding:10px;margin:10px;background-color:white;border:1px solid #888}
-.ccAdminButtonBar {COLOR:black;Background-color:#567694;Padding:5px}
-.ccCon  div.ccAdminTitleBar {COLOR:black;Background-color:transparent;Padding:10px}
-.ccAdminInfoBar {COLOR:black;Background-color:rgb(248,248,250);Padding:10px;Margin:10px;Margin-Top:0px;}
-.ccAuthoringLink {COLOR:#ffffff;BACKGROUND-COLOR:#89ab22;}
-.ccNavLink {text-indent:-19px;margin-left:29px;margin-right:10px;white-space:nowrap;margin-top:3px;}
-.ccNavLinkEmpty {text-indent:-19px;margin-left:29px;margin-right:10px;white-space:nowrap;}
-.ccNavLinkChild {margin-left:19px;}
-.ccHeadline {}
-.ccList {}
-.ccWatchList {}
-.ccListCopy {}
-.ccSmall {}
-.ccNormal {}
-.ccLarge {}
-.ccSurveyHeadline {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;}
-.ccSurveyQuestion {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;}
-.ccSurveyCopy {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;}
-.ccError {COLOR:#c02020;}
-.ccPanel3D{BACKGROUND-COLOR:#e0e0e0;Border-Top:1px solid #f8f8f8;Border-Left:1px solid #f8f8f8;Border-Bottom:1px solid #808080;Border-right:1px solid #808080;}
-.ccPanel3DReverse{BACKGROUND-COLOR:#e0e0e0;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
-.ccPanel3DInput{BACKGROUND-COLOR:#f0f0f0;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
-.ccPanel {BACKGROUND-COLOR:#e0e0e0}
-.ccPanelHilite {BACKGROUND-COLOR:#f8f8f8}
-.ccPanelShadow {BACKGROUND-COLOR:#808080}
-.ccPanelInput {BACKGROUND-COLOR:#f0f0f0;}
-.ccPanelBackground {BACKGROUND-COLOR:#f0f0f0}
-.ccPanelButtons {BACKGROUND-COLOR:#a0a0a0}
-.ccPanelDark {BACKGROUND-COLOR:#d0d0d0}
-.ccPanelHeader {COLOR:#ffffff;BACKGROUND-COLOR:#0320b0}
-.ccPanelHeaderHilite {BACKGROUND-COLOR:#8080ff}
-.ccPanelHeaderShadow {BACKGROUND-COLOR:#000000}
-.ccPanelReverse {BACKGROUND-COLOR:#0320c0}
-.ccPanelIndexRow {BACKGROUND-COLOR:#d6dfed}
-.ccPanelRowEven {BACKGROUND-COLOR:#f0f0f0}
-.ccPanelRowOdd {BACKGROUND-COLOR:#ffffff}
-.ccFlyoutButton {MARGIN:0px;PADDING-RIGHT:0px;PADDING-LEFT:0px;PADDING-BOTTOM:4px;PADDING-TOP:4px;white-space:nowrap;}
-A.ccFlyoutButton {MARGIN:0px;PADDING-RIGHT:6px;PADDING-LEFT:6px;PADDING-BOTTOM:4px;PADDING-TOP:4px;Z-INDEX:100;COLOR:black;white-space:nowrap;}
-A.ccFlyoutButton:hover {color:white;Background-color:rgb(140,140,140);}
-A.ccFlyoutButton:visited {}
-A.ccFlyoutButtonDown {color:white;Background-color:rgb(140,140,140);}
-A.ccFlyoutButtonDown:hover {}
-A.ccFlyoutButtonDown:visited {}
-.ccFlyoutDelimiter {color:#808080;padding:0px;margin:0px;}
-.ccFlyoutPanel {BORDER:white 1px solid;Z-INDEX:101;VISIBILITY:hidden;POSITION:absolute;BACKGROUND-COLOR:#e0e0e0;}
-A.ccFlyoutPanelButton {DISPLAY:block;BORDER-BOTTOM:#f0f0f0 1px solid;PADDING:4px;PADDING-LEFT:10px;PADDING-RIGHT:10px;WHITE-SPACE:nowrap;COLOR:black;}
-A.ccFlyoutPanelButton:hover {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);}
-A.ccFlyoutPanelButton:visited {}
-A.ccFlyoutPanelButtonDown {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);}
-.ccReport {padding:20px;Background-Color:white;Border-bottom:1px solid black;Border-left:1px solid black;Border-right:1px solid black;} 
-.ccReportRowTop {padding:4px;Background-Color:white;} 
-.ccReportRowOdd {padding:4px;Border-top:1px solid black;Background-Color:#F0F0F0;} 
-.ccReportRowEven {padding:4px;Border-top:1px solid black;Background-Color:white;} 
-.ccTab {background-color:rgb(140,140,140);color:white;}
-A.ccTabLink:Link {color:white;}
-A.ccTabLink:visited {color:white;}
-A.ccTabLink:hover {color:white;}
-.ccTabHit {background-color:white;color:black;}
-A.ccTabHitLink:link {color:black;}
-A.ccTabHitLink:visited {color:black;}
-A.ccTabHitLink:hover {color:black;}
-.ccTabEnd {width:100%;border-bottom:1px solid black;} 
-.ccTabEdge {background-color:black;} 
-.ccTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;border-bottom:1px solid black;margin:0px;}
-.ccTabHitSpacer { width: 5px; }
-.ccTabHitFiller { width: 100%; }
-.ccLiveTab {background-color:#A0A0A0;color:white;}
-A.ccLiveTabLink {color:white;}
-A.ccLiveTabLink:visited {color:white;}
-A.ccLiveTabLink:hover {color:white;}
-.ccLiveTabHit {background-color:white;color:black;}
-A.ccLiveTabHitLink {color:black;}
-A.ccLiveTabHitLink:visited {color:black;}
-A.ccLiveTabHitLink:hover {color:black;}
-.ccLiveTabEnd {width:100%;border-bottom:1px solid black;} 
-.ccLiveTabEdge {background-color:black;} 
-.ccLiveTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;}
-.ccLiveTabHitSpacer { width: 5px; }
-.ccLiveTabHitFiller { width: 100%; }
-.ccLiveTabBodyCollectionWrap { position:relative;background-color:white;}
-.ccWizardHeader{COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);Padding:5px;Border-Top:1px solid #1330c0;Border-Left:1px solid #1330c0;Border-Bottom:1px solid #0210a0;Border-right:1px solid #0210a0;}
-.ccWizardPanel{COLOR:black;BACKGROUND-COLOR:rgb(248,248,250);Border-Top:1px solid #ffffff;Border-Left:1px solid #ffffff;Border-Bottom:1px solid #808080;Border-right:1px solid #808080;}
-.ccTextArea {width:100%;overflow:auto;}
-.ccTextArea textarea {padding:0;margin:0;border:none}
-.ccTextAreaOpened {position:absolute;top:24px;left:0px;width:100%;overflow:auto;}
-.ccTextAreaHead {COLOR:white;BACKGROUND-COLOR:rgb(140,140,140);padding:5px;}
-div.ccTextAreaHead A:link {COLOR:white;}
-div.ccTextAreaHead A:visited {COLOR:white;}
-div.ccTextAreaHead A:hover {COLOR:white;}
-.ccTextAreaHeadOpened {position:absolute;top:0px;left:0px;height:24px;width:100%;background-color:rgb(140,140,140);margin:0px;padding:5px;border-bottom:2px solid #d0d0d0;}
-div.ccTextAreaHeadOpened A:link {COLOR:white;}
-div.ccTextAreaHeadOpened A:visited {COLOR:white;}
-div.ccTextAreaHeadOpened A:hover {COLOR:white;}
-div.ccTestPointMessageCon { margin:10px;border:1px solid #444;padding:20px;background-color:#eee;}
+.ccButtonCon {
+    COLOR: black;
+    Background-color: #567694;
+    Padding: 5px !important;
+    Border-Top: 1px solid #808080;
+    Border-Left: 1px solid #808080;
+    Border-Bottom: 1px solid #f8f8f8;
+    Border-right: 1px solid #f8f8f8;
+}
+
+div.ccJumpCon {
+    padding: 0;
+    margin: 0;
+}
+
+.ccJumpCon ul {
+    vertical-align: middle;
+    white-space: nowrap;
+    padding: 0;
+    margin: 0;
+}
+
+    .ccJumpCon ul li {
+        display: inline;
+        width: 30px;
+        vertical-align: middle;
+        text-align: center;
+        cursor: pointer;
+        list-style: none inside none;
+        margin: 0;
+        padding: 2px 5px !important;
+        color: #444;
+        Background-Color: #ccc;
+    }
+
+        .ccJumpCon ul li:hover {
+            color: #000;
+        }
+
+        .ccJumpCon ul li.caption {
+            Background-Color: transparent;
+            border: 0;
+            cursor: default;
+        }
+
+        .ccJumpCon ul li.delim {
+            Background-Color: transparent;
+            border: 0;
+            cursor: default;
+        }
+
+        .ccJumpCon ul li.hit {
+            cursor: default;
+            Background-Color: #666;
+            color: #ddd;
+        }
+
+.ccBubbleCon {
+    position: absolute;
+    border: 2px solid rgb(140,140,140);
+    margin: 0;
+    padding: 0;
+    Background-color: rgb(240,240,240);
+    z-index: 1;
+}
+
+    .ccBubbleCon .ccHeaderCon {
+        position: static;
+        width: 100%;
+        COLOR: white;
+        BACKGROUND-COLOR: rgb(140,140,140);
+    }
+
+        .ccBubbleCon .ccHeaderCon .bbLeft {
+            COLOR: white;
+            BACKGROUND-COLOR: rgb(140,140,140);
+            text-align: left;
+            padding: 5px;
+            white-space: nowrap;
+            width: 99%
+        }
+
+        .ccBubbleCon .ccHeaderCon .bbRight {
+            COLOR: white;
+            BACKGROUND-COLOR: rgb(140,140,140);
+            text-align: right;
+            padding: 5px;
+            width: 23px
+        }
+
+    .ccBubbleCon .ccButtonCon {
+        margin: 0;
+        padding: 0;
+        BACKGROUND-COLOR: #567694;
+        Border-Top: 1px solid #246;
+        Border-Left: 1px solid #246;
+        Border-Bottom: 1px solid #8be;
+        Border-right: 1px solid #8be;
+    }
+
+    .ccBubbleCon .ccContentCon {
+        margin: 0;
+        padding: 10px;
+        Background-color: rgb(240,240,240);
+        vertical-align: middle;
+    }
+
+        .ccBubbleCon .ccContentCon td {
+            margin: 0;
+            padding: 5px;
+            vertical-align: middle;
+        }
+
+            .ccBubbleCon .ccContentCon td.bbLeft {
+                text-align: right;
+                white-space: nowrap;
+            }
+
+            .ccBubbleCon .ccContentCon td.bbRight {
+                text-align: left;
+            }
+
+.ccDialogCon {
+    margin: 0;
+    padding: 0;
+    Background-color: rgb(240,240,240);
+}
+
+    .ccDialogCon .ccButtonCon {
+        margin: 0;
+        padding: 0;
+        BACKGROUND-COLOR: #567694;
+        Border-Top: 1px solid #246;
+        Border-Left: 1px solid #246;
+        Border-Bottom: 1px solid #8be;
+        Border-right: 1px solid #8be;
+    }
+
+    .ccDialogCon .ccContentCon {
+        margin: 0;
+        padding: 10px;
+        Background-color: rgb(240,240,240);
+        vertical-align: middle;
+    }
+
+        .ccDialogCon .ccContentCon td {
+            margin: 0;
+            padding: 5px;
+            vertical-align: middle;
+        }
+
+            .ccDialogCon .ccContentCon td.left {
+                text-align: right;
+                white-space: nowrap;
+            }
+
+            .ccDialogCon .ccContentCon td.right {
+                text-align: left;
+            }
+
+.ccAddonFrameCon {
+    width: 100%;
+    border: 0;
+    overflow: auto;
+}
+
+.ccAddonAjaxCon {
+}
+
+.ccAddonEditCaption {
+    white-space: nowrap;
+    clear: left;
+    padding: 2px;
+}
+
+.ccAddonEditTools {
+    clear: left;
+    padding: 0px;
+}
+
+.ccHelpIcon a {
+    cursor: help
+}
+
+ul.ccChildList {
+    text-align: left
+}
+
+    ul.ccChildList li.ccListItem {
+        text-align: left
+    }
+
+        ul.ccChildList li.ccListItem a {
+        }
+
+            ul.ccChildList li.ccListItem a:hover {
+            }
+
+            ul.ccChildList li.ccListItem a:visited {
+            }
+
+ul.ccChildListInactive {
+    text-align: left;
+    border-top: 1px solid #444;
+}
+
+    ul.ccChildListInactive li.ccListItem {
+        text-align: left
+    }
+
+        ul.ccChildListInactive li.ccListItem a {
+        }
+
+            ul.ccChildListInactive li.ccListItem a:hover {
+            }
+
+            ul.ccChildListInactive li.ccListItem a:visited {
+            }
+
+.ccImgA {
+    width: 18px;
+    height: 18px;
+    border: 0;
+    vertical-align: middle;
+}
+
+.ccCategoryListCon {
+}
+
+    .ccCategoryListCon .caption {
+        padding-top: 5px;
+    }
+
+        .ccCategoryListCon .caption a {
+        }
+
+    .ccCategoryListCon UL {
+        margin: 0;
+        padding: 0;
+        padding-left: 20px;
+    }
+
+        .ccCategoryListCon ul li {
+            margin: 0;
+            padding: 0;
+            padding-left: 2px;
+            padding-top: 5px;
+        }
+
+.ccFilterHead {
+    margin-top: 10px;
+    color: black
+}
+
+.ccFilterSubHead {
+    margin-top: 10px;
+    color: black
+}
+
+.ccFilterList {
+    color: black;
+}
+
+A.ccFilterLink {
+    !important;
+    color: black !important;
+}
+
+.ccFilterIndent {
+    margin-left: 10px;
+}
+
+ul.ccFilterList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+    ul.ccFilterList li {
+        margin: 0;
+        padding: 0;
+        padding-left: 10px;
+    }
+
+        ul.ccFilterList li a {
+            !important;
+            color: black !important;
+        }
+
+.ccRecordLinkCon {
+    position: absolute;
+    z-index: 999;
+}
+
+.ccListItem .ccRecordLinkCon {
+    position: static;
+}
+
+.ccRecordLinkCon a.ccRecordEditLink {
+}
+
+.ccRecordLinkCon a.ccRecordCutLink {
+}
+
+.ccEditWrapper {
+    border: 1px dashed #808080;
+}
+
+.ccEditWrapperCaption {
+    text-align: left;
+    border-bottom: 1px solid #808080;
+    padding: 4px;
+    color: black;
+    background-color: #4c4;
+}
+
+.ccEditWrapperContent {
+    padding: 4px;
+}
+
+.ccDisabledReason {
+    color: gray;
+}
+
+.ccEditorTextROCon {
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #aaa;
+}
+
+.ccAdminMsg {
+    padding: 10px;
+    margin: 10px;
+    background-color: white;
+    border: 1px solid #888
+}
+
+.ccAdminButtonBar {
+    COLOR: black;
+    Background-color: #567694;
+    Padding: 5px
+}
+
+.ccCon div.ccAdminTitleBar {
+    COLOR: black;
+    Background-color: transparent;
+    Padding: 10px
+}
+
+.ccAdminInfoBar {
+    COLOR: black;
+    Background-color: rgb(248,248,250);
+    Padding: 10px;
+    Margin: 10px;
+    Margin-Top: 0px;
+}
+
+.ccAuthoringLink {
+    COLOR: #ffffff;
+    BACKGROUND-COLOR: #89ab22;
+}
+
+.ccNavLink {
+    text-indent: -19px;
+    margin-left: 29px;
+    margin-right: 10px;
+    white-space: nowrap;
+    margin-top: 3px;
+}
+
+.ccNavLinkEmpty {
+    text-indent: -19px;
+    margin-left: 29px;
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.ccNavLinkChild {
+    margin-left: 19px;
+}
+
+.ccHeadline {
+}
+
+.ccList {
+}
+
+.ccWatchList {
+}
+
+.ccListCopy {
+}
+
+.ccSmall {
+}
+
+.ccNormal {
+}
+
+.ccLarge {
+}
+
+.ccSurveyHeadline {
+    MARGIN-TOP: 4px;
+    MARGIN-BOTTOM: 2px;
+}
+
+.ccSurveyQuestion {
+    MARGIN-TOP: 4px;
+    MARGIN-BOTTOM: 2px;
+}
+
+.ccSurveyCopy {
+    MARGIN-TOP: 4px;
+    MARGIN-BOTTOM: 2px;
+}
+
+.ccError {
+    COLOR: #c02020;
+}
+
+.ccPanel3D {
+    BACKGROUND-COLOR: #e0e0e0;
+    Border-Top: 1px solid #f8f8f8;
+    Border-Left: 1px solid #f8f8f8;
+    Border-Bottom: 1px solid #808080;
+    Border-right: 1px solid #808080;
+}
+
+.ccPanel3DReverse {
+    BACKGROUND-COLOR: #e0e0e0;
+    Border-Top: 1px solid #808080;
+    Border-Left: 1px solid #808080;
+    Border-Bottom: 1px solid #f8f8f8;
+    Border-right: 1px solid #f8f8f8;
+}
+
+.ccPanel3DInput {
+    BACKGROUND-COLOR: #f0f0f0;
+    Border-Top: 1px solid #808080;
+    Border-Left: 1px solid #808080;
+    Border-Bottom: 1px solid #f8f8f8;
+    Border-right: 1px solid #f8f8f8;
+}
+
+.ccPanel {
+    BACKGROUND-COLOR: #e0e0e0
+}
+
+.ccPanelHilite {
+    BACKGROUND-COLOR: #f8f8f8
+}
+
+.ccPanelShadow {
+    BACKGROUND-COLOR: #808080
+}
+
+.ccPanelInput {
+    BACKGROUND-COLOR: #f0f0f0;
+}
+
+.ccPanelBackground {
+    BACKGROUND-COLOR: #f0f0f0
+}
+
+.ccPanelButtons {
+    BACKGROUND-COLOR: #a0a0a0
+}
+
+.ccPanelDark {
+    BACKGROUND-COLOR: #d0d0d0
+}
+
+.ccPanelHeader {
+    COLOR: #ffffff;
+    BACKGROUND-COLOR: #0320b0
+}
+
+.ccPanelHeaderHilite {
+    BACKGROUND-COLOR: #8080ff
+}
+
+.ccPanelHeaderShadow {
+    BACKGROUND-COLOR: #000000
+}
+
+.ccPanelReverse {
+    BACKGROUND-COLOR: #0320c0
+}
+
+.ccPanelIndexRow {
+    BACKGROUND-COLOR: #d6dfed
+}
+
+.ccPanelRowEven {
+    BACKGROUND-COLOR: #f0f0f0
+}
+
+.ccPanelRowOdd {
+    BACKGROUND-COLOR: #ffffff
+}
+
+.ccFlyoutButton {
+    MARGIN: 0px;
+    PADDING-RIGHT: 0px;
+    PADDING-LEFT: 0px;
+    PADDING-BOTTOM: 4px;
+    PADDING-TOP: 4px;
+    white-space: nowrap;
+}
+
+A.ccFlyoutButton {
+    MARGIN: 0px;
+    PADDING-RIGHT: 6px;
+    PADDING-LEFT: 6px;
+    PADDING-BOTTOM: 4px;
+    PADDING-TOP: 4px;
+    Z-INDEX: 100;
+    COLOR: black;
+    white-space: nowrap;
+}
+
+    A.ccFlyoutButton:hover {
+        color: white;
+        Background-color: rgb(140,140,140);
+    }
+
+    A.ccFlyoutButton:visited {
+    }
+
+A.ccFlyoutButtonDown {
+    color: white;
+    Background-color: rgb(140,140,140);
+}
+
+    A.ccFlyoutButtonDown:hover {
+    }
+
+    A.ccFlyoutButtonDown:visited {
+    }
+
+.ccFlyoutDelimiter {
+    color: #808080;
+    padding: 0px;
+    margin: 0px;
+}
+
+.ccFlyoutPanel {
+    BORDER: white 1px solid;
+    Z-INDEX: 101;
+    VISIBILITY: hidden;
+    POSITION: absolute;
+    BACKGROUND-COLOR: #e0e0e0;
+}
+
+A.ccFlyoutPanelButton {
+    DISPLAY: block;
+    BORDER-BOTTOM: #f0f0f0 1px solid;
+    PADDING: 4px;
+    PADDING-LEFT: 10px;
+    PADDING-RIGHT: 10px;
+    WHITE-SPACE: nowrap;
+    COLOR: black;
+}
+
+    A.ccFlyoutPanelButton:hover {
+        COLOR: white;
+        BACKGROUND-COLOR: rgb(140,140,140);
+    }
+
+    A.ccFlyoutPanelButton:visited {
+    }
+
+A.ccFlyoutPanelButtonDown {
+    COLOR: white;
+    BACKGROUND-COLOR: rgb(140,140,140);
+}
+
+.ccReport {
+    padding: 20px;
+    Background-Color: white;
+    Border-bottom: 1px solid black;
+    Border-left: 1px solid black;
+    Border-right: 1px solid black;
+}
+
+.ccReportRowTop {
+    padding: 4px;
+    Background-Color: white;
+}
+
+.ccReportRowOdd {
+    padding: 4px;
+    Border-top: 1px solid black;
+    Background-Color: #F0F0F0;
+}
+
+.ccReportRowEven {
+    padding: 4px;
+    Border-top: 1px solid black;
+    Background-Color: white;
+}
+
+.ccTab {
+    background-color: rgb(140,140,140);
+    color: white;
+}
+
+A.ccTabLink:Link {
+    color: white;
+}
+
+A.ccTabLink:visited {
+    color: white;
+}
+
+A.ccTabLink:hover {
+    color: white;
+}
+
+.ccTabHit {
+    background-color: white;
+    color: black;
+}
+
+A.ccTabHitLink:link {
+    color: black;
+}
+
+A.ccTabHitLink:visited {
+    color: black;
+}
+
+A.ccTabHitLink:hover {
+    color: black;
+}
+
+.ccTabEnd {
+    width: 100%;
+    border-bottom: 1px solid black;
+}
+
+.ccTabEdge {
+    background-color: black;
+}
+
+.ccTabBody {
+    background-color: white;
+    padding: 10px;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    margin: 0px;
+}
+
+.ccTabHitSpacer {
+    width: 5px;
+}
+
+.ccTabHitFiller {
+    width: 100%;
+}
+
+.ccLiveTab {
+    background-color: #A0A0A0;
+    color: white;
+}
+
+A.ccLiveTabLink {
+    color: white;
+}
+
+    A.ccLiveTabLink:visited {
+        color: white;
+    }
+
+    A.ccLiveTabLink:hover {
+        color: white;
+    }
+
+.ccLiveTabHit {
+    background-color: white;
+    color: black;
+}
+
+A.ccLiveTabHitLink {
+    color: black;
+}
+
+    A.ccLiveTabHitLink:visited {
+        color: black;
+    }
+
+    A.ccLiveTabHitLink:hover {
+        color: black;
+    }
+
+.ccLiveTabEnd {
+    width: 100%;
+    border-bottom: 1px solid black;
+}
+
+.ccLiveTabEdge {
+    background-color: black;
+}
+
+.ccLiveTabBody {
+    background-color: white;
+    padding: 10px;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+.ccLiveTabHitSpacer {
+    width: 5px;
+}
+
+.ccLiveTabHitFiller {
+    width: 100%;
+}
+
+.ccLiveTabBodyCollectionWrap {
+    position: relative;
+    background-color: white;
+}
+
+.ccWizardHeader {
+    COLOR: white;
+    BACKGROUND-COLOR: rgb(140,140,140);
+    Padding: 5px;
+    Border-Top: 1px solid #1330c0;
+    Border-Left: 1px solid #1330c0;
+    Border-Bottom: 1px solid #0210a0;
+    Border-right: 1px solid #0210a0;
+}
+
+.ccWizardPanel {
+    COLOR: black;
+    BACKGROUND-COLOR: rgb(248,248,250);
+    Border-Top: 1px solid #ffffff;
+    Border-Left: 1px solid #ffffff;
+    Border-Bottom: 1px solid #808080;
+    Border-right: 1px solid #808080;
+}
+
+.ccTextArea {
+    width: 100%;
+    overflow: auto;
+}
+
+    .ccTextArea textarea {
+        padding: 0;
+        margin: 0;
+        border: none
+    }
+
+.ccTextAreaOpened {
+    position: absolute;
+    top: 24px;
+    left: 0px;
+    width: 100%;
+    overflow: auto;
+}
+
+.ccTextAreaHead {
+    COLOR: white;
+    BACKGROUND-COLOR: rgb(140,140,140);
+    padding: 5px;
+}
+
+div.ccTextAreaHead A:link {
+    COLOR: white;
+}
+
+div.ccTextAreaHead A:visited {
+    COLOR: white;
+}
+
+div.ccTextAreaHead A:hover {
+    COLOR: white;
+}
+
+.ccTextAreaHeadOpened {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 24px;
+    width: 100%;
+    background-color: rgb(140,140,140);
+    margin: 0px;
+    padding: 5px;
+    border-bottom: 2px solid #d0d0d0;
+}
+
+div.ccTextAreaHeadOpened A:link {
+    COLOR: white;
+}
+
+div.ccTextAreaHeadOpened A:visited {
+    COLOR: white;
+}
+
+div.ccTextAreaHeadOpened A:hover {
+    COLOR: white;
+}
+
+div.ccTestPointMessageCon {
+    margin: 10px;
+    border: 1px solid #444;
+    padding: 20px;
+    background-color: #eee;
+}
 /*
 for hints created with getAdminHintWrapper
 */
-.ccEditWrapper {border:1px dashed #808080;}
-.ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}
-.ccEditWrapperContent{padding:4px;}
-.ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}
-.ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}
+.ccEditWrapper {
+    border: 1px dashed #808080;
+}
+
+.ccEditWrapperCaption {
+    text-align: left;
+    border-bottom: 1px solid #808080;
+    padding: 4px;
+    background-color: #40C040;
+    color: black;
+}
+
+.ccEditWrapperContent {
+    padding: 4px;
+}
+
+.ccHintWrapper {
+    border: 1px dashed #808080;
+    margin-bottom: 10px
+}
+
+.ccHintWrapperContent {
+    padding: 10px;
+    background-color: #80E080;
+    color: black;
+}
 /*
 help dialog for addon options, etc.
 */
-.helpDialogCon {/* blows advanced edit page out - width:420px; */}
+.helpDialogCon { /* blows advanced edit page out - width:420px; */
+}
 /*
 Container for the login panel when the section is blocked
 */
-.ccLoginPageCon 
-{
-	width: 400px;
-	margin: 100px auto 0 auto;
+.ccLoginPageCon {
+    width: 400px;
+    margin: 100px auto 0 auto;
 }
 /*
 Container for the default login form
 */
-.ccLoginFormCon
-{
-	width: 350px;
-	margin: 0 auto;
+.ccLoginFormCon {
+    width: 350px;
+    margin: 0 auto;
 }
 /*
 Exception list
 */
-ul.ccExceptionList { padding: 10px 20px;margin:0;background-color:red;list-style-type: none;}
-li.ccExceptionListRow { padding:0;margin: 10px auto;}
+ul.ccExceptionList {
+    padding: 10px 20px;
+    margin: 0;
+    background-color: red;
+    list-style-type: none;
+}
+
+li.ccExceptionListRow {
+    padding: 0;
+    margin: 10px auto;
+}
 /*
     page manager verified styles
 */
 .ccChildList li {
-    min-height:30px;
-    vertical-align:middle;
+    min-height: 30px;
+    vertical-align: middle;
 }
 /*
     child list
 */
 .ccEditWrapper .ccChildList li {
-	border:1px dashed #262;
-	padding-right:40px !important;background:white url(/contensiveBase/arrowUpDown.png) no-repeat right;
-}	
+    border: 1px dashed #262;
+    padding-right: 40px !important;
+    background: white url(/contensiveBase/arrowUpDown.png) no-repeat right;
+}

@@ -1496,7 +1496,7 @@ namespace Contensive.Core.Models.Complex {
                     //
                     // This update is not allowed
                     //
-                    logController.handleError( core,new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
+                    logController.handleWarn( core,new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
                 }
                 if (true) {
                     //FieldAdminOnly = field.adminOnly

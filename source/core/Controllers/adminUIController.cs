@@ -99,6 +99,7 @@ namespace Contensive.Core {
             public bool isClose = false;
             public bool isAdd = false;
         }
+        //
         // ====================================================================================================
         /// <summary>
         /// Title Bar
@@ -123,6 +124,7 @@ namespace Contensive.Core {
             result = htmlController.div(result, "ccAdminTitleBar");
             return result;
         }
+        //
         // ====================================================================================================
         /// <summary>
         /// Get the Normal Edit Button Bar String, used on Normal Edit and others
@@ -156,6 +158,7 @@ namespace Contensive.Core {
             }
             return GetButtonBar(core, buttonsLeft, buttonsRight);
         }
+        //
         // ====================================================================================================
         /// <summary>
         /// Return a panel header with the header message reversed out of the left
@@ -195,6 +198,9 @@ namespace Contensive.Core {
             }
             return s;
         }
+        //
+        // ====================================================================================================
+        //
         public static string GetButtonsFromList(coreController core, List<buttonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
             string s = "";
             try {
@@ -216,11 +222,13 @@ namespace Contensive.Core {
             }
             return s;
         }
+        //
         // ====================================================================================================
         //
         public static string GetButtonsFromList(coreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
             return GetButtonsFromList(core, buttonStringToButtonList(ButtonList), AllowDelete, AllowAdd);
         }
+        //
         // ====================================================================================================
         /// <summary>
         /// Return a bootstrap button bar
@@ -237,6 +245,7 @@ namespace Contensive.Core {
                 return "<div class=\"border bg-white p-2\">" + LeftButtons + "<div class=\"float-right\">" + RightButtons + "</div></div>";
             }
         }
+        //
         // ====================================================================================================
         /// <summary>
         /// get button bar for the index form
@@ -339,6 +348,7 @@ namespace Contensive.Core {
             }
             return result;
         }
+        //
         // ====================================================================================================
         //
         public static string GetBody(coreController core, string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
@@ -371,17 +381,20 @@ namespace Contensive.Core {
                 + nop(Content) + "\r</div>";
                 result += nop(ButtonBar) + nop(GetTitleBar(core, Caption, Description)) + nop(CellContentSummary) + nop(ContentCell) + nop(ButtonBar) + "";
 
-                result = '\r' + core.html.formStartMultipart() + nop(result) + '\r' + htmlController.formEnd();
+                result = '\r' + htmlController.formStartMultipart(core.doc.refreshQueryString,"","ccForm") + nop(result) + '\r' + htmlController.formEnd();
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
             return result;
         }
+        //
+        // ====================================================================================================
+        //
         public static string GetEditSubheadRow(coreController core, string Caption) {
             return "<tr><td colspan=2 class=\"ccAdminEditSubHeader\">" + Caption + "</td></tr>";
         }
         //
-        //========================================================================
+        // ====================================================================================================
         // GetEditPanel, An edit panel is a section of an admin page, under a subhead. When in tab mode, the subhead is blocked, and the panel is assumed to go in its own tab windows
         //
         public static string GetEditPanel(coreController core, bool AllowHeading, string PanelHeading, string PanelDescription, string PanelBody) {
@@ -394,13 +407,13 @@ namespace Contensive.Core {
                 // ----- Subhead
                 //
                 if (AllowHeading && (!string.IsNullOrEmpty(PanelHeading))) {
-                    result += "<div class=\"ccAdminEditHeading\">" + PanelHeading + "</div>";
+                    result += "<h3 class=\"p-2 ccAdminEditHeading\">" + PanelHeading + "</h3>";
                 }
                 //
                 // ----- Description
                 //
                 if (!string.IsNullOrEmpty(PanelDescription)) {
-                    result += "<div class=\"ccAdminEditDescription\">" + PanelDescription + "</div>";
+                    result += "<p class=\"p-2 ccAdminEditDescription\">" + PanelDescription + "</p>";
                 }
                 //
                 result += PanelBody + "</div>";
@@ -410,18 +423,16 @@ namespace Contensive.Core {
             return result;
         }
         //
-        //========================================================================
+        // ====================================================================================================
         // Edit Table Open
-        //
         public static string EditTableOpen {
             get {
                 return "<table border=0 cellpadding=3 cellspacing=0 width=\"100%\">";
             }
         }
         //
-        //========================================================================
+        // ====================================================================================================
         // Edit Table Close
-        //
         public static string EditTableClose {
             get {
                 string tempEditTableClose = null;
@@ -435,9 +446,7 @@ namespace Contensive.Core {
 
         }
         //
-        //==========================================================================================
-        //   Report Cell
-        //==========================================================================================
+        // ====================================================================================================
         //
         private static string GetReport_Cell(coreController core, string Copy, string Align, int Columns, int RowPointer) {
             string tempGetReport_Cell = null;
@@ -465,7 +474,7 @@ namespace Contensive.Core {
             return tempGetReport_Cell + "><span class=\"ccSmall\">" + CellCopy + "</span></td>";
         }
         //
-        //==========================================================================================
+        // ====================================================================================================
         //   Report Cell Header
         //       ColumnPtr       :   0 based column number
         //       Title
@@ -476,7 +485,6 @@ namespace Contensive.Core {
         //       ClassStyle      :   class
         //       RQS
         //       SortingState
-        //==========================================================================================
         //
         private static string GetReport_CellHeader(coreController core, int ColumnPtr, string Title, string Width, string Align, string ClassStyle, string RefreshQueryString, SortingStateEnum SortingState) {
             string result = "";
@@ -533,12 +541,13 @@ namespace Contensive.Core {
             return result;
         }
         //
-        //=============================================================================
-        //   Get Sort Column Ptr
-        //
-        //   returns the integer column ptr of the column last selected
-        //=============================================================================
-        //
+        // ====================================================================================================
+        /// <summary>
+        /// returns the integer column ptr of the column last selected
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="DefaultSortColumnPtr"></param>
+        /// <returns></returns>
         public static int GetReportSortColumnPtr(coreController core, int DefaultSortColumnPtr) {
             int tempGetReportSortColumnPtr = 0;
             string VarText;
@@ -551,7 +560,7 @@ namespace Contensive.Core {
             return tempGetReportSortColumnPtr;
         }
         //
-        //=============================================================================
+        // ====================================================================================================
         //   Get Sort Column Type
         //
         //   returns the integer for the type of sorting last requested
@@ -562,7 +571,6 @@ namespace Contensive.Core {
         //   Orderby is generated by the selection of headers captions by the user
         //   It is up to the calling program to call GetReportOrderBy to get the orderby and use it in the query to generate the cells
         //   This call returns a comma delimited list of integers representing the columns to sort
-        //=============================================================================
         //
         public static int GetReportSortType(coreController core) {
             int tempGetReportSortType = 0;
@@ -580,9 +588,7 @@ namespace Contensive.Core {
             return tempGetReportSortType;
         }
         //
-        //=============================================================================
-        //   Translate the old GetReport to the new GetReport2
-        //=============================================================================
+        // ====================================================================================================
         //
         public static string GetReport(coreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle) {
             string result = "";
@@ -600,15 +606,7 @@ namespace Contensive.Core {
             return result;
         }
         //
-        //=============================================================================
-        //   Report
-        //
-        //   This is a list report that you have to fill in all the cells and pass them in arrays.
-        //   The column headers are always assumed to include the orderby options. they are linked. To get the correct orderby, the calling program
-        //   has to call GetReport2orderby
-        //
-        //
-        //=============================================================================
+        // ====================================================================================================
         //
         public static string GetReport2(coreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle, bool[] ColSortable, int DefaultSortColumnPtr) {
             string result = "";
@@ -771,8 +769,7 @@ namespace Contensive.Core {
             return result;
         }
         //
-        //========================================================================
-        // Get the Normal Edit Button Bar String used on Normal Edit and others
+        // ====================================================================================================
         //
         public static string GetFormBodyAdminOnly() {
             return "<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">This page requires administrator permissions.</div>";
@@ -793,6 +790,9 @@ namespace Contensive.Core {
             // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
             // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
         }
+        //
+        // ====================================================================================================
+        //
         public static List<buttonMetadata> buttonStringToButtonList(string ButtonList) {
             var result = new List<buttonMetadata>();
             string[] Buttons = null;
@@ -902,6 +902,7 @@ namespace Contensive.Core {
             }
             return result;
         }
+        //
         // ====================================================================================================
         /// <summary>
         /// return the default admin editor for this field type
@@ -910,11 +911,12 @@ namespace Contensive.Core {
         /// <param name="htmlName"></param>
         /// <param name="htmlValue"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Bool(coreController core, string htmlName, bool htmlValue, bool readOnly, string htmlId) {
-            string result = htmlController.div(core.html.inputCheckbox(htmlName, htmlValue, htmlId, readOnly), "checkbox");
+        public static string getDefaultEditor_Bool(coreController core, string htmlName, bool htmlValue, bool readOnly = false, string htmlId = "") {
+            string result = htmlController.div(htmlController.checkbox(htmlName, htmlValue, htmlId, readOnly), "checkbox");
             if (readOnly)  result += htmlController.inputHidden(htmlName, htmlValue);
             return result;
         }
+        //
         // ====================================================================================================
         /// <summary>
         /// return the default admin editor for this field type
@@ -926,17 +928,48 @@ namespace Contensive.Core {
         /// <param name="htmlId"></param>
         /// <param name="isPassword"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Text(coreController core, string fieldName, string fieldValue, bool readOnly, string htmlId) {
+        public static string getDefaultEditor_Text(coreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
             if ((fieldValue.IndexOf("\n") == -1) && (fieldValue.Length < 80)) {
                 //
                 // text field shorter then 40 characters without a CR
                 return htmlController.inputText( core,fieldName, fieldValue, 1, -1, htmlId, false, readOnly, "text form-control", 255);
-            } else {
-                //
-                // longer text data, or text that contains a CR
-                return htmlController.inputTextarea( core,fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false, 255);
             }
+            return getDefaultEditor_TextArea(core, fieldName, fieldValue, readOnly, htmlId);
         }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// return the default admin editor for this field type
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="fieldValue"></param>
+        /// <param name="readOnly"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="isPassword"></param>
+        /// <returns></returns>
+        public static string getDefaultEditor_TextArea(coreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
+            //
+            // longer text data, or text that contains a CR
+            return htmlController.inputTextarea(core, fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false, 255);
+        }
+        //
+        // ====================================================================================================
+        //
+        public static string getDefaultEditor_Html( coreController core, string fieldName, string fieldValue, string editorAddonListJSON, string styleList, string styleOptionList, bool readONly = false, string htmlId = "" ) {
+            string result = "";
+            if (readONly) {
+                result += htmlController.inputHidden(fieldName, fieldValue);
+            } else if (string.IsNullOrEmpty(fieldValue)) {
+                //
+                // editor needs a starting p tag to setup correctly
+                fieldValue = HTMLEditorDefaultCopyNoCr;
+            }
+            result += core.html.getFormInputHTML(fieldName.ToLower(), fieldValue, "500", "", readONly, true, editorAddonListJSON, styleList, styleOptionList);
+            result = "<div style=\"width:95%\">" + result + "</div>";
+            return result;
+        }
+        //
         // ====================================================================================================
         /// <summary>
         /// return an admin edit page row for one field in a list of fields within a tab
@@ -947,9 +980,10 @@ namespace Contensive.Core {
         /// <param name="readOnly"></param>
         /// <param name="htmlId"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Password(coreController core, string fieldName, string fieldValue, bool readOnly, string htmlId) {
+        public static string getDefaultEditor_Password(coreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
             return htmlController.inputText( core,fieldName, fieldValue, -1, -1, htmlId, true, readOnly, "password form-control", 255);
         }
+        //
         // ====================================================================================================
         /// <summary>
         /// admin editor for a lookup field into a content table
@@ -964,7 +998,7 @@ namespace Contensive.Core {
         /// <param name="fieldRequired"></param>
         /// <param name="IsEmptyList"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_LookupContent( coreController core, string fieldName, int fieldValue, int lookupContentID, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired, ref bool IsEmptyList, string sqlFilter = "") {
+        public static string getDefaultEditor_LookupContent( coreController core, string fieldName, int fieldValue, int lookupContentID, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
             string result = "";
             string LookupContentName = "";
             if (lookupContentID != 0) LookupContentName = genericController.encodeText(Models.Complex.cdefModel.getContentNameByID(core, lookupContentID));
@@ -1005,6 +1039,7 @@ namespace Contensive.Core {
             }
             return result;
         }
+        //
         // ====================================================================================================
         /// <summary>
         /// admin editor for a lookup field into a static list
@@ -1018,7 +1053,7 @@ namespace Contensive.Core {
         /// <param name="WhyReadOnlyMsg"></param>
         /// <param name="fieldRequired"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_LookupList(coreController core, string fieldName, int fieldValue, string[] lookups, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired) {
+        public static string getDefaultEditor_LookupList(coreController core, string fieldName, int fieldValue, string[] lookups, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
             string result = "";
             if (readOnly) {
                 //
@@ -1042,8 +1077,10 @@ namespace Contensive.Core {
             }
             return result;
         }
+        //
         // ====================================================================================================
-        public static string getDefaultEditor_Date( coreController core, string fieldName, DateTime FieldValueDate, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg) {
+        //
+        public static string getDefaultEditor_Date( coreController core, string fieldName, DateTime FieldValueDate, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
             string result = "";
             string fieldValue_text = "";
             if (FieldValueDate == DateTime.MinValue) {
@@ -1064,9 +1101,10 @@ namespace Contensive.Core {
             }
             return result;
         }
+        //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_memberSelect(coreController core, string htmlName, int selectedRecordId, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg, int groupId, string groupName) {
+        public static string getDefaultEditor_memberSelect(coreController core, string htmlName, int selectedRecordId, int groupId, string groupName, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
             string EditorString = "";
             if (readOnly) {
                 //
@@ -1101,8 +1139,10 @@ namespace Contensive.Core {
             }
             return EditorString;
         }
-
-        public static string getDefaultEditor_manyToMany(coreController core, cdefFieldModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly, string WhyReadOnlyMsg ) {
+        //
+        // ====================================================================================================
+        //
+        public static string getDefaultEditor_manyToMany(coreController core, cdefFieldModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly = false, string WhyReadOnlyMsg = "" ) {
             string result = "";
             //
             string MTMContent0 =   cdefModel.getContentNameByID(core, field.contentId);
@@ -1115,7 +1155,132 @@ namespace Contensive.Core {
             result += WhyReadOnlyMsg;
             return result;
         }
+        //
+        //====================================================================================================
+        //
+        public static string getDefaultEditor_SelectorString(coreController core, string SitePropertyName, string SitePropertyValue, string selector) {
+            string result = "";
+            try {
+                Dictionary<string, string> instanceOptions = new Dictionary<string, string> {
+                    { SitePropertyName, SitePropertyValue }
+                };
+                string ExpandedSelector = "";
+                Dictionary<string, string> addonInstanceProperties = new Dictionary<string, string>();
+                core.addon.buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
+                //buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
+                int Pos = genericController.vbInstr(1, ExpandedSelector, "[");
+                if (Pos != 0) {
+                    //
+                    // List of Options, might be select, radio or checkbox
+                    //
+                    string LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Left(Pos - 1));
+                    int PosEqual = genericController.vbInstr(1, LCaseOptionDefault, "=");
 
+                    if (PosEqual > 0) {
+                        LCaseOptionDefault = LCaseOptionDefault.Substring(PosEqual);
+                    }
+
+                    LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault);
+                    ExpandedSelector = ExpandedSelector.Substring(Pos);
+                    Pos = genericController.vbInstr(1, ExpandedSelector, "]");
+                    string OptionSuffix = "";
+                    if (Pos > 0) {
+                        if (Pos < ExpandedSelector.Length) {
+                            OptionSuffix = genericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
+                        }
+                        ExpandedSelector = ExpandedSelector.Left(Pos - 1);
+                    }
+                    string[] OptionValues = ExpandedSelector.Split('|');
+                    result = "";
+                    int OptionCnt = OptionValues.GetUpperBound(0) + 1;
+                    int OptionPtr = 0;
+                    for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
+                        string OptionValue_AddonEncoded = OptionValues[OptionPtr].Trim(' ');
+                        if (!string.IsNullOrEmpty(OptionValue_AddonEncoded)) {
+                            Pos = genericController.vbInstr(1, OptionValue_AddonEncoded, ":");
+                            string OptionCaption = null;
+                            string OptionValue = null;
+                            if (Pos == 0) {
+                                OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
+                                OptionCaption = OptionValue;
+                            } else {
+                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
+                                OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
+                            }
+                            switch (OptionSuffix) {
+                                case "checkbox":
+                                    //
+                                    // Create checkbox addon_execute_getFormContent_decodeSelector
+                                    //
+                                    bool selected = (genericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + genericController.vbLCase(OptionValue) + ",") != 0);
+                                    result = htmlController.checkbox(SitePropertyName + OptionPtr, selected, "", false, "", false, OptionValue, OptionCaption);
+                                    //if (genericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + genericController.vbLCase(OptionValue) + ",") != 0) {
+                                    //    result += "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + SitePropertyName + OptionPtr + "\" value=\"" + OptionValue + "\" checked=\"checked\">" + OptionCaption + "</div>";
+                                    //} else {
+                                    //    result += "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + SitePropertyName + OptionPtr + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
+                                    //}
+                                    break;
+                                case "radio":
+                                    //
+                                    // Create Radio addon_execute_getFormContent_decodeSelector
+                                    //
+                                    if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
+                                        result += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" checked=\"checked\" >" + OptionCaption + "</div>";
+                                    } else {
+                                        result += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
+                                    }
+                                    break;
+                                default:
+                                    //
+                                    // Create select addon_execute_result
+                                    //
+                                    if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
+                                        result += "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
+                                    } else {
+                                        result += "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    //stringBuilderLegacyController FastString = null;
+                    string Copy = "";
+                    switch (OptionSuffix) {
+                        case "checkbox":
+                            //
+                            //
+                            Copy += htmlController.inputHidden(SitePropertyName + "CheckBoxCnt", OptionCnt);
+                            break;
+                        case "radio":
+                            //
+                            // Create Radio addon_execute_result
+                            //
+                            //addon_execute_result = "<div>" & genericController.vbReplace(addon_execute_result, "><", "></div><div><") & "</div>"
+                            break;
+                        default:
+                            //
+                            // Create select addon_execute_result
+                            //
+                            result = "<select name=\"" + SitePropertyName + "\" class=\"select form-control\">" + result + "</select>";
+                            break;
+                    }
+                } else {
+                    //
+                    // Create Text addon_execute_result
+                    //
+
+                    selector = genericController.decodeNvaArgument(selector);
+                    result = getDefaultEditor_Text(core, SitePropertyName, selector);
+                }
+
+                //FastString = null;
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
+            }
+            return result;
+        }
+
+        //
         // ====================================================================================================
         /// <summary>
         /// return an admin edit page row for one field in a list of fields within a tab
@@ -1127,8 +1292,9 @@ namespace Contensive.Core {
         /// <param name="editorHelpRow"></param>
         /// <returns></returns>
         public static string getEditRow(coreController core, string EditorString, string Caption, string editorHelpRow, bool fieldRequired = false, bool ignore = false, string fieldHtmlId = "") {
-            return htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div(editorHelpRow, "ml-5"), "p-2 ");
+            return htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div(editorHelpRow, "small ml-5"), "p-2 ");
         }
+        //
         // ====================================================================================================
         //
         public static string getEditRowLegacy(coreController core, string HTMLFieldString, string Caption, string HelpMessage = "", bool FieldRequired = false, bool AllowActiveEdit = false, string ignore0 = "") {
@@ -1295,8 +1461,8 @@ namespace Contensive.Core {
             }
             return Title;
         }
-
-        //====================================================================================================
+        //
+        // ====================================================================================================
         /// <summary>
         /// get linked icon for remove (red x)
         /// </summary>
@@ -1305,7 +1471,8 @@ namespace Contensive.Core {
         public static string getIconRemove(string link, string cssColor = "red") {
             return "<a href=\"" + link + "\"><span class=\"fa fa-remove\" style=\"color:" + cssColor + ";\"></span></a>";
         }
-        //====================================================================================================
+        //
+        // ====================================================================================================
         /// <summary>
         /// get linked icon for refresh (green refresh)
         /// </summary>

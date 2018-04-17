@@ -139,5 +139,19 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 Assert.AreEqual(0, resultNoData);
             }
         }
+        //
+        //====================================================================================================
+        //
+        [TestMethod()]
+        public void Controllers_db_isSqlTableField() {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+                // arrange
+                // act
+                // assert
+                Assert.IsTrue(cp.core.db.isSQLTableField("", "ccmembers", "name"));
+                Assert.IsTrue(cp.core.db.isSQLTableField("", "ccmembers", "NaMe"));
+                Assert.IsFalse(cp.core.db.isSQLTableField("", "ccmembers", "namex"));
+            }
+        }
     }
 }

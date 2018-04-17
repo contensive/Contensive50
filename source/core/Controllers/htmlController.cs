@@ -854,20 +854,15 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Starts an HTML form for uploads, Should be closed with main_GetUploadFormEnd
         /// </summary>
-        /// <param name="ActionQueryString"></param>
+        /// <param name="actionQueryString"></param>
         /// <returns></returns>
-        public string formStartMultipart(string ActionQueryString = null) {
-            string result = "";
-            try {
-                if (ActionQueryString == null) {
-                    ActionQueryString = core.doc.refreshQueryString;
-                }
-                string iActionQueryString = genericController.modifyQueryString(ActionQueryString, RequestNameRequestBinary, true, true);
-                result = "<form action=\"" + core.webServer.serverFormActionURL + "?" + iActionQueryString + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" METHOD=\"POST\"  style=\"display: inline;\" >";
-            } catch (Exception ex) {
-                logController.handleError( core,ex);
-            }
-            return result;
+        public static string formStartMultipart(string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
+            actionQueryString = genericController.modifyQueryString(actionQueryString, RequestNameRequestBinary, true, true);
+            string result = "<form action=\"?" + actionQueryString + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" method=\"post\" style=\"display: inline;\"";
+            if (!string.IsNullOrWhiteSpace(htmlName)) result += " name=\"" + htmlName + "\"";
+            if (!string.IsNullOrWhiteSpace(htmlClass)) result += " class=\"" + htmlClass + "\"";
+            if (!string.IsNullOrWhiteSpace(htmlId)) result += " id=\"" + htmlId + "\"";
+            return result + ">";
         }
         //
         //====================================================================================================
@@ -1147,38 +1142,31 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string inputCheckbox(string TagName, string DefaultValue) {
-            return inputCheckbox(genericController.encodeText(TagName), genericController.encodeBoolean(DefaultValue));
+        public static string checkbox(string TagName, string DefaultValue) {
+            return checkbox(TagName, genericController.encodeBoolean(DefaultValue));
         }
         //
         //====================================================================================================
         //
-        public string inputCheckbox(string TagName, bool DefaultValue = false, string HtmlId = "", bool Disabled = false, string HtmlClass = "") {
-            string temphtml_GetFormInputCheckBox2 = null;
-            try {
-                //
-                temphtml_GetFormInputCheckBox2 = "<input type=\"CheckBox\" NAME=\"" + TagName + "\" value=\"1\"";
-                if (!string.IsNullOrEmpty(HtmlId)) {
-                    temphtml_GetFormInputCheckBox2 = temphtml_GetFormInputCheckBox2 + " id=\"" + HtmlId + "\"";
-                }
-                if (!string.IsNullOrEmpty(HtmlClass)) {
-                    temphtml_GetFormInputCheckBox2 = temphtml_GetFormInputCheckBox2 + " class=\"" + HtmlClass + "\"";
-                }
-                if (DefaultValue) {
-                    temphtml_GetFormInputCheckBox2 = temphtml_GetFormInputCheckBox2 + " checked=\"checked\"";
-                }
-                if (Disabled) {
-                    temphtml_GetFormInputCheckBox2 = temphtml_GetFormInputCheckBox2 + " disabled=\"disabled\"";
-                }
-                return temphtml_GetFormInputCheckBox2 + ">";
-                //
-                //
-            } catch (Exception ex) {
-                logController.handleError( core,ex);
+        public static string checkbox(string htmlName, bool selected = false, string htmlId = "", bool disabled = false, string htmlClass = "", bool readOnly = false, string htmlValue="1", string label = "") {
+            string result = "<input type=\"checkbox\" name=\"" + htmlName + "\" value=\"" + htmlValue + "\"";
+            if (readOnly && !selected) {
+                result += " disabled";
+            } else if (readOnly) {
+                result += " disabled checked";
+            } else if (selected) {
+                result += " checked";
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_GetFormInputCheckBox2")
-            return temphtml_GetFormInputCheckBox2;
+            if (!string.IsNullOrWhiteSpace(htmlId)) {
+                result +=  " id=\"" + htmlId + "\"";
+            }
+            if (!string.IsNullOrWhiteSpace(htmlClass)) {
+                result +=  " class=\"" + htmlClass + "\"";
+            }
+            if (!string.IsNullOrWhiteSpace(label)) {
+                result = "<label>" + result + "&nbsp;" + label + "</label>";
+            }
+            return div( result + ">","checkbox");
         }
         //
         //====================================================================================================
@@ -1307,7 +1295,7 @@ namespace Contensive.Core.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = genericController.encodeText(genericController.encodeBoolean(FieldValueVariant));
                                     } else {
-                                        returnResult = inputCheckbox(FieldName, genericController.encodeBoolean(FieldValueVariant));
+                                        returnResult = checkbox(FieldName, genericController.encodeBoolean(FieldValueVariant));
                                     }
                                     //
                                     //
@@ -3391,7 +3379,7 @@ namespace Contensive.Core.Controllers {
                             helpLink = "";
                             //helpLink = main_GetHelpLink(7, "Enable Editing", "Display the edit tools for basic content, such as pages, copy and sections. ")
                             iValueBoolean = core.visitProperty.getBoolean("AllowEditing");
-                            Tag = core.html.inputCheckbox(EditTagID, iValueBoolean, EditTagID);
+                            Tag = htmlController.checkbox(EditTagID, iValueBoolean, EditTagID);
                             Tag = genericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + QuickEditTagID + "').checked=false;document.getElementById('" + AdvancedEditTagID + "').checked=false;\">");
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
                             + cr2 + "<LABEL for=\"" + EditTagID + "\">" + Tag + "&nbsp;Edit</LABEL>" + helpLink + "\r</div>";
@@ -3401,7 +3389,7 @@ namespace Contensive.Core.Controllers {
                             helpLink = "";
                             //helpLink = main_GetHelpLink(8, "Enable Quick Edit", "Display the quick editor to edit the main page content.")
                             iValueBoolean = core.visitProperty.getBoolean("AllowQuickEditor");
-                            Tag = core.html.inputCheckbox(QuickEditTagID, iValueBoolean, QuickEditTagID);
+                            Tag = htmlController.checkbox(QuickEditTagID, iValueBoolean, QuickEditTagID);
                             Tag = genericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + EditTagID + "').checked=false;document.getElementById('" + AdvancedEditTagID + "').checked=false;\">");
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
                             + cr2 + "<LABEL for=\"" + QuickEditTagID + "\">" + Tag + "&nbsp;Quick Edit</LABEL>" + helpLink + "\r</div>";
@@ -3411,7 +3399,7 @@ namespace Contensive.Core.Controllers {
                             helpLink = "";
                             //helpLink = main_GetHelpLink(0, "Enable Advanced Edit", "Display the edit tools for advanced content, such as templates and add-ons. Basic content edit tools are also displayed.")
                             iValueBoolean = core.visitProperty.getBoolean("AllowAdvancedEditor");
-                            Tag = core.html.inputCheckbox(AdvancedEditTagID, iValueBoolean, AdvancedEditTagID);
+                            Tag = htmlController.checkbox(AdvancedEditTagID, iValueBoolean, AdvancedEditTagID);
                             Tag = genericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + QuickEditTagID + "').checked=false;document.getElementById('" + EditTagID + "').checked=false;\">");
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
                             + cr2 + "<LABEL for=\"" + AdvancedEditTagID + "\">" + Tag + "&nbsp;Advanced Edit</LABEL>" + helpLink + "\r</div>";
@@ -3431,7 +3419,7 @@ namespace Contensive.Core.Controllers {
                             helpLink = "";
                             iValueBoolean = core.visitProperty.getBoolean("AllowDebugging");
                             TagID = "AllowDebugging";
-                            Tag = core.html.inputCheckbox(TagID, iValueBoolean, TagID);
+                            Tag = htmlController.checkbox(TagID, iValueBoolean, TagID);
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
                             + cr2 + "<LABEL for=\"" + TagID + "\">" + Tag + "&nbsp;Debug</LABEL>" + helpLink + "\r</div>";
                             //
@@ -3524,7 +3512,7 @@ namespace Contensive.Core.Controllers {
                                 TagID = "autologin";
                                 LoginPanel = LoginPanel + ""
                                 + "\r<div class=\"ccAdminSmall\">"
-                                + cr2 + "<LABEL for=\"" + TagID + "\">" + core.html.inputCheckbox(TagID, true, TagID) + "&nbsp;Login automatically from this computer</LABEL>"
+                                + cr2 + "<LABEL for=\"" + TagID + "\">" + htmlController.checkbox(TagID, true, TagID) + "&nbsp;Login automatically from this computer</LABEL>"
                                 + "\r</div>";
                             }
                         }

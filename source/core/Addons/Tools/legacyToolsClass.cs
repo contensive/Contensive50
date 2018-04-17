@@ -1999,7 +1999,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Add Admin Menu Entry under Parent's Menu Entry<br>");
-                Stream.Add(core.html.inputCheckbox("AddAdminMenuEntry", AddAdminMenuEntry));
+                Stream.Add(htmlController.checkbox("AddAdminMenuEntry", AddAdminMenuEntry));
                 Stream.Add("<br><br>");
                 //
                 //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
@@ -3043,7 +3043,7 @@ namespace Contensive.Core.Addons.Tools {
                                 //
                                 // inherited property
                                 //
-                                streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + core.html.inputCheckbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
+                                streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + htmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                             } else {
                                 //
                                 // CDef has a parent, but the field is non-inherited, test for a matching Parent Field
@@ -3060,7 +3060,7 @@ namespace Contensive.Core.Addons.Tools {
                                     streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "False**</span></td>");
                                     NeedFootNote2 = true;
                                 } else {
-                                    streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + core.html.inputCheckbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
+                                    streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + htmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                                 }
                             }
                             //
@@ -3142,50 +3142,50 @@ namespace Contensive.Core.Addons.Tools {
                             //
                             // active
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaActive." + RecordCount, genericController.encodeText(fieldsort.field.active), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaActive." + RecordCount, fieldsort.field.active, fieldsort.field.inherited));
                             //
                             // read only
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." + RecordCount, genericController.encodeText(fieldsort.field.readOnly), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." + RecordCount, fieldsort.field.readOnly, fieldsort.field.inherited));
                             //
                             // authorable
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAuthorable." + RecordCount, genericController.encodeText(fieldsort.field.authorable), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAuthorable." + RecordCount, fieldsort.field.authorable, fieldsort.field.inherited));
                             //
                             // required
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." + RecordCount, genericController.encodeText(fieldsort.field.required), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." + RecordCount, fieldsort.field.required, fieldsort.field.inherited));
                             //
                             // UniqueName
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." + RecordCount, genericController.encodeText(fieldsort.field.uniqueName), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." + RecordCount, fieldsort.field.uniqueName, fieldsort.field.inherited));
                             //
                             // text buffered
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." + RecordCount, genericController.encodeText(fieldsort.field.textBuffered), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." + RecordCount, fieldsort.field.textBuffered, fieldsort.field.inherited));
                             //
                             // password
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." + RecordCount, genericController.encodeText(fieldsort.field.password), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." + RecordCount, fieldsort.field.password, fieldsort.field.inherited));
                             //
                             // scramble
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaScramble." + RecordCount, genericController.encodeText(fieldsort.field.Scramble), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaScramble." + RecordCount, fieldsort.field.Scramble, fieldsort.field.inherited));
                             //
                             // HTML Content
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaHTMLContent." + RecordCount, genericController.encodeText(fieldsort.field.htmlContent), fieldsort.field.inherited));
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaHTMLContent." + RecordCount, fieldsort.field.htmlContent, fieldsort.field.inherited));
                             //
                             // Admin Only
                             //
                             if (core.session.isAuthenticatedAdmin(core)) {
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, genericController.encodeText(fieldsort.field.adminOnly), fieldsort.field.inherited));
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, fieldsort.field.adminOnly, fieldsort.field.inherited));
                             }
                             //
                             // Developer Only
                             //
                             if (core.session.isAuthenticatedDeveloper(core)) {
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, genericController.encodeText(fieldsort.field.developerOnly), fieldsort.field.inherited));
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, fieldsort.field.developerOnly, fieldsort.field.inherited));
                             }
                             //
                             streamRow.Add("</tr>");
@@ -3240,15 +3240,14 @@ namespace Contensive.Core.Addons.Tools {
         //
         //
         //
-        private string GetForm_ConfigureEdit_CheckBox(string Label, string Value, bool Inherited) {
-            string tempGetForm_ConfigureEdit_CheckBox = null;
-            tempGetForm_ConfigureEdit_CheckBox = "<td class=\"ccPanelInput\" align=\"center\"><nobr>";
+        private string GetForm_ConfigureEdit_CheckBox(string htmlName, bool selected, bool Inherited) {
+            string result = "<td class=\"ccPanelInput\" align=\"center\"><nobr>";
             if (Inherited) {
-                tempGetForm_ConfigureEdit_CheckBox = tempGetForm_ConfigureEdit_CheckBox + SpanClassAdminSmall + Value + "</SPAN>";
+                result += SpanClassAdminSmall + getYesNo( selected ) + "</SPAN>";
             } else {
-                tempGetForm_ConfigureEdit_CheckBox = tempGetForm_ConfigureEdit_CheckBox + core.html.inputCheckbox(Label, Value);
+                result += htmlController.checkbox(htmlName, selected);
             }
-            return tempGetForm_ConfigureEdit_CheckBox + "</nobr></td>";
+            return result + "</nobr></td>";
         }
         //
         //=============================================================================
@@ -3359,7 +3358,7 @@ namespace Contensive.Core.Addons.Tools {
                             IndexName = genericController.encodeText(Rows[5, RowPointer]);
                             if (!string.IsNullOrEmpty(IndexName)) {
                                 result += htmlController.tableRowStart();
-                                Copy = core.html.inputCheckbox("DropIndex." + RowPointer, false) + htmlController.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
+                                Copy = htmlController.checkbox("DropIndex." + RowPointer, false) + htmlController.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
                                 result += htmlController.tableCell(Copy,"",0, TableRowEven);
                                 result += htmlController.tableCell(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
                                 result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
@@ -3388,7 +3387,7 @@ namespace Contensive.Core.Addons.Tools {
                         RowMax = Rows.GetUpperBound(1);
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             result += htmlController.tableRowStart();
-                            Copy = core.html.inputCheckbox("AddIndex." + RowPointer, false) + htmlController.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
+                            Copy = htmlController.checkbox("AddIndex." + RowPointer, false) + htmlController.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
                             result += htmlController.tableCell(Copy,"",0, TableRowEven);
                             result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
                             result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
@@ -3847,10 +3846,10 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(SpanClassAdminNormal);
                 Stream.Add("<br>");
                 //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolLoadTemplates)
-                Stream.Add("<br>" + core.html.inputCheckbox("AllowBodyHTML", AllowBodyHTML) + " Update/Import Soft Templates from the Body of .HTM and .HTML files");
-                Stream.Add("<br>" + core.html.inputCheckbox("AllowScriptLink", AllowScriptLink) + " Update/Import Hard Templates with links to .ASP and .ASPX scripts");
-                Stream.Add("<br>" + core.html.inputCheckbox("AllowImageImport", AllowImageImport) + " Update/Import image links (.GIF,.JPG,.PDF ) into the resource library");
-                Stream.Add("<br>" + core.html.inputCheckbox("AllowStyleImport", AllowStyleImport) + " Import style sheets (.CSS) to Dynamic Styles");
+                Stream.Add("<br>" + htmlController.checkbox("AllowBodyHTML", AllowBodyHTML) + " Update/Import Soft Templates from the Body of .HTM and .HTML files");
+                Stream.Add("<br>" + htmlController.checkbox("AllowScriptLink", AllowScriptLink) + " Update/Import Hard Templates with links to .ASP and .ASPX scripts");
+                Stream.Add("<br>" + htmlController.checkbox("AllowImageImport", AllowImageImport) + " Update/Import image links (.GIF,.JPG,.PDF ) into the resource library");
+                Stream.Add("<br>" + htmlController.checkbox("AllowStyleImport", AllowStyleImport) + " Import style sheets (.CSS) to Dynamic Styles");
                 Stream.Add("</SPAN>");
                 //
                 ButtonList = ButtonCancel + "," + ButtonImportTemplates;
@@ -4275,9 +4274,9 @@ namespace Contensive.Core.Addons.Tools {
                     if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
                         RecordID = core.db.csGetInteger(CS, "ID");
                         if (genericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
-                            TopHalf = TopHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, true) + htmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
+                            TopHalf = TopHalf + "<div>" + htmlController.checkbox("Cdef" + RowPtr, true) + htmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
                         } else {
-                            BottomHalf = BottomHalf + "<div>" + core.html.inputCheckbox("Cdef" + RowPtr, false) + htmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
+                            BottomHalf = BottomHalf + "<div>" + htmlController.checkbox("Cdef" + RowPtr, false) + htmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
                         }
                     }
                     core.db.csGoNext(CS);

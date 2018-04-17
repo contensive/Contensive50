@@ -26,7 +26,7 @@ namespace Contensive.Core.Models.Complex {
                 result = getCache(core);
                 if (result == null) {
                     result = new Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass>();
-                    string physicalFile = "~/" + core.siteProperties.getText("serverpagedefault", "default.aspx");
+                    string physicalFile = "~/" + core.siteProperties.serverPageDefault;
                     //
                     // -- admin route
                     string adminRoute = genericController.normalizeRoute(core.appConfig.adminRoute);

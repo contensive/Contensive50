@@ -19,7 +19,7 @@ namespace Contensive.CLI {
                 // -- if you get a cluster object from cp with a key, and the key gives you access, you have a cluster object to create an app
                 String appName;
                 string domainName;
-                string iisDefaultDoc = "default.aspx";
+                const string iisDefaultDoc = "default.aspx";
                 string authToken;
                 string authTokenDefault = "909903";
 

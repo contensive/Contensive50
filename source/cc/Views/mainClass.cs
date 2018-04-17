@@ -53,7 +53,7 @@ namespace Contensive.CLI {
                         for (int argPtr = 0; argPtr < args.Length; argPtr++) {
                             string argument = args[argPtr];
                             bool exitArgumentProcessing = false;
-                            bool forceFullInstall = false;
+                            bool repair = false;
                             switch (argument.ToLower()) {
                                 case "--flushcache":
                                     if (!string.IsNullOrEmpty(appName)) {
@@ -111,7 +111,7 @@ namespace Contensive.CLI {
                                                 foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
                                                     using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(kvp.Key)) {
                                                         string returnErrorMessage = "";
-                                                        collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, forceFullInstall);
+                                                        collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
                                                         if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                             Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                         }
@@ -120,7 +120,7 @@ namespace Contensive.CLI {
                                             } else {
                                                 using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
                                                     string returnErrorMessage = "";
-                                                    collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, forceFullInstall);
+                                                    collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
                                                     if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                         Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                     }
@@ -401,20 +401,20 @@ namespace Contensive.CLI {
         /// Upgrade a single or all apps, optionally forcing full install to include up-to-date collections (to fix broken collection addons)
         /// </summary>
         /// <param name="appName"></param>
-        /// <param name="forceFullInstall"></param>
-        private static void upgrade( Contensive.Core.CPClass cp, string appName, bool forceFullInstall) {
+        /// <param name="repair"></param>
+        private static void upgrade( Contensive.Core.CPClass cp, string appName, bool repair) {
             if (!string.IsNullOrEmpty(appName)) {
                 //
                 // -- upgrade app
                 using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(appName)) {
-                    Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false, forceFullInstall);
+                    Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false, repair);
                 }
             } else {
                 //
                 // -- upgrade all apps
                 foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
                     using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(kvp.Key)) {
-                        Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false, forceFullInstall);
+                        Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false, repair);
                     }
                 }
             }

@@ -817,7 +817,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 Cells = tempVar3;
                                 RowPtr = 0;
                                 while (core.db.csOk(CS)) {
-                                    Cells[RowPtr, 0] = core.html.inputCheckbox("AC" + RowPtr) + htmlController.inputHidden("ACID" + RowPtr, core.db.csGetInteger(CS, "ID"));
+                                    Cells[RowPtr, 0] = htmlController.checkbox("AC" + RowPtr) + htmlController.inputHidden("ACID" + RowPtr, core.db.csGetInteger(CS, "ID"));
                                     //Cells(RowPtr, 1) = "<a href=""" & core.app.SiteProperty_AdminURL & "?id=" & core.app.cs_getInteger(CS, "ID") & "&cid=" & core.app.cs_getInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
                                     Cells[RowPtr, 1] = core.db.csGetText(CS, "name");
                                     if (DisplaySystem) {
@@ -844,7 +844,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 } else {
                                     Body.Add(adminUIController.EditTableOpen);
                                     if (core.session.isAuthenticatedDeveloper(core)) {
-                                        Body.Add(adminUIController.getEditRowLegacy(core,core.html.inputCheckbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
+                                        Body.Add(adminUIController.getEditRowLegacy(core,htmlController.checkbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
                                     }
                                     Body.Add(adminUIController.getEditRowLegacy(core,core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
                                     FormInput = ""
