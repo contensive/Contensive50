@@ -657,20 +657,20 @@ namespace Contensive.Core.Controllers {
                                                         //
                                                         libraryFilesModel file = libraryFilesModel.create(core, ACAttrRecordID);
                                                         if (file != null) {
-                                                            string Filename = file.Filename;
+                                                            string Filename = file.filename;
                                                             Filename = genericController.vbReplace(Filename, "\\", "/");
                                                             Filename = genericController.encodeURL(Filename);
                                                             Copy += "<img ID=\"AC,IMAGE,," + ACAttrRecordID + "\" src=\"" + genericController.getCdnFileLink(core, Filename) + "\"";
                                                             //
                                                             if (ACAttrWidth == 0) {
-                                                                ACAttrWidth = file.pxWidth;
+                                                                ACAttrWidth = file.width;
                                                             }
                                                             if (ACAttrWidth != 0) {
                                                                 Copy += " width=\"" + ACAttrWidth + "\"";
                                                             }
                                                             //
                                                             if (ACAttrHeight == 0) {
-                                                                ACAttrHeight = file.pxHeight;
+                                                                ACAttrHeight = file.height;
                                                             }
                                                             if (ACAttrHeight != 0) {
                                                                 Copy += " height=\"" + ACAttrHeight + "\"";
@@ -735,7 +735,7 @@ namespace Contensive.Core.Controllers {
                                                         libraryFilesModel file = libraryFilesModel.create(core, ACAttrRecordID);
                                                         if (file != null) {
                                                             if (string.IsNullOrEmpty(ACAttrAlt)) {
-                                                                ACAttrAlt = genericController.encodeText(file.AltText);
+                                                                ACAttrAlt = genericController.encodeText(file.altText);
                                                             }
                                                             Copy = "<a href=\"" + ProtocolHostLink + requestAppRootPath + core.siteProperties.serverPageDefault + "?" + RequestNameDownloadID + "=" + ACAttrRecordID + "\" target=\"_blank\"><img src=\"" + ProtocolHostLink + "/ccLib/images/IconDownload3.gif\" width=\"16\" height=\"16\" border=\"0\" alt=\"" + ACAttrAlt + "\"></a>";
                                                         }
@@ -1289,10 +1289,10 @@ namespace Contensive.Core.Controllers {
                                                                                 //
                                                                                 libraryFilesModel file = libraryFilesModel.create(core, RecordID);
                                                                                 if (file != null) {
-                                                                                    RecordVirtualFilename = file.Filename;
-                                                                                    RecordWidth = file.pxWidth;
-                                                                                    RecordHeight = file.pxHeight;
-                                                                                    RecordAltSizeList = file.AltSizeList;
+                                                                                    RecordVirtualFilename = file.filename;
+                                                                                    RecordWidth = file.width;
+                                                                                    RecordHeight = file.height;
+                                                                                    RecordAltSizeList = file.altSizeList;
                                                                                     RecordFilename = RecordVirtualFilename;
                                                                                     Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
                                                                                     if (Pos > 0) {
@@ -1311,8 +1311,8 @@ namespace Contensive.Core.Controllers {
                                                                                     if (RecordWidth == 0 || RecordHeight == 0) {
                                                                                         sf = new imageEditController();
                                                                                         if (sf.load(ImageVirtualFilename, core.cdnFiles)) {
-                                                                                            file.pxWidth = sf.width;
-                                                                                            file.pxHeight = sf.height;
+                                                                                            file.width = sf.width;
+                                                                                            file.height = sf.height;
                                                                                             file.save(core);
                                                                                         }
                                                                                         sf.Dispose();
@@ -1950,7 +1950,7 @@ namespace Contensive.Core.Controllers {
                                             // odd cases:
                                             //   URL( /image.jpg) -
                                             //
-                                            string RecordVirtualFilename = file.Filename;
+                                            string RecordVirtualFilename = file.filename;
                                             //RecordAltSizeList = file.AltSizeList;
                                             if (RecordVirtualFilename == genericController.EncodeJavascriptStringSingleQuote(RecordVirtualFilename)) {
                                                 //

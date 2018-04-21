@@ -55,31 +55,31 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string div(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("div", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("div", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string p(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("p", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("p", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string li(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("li", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("li", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string ul(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("ul", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("ul", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string ol(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("ol", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("ol", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
@@ -134,37 +134,37 @@ namespace Contensive.Core {
         // ==========================================================================================
         //
         public override string h1(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h1", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h1", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ==========================================================================================
         //
         public override string h2(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h2", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h2", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ==========================================================================================
         //
         public override string h3(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h3", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h3", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ==========================================================================================
         //
         public override string h4(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h4", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h4", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ==========================================================================================
         //
         public override string h5(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h5", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h5", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string h6(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h6", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h6", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ==========================================================================================

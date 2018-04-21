@@ -125,7 +125,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         //====================================================================================================
         /// <summary>
-        /// REFACTOR - Constructor for non-addon instances. (REFACTOR - work-around for pre-refactoring of admin remote methods currently in core classes)
+        /// get the admin content
         /// </summary>
         /// <param name="core"></param>
         public getHtmlBodyClass(Contensive.Core.CPClass cp) : base() {
@@ -138,102 +138,58 @@ namespace Contensive.Core.Addons.AdminSite {
         private string getAdminBody(string ContentArgFromCaller = "") {
             string result = "";
             try {
-                int DefaultWrapperID = 0;
-                string AddonHelpCopy = null;
-                string InstanceOptionString = null;
-                int HelpLevel = 0;
-                int HelpAddonID = 0;
-                int HelpCollectionID = 0;
-                string CurrentLink = null;
-                string EditReferer = null;
-                string ContentCell = null;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                int addonId = 0;
-                string AddonGuid = null;
-                string AddonName = "";
-                bool UseContentWatchLink = false;
-                editRecordClass editRecord = new editRecordClass();
-                cdefModel AdminContent = new cdefModel();
                 //
-                //-------------------------------------------------------------------------------
                 // Setup defaults
-                //-------------------------------------------------------------------------------
-                //
                 core.db.sqlCommandTimeout = 300;
                 ButtonObjectCount = 0;
                 JavaScriptString = "";
                 ContentWatchLoaded = false;
-                editRecord.Loaded = false;
-                UseContentWatchLink = core.siteProperties.useContentWatchLink;
+                // todo convert to jquery bind
                 core.html.addScriptCode_onLoad("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive");
                 core.doc.setMetaContent(0, 0);
                 //
                 // turn off chrome protection against submitting html content
                 core.webServer.addResponseHeader("X-XSS-Protection", "0");
                 //
-                //-------------------------------------------------------------------------------
-                // check for member login, if logged in and no admin, lock out
-                // Do CheckMember here because we need to know who is there to create proper blocked menu
-                //-------------------------------------------------------------------------------
-                //
+                // check for member login, if logged in and no admin, lock out, Do CheckMember here because we need to know who is there to create proper blocked menu
                 if (core.doc.continueProcessing) {
                     if (string.Compare(core.siteProperties.dataBuildVersion, cp.Version) > 0) {
                         logController.handleError(core, new ApplicationException("Application code version (" + cp.Version + ") is newer than Db version (" + core.siteProperties.dataBuildVersion + "). Upgrade site code."));
                     }
+                    cdefModel AdminContent = null;
+                    editRecordClass editRecord = null;
+                    adminContextClass adminContext = null;
                     //
-                    //-------------------------------------------------------------------------------
-                    // Get Requests
-                    //   initialize adminContent and editRecord objects 
-                    //-------------------------------------------------------------------------------
+                    // Get Requests, initialize adminContent and editRecord objects 
+                    loadContext(ref adminContext, ref AdminContent, ref editRecord);
                     //
-                    GetForm_LoadControl(ref AdminContent, editRecord);
-                    addonId = core.docProperties.getInteger("addonid");
-                    AddonGuid = core.docProperties.getText("addonguid");
-                    //
-                    //-------------------------------------------------------------------------------
-                    //
-                    //-------------------------------------------------------------------------------
-                    //
-                    //If AdminContent.fields.Count > 0 Then
-                    //    ReDim EditRecordValuesObject(AdminContent.fields.Count)
-                    //    ReDim EditRecordDbValues(AdminContent.fields.Count)
-                    //End If
-                    //
-                    //-------------------------------------------------------------------------------
                     // Process SourceForm/Button into Action/Form, and process
-                    //-------------------------------------------------------------------------------
-                    //
-                    if (core.docProperties.getText("Button") == ButtonCancelAll) {
-                        AdminForm = AdminFormRoot;
+                    if (adminContext.requestButton == ButtonCancelAll) {
+                        adminContext.AdminForm = AdminFormRoot;
                     } else {
-                        ProcessForms(ref AdminContent, ref editRecord);
-                        ProcessActions(AdminContent, editRecord, UseContentWatchLink);
+                        ProcessForms(adminContext, ref AdminContent, ref editRecord);
+                        ProcessActions(adminContext, AdminContent, editRecord, core.siteProperties.useContentWatchLink);
                     }
                     //
-                    //-------------------------------------------------------------------------------
                     // Normalize values to be needed
-                    //-------------------------------------------------------------------------------
-                    //
                     if (editRecord.id != 0) {
                         core.workflow.ClearEditLock(AdminContent.name, editRecord.id);
                     }
-                    //
-                    if (AdminForm < 1) {
+                    if (adminContext.AdminForm < 1) {
                         //
                         // No form was set, use default form
-                        //
                         if (AdminContent.id <= 0) {
-                            AdminForm = AdminFormRoot;
+                            adminContext.AdminForm = AdminFormRoot;
                         } else {
-                            AdminForm = AdminFormIndex;
+                            adminContext.AdminForm = AdminFormIndex;
                         }
                     }
-                    //
-                    if (AdminForm == AdminFormLegacyAddonManager) {
+                    int addonId = core.docProperties.getInteger("addonid");
+                    string AddonGuid = core.docProperties.getText("addonguid");
+                    if (adminContext.AdminForm == AdminFormLegacyAddonManager) {
                         //
                         // patch out any old links to the legacy addon manager
-                        //
-                        AdminForm = 0;
+                        adminContext.AdminForm = 0;
                         AddonGuid = addonGuidAddonManager;
                     }
                     //
@@ -244,9 +200,9 @@ namespace Contensive.Core.Addons.AdminSite {
                     //-------------------------------------------------------------------------------
                     //
                     if (AdminSourceForm == AdminFormEdit) {
-                        if ((!(core.doc.debug_iUserError != "")) & ((AdminButton == ButtonOK) || (AdminButton == ButtonCancel) || (AdminButton == ButtonDelete))) {
-                            EditReferer = core.docProperties.getText("EditReferer");
-                            CurrentLink = genericController.modifyLinkQuery(core.webServer.requestUrl, "editreferer", "", false);
+                        if ((!(core.doc.debug_iUserError != "")) & ((adminContext.requestButton == ButtonOK) || (adminContext.requestButton == ButtonCancel) || (adminContext.requestButton == ButtonDelete))) {
+                            string EditReferer = core.docProperties.getText("EditReferer");
+                            string CurrentLink = genericController.modifyLinkQuery(core.webServer.requestUrl, "editreferer", "", false);
                             CurrentLink = genericController.vbLCase(CurrentLink);
                             //
                             // check if this editreferer includes cid=thisone and id=thisone -- if so, go to index form for this cid
@@ -260,16 +216,16 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 // return to the index page for this content
                                 //
-                                AdminForm = AdminFormIndex;
+                                adminContext.AdminForm = AdminFormIndex;
                             }
                         }
                         if (BlockEditForm) {
-                            AdminForm = AdminFormIndex;
+                            adminContext.AdminForm = AdminFormIndex;
                         }
                     }
-                    HelpLevel = core.docProperties.getInteger("helplevel");
-                    HelpAddonID = core.docProperties.getInteger("helpaddonid");
-                    HelpCollectionID = core.docProperties.getInteger("helpcollectionid");
+                    int HelpLevel = core.docProperties.getInteger("helplevel");
+                    int HelpAddonID = core.docProperties.getInteger("helpaddonid");
+                    int HelpCollectionID = core.docProperties.getInteger("helpcollectionid");
                     if (HelpCollectionID == 0) {
                         HelpCollectionID = core.visitProperty.getInteger("RunOnce HelpCollectionID");
                         if (HelpCollectionID != 0) {
@@ -296,8 +252,8 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (RecordsPerPage != RecordsPerPageDefault) {
                         core.doc.addRefreshQueryString("rs", genericController.encodeText(RecordsPerPage));
                     }
-                    if (AdminForm != 0) {
-                        core.doc.addRefreshQueryString(rnAdminForm, genericController.encodeText(AdminForm));
+                    if (adminContext.AdminForm != 0) {
+                        core.doc.addRefreshQueryString(rnAdminForm, genericController.encodeText(adminContext.AdminForm));
                     }
                     if (ignore_legacyMenuDepth != 0) {
                         core.doc.addRefreshQueryString(RequestNameAdminDepth, genericController.encodeText(ignore_legacyMenuDepth));
@@ -332,91 +288,93 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Create the content
                     //-------------------------------------------------------------------------------
                     //
-                    ContentCell = "";
+                    string adminBody = "";
+                    stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                    string AddonName = "";
                     if (!string.IsNullOrEmpty(ContentArgFromCaller)) {
                         //
                         // Use content passed in as an argument
                         //
-                        ContentCell = ContentArgFromCaller;
+                        adminBody = ContentArgFromCaller;
                     } else if (HelpAddonID != 0) {
                         //
                         // display Addon Help
                         //
                         core.doc.addRefreshQueryString("helpaddonid", HelpAddonID.ToString());
-                        ContentCell = GetAddonHelp(HelpAddonID, "");
+                        adminBody = GetAddonHelp(HelpAddonID, "");
                     } else if (HelpCollectionID != 0) {
                         //
                         // display Collection Help
                         //
                         core.doc.addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString());
-                        ContentCell = GetCollectionHelp(HelpCollectionID, "");
-                    } else if (AdminForm != 0) {
+                        adminBody = GetCollectionHelp(HelpCollectionID, "");
+                    } else if (adminContext.AdminForm != 0) {
                         //
                         // No content so far, try the forms
                         // todo - convert this to switch
-                        if (AdminForm == AdminFormBuilderCollection) {
-                            ContentCell = GetForm_BuildCollection();
-                        } else if (AdminForm == AdminFormSecurityControl) {
+                        if (adminContext.AdminForm == AdminFormBuilderCollection) {
+                            adminBody = GetForm_BuildCollection();
+                        } else if (adminContext.AdminForm == AdminFormSecurityControl) {
                             AddonGuid = AddonGuidPreferences;
-                        } else if (AdminForm == AdminFormMetaKeywordTool) {
-                            ContentCell = GetForm_MetaKeywordTool();
-                        } else if ((AdminForm == AdminFormMobileBrowserControl) || (AdminForm == AdminFormPageControl) || (AdminForm == AdminFormEmailControl)) {
-                            ContentCell = core.addon.execute(AddonGuidPreferences, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                        } else if (adminContext.AdminForm == AdminFormMetaKeywordTool) {
+                            adminBody = GetForm_MetaKeywordTool();
+                        } else if ((adminContext.AdminForm == AdminFormMobileBrowserControl) || (adminContext.AdminForm == AdminFormPageControl) || (adminContext.AdminForm == AdminFormEmailControl)) {
+                            adminBody = core.addon.execute(AddonGuidPreferences, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorContextMessage = "get Preferences for Admin"
                             });
-                        } else if (AdminForm == AdminFormClearCache) {
-                            ContentCell = adminClearCacheToolAddon.GetForm_ClearCache(core);
-                        } else if (AdminForm == AdminFormSpiderControl) {
-                            ContentCell = core.addon.execute(addonModel.createByName(core, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                        } else if (adminContext.AdminForm == AdminFormClearCache) {
+                            adminBody = adminClearCacheToolAddon.GetForm_ClearCache(core);
+                        } else if (adminContext.AdminForm == AdminFormSpiderControl) {
+                            adminBody = core.addon.execute(addonModel.createByName(core, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorContextMessage = "get Content Spider Control for Admin"
                             });
-                        } else if (AdminForm == AdminFormResourceLibrary) {
-                            ContentCell = core.html.getResourceLibrary("", false, "", "", true);
-                        } else if (AdminForm == AdminFormQuickStats) {
-                            ContentCell = (GetForm_QuickStats());
-                        } else if (AdminForm == AdminFormIndex) {
-                            ContentCell = (GetForm_Index(AdminContent, editRecord, (AdminContent.contentTableName.ToLower() == "ccemail")));
-                        } else if (AdminForm == AdminFormEdit) {
-                            ContentCell = GetForm_Edit(AdminContent, editRecord);
-                        } else if (AdminForm == AdminFormClose) {
+                        } else if (adminContext.AdminForm == AdminFormResourceLibrary) {
+                            adminBody = core.html.getResourceLibrary("", false, "", "", true);
+                        } else if (adminContext.AdminForm == AdminFormQuickStats) {
+                            adminBody = (GetForm_QuickStats());
+                        } else if (adminContext.AdminForm == AdminFormIndex) {
+                            adminBody = (GetForm_Index(adminContext, AdminContent, editRecord, (AdminContent.contentTableName.ToLower() == "ccemail")));
+                        } else if (adminContext.AdminForm == AdminFormEdit) {
+                            adminBody = GetForm_Edit(AdminContent, editRecord);
+                        } else if (adminContext.AdminForm == AdminFormClose) {
                             Stream.Add("<Script Language=\"JavaScript\" type=\"text/javascript\"> window.close(); </Script>");
-                        } else if (AdminForm == AdminFormPublishing) {
-                            ContentCell = (GetForm_Publish());
-                        } else if (AdminForm == AdminFormContentChildTool) {
-                            ContentCell = (GetContentChildTool());
-                        } else if (AdminForm == AdminformPageContentMap) {
-                            ContentCell = (GetForm_PageContentMap());
-                        } else if (AdminForm == AdminformHousekeepingControl) {
-                            ContentCell = (GetForm_HouseKeepingControl());
-                        } else if ((AdminForm == AdminFormTools) || (AdminForm >= 100 && AdminForm <= 199)) {
+                        } else if (adminContext.AdminForm == AdminFormPublishing) {
+                            adminBody = (GetForm_Publish());
+                        } else if (adminContext.AdminForm == AdminFormContentChildTool) {
+                            adminBody = (GetContentChildTool());
+                        } else if (adminContext.AdminForm == AdminformPageContentMap) {
+                            adminBody = (GetForm_PageContentMap());
+                        } else if (adminContext.AdminForm == AdminformHousekeepingControl) {
+                            adminBody = (GetForm_HouseKeepingControl());
+                        } else if ((adminContext.AdminForm == AdminFormTools) || (adminContext.AdminForm >= 100 && adminContext.AdminForm <= 199)) {
                             legacyToolsClass Tools = new legacyToolsClass(core);
-                            ContentCell = Tools.GetForm();
-                        } else if (AdminForm == AdminFormStyleEditor) {
-                            ContentCell = (admin_GetForm_StyleEditor());
-                        } else if (AdminForm == AdminFormDownloads) {
-                            ContentCell = (GetForm_Downloads());
-                        } else if (AdminForm == AdminformRSSControl) {
-                            ContentCell = core.webServer.redirect("?cid=" + cdefModel.getContentId(core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
-                        } else if (AdminForm == AdminFormImportWizard) {
-                            ContentCell = core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                            adminBody = Tools.GetForm();
+                        } else if (adminContext.AdminForm == AdminFormStyleEditor) {
+                            adminBody = (admin_GetForm_StyleEditor());
+                        } else if (adminContext.AdminForm == AdminFormDownloads) {
+                            adminBody = (GetForm_Downloads());
+                        } else if (adminContext.AdminForm == AdminformRSSControl) {
+                            adminBody = core.webServer.redirect("?cid=" + cdefModel.getContentId(core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
+                        } else if (adminContext.AdminForm == AdminFormImportWizard) {
+                            adminBody = core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorContextMessage = "get Import Wizard for Admin"
                             });
-                        } else if (AdminForm == AdminFormCustomReports) {
-                            ContentCell = GetForm_CustomReports();
-                        } else if (AdminForm == AdminFormFormWizard) {
-                            ContentCell = core.addon.execute(addonGuidFormWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                        } else if (adminContext.AdminForm == AdminFormCustomReports) {
+                            adminBody = GetForm_CustomReports();
+                        } else if (adminContext.AdminForm == AdminFormFormWizard) {
+                            adminBody = core.addon.execute(addonGuidFormWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorContextMessage = "get Form Wizard for Admin"
                             });
-                        } else if (AdminForm == AdminFormLegacyAddonManager) {
-                            ContentCell = addonController.GetAddonManager(core);
-                        } else if (AdminForm == AdminFormEditorConfig) {
-                            ContentCell = GetForm_EditConfig();
+                        } else if (adminContext.AdminForm == AdminFormLegacyAddonManager) {
+                            adminBody = addonController.GetAddonManager(core);
+                        } else if (adminContext.AdminForm == AdminFormEditorConfig) {
+                            adminBody = GetForm_EditConfig();
                         } else {
-                            ContentCell = "<p>The form requested is not supported</p>";
+                            adminBody = "<p>The form requested is not supported</p>";
                         }
                     } else if ((addonId != 0) | (!string.IsNullOrEmpty(AddonGuid)) | (!string.IsNullOrEmpty(AddonName))) {
                         //
@@ -427,7 +385,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             // Special case, call the routine that provides a backup
                             //
                             core.doc.addRefreshQueryString("addonguid", addonGuidAddonManager);
-                            ContentCell = addonController.GetAddonManager(core);
+                            adminBody = addonController.GetAddonManager(core);
                         } else {
                             addonModel addon = null;
                             string executeContextErrorCaption = "unknown";
@@ -447,22 +405,22 @@ namespace Contensive.Core.Addons.AdminSite {
                             if (addon != null) {
                                 addonId = addon.id;
                                 AddonName = addon.name;
-                                AddonHelpCopy = addon.Help;
+                                string AddonHelpCopy = addon.Help;
                                 core.doc.addRefreshQueryString(RequestNameRunAddon, addonId.ToString());
                             }
-                            InstanceOptionString = core.userProperty.getText("Addon [" + AddonName + "] Options", "");
-                            DefaultWrapperID = -1;
-                            ContentCell = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                            string InstanceOptionString = core.userProperty.getText("Addon [" + AddonName + "] Options", "");
+                            int DefaultWrapperID = -1;
+                            adminBody = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 instanceGuid = adminSiteInstanceId,
                                 instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
                                 wrapperID = DefaultWrapperID,
                                 errorContextMessage = executeContextErrorCaption
                             });
-                            if (string.IsNullOrEmpty(ContentCell)) {
+                            if (string.IsNullOrEmpty(adminBody)) {
                                 //
                                 // empty returned, display desktop
-                                ContentCell = GetForm_Root();
+                                adminBody = GetForm_Root();
                             }
 
                         }
@@ -470,7 +428,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // nothing so far, display desktop
                         //
-                        ContentCell = GetForm_Root();
+                        adminBody = GetForm_Root();
                     }
                     //
                     // include fancybox if it was needed
@@ -487,13 +445,13 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Pickup user errors
                     //
                     if (core.doc.debug_iUserError != "") {
-                        ContentCell = "<div class=\"ccAdminMsg\">" + errorController.getUserError(core) + "</div>" + ContentCell;
+                        adminBody = "<div class=\"ccAdminMsg\">" + errorController.getUserError(core) + "</div>" + adminBody;
                     }
                     //
-                    Stream.Add('\r' + GetForm_Top());
-                    Stream.Add(genericController.nop(ContentCell));
-                    Stream.Add('\r' + AdminFormBottom);
-                    JavaScriptString += "\rButtonObjectCount = " + ButtonObjectCount + ";";
+                    Stream.Add(getAdminHeader());
+                    Stream.Add(adminBody);
+                    Stream.Add(adminFooter);
+                    JavaScriptString += "ButtonObjectCount = " + ButtonObjectCount + ";";
                     core.html.addScriptCode(JavaScriptString, "Admin Site");
                     result = Stream.Text;
                 }
@@ -1453,133 +1411,27 @@ namespace Contensive.Core.Addons.AdminSite {
         private int requestedRecordId;
         //Private false As Boolean    ' set if content and site support workflow authoring
         private bool BlockEditForm; // true if there was an error loading the edit record - use to block the edit form
-                                    //
-                                    // ----- Storage for current EditRecord, loaded in LoadEditRecord
-                                    //
-        public class editRecordFieldClass {
-            public object dbValue;
-            public object value;
+        /// <summary>
+        /// object that contains the context for the admin site, like recordsPerPage, etc. Should eventually include the loadContext and be its own document
+        /// </summary>
+        public class adminContextClass {
+            /// <summary>
+            /// Value returned from a submit button, process into action/form
+            /// </summary>
+            public string requestButton;
+            /// <summary>
+            /// the next form requested (the get)
+            /// </summary>
+            public int AdminForm;
         }
-        //
-        public class editRecordClass {
-            public Dictionary<string, editRecordFieldClass> fieldsLc = new Dictionary<string, editRecordFieldClass>();
-            public int id; // ID field of edit record (Record to be edited)
-            public int parentID; // ParentID field of edit record (Record to be edited)
-            public string nameLc; // name field of edit record
-            public bool active; // active field of the edit record
-            public int contentControlId; // ContentControlID of the edit record
-            public string contentControlId_Name;
-            public string menuHeadline; // Used for Content Watch Link Label if default
-            public DateTime modifiedDate; // Used for control section display
-            public int modifiedByMemberID; // =
-            public DateTime dateAdded; // =
-            public int createByMemberId; // =
-
-            public int RootPageID;
-            public bool SetPageNotFoundPageID;
-            public bool SetLandingPageID;
-
-            //
-            public bool Loaded; // true/false - set true when the field array values are loaded
-            public bool Saved; // true if edit record was saved during this page
-            public bool Read_Only; // set if this record can not be edited, for various reasons
-                                   //
-                                   // From core.main_GetAuthoringStatus
-                                   //
-            public bool IsDeleted; // true means the edit record has been deleted
-            public bool IsInserted; // set if Workflow authoring insert
-            public bool IsModified; // record has been modified since last published
-            public string LockModifiedName; // member who first edited the record
-            public DateTime LockModifiedDate; // Date when member modified record
-            public bool SubmitLock; // set if a submit Lock, even if the current user is admin
-            public string SubmittedName; // member who submitted the record
-            public DateTime SubmittedDate; // Date when record was submitted
-            public bool ApproveLock; // set if an approve Lock
-            public string ApprovedName; // member who approved the record
-            public DateTime ApprovedDate; // Date when record was approved
-                                          //
-                                          // From core.main_GetAuthoringPermissions
-                                          //
-            public bool AllowInsert;
-            public bool AllowCancel;
-            public bool AllowSave;
-            public bool AllowDelete;
-            public bool AllowPublish;
-            public bool AllowAbort;
-            public bool AllowSubmit;
-            public bool AllowApprove;
-            //
-            // From core.main_GetEditLock
-            //
-            public bool EditLock; // set if an edit Lock by anyone else besides the current user
-            public int EditLockMemberID; // Member who edit locked the record
-            public string EditLockMemberName; // Member who edit locked the record
-            public DateTime EditLockExpires; // Time when the edit lock expires
-
-        }
-        //Private EditRecordValuesObject() As Object      ' Storage for Edit Record values
-        //Private EditRecordDbValues() As Object         ' Storage for last values read from Defaults+Db, added b/c file fields need Db value to display
-        //Private EditRecord.ID As Integer                    ' ID field of edit record (Record to be edited)
-        //Private EditRecord.ParentID As Integer              ' ParentID field of edit record (Record to be edited)
-        //Private EditRecord.Name As String                ' name field of edit record
-        //Private EditRecord.Active As Boolean             ' active field of the edit record
-        //Private EditRecord.ContentID As Integer             ' ContentControlID of the edit record
-        //Private EditRecord.ContentName As String         '
-        //Private EditRecord.MenuHeadline As String        ' Used for Content Watch Link Label if default
-        //Private EditRecord.ModifiedDate As Date          ' Used for control section display
-        //Private EditRecord.ModifiedByMemberID As Integer    '   =
-        //Private EditRecord.AddedDate As Date             '   =
-        //Private EditRecord.AddedByMemberID As Integer       '   =
-        //Private EditRecord.ContentCategoryID As Integer
-        //Private EditRecordRootPageID As Integer
-        //Private EditRecord.SetPageNotFoundPageID As Boolean
-        //Private EditRecord.SetLandingPageID As Boolean
-
-        //
-        //Private EditRecord.Loaded As Boolean            ' true/false - set true when the field array values are loaded
-        //Private EditRecord.Saved As Boolean              ' true if edit record was saved during this page
-        //Private editrecord.read_only As Boolean           ' set if this record can not be edited, for various reasons
-        //
-        // From core.main_GetAuthoringStatus
-        //
-        //Private EditRecord.IsDeleted As Boolean          ' true means the edit record has been deleted
-        //Private EditRecord.IsInserted As Boolean         ' set if Workflow authoring insert
-        //Private EditRecord.IsModified As Boolean         ' record has been modified since last published
-        //Private EditRecord.LockModifiedName As String        ' member who first edited the record
-        //Private EditRecord.LockModifiedDate As Date          ' Date when member modified record
-        //Private EditRecord.SubmitLock As Boolean         ' set if a submit Lock, even if the current user is admin
-        //Private EditRecord.SubmittedName As String       ' member who submitted the record
-        //Private EditRecordSubmittedDate As Date         ' Date when record was submitted
-        //Private EditRecord.ApproveLock As Boolean        ' set if an approve Lock
-        //Private EditRecord.ApprovedName As String        ' member who approved the record
-        //Private EditRecordApprovedDate As Date          ' Date when record was approved
-        //
-        // From core.main_GetAuthoringPermissions
-        //
-        //Private EditRecord.AllowInsert As Boolean
-        //Private EditRecord.AllowCancel As Boolean
-        //Private EditRecord.AllowSave As Boolean
-        //Private EditRecord.AllowDelete As Boolean
-        //Private EditRecord.AllowPublish As Boolean
-        //Private EditRecord.AllowAbort As Boolean
-        //Private EditRecord.AllowSubmit As Boolean
-        //Private EditRecord.AllowApprove As Boolean
-        //
-        // From core.main_GetEditLock
-        //
-        //Private EditRecord.EditLock As Boolean           ' set if an edit Lock by anyone else besides the current user
-        //Private EditRecord.EditLockMemberID As Integer      ' Member who edit locked the record
-        //Private EditRecord.EditLockMemberName As String  ' Member who edit locked the record
-        //Private EditRecord.EditLockExpires As Date       ' Time when the edit lock expires
-        //
+        // todo refactor legacy fields below this line
+        // **************** Legacy **********************
         //
         //=============================================================================
         // ----- Control Response
         //=============================================================================
         //
-        private string AdminButton; // Value returned from a submit button, process into action/form
         private int AdminAction; // The action to be performed before the next form
-        private int AdminForm; // The next form to print
         private int AdminSourceForm; // The form that submitted that the button to process
         private string[,] WherePair = new string[3, 11]; // for passing where clause values from page to page
         private int WherePairCount; // the current number of WherePairCount in use
@@ -1639,7 +1491,7 @@ namespace Contensive.Core.Addons.AdminSite {
         private int ButtonObjectCount;
         private string[,] ImagePreloads = new string[3, 101];
         private string JavaScriptString; // Collected string of Javascript functions to print at end
-        private string AdminFormBottom; // the HTML needed to complete the Admin Form after contents
+        private string adminFooter; // the HTML needed to complete the Admin Form after contents
         private bool UserAllowContentEdit;
         private int FormInputCount; // used to generate labels for form input
         private int EditSectionPanelCount;
@@ -1667,7 +1519,7 @@ namespace Contensive.Core.Addons.AdminSite {
             NodeTypeContent = 3
         }
         //
-        private const string IndexConfigPrefix = "IndexConfig:";
+        public const string IndexConfigPrefix = "IndexConfig:";
         //
         //
         //
@@ -1709,7 +1561,7 @@ namespace Contensive.Core.Addons.AdminSite {
         /// <param name="editRecord"></param>
         /// <param name="IsEmailContent"></param>
         /// <returns></returns>
-        private string GetForm_Index(cdefModel adminContent, editRecordClass editRecord, bool IsEmailContent) {
+        private string GetForm_Index(adminContextClass adminContext, cdefModel adminContent, editRecordClass editRecord, bool IsEmailContent) {
             string result = "";
             try {
                 //
@@ -1754,7 +1606,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 Copy = GetForm_Index_Export(adminContent, editRecord);
                                 break;
                             case AdminFormIndex_SubFormSetColumns:
-                                Copy = GetForm_Index_SetColumns(adminContent, editRecord);
+                                Copy = toolSetListColumnsClass.GetForm_Index_SetColumns(core, adminContent, editRecord);
                                 break;
                             case AdminFormIndex_SubFormAdvancedSearch:
                                 Copy = GetForm_Index_AdvancedSearch(adminContent, editRecord);
@@ -1767,9 +1619,9 @@ namespace Contensive.Core.Addons.AdminSite {
                         // If subforms return empty, go to parent form
                         //
                         // -- Load Index page customizations
-                        indexConfigClass IndexConfig = LoadIndexConfig(adminContent);
-                        SetIndexSQL_ProcessIndexConfigRequests(adminContent, editRecord, ref IndexConfig);
-                        SetIndexSQL_SaveIndexConfig(IndexConfig);
+                        indexConfigClass IndexConfig = LoadIndexConfig(core, adminContent);
+                        SetIndexSQL_ProcessIndexConfigRequests(adminContext, adminContent, editRecord, ref IndexConfig);
+                        SetIndexSQL_SaveIndexConfig(core, IndexConfig);
                         //
                         // Get the SQL parts
                         bool AllowAccessToContent = false;
@@ -1822,7 +1674,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             // Refresh Query String
                             //
                             core.doc.addRefreshQueryString("tr", IndexConfig.RecordTop.ToString());
-                            core.doc.addRefreshQueryString("asf", AdminForm.ToString());
+                            core.doc.addRefreshQueryString("asf", adminContext.AdminForm.ToString());
                             core.doc.addRefreshQueryString("cid", adminContent.id.ToString());
                             core.doc.addRefreshQueryString(RequestNameTitleExtension, genericController.encodeRequestVariable(TitleExtension));
                             if (WherePairCount > 0) {
@@ -1848,11 +1700,11 @@ namespace Contensive.Core.Addons.AdminSite {
                                     + "\r\n<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\">"
                                     + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
                                     + "\r<td valign=Middle class=\"left\">Filters</td>"
-                                    + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\"><img alt=\"Close Filters\" title=\"Close Filters\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                                    + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></a></td>"
                                     + "\r</tr></table>"
                                     + "\r\n</div>"
                                     + "\r\n<div id=\"IndexFilterHeadClosed\" class=\"closed\" style=\"display:none;\">"
-                                    + "\r<a href=\"#\" onClick=\"OpenIndexFilter();return false\"><img title=\"Open Navigator\" alt=\"Open Filter\" src=\"/ccLib/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\"></a>"
+                                    + "\r<a href=\"#\" onClick=\"OpenIndexFilter();return false\"><i title=\"open\" class=\"fa fa-angle-double-right\" style=\"color:#fff\"></i></a>"
                                     + "\r\n</div>"
                                     + "\r\n</div>"
                                     + "";
@@ -1875,11 +1727,11 @@ namespace Contensive.Core.Addons.AdminSite {
                                     + "\r\n<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\" style=\"display:none;\">"
                                     + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
                                     + "\r<td valign=Middle class=\"left\">Filter</td>"
-                                    + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\"><img alt=\"Close Filter\" title=\"Close Navigator\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                                    + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></a></td>"
                                     + "\r</tr></table>"
                                     + "\r\n</div>"
                                     + "\r\n<div id=\"IndexFilterHeadClosed\" class=\"closed\">"
-                                    + "\r<a href=\"#\" onClick=\"OpenIndexFilter();return false\"><img title=\"Open Navigator\" alt=\"Open Navigator\" src=\"/ccLib/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\"></a>"
+                                    + "\r<a href=\"#\" onClick=\"OpenIndexFilter();return false\"><i title=\"open\" class=\"fa fa-angle-double-right\" style=\"color:#fff\"></i></a>"
                                     + "\r\n</div>"
                                     + "\r\n</div>"
                                     + "";
@@ -1905,14 +1757,14 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Row Number Column
                             //
-                            DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"ccAdminListCaption\">Row</td>";
+                            DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Row</td>";
                             //
                             // Delete Select Box Columns
                             //
                             if (!AllowDelete) {
-                                DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"ccAdminListCaption\"><input TYPE=CheckBox disabled=\"disabled\"></td>";
+                                DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\"><input TYPE=CheckBox disabled=\"disabled\"></td>";
                             } else {
-                                DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"ccAdminListCaption\"><input TYPE=CheckBox OnClick=\"CheckInputs('DelCheck',this.checked);\"></td>";
+                                DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\"><input TYPE=CheckBox OnClick=\"CheckInputs('DelCheck',this.checked);\"></td>";
                             }
                             //
                             // Calculate total width
@@ -1928,7 +1780,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Edit Column
                             //
-                            DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"ccAdminListCaption\">Edit</td>";
+                            DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Edit</td>";
                             foreach (var kvp in IndexConfig.Columns) {
                                 indexConfigColumnClass column = kvp.Value;
                                 //
@@ -1990,7 +1842,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 }
                                 //ButtonObject = "Button" + ButtonObjectCount;
                                 ButtonObjectCount = ButtonObjectCount + 1;
-                                DataTable_HdrRow += "<td width=\"" + ColumnWidth + "%\" valign=bottom align=left class=\"ccAdminListCaption\">";
+                                DataTable_HdrRow += "<td width=\"" + ColumnWidth + "%\" valign=bottom align=left class=\"small ccAdminListCaption\">";
                                 DataTable_HdrRow += ("<a title=\"" + SortTitle + "\" href=\"" + htmlController.encodeHtml(ButtonHref) + "\" class=\"ccAdminListCaption\">" + ButtonFace + "</A>");
                                 DataTable_HdrRow += ("</td>");
                             }
@@ -2036,7 +1888,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     // --- Edit button column
                                     //
                                     DataTable_DataRows += "<td align=center " + RowColor + ">";
-                                    string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + AdminActionNop + "&cid=" + adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + genericController.encodeRequestVariable(TitleExtension) + "&ad=" + ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + AdminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
+                                    string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + AdminActionNop + "&cid=" + adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + genericController.encodeRequestVariable(TitleExtension) + "&ad=" + ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminContext.AdminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
                                     if (WherePairCount > 0) {
                                         for (int WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
                                             URI = URI + "&wl" + WhereCount + "=" + genericController.encodeRequestVariable(WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + genericController.encodeRequestVariable(WherePair[1, WhereCount]);
@@ -2260,7 +2112,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int Pos = 0;
                 int subContentID = 0;
                 //
-                IndexConfig = LoadIndexConfig(adminContent);
+                IndexConfig = LoadIndexConfig(core, adminContent);
                 //
                 ContentName = cdefModel.getContentNameByID(core, adminContent.id);
                 RQS = "cid=" + adminContent.id + "&af=1";
@@ -2583,34 +2435,17 @@ namespace Contensive.Core.Addons.AdminSite {
         //========================================================================
         //   read the input request
         //       If RequestBlocked get adminContent.id, AdminAction, FormID
-        //       and AdminForm are the only variables accessible before reading
+        //       and adminContext.AdminForm are the only variables accessible before reading
         //       the upl collection
         //========================================================================
         //
-        private void GetForm_LoadControl(ref cdefModel adminContent, editRecordClass editRecord) {
+        private void loadContext(ref adminContextClass adminContext, ref cdefModel adminContent, ref editRecordClass editRecord) {
             try {
-                //
-                string editorpreferences = null;
-                int Pos = 0;
-                string SQL = null;
-                string Key = null;
-                string[] Parts = null;
-                int Ptr = 0;
-                int Cnt = 0;
-                int fieldEditorFieldId = 0;
-                int fieldEditorAddonId = 0;
-                bool editorOk = false;
-                int CS = 0;
-                string[] QSSplit = null;
-                int QSPointer = 0;
-                string[] NVSplit = null;
-                string NameValue = null;
-                int WCount = 0;
-                string WhereClauseContent = null;
-                DataTable dtTest = null;
+                if (adminContext == null) {
+                    adminContext = new adminContextClass();
+                }
                 //
                 // Tab Control
-                //
                 allowAdminTabs = genericController.encodeBoolean(core.userProperty.getText("AllowAdminTabs", "1"));
                 if (core.docProperties.getText("tabs") != "") {
                     if (core.docProperties.getBoolean("tabs") != allowAdminTabs) {
@@ -2620,7 +2455,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 }
                 //
                 // AdminContent init
-                //
                 requestedContentId = core.docProperties.getInteger("cid");
                 if (requestedContentId != 0) {
                     adminContent = cdefModel.getCdef(core, requestedContentId);
@@ -2636,7 +2470,6 @@ namespace Contensive.Core.Addons.AdminSite {
                 }
                 //
                 // determine user rights to this content
-                //
                 UserAllowContentEdit = true;
                 if (!core.session.isAuthenticatedAdmin(core)) {
                     if (adminContent.id > 0) {
@@ -2646,12 +2479,15 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // editRecord init
                 //
+                editRecord = new editRecordClass {
+                    Loaded = false
+                };
                 requestedRecordId = core.docProperties.getInteger("id");
                 if ((UserAllowContentEdit) & (requestedRecordId != 0) && (adminContent.id > 0)) {
                     //
                     // set AdminContent to the content definition of the requested record
                     //
-                    CS = core.db.csOpenRecord(adminContent.name, requestedRecordId, false, false, "ContentControlID");
+                    int CS = core.db.csOpenRecord(adminContent.name, requestedRecordId, false, false, "ContentControlID");
                     if (core.db.csOk(CS)) {
                         editRecord.id = requestedRecordId;
                         adminContent.id = core.db.csGetInteger(CS, "ContentControlID");
@@ -2676,6 +2512,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 // Read WherePairCount
                 //
                 WherePairCount = 99;
+                int WCount = 0;
                 for (WCount = 0; WCount <= 99; WCount++) {
                     WherePair[0, WCount] = genericController.encodeText(core.docProperties.getText("WL" + WCount));
                     if (WherePair[0, WCount] == "") {
@@ -2690,7 +2527,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // Read WhereClauseContent to WherePairCount
                 //
-                WhereClauseContent = genericController.encodeText(core.docProperties.getText("wc"));
+                string WhereClauseContent = genericController.encodeText(core.docProperties.getText("wc"));
                 if (!string.IsNullOrEmpty(WhereClauseContent)) {
                     //
                     // ***** really needs a server.URLDecode() function
@@ -2699,14 +2536,15 @@ namespace Contensive.Core.Addons.AdminSite {
                     //WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%3D", "=")
                     //WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%26", "&")
                     if (!string.IsNullOrEmpty(WhereClauseContent)) {
-                        QSSplit = WhereClauseContent.Split(',');
+                        string[] QSSplit = WhereClauseContent.Split(',');
+                        int QSPointer = 0;
                         for (QSPointer = 0; QSPointer <= QSSplit.GetUpperBound(0); QSPointer++) {
-                            NameValue = QSSplit[QSPointer];
+                            string NameValue = QSSplit[QSPointer];
                             if (!string.IsNullOrEmpty(NameValue)) {
                                 if ((NameValue.Left(1) == "(") && (NameValue.Substring(NameValue.Length - 1) == ")") && (NameValue.Length > 2)) {
                                     NameValue = NameValue.Substring(1, NameValue.Length - 2);
                                 }
-                                NVSplit = NameValue.Split('=');
+                                string[] NVSplit = NameValue.Split('=');
                                 WherePair[0, WherePairCount] = NVSplit[0];
                                 if (NVSplit.GetUpperBound(0) > 0) {
                                     WherePair[1, WherePairCount] = NVSplit[1];
@@ -2739,9 +2577,9 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 AdminAction = core.docProperties.getInteger(rnAdminAction);
                 AdminSourceForm = core.docProperties.getInteger(rnAdminSourceForm);
-                AdminForm = core.docProperties.getInteger(rnAdminForm);
-                AdminButton = core.docProperties.getText(RequestNameButton);
-                if (AdminForm == AdminFormEdit) {
+                adminContext.AdminForm = core.docProperties.getInteger(rnAdminForm);
+                adminContext.requestButton = core.docProperties.getText(RequestNameButton);
+                if (adminContext.AdminForm == AdminFormEdit) {
                     ignore_legacyMenuDepth = 0;
                 } else {
                     ignore_legacyMenuDepth = core.docProperties.getInteger(RequestNameAdminDepth);
@@ -2755,17 +2593,17 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // Editor Preference change attempt. Set new preference and set this as a refresh
                         //
-                        AdminButton = "";
+                        adminContext.requestButton = "";
                         AdminAction = AdminActionEditRefresh;
-                        AdminForm = AdminFormEdit;
-                        Pos = genericController.vbInstr(1, fieldEditorPreference, ":");
+                        adminContext.AdminForm = AdminFormEdit;
+                        int Pos = genericController.vbInstr(1, fieldEditorPreference, ":");
                         if (Pos > 0) {
-                            fieldEditorFieldId = genericController.encodeInteger(fieldEditorPreference.Left(Pos - 1));
-                            fieldEditorAddonId = genericController.encodeInteger(fieldEditorPreference.Substring(Pos));
+                            int fieldEditorFieldId = genericController.encodeInteger(fieldEditorPreference.Left(Pos - 1));
+                            int fieldEditorAddonId = genericController.encodeInteger(fieldEditorPreference.Substring(Pos));
                             if (fieldEditorFieldId != 0) {
-                                editorOk = true;
-                                SQL = "select id from ccfields where (active<>0) and id=" + fieldEditorFieldId;
-                                dtTest = core.db.executeQuery(SQL);
+                                bool editorOk = true;
+                                string SQL = "select id from ccfields where (active<>0) and id=" + fieldEditorFieldId;
+                                DataTable dtTest = core.db.executeQuery(SQL);
                                 if (dtTest.Rows.Count == 0) {
                                     editorOk = false;
                                 }
@@ -2801,15 +2639,17 @@ namespace Contensive.Core.Addons.AdminSite {
                                     //End If
                                 }
                                 if (editorOk) {
-                                    Key = "editorPreferencesForContent:" + adminContent.id;
-                                    editorpreferences = core.userProperty.getText(Key, "");
+                                    string Key = "editorPreferencesForContent:" + adminContent.id;
+                                    //
+                                    string editorpreferences = core.userProperty.getText(Key, "");
                                     if (!string.IsNullOrEmpty(editorpreferences)) {
                                         //
                                         // remove current preferences for this field
                                         //
-                                        Parts = ("," + editorpreferences).Split(new[] { "," + fieldEditorFieldId.ToString() + ":" }, StringSplitOptions.None);
-                                        Cnt = Parts.GetUpperBound(0) + 1;
+                                        string[] Parts = ("," + editorpreferences).Split(new[] { "," + fieldEditorFieldId.ToString() + ":" }, StringSplitOptions.None);
+                                        int Cnt = Parts.GetUpperBound(0) + 1;
                                         if (Cnt > 0) {
+                                            int Ptr = 0;
                                             for (Ptr = 1; Ptr < Cnt; Ptr++) {
                                                 Pos = genericController.vbInstr(1, Parts[Ptr], ",");
                                                 if (Pos == 0) {
@@ -2859,7 +2699,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //       Email - (not done) Sends "body" field to "email" field in adminContent.id
         //========================================================================
         //
-        private void ProcessActions(cdefModel adminContent, editRecordClass editRecord, bool UseContentWatchLink) {
+        private void ProcessActions(adminContextClass adminContext, cdefModel adminContent, editRecordClass editRecord, bool UseContentWatchLink) {
             try {
                 int CS = 0;
                 int RecordID = 0;
@@ -2911,7 +2751,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 } else {
                                     LoadEditRecord(adminContent, editRecord);
                                     LoadEditRecord_Request(adminContent, editRecord);
-                                    ProcessActionSave(adminContent, editRecord, UseContentWatchLink);
+                                    ProcessActionSave(adminContext, adminContent, editRecord, UseContentWatchLink);
                                     core.doc.processAfterSave(false, adminContent.name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink);
                                 }
                                 AdminAction = AdminActionNop; // convert so action can be used in as a refresh
@@ -2926,7 +2766,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 } else {
                                     LoadEditRecord(adminContent, editRecord);
                                     LoadEditRecord_Request(adminContent, editRecord);
-                                    ProcessActionSave(adminContent, editRecord, UseContentWatchLink);
+                                    ProcessActionSave(adminContext, adminContent, editRecord, UseContentWatchLink);
                                     core.doc.processAfterSave(false, adminContent.name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink);
                                     editRecord.id = 0;
                                     editRecord.Loaded = false;
@@ -2942,7 +2782,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 // ----- Save Record
                                 //
-                                ProcessActionDuplicate(adminContent, editRecord);
+                                ProcessActionDuplicate(adminContext, adminContent, editRecord);
                                 AdminAction = AdminActionNop;
                                 break;
                             case AdminActionSendEmail:
@@ -2954,7 +2794,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 } else {
                                     LoadEditRecord(adminContent, editRecord);
                                     LoadEditRecord_Request(adminContent, editRecord);
-                                    ProcessActionSave(adminContent, editRecord, UseContentWatchLink);
+                                    ProcessActionSave( adminContext, adminContent, editRecord, UseContentWatchLink);
                                     core.doc.processAfterSave(false, adminContent.name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink);
                                     if (!(core.doc.debug_iUserError != "")) {
                                         if (!cdefModel.isWithinContent(core, editRecord.contentControlId, cdefModel.getContentId(core, "Group Email"))) {
@@ -3015,7 +2855,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 } else {
                                     LoadEditRecord(adminContent, editRecord);
                                     LoadEditRecord_Request(adminContent, editRecord);
-                                    ProcessActionSave(adminContent, editRecord, UseContentWatchLink);
+                                    ProcessActionSave(adminContext, adminContent, editRecord, UseContentWatchLink);
                                     core.doc.processAfterSave(false, adminContent.name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink);
                                     if (!(core.doc.debug_iUserError != "")) {
                                         if (!cdefModel.isWithinContent(core, editRecord.contentControlId, cdefModel.getContentId(core, "Conditional Email"))) {
@@ -3045,7 +2885,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     //
                                     LoadEditRecord(adminContent, editRecord);
                                     LoadEditRecord_Request(adminContent, editRecord);
-                                    ProcessActionSave(adminContent, editRecord, UseContentWatchLink);
+                                    ProcessActionSave( adminContext, adminContent, editRecord, UseContentWatchLink);
                                     core.doc.processAfterSave(false, adminContent.name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink);
                                     //
                                     if (!(core.doc.debug_iUserError != "")) {
@@ -3112,7 +2952,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 } else {
                                     LoadEditRecord(adminContent, editRecord);
                                     LoadEditRecord_Request(adminContent, editRecord);
-                                    ProcessActionSave(adminContent, editRecord, UseContentWatchLink);
+                                    ProcessActionSave( adminContext, adminContent, editRecord, UseContentWatchLink);
                                     core.cache.invalidateAll();
                                     core.doc.clearMetaData();
                                 }
@@ -4700,14 +4540,18 @@ namespace Contensive.Core.Addons.AdminSite {
                                         break;
                                     }
                                 case "CCGUID": {
-                                        string saveValue = genericController.encodeText(fieldValueObject);
-                                        if (core.db.csGetText(csEditRecord, fieldName) != saveValue) {
-                                            fieldChanged = true;
-                                            recordChanged = true;
-                                            core.db.csSet(csEditRecord, fieldName, saveValue);
+                                        if (NewRecord & string.IsNullOrEmpty( FieldValueText)) {
+                                            //
+                                            // if new record and edit form returns empty, preserve the guid used to create the record.
+                                        } else {
+                                            //
+                                            // save the value in the request
+                                            if (core.db.csGetText(csEditRecord, fieldName) != FieldValueText) {
+                                                fieldChanged = true;
+                                                recordChanged = true;
+                                                core.db.csSet(csEditRecord, fieldName, FieldValueText);
+                                            }
                                         }
-                                        //RecordChanged = True
-                                        //Call core.app.SetCS(CSEditRecord, FieldName, FieldValueVariant)
                                         break;
                                     }
                                 case "CONTENTCONTROLID": {
@@ -4906,26 +4750,30 @@ namespace Contensive.Core.Addons.AdminSite {
                             // -- Log Activity for changes to people and organizattions
                             if (fieldChanged) {
                                 switch (genericController.vbLCase(adminContent.contentTableName)) {
-                                    case "ccmembers":
-                                        //
-                                        if (ActivityLogOrganizationID < 0) {
-                                            personModel person = personModel.create(core, editRecord.id);
-                                            if (person != null) {
-                                                ActivityLogOrganizationID = person.OrganizationID;
-                                            }
-                                        }
-                                        logController.addSiteActivity(core, "modifying field " + fieldName, editRecord.id, ActivityLogOrganizationID);
-                                        break;
-                                    case "organizations":
-                                        //
-                                        logController.addSiteActivity(core, "modifying field " + fieldName, 0, editRecord.id);
-                                        break;
                                     case "cclibraryfiles":
                                         //
                                         if (core.docProperties.getText("filename") != "") {
                                             core.db.csSet(csEditRecord, "altsizelist", "");
                                         }
                                         break;
+                                }
+                                if (!NewRecord) {
+                                    switch (genericController.vbLCase(adminContent.contentTableName)) {
+                                        case "ccmembers":
+                                            //
+                                            if (ActivityLogOrganizationID < 0) {
+                                                personModel person = personModel.create(core, editRecord.id);
+                                                if (person != null) {
+                                                    ActivityLogOrganizationID = person.OrganizationID;
+                                                }
+                                            }
+                                            logController.addSiteActivity(core, "modifying field " + fieldName, editRecord.id, ActivityLogOrganizationID);
+                                            break;
+                                        case "organizations":
+                                            //
+                                            logController.addSiteActivity(core, "modifying field " + fieldName, 0, editRecord.id);
+                                            break;
+                                    }
                                 }
                             }
                         }
@@ -5290,7 +5138,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     recordModifiedById = editRecord.modifiedByMemberID,
                     recordName = editRecord.nameLc
                 };
-                string titleBarDetails = adminUIController.getTitleBarDetails(core, headerInfo);
+                string titleBarDetails = adminUIController.getEditForm_TitleBarDetails(core, headerInfo, editRecord);
                 //
                 // ----- determine access details
                 //
@@ -6953,9 +6801,8 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // assemble the editor row
                         //
-                        string fieldHelp = "<small id=\"emailHelp\" class=\"form-text text-muted\">" + field.helpDefault + "</small>";
-                        //string editorRowContent = htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div(editorHelpRow, "ml-5"));
-                        string editorRow = adminUIController.getEditRow( core, EditorString, fieldCaption, fieldHelp, field.required, false, fieldHtmlId);
+                        //string fieldHelp = htmlController.div(htmlController.small(field.helpDefault), "form-text text-muted","emailHelp");
+                        string editorRow = adminUIController.getEditRow( core, EditorString, fieldCaption, field.helpDefault, field.required, false, fieldHtmlId);
                         resultBody.Add("<tr><td colspan=2>" + editorRow + "</td></tr>");
                     }
                     //
@@ -7211,7 +7058,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         string fieldId = "setGuid" + genericController.GetRandomInteger(core).ToString();
                         string buttonCell = htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='{" + Guid.NewGuid().ToString() + "}';this.disabled=true;}"), "col-xs-1");
                         string inputCell = htmlController.div(adminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId), "col-xs-11");
-                        fieldEditor = htmlController.div(htmlController.div(buttonCell + inputCell, "row"));
+                        fieldEditor = htmlController.div(htmlController.div(buttonCell + inputCell, "row"),"container-fluid");
                         //fieldEditor = htmlController.div(htmlController.div(buttonCell + inputCell, "row"), "container");
                         //fieldEditor = htmlController.div(htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + fieldValue + "';this.disabled=true;}")));
                         //sfieldEditor = adminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId) + htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + fieldValue + "';this.disabled=true;}"));
@@ -8761,7 +8608,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //   After this, print the content window, then PrintFormBottom()
         //========================================================================
         //
-        private string GetForm_Top(string BackgroundColor = "") {
+        private string getAdminHeader(string BackgroundColor = "") {
             string result = "";
             try {
                 string LeftSide = core.siteProperties.getText("AdminHeaderHTML", "Contensive Administration Site");
@@ -8780,30 +8627,28 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // --- Rule to separate content
                 //
-                Stream.Add("\r<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=1></div>");
+                //Stream.Add("\r<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=1></div>");
                 //
                 // --- Content Definition
+                adminFooter = "";
                 //
-                AdminFormBottom = "";
-                if (!((ignore_legacyMenuDepth == 0) && (AdminMenuModeID == AdminMenuModeLeft))) {
-                    //
-                    // #Content is full width, no Navigator
-                    //
-                    Stream.Add("\r<div id=\"desktop\" class=\"ccContentCon\">");
-                    //Stream.Add( "<div id=""ccContentCon"">")
-                    AdminFormBottom = AdminFormBottom + "\r</div>";
-                } else {
-                    const string AdminNavigatorGuid = "{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}";
-                    //
-                    // -- Admin Navigator
-                    string AdminNavFull = core.addon.execute(addonModel.create(core, AdminNavigatorGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
-                        addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                        errorContextMessage = "executing Admin Navigator in Admin"
-                    });
-                    //AdminNavFull = core.addon.execute_legacy4(AdminNavigatorGuid)
-                    Stream.Add("\r<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + genericController.nop(AdminNavFull) + "\r</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
-                    AdminFormBottom = AdminFormBottom + "</td></tr></table>";
-                }
+                // -- Admin Navigator
+                string AdminNavFull = core.addon.execute(addonModel.create(core, AdminNavigatorGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                    addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
+                    errorContextMessage = "executing Admin Navigator in Admin"
+                });
+                //AdminNavFull = core.addon.execute_legacy4(AdminNavigatorGuid)
+                Stream.Add("<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + genericController.nop(AdminNavFull) + "\r</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
+                adminFooter = adminFooter + "</td></tr></table>";
+                //if (!((ignore_legacyMenuDepth == 0) && (AdminMenuModeID == AdminMenuModeLeft))) {
+                //    //
+                //    // #Content is full width, no Navigator
+                //    //
+                //    Stream.Add("\r<div id=\"desktop\" class=\"ccContentCon\">");
+                //    //Stream.Add( "<div id=""ccContentCon"">")
+                //    adminFooter = adminFooter + "\r</div>";
+                //} else {
+                //}
                 //
                 result = Stream.Text;
             } catch (Exception ex) {
@@ -8939,7 +8784,7 @@ namespace Contensive.Core.Addons.AdminSite {
         /// <param name="adminContent"></param>
         /// <param name="editRecord"></param>
         //
-        private void ProcessForms(ref cdefModel adminContent, ref editRecordClass editRecord) {
+        private void ProcessForms(adminContextClass adminContext, ref cdefModel adminContent, ref editRecordClass editRecord) {
             try {
                 //
                 if (AdminSourceForm != 0) {
@@ -8950,18 +8795,18 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Reports form cancel button
                             //
-                            switch (AdminButton) {
+                            switch (adminContext.requestButton) {
                                 case ButtonCancel:
                                     AdminAction = AdminActionNop;
-                                    AdminForm = AdminFormRoot;
+                                    adminContext.AdminForm = AdminFormRoot;
                                     break;
                             }
                             break;
                         case AdminFormQuickStats:
-                            switch (AdminButton) {
+                            switch (adminContext.requestButton) {
                                 case ButtonCancel:
                                     AdminAction = AdminActionNop;
-                                    AdminForm = AdminFormRoot;
+                                    adminContext.AdminForm = AdminFormRoot;
                                     break;
                             }
                             break;
@@ -8969,36 +8814,36 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Publish Form
                             //
-                            switch (AdminButton) {
+                            switch (adminContext.requestButton) {
                                 case ButtonCancel:
                                     AdminAction = AdminActionNop;
-                                    AdminForm = AdminFormRoot;
+                                    adminContext.AdminForm = AdminFormRoot;
                                     break;
                             }
                             break;
                         case AdminFormIndex:
-                            switch (AdminButton) {
+                            switch (adminContext.requestButton) {
                                 case ButtonCancel:
                                     AdminAction = AdminActionNop;
-                                    AdminForm = AdminFormRoot;
+                                    adminContext.AdminForm = AdminFormRoot;
                                     adminContent = new cdefModel();
                                     break;
                                 case ButtonClose:
                                     AdminAction = AdminActionNop;
-                                    AdminForm = AdminFormRoot;
+                                    adminContext.AdminForm = AdminFormRoot;
                                     adminContent = new cdefModel();
                                     break;
                                 case ButtonAdd:
                                     AdminAction = AdminActionNop;
-                                    AdminForm = AdminFormEdit;
+                                    adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonFind:
                                     AdminAction = AdminActionFind;
-                                    AdminForm = AdminSourceForm;
+                                    adminContext.AdminForm = AdminSourceForm;
                                     break;
                                 case ButtonFirst:
                                     RecordTop = 0;
-                                    AdminForm = AdminSourceForm;
+                                    adminContext.AdminForm = AdminSourceForm;
                                     break;
                                 case ButtonPrevious:
                                     RecordTop = RecordTop - RecordsPerPage;
@@ -9006,15 +8851,15 @@ namespace Contensive.Core.Addons.AdminSite {
                                         RecordTop = 0;
                                     }
                                     AdminAction = AdminActionNop;
-                                    AdminForm = AdminSourceForm;
+                                    adminContext.AdminForm = AdminSourceForm;
                                     break;
                                 case ButtonNext:
                                     AdminAction = AdminActionNext;
-                                    AdminForm = AdminSourceForm;
+                                    adminContext.AdminForm = AdminSourceForm;
                                     break;
                                 case ButtonDelete:
                                     AdminAction = AdminActionDeleteRows;
-                                    AdminForm = AdminSourceForm;
+                                    adminContext.AdminForm = AdminSourceForm;
                                     break;
                             }
                             // end case
@@ -9023,81 +8868,81 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Edit Form
                             //
-                            switch (AdminButton) {
+                            switch (adminContext.requestButton) {
                                 case ButtonRefresh:
                                     //
                                     // this is a test operation. need this so the user can set editor preferences without saving the record
                                     //   during refresh, the edit page is redrawn just was it was, but no save
                                     //
                                     AdminAction = AdminActionEditRefresh;
-                                    AdminForm = AdminFormEdit;
+                                    adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonMarkReviewed:
                                     AdminAction = AdminActionMarkReviewed;
-                                    AdminForm = GetForm_Close(ignore_legacyMenuDepth, adminContent.name, editRecord.id);
+                                    adminContext.AdminForm = GetForm_Close(ignore_legacyMenuDepth, adminContent.name, editRecord.id);
                                     break;
                                 case ButtonSaveandInvalidateCache:
                                     AdminAction = AdminActionReloadCDef;
-                                    AdminForm = AdminFormEdit;
+                                    adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonDelete:
                                     AdminAction = AdminActionDelete;
-                                    AdminForm = GetForm_Close(ignore_legacyMenuDepth, adminContent.name, editRecord.id);
+                                    adminContext.AdminForm = GetForm_Close(ignore_legacyMenuDepth, adminContent.name, editRecord.id);
                                     break;
                                 case ButtonSave:
                                     AdminAction = AdminActionSave;
-                                    AdminForm = AdminFormEdit;
+                                    adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonSaveAddNew:
                                     AdminAction = AdminActionSaveAddNew;
-                                    AdminForm = AdminFormEdit;
+                                    adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonOK:
                                     AdminAction = AdminActionSave;
-                                    AdminForm = GetForm_Close(ignore_legacyMenuDepth, adminContent.name, editRecord.id);
+                                    adminContext.AdminForm = GetForm_Close(ignore_legacyMenuDepth, adminContent.name, editRecord.id);
                                     break;
                                 case ButtonCancel:
                                     AdminAction = AdminActionNop;
-                                    AdminForm = GetForm_Close(ignore_legacyMenuDepth, adminContent.name, editRecord.id);
+                                    adminContext.AdminForm = GetForm_Close(ignore_legacyMenuDepth, adminContent.name, editRecord.id);
                                     break;
                                 case ButtonSend:
                                     //
                                     // Send a Group Email
                                     //
                                     AdminAction = AdminActionSendEmail;
-                                    AdminForm = AdminFormEdit;
+                                    adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonActivate:
                                     //
                                     // Activate (submit) a conditional Email
                                     //
                                     AdminAction = AdminActionActivateEmail;
-                                    AdminForm = AdminFormEdit;
+                                    adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonDeactivate:
                                     //
                                     // Deactivate (clear submit) a conditional Email
                                     //
                                     AdminAction = AdminActionDeactivateEmail;
-                                    AdminForm = AdminFormEdit;
+                                    adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonSendTest:
                                     //
                                     // Test an Email (Group, System, or Conditional)
                                     //
                                     AdminAction = AdminActionSendEmailTest;
-                                    AdminForm = AdminFormEdit;
+                                    adminContext.AdminForm = AdminFormEdit;
                                     //                Case ButtonSpellCheck
                                     //                    SpellCheckRequest = True
                                     //                    AdminAction = AdminActionSave
-                                    //                    AdminForm = AdminFormEdit
+                                    //                    adminContext.AdminForm = AdminFormEdit
                                     break;
                                 case ButtonCreateDuplicate:
                                     //
                                     // Create a Duplicate record (for email)
                                     //
                                     AdminAction = AdminActionDuplicate;
-                                    AdminForm = AdminFormEdit;
+                                    adminContext.AdminForm = AdminFormEdit;
                                     break;
                             }
                             break;
@@ -9105,7 +8950,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Process actions
                             //
-                            switch (AdminButton) {
+                            switch (adminContext.requestButton) {
                                 case ButtonSave:
                                 case ButtonOK:
                                     //
@@ -9152,10 +8997,10 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Process redirects
                             //
-                            switch (AdminButton) {
+                            switch (adminContext.requestButton) {
                                 case ButtonCancel:
                                 case ButtonOK:
-                                    AdminForm = AdminFormRoot;
+                                    adminContext.AdminForm = AdminFormRoot;
                                     break;
                             }
                             break;
@@ -9174,18 +9019,20 @@ namespace Contensive.Core.Addons.AdminSite {
         //========================================================================
         //
         private string GetForm_EditTitle(cdefModel adminContent, editRecordClass editRecord) {
-            string tempGetForm_EditTitle = "";
-            try {
-                //
-                if (editRecord.id == 0) {
-                    tempGetForm_EditTitle = "Add an entry to " + editRecord.contentControlId_Name + TitleExtension;
-                } else {
-                    tempGetForm_EditTitle = "Editing Record " + editRecord.id + " in " + editRecord.contentControlId_Name + " " + TitleExtension;
-                }
-            } catch (Exception ex) {
-                logController.handleError(core, ex);
-            }
-            return tempGetForm_EditTitle;
+            return "";
+            // this info moved to description block
+            //string tempGetForm_EditTitle = "";
+            //try {
+            //    //
+            //    if (editRecord.id == 0) {
+            //        tempGetForm_EditTitle = "Add an entry to " + editRecord.contentControlId_Name + TitleExtension;
+            //    } else {
+            //        tempGetForm_EditTitle = "Editing Record " + editRecord.id + " in " + editRecord.contentControlId_Name + " " + TitleExtension;
+            //    }
+            //} catch (Exception ex) {
+            //    logController.handleError(core, ex);
+            //}
+            //return tempGetForm_EditTitle;
         }
         //
         //========================================================================
@@ -9321,7 +9168,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         //=============================================================================================
         //
-        private void ProcessActionSave(cdefModel adminContent, editRecordClass editRecord, bool UseContentWatchLink) {
+        private void ProcessActionSave(adminContextClass adminContext, cdefModel adminContent, editRecordClass editRecord, bool UseContentWatchLink) {
             try {
                 string EditorStyleRulesFilename = null;
                 //
@@ -9477,7 +9324,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 // If the content supports datereviewed, mark it
                 //
                 if (core.doc.debug_iUserError != "") {
-                    AdminForm = AdminSourceForm;
+                    adminContext.AdminForm = AdminSourceForm;
                 }
                 AdminAction = AdminActionNop; // convert so action can be used in as a refresh
             } catch (Exception ex) {
@@ -10394,7 +10241,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //   Create a duplicate record
         //=============================================================================================
         //
-        private void ProcessActionDuplicate(cdefModel adminContent, editRecordClass editRecord) {
+        private void ProcessActionDuplicate(adminContextClass adminContext, cdefModel adminContent, editRecordClass editRecord) {
             try {
                 // converted array to dictionary - Dim FieldPointer As Integer
                 //
@@ -10475,7 +10322,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             //Call core.htmldoc.main_AddUserError("The create duplicate action is not supported for this content.")
                             break;
                     }
-                    AdminForm = AdminSourceForm;
+                    adminContext.AdminForm = AdminSourceForm;
                     AdminAction = AdminActionNop; // convert so action can be used in as a refresh
                 }
             } catch (Exception ex) {
@@ -11437,7 +11284,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         //DataSourceName = core.db.getDataSourceNameByID(adminContent.dataSourceId)
                         //DataSourceType = core.db.getDataSourceType(DataSourceName)
-                        IndexConfig = LoadIndexConfig(adminContent);
+                        IndexConfig = LoadIndexConfig(core, adminContent);
                         //RecordTop = IndexConfig.RecordTop
                         //RecordsPerPage = IndexConfig.RecordsPerPage
                         SetIndexSQL(adminContent, editRecord, IndexConfig, ref AllowContentAccess, ref sqlFieldList, ref SQLFrom, ref SQLWhere, ref SQLOrderBy, ref IsLimitedToSubContent, ref ContentAccessLimitMessage, ref FieldUsedInColumns, IsLookupFieldValid);
@@ -11583,596 +11430,7 @@ namespace Contensive.Core.Addons.AdminSite {
             }
             return tempGetForm_Index_Export;
         }
-        //
-        //=============================================================================
-        //   Print the Configure Index Form
-        //=============================================================================
-        //
-        private string GetForm_Index_SetColumns(cdefModel adminContent, editRecordClass editRecord) {
-            string tempGetForm_Index_SetColumns = null;
-            try {
-                //
-                string Button = null;
-                string Description = null;
-                bool NeedToReloadCDef = false;
-                string Title = null;
-                string Content = null;
-                //adminUIController Adminui = new adminUIController(core);
-                int ColumnPtr = 0;
-                int ColumnWidth = 0;
-                string AStart = null;
-                int CSPointer = 0;
-                int ContentID = 0;
-                cdefModel CDef = null;
-                string ContentName = null;
-                int TargetFieldID = 0;
-                string TargetFieldName = null;
-                int ColumnWidthTotal = 0;
-                int ColumnPointer = 0;
-                int fieldId = 0;
-                bool AllowContentAutoLoad = false;
-                string FieldNameToAdd = null;
-                int FieldIDToAdd = 0;
-                int CSSource = 0;
-                int CSTarget = 0;
-                int SourceContentID = 0;
-                string SourceName = null;
-                bool NeedToReloadConfig = false;
-                int InheritedFieldCount = 0;
-                string Caption = null;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                int ToolsAction = 0;
-                indexConfigClass IndexConfig = null;
-                //
-                const string RequestNameAddField = "addfield";
-                const string RequestNameAddFieldID = "addfieldID";
-                //
-                //
-                //--------------------------------------------------------------------------------
-                //   Process Button
-                //--------------------------------------------------------------------------------
-                //
-                Button = core.docProperties.getText(RequestNameButton);
-                if (Button == ButtonOK) {
-                    return tempGetForm_Index_SetColumns;
-                }
-                //
-                //--------------------------------------------------------------------------------
-                //   Load Request
-                //--------------------------------------------------------------------------------
-                //
-                ContentID = adminContent.id;
-                ContentName = cdefModel.getContentNameByID(core, ContentID);
-                if (Button == ButtonReset) {
-                    core.userProperty.setProperty(IndexConfigPrefix + ContentID.ToString(), "");
-                }
-                IndexConfig = LoadIndexConfig(adminContent);
-                Title = adminContent.name + " Columns";
-                Description = "Use the icons to add, remove and modify your personal column prefernces for this content (" + ContentName + "). Hit OK when complete. Hit Reset to restore your column preferences for this content to the site's default column preferences.";
-                ToolsAction = core.docProperties.getInteger("dta");
-                TargetFieldID = core.docProperties.getInteger("fi");
-                TargetFieldName = core.docProperties.getText("FieldName");
-                ColumnPointer = core.docProperties.getInteger("dtcn");
-                FieldNameToAdd = genericController.vbUCase(core.docProperties.getText(RequestNameAddField));
-                FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldID);
-                //ButtonList = ButtonCancel & "," & ButtonSelect
-                NeedToReloadConfig = core.docProperties.getBoolean("NeedToReloadConfig");
-                //
-                //--------------------------------------------------------------------------------
-                // Process actions
-                //--------------------------------------------------------------------------------
-                //
-                if (ContentID != 0) {
-                    CDef = cdefModel.getCdef(core, ContentName);
-                    if (ToolsAction != 0) {
-                        //
-                        // Block contentautoload, then force a load at the end
-                        //
-                        AllowContentAutoLoad = (core.siteProperties.getBoolean("AllowContentAutoLoad", true));
-                        core.siteProperties.setProperty("AllowContentAutoLoad", false);
-                        //
-                        // Make sure the FieldNameToAdd is not-inherited, if not, create new field
-                        //
-                        if (FieldIDToAdd != 0) {
-                            foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContent.fields) {
-                                cdefFieldModel field = keyValuePair.Value;
-                                if (field.id == FieldIDToAdd) {
-                                    //If CDef.fields(FieldPtr).Name = FieldNameToAdd Then
-                                    if (field.inherited) {
-                                        SourceContentID = field.contentId;
-                                        SourceName = field.nameLc;
-                                        CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + core.db.encodeSQLText(SourceName) + ")");
-                                        if (core.db.csOk(CSSource)) {
-                                            CSTarget = core.db.csInsertRecord("Content Fields");
-                                            if (core.db.csOk(CSTarget)) {
-                                                core.db.csCopyRecord(CSSource, CSTarget);
-                                                core.db.csSet(CSTarget, "ContentID", ContentID);
-                                                NeedToReloadCDef = true;
-                                            }
-                                            core.db.csClose(ref CSTarget);
-                                        }
-                                        core.db.csClose(ref CSSource);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                        //
-                        // Make sure all fields are not-inherited, if not, create new fields
-                        //
-                        foreach (var kvp in IndexConfig.Columns) {
-                            indexConfigColumnClass column = kvp.Value;
-                            cdefFieldModel field = adminContent.fields[column.Name.ToLower()];
-                            if (field.inherited) {
-                                SourceContentID = field.contentId;
-                                SourceName = field.nameLc;
-                                CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + core.db.encodeSQLText(SourceName) + ")");
-                                if (core.db.csOk(CSSource)) {
-                                    CSTarget = core.db.csInsertRecord("Content Fields");
-                                    if (core.db.csOk(CSTarget)) {
-                                        core.db.csCopyRecord(CSSource, CSTarget);
-                                        core.db.csSet(CSTarget, "ContentID", ContentID);
-                                        NeedToReloadCDef = true;
-                                    }
-                                    core.db.csClose(ref CSTarget);
-                                }
-                                core.db.csClose(ref CSSource);
-                            }
-                        }
-                        //
-                        // get current values for Processing
-                        //
-                        foreach (var kvp in IndexConfig.Columns) {
-                            indexConfigColumnClass column = kvp.Value;
-                            ColumnWidthTotal += column.Width;
-                        }
-                        //
-                        // ----- Perform any actions first
-                        //
-                        switch (ToolsAction) {
-                            case ToolsActionAddField: {
-                                    //
-                                    // Add a field to the index form
-                                    //
-                                    if (FieldIDToAdd != 0) {
-                                        indexConfigColumnClass column = null;
-                                        foreach (var kvp in IndexConfig.Columns) {
-                                            column = kvp.Value;
-                                            column.Width = encodeInteger((column.Width * 80) / (double)ColumnWidthTotal);
-                                        }
-                                        column = new indexConfigColumnClass();
-                                        CSPointer = core.db.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
-                                        if (core.db.csOk(CSPointer)) {
-                                            column.Name = core.db.csGet(CSPointer, "name");
-                                            column.Width = 20;
-                                        }
-                                        core.db.csClose(ref CSPointer);
-                                        IndexConfig.Columns.Add(column.Name.ToLower(), column);
-                                        NeedToReloadConfig = true;
-                                    }
-                                    //
-                                    break;
-                                }
-                            case ToolsActionRemoveField: {
-                                    //
-                                    // Remove a field to the index form
-                                    //
-                                    indexConfigColumnClass column = null;
-                                    if (IndexConfig.Columns.ContainsKey(TargetFieldName.ToLower())) {
-                                        column = IndexConfig.Columns[TargetFieldName.ToLower()];
-                                        ColumnWidthTotal = ColumnWidthTotal + column.Width;
-                                        IndexConfig.Columns.Remove(TargetFieldName.ToLower());
-                                        //
-                                        // Normalize the widths of the remaining columns
-                                        //
-                                        foreach (var kvp in IndexConfig.Columns) {
-                                            column = kvp.Value;
-                                            column.Width = encodeInteger((1000 * column.Width) / (double)ColumnWidthTotal);
-                                        }
-                                        NeedToReloadConfig = true;
-                                    }
-                                    break;
-                                }
-                            case ToolsActionMoveFieldLeft: {
-                                    //
-                                    // Move column field left
-                                    //
-                                    //If IndexConfig.Columns.Count > 1 Then
-                                    //    MoveNextColumn = False
-                                    //    For ColumnPointer = 1 To IndexConfig.Columns.Count - 1
-                                    //        If TargetFieldName = IndexConfig.Columns(ColumnPointer).Name Then
-                                    //            With IndexConfig.Columns(ColumnPointer)
-                                    //                FieldPointerTemp = .FieldId
-                                    //                NameTemp = .Name
-                                    //                WidthTemp = .Width
-                                    //                .FieldId = IndexConfig.Columns(ColumnPointer - 1).FieldId
-                                    //                .Name = IndexConfig.Columns(ColumnPointer - 1).Name
-                                    //                .Width = IndexConfig.Columns(ColumnPointer - 1).Width
-                                    //            End With
-                                    //            With IndexConfig.Columns(ColumnPointer - 1)
-                                    //                .FieldId = FieldPointerTemp
-                                    //                .Name = NameTemp
-                                    //                .Width = WidthTemp
-                                    //            End With
-                                    //        End If
-                                    //    Next
-                                    //    NeedToReloadConfig = True
-                                    //End If
-                                    // end case
-                                    break;
-                                }
-                            case ToolsActionMoveFieldRight: {
-                                    //
-                                    // Move Index column field right
-                                    //
-                                    //If IndexConfig.Columns.Count > 1 Then
-                                    //    MoveNextColumn = False
-                                    //    For ColumnPointer = 0 To IndexConfig.Columns.Count - 2
-                                    //        If TargetFieldName = IndexConfig.Columns(ColumnPointer).Name Then
-                                    //            With IndexConfig.Columns(ColumnPointer)
-                                    //                FieldPointerTemp = .FieldId
-                                    //                NameTemp = .Name
-                                    //                WidthTemp = .Width
-                                    //                .FieldId = IndexConfig.Columns(ColumnPointer + 1).FieldId
-                                    //                .Name = IndexConfig.Columns(ColumnPointer + 1).Name
-                                    //                .Width = IndexConfig.Columns(ColumnPointer + 1).Width
-                                    //            End With
-                                    //            With IndexConfig.Columns(ColumnPointer + 1)
-                                    //                .FieldId = FieldPointerTemp
-                                    //                .Name = NameTemp
-                                    //                .Width = WidthTemp
-                                    //            End With
-                                    //        End If
-                                    //    Next
-                                    //    NeedToReloadConfig = True
-                                    //End If
-                                    // end case
-                                    break;
-                                }
-                            case ToolsActionExpand: {
-                                    //
-                                    // Expand column
-                                    //
-                                    //ColumnWidthBalance = 0
-                                    //If IndexConfig.Columns.Count > 1 Then
-                                    //    '
-                                    //    ' Calculate the total width of the non-target columns
-                                    //    '
-                                    //    ColumnWidthIncrease = CInt(ColumnWidthTotal * 0.1)
-                                    //    For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
-                                    //        If TargetFieldName <> IndexConfig.Columns(ColumnPointer).Name Then
-                                    //            ColumnWidthBalance = ColumnWidthBalance + IndexConfig.Columns(ColumnPointer).Width
-                                    //        End If
-                                    //    Next
-                                    //    '
-                                    //    ' Adjust all columns
-                                    //    '
-                                    //    If ColumnWidthBalance > 0 Then
-                                    //        For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
-                                    //            With IndexConfig.Columns(ColumnPointer)
-                                    //                If TargetFieldName = .Name Then
-                                    //                    '
-                                    //                    ' Target gets 10% increase
-                                    //                    '
-                                    //                    .Width = Int(.Width + ColumnWidthIncrease)
-                                    //                Else
-                                    //                    '
-                                    //                    ' non-targets get their share of the shrinkage
-                                    //                    '
-                                    //                    .Width = CInt(.Width - ((ColumnWidthIncrease * .Width) / ColumnWidthBalance))
-                                    //                End If
-                                    //            End With
-                                    //        Next
-                                    //        NeedToReloadConfig = True
-                                    //    End If
-                                    //End If
-
-                                    // end case
-                                    break;
-                                }
-                            case ToolsActionContract: {
-                                    //
-                                    // Contract column
-                                    //
-                                    //ColumnWidthBalance = 0
-                                    //If IndexConfig.Columns.Count > 0 Then
-                                    //    '
-                                    //    ' Calculate the total width of the non-target columns
-                                    //    '
-                                    //    ColumnWidthIncrease = CInt(-(ColumnWidthTotal * 0.1))
-                                    //    For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
-                                    //        With IndexConfig.Columns(ColumnPointer)
-                                    //            If TargetFieldName <> .Name Then
-                                    //                ColumnWidthBalance = ColumnWidthBalance + IndexConfig.Columns(ColumnPointer).Width
-                                    //            End If
-                                    //        End With
-                                    //    Next
-                                    //    '
-                                    //    ' Adjust all columns
-                                    //    '
-                                    //    If (ColumnWidthBalance > 0) And (ColumnWidthIncrease <> 0) Then
-                                    //        For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
-                                    //            With IndexConfig.Columns(ColumnPointer)
-                                    //                If TargetFieldName = .Name Then
-                                    //                    '
-                                    //                    ' Target gets 10% increase
-                                    //                    '
-                                    //                    .Width = Int(.Width + ColumnWidthIncrease)
-                                    //                Else
-                                    //                    '
-                                    //                    ' non-targets get their share of the shrinkage
-                                    //                    '
-                                    //                    .Width = CInt(.Width - ((ColumnWidthIncrease * FieldWidth) / ColumnWidthBalance))
-                                    //                End If
-                                    //            End With
-                                    //        Next
-                                    //        NeedToReloadConfig = True
-                                    //    End If
-                                    //End If
-                                    break;
-                                }
-                        }
-                        //
-                        // Reload CDef if it changed
-                        //
-                        if (NeedToReloadCDef) {
-                            core.doc.clearMetaData();
-                            core.cache.invalidateAll();
-                            CDef = cdefModel.getCdef(core, ContentName);
-                        }
-                        //
-                        // save indexconfig
-                        //
-                        if (NeedToReloadConfig) {
-                            SetIndexSQL_SaveIndexConfig(IndexConfig);
-                            IndexConfig = LoadIndexConfig(adminContent);
-                        }
-                    }
-                    //
-                    //--------------------------------------------------------------------------------
-                    //   Display the form
-                    //--------------------------------------------------------------------------------
-                    //
-                    Stream.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
-                    Stream.Add("<td width=\"5%\">&nbsp;</td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>10%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>20%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>30%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>40%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>50%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>60%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>70%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>80%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>90%</nobr></td>");
-                    Stream.Add("<td width=\"9%\" align=\"center\" class=\"ccAdminSmall\"><nobr>100%</nobr></td>");
-                    Stream.Add("<td width=\"4%\" align=\"center\">&nbsp;</td>");
-                    Stream.Add("</tr></table>");
-                    //
-                    Stream.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("</tr></table>");
-                    //
-                    // print the column headers
-                    //
-                    ColumnWidthTotal = 0;
-                    if (IndexConfig.Columns.Count > 0) {
-                        //
-                        // Calc total width
-                        //
-                        foreach (var kvp in IndexConfig.Columns) {
-                            indexConfigColumnClass column = kvp.Value;
-                            ColumnWidthTotal += column.Width;
-                        }
-                        if (ColumnWidthTotal > 0) {
-                            Stream.Add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
-                            //
-                            // -- header
-                            Stream.Add("<tr>");
-                            foreach (var kvp in IndexConfig.Columns) {
-                                indexConfigColumnClass column = kvp.Value;
-                                //
-                                // print column headers - anchored so they sort columns
-                                //
-                                ColumnWidth = encodeInteger(100 * (column.Width / (double)ColumnWidthTotal));
-                                cdefFieldModel field = adminContent.fields[column.Name.ToLower()];
-                                fieldId = field.id;
-                                Caption = field.caption;
-                                if (field.inherited) {
-                                    Caption = Caption + "*";
-                                    InheritedFieldCount = InheritedFieldCount + 1;
-                                }
-                                //AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHTML(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
-                                Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + Caption + "</td>");
-                                //Stream.Add("<img src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\" >");
-                                //Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><img src=\"/ccLib/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                //Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><img src=\"/ccLib/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                //Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><img src=\"/ccLib/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                ////Call Stream.Add(AStart & "&dta=" & ToolsActionSetAZ & """><img src=""/ccLib/images/LibButtonSortazUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
-                                ////Call Stream.Add(AStart & "&dta=" & ToolsActionSetZA & """><img src=""/ccLib/images/LibButtonSortzaUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
-                                //Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><img src=\"/ccLib/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                //Stream.Add(AStart + "&dta=" + ToolsActionContract + "\"><img src=\"/ccLib/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A>");
-                                //Stream.Add("</span></td>");
-                            }
-                            Stream.Add("</tr>");
-                            //
-                            // -- body
-                            Stream.Add("<tr>");
-                            foreach (var kvp in IndexConfig.Columns) {
-                                indexConfigColumnClass column = kvp.Value;
-                                //
-                                // print column headers - anchored so they sort columns
-                                //
-                                ColumnWidth = encodeInteger(100 * (column.Width / (double)ColumnWidthTotal));
-                                cdefFieldModel field = adminContent.fields[column.Name.ToLower()];
-                                fieldId = field.id;
-                                Caption = field.caption;
-                                if (field.inherited) {
-                                    Caption = Caption + "*";
-                                    InheritedFieldCount = InheritedFieldCount + 1;
-                                }
-                                AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
-                                Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">");
-                                //Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
-                                Stream.Add("<img src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\" >");
-                                Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><img src=\"/ccLib/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><img src=\"/ccLib/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><img src=\"/ccLib/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                //Call Stream.Add(AStart & "&dta=" & ToolsActionSetAZ & """><img src=""/ccLib/images/LibButtonSortazUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
-                                //Call Stream.Add(AStart & "&dta=" & ToolsActionSetZA & """><img src=""/ccLib/images/LibButtonSortzaUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
-                                Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><img src=\"/ccLib/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionContract + "\"><img src=\"/ccLib/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A>");
-                                Stream.Add("</td>");
-                                //Stream.Add("</span></td>");
-                            }
-                            Stream.Add("</tr>");
-                            //
-                            Stream.Add("</table>");
-                        }
-                    }
-                    //
-                    // ----- If anything was inherited, put up the message
-                    //
-                    if (InheritedFieldCount > 0) {
-                        Stream.Add("<p class=\"ccNormal\">* This field was inherited from the Content Definition's Parent. Inherited fields will automatically change when the field in the parent is changed. If you alter these settings, this connection will be broken, and the field will no longer inherit it's properties.</P class=\"ccNormal\">");
-                    }
-                    //
-                    // ----- now output a list of fields to add
-                    //
-                    if (CDef.fields.Count == 0) {
-                        Stream.Add(SpanClassAdminNormal + "This Content Definition has no fields</span><br>");
-                    } else {
-                        Stream.Add(SpanClassAdminNormal + "<br>");
-                        foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContent.fields) {
-                            cdefFieldModel field = keyValuePair.Value;
-                            //
-                            // display the column if it is not in use
-                            //
-                            if (!IndexConfig.Columns.ContainsKey(field.nameLc)) {
-                                if (field.fieldTypeId == FieldTypeIdFile) {
-                                    //
-                                    // file can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (file field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileText) {
-                                    //
-                                    // filename can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (text file field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileHTML) {
-                                    //
-                                    // filename can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (html file field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileCSS) {
-                                    //
-                                    // css filename can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (css file field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileXML) {
-                                    //
-                                    // xml filename can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (xml file field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileJavascript) {
-                                    //
-                                    // javascript filename can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (javascript file field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdLongText) {
-                                    //
-                                    // long text can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (long text field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdHTML) {
-                                    //
-                                    // long text can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (long text field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileImage) {
-                                    //
-                                    // long text can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (image field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdRedirect) {
-                                    //
-                                    // long text can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (redirect field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdManyToMany) {
-                                    //
-                                    // many to many can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (many-to-many field)<br>");
-                                } else {
-                                    //
-                                    // can be used as column header
-                                    //
-                                    Stream.Add("<a href=\"?" + core.doc.refreshQueryString + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldID + "=" + field.id + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns + "\"><img src=\"/ccLib/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A> " + field.caption + "<br>");
-                                }
-                            }
-                        }
-                    }
-                }
-                //
-                //--------------------------------------------------------------------------------
-                // print the content tables that have index forms to Configure
-                //--------------------------------------------------------------------------------
-                //
-                //FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its index form<br>"
-                //FormPanel = FormPanel & core.main_GetFormInputHidden("af", AdminFormToolConfigureIndex)
-                //FormPanel = FormPanel & core.htmldoc.main_GetFormInputSelect2("ContentID", ContentID, "Content")
-                //Call Stream.Add(core.htmldoc.main_GetPanel(FormPanel))
-                //
-                core.siteProperties.setProperty("AllowContentAutoLoad", genericController.encodeText(AllowContentAutoLoad));
-                //Stream.Add( core.main_GetFormInputHidden("NeedToReloadConfig", NeedToReloadConfig))
-
-                Content = ""
-                    + Stream.Text + htmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns) + "";
-                tempGetForm_Index_SetColumns = adminUIController.GetBody(core, Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
-                //
-                //
-                //    ButtonBar = adminUIController.GetButtonsFromList( ButtonList, True, True, "button")
-                //    ButtonBar = adminUIController.GetButtonBar(ButtonBar, "")
-                //    Stream = New FastStringClass
-                //
-                //    GetForm_Index_SetColumns = "" _
-                //        & ButtonBar _
-                //        & adminUIController.EditTableOpen _
-                //        & Stream.Text _
-                //        & adminUIController.EditTableClose _
-                //        & ButtonBar _
-                //    '
-                //    '
-                //    ' Assemble LiveWindowTable
-                //    '
-                //    Stream.Add( OpenLiveWindowTable)
-                //    Stream.Add( vbCrLf & core.main_GetFormStart()
-                //    Stream.Add( ButtonBar)
-                //    Stream.Add( TitleBar)
-                //    Stream.Add( Content)
-                //    Stream.Add( ButtonBar)
-                //    Stream.Add( "<input type=hidden name=asf VALUE=" & AdminFormIndex_SubFormSetColumns & ">")
-                //    Stream.Add( "</form>")
-                //    Stream.Add( CloseLiveWindowTable)
-                //    '
-                //    GetForm_Index_SetColumns = Stream.Text
-                core.html.addTitle(Title);
-            } catch (Exception ex) {
-                logController.handleError(core, ex);
-            }
-            return tempGetForm_Index_SetColumns;
-        }
-        //
+        ////
         //========================================================================
         //
         //========================================================================
@@ -12493,7 +11751,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //       if it is empty, setup defaults
         //=================================================================================
         //
-        private indexConfigClass LoadIndexConfig(cdefModel adminContent) {
+        public static indexConfigClass LoadIndexConfig(coreController core, cdefModel adminContent) {
             indexConfigClass returnIndexConfig = new indexConfigClass();
             try {
                 //
@@ -12536,17 +11794,23 @@ namespace Contensive.Core.Addons.AdminSite {
                                             string fieldName = LineSplit[0].Trim().ToLower();
                                             if (!string.IsNullOrWhiteSpace(fieldName)) {
                                                 if (adminContent.fields.ContainsKey(fieldName)) {
-                                                    if (adminContent.fields[fieldName].authorable) {
-                                                        //indexConfigColumnClass column = new indexConfigColumnClass();
-                                                        //column.Name = LineSplit[0].Trim();
-                                                        //column.Width = genericController.encodeInteger(LineSplit[1]);
-                                                        returnIndexConfig.Columns.Add(fieldName, new indexConfigColumnClass() {
-                                                            Name = fieldName,
-                                                            Width = genericController.encodeInteger(LineSplit[1]),
-                                                            SortDirection = 0,
-                                                            SortPriority = 0
-                                                        });
-                                                    }
+                                                    returnIndexConfig.Columns.Add(fieldName, new indexConfigColumnClass() {
+                                                        Name = fieldName,
+                                                        Width = genericController.encodeInteger(LineSplit[1]),
+                                                        SortDirection = 0,
+                                                        SortPriority = 0
+                                                    });
+                                                    //if (adminContent.fields[fieldName].authorable) {
+                                                    //    //indexConfigColumnClass column = new indexConfigColumnClass();
+                                                    //    //column.Name = LineSplit[0].Trim();
+                                                    //    //column.Width = genericController.encodeInteger(LineSplit[1]);
+                                                    //    returnIndexConfig.Columns.Add(fieldName, new indexConfigColumnClass() {
+                                                    //        Name = fieldName,
+                                                    //        Width = genericController.encodeInteger(LineSplit[1]),
+                                                    //        SortDirection = 0,
+                                                    //        SortPriority = 0
+                                                    //    });
+                                                    //}
                                                 }
                                             }
                                         }
@@ -12761,7 +12025,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //   Process request input on the IndexConfig
         //========================================================================================
         //
-        private void SetIndexSQL_ProcessIndexConfigRequests(cdefModel adminContent, editRecordClass editRecord, ref indexConfigClass IndexConfig) {
+        private void SetIndexSQL_ProcessIndexConfigRequests(adminContextClass adminContext, cdefModel adminContent, editRecordClass editRecord, ref indexConfigClass IndexConfig) {
             try {
                 //
                 int TestInteger = 0;
@@ -12773,7 +12037,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int ColumnPtr = 0;
                 string Button = null;
                 if (!IndexConfig.Loaded) {
-                    IndexConfig = LoadIndexConfig(adminContent);
+                    IndexConfig = LoadIndexConfig(core, adminContent);
                 }
                 //
                 // ----- Page number
@@ -12804,7 +12068,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     Button = core.docProperties.getText(RequestNameButton);
                     if (!string.IsNullOrEmpty(Button)) {
-                        switch (AdminButton) {
+                        switch (adminContext.requestButton) {
                             case ButtonFirst:
                                 //
                                 // Force to first page
@@ -13084,7 +12348,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         //=================================================================================
         //
-        private void SetIndexSQL_SaveIndexConfig(indexConfigClass IndexConfig) {
+        public static void SetIndexSQL_SaveIndexConfig(coreController core, indexConfigClass IndexConfig) {
             //
             string FilterText = null;
             string SubList = null;
@@ -13277,7 +12541,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (!string.IsNullOrEmpty(Button)) {
                     switch (Button) {
                         case ButtonSearch:
-                            IndexConfig = LoadIndexConfig(adminContent);
+                            IndexConfig = LoadIndexConfig(core, adminContent);
                             FormFieldCnt = core.docProperties.getInteger("fieldcnt");
                             if (FormFieldCnt > 0) {
                                 for (FormFieldPtr = 0; FormFieldPtr < FormFieldCnt; FormFieldPtr++) {
@@ -13314,13 +12578,13 @@ namespace Contensive.Core.Addons.AdminSite {
                                     }
                                 }
                             }
-                            SetIndexSQL_SaveIndexConfig(IndexConfig);
+                            SetIndexSQL_SaveIndexConfig(core, IndexConfig);
                             return string.Empty;
                         case ButtonCancel:
                             return string.Empty;
                     }
                 }
-                IndexConfig = LoadIndexConfig(adminContent);
+                IndexConfig = LoadIndexConfig(core, adminContent);
                 Button = "CriteriaSelect";
                 RQS = core.doc.refreshQueryString;
                 //

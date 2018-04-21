@@ -1971,7 +1971,7 @@ namespace Contensive.Core.Controllers {
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
                             + "<td align=left class=\"bbLeft\">Options for this instance of " + AddonName + "</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></a></td>"
                             + "</tr>"
                             + "</table>"
                             + "</div>";
@@ -2218,7 +2218,7 @@ namespace Contensive.Core.Controllers {
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
                             + "<td align=left class=\"bbLeft\">Stylesheet for " + addon.name + "</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></a></td>"
                             + "</tr>"
                             + "</table>"
                             + "</div>";
@@ -2308,7 +2308,7 @@ namespace Contensive.Core.Controllers {
                         + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                         + "<tr>"
                         + "<td align=left class=\"bbLeft\">Help Viewer</td>"
-                        + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                        + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></a></td>"
                         + "</tr>"
                         + "</table>"
                         + "</div>";
@@ -2372,7 +2372,7 @@ namespace Contensive.Core.Controllers {
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
                             + "<td align=left class=\"bbLeft\">HTML viewer</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('" + HTMLViewerBubbleID + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></A></td>"
+                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('" + HTMLViewerBubbleID + "');return false;\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></A></td>"
                             + "</tr>"
                             + "</table>"
                             + "</div>";

@@ -119,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addons\AdminSite\adminClearCacheToolAddon.cs" />
+    <Compile Include="Addons\AdminSite\toolSetListColumnsClass.cs" />
     <Compile Include="Addons\_blank.cs" />
     <Compile Include="Addons\SafeAddonManager\addonManagerClass.cs" />
     <Compile Include="Addons\AdminSite\closeAjaxIndexFilter.cs" />
@@ -323,6 +324,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Models\dataModelFields.txt" />
+    <Content Include="Resources\adminTemplateHtml.txt" />
     <Content Include="Resources\defaultLogin_email_html.txt" />
     <Content Include="Resources\defaultForgetPassword_html.txt" />
     <Content Include="Resources\defaultLogin_email_autoLogin_html.txt" />

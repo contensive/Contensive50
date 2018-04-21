@@ -40,9 +40,6 @@ namespace Contensive.Core.Addons.AdminSite {
                     cdefModel cdef = cdefModel.getCdef(core, ContentID);
                     result = adminSite.GetForm_IndexFilterContent(cdef);
                 }
-                adminSite = null;
-
-
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

@@ -1103,9 +1103,9 @@ namespace Contensive.Core.Controllers {
                             // -- lookup record and set clicks
                             libraryFilesModel file = libraryFilesModel.create(core, downloadId);
                             if (file != null) {
-                                file.Clicks += 1;
+                                file.clicks += 1;
                                 file.save(core);
-                                if (file.Filename != "") {
+                                if (file.filename != "") {
                                     //
                                     // -- create log entry
                                     libraryFileLogModel log = libraryFileLogModel.add(core);
@@ -1116,7 +1116,7 @@ namespace Contensive.Core.Controllers {
                                     }
                                     //
                                     // -- and go
-                                    string link = genericController.getCdnFileLink(core, file.Filename);
+                                    string link = genericController.getCdnFileLink(core, file.filename);
                                     //string link = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, file.Filename);
                                     return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.");
                                 }

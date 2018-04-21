@@ -1,9 +1,5 @@
 
 /*
-    contensive base: adminSite, pageManager, etc
-    20180323 - removed typography references to focus on bootstrap defaults
-*/
-/*
     Body Class Selectors 
 */
 .ccBodyWeb {
@@ -24,6 +20,30 @@
     BACKGROUND-COLOR: rgb(240,240,240);
     min-height: 100vh;
 }
+/*
+    bootstrap tweeks
+*/
+.btn-primary {
+    color: #fff;
+    background-color: #04a;
+    border-color: #04a;
+}
+
+    .btn-primary.disabled, .btn-primary:disabled {
+        background-color: #04a;
+        border-color: #04a;
+    }
+
+.btn-danger {
+    color: #fff;
+    background-color: #a33;
+    border-color: #a33;
+}
+
+    .btn-danger.disabled, .btn-danger:disabled {
+        background-color: #a33;
+        border-color: #a33;
+    }
 /*
     edit form tweeks
 */
@@ -93,66 +113,46 @@
 
 .ccCon .ccHeaderCon {
     width: 100%;
-    COLOR: white;
-    BACKGROUND-COLOR: rgb(140,140,140);
+    COLOR: #eee;
+    BACKGROUND-COLOR: #444;
     clear: both;
     vertical-align: middle;
+    border-bottom: 1px solid #000;
 }
 
-    .ccCon .ccHeaderCon .cchLeft {
-        COLOR: white;
-        BACKGROUND-COLOR: rgb(140,140,140);
+    .ccCon .ccHeaderCon .cchLeft, .ccCon .ccHeaderCon .left {
+        COLOR: #eee;
         text-align: left;
-        padding: 5px;
+        padding: 5px 10px 3px 10px;
         width: 50%;
         vertical-align: middle;
         Float: none;
     }
 
-    .ccCon .ccHeaderCon .cchRight {
-        COLOR: white;
-        BACKGROUND-COLOR: rgb(140,140,140);
+    .ccCon .ccHeaderCon .cchRight, .ccCon .ccHeaderCon .right {
+        COLOR: #eee;
         text-align: right;
-        padding: 5px;
+        padding: 5px 10px 3px 10px;
         width: 50%;
         vertical-align: middle;
         Float: none;
     }
 
     .ccCon .ccHeaderCon .cchSingle {
-        COLOR: white;
-        BACKGROUND-COLOR: rgb(140,140,140);
+        COLOR: #eee;
+        BACKGROUND-COLOR: #444;
         text-align: left;
-        padding: 5px;
+        padding: 5px 10px 3px 10px;
         vertical-align: middle;
     }
 
     .ccCon .ccHeaderCon .cchClosed {
-        COLOR: white;
-        BACKGROUND-COLOR: rgb(140,140,140);
+        COLOR: #eee;
+        BACKGROUND-COLOR: #444;
         text-align: right;
         padding: 5px
     }
 
-    .ccCon .ccHeaderCon .left {
-        COLOR: white;
-        BACKGROUND-COLOR: rgb(140,140,140);
-        text-align: left;
-        padding: 5px;
-        width: 50%;
-        vertical-align: middle;
-        Float: none;
-    }
-    /*legacy*/
-    .ccCon .ccHeaderCon .right {
-        COLOR: white;
-        BACKGROUND-COLOR: rgb(140,140,140);
-        text-align: right;
-        padding: 5px;
-        width: 50%;
-        vertical-align: middle;
-        Float: none;
-    }
 /*legacy*/
 /**/
 .ccCon .ccToolsCon {
@@ -164,26 +164,26 @@
 }
 
     .ccCon .ccToolsCon .ccHeaderCon {
-        COLOR: white;
-        BACKGROUND-COLOR: rgb(140,140,140);
+        COLOR: #eee;
+        BACKGROUND-COLOR: #444;
     }
 
         .ccCon .ccToolsCon .ccHeaderCon .closed {
-            COLOR: white;
-            BACKGROUND-COLOR: rgb(140,140,140);
+            COLOR: #eee;
+            BACKGROUND-COLOR: #444;
             text-align: left;
             padding: 5px;
         }
 
         .ccCon .ccToolsCon .ccHeaderCon .left {
-            COLOR: white;
-            BACKGROUND-COLOR: rgb(140,140,140);
+            COLOR: #eee;
+            BACKGROUND-COLOR: #444;
             text-align: left
         }
 
         .ccCon .ccToolsCon .ccHeaderCon .right {
-            COLOR: white;
-            BACKGROUND-COLOR: rgb(140,140,140);
+            COLOR: #eee;
+            BACKGROUND-COLOR: #444;
             text-align: right
         }
 
@@ -615,7 +615,7 @@ div.ccJumpCon {
         cursor: pointer;
         list-style: none inside none;
         margin: 0;
-        padding: 2px 5px !important;
+        padding: 5px 5px !important;
         color: #444;
         Background-Color: #ccc;
     }
@@ -639,7 +639,7 @@ div.ccJumpCon {
         .ccJumpCon ul li.hit {
             cursor: default;
             Background-Color: #666;
-            color: #ddd;
+            color: #eee;
         }
 
 .ccBubbleCon {

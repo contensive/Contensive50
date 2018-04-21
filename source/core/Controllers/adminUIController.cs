@@ -21,6 +21,38 @@ namespace Contensive.Core {
     /// </summary>
     public class adminUIController {
         //
+        //====================================================================================================
+        /// <summary>
+        /// structure used in admin edit forms at the top
+        /// </summary>
+        public class recordEditHeaderInfoClass {
+            //public string description;
+            public string recordName;
+            public int recordId;
+            public DateTime recordDateAdded;
+            public DateTime recordDateModified;
+            public int recordAddedById;
+            public int recordModifiedById;
+            public DateTime recordLockExpiresDate;
+            public int recordLockById;
+        }
+        //
+        public class editButtonBarInfoClass {
+            public bool allowDelete = false;
+            public bool allowCancel = false;
+            public bool allowSave = false;
+            public bool allowAdd = false;
+            public bool allowActivate = false;
+            public bool allowSendTest = false;
+            public bool allowSend = false;
+            public bool hasChildRecords = false;
+            public bool isPageContent = false;
+            public bool allowMarkReviewed = false;
+            public bool allowRefresh = false;
+            public bool allowCreateDuplicate = false;
+            public bool allowDeactivate = false;
+        }
+        //
         //========================================================================
         /// <summary>
         /// admin filter methods (includes, equals, greaterthan, etc)
@@ -98,6 +130,93 @@ namespace Contensive.Core {
             public bool isDelete = false;
             public bool isClose = false;
             public bool isAdd = false;
+        }
+        /// <summary>
+        /// Storage for current EditRecord, loaded in LoadEditRecord
+        /// </summary>
+        public class editRecordFieldClass {
+            public object dbValue;
+            public object value;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public class editRecordClass {
+            public Dictionary<string, editRecordFieldClass> fieldsLc = new Dictionary<string, editRecordFieldClass>();
+            /// <summary>
+            /// ID field of edit record (Record to be edited)
+            /// </summary>
+            public int id;
+            /// <summary>
+            /// ParentID field of edit record (Record to be edited)
+            /// </summary>
+            public int parentID;
+            /// <summary>
+            /// name field of edit record
+            /// </summary>
+            public string nameLc;
+            /// <summary>
+            /// active field of the edit record
+            /// </summary>
+            public bool active;
+            /// <summary>
+            /// ContentControlID of the edit record
+            /// </summary>
+            public int contentControlId;
+            public string contentControlId_Name;
+            /// <summary>
+            /// Used for Content Watch Link Label if default
+            /// </summary>
+            public string menuHeadline;
+            /// <summary>
+            /// Used for control section display
+            /// </summary>
+            public DateTime modifiedDate;
+            public int modifiedByMemberID;
+            public DateTime dateAdded;
+            public int createByMemberId;
+
+            public int RootPageID;
+            public bool SetPageNotFoundPageID;
+            public bool SetLandingPageID;
+
+            //
+            public bool Loaded; // true/false - set true when the field array values are loaded
+            public bool Saved; // true if edit record was saved during this page
+            public bool Read_Only; // set if this record can not be edited, for various reasons
+                                   //
+                                   // From core.main_GetAuthoringStatus
+                                   //
+            public bool IsDeleted; // true means the edit record has been deleted
+            public bool IsInserted; // set if Workflow authoring insert
+            public bool IsModified; // record has been modified since last published
+            public string LockModifiedName; // member who first edited the record
+            public DateTime LockModifiedDate; // Date when member modified record
+            public bool SubmitLock; // set if a submit Lock, even if the current user is admin
+            public string SubmittedName; // member who submitted the record
+            public DateTime SubmittedDate; // Date when record was submitted
+            public bool ApproveLock; // set if an approve Lock
+            public string ApprovedName; // member who approved the record
+            public DateTime ApprovedDate; // Date when record was approved
+                                          //
+                                          // From core.main_GetAuthoringPermissions
+                                          //
+            public bool AllowInsert;
+            public bool AllowCancel;
+            public bool AllowSave;
+            public bool AllowDelete;
+            public bool AllowPublish;
+            public bool AllowAbort;
+            public bool AllowSubmit;
+            public bool AllowApprove;
+            //
+            // From core.main_GetEditLock
+            //
+            public bool EditLock; // set if an edit Lock by anyone else besides the current user
+            public int EditLockMemberID; // Member who edit locked the record
+            public string EditLockMemberName; // Member who edit locked the record
+            public DateTime EditLockExpires; // Time when the edit lock expires
+
         }
         //
         // ====================================================================================================
@@ -819,86 +938,98 @@ namespace Contensive.Core {
         /// <param name="core"></param>
         /// <param name="headerInfo"></param>
         /// <returns></returns>
-        public static string getTitleBarDetails(coreController core, recordEditHeaderInfoClass headerInfo) {
+        public static string getEditForm_TitleBarDetails(coreController core, recordEditHeaderInfoClass headerInfo, editRecordClass editRecord) {
             string result = "";
-            if (headerInfo.recordId == 0) {
-                result = "<div>New Record</div>";
+            bool alt = true;
+            if (alt) {
+                if (editRecord.id == 0) {
+                    result += htmlController.div( "New record" , "col-sm-12");
+                } else {
+                    result += htmlController.div(htmlController.label( editRecord.contentControlId_Name + ":&nbsp;#" ) + headerInfo.recordId + ", " + editRecord.nameLc , "col-sm-4");
+                    result += htmlController.div(htmlController.label("created:&nbsp;" ) + editRecord.dateAdded.ToString(), "col-sm-4");
+                    result += htmlController.div(htmlController.label("modified:&nbsp;") + editRecord.modifiedDate.ToString(), "col-sm-4");
+                }
+                result = htmlController.div(result, "row");
             } else {
-                result = "<table border=0 cellpadding=0 cellspacing=0 style=\"width:90%\">";
-                result += "<tr><td width=\"50%\">"
-                + "Name: " + headerInfo.recordName + "<br>Record ID: " + headerInfo.recordId + "</td><td width=\"50%\">";
-                //
-                string CreatedCopy = "";
-                CreatedCopy = CreatedCopy + " " + headerInfo.recordDateAdded.ToString();
-                //
-                string CreatedBy = "the system";
-                if (headerInfo.recordAddedById != 0) {
-                    int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + headerInfo.recordAddedById);
-                    if (core.db.csOk(CS)) {
-                        string Name = core.db.csGetText(CS, "name");
-                        bool Active = core.db.csGetBoolean(CS, "active");
-                        if (!Active && (!string.IsNullOrEmpty(Name))) {
-                            CreatedBy = "Inactive user " + Name;
-                        } else if (!Active) {
-                            CreatedBy = "Inactive user #" + headerInfo.recordAddedById;
-                        } else if (string.IsNullOrEmpty(Name)) {
-                            CreatedBy = "Unnamed user #" + headerInfo.recordAddedById;
-                        } else {
-                            CreatedBy = Name;
-                        }
-                    } else {
-                        CreatedBy = "deleted user #" + headerInfo.recordAddedById;
-                    }
-                    core.db.csClose(ref CS);
-                }
-                if (!string.IsNullOrEmpty(CreatedBy)) {
-                    CreatedCopy = CreatedCopy + " by " + CreatedBy;
+                if (headerInfo.recordId == 0) {
+                    result = "<div>New Record</div>";
                 } else {
-                }
-                result += "Created:" + CreatedCopy;
-                //
-                string ModifiedCopy = "";
-                if (headerInfo.recordDateModified == DateTime.MinValue) {
-                    ModifiedCopy = CreatedCopy;
-                } else {
-                    ModifiedCopy = ModifiedCopy + " " + headerInfo.recordDateModified;
-                    CreatedBy = "the system";
-                    if (headerInfo.recordModifiedById != 0) {
-                        int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + headerInfo.recordModifiedById);
+                    result = "<table border=0 cellpadding=0 cellspacing=0 style=\"width:90%\">";
+                    result += "<tr><td width=\"50%\">"
+                    + "Name: " + headerInfo.recordName + "<br>Record ID: " + headerInfo.recordId + "</td><td width=\"50%\">";
+                    //
+                    string CreatedCopy = "";
+                    CreatedCopy = CreatedCopy + " " + headerInfo.recordDateAdded.ToString();
+                    //
+                    string CreatedBy = "the system";
+                    if (headerInfo.recordAddedById != 0) {
+                        int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + headerInfo.recordAddedById);
                         if (core.db.csOk(CS)) {
                             string Name = core.db.csGetText(CS, "name");
                             bool Active = core.db.csGetBoolean(CS, "active");
                             if (!Active && (!string.IsNullOrEmpty(Name))) {
                                 CreatedBy = "Inactive user " + Name;
                             } else if (!Active) {
-                                CreatedBy = "Inactive user #" + headerInfo.recordModifiedById;
+                                CreatedBy = "Inactive user #" + headerInfo.recordAddedById;
                             } else if (string.IsNullOrEmpty(Name)) {
-                                CreatedBy = "Unnamed user #" + headerInfo.recordModifiedById;
+                                CreatedBy = "Unnamed user #" + headerInfo.recordAddedById;
                             } else {
                                 CreatedBy = Name;
                             }
                         } else {
-                            CreatedBy = "deleted user #" + headerInfo.recordModifiedById;
+                            CreatedBy = "deleted user #" + headerInfo.recordAddedById;
                         }
                         core.db.csClose(ref CS);
                     }
                     if (!string.IsNullOrEmpty(CreatedBy)) {
-                        ModifiedCopy = ModifiedCopy + " by " + CreatedBy;
+                        CreatedCopy = CreatedCopy + " by " + CreatedBy;
                     } else {
                     }
-                }
-                result += "<br>Last Modified:" + ModifiedCopy;
-                if ((headerInfo.recordLockExpiresDate == null) | (headerInfo.recordLockExpiresDate < DateTime.Now)) {
+                    result += "Created:" + CreatedCopy;
                     //
-                    // Add Edit Locking to right panel
-                    personModel personLock = personModel.create(core, headerInfo.recordLockById);
-                    if (personLock != null) {
-                        result += "<br><b>Record is locked by " + personLock.name + " until " + headerInfo.recordLockExpiresDate + "</b>";
+                    string ModifiedCopy = "";
+                    if (headerInfo.recordDateModified == DateTime.MinValue) {
+                        ModifiedCopy = CreatedCopy;
+                    } else {
+                        ModifiedCopy = ModifiedCopy + " " + headerInfo.recordDateModified;
+                        CreatedBy = "the system";
+                        if (headerInfo.recordModifiedById != 0) {
+                            int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + headerInfo.recordModifiedById);
+                            if (core.db.csOk(CS)) {
+                                string Name = core.db.csGetText(CS, "name");
+                                bool Active = core.db.csGetBoolean(CS, "active");
+                                if (!Active && (!string.IsNullOrEmpty(Name))) {
+                                    CreatedBy = "Inactive user " + Name;
+                                } else if (!Active) {
+                                    CreatedBy = "Inactive user #" + headerInfo.recordModifiedById;
+                                } else if (string.IsNullOrEmpty(Name)) {
+                                    CreatedBy = "Unnamed user #" + headerInfo.recordModifiedById;
+                                } else {
+                                    CreatedBy = Name;
+                                }
+                            } else {
+                                CreatedBy = "deleted user #" + headerInfo.recordModifiedById;
+                            }
+                            core.db.csClose(ref CS);
+                        }
+                        if (!string.IsNullOrEmpty(CreatedBy)) {
+                            ModifiedCopy = ModifiedCopy + " by " + CreatedBy;
+                        } else {
+                        }
                     }
+                    result += "<br>Last Modified:" + ModifiedCopy;
+                    if ((headerInfo.recordLockExpiresDate == null) | (headerInfo.recordLockExpiresDate < DateTime.Now)) {
+                        //
+                        // Add Edit Locking to right panel
+                        personModel personLock = personModel.create(core, headerInfo.recordLockById);
+                        if (personLock != null) {
+                            result += "<br><b>Record is locked by " + personLock.name + " until " + headerInfo.recordLockExpiresDate + "</b>";
+                        }
+                    }
+                    //
+                    result += "</td></tr>";
+                    result += "</table>";
                 }
-                //
-                result += "</td></tr>";
-                result += "</table>";
             }
             return result;
         }
@@ -1292,7 +1423,7 @@ namespace Contensive.Core {
         /// <param name="editorHelpRow"></param>
         /// <returns></returns>
         public static string getEditRow(coreController core, string EditorString, string Caption, string editorHelpRow, bool fieldRequired = false, bool ignore = false, string fieldHtmlId = "") {
-            return htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div(editorHelpRow, "small ml-5"), "p-2 ");
+            return htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div( htmlController.small( editorHelpRow, "form-text text-muted"), "ml-5"), "p-2 ");
         }
         //
         // ====================================================================================================
@@ -1481,37 +1612,5 @@ namespace Contensive.Core {
         public static  string getIconRefresh(string link, string cssColor = "green") {
             return "<a href=\"" + link + "\"><span class=\"fa fa-refresh\" style=\"color:" + cssColor + ";\"></span></a>";
         }
-    }
-    //
-    //====================================================================================================
-    /// <summary>
-    /// structure used in admin edit forms at the top
-    /// </summary>
-    public class recordEditHeaderInfoClass {
-        //public string description;
-        public string recordName;
-        public int recordId;
-        public DateTime recordDateAdded;
-        public DateTime recordDateModified;
-        public int recordAddedById;
-        public int recordModifiedById;
-        public DateTime recordLockExpiresDate;
-        public int recordLockById;
-    }
-    //
-    public class editButtonBarInfoClass {
-        public bool allowDelete = false;
-        public bool allowCancel = false;
-        public bool allowSave = false;
-        public bool allowAdd = false;
-        public bool allowActivate = false;
-        public bool allowSendTest = false;
-        public bool allowSend = false;
-        public bool hasChildRecords = false;
-        public bool isPageContent = false;
-        public bool allowMarkReviewed = false;
-        public bool allowRefresh = false;
-        public bool allowCreateDuplicate = false;
-        public bool allowDeactivate = false;
     }
 }

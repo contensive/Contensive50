@@ -4210,7 +4210,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="HtmlClass"></param>
         /// <param name="HtmlId"></param>
         /// <returns></returns>
-        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
+        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass = "", string HtmlId = "", string HtmlName = "") {
             string s = "";
             //
             if (!string.IsNullOrEmpty(HtmlName)) {
@@ -4235,28 +4235,28 @@ namespace Contensive.Core.Controllers {
         /// <param name="htmlId"></param>
         /// <returns></returns>
         public static string div(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("div", innerHtml, "", htmlClass, htmlId);
+            return genericBlockTag("div", innerHtml, htmlClass, htmlId, "");
         }
         public static string p(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("p", innerHtml, "", htmlClass, htmlId);
+            return genericBlockTag("p", innerHtml, htmlClass, htmlId, "");
         }
         public static string h1(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h1", innerHtml, "", htmlClass, htmlId);
+            return genericBlockTag("h1", innerHtml, htmlClass, htmlId, "");
         }
         public static string h2(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h2", innerHtml, "", htmlClass, htmlId);
+            return genericBlockTag("h2", innerHtml, htmlClass, htmlId, "");
         }
         public static string h3(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h3", innerHtml, "", htmlClass, htmlId);
+            return genericBlockTag("h3", innerHtml, htmlClass, htmlId, "");
         }
         public static string h4(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h4", innerHtml, "", htmlClass, htmlId);
+            return genericBlockTag("h4", innerHtml, htmlClass, htmlId, "");
         }
         public static string h5(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h5", innerHtml, "", htmlClass, htmlId);
+            return genericBlockTag("h5", innerHtml, htmlClass, htmlId, "");
         }
         public static string h6(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h6", innerHtml, "", htmlClass, htmlId);
+            return genericBlockTag("h6", innerHtml, htmlClass, htmlId, "");
         }
         public static string label(string innerHtml, string forHtmlId = "", string htmlClass = "", string htmlId = "") {
             string s = "";
@@ -4289,15 +4289,27 @@ namespace Contensive.Core.Controllers {
         /// <param name="innerHtml"></param>
         /// <param name="htmlClass"></param>
         /// <returns></returns>
-        public static string span(string innerHtml, string htmlClass) => "<span class=\"" + htmlClass + "\">" + innerHtml + "</span>";
+        public static string genericInlineTag(string htmlTag, string innerHtml, string htmlClass, string htmlId) => "<" + htmlTag + " class=\"" + htmlClass + "\" id=\"" + htmlId + "\">" + innerHtml + "</" + htmlTag + ">";
+        public static string genericInlineTag(string htmlTag, string innerHtml, string htmlClass) => "<" + htmlTag + " class=\"" + htmlClass + "\">" + innerHtml + "</" + htmlTag + ">";
+        public static string genericInlineTag(string htmlTag, string innerHtml) => "<" + htmlTag + ">" + innerHtml + "</" + htmlTag + ">";
         //
         // ====================================================================================================
         /// <summary>
         /// create html span inline tag
         /// </summary>
-        /// <param name="innerHtml"></param>
         /// <returns></returns>
-        public static string span(string innerHtml) => "<span>" + innerHtml + "</span>";
+        public static string span(string innerHtml, string htmlClass, string htmlId) { return genericInlineTag("span", innerHtml, htmlClass, htmlId); }
+        public static string span(string innerHtml, string htmlClass) { return genericInlineTag("span", innerHtml, htmlClass); }
+        public static string span(string innerHtml) { return genericInlineTag("span", innerHtml); }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// create html small inline tag
+        /// </summary>
+        /// <returns></returns>
+        public static string small(string innerHtml, string htmlClass, string htmlId) { return genericInlineTag("small", innerHtml, htmlClass, htmlId); }
+        public static string small(string innerHtml, string htmlClass) { return genericInlineTag("small", innerHtml, htmlClass); }
+        public static string small(string innerHtml) { return genericInlineTag("small", innerHtml); }
         //
         // ====================================================================================================
         /// <summary>

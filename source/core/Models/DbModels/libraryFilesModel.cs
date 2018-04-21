@@ -25,16 +25,16 @@ namespace Contensive.Core.Models.DbModels {
         //
         //====================================================================================================
         // -- instance properties
-        public string AltSizeList { get; set; }
-        public string AltText { get; set; }
-        public int Clicks { get; set; }
-        public string Description { get; set; }
-        public string Filename { get; set; }
-        public int FileSize { get; set; }
-        public int FileTypeID { get; set; }
-        public int FolderID { get; set; }
-        public int pxHeight { get; set; }
-        public int pxWidth { get; set; }
+        public string altSizeList { get; set; }
+        public string altText { get; set; }
+        public int clicks { get; set; }
+        public string description { get; set; }
+        public string filename { get; set; }
+        public int fileSize { get; set; }
+        public int fileTypeId { get; set; }
+        public int folderId { get; set; }
+        public int height { get; set; }
+        public int width { get; set; }
         //
         //====================================================================================================
         public static libraryFilesModel add(coreController core) {

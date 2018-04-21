@@ -525,23 +525,24 @@ namespace Contensive.Core.Controllers {
             DataTable returnDt = null;
             try {
                 sqlFieldListClass sqlList = new sqlFieldListClass();
-                string CreateKeyString = null;
-                string DateAddedString = null;
-                //
-                CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
-                DateAddedString = encodeSQLDate(DateTime.Now);
-                //
-                sqlList.add("createkey", CreateKeyString);
-                sqlList.add("dateadded", DateAddedString);
+                //string CreateKeyString = null;
+                //string sqlDateAdded = null;
+                string sqlGuid = encodeSQLText( genericController.createGuid());
+                string sqlDateAdded = encodeSQLDate(DateTime.Now);
+                //CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
+                sqlList.add("ccguid", sqlGuid);
+                //sqlList.add("createkey", CreateKeyString);
+                sqlList.add("dateadded", sqlDateAdded);
                 sqlList.add("createdby", encodeSQLNumber(MemberID));
-                sqlList.add("ModifiedDate", DateAddedString);
+                sqlList.add("ModifiedDate", sqlDateAdded);
                 sqlList.add("ModifiedBy", encodeSQLNumber(MemberID));
                 sqlList.add("ContentControlID", encodeSQLNumber(0));
                 sqlList.add("Name", encodeSQLText(""));
                 sqlList.add("Active", encodeSQLNumber(1));
                 //
                 insertTableRecord(DataSourceName, TableName, sqlList);
-                returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + DateAddedString + ")and(CreateKey=" + CreateKeyString + ")", "ID DESC", "", 1);
+                returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1);
+                //returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + DateAddedString + ")and(CreateKey=" + CreateKeyString + ")", "ID DESC", "", 1);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -2314,8 +2315,6 @@ namespace Contensive.Core.Controllers {
         public int csInsertRecord(string ContentName, int MemberID = -1) {
             int returnCs = -1;
             try {
-                string DateAddedString = null;
-                string CreateKeyString = null;
                 string Criteria = null;
                 string DataSourceName = null;
                 string FieldName = null;
@@ -2430,19 +2429,21 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         //
-                        CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
-                        DateAddedString = encodeSQLDate(DateTime.Now);
+                        string sqlGuid = encodeSQLText(genericController.createGuid());
+                        //string CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
+                        string sqlDateAdded = encodeSQLDate(DateTime.Now);
                         //
-                        sqlList.add("CREATEKEY", CreateKeyString); // ArrayPointer)
-                        sqlList.add("DATEADDED", DateAddedString); // ArrayPointer)
-                        sqlList.add("CONTENTCONTROLID", encodeSQLNumber(CDef.id)); // ArrayPointer)
-                        sqlList.add("CREATEDBY", encodeSQLNumber(MemberID)); // ArrayPointer)
-                                                                             //
+                        sqlList.add("ccguid", sqlGuid);
+                        //sqlList.add("CREATEKEY", CreateKeyString); 
+                        sqlList.add("DATEADDED", sqlDateAdded); 
+                        sqlList.add("CONTENTCONTROLID", encodeSQLNumber(CDef.id)); 
+                        sqlList.add("CREATEDBY", encodeSQLNumber(MemberID)); 
                         insertTableRecord(DataSourceName, TableName, sqlList);
                         //
                         // ----- Get the record back so we can use the ID
                         //
-                        Criteria = "((createkey=" + CreateKeyString + ")And(DateAdded=" + DateAddedString + "))";
+                        Criteria = "(ccguid=" + sqlGuid + ")And(DateAdded=" + sqlDateAdded + ")";
+                        //Criteria = "((createkey=" + CreateKeyString + ")And(DateAdded=" + DateAddedString + "))";
                         returnCs = csOpen(ContentName, Criteria, "ID DESC", false, MemberID, false, true);
                         //
                         // ----- Clear Time Stamp because a record changed
@@ -4215,8 +4216,9 @@ namespace Contensive.Core.Controllers {
         //
         public void createContentFromSQLTable(dataSourceModel DataSource, string TableName, string ContentName) {
             try {
-                string DateAddedString = core.db.encodeSQLDate(DateTime.Now);
-                string CreateKeyString = core.db.encodeSQLNumber(genericController.GetRandomInteger(core));
+                //string DateAddedString = core.db.encodeSQLDate(DateTime.Now);
+                //string sqlGuid = encodeSQLText( createGuid());
+                //string CreateKeyString = core.db.encodeSQLNumber(genericController.GetRandomInteger(core));
                 //
                 // Read in a record from the table to get fields
                 DataTable dt = core.db.openTable(DataSource.Name, TableName, "", "", "", 1);
