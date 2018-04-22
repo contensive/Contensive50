@@ -330,27 +330,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetListLink(string ContentName) {
-            string returnHtml = "";
-            try {
-                string adminUrl = cp.Site.GetText("adminUrl") + "?cid=" + cp.Content.GetID(ContentName);
-                string encodedCaption = "List Records in " + cp.Utils.EncodeHTML(ContentName);
-
-                returnHtml = returnHtml + "<a"
-                    + " class=\"ccRecordEditLink\" "
-                    + " TabIndex=-1"
-                    + " href=\"" + adminUrl + "\""
-                    + "><img"
-                    + " src=\"/ccLib/images/IconContentEdit.gif\""
-                    + " border=\"0\""
-                    + " alt=\"" + encodedCaption + "\""
-                    + " title=\"" + encodedCaption + "\""
-                    + " align=\"absmiddle\""
-                    + "></a>";
-            } catch (Exception ex) {
-                logController.handleError( core,ex); // "Unexpected error in GetListLink")
-                throw;
-            }
-            return returnHtml;
+            return adminUIController.getIconEditAdminLink(core, Models.Complex.cdefModel.getCdef(core, ContentName));
         }
         //
         //====================================================================================================

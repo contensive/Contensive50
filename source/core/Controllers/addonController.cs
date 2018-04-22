@@ -1356,7 +1356,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 //
-                result = adminUIController.GetBody(core, Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
+                result = adminUIController.getBody(core, Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
 
             } catch (Exception ex) {

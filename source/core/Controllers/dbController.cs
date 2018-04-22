@@ -1731,13 +1731,9 @@ namespace Contensive.Core.Controllers {
         //
         public void csGoFirst(int CSPointer, bool AsyncSave = false) {
             try {
-                if (!csOk(CSPointer)) {
-                    throw new ApplicationException("data set is not valid");
-                } else {
-                    csSave(CSPointer, AsyncSave);
-                    contentSetStore[CSPointer].writeCache = new Dictionary<string, string>();
-                    contentSetStore[CSPointer].readCacheRowPtr = 0;
-                }
+                csSave(CSPointer, AsyncSave);
+                contentSetStore[CSPointer].writeCache = new Dictionary<string, string>();
+                contentSetStore[CSPointer].readCacheRowPtr = 0;
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;

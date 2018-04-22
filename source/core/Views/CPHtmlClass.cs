@@ -197,7 +197,7 @@ namespace Contensive.Core {
         //
         public override string SelectList(string HtmlName, string HtmlValue, string OptionList, string NoneCaption = "", string HtmlClass = "", string HtmlId = "") {
             string tempSelectList = null;
-            tempSelectList = core.html.selectFromList(HtmlName, genericController.encodeInteger( HtmlValue ), OptionList.Split(','), NoneCaption, HtmlId);
+            tempSelectList = htmlController.selectFromList( core, HtmlName, genericController.encodeInteger( HtmlValue ), OptionList.Split(','), NoneCaption, HtmlId);
             if (!string.IsNullOrEmpty(HtmlClass)) {
                 tempSelectList = tempSelectList.Replace("<select ", "<select class=\"" + HtmlClass + "\" ");
             }

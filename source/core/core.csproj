@@ -119,7 +119,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addons\AdminSite\adminClearCacheToolAddon.cs" />
+    <Compile Include="Addons\AdminSite\adminContextClass.cs" />
     <Compile Include="Addons\AdminSite\toolSetListColumnsClass.cs" />
+    <Compile Include="Addons\Tools\manualQueryClass.cs" />
     <Compile Include="Addons\_blank.cs" />
     <Compile Include="Addons\SafeAddonManager\addonManagerClass.cs" />
     <Compile Include="Addons\AdminSite\closeAjaxIndexFilter.cs" />

@@ -674,7 +674,45 @@ namespace Contensive.Core.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="HtmlClass"></param>
         /// <returns></returns>
-        public string selectFromList(string MenuName, int CurrentValue, string[] lookups, string NoneCaption, string htmlId, string HtmlClass = "") {
+        public static string selectFromList(coreController core, string MenuName, string CurrentValue, List<nameValueClass> lookupList, string NoneCaption, string htmlId, string HtmlClass = "") {
+            string result = "";
+            try {
+                stringBuilderLegacyController FastString = new stringBuilderLegacyController();
+                FastString.Add("<select size=1 ");
+                if (!string.IsNullOrEmpty(htmlId)) FastString.Add("id=\"" + htmlId + "\" ");
+                if (!string.IsNullOrEmpty(HtmlClass)) FastString.Add("class=\"" + HtmlClass + "\" ");
+                if (!string.IsNullOrEmpty(MenuName)) FastString.Add("name=\"" + MenuName + "\" ");
+                if (!string.IsNullOrEmpty(NoneCaption)) {
+                    FastString.Add("><option value=\"\">" + NoneCaption + "</option>");
+                } else {
+                    FastString.Add("><option value=\"\">Select One</option>");
+                }
+                //
+                // ----- select values
+                string CurrentValueLower = CurrentValue.ToLower();
+                foreach (nameValueClass nameValue in lookupList) {
+                    string selected = (nameValue.value.ToLower() == CurrentValueLower) ? " selected" : "";
+                    FastString.Add("<option value=\"" + nameValue.value + "\" " + selected + ">" + nameValue.name + "</option>");
+                }
+                FastString.Add("</select>");
+                result = FastString.Text;
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
+            }
+            return result;
+        }
+        /// <summary>
+        /// Select from a list where the list is a comma delimited list
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="MenuName"></param>
+        /// <param name="CurrentValue"></param>
+        /// <param name="lookups"></param>
+        /// <param name="NoneCaption"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="HtmlClass"></param>
+        /// <returns></returns>
+        public static string selectFromList(coreController core, string MenuName, int CurrentValue, string[] lookups, string NoneCaption, string htmlId, string HtmlClass = "") {
             string result = "";
             try {
                 //
@@ -1362,7 +1400,7 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // Lookup into LookupList
                                         //
-                                        returnResult = selectFromList(FieldName, FieldValueInteger, FieldLookupList.Split(','), "", "");
+                                        returnResult = selectFromList(core, FieldName, FieldValueInteger, FieldLookupList.Split(','), "", "");
                                     } else {
                                         //
                                         // Just call it text
@@ -1952,18 +1990,19 @@ namespace Contensive.Core.Controllers {
                     // todo ----- move this (defaulteditor override) to AdminUI
                     //
                     // use addon editor
-                    Dictionary<string, string> arguments = new Dictionary<string, string>();
-                    arguments.Add("editorName", htmlName);
-                    arguments.Add("editorValue", DefaultValue);
-                    arguments.Add("editorFieldType", FieldTypeIdHTML.ToString());
-                    arguments.Add("editorReadOnly", readOnlyfield.ToString());
-                    arguments.Add("editorWidth", styleWidth);
-                    arguments.Add("editorHeight", styleHeight);
-                    arguments.Add("editorAllowResourceLibrary", allowResourceLibrary.ToString());
-                    arguments.Add("editorAllowActiveContent", allowActiveContent.ToString());
-                    arguments.Add("editorAddonList", addonListJSON);
-                    arguments.Add("editorStyles", styleList);
-                    arguments.Add("editorStyleOptions", styleOptionList);
+                    Dictionary<string, string> arguments = new Dictionary<string, string> {
+                        { "editorName", htmlName },
+                        { "editorValue", DefaultValue },
+                        { "editorFieldType", FieldTypeIdHTML.ToString() },
+                        { "editorReadOnly", readOnlyfield.ToString() },
+                        { "editorWidth", styleWidth },
+                        { "editorHeight", styleHeight },
+                        { "editorAllowResourceLibrary", allowResourceLibrary.ToString() },
+                        { "editorAllowActiveContent", allowActiveContent.ToString() },
+                        { "editorAddonList", addonListJSON },
+                        { "editorStyles", styleList },
+                        { "editorStyleOptions", styleOptionList }
+                    };
                     returnHtml = core.addon.execute(addonModel.create(core, FieldTypeDefaultEditorAddonId), new CPUtilsBaseClass.addonExecuteContext() {
                         addonType = CPUtilsBaseClass.addonContext.ContextEditor,
                         instanceArguments = arguments,
@@ -2700,7 +2739,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string getRecordEditLink(string ContentName, int RecordID, bool AllowCut, string RecordName, bool IsEditing) {
-            string tempmain_GetRecordEditLink2 = null;
+            string result = null;
             try {
                 int ContentID = 0;
                 string iContentName = null;
@@ -2724,7 +2763,7 @@ namespace Contensive.Core.Controllers {
                     ContentCaption = ContentCaption + ", named '" + RecordName + "'";
                 }
                 //
-                tempmain_GetRecordEditLink2 = "";
+                result = "";
                 if (string.IsNullOrEmpty(iContentName)) {
                     throw (new ApplicationException("ContentName [" + ContentName + "] is invalid")); // handleLegacyError14(MethodName, "")
                 } else {
@@ -2734,63 +2773,31 @@ namespace Contensive.Core.Controllers {
                         if (IsEditing) {
                             //
                             // Edit link, main_Get the CID
-                            //
-                            ContentID = Models.Complex.cdefModel.getContentId(core, iContentName);
-                            //
-                            tempmain_GetRecordEditLink2 = tempmain_GetRecordEditLink2 + "<a"
-                                + " class=\"ccRecordEditLink\" "
-                                + " TabIndex=-1"
-                                + " href=\"" + htmlController.encodeHtml("/" + core.appConfig.adminRoute + "?cid=" + ContentID + "&id=" + iRecordID + "&af=4&aa=2&ad=1") + "\"";
-                            tempmain_GetRecordEditLink2 = tempmain_GetRecordEditLink2 + "><img"
-                                + " src=\"/ccLib/images/IconContentEdit.gif\""
-                                + " border=\"0\""
-                                + " alt=\"Edit this " + htmlController.encodeHtml(ContentCaption) + "\""
-                                + " title=\"Edit this " + htmlController.encodeHtml(ContentCaption) + "\""
-                                + " align=\"absmiddle\""
-                                + "></a>";
+                            var cdef = Models.Complex.cdefModel.getCdef(core, iContentName);
+                            //ContentID = Models.Complex.cdefModel.getContentId(core, iContentName);
+                            result += adminUIController.getIconEditAdminLink(core, cdef);
+
+                            //result = result + "<a"
+                            //    + " class=\"ccRecordEditLink\" "
+                            //    + " TabIndex=-1"
+                            //    + " href=\"" + htmlController.encodeHtml("/" + core.appConfig.adminRoute + "?cid=" + ContentID + "&id=" + iRecordID + "&af=4&aa=2&ad=1") + "\"";
+                            //result = result + ">" + iconEdit + "</a>";
                             //
                             // Cut Link if enabled
-                            //
                             if (iAllowCut) {
                                 WorkingLink = genericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) + "." + genericController.encodeText(RecordID), true);
-                                tempmain_GetRecordEditLink2 = ""
-                                    + tempmain_GetRecordEditLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
+                                result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
                             }
                             //
                             // Help link if enabled
-                            //
-                            string helpLink = "";
-                            //helpLink = main_GetHelpLink(5, "Editing " & ContentCaption, "Turn on Edit icons by checking 'Edit' in the tools panel, and click apply.<br><br><img src=""/ccLib/images/IconContentEdit.gif"" style=""vertical-align:middle""> Edit-Content icon<br><br>Edit-Content icons appear in your content. Click them to edit your content.")
-                            tempmain_GetRecordEditLink2 = ""
-                                + tempmain_GetRecordEditLink2 + helpLink;
-                            //
-                            tempmain_GetRecordEditLink2 = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + tempmain_GetRecordEditLink2 + "</span>";
-                            //
-                            //main_GetRecordEditLink2 = "" _
-                            //    & cr & "<div style=""position:absolute;"">" _
-                            //    & genericController.kmaIndent(main_GetRecordEditLink2) _
-                            //    & cr & "</div>"
-                            //
-                            //main_GetRecordEditLink2 = "" _
-                            //    & cr & "<div style=""position:relative;display:inline;"">" _
-                            //    & genericController.kmaIndent(main_GetRecordEditLink2) _
-                            //    & cr & "</div>"
+                            result = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + result + "</span>";
                         }
-
                     }
                 }
-                //
-                return tempmain_GetRecordEditLink2;
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
-            //
-            return tempmain_GetRecordEditLink2;
+            return result;
         }
         //
         //====================================================================================================
@@ -3283,7 +3290,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string getPanelButtons(string ButtonValueList, string ButtonName, string PanelWidth = "", string PanelHeightMin = "") {
-            return adminUIController.GetButtonBar(core, adminUIController.GetButtonsFromList(core, ButtonValueList, true, true, ButtonName), "");
+            return adminUIController.getButtonBar(core, adminUIController.GetButtonsFromList(core, ButtonValueList, true, true, ButtonName), "");
         }
         //
         //====================================================================================================
@@ -3519,7 +3526,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Buttons
                         //
-                        LoginPanel = LoginPanel + adminUIController.GetButtonBar(core, adminUIController.GetButtonsFromList(core, ButtonLogin + "," + ButtonLogout, true, true, "mb"), "");
+                        LoginPanel = LoginPanel + adminUIController.getButtonBar(core, adminUIController.GetButtonsFromList(core, ButtonLogin + "," + ButtonLogout, true, true, "mb"), "");
                         //
                         // ----- assemble tools panel
                         //
@@ -3632,44 +3639,6 @@ namespace Contensive.Core.Controllers {
                     + "\r\n" + htmlBodyTag + htmlBody + htmlBeforeEndOfBody + "\r\n</body>"
                     + "\r\n</html>"
                     + "";
-            } catch (Exception ex) {
-                logController.handleError( core,ex);
-            }
-            return result;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// legacy compatibility
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="ButtonList"></param>
-        /// <returns></returns>
-        public static string closeFormTableLegacy(coreController core, string ButtonList) {
-            string templegacy_closeFormTable = null;
-            if (!string.IsNullOrEmpty(ButtonList)) {
-                templegacy_closeFormTable = core.html.getPanelButtons(ButtonList, "Button") + "</form>";
-            } else {
-                templegacy_closeFormTable = "</form>";
-            }
-            return templegacy_closeFormTable;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// legacy compatibility
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="ButtonList"></param>
-        /// <returns></returns>
-        public static string openFormTableLegacy(coreController core, string ButtonList) {
-            string result = "";
-            try {
-
-                result = htmlController.formStart( core);
-                if (!string.IsNullOrEmpty(ButtonList)) {
-                    result += core.html.getPanelButtons(ButtonList, "Button");
-                }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -4037,12 +4006,13 @@ namespace Contensive.Core.Controllers {
         //
         public string getResourceLibrary(string RootFolderName, bool AllowSelectResource, string SelectResourceEditorName, string SelectLinkObjectName, bool AllowGroupAdd) {
             string addonGuidResourceLibrary = "{564EF3F5-9673-4212-A692-0942DD51FF1A}";
-            Dictionary<string, string> arguments = new Dictionary<string, string>();
-            arguments.Add("RootFolderName", RootFolderName);
-            arguments.Add("AllowSelectResource", AllowSelectResource.ToString());
-            arguments.Add("SelectResourceEditorName", SelectResourceEditorName);
-            arguments.Add("SelectLinkObjectName", SelectLinkObjectName);
-            arguments.Add("AllowGroupAdd", AllowGroupAdd.ToString());
+            Dictionary<string, string> arguments = new Dictionary<string, string> {
+                { "RootFolderName", RootFolderName },
+                { "AllowSelectResource", AllowSelectResource.ToString() },
+                { "SelectResourceEditorName", SelectResourceEditorName },
+                { "SelectLinkObjectName", SelectLinkObjectName },
+                { "AllowGroupAdd", AllowGroupAdd.ToString() }
+            };
             return core.addon.execute(addonModel.create(core, addonGuidResourceLibrary), new CPUtilsBaseClass.addonExecuteContext() {
                 addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                 instanceArguments = arguments,
@@ -4410,5 +4380,10 @@ namespace Contensive.Core.Controllers {
         public static string decodeHtml(string Source) {
             return WebUtility.HtmlDecode(Source);
         }
+        //
+        // ====================================================================================================
+        //
+        public static string a(string innerHtml, string href) => "<a href=\"" + encodeHtml( href ) + "\">" + innerHtml + "</a>";
+        public static string a(string innerHtml, string href, string htmlClass) => "<a href=\"" + encodeHtml(href) + "\" class=\"" + htmlClass + "\">" + innerHtml + "</a>";
     }
 }

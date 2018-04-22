@@ -183,7 +183,7 @@ namespace Contensive.Core.Addons.Tools {
                     // You must be admin to use this feature
                     //
                     tempGetForm = adminUIController.GetFormBodyAdminOnly();
-                    tempGetForm = adminUIController.GetBody(core,"Admin Tools", ButtonCancelAll, "", false, false, "<div>Administration Tools</div>", "", 0, tempGetForm);
+                    tempGetForm = adminUIController.getBody(core,"Admin Tools", ButtonCancelAll, "", false, false, "<div>Administration Tools</div>", "", 0, tempGetForm);
                 } else {
                     ToolsAction = core.docProperties.getInteger("dta");
                     Button = core.docProperties.getText("Button");
@@ -234,11 +234,11 @@ namespace Contensive.Core.Addons.Tools {
                             case AdminFormToolConfigureEdit:
                                 //
                                 //Call Stream.Add(core.addon.execute(guid_ToolConfigureEdit))
-                                Stream.Add(GetForm_ConfigureEdit(core.cp_forAddonExecutionOnly));
+                                Stream.Add( configureContentEditClass.configureContentEdit(core.cp_forAddonExecutionOnly));
                                 break;
                             case AdminFormToolManualQuery:
                                 //
-                                Stream.Add(GetForm_ManualQuery());
+                                Stream.Add( manualQueryClass.GetForm_ManualQuery(core.cp_forAddonExecutionOnly));
                                 break;
                             case AdminFormToolCreateChildContent:
                                 //
@@ -389,16 +389,11 @@ namespace Contensive.Core.Addons.Tools {
                         }
                     }
                 }
-                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
             return result;
-        }
-        //
-        private class fieldSortClass {
-            public string sort;
-            public Models.Complex.cdefFieldModel field;
         }
         //
         //=============================================================================
@@ -436,7 +431,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminFormToolRestart, "Contensive Application Restart", "Restart the Contensive Applicaiton. This will stop your site on the server for a short period."));
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminformToolCreateGUID, "Create GUID", "Use this tool to create a new GUID. This is useful when creating a new core.addon."));
                 Stream.Add("</table>");
-                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -467,228 +462,6 @@ namespace Contensive.Core.Addons.Tools {
                 logController.handleError( core,ex);
             }
             return tempGetForm_RootRow;
-        }
-        //
-        //==================================================================================
-        //
-        //==================================================================================
-        //
-        private string GetTitle(string Title, string Description) {
-            return "<h2>" + Title + "</h2>" + "<p>" + Description + "</p>";
-        }
-        //
-        //=============================================================================
-        //   Print the manual query form
-        //=============================================================================
-        //
-        private string GetForm_ManualQuery() {
-            string returnHtml = "";
-            try {
-                //Dim DataSourceName As String
-                //Dim DataSourceID As Integer
-                string SQL = "";
-                DataTable dt = null;
-                int FieldCount = 0;
-                string SQLFilename = null;
-                string SQLArchive = null;
-                string SQLArchiveOld = null;
-                int LineCounter = 0;
-                string SQLLine = null;
-                int Timeout = 0;
-                int PageSize = 0;
-                int PageNumber = 0;
-                int RowMax = 0;
-                int RowPointer = 0;
-                int ColumnMax = 0;
-                int ColumnPointer = 0;
-                string ColumnStart = null;
-                string ColumnEnd = null;
-                string RowStart = null;
-                string RowEnd = null;
-                string[,] resultArray = null;
-                string CellData = null;
-                int SelectFieldWidthLimit = 0;
-                string SQLName = null;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                string ButtonList = null;
-                dataSourceModel datasource = dataSourceModel.create(core, core.docProperties.getInteger("dataSourceid"));
-                //
-                ButtonList = ButtonCancel + "," + ButtonRun;
-                //
-                Stream.Add(GetTitle("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));
-                //
-                // Get the members SQL Queue
-                //
-                SQLFilename = core.userProperty.getText("SQLArchive");
-                if (string.IsNullOrEmpty(SQLFilename)) {
-                    SQLFilename = "SQLArchive" + core.session.user.id.ToString("000000000") + ".txt";
-                    core.userProperty.setProperty("SQLArchive", SQLFilename);
-                }
-                SQLArchive = core.cdnFiles.readFileText(SQLFilename);
-                //
-                // Read in arguments if available
-                //
-                Timeout = core.docProperties.getInteger("Timeout");
-                if (Timeout == 0) {
-                    Timeout = 30;
-                }
-                //
-                PageSize = core.docProperties.getInteger("PageSize");
-                if (PageSize == 0) {
-                    PageSize = 10;
-                }
-                //
-                PageNumber = core.docProperties.getInteger("PageNumber");
-                if (PageNumber == 0) {
-                    PageNumber = 1;
-                }
-                //
-                SQL = core.docProperties.getText("SQL");
-                if (string.IsNullOrEmpty(SQL)) {
-                    SQL = core.docProperties.getText("SQLList");
-                }
-                //
-                if ((core.docProperties.getText("button")) == ButtonRun) {
-                    //
-                    // Add this SQL to the members SQL list
-                    //
-                    if (!string.IsNullOrEmpty(SQL)) {
-                        SQLArchive = genericController.vbReplace(SQLArchive, SQL + "\r\n", "");
-                        SQLArchiveOld = SQLArchive;
-                        SQLArchive = genericController.vbReplace(SQL, "\r\n", " ") + "\r\n";
-                        LineCounter = 0;
-                        while ((LineCounter < 10) && (!string.IsNullOrEmpty(SQLArchiveOld))) {
-                            SQLArchive = SQLArchive + getLine( ref SQLArchiveOld) + "\r\n";
-                        }
-                        core.appRootFiles.saveFile(SQLFilename, SQLArchive);
-                    }
-                    //
-                    // Run the SQL
-                    //
-                    Stream.Add("<p>" + DateTime.Now + " Executing sql [" + SQL + "] on DataSource [" + datasource.Name + "]");
-                    try {
-                        dt = core.db.executeQuery(SQL, datasource.Name, PageSize * (PageNumber - 1), PageSize);
-                    } catch (Exception ex) {
-                        //
-                        // ----- error
-                        Stream.Add("<br>" + DateTime.Now + " SQL execution returned the following error");
-                        Stream.Add("<br>" + ex.Message);
-                    }
-                    Stream.Add("<br>" + DateTime.Now + " SQL executed successfully");
-                    if (dt == null) {
-                        Stream.Add("<br>" + DateTime.Now + " SQL returned invalid data.");
-                    } else if (dt.Rows == null) {
-                        Stream.Add("<br>" + DateTime.Now + " SQL returned invalid data rows.");
-                    } else if (dt.Rows.Count == 0) {
-                        Stream.Add("<br>" + DateTime.Now + " The SQL returned no data.");
-                    } else {
-                        //
-                        // ----- print results
-                        //
-                        Stream.Add("<br>" + DateTime.Now + " The following results were returned");
-                        Stream.Add("<br></p>");
-                        //
-                        // --- Create the Fields for the new table
-                        //
-                        FieldCount = dt.Columns.Count;
-                        Stream.Add("<table class=\"table table-bordered table-hover table-sm table-striped\">");
-                        Stream.Add("<thead class=\"thead - inverse\"><tr>");
-                        foreach (DataColumn dc in dt.Columns) Stream.Add("<th>" + dc.ColumnName + "</th>");
-                        Stream.Add("</tr></thead>");
-                        //
-                        //Dim dtOK As Boolean
-                        resultArray = core.db.convertDataTabletoArray(dt);
-                        //
-                        RowMax = resultArray.GetUpperBound(1);
-                        ColumnMax = resultArray.GetUpperBound(0);
-                        RowStart = "<tr>";
-                        RowEnd = "</tr>";
-                        ColumnStart = "<td>";
-                        ColumnEnd = "</td>";
-                        for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                            Stream.Add(RowStart);
-                            for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
-                                CellData = resultArray[ColumnPointer, RowPointer];
-                                if (IsNull(CellData)) {
-                                    Stream.Add(ColumnStart + "[null]" + ColumnEnd);
-                                    //ElseIf IsEmpty(CellData) Then
-                                    //    Stream.Add(ColumnStart & "[empty]" & ColumnEnd)
-                                    //ElseIf IsArray(CellData) Then
-                                    //    Stream.Add(ColumnStart & "[array]")
-                                    //    Cnt = UBound(CellData)
-                                    //    For Ptr = 0 To Cnt - 1
-                                    //        Stream.Add("<br>(" & Ptr & ")&nbsp;[" & CellData[Ptr] & "]")
-                                    //    Next
-                                    //    Stream.Add(ColumnEnd)
-                                } else if (string.IsNullOrEmpty(CellData)) {
-                                    Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
-                                } else {
-                                    Stream.Add(ColumnStart + htmlController.encodeHtml(genericController.encodeText(CellData)) + ColumnEnd);
-                                }
-                            }
-                            Stream.Add(RowEnd);
-                        }
-                        Stream.Add("</table>");
-                    }
-                    Stream.Add("<p>" + DateTime.Now + " Done</p>");
-                    //
-                    // End of Run SQL
-                    //
-                }
-                //
-                // Display form
-                //
-                int SQLRows = core.docProperties.getInteger("SQLRows");
-                if (SQLRows == 0) {
-                    SQLRows = core.userProperty.getInteger("ManualQueryInputRows", 5);
-                } else {
-                    core.userProperty.setProperty("ManualQueryInputRows", SQLRows.ToString());
-                }
-                Stream.Add("<TEXTAREA NAME=\"SQL\" ROWS=\"" + SQLRows + "\" ID=\"SQL\" STYLE=\"width: 800px;\">" + SQL + "</TEXTAREA>");
-                Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
-                Stream.Add("<div class=\"p-1\">Data Source<br>" + core.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default") + "</div>");
-                //
-                SelectFieldWidthLimit = core.siteProperties.getInteger("SelectFieldWidthLimit", 200);
-                if (!string.IsNullOrEmpty(SQLArchive)) {
-                    Stream.Add("<div class=\"p-1 pt-2\">Previous Queries</div>");
-                    Stream.Add("<div class=\"p-1\"><select size=\"1\" name=\"SQLList\" ID=\"SQLList\" onChange=\"SQL.value=SQLList.value\">");
-                    Stream.Add("<option value=\"\">Select One</option>");
-                    LineCounter = 0;
-                    while ((LineCounter < 10) && (!string.IsNullOrEmpty(SQLArchive))) {
-                        SQLLine = getLine( ref SQLArchive);
-                        if (SQLLine.Length > SelectFieldWidthLimit) {
-                            SQLName = SQLLine.Left( SelectFieldWidthLimit) + "...";
-                        } else {
-                            SQLName = SQLLine;
-                        }
-                        Stream.Add("<option value=\"" + SQLLine + "\">" + SQLName + "</option>");
-                    }
-                    Stream.Add("</select></div>");
-                }
-                //
-                if (IsNull(PageSize)) {
-                    PageSize = 100;
-                }
-                Stream.Add("<div class=\"p-1\">Page Size:<br>" + htmlController.inputText( core,"PageSize", PageSize.ToString()) + "</div>");
-                //
-                if (IsNull(PageNumber)) {
-                    PageNumber = 1;
-                }
-                Stream.Add("<div class=\"p-1\">Page Number:<br>" + htmlController.inputText( core,"PageNumber", PageNumber.ToString()) + "</div>");
-                //
-                if (IsNull(Timeout)) {
-                    Timeout = 30;
-                }
-                Stream.Add("<div class=\"p-1\">Timeout (sec):<br>" + htmlController.inputText( core,"Timeout", Timeout.ToString()) + "</div>");
-                //
-                returnHtml = Stream.Text;
-                returnHtml = "<div class=\"p-4 bg-light\">" + returnHtml + "</div>";
-                returnHtml = htmlController.openFormTableLegacy(core, ButtonList) + returnHtml + htmlController.closeFormTableLegacy(core, ButtonList);
-            } catch (Exception ex) {
-                logController.handleError( core,ex);
-                throw;
-            }
-            return returnHtml;
         }
         //
         //=============================================================================
@@ -774,7 +547,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(htmlController.inputText( core,"TableName", TableName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("</SPAN>");
-                result = adminUIController.GetBody(core,Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
+                result = adminUIController.getBody(core,Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -818,7 +591,7 @@ namespace Contensive.Core.Addons.Tools {
                 const string RequestNameAddField = "addfield";
                 const string RequestNameAddFieldID = "addfieldID";
                 //
-                Stream.Add(GetTitle("Configure Admin Listing", "Configure the Administration Content Listing Page."));
+                Stream.Add(adminUIController.getToolFormTitle("Configure Admin Listing", "Configure the Administration Content Listing Page."));
                 //
                 //--------------------------------------------------------------------------------
                 //   Load Request
@@ -1371,7 +1144,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 core.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
                 Stream.Add(htmlController.inputHidden("ReloadCDef", ReloadCDef));
-                result =  htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                result =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -1423,7 +1196,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 ButtonList = ButtonRun;
                 //
-                Stream.Add(GetTitle("Content Diagnostic", "This tool finds Content and Table problems. To run successfully, the Site Property 'TrapErrors' must be set to true."));
+                Stream.Add(adminUIController.getToolFormTitle("Content Diagnostic", "This tool finds Content and Table problems. To run successfully, the Site Property 'TrapErrors' must be set to true."));
                 Stream.Add(SpanClassAdminNormal + "<br>");
                 //
                 iDiagActionCount = core.docProperties.getInteger("DiagActionCount");
@@ -1796,7 +1569,7 @@ namespace Contensive.Core.Addons.Tools {
                     ButtonList = ButtonList + "," + ButtonFix;
                     ButtonList = ButtonList + "," + ButtonFixAndRun;
                 }
-                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -1941,7 +1714,7 @@ namespace Contensive.Core.Addons.Tools {
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(GetTitle("Create a Child Content from a Content Definition", "This tool creates a Content Definition based on another Content Definition."));
+                Stream.Add(adminUIController.getToolFormTitle("Create a Child Content from a Content Definition", "This tool creates a Content Definition based on another Content Definition."));
                 //
                 //   print out the submit form
                 if (core.docProperties.getText("Button") != "") {
@@ -2005,7 +1778,7 @@ namespace Contensive.Core.Addons.Tools {
                 //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
                 Stream.Add("</SPAN>");
                 //
-                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -2024,7 +1797,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + ",Clear Content Watch Links";
                 Stream.Add(SpanClassAdminNormal);
-                Stream.Add(GetTitle("Clear ContentWatch Links", "This tools nulls the Links field of all Content Watch records. After running this tool, run the diagnostic spider to repopulate the links."));
+                Stream.Add(adminUIController.getToolFormTitle("Clear ContentWatch Links", "This tools nulls the Links field of all Content Watch records. After running this tool, run the diagnostic spider to repopulate the links."));
                 //
                 if (core.docProperties.getText("Button") != "") {
                     //
@@ -2036,7 +1809,7 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add("<br>Content Watch Link field cleared.");
                 }
                 Stream.Add("</span>");
-                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -2061,7 +1834,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(GetTitle("Synchronize Tables to Content Definitions", "This tools goes through all Content Definitions and creates any necessary Tables and Table Fields to support the Definition."));
+                Stream.Add(adminUIController.getToolFormTitle("Synchronize Tables to Content Definitions", "This tools goes through all Content Definitions and creates any necessary Tables and Table Fields to support the Definition."));
                 //
                 if (core.docProperties.getText("Button") != "") {
                     //
@@ -2090,7 +1863,7 @@ namespace Contensive.Core.Addons.Tools {
                     core.db.csClose(ref CSContent);
                 }
                 //
-                returnValue = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                returnValue = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -2203,7 +1976,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(GetTitle("Benchmark", "Run a series of data operations and compare the results to previous known values."));
+                Stream.Add(adminUIController.getToolFormTitle("Benchmark", "Run a series of data operations and compare the results to previous known values."));
                 //
                 if (core.docProperties.getText("Button") != "") {
                     //
@@ -2337,7 +2110,7 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 //
                 // Print Start Button
-                result =  htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                result =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -2460,7 +2233,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
-                Stream.Add(GetTitle("Query Database Schema", "This tool examines the database schema for all tables available."));
+                Stream.Add(adminUIController.getToolFormTitle("Query Database Schema", "This tool examines the database schema for all tables available."));
                 //
                 StatusOK = true;
                 if ((core.docProperties.getText("button")) != ButtonRun) {
@@ -2681,573 +2454,11 @@ namespace Contensive.Core.Addons.Tools {
                 //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
                 Stream.Add("</SPAN>");
                 //
-                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
             return result;
-        }
-        //
-        //=============================================================================
-        //   Get the Configure Edit
-        //=============================================================================
-        //
-        private string GetForm_ConfigureEdit(BaseClasses.CPBaseClass cp) {
-            string result = "";
-            try {
-                //
-                string SQL = null;
-                string DataSourceName = "";
-                string ToolButton = null;
-                int ContentID = 0;
-                int RecordCount = 0;
-                int RecordPointer = 0;
-                int CSPointer = 0;
-                int formFieldId = 0;
-                string ContentName = "";
-                Models.Complex.cdefModel CDef = null;
-                string formFieldName = null;
-                int formFieldTypeId = 0;
-                string TableName = "";
-                int ContentFieldsCID = 0;
-                string StatusMessage = "";
-                string ErrorMessage = "";
-                bool formFieldInherited = false;
-                bool AllowContentAutoLoad = false;
-                bool ReloadCDef = false;
-                int CSTarget = 0;
-                int CSSource = 0;
-                bool AllowCDefInherit = false;
-                int ParentContentID = 0;
-                string ParentContentName = null;
-                Models.Complex.cdefModel ParentCDef = null;
-                bool NeedFootNote1 = false;
-                bool NeedFootNote2 = false;
-                string FormPanel = "";
-                keyPtrController Index = new keyPtrController();
-                string ButtonList = null;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                stringBuilderLegacyController StreamValidRows = new stringBuilderLegacyController();
-                string TypeSelectTemplate = null;
-                string TypeSelect = null;
-                int FieldCount = 0;
-                Models.Complex.cdefFieldModel parentField = null;
-                //
-                ButtonList = ButtonCancel + "," + ButtonSelect;
-                //
-                ToolButton = cp.Doc.GetText("Button");
-                ReloadCDef = cp.Doc.GetBoolean("ReloadCDef");
-                ContentID = cp.Doc.GetInteger("" + RequestNameToolContentID + "");
-                if (ContentID > 0) {
-                    ContentName = cp.Content.GetRecordName("content", ContentID);
-                    if (!string.IsNullOrEmpty(ContentName)) {
-                        TableName = cp.Content.GetTable(ContentName);
-                        DataSourceName = cp.Content.GetDataSource(ContentName);
-                        CDef = Models.Complex.cdefModel.getCdef(core, ContentID, true, true);
-                    }
-                }
-                if (CDef != null) {
-                    //
-                    if (!string.IsNullOrEmpty(ToolButton)) {
-                        if (ToolButton != ButtonCancel) {
-                            //
-                            // Save the form changes
-                            //
-                            AllowContentAutoLoad = cp.Site.GetBoolean("AllowContentAutoLoad", "true");
-                            cp.Site.SetProperty("AllowContentAutoLoad", "false");
-                            //
-                            // ----- Save the input
-                            //
-                            RecordCount = genericController.encodeInteger(cp.Doc.GetInteger("dtfaRecordCount"));
-                            if (RecordCount > 0) {
-                                for (RecordPointer = 0; RecordPointer < RecordCount; RecordPointer++) {
-                                    //
-                                    formFieldName = cp.Doc.GetText("dtfaName." + RecordPointer);
-                                    formFieldTypeId = cp.Doc.GetInteger("dtfaType." + RecordPointer);
-                                    formFieldId = genericController.encodeInteger(cp.Doc.GetInteger("dtfaID." + RecordPointer));
-                                    formFieldInherited = cp.Doc.GetBoolean("dtfaInherited." + RecordPointer);
-                                    //
-                                    // problem - looking for the name in the Db using the form's name, but it could have changed.
-                                    // have to look field up by id
-                                    //
-                                    foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> cdefFieldKvp in CDef.fields) {
-                                        if (cdefFieldKvp.Value.id == formFieldId) {
-                                            //
-                                            // Field was found in CDef
-                                            //
-                                            if (cdefFieldKvp.Value.inherited && (!formFieldInherited)) {
-                                                //
-                                                // Was inherited, but make a copy of the field
-                                                //
-                                                CSTarget = core.db.csInsertRecord("Content Fields");
-                                                if (core.db.csOk(CSTarget)) {
-                                                    CSSource = core.db.csOpenContentRecord("Content Fields", formFieldId);
-                                                    if (core.db.csOk(CSSource)) {
-                                                        core.db.csCopyRecord(CSSource, CSTarget);
-                                                    }
-                                                    core.db.csClose(ref CSSource);
-                                                    formFieldId = core.db.csGetInteger(CSTarget, "ID");
-                                                    core.db.csSet(CSTarget, "ContentID", ContentID);
-                                                }
-                                                core.db.csClose(ref CSTarget);
-                                                ReloadCDef = true;
-                                            } else if ((!cdefFieldKvp.Value.inherited) && (formFieldInherited)) {
-                                                //
-                                                // Was a field, make it inherit from it's parent
-                                                //
-                                                //CSTarget = CSTarget;
-                                                core.db.deleteContentRecord("Content Fields", formFieldId);
-                                                ReloadCDef = true;
-                                            } else if ((!cdefFieldKvp.Value.inherited) && (!formFieldInherited)) {
-                                                //
-                                                // not inherited, save the field values and mark for a reload
-                                                //
-                                                if (true) {
-                                                    if (formFieldName.IndexOf(" ")  != -1) {
-                                                        //
-                                                        // remoave spaces from new name
-                                                        //
-                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was renamed [" + genericController.vbReplace(formFieldName, " ", "") + "] because the field name can not include spaces.</LI>";
-                                                        formFieldName = genericController.vbReplace(formFieldName, " ", "");
-                                                    }
-                                                    //
-                                                    if ((!string.IsNullOrEmpty(formFieldName)) & (formFieldTypeId != 0) & ((cdefFieldKvp.Value.nameLc == "") || (cdefFieldKvp.Value.fieldTypeId == 0))) {
-                                                        //
-                                                        // Create Db field, Field is good but was not before
-                                                        //
-                                                        core.db.createSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId);
-                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + CDef.contentTableName + "].</LI>";
-                                                    } else if ((string.IsNullOrEmpty(formFieldName)) || (formFieldTypeId == 0)) {
-                                                        //
-                                                        // name blank or type=0 - do nothing but tell them
-                                                        //
-                                                        if (string.IsNullOrEmpty(formFieldName) && formFieldTypeId == 0) {
-                                                            ErrorMessage += "<LI>Field number " + (RecordPointer + 1) + " was saved to this content definition but no database field was created because a name and field type are required.</LI>";
-                                                        } else if (formFieldName == "unnamedfield" + legacyToolsClass.fieldId.ToString()) {
-                                                            ErrorMessage += "<LI>Field number " + (RecordPointer + 1) + " was saved to this content definition but no database field was created because a field name is required.</LI>";
-                                                        } else {
-                                                            ErrorMessage += "<LI>Field [" + formFieldName + "] was saved to this content definition but no database field was created because a field type are required.</LI>";
-                                                        }
-                                                    } else if ((formFieldName == cdefFieldKvp.Value.nameLc) && (formFieldTypeId != cdefFieldKvp.Value.fieldTypeId)) {
-                                                        //
-                                                        // Field Type changed, must be done manually
-                                                        //
-                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + core.db.getRecordName("content Field Types", cdefFieldKvp.Value.fieldTypeId) + "] to [" + core.db.getRecordName("content Field Types", formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
-                                                        int DataSourceTypeID = core.db.getDataSourceType(DataSourceName);
-                                                        switch (DataSourceTypeID) {
-                                                            case DataSourceTypeODBCMySQL:
-                                                                SQL = "alter table " + CDef.contentTableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, fieldType) + ";";
-                                                                break;
-                                                            default:
-                                                                SQL = "alter table " + CDef.contentTableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, fieldType) + ";";
-                                                                break;
-                                                        }
-                                                        core.db.executeQuery(SQL, DataSourceName);
-                                                    }
-                                                    SQL = "Update ccFields"
-                                                + " Set name=" + core.db.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + core.db.encodeSQLText(genericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
-                                                    if (core.session.isAuthenticatedAdmin(core)) {
-                                                        SQL += ",adminonly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." + RecordPointer));
-                                                    }
-                                                    if (core.session.isAuthenticatedDeveloper(core)) {
-                                                        SQL += ",DeveloperOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." + RecordPointer));
-                                                    }
-                                                    SQL += " where ID=" + formFieldId;
-                                                    core.db.executeQuery(SQL);
-                                                    ReloadCDef = true;
-                                                }
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            core.cache.invalidateAll();
-                            core.doc.clearMetaData();
-                        }
-                        if (ToolButton == ButtonAdd) {
-                            //
-                            // ----- Insert a blank Field
-                            //
-                            CSPointer = core.db.csInsertRecord("Content Fields");
-                            if (core.db.csOk(CSPointer)) {
-                                core.db.csSet(CSPointer, "name", "unnamedField" + core.db.csGetInteger(CSPointer, "id").ToString());
-                                core.db.csSet(CSPointer, "ContentID", ContentID);
-                                core.db.csSet(CSPointer, "EditSortPriority", 0);
-                                ReloadCDef = true;
-                            }
-                            core.db.csClose(ref CSPointer);
-                        }
-                        //
-                        // ----- Button Reload CDef
-                        //
-                        if (ToolButton == ButtonSaveandInvalidateCache) {
-                            core.cache.invalidateAll();
-                            core.doc.clearMetaData();
-                        }
-                        //
-                        // ----- Restore Content Autoload site property
-                        //
-                        if (AllowContentAutoLoad) {
-                            cp.Site.SetProperty("AllowContentAutoLoad", AllowContentAutoLoad.ToString());
-                        }
-                        //
-                        // ----- Cancel or Save, reload CDef and go
-                        //
-                        if ((ToolButton == ButtonCancel) || (ToolButton == ButtonOK)) {
-                            //
-                            // ----- Exit back to menu
-                            //
-                            return core.webServer.redirect(core.webServer.requestProtocol + core.webServer.requestDomain + core.webServer.requestPath + core.webServer.requestPage + "?af=" + AdminFormTools);
-                        }
-                    }
-                }
-                //
-                //--------------------------------------------------------------------------------
-                //   Print Output
-                //--------------------------------------------------------------------------------
-                //
-                Stream.Add(SpanClassAdminNormal + "<strong><a href=\"" + core.webServer.requestPage + "?af=" + AdminFormToolRoot + "\">Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>");
-                Stream.Add("<div>");
-                Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field.</div>");
-                if (ContentID == 0) {
-                    Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Related Tools:<div style=\"padding-left:20px;\"><a href=\"?af=104\">Set Default Admin Listing page columns</a></div></div>");
-                } else {
-                    Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Related Tools:<div style=\"padding-left:20px;\"><a href=\"?af=104&ContentID=" + ContentID + "\">Set Default Admin Listing page columns for '" + ContentName + "'</a></div><div style=\"padding-left:20px;\"><a href=\"?af=4&cid=" + Models.Complex.cdefModel.getContentId(core, "content") + "&id=" + ContentID + "\">Edit '" + ContentName + "' Content Definition</a></div><div style=\"padding-left:20px;\"><a href=\"?cid=" + ContentID + "\">View records in '" + ContentName + "'</a></div></div>");
-                }
-                Stream.Add("</div>");
-                Stream.Add("<div style=\"clear:both\">&nbsp;</div>");
-                if (!string.IsNullOrEmpty(StatusMessage)) {
-                    Stream.Add("<UL>" + StatusMessage + "</UL>");
-                    Stream.Add("<div style=\"clear:both\">&nbsp;</div>");
-                }
-                if (!string.IsNullOrEmpty(ErrorMessage)) {
-                    Stream.Add("<br><span class=\"ccError\">There was a problem saving these changes</span><UL>" + ErrorMessage + "</UL></SPAN>");
-                    Stream.Add("<div style=\"clear:both\">&nbsp;</div>");
-                }
-                if (ReloadCDef) {
-                    CDef = Models.Complex.cdefModel.getCdef(core, ContentID, true, true);
-                }
-                if (ContentID != 0) {
-                    //
-                    //--------------------------------------------------------------------------------
-                    // print the Configure edit form
-                    //--------------------------------------------------------------------------------
-                    //
-                    Stream.Add(core.html.getPanelTop());
-                    ContentName = Local_GetContentNameByID(ContentID);
-                    ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd; // & "," & ButtonReloadCDef
-                                                                                                     //
-                                                                                                     // Get a new copy of the content definition
-                                                                                                     //
-                    Stream.Add(SpanClassAdminNormal + "<P><B>" + ContentName + "</b></P>");
-                    Stream.Add("<table border=\"0\" cellpadding=\"1\" cellspacing=\"1\" width=\"100%\">");
-                    //
-                    ParentContentID = CDef.parentID;
-                    if (ParentContentID == -1) {
-                        AllowCDefInherit = false;
-                    } else {
-                        AllowCDefInherit = true;
-                        ParentContentName = Models.Complex.cdefModel.getContentNameByID(core, ParentContentID);
-                        ParentCDef = Models.Complex.cdefModel.getCdef(core, ParentContentID, true, true);
-                    }
-                    if (CDef.fields.Count > 0) {
-                        Stream.Add("<tr>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\"></td>");
-                        if (!AllowCDefInherit) {
-                            Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Inherited*</b></span></td>");
-                            NeedFootNote1 = true;
-                        } else {
-                            Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Inherited</b></span></td>");
-                        }
-                        Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Field</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Caption</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Edit Tab</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"100\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Default</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>Type</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b>Edit<br>Order</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Active</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b>Read<br>Only</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Auth</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Req</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Unique</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b>Text<br>Buffer</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b><br>Pass</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "<b>Text<br>Scrm</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b><br>HTML</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b>Admin<br>Only</b></span></td>");
-                        Stream.Add("<td valign=\"bottom\" width=\"50\" class=\"ccPanelInput\" align=\"left\">" + SpanClassAdminSmall + "<b>Dev<br>Only</b></span></td>");
-                        Stream.Add("</tr>");
-                        RecordCount = 0;
-                        //
-                        // Build a select template for Type
-                        //
-                        TypeSelectTemplate = core.html.selectFromContent("menuname", -1, "Content Field Types", "", "unknown");
-                        //
-                        // Index the sort order
-                        //
-                        List<fieldSortClass> fieldList = new List<fieldSortClass>();
-                        FieldCount = CDef.fields.Count;
-                        foreach (var keyValuePair in CDef.fields) {
-                            fieldSortClass fieldSort = new fieldSortClass();
-                            //Dim field As New appServices_metaDataClass.CDefFieldClass
-                            string sortOrder = "";
-                            fieldSort.field = keyValuePair.Value;
-                            sortOrder = "";
-                            if (fieldSort.field.active) {
-                                sortOrder += "0";
-                            } else {
-                                sortOrder += "1";
-                            }
-                            if (fieldSort.field.authorable) {
-                                sortOrder += "0";
-                            } else {
-                                sortOrder += "1";
-                            }
-                            sortOrder += fieldSort.field.editTabName + getIntegerString(fieldSort.field.editSortPriority, 10) + getIntegerString(fieldSort.field.id, 10);
-                            fieldSort.sort = sortOrder;
-                            fieldList.Add(fieldSort);
-                        }
-                        fieldList.Sort((p1, p2) => p1.sort.CompareTo(p2.sort));
-                        foreach (fieldSortClass fieldsort in fieldList) {
-                            stringBuilderLegacyController streamRow = new stringBuilderLegacyController();
-                            bool rowValid = true;
-                            //
-                            // If Field has name and type, it is locked and can not be changed
-                            //
-                            bool FieldLocked = (fieldsort.field.nameLc != "") & (fieldsort.field.fieldTypeId != 0);
-                            //
-                            // put the menu into the current menu format
-                            //
-                            formFieldId = fieldsort.field.id;
-                            streamRow.Add(htmlController.inputHidden("dtfaID." + RecordCount, formFieldId));
-                            streamRow.Add("<tr>");
-                            //
-                            // edit button
-                            //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><img src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"10\">");
-                            ContentFieldsCID = Local_GetContentID("Content Fields");
-                            if (ContentFieldsCID != 0) {
-                                streamRow.Add("<nobr>" + SpanClassAdminSmall + "[<a href=\"?aa=" + AdminActionNop + "&af=" + AdminFormEdit + "&id=" + formFieldId + "&cid=" + ContentFieldsCID + "&mm=0\">EDIT</a>]</span></nobr>");
-                            }
-                            streamRow.Add("</td>");
-                            //
-                            // Inherited
-                            //
-                            if (!AllowCDefInherit) {
-                                //
-                                // no parent
-                                //
-                                streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "False</span></td>");
-                            } else if (fieldsort.field.inherited) {
-                                //
-                                // inherited property
-                                //
-                                streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + htmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
-                            } else {
-                                //
-                                // CDef has a parent, but the field is non-inherited, test for a matching Parent Field
-                                //
-                                if (ParentCDef == null) {
-                                    foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> kvp in ParentCDef.fields) {
-                                        if (kvp.Value.nameLc == fieldsort.field.nameLc) {
-                                            parentField = kvp.Value;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (parentField == null) {
-                                    streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "False**</span></td>");
-                                    NeedFootNote2 = true;
-                                } else {
-                                    streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + htmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
-                                }
-                            }
-                            //
-                            // name
-                            //
-                            bool tmpValue = string.IsNullOrEmpty(fieldsort.field.nameLc);
-                            rowValid = rowValid && !tmpValue;
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
-                            if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + fieldsort.field.nameLc + "&nbsp;</SPAN>");
-                            } else if (FieldLocked) {
-                                streamRow.Add(SpanClassAdminSmall + fieldsort.field.nameLc + "&nbsp;</SPAN><input type=hidden name=dtfaName." + RecordCount + " value=\"" + fieldsort.field.nameLc + "\">");
-                            } else {
-                                streamRow.Add(htmlController.inputText( core,"dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
-                            }
-                            streamRow.Add("</nobr></td>");
-                            //
-                            // caption
-                            //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
-                            if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + fieldsort.field.caption + "</SPAN>");
-                            } else {
-                                streamRow.Add(htmlController.inputText( core,"dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
-                            }
-                            streamRow.Add("</nobr></td>");
-                            //
-                            // Edit Tab
-                            //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
-                            if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + fieldsort.field.editTabName + "</SPAN>");
-                            } else {
-                                streamRow.Add(htmlController.inputText( core,"dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
-                            }
-                            streamRow.Add("</nobr></td>");
-                            //
-                            // default
-                            //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
-                            if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + genericController.encodeText(fieldsort.field.defaultValue) + "</SPAN>");
-                            } else {
-                                streamRow.Add(htmlController.inputText( core,"dtfaDefaultValue." + RecordCount, genericController.encodeText(fieldsort.field.defaultValue), 1, 10));
-                            }
-                            streamRow.Add("</nobr></td>");
-                            //
-                            // type
-                            //
-                            rowValid = rowValid && (fieldsort.field.fieldTypeId > 0);
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
-                            if (fieldsort.field.inherited) {
-                                CSPointer = core.db.csOpenRecord("Content Field Types", fieldsort.field.fieldTypeId);
-                                if (!core.db.csOk(CSPointer)) {
-                                    streamRow.Add(SpanClassAdminSmall + "Unknown[" + fieldsort.field.fieldTypeId + "]</SPAN>");
-                                } else {
-                                    streamRow.Add(SpanClassAdminSmall + core.db.csGetText(CSPointer, "Name") + "</SPAN>");
-                                }
-                                core.db.csClose(ref CSPointer);
-                            } else if (FieldLocked) {
-                                streamRow.Add(core.db.getRecordName("content field types", fieldsort.field.fieldTypeId) + htmlController.inputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
-                            } else {
-                                TypeSelect = TypeSelectTemplate;
-                                TypeSelect = genericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
-                                TypeSelect = genericController.vbReplace(TypeSelect, "=\"" + fieldsort.field.fieldTypeId + "\"", "=\"" + fieldsort.field.fieldTypeId + "\" selected", 1, 99, 1);
-                                streamRow.Add(TypeSelect);
-                            }
-                            streamRow.Add("</nobr></td>");
-                            //
-                            // sort priority
-                            //
-                            streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
-                            if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + fieldsort.field.editSortPriority + "</SPAN>");
-                            } else {
-                                streamRow.Add(htmlController.inputText( core,"dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
-                            }
-                            streamRow.Add("</nobr></td>");
-                            //
-                            // active
-                            //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaActive." + RecordCount, fieldsort.field.active, fieldsort.field.inherited));
-                            //
-                            // read only
-                            //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." + RecordCount, fieldsort.field.readOnly, fieldsort.field.inherited));
-                            //
-                            // authorable
-                            //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAuthorable." + RecordCount, fieldsort.field.authorable, fieldsort.field.inherited));
-                            //
-                            // required
-                            //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." + RecordCount, fieldsort.field.required, fieldsort.field.inherited));
-                            //
-                            // UniqueName
-                            //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." + RecordCount, fieldsort.field.uniqueName, fieldsort.field.inherited));
-                            //
-                            // text buffered
-                            //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." + RecordCount, fieldsort.field.textBuffered, fieldsort.field.inherited));
-                            //
-                            // password
-                            //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." + RecordCount, fieldsort.field.password, fieldsort.field.inherited));
-                            //
-                            // scramble
-                            //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaScramble." + RecordCount, fieldsort.field.Scramble, fieldsort.field.inherited));
-                            //
-                            // HTML Content
-                            //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaHTMLContent." + RecordCount, fieldsort.field.htmlContent, fieldsort.field.inherited));
-                            //
-                            // Admin Only
-                            //
-                            if (core.session.isAuthenticatedAdmin(core)) {
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, fieldsort.field.adminOnly, fieldsort.field.inherited));
-                            }
-                            //
-                            // Developer Only
-                            //
-                            if (core.session.isAuthenticatedDeveloper(core)) {
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, fieldsort.field.developerOnly, fieldsort.field.inherited));
-                            }
-                            //
-                            streamRow.Add("</tr>");
-                            RecordCount = RecordCount + 1;
-                            //
-                            // rows are built - put the blank rows at the top
-                            //
-                            if (!rowValid) {
-                                Stream.Add(streamRow.Text);
-                            } else {
-                                StreamValidRows.Add(streamRow.Text);
-                            }
-                        }
-                        Stream.Add(StreamValidRows.Text);
-                        Stream.Add(htmlController.inputHidden("dtfaRecordCount", RecordCount));
-                    }
-                    Stream.Add("</table>");
-                    //Stream.Add( core.htmldoc.main_GetPanelButtons(ButtonList, "Button"))
-                    //
-                    Stream.Add(core.html.getPanelBottom());
-                    //Call Stream.Add(core.main_GetFormEnd())
-                    if (NeedFootNote1) {
-                        Stream.Add("<br>*Field Inheritance is not allowed because this Content Definition has no parent.");
-                    }
-                    if (NeedFootNote2) {
-                        Stream.Add("<br>**This field can not be inherited because the Parent Content Definition does not have a field with the same name.");
-                    }
-                }
-                if (ContentID != 0) {
-                    //
-                    // Save the content selection
-                    //
-                    Stream.Add(htmlController.inputHidden(RequestNameToolContentID, ContentID));
-                } else {
-                    //
-                    // content tables that have edit forms to Configure
-                    //
-                    FormPanel = FormPanel + SpanClassAdminNormal + "Select a Content Definition to Configure its edit form<br>";
-                    FormPanel = FormPanel + "<br>";
-                    FormPanel = FormPanel + core.html.selectFromContent(RequestNameToolContentID, ContentID, "Content");
-                    FormPanel = FormPanel + "</SPAN>";
-                    Stream.Add(core.html.getPanel(FormPanel));
-                }
-                //
-                Stream.Add(htmlController.inputHidden("ReloadCDef", ReloadCDef));
-                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
-            } catch (Exception ex) {
-                logController.handleError( core,ex);
-            }
-            return result;
-        }
-        //
-        //
-        //
-        private string GetForm_ConfigureEdit_CheckBox(string htmlName, bool selected, bool Inherited) {
-            string result = "<td class=\"ccPanelInput\" align=\"center\"><nobr>";
-            if (Inherited) {
-                result += SpanClassAdminSmall + getYesNo( selected ) + "</SPAN>";
-            } else {
-                result += htmlController.checkbox(htmlName, selected);
-            }
-            return result + "</nobr></td>";
         }
         //
         //=============================================================================
@@ -3277,7 +2488,7 @@ namespace Contensive.Core.Addons.Tools {
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel + "," + ButtonSelect;
-                result = GetTitle("Modify Database Indexes", "This tool adds and removes database indexes.");
+                result = adminUIController.getToolFormTitle("Modify Database Indexes", "This tool adds and removes database indexes.");
                 //
                 // Process Input
                 //
@@ -3409,7 +2620,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Buttons
                 //
-                result = htmlController.openFormTableLegacy(core, ButtonList) + result + htmlController.closeFormTableLegacy(core, ButtonList);
+                result = adminUIController.getToolFormOpen(core, ButtonList) + result + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -3432,7 +2643,7 @@ namespace Contensive.Core.Addons.Tools {
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel;
-                result = GetTitle("Get Content Database Schema", "This tool displays all tables and fields required for the current Content Defintions.");
+                result = adminUIController.getToolFormTitle("Get Content Database Schema", "This tool displays all tables and fields required for the current Content Defintions.");
                 //
                 TableColSpan = 3;
                 result += htmlController.tableStart(2, 0, 0);
@@ -3480,7 +2691,7 @@ namespace Contensive.Core.Addons.Tools {
                 result += kmaEndTable;
                 //
                 //GetForm_ContentDbSchema = GetForm_ContentDbSchema & core.main_GetFormInputHidden("af", AdminFormToolContentDbSchema)
-                result =  (htmlController.openFormTableLegacy(core, ButtonList)) + result + (htmlController.closeFormTableLegacy(core, ButtonList));
+                result =  (adminUIController.getToolFormOpen(core, ButtonList)) + result + (adminUIController.getToolFormClose(core, ButtonList));
                 //
                 //
                 // ----- Error Trap
@@ -3499,14 +2710,14 @@ namespace Contensive.Core.Addons.Tools {
             string tempGetForm_LogFiles = null;
             try {
                 string ButtonList = ButtonCancel;
-                tempGetForm_LogFiles = GetTitle("Log File View", "This tool displays the Contensive Log Files.");
+                tempGetForm_LogFiles = adminUIController.getToolFormTitle("Log File View", "This tool displays the Contensive Log Files.");
                 tempGetForm_LogFiles = tempGetForm_LogFiles + "<P></P>";
                 //
                 string QueryOld = ".asp?";
                 string QueryNew = genericController.modifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
                 tempGetForm_LogFiles = tempGetForm_LogFiles + genericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
                 //
-                tempGetForm_LogFiles = htmlController.openFormTableLegacy(core, ButtonList) + tempGetForm_LogFiles + (htmlController.closeFormTableLegacy(core, ButtonList));
+                tempGetForm_LogFiles = adminUIController.getToolFormOpen(core, ButtonList) + tempGetForm_LogFiles + (adminUIController.getToolFormClose(core, ButtonList));
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -3694,7 +2905,7 @@ namespace Contensive.Core.Addons.Tools {
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
-                Stream.Add(GetTitle("Load Content Definitions", "This tool reloads the content definitions. This is necessary when changes are made to the ccContent or ccFields tables outside Contensive. The site will be blocked during the load."));
+                Stream.Add(adminUIController.getToolFormTitle("Load Content Definitions", "This tool reloads the content definitions. This is necessary when changes are made to the ccContent or ccFields tables outside Contensive. The site will be blocked during the load."));
                 //
                 if ((core.docProperties.getText("button")) != ButtonSaveandInvalidateCache) {
                     //
@@ -3716,7 +2927,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("<br>");
                 Stream.Add("</span>");
                 //
-                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -3737,7 +2948,7 @@ namespace Contensive.Core.Addons.Tools {
                 // Dim runAtServer As runAtServerClass
                 //
                 ButtonList = ButtonCancel + "," + ButtonRestartContensiveApplication;
-                Stream.Add(GetTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."));
+                Stream.Add(adminUIController.getToolFormTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."));
                 //
                 if (!core.session.isAuthenticatedAdmin(core)) {
                     //
@@ -3767,7 +2978,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("<br>");
                 Stream.Add("</SPAN>");
                 //
-                tempGetForm_Restart =  htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                tempGetForm_Restart =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -3826,7 +3037,7 @@ namespace Contensive.Core.Addons.Tools {
                 AllowImageImport = core.docProperties.getBoolean("AllowImageImport");
                 AllowStyleImport = core.docProperties.getBoolean("AllowStyleImport");
                 //
-                Stream.Add(GetTitle("Load Templates", "This tool creates template records from the HTML files in the root folder of the site."));
+                Stream.Add(adminUIController.getToolFormTitle("Load Templates", "This tool creates template records from the HTML files in the root folder of the site."));
                 //
                 if ((core.docProperties.getText("button")) != ButtonImportTemplates) {
                     //
@@ -3853,7 +3064,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("</SPAN>");
                 //
                 ButtonList = ButtonCancel + "," + ButtonImportTemplates;
-                result = htmlController.openFormTableLegacy(core, ButtonList) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonList);
+                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -4147,7 +3358,7 @@ namespace Contensive.Core.Addons.Tools {
                 });
                 string Description = "Manage files and folders within the virtual content file area.";
                 string ButtonList = ButtonApply + "," + ButtonCancel;
-                result = adminUIController.GetBody(core,"Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
+                result = adminUIController.getBody(core,"Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -4171,7 +3382,7 @@ namespace Contensive.Core.Addons.Tools {
                 });
                 string Description = "Manage files and folders within the Website's file area.";
                 string ButtonList = ButtonApply + "," + ButtonCancel;
-                result = adminUIController.GetBody(core,"Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
+                result = adminUIController.getBody(core,"Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -4205,7 +3416,7 @@ namespace Contensive.Core.Addons.Tools {
                 int FindRows = 0;
                 string lcName = null;
                 //
-                Stream.Add(GetTitle("Find and Replace", "This tool runs a find and replace operation on content throughout the site."));
+                Stream.Add(adminUIController.getToolFormTitle("Find and Replace", "This tool runs a find and replace operation on content throughout the site."));
                 //
                 // Process the form
                 //
@@ -4285,7 +3496,7 @@ namespace Contensive.Core.Addons.Tools {
                 core.db.csClose(ref CS);
                 Stream.Add(TopHalf + BottomHalf + htmlController.inputHidden("CDefRowCnt", RowPtr));
                 //
-                result = htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonFindAndReplace);
+                result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -4302,7 +3513,7 @@ namespace Contensive.Core.Addons.Tools {
                 string Button = null;
                 stringBuilderLegacyController s = new stringBuilderLegacyController();
                 //
-                s.Add(GetTitle("IIS Reset", "Reset the webserver."));
+                s.Add(adminUIController.getToolFormTitle("IIS Reset", "Reset the webserver."));
                 //
                 // Process the form
                 //
@@ -4324,7 +3535,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // Display form
                 //
-                result = htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonIISReset) + s.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonIISReset);
+                result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonIISReset) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -4341,7 +3552,7 @@ namespace Contensive.Core.Addons.Tools {
                 string Button = null;
                 stringBuilderLegacyController s;
                 s = new stringBuilderLegacyController();
-                s.Add(GetTitle("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
+                s.Add(adminUIController.getToolFormTitle("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
                 //
                 // Process the form
                 Button = core.docProperties.getText("button");
@@ -4349,7 +3560,7 @@ namespace Contensive.Core.Addons.Tools {
                 s.Add(htmlController.inputText( core,"GUID", Guid.NewGuid().ToString(), 1, 80));
                 //
                 // Display form
-                result= htmlController.openFormTableLegacy(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + htmlController.closeFormTableLegacy(core, ButtonCancel + "," + ButtonCreateGUID);
+                result= adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonCreateGUID);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }

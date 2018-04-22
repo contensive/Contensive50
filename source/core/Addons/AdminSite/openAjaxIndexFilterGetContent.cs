@@ -32,13 +32,14 @@ namespace Contensive.Core.Addons.AdminSite {
 
                 //
                 core.visitProperty.setProperty("IndexFilterOpen", "1");
-                Contensive.Core.Addons.AdminSite.getHtmlBodyClass adminSite = new Contensive.Core.Addons.AdminSite.getHtmlBodyClass(core.cp_forAddonExecutionOnly);
+                getHtmlBodyClass adminSite = new getHtmlBodyClass(core.cp_forAddonExecutionOnly);
                 int ContentID = core.docProperties.getInteger("cid");
                 if (ContentID == 0) {
                     result = "No filter is available";
                 } else {
-                    cdefModel cdef = cdefModel.getCdef(core, ContentID);
-                    result = adminSite.GetForm_IndexFilterContent(cdef);
+                    //cdefModel cdef = cdefModel.getCdef(core, ContentID);
+                    var adminContext = new adminContextClass(core);
+                    result = adminSite.GetForm_IndexFilterContent(adminContext);
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

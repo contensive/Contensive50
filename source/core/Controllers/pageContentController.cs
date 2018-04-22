@@ -2423,8 +2423,9 @@ namespace Contensive.Core.Controllers {
                     core.html.addHeadTag(core.doc.pageController.page.OtherHeadTags, "page content");
                     core.html.addMetaKeywordList(core.doc.pageController.page.MetaKeywordList, "page content");
                     //
-                    Dictionary<string, string> instanceArguments = new Dictionary<string, string>();
-                    instanceArguments.Add("CSPage", "-1");
+                    Dictionary<string, string> instanceArguments = new Dictionary<string, string> {
+                        { "CSPage", "-1" }
+                    };
                     //
                     // -- OnPageStartEvent
                     core.doc.bodyContent = returnHtml;

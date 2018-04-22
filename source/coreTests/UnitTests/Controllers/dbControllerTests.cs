@@ -153,5 +153,92 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 Assert.IsFalse(cp.core.db.isSQLTableField("", "ccmembers", "namex"));
             }
         }
+        //
+        //====================================================================================================
+        //
+        [TestMethod()]
+        public void Controllers_db_csGoNext() {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+                // arrange
+                string name = genericController.createGuid();
+                //
+                // -- add three records
+                int cs = cp.core.db.csInsertRecord("people");
+                cp.core.db.csSet(cs, "name", name);
+                cp.core.db.csSave(cs);
+                int id0 = cp.core.db.csGetInteger(cs, "id");
+                cp.core.db.csClose(ref cs);
+                //
+                cs = cp.core.db.csInsertRecord("people");
+                cp.core.db.csSet(cs, "name", name);
+                cp.core.db.csSave(cs);
+                int id1 = cp.core.db.csGetInteger(cs, "id");
+                cp.core.db.csClose(ref cs);
+                //
+                cs = cp.core.db.csInsertRecord("people");
+                cp.core.db.csSet(cs, "name", name);
+                cp.core.db.csSave(cs);
+                int id2 = cp.core.db.csGetInteger(cs, "id");
+                cp.core.db.csClose(ref cs);
+                //
+                // act
+                cs = cp.core.db.csOpen("people", "name=" + cp.core.db.encodeSQLText(name),"id");
+                Assert.IsTrue(cp.core.db.csOk(cs), "csOpen");
+                Assert.AreEqual(id0, cp.core.db.csGetInteger(cs, "id"),"correct id0 after open");
+                cp.core.db.csGoNext(cs);
+                Assert.AreEqual(id1, cp.core.db.csGetInteger(cs, "id"), "goNext id1, id correct");
+                cp.core.db.csGoNext(cs);
+                Assert.AreEqual(id2, cp.core.db.csGetInteger(cs, "id"), "goNext id2, id correct");
+                cp.core.db.csGoNext(cs);
+                Assert.IsFalse(cp.core.db.csOk(cs),"csOk false after all records");
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        [TestMethod()]
+        public void Controllers_db_csGoFirst() {
+            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+                // arrange
+                string name = genericController.createGuid();
+                //
+                // -- add three records
+                int cs = cp.core.db.csInsertRecord("people");
+                cp.core.db.csSet(cs, "name", name);
+                cp.core.db.csSave(cs);
+                int id0 = cp.core.db.csGetInteger(cs, "id");
+                cp.core.db.csClose(ref cs);
+                //
+                cs = cp.core.db.csInsertRecord("people");
+                cp.core.db.csSet(cs, "name", name);
+                cp.core.db.csSave(cs);
+                int id1 = cp.core.db.csGetInteger(cs, "id");
+                cp.core.db.csClose(ref cs);
+                //
+                cs = cp.core.db.csInsertRecord("people");
+                cp.core.db.csSet(cs, "name", name);
+                cp.core.db.csSave(cs);
+                int id2 = cp.core.db.csGetInteger(cs, "id");
+                cp.core.db.csClose(ref cs);
+                //
+                // act
+                cs = cp.core.db.csOpen("people", "name=" + cp.core.db.encodeSQLText(name), "id");
+                Assert.IsTrue(cp.core.db.csOk(cs), "csOpen");
+                cp.core.db.csGoNext(cs);
+                cp.core.db.csGoNext(cs);
+                cp.core.db.csGoNext(cs);
+                Assert.IsFalse(cp.core.db.csOk(cs), "csOK false after last record");
+                cp.core.db.csGoFirst(cs);
+                Assert.IsTrue(cp.core.db.csOk(cs), "csOK true after goFirst (back at first record");
+                //
+                Assert.AreEqual(id0, cp.core.db.csGetInteger(cs, "id"), "correct id0 after goFirst");
+                cp.core.db.csGoNext(cs);
+                Assert.AreEqual(id1, cp.core.db.csGetInteger(cs, "id"), "goNext id1, id correct");
+                cp.core.db.csGoNext(cs);
+                Assert.AreEqual(id2, cp.core.db.csGetInteger(cs, "id"), "goNext id2, id correct");
+                cp.core.db.csGoNext(cs);
+                Assert.IsFalse(cp.core.db.csOk(cs), "csOk false after all records");
+            }
+        }
     }
 }

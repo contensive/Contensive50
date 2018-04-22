@@ -818,7 +818,6 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 RowPtr = 0;
                                 while (core.db.csOk(CS)) {
                                     Cells[RowPtr, 0] = htmlController.checkbox("AC" + RowPtr) + htmlController.inputHidden("ACID" + RowPtr, core.db.csGetInteger(CS, "ID"));
-                                    //Cells(RowPtr, 1) = "<a href=""" & core.app.SiteProperty_AdminURL & "?id=" & core.app.cs_getInteger(CS, "ID") & "&cid=" & core.app.cs_getInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
                                     Cells[RowPtr, 1] = core.db.csGetText(CS, "name");
                                     if (DisplaySystem) {
                                         if (core.db.csGetBoolean(CS, "system")) {
@@ -888,7 +887,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                     if (!string.IsNullOrEmpty(status)) {
                         Description = Description + "<div style=\"Margin-left:50px\">" + status + "</div>";
                     }
-                    addonManager = adminUIController.GetBody(core,Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
+                    addonManager = adminUIController.getBody(core,Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
                     core.html.addTitle("Add-on Manager");
                 }
             } catch (Exception ex) {

@@ -24,9 +24,11 @@ namespace Contensive.Core.Addons.AdminSite {
         //   Print the Configure Index Form
         //=============================================================================
         //
-        public static string GetForm_Index_SetColumns(coreController core, cdefModel adminContent, editRecordClass editRecord) {
+        public static string GetForm_Index_SetColumns(coreController core, adminContextClass adminContext) {
             string result = "";
             try {
+                // todo refactor out
+                cdefModel adminContent = adminContext.adminContent;
                 string Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonOK) {
                     //
@@ -38,9 +40,9 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (Button == ButtonReset) {
                     //
                     //   Process reset
-                    core.userProperty.setProperty(getHtmlBodyClass.IndexConfigPrefix + adminContent.id.ToString(), "");
+                    core.userProperty.setProperty(adminContextClass.IndexConfigPrefix + adminContent.id.ToString(), "");
                 }
-                indexConfigClass IndexConfig = getHtmlBodyClass.LoadIndexConfig(core, adminContent);
+                indexConfigClass IndexConfig = getHtmlBodyClass.LoadIndexConfig(core, adminContext);
                 string Title = adminContent.name + " Columns";
                 string Description = "Use the icons to add, remove and modify your personal column prefernces for this content (" + adminContent.name + "). Hit OK when complete. Hit Reset to restore your column preferences for this content to the site's default column preferences.";
                 int ToolsAction = core.docProperties.getInteger("dta");
@@ -328,7 +330,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         if (NeedToReloadConfig) {
                             getHtmlBodyClass.SetIndexSQL_SaveIndexConfig(core, IndexConfig);
-                            IndexConfig = getHtmlBodyClass.LoadIndexConfig(core, adminContent);
+                            IndexConfig = getHtmlBodyClass.LoadIndexConfig(core, adminContext);
                         }
                     }
                     //
@@ -551,7 +553,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     + htmlController.inputHidden(rnAdminForm, "1")
                     + htmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns)
                     + "";
-                result = adminUIController.GetBody(core, Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
+                result = adminUIController.getBody(core, Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
                 //
                 //
                 //    ButtonBar = adminUIController.GetButtonsFromList( ButtonList, True, True, "button")

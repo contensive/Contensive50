@@ -38,7 +38,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //result = htmlController.div(result, "ccCon bg-light");
                 result = ""
-                    + "<div class=\"ccCon bg-light pt-2 pb-4\" style=\"width:400px;margin:100px auto 0 auto;\">"
+                    + "<div class=\"ccCon bg-light pt-2 pb-4\" style=\"width:400px;margin:100px auto 0 auto;border:1px solid #bbb;border-radius:5px;\">"
                     + result
                     + "</div>";
                 //result = ""

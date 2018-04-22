@@ -69,7 +69,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 }
                 //
                 Description = "Hit Apply or OK to clear all current content caches";
-                returnHtml = adminUIController.GetBody(core, "Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                returnHtml = adminUIController.getBody(core, "Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
                 logController.handleError(core, ex);

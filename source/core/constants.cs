@@ -9,6 +9,14 @@ namespace Contensive.Core {
         //
         public const int codeVersion = 0;
         //
+        // -- symbols
+        public const string iconDelete = "<i alt=\"delete\" title=\"delete\" class=\"fa fa-remove\" style=\"color:#f00\"></i>";
+        public const string iconClose = "<i alt=\"close\" title=\"close\" class=\"fa fa-remove\" style=\"color:#eee\"></i>";
+        public const string iconEdit = "<i alt=\"edit\" title=\"edit\" class=\"fa fa-edit\" style=\"color: #080;\" valign=absmiddle></i>";
+        public const string iconOpen = "<i alt=\"open\" title=\"open\" class=\"fa fa-angle-double-right\" style=\"color:#eee\">";
+        public const string iconRefresh = "<i alt=\"refresh\" title=\"refresh\" class=\"fa fa-refresh\" style=\"color:#eee\">";
+        // public const string iconEdit = "<img src=\"/ccLib/images/IconContentEdit.gif\" border=0 alt=\"Edit content\" valign=absmiddle>";
+        //
         // -- content names
         public const string cnBlank = "";
         public const string cnDataSources = "data sources";
@@ -792,40 +800,40 @@ namespace Contensive.Core {
                                                //
                                                // ----- AdminActions - describes the form processing to do
                                                //
-        public const int AdminActionNop = 0; // do nothing
-        public const int AdminActionDelete = 4; // delete record
-        public const int AdminActionFind = 5;
-        public const int AdminActionDeleteFilex = 6;
-        public const int AdminActionUpload = 7;
-        public const int AdminActionSaveNormal = 3; // save fields to database
-        public const int AdminActionSaveEmail = 8; // save email record (and update EmailGroups) to database
-        public const int AdminActionSaveMember = 11;
-        public const int AdminActionSaveSystem = 12;
-        public const int AdminActionSavePaths = 13; // Save a record that is in the BathBlocking Format
-        public const int AdminActionSendEmail = 9;
-        public const int AdminActionSendEmailTest = 10;
-        public const int AdminActionNext = 14;
-        public const int AdminActionPrevious = 15;
-        public const int AdminActionFirst = 16;
-        public const int AdminActionSaveContent = 17;
-        public const int AdminActionSaveField = 18; // Save a single field, fieldname = fn input
-        public const int AdminActionPublish = 19; // Publish record live
-        public const int AdminActionAbortEdit = 20; // Publish record live
-        public const int AdminActionPublishSubmit = 21; // Submit for Workflow Publishing
-        public const int AdminActionPublishApprove = 22; // Approve for Workflow Publishing
-                                                         //Public Const AdminActionWorkflowPublishApproved = 23    ' Publish what was approved
-        public const int AdminActionSetHTMLEdit = 24; // Set Member Property for this field to HTML Edit
-        public const int AdminActionSetTextEdit = 25; // Set Member Property for this field to Text Edit
-        public const int AdminActionSave = 26; // Save Record
-        public const int AdminActionActivateEmail = 27; // Activate a Conditional Email
-        public const int AdminActionDeactivateEmail = 28; // Deactivate a conditional email
-        public const int AdminActionDuplicate = 29; // Duplicate the (sent email) record
-        public const int AdminActionDeleteRows = 30; // Delete from rows of records, row0 is boolean, rowid0 is ID, rowcnt is count
-        public const int AdminActionSaveAddNew = 31; // Save Record and add a new record
-        public const int AdminActionReloadCDef = 32; // Load Content Definitions
-                                                     // Public Const AdminActionWorkflowPublishSelected = 33 ' Publish what was selected
-        public const int AdminActionMarkReviewed = 34; // Mark the record reviewed without making any changes
-        public const int AdminActionEditRefresh = 35; // reload the page just like a save, but do not save
+        //public const int AdminActionNop = 0; // do nothing
+        //public const int AdminActionDelete = 4; // delete record
+        //public const int AdminActionFind = 5;
+        //public const int AdminActionDeleteFilex = 6;
+        //public const int AdminActionUpload = 7;
+        //public const int AdminActionSaveNormal = 3; // save fields to database
+        //public const int AdminActionSaveEmail = 8; // save email record (and update EmailGroups) to database
+        //public const int AdminActionSaveMember = 11;
+        //public const int AdminActionSaveSystem = 12;
+        //public const int AdminActionSavePaths = 13; // Save a record that is in the BathBlocking Format
+        //public const int AdminActionSendEmail = 9;
+        //public const int AdminActionSendEmailTest = 10;
+        //public const int AdminActionNext = 14;
+        //public const int AdminActionPrevious = 15;
+        //public const int AdminActionFirst = 16;
+        //public const int AdminActionSaveContent = 17;
+        //public const int AdminActionSaveField = 18; // Save a single field, fieldname = fn input
+        //public const int AdminActionPublish = 19; // Publish record live
+        //public const int AdminActionAbortEdit = 20; // Publish record live
+        //public const int AdminActionPublishSubmit = 21; // Submit for Workflow Publishing
+        //public const int AdminActionPublishApprove = 22; // Approve for Workflow Publishing
+        //                                                 //Public Const AdminActionWorkflowPublishApproved = 23    ' Publish what was approved
+        //public const int AdminActionSetHTMLEdit = 24; // Set Member Property for this field to HTML Edit
+        //public const int AdminActionSetTextEdit = 25; // Set Member Property for this field to Text Edit
+        //public const int AdminActionSave = 26; // Save Record
+        //public const int AdminActionActivateEmail = 27; // Activate a Conditional Email
+        //public const int AdminActionDeactivateEmail = 28; // Deactivate a conditional email
+        //public const int AdminActionDuplicate = 29; // Duplicate the (sent email) record
+        //public const int AdminActionDeleteRows = 30; // Delete from rows of records, row0 is boolean, rowid0 is ID, rowcnt is count
+        //public const int AdminActionSaveAddNew = 31; // Save Record and add a new record
+        //public const int AdminActionReloadCDef = 32; // Load Content Definitions
+        //                                             // Public Const AdminActionWorkflowPublishSelected = 33 ' Publish what was selected
+        //public const int AdminActionMarkReviewed = 34; // Mark the record reviewed without making any changes
+        //public const int AdminActionEditRefresh = 35; // reload the page just like a save, but do not save
                                                       //
                                                       // ----- Adminforms (0-99)
                                                       //
@@ -1363,6 +1371,10 @@ namespace Contensive.Core {
         // put content definitions here
         //
         //
+        public class nameValueClass {
+            public string name;
+            public string value;
+        }
         public struct NameValuePairType {
             public string Name;
             public string Value;

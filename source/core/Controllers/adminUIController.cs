@@ -248,7 +248,7 @@ namespace Contensive.Core {
         /// <summary>
         /// Get the Normal Edit Button Bar String, used on Normal Edit and others
         /// </summary>
-        public static string GetButtonBarForEdit(coreController core, editButtonBarInfoClass info) {
+        public static string getButtonBarForEdit(coreController core, editButtonBarInfoClass info) {
             string buttonsLeft = "";
             string buttonsRight = "";
             try {
@@ -275,7 +275,7 @@ namespace Contensive.Core {
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
-            return GetButtonBar(core, buttonsLeft, buttonsRight);
+            return getButtonBar(core, buttonsLeft, buttonsRight);
         }
         //
         // ====================================================================================================
@@ -320,7 +320,7 @@ namespace Contensive.Core {
         //
         // ====================================================================================================
         //
-        public static string GetButtonsFromList(coreController core, List<buttonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
+        public static string getButtonsFromList(coreController core, List<buttonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
             string s = "";
             try {
                 foreach (buttonMetadata button in ButtonList) {
@@ -345,7 +345,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public static string GetButtonsFromList(coreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
-            return GetButtonsFromList(core, buttonStringToButtonList(ButtonList), AllowDelete, AllowAdd);
+            return getButtonsFromList(core, buttonStringToButtonList(ButtonList), AllowDelete, AllowAdd);
         }
         //
         // ====================================================================================================
@@ -355,7 +355,7 @@ namespace Contensive.Core {
         /// <param name="LeftButtons"></param>
         /// <param name="RightButtons"></param>
         /// <returns></returns>
-        public static string GetButtonBar(coreController core, string LeftButtons, string RightButtons) {
+        public static string getButtonBar(coreController core, string LeftButtons, string RightButtons) {
             if (string.IsNullOrWhiteSpace(LeftButtons + RightButtons)) {
                 return "";
             } else if (string.IsNullOrWhiteSpace(RightButtons)) {
@@ -406,7 +406,7 @@ namespace Contensive.Core {
             } else {
                 RightButtons += adminUIController.getButtonDanger(ButtonDelete, "", true);
             }
-            result = GetButtonBar(core, LeftButtons, RightButtons);
+            result = getButtonBar(core, LeftButtons, RightButtons);
             return result;
             //return adminUIController.getForm_index_pageNavigation(core, LeftButtons, RightButtons, pageNumber, recordsPerPage, PageCount, recordCnt, contentName);
         }
@@ -470,7 +470,7 @@ namespace Contensive.Core {
         //
         // ====================================================================================================
         //
-        public static string GetBody(coreController core, string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
+        public static string getBody(coreController core, string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
             string result = "";
             try {
                 string ContentCell = "";
@@ -488,7 +488,7 @@ namespace Contensive.Core {
                 if (!string.IsNullOrEmpty(ButtonListRight.Trim(' '))) {
                     RightButtons = GetButtonsFromList(core, ButtonListRight, AllowDelete, AllowAdd, "Button");
                 }
-                ButtonBar = GetButtonBar(core, LeftButtons, RightButtons);
+                ButtonBar = getButtonBar(core, LeftButtons, RightButtons);
                 if (!string.IsNullOrEmpty(ContentSummary)) {
                     CellContentSummary = ""
                     + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
@@ -1176,38 +1176,62 @@ namespace Contensive.Core {
         /// admin editor for a lookup field into a static list
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="fieldName"></param>
-        /// <param name="fieldValue"></param>
-        /// <param name="lookups"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="defaultLookupIndexBaseOne"></param>
+        /// <param name="lookupArray"></param>
         /// <param name="readOnly"></param>
         /// <param name="htmlId"></param>
         /// <param name="WhyReadOnlyMsg"></param>
         /// <param name="fieldRequired"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_LookupList(coreController core, string fieldName, int fieldValue, string[] lookups, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
+        public static string getDefaultEditor_LookupList(coreController core, string htmlName, int defaultLookupIndexBaseOne, string[] lookupArray, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
             string result = "";
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
-                result += (htmlController.inputHidden(fieldName, genericController.encodeText(fieldValue)));
-                if (fieldValue < 1) {
-                    result += ("None");
-                } else if (fieldValue > (lookups.GetUpperBound(0) + 1)) {
-                    result += ("None");
+                result += (htmlController.inputHidden(htmlName, defaultLookupIndexBaseOne.ToString()));
+                if (defaultLookupIndexBaseOne < 1) {
+                    result += "None";
+                } else if (defaultLookupIndexBaseOne > (lookupArray.GetUpperBound(0) + 1)) {
+                    result += "None";
                 } else {
-                    result += lookups[fieldValue - 1];
+                    result += lookupArray[defaultLookupIndexBaseOne - 1];
                 }
                 result += WhyReadOnlyMsg;
             } else {
                 if (!fieldRequired) {
-                    result += core.html.selectFromList(fieldName, fieldValue, lookups, "Select One", "", "select form-control");
+                    result += htmlController.selectFromList( core, htmlName, defaultLookupIndexBaseOne, lookupArray, "Select One", "", "select form-control");
                 } else {
-                    result += core.html.selectFromList(fieldName, fieldValue, lookups, "", "", "select form-control");
+                    result += htmlController.selectFromList( core, htmlName, defaultLookupIndexBaseOne, lookupArray, "", "", "select form-control");
                 }
 
             }
             return result;
         }
+        public static string getDefaultEditor_LookupList(coreController core, string htmlName, string defaultValue, List<nameValueClass> lookupList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
+            string result = "";
+            if (readOnly) {
+                //
+                // ----- Lookup ReadOnly
+                result += (htmlController.inputHidden(htmlName, genericController.encodeText(defaultValue)));
+                nameValueClass nameValue = lookupList.Find(x => x.name.ToLower() == htmlName.ToLower());
+                if (nameValue == null) {
+                    result += "none";
+                } else {
+                    result += nameValue.value;
+                }
+                result += WhyReadOnlyMsg;
+            } else {
+                if (!fieldRequired) {
+                    result += htmlController.selectFromList(core, htmlName, defaultValue, lookupList, "Select One", "", "select form-control");
+                } else {
+                    result += htmlController.selectFromList(core, htmlName, defaultValue, lookupList, "", "", "select form-control");
+                }
+
+            }
+            return result;
+        }
+
         //
         // ====================================================================================================
         //
@@ -1465,11 +1489,11 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="IndexConfig"></param>
-        /// <param name="adminContent"></param>
+        /// <param name="adminContext.content"></param>
         /// <param name="recordCnt"></param>
         /// <param name="ContentAccessLimitMessage"></param>
         /// <returns></returns>
-        public static string getForm_Index_Header(coreController core, indexConfigClass IndexConfig, cdefModel adminContent, int recordCnt, string ContentAccessLimitMessage) {
+        public static string getForm_Index_Header(coreController core, indexConfigClass IndexConfig, cdefModel content, int recordCnt, string ContentAccessLimitMessage) {
             //
             // ----- TitleBar
             //
@@ -1497,7 +1521,7 @@ namespace Contensive.Core {
             foreach (var kvp in IndexConfig.FindWords) {
                 indexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
-                    string FieldCaption = cdefModel.GetContentFieldProperty(core, adminContent.name, findWord.Name, "caption");
+                    string FieldCaption = cdefModel.GetContentFieldProperty(core, content.name, findWord.Name, "caption");
                     switch (findWord.MatchOption) {
                         case FindWordMatchEnum.MatchEmpty:
                             filterLine = filterLine + ", " + FieldCaption + " is empty";
@@ -1536,7 +1560,7 @@ namespace Contensive.Core {
             //
             // add groups to caption
             //
-            if ((adminContent.contentTableName.ToLower() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
+            if ((content.contentTableName.ToLower() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
                 string GroupList = "";
                 for (int Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
                     if (IndexConfig.GroupList[Ptr] != "") {
@@ -1567,23 +1591,23 @@ namespace Contensive.Core {
             foreach (var kvp in IndexConfig.Sorts) {
                 indexConfigSortClass sort = kvp.Value;
                 if (sort.direction > 0) {
-                    sortLine = sortLine + ", then " + adminContent.fields[sort.fieldName].caption;
+                    sortLine = sortLine + ", then " + content.fields[sort.fieldName].caption;
                     if (sort.direction > 1) {
                         sortLine += " reverse";
                     }
                 }
             }
-            string pageNavigation = getForm_index_pageNavigation(core, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, adminContent.name);
-            Title = htmlController.div("<strong>" + adminContent.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
+            string pageNavigation = getForm_index_pageNavigation(core, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, content.name);
+            Title = htmlController.div("<strong>" + content.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
             int TitleRows = 0;
             if (!string.IsNullOrEmpty(filterLine)) {
-                string link = "/" + core.appConfig.adminRoute + "?cid=" + adminContent.id + "&af=1&IndexFilterRemoveAll=1";
-                Title += htmlController.div(getIconRemove(link) + "&nbsp;Filter: " + htmlController.encodeHtml(filterLine.Substring(2)));
+                string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexFilterRemoveAll=1";
+                Title += htmlController.div(getIconDeleteLink(link) + "&nbsp;Filter: " + htmlController.encodeHtml(filterLine.Substring(2)));
                 TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(sortLine)) {
-                string link = "/" + core.appConfig.adminRoute + "?cid=" + adminContent.id + "&af=1&IndexSortRemoveAll=1";
-                Title += htmlController.div(getIconRemove(link) + "&nbsp;Sort: " + htmlController.encodeHtml(sortLine.Substring(6)));
+                string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexSortRemoveAll=1";
+                Title += htmlController.div(getIconDeleteLink(link) + "&nbsp;Sort: " + htmlController.encodeHtml(sortLine.Substring(6)));
                 TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(ContentAccessLimitMessage)) {
@@ -1599,9 +1623,7 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public static string getIconRemove(string link, string cssColor = "red") {
-            return "<a href=\"" + link + "\"><span class=\"fa fa-remove\" style=\"color:" + cssColor + ";\"></span></a>";
-        }
+        public static string getIconDeleteLink(string link) {return htmlController.a(iconDelete, link);}
         //
         // ====================================================================================================
         /// <summary>
@@ -1609,8 +1631,86 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public static  string getIconRefresh(string link, string cssColor = "green") {
-            return "<a href=\"" + link + "\"><span class=\"fa fa-refresh\" style=\"color:" + cssColor + ";\"></span></a>";
+        public static  string getIconRefreshLink(string link) {return htmlController.a( iconRefresh, link );}
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// get linked icon for edit (green edit)
+        /// </summary>
+        /// <param name="link"></param>
+        /// <returns></returns>
+        public static string getIconEditLink(string link) { return htmlController.a(iconEdit, link); }
+        public static string getIconEditLink(string link, string htmlClass) { return htmlController.a(iconEdit, link, htmlClass); }
+        /// <summary>
+        /// get a link to edit a record in the admin site
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="cdef"></param>
+        /// <returns></returns>
+        public static string getIconEditAdminLink(coreController core, Models.Complex.cdefModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(coreController core, Models.Complex.cdefModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
+        //
+        //====================================================================================================
+        //
+        public static string getToolFormTitle(string Title, string Description) {
+            return htmlController.h2(Title) + htmlController.p(Description);
+        }
+        //
+        //====================================================================================================
+        //
+        public static string getToolForm(coreController core, string innerHtml, string buttonList) {
+            return ""
+                + getToolFormOpen(core, buttonList)
+                + htmlController.div(innerHtml, "p-4 bg-light")  
+                + getToolFormClose(core, buttonList);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// legacy compatibility
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ButtonList"></param>
+        /// <returns></returns>
+        public static string getToolFormClose(coreController core, string ButtonList) {
+            string templegacy_closeFormTable = null;
+            if (!string.IsNullOrEmpty(ButtonList)) {
+                templegacy_closeFormTable = core.html.getPanelButtons(ButtonList, "Button") + "</form>";
+            } else {
+                templegacy_closeFormTable = "</form>";
+            }
+            return templegacy_closeFormTable;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// legacy compatibility
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ButtonList"></param>
+        /// <returns></returns>
+        public static string getToolFormOpen(coreController core, string ButtonList) {
+            string result = "";
+            try {
+
+                result = htmlController.formStart(core);
+                if (!string.IsNullOrEmpty(ButtonList)) {
+                    result += core.html.getPanelButtons(ButtonList, "Button");
+                }
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
+            }
+            return result;
+        }
+        //
+        public static string getToolFormRow( coreController core, string asdf) {
+            return htmlController.div(asdf, "p-1"); 
+        }
+        //
+        public static string getToolFormInputRow( coreController core, string label, string input ) {
+            return getToolFormRow(core, htmlController.label(label) + "<br>" + input);
+
+            //"<div class=\"p-1\">Page Number:<br>" + htmlController.inputText(core, "PageNumber", PageNumber.ToString()) + "</div>";
         }
     }
 }
