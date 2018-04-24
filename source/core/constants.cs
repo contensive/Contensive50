@@ -9,8 +9,14 @@ namespace Contensive.Core {
         //
         public const int codeVersion = 0;
         //
-        // -- symbols
+        // -- symbols 
+        public const string iconNotAvailable = "<i alt=\"not available\" title=\"not available\" class=\"fa fa-ban\" style=\"color:#080\"></i>";
+        public const string iconExpand = "<i alt=\"expand\" title=\"expand\" class=\"fa fa-chevron-circle-up\" style=\"color:#080\"></i>";
+        public const string iconContract = "<i alt=\"contract\" title=\"contract\" class=\"fa fa-chevron-circle-down\" style=\"color:#080\"></i>";
+        public const string iconArrowRight = "<i alt=\"right\" title=\"right\" class=\"fa fa-arrow-circle-right\" style=\"color:#080\"></i>";
+        public const string iconArrowLeft = "<i alt=\"left\" title=\"left\" class=\"fa fa-arrow-circle-left\" style=\"color:#080\"></i>";
         public const string iconDelete = "<i alt=\"delete\" title=\"delete\" class=\"fa fa-remove\" style=\"color:#f00\"></i>";
+        public const string iconPlus = "<i alt=\"add\" title=\"add\" class=\"fa fa-plus-circle\" style=\"color:#080\"></i>";
         public const string iconClose = "<i alt=\"close\" title=\"close\" class=\"fa fa-remove\" style=\"color:#eee\"></i>";
         public const string iconEdit = "<i alt=\"edit\" title=\"edit\" class=\"fa fa-edit\" style=\"color: #080;\" valign=absmiddle></i>";
         public const string iconOpen = "<i alt=\"open\" title=\"open\" class=\"fa fa-angle-double-right\" style=\"color:#eee\">";

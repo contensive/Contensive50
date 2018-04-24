@@ -118,7 +118,8 @@ namespace Contensive.Core {
             public int GroupListCnt;
             public string[] GroupList;
             //public ColumnCnt As Integer
-            public Dictionary<string, indexConfigColumnClass> Columns = new Dictionary<string, indexConfigColumnClass>();
+            public List<indexConfigColumnClass> columns = new List<indexConfigColumnClass>() { };
+            //public Dictionary<string, indexConfigColumnClass> Columns = new Dictionary<string, indexConfigColumnClass>();
             //SubCDefs() as integer
             //SubCDefCnt as integer
             public int SubCDefID;
@@ -1623,7 +1624,13 @@ namespace Contensive.Core {
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public static string getIconDeleteLink(string link) {return htmlController.a(iconDelete, link);}
+        public static string getIconDeleteLink(string link) { return htmlController.a(iconDelete, link); }
+        public static string getIconArrowRightLink(string link) { return htmlController.a(iconArrowRight, link); }
+        public static string getIconArrowLeftLink(string link) { return htmlController.a(iconArrowLeft, link); }
+        public static string getIconPlusLink(string link, string caption = "") { return htmlController.a(iconPlus + caption, link); }
+        public static string getIconExpandLink(string link) { return htmlController.a(iconExpand, link); }
+        public static string getIconContractLink(string link) { return htmlController.a(iconContract, link); }
+        //
         //
         // ====================================================================================================
         /// <summary>

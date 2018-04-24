@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -131,5 +132,23 @@ public static class ExtensionMethods {
     public static bool IsBase64String(this string s) {
         s = s.Trim();
         return (s.Length % 4 == 0) && Regex.IsMatch(s, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None);
+    }
+    //
+    //====================================================================================================
+    /// <summary>
+    /// swap two entries in a list
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="list"></param>
+    /// <param name="indexA"></param>
+    /// <param name="indexB"></param>
+    /// <returns></returns>
+    public static IList<T> Swap<T>(this IList<T> list, int indexA, int indexB) {
+        if (indexB > -1 && indexB < list.Count) {
+            T tmp = list[indexA];
+            list[indexA] = list[indexB];
+            list[indexB] = tmp;
+        }
+        return list;
     }
 }

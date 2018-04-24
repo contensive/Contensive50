@@ -18,7 +18,7 @@ using Contensive.Core.Addons.Tools;
 using static Contensive.Core.adminUIController;
 //
 namespace Contensive.Core.Addons.AdminSite {
-    public class toolSetListColumnsClass{
+    public class toolSetListColumnsClass {
         //
         //=============================================================================
         //   Print the Configure Index Form
@@ -43,8 +43,6 @@ namespace Contensive.Core.Addons.AdminSite {
                     core.userProperty.setProperty(adminContextClass.IndexConfigPrefix + adminContent.id.ToString(), "");
                 }
                 indexConfigClass IndexConfig = getHtmlBodyClass.LoadIndexConfig(core, adminContext);
-                string Title = adminContent.name + " Columns";
-                string Description = "Use the icons to add, remove and modify your personal column prefernces for this content (" + adminContent.name + "). Hit OK when complete. Hit Reset to restore your column preferences for this content to the site's default column preferences.";
                 int ToolsAction = core.docProperties.getInteger("dta");
                 int TargetFieldID = core.docProperties.getInteger("fi");
                 string TargetFieldName = core.docProperties.getText("FieldName");
@@ -53,9 +51,12 @@ namespace Contensive.Core.Addons.AdminSite {
                 string FieldNameToAdd = genericController.vbUCase(core.docProperties.getText(RequestNameAddField));
                 const string RequestNameAddFieldID = "addfieldID";
                 int FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldID);
-                bool NeedToReloadConfig = core.docProperties.getBoolean("NeedToReloadConfig");
+                bool normalizeSaveLoad = core.docProperties.getBoolean("NeedToReloadConfig");
                 bool AllowContentAutoLoad = false;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                string Title = "Set Columns: " + adminContent.name;
+                string Description = "Use the icons to add, remove and modify your personal column prefernces for this content (" + adminContent.name + "). Hit OK when complete. Hit Reset to restore your column preferences for this content to the site's default column preferences.";
+                Stream.Add(adminUIController.getToolFormTitle(Title, Description));
                 //
                 //--------------------------------------------------------------------------------
                 // Process actions
@@ -70,7 +71,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         AllowContentAutoLoad = (core.siteProperties.getBoolean("AllowContentAutoLoad", true));
                         core.siteProperties.setProperty("AllowContentAutoLoad", false);
-                        bool NeedToReloadCDef = false;
+                        bool reloadMetadata = false;
                         int CSSource = 0;
                         int CSTarget = 0;
                         int SourceContentID = 0;
@@ -92,7 +93,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             if (core.db.csOk(CSTarget)) {
                                                 core.db.csCopyRecord(CSSource, CSTarget);
                                                 core.db.csSet(CSTarget, "ContentID", adminContent.id);
-                                                NeedToReloadCDef = true;
+                                                reloadMetadata = true;
                                             }
                                             core.db.csClose(ref CSTarget);
                                         }
@@ -105,8 +106,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // Make sure all fields are not-inherited, if not, create new fields
                         //
-                        foreach (var kvp in IndexConfig.Columns) {
-                            indexConfigColumnClass column = kvp.Value;
+                        foreach (var column in IndexConfig.columns) {
                             cdefFieldModel field = adminContent.fields[column.Name.ToLower()];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
@@ -117,7 +117,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     if (core.db.csOk(CSTarget)) {
                                         core.db.csCopyRecord(CSSource, CSTarget);
                                         core.db.csSet(CSTarget, "ContentID", adminContent.id);
-                                        NeedToReloadCDef = true;
+                                        reloadMetadata = true;
                                     }
                                     core.db.csClose(ref CSTarget);
                                 }
@@ -127,8 +127,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // get current values for Processing
                         //
-                        foreach (var kvp in IndexConfig.Columns) {
-                            indexConfigColumnClass column = kvp.Value;
+                        foreach (var column in IndexConfig.columns) {
                             ColumnWidthTotal += column.Width;
                         }
                         //
@@ -141,19 +140,20 @@ namespace Contensive.Core.Addons.AdminSite {
                                     //
                                     if (FieldIDToAdd != 0) {
                                         indexConfigColumnClass column = null;
-                                        foreach (var kvp in IndexConfig.Columns) {
-                                            column = kvp.Value;
-                                            column.Width = encodeInteger((column.Width * 80) / (double)ColumnWidthTotal);
+                                        foreach (var columnx in IndexConfig.columns) {
+                                            columnx.Width = encodeInteger((columnx.Width * 80) / (double)ColumnWidthTotal);
                                         }
-                                        column = new indexConfigColumnClass();
-                                        int CSPointer = core.db.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
-                                        if (core.db.csOk(CSPointer)) {
-                                            column.Name = core.db.csGet(CSPointer, "name");
-                                            column.Width = 20;
+                                        {
+                                            column = new indexConfigColumnClass();
+                                            int CSPointer = core.db.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
+                                            if (core.db.csOk(CSPointer)) {
+                                                column.Name = core.db.csGet(CSPointer, "name");
+                                                column.Width = 20;
+                                            }
+                                            core.db.csClose(ref CSPointer);
+                                            IndexConfig.columns.Add(column);
+                                            normalizeSaveLoad = true;
                                         }
-                                        core.db.csClose(ref CSPointer);
-                                        IndexConfig.Columns.Add(column.Name.ToLower(), column);
-                                        NeedToReloadConfig = true;
                                     }
                                     //
                                     break;
@@ -161,166 +161,73 @@ namespace Contensive.Core.Addons.AdminSite {
                             case ToolsActionRemoveField: {
                                     //
                                     // Remove a field to the index form
-                                    //
-                                    indexConfigColumnClass column = null;
-                                    if (IndexConfig.Columns.ContainsKey(TargetFieldName.ToLower())) {
-                                        column = IndexConfig.Columns[TargetFieldName.ToLower()];
-                                        ColumnWidthTotal = ColumnWidthTotal + column.Width;
-                                        IndexConfig.Columns.Remove(TargetFieldName.ToLower());
-                                        //
-                                        // Normalize the widths of the remaining columns
-                                        //
-                                        foreach (var kvp in IndexConfig.Columns) {
-                                            column = kvp.Value;
-                                            column.Width = encodeInteger((1000 * column.Width) / (double)ColumnWidthTotal);
+                                    int columnWidthTotal = 0;
+                                    var dstColumns = new List<indexConfigColumnClass>() { };
+                                    foreach (var column in IndexConfig.columns) {
+                                        if (column.Name != TargetFieldName.ToLower()) {
+                                            dstColumns.Add(column);
+                                            columnWidthTotal += column.Width;
                                         }
-                                        NeedToReloadConfig = true;
                                     }
+                                    IndexConfig.columns = dstColumns;
+                                    normalizeSaveLoad = true;
                                     break;
                                 }
                             case ToolsActionMoveFieldLeft: {
-                                    //
-                                    // Move column field left
-                                    //
-                                    //If IndexConfig.Columns.Count > 1 Then
-                                    //    MoveNextColumn = False
-                                    //    For ColumnPointer = 1 To IndexConfig.Columns.Count - 1
-                                    //        If TargetFieldName = IndexConfig.Columns(ColumnPointer).Name Then
-                                    //            With IndexConfig.Columns(ColumnPointer)
-                                    //                FieldPointerTemp = .FieldId
-                                    //                NameTemp = .Name
-                                    //                WidthTemp = .Width
-                                    //                .FieldId = IndexConfig.Columns(ColumnPointer - 1).FieldId
-                                    //                .Name = IndexConfig.Columns(ColumnPointer - 1).Name
-                                    //                .Width = IndexConfig.Columns(ColumnPointer - 1).Width
-                                    //            End With
-                                    //            With IndexConfig.Columns(ColumnPointer - 1)
-                                    //                .FieldId = FieldPointerTemp
-                                    //                .Name = NameTemp
-                                    //                .Width = WidthTemp
-                                    //            End With
-                                    //        End If
-                                    //    Next
-                                    //    NeedToReloadConfig = True
-                                    //End If
-                                    // end case
+                                    if(IndexConfig.columns.First().Name != TargetFieldName.ToLower()) {
+                                        int listIndex = 0;
+                                        foreach (var column in IndexConfig.columns) {
+                                            if (column.Name == TargetFieldName.ToLower()) {
+                                                break;
+                                            }
+                                            listIndex += 1;
+                                        }
+                                        IndexConfig.columns.Swap(listIndex, listIndex - 1);
+                                        normalizeSaveLoad = true;
+                                    }
                                     break;
                                 }
                             case ToolsActionMoveFieldRight: {
-                                    //
-                                    // Move Index column field right
-                                    //
-                                    //If IndexConfig.Columns.Count > 1 Then
-                                    //    MoveNextColumn = False
-                                    //    For ColumnPointer = 0 To IndexConfig.Columns.Count - 2
-                                    //        If TargetFieldName = IndexConfig.Columns(ColumnPointer).Name Then
-                                    //            With IndexConfig.Columns(ColumnPointer)
-                                    //                FieldPointerTemp = .FieldId
-                                    //                NameTemp = .Name
-                                    //                WidthTemp = .Width
-                                    //                .FieldId = IndexConfig.Columns(ColumnPointer + 1).FieldId
-                                    //                .Name = IndexConfig.Columns(ColumnPointer + 1).Name
-                                    //                .Width = IndexConfig.Columns(ColumnPointer + 1).Width
-                                    //            End With
-                                    //            With IndexConfig.Columns(ColumnPointer + 1)
-                                    //                .FieldId = FieldPointerTemp
-                                    //                .Name = NameTemp
-                                    //                .Width = WidthTemp
-                                    //            End With
-                                    //        End If
-                                    //    Next
-                                    //    NeedToReloadConfig = True
-                                    //End If
-                                    // end case
+                                    if (IndexConfig.columns.Last().Name != TargetFieldName.ToLower()) {
+                                        int listIndex = 0;
+                                        foreach (var column in IndexConfig.columns) {
+                                            if (column.Name == TargetFieldName.ToLower()) {
+                                                break;
+                                            }
+                                            listIndex += 1;
+                                        }
+                                        IndexConfig.columns.Swap(listIndex, listIndex + 1);
+                                        normalizeSaveLoad = true;
+                                    }
                                     break;
                                 }
                             case ToolsActionExpand: {
-                                    //
-                                    // Expand column
-                                    //
-                                    //ColumnWidthBalance = 0
-                                    //If IndexConfig.Columns.Count > 1 Then
-                                    //    '
-                                    //    ' Calculate the total width of the non-target columns
-                                    //    '
-                                    //    ColumnWidthIncrease = CInt(ColumnWidthTotal * 0.1)
-                                    //    For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
-                                    //        If TargetFieldName <> IndexConfig.Columns(ColumnPointer).Name Then
-                                    //            ColumnWidthBalance = ColumnWidthBalance + IndexConfig.Columns(ColumnPointer).Width
-                                    //        End If
-                                    //    Next
-                                    //    '
-                                    //    ' Adjust all columns
-                                    //    '
-                                    //    If ColumnWidthBalance > 0 Then
-                                    //        For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
-                                    //            With IndexConfig.Columns(ColumnPointer)
-                                    //                If TargetFieldName = .Name Then
-                                    //                    '
-                                    //                    ' Target gets 10% increase
-                                    //                    '
-                                    //                    .Width = Int(.Width + ColumnWidthIncrease)
-                                    //                Else
-                                    //                    '
-                                    //                    ' non-targets get their share of the shrinkage
-                                    //                    '
-                                    //                    .Width = CInt(.Width - ((ColumnWidthIncrease * .Width) / ColumnWidthBalance))
-                                    //                End If
-                                    //            End With
-                                    //        Next
-                                    //        NeedToReloadConfig = True
-                                    //    End If
-                                    //End If
-
-                                    // end case
+                                    foreach (var column in IndexConfig.columns) {
+                                        if (column.Name == TargetFieldName.ToLower()) {
+                                            column.Width = Convert.ToInt32(Convert.ToDouble(column.Width) * 1.1);
+                                        } else {
+                                            column.Width = Convert.ToInt32(Convert.ToDouble(column.Width) * 0.9);
+                                        }
+                                    }
+                                    normalizeSaveLoad = true;
                                     break;
                                 }
                             case ToolsActionContract: {
-                                    //
-                                    // Contract column
-                                    //
-                                    //ColumnWidthBalance = 0
-                                    //If IndexConfig.Columns.Count > 0 Then
-                                    //    '
-                                    //    ' Calculate the total width of the non-target columns
-                                    //    '
-                                    //    ColumnWidthIncrease = CInt(-(ColumnWidthTotal * 0.1))
-                                    //    For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
-                                    //        With IndexConfig.Columns(ColumnPointer)
-                                    //            If TargetFieldName <> .Name Then
-                                    //                ColumnWidthBalance = ColumnWidthBalance + IndexConfig.Columns(ColumnPointer).Width
-                                    //            End If
-                                    //        End With
-                                    //    Next
-                                    //    '
-                                    //    ' Adjust all columns
-                                    //    '
-                                    //    If (ColumnWidthBalance > 0) And (ColumnWidthIncrease <> 0) Then
-                                    //        For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
-                                    //            With IndexConfig.Columns(ColumnPointer)
-                                    //                If TargetFieldName = .Name Then
-                                    //                    '
-                                    //                    ' Target gets 10% increase
-                                    //                    '
-                                    //                    .Width = Int(.Width + ColumnWidthIncrease)
-                                    //                Else
-                                    //                    '
-                                    //                    ' non-targets get their share of the shrinkage
-                                    //                    '
-                                    //                    .Width = CInt(.Width - ((ColumnWidthIncrease * FieldWidth) / ColumnWidthBalance))
-                                    //                End If
-                                    //            End With
-                                    //        Next
-                                    //        NeedToReloadConfig = True
-                                    //    End If
-                                    //End If
+                                    foreach (var column in IndexConfig.columns) {
+                                        if (column.Name != TargetFieldName.ToLower()) {
+                                            column.Width = Convert.ToInt32(Convert.ToDouble(column.Width) * 1.1);
+                                        } else {
+                                            column.Width = Convert.ToInt32(Convert.ToDouble(column.Width) * 0.9);
+                                        }
+                                    }
+                                    normalizeSaveLoad = true;
                                     break;
                                 }
                         }
                         //
                         // Reload CDef if it changed
                         //
-                        if (NeedToReloadCDef) {
+                        if (reloadMetadata) {
                             core.doc.clearMetaData();
                             core.cache.invalidateAll();
                             CDef = cdefModel.getCdef(core, adminContent.name);
@@ -328,7 +235,16 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // save indexconfig
                         //
-                        if (NeedToReloadConfig) {
+                        if (normalizeSaveLoad) {
+                            //
+                            // Normalize the widths of the remaining columns
+                            ColumnWidthTotal = 0;
+                            foreach (var column in IndexConfig.columns) {
+                                ColumnWidthTotal += column.Width;
+                            }
+                            foreach (var column in IndexConfig.columns) {
+                                column.Width = encodeInteger((1000 * column.Width) / (double)ColumnWidthTotal);
+                            }
                             getHtmlBodyClass.SetIndexSQL_SaveIndexConfig(core, IndexConfig);
                             IndexConfig = getHtmlBodyClass.LoadIndexConfig(core, adminContext);
                         }
@@ -371,12 +287,11 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     ColumnWidthTotal = 0;
                     int InheritedFieldCount = 0;
-                    if (IndexConfig.Columns.Count > 0) {
+                    if (IndexConfig.columns.Count > 0) {
                         //
                         // Calc total width
                         //
-                        foreach (var kvp in IndexConfig.Columns) {
-                            indexConfigColumnClass column = kvp.Value;
+                        foreach (var column in IndexConfig.columns) {
                             ColumnWidthTotal += column.Width;
                         }
                         if (ColumnWidthTotal > 0) {
@@ -387,8 +302,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             int ColumnWidth = 0;
                             int fieldId = 0;
                             string Caption = null;
-                            foreach (var kvp in IndexConfig.Columns) {
-                                indexConfigColumnClass column = kvp.Value;
+                            foreach (var column in IndexConfig.columns) {
                                 //
                                 // print column headers - anchored so they sort columns
                                 //
@@ -400,24 +314,13 @@ namespace Contensive.Core.Addons.AdminSite {
                                     Caption = Caption + "*";
                                     InheritedFieldCount = InheritedFieldCount + 1;
                                 }
-                                //AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHTML(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
-                                Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + Caption + "</td>");
-                                //Stream.Add("<img src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\" >");
-                                //Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><img src=\"/ccLib/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                //Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><img src=\"/ccLib/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                //Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><img src=\"/ccLib/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                ////Call Stream.Add(AStart & "&dta=" & ToolsActionSetAZ & """><img src=""/ccLib/images/LibButtonSortazUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
-                                ////Call Stream.Add(AStart & "&dta=" & ToolsActionSetZA & """><img src=""/ccLib/images/LibButtonSortzaUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
-                                //Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><img src=\"/ccLib/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                //Stream.Add(AStart + "&dta=" + ToolsActionContract + "\"><img src=\"/ccLib/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A>");
-                                //Stream.Add("</span></td>");
+                                Stream.Add("<td class=\"small\" width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\" style=\"background-color:white;border: 1px solid #555;\">" + Caption + "</td>");
                             }
                             Stream.Add("</tr>");
                             //
                             // -- body
                             Stream.Add("<tr>");
-                            foreach (var kvp in IndexConfig.Columns) {
-                                indexConfigColumnClass column = kvp.Value;
+                            foreach (var column in IndexConfig.columns) {
                                 //
                                 // print column headers - anchored so they sort columns
                                 //
@@ -431,19 +334,16 @@ namespace Contensive.Core.Addons.AdminSite {
                                 }
                                 //adminUIController Adminui = new adminUIController(core);
                                 int ColumnPtr = 0;
-                                string AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
+                                string link = "?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns; 
+                                //string AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
                                 Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">");
-                                //Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
-                                Stream.Add("<img src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\" >");
-                                Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><img src=\"/ccLib/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><img src=\"/ccLib/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><img src=\"/ccLib/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                //Call Stream.Add(AStart & "&dta=" & ToolsActionSetAZ & """><img src=""/ccLib/images/LibButtonSortazUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
-                                //Call Stream.Add(AStart & "&dta=" & ToolsActionSetZA & """><img src=""/ccLib/images/LibButtonSortzaUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
-                                Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><img src=\"/ccLib/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
-                                Stream.Add(AStart + "&dta=" + ToolsActionContract + "\"><img src=\"/ccLib/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A>");
+                                //Stream.Add("<img src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\" >");
+                                Stream.Add(htmlController.div(adminUIController.getIconDeleteLink(link + "&dta=" + ToolsActionRemoveField),"text-center"));
+                                Stream.Add(htmlController.div(adminUIController.getIconArrowRightLink(link + "&dta=" + ToolsActionMoveFieldRight), "text-center"));
+                                Stream.Add(htmlController.div(adminUIController.getIconArrowLeftLink(link + "&dta=" + ToolsActionMoveFieldLeft), "text-center"));
+                                Stream.Add(htmlController.div(adminUIController.getIconExpandLink(link + "&dta=" + ToolsActionExpand), "text-center"));
+                                Stream.Add(htmlController.div(adminUIController.getIconContractLink(link + "&dta=" + ToolsActionContract), "text-center"));
                                 Stream.Add("</td>");
-                                //Stream.Add("</span></td>");
                             }
                             Stream.Add("</tr>");
                             //
@@ -462,73 +362,60 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (CDef.fields.Count == 0) {
                         Stream.Add(SpanClassAdminNormal + "This Content Definition has no fields</span><br>");
                     } else {
-                        Stream.Add(SpanClassAdminNormal + "<br>");
                         foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContent.fields) {
                             cdefFieldModel field = keyValuePair.Value;
                             //
                             // display the column if it is not in use
-                            //
-                            if (!IndexConfig.Columns.ContainsKey(field.nameLc)) {
+                            if ((IndexConfig.columns.Find(x => x.Name == field.nameLc) == null)) {
                                 if (field.fieldTypeId == FieldTypeIdFile) {
                                     //
                                     // file can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (file field)<br>");
+                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileText) {
                                     //
                                     // filename can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (text file field)<br>");
+                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (text file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileHTML) {
                                     //
                                     // filename can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (html file field)<br>");
+                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (html file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileCSS) {
                                     //
                                     // css filename can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (css file field)<br>");
+                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (css file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileXML) {
                                     //
                                     // xml filename can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (xml file field)<br>");
+                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (xml file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileJavascript) {
                                     //
                                     // javascript filename can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (javascript file field)<br>");
+                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (javascript file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdLongText) {
                                     //
                                     // long text can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (long text field)<br>");
+                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdHTML) {
                                     //
                                     // long text can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (long text field)<br>");
+                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileImage) {
                                     //
                                     // long text can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (image field)<br>");
+                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (image field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdRedirect) {
                                     //
                                     // long text can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (redirect field)<br>");
+                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (redirect field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdManyToMany) {
                                     //
                                     // many to many can not be search
-                                    //
-                                    Stream.Add("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"50\" height=\"15\" border=\"0\" > " + field.caption + " (many-to-many field)<br>");
+                                    Stream.Add(htmlController.div( iconNotAvailable + "&nbsp;" + field.caption + " (many-to-many field)"));
                                 } else {
                                     //
                                     // can be used as column header
-                                    //
-                                    Stream.Add("<a href=\"?" + core.doc.refreshQueryString + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldID + "=" + field.id + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns + "\"><img src=\"/ccLib/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A> " + field.caption + "<br>");
+                                    string link = "?" + core.doc.refreshQueryString + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldID + "=" + field.id + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
+                                    Stream.Add(htmlController.div(adminUIController.getIconPlusLink(link, "&nbsp;" + field.caption)));
                                 }
                             }
                         }
@@ -546,14 +433,17 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 core.siteProperties.setProperty("AllowContentAutoLoad", genericController.encodeText(AllowContentAutoLoad));
                 //Stream.Add( core.main_GetFormInputHidden("NeedToReloadConfig", NeedToReloadConfig))
-
                 string Content = ""
                     + Stream.Text
-                    + htmlController.inputHidden("cid",adminContent.id.ToString())
+                    + htmlController.inputHidden("cid", adminContent.id.ToString())
                     + htmlController.inputHidden(rnAdminForm, "1")
                     + htmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns)
                     + "";
-                result = adminUIController.getBody(core, Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
+                //
+                // -- assemble form
+
+                result = adminUIController.getToolForm(core, Content, ButtonOK + "," + ButtonReset);
+                //result = adminUIController.getBody(core, Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
                 //
                 //
                 //    ButtonBar = adminUIController.GetButtonsFromList( ButtonList, True, True, "button")
