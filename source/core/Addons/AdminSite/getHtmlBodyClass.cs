@@ -1568,7 +1568,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Edit</td>";
                             //
                             // Row Number Column
-                            DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Row</td>";
+                            //DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Row</td>";
                             //
                             // Delete Select Box Columns
                             if (!AllowDelete) {
@@ -1679,7 +1679,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     DataTable_DataRows += ("</td>");
                                     //
                                     // --- Record Number column
-                                    DataTable_DataRows += "<td align=right " + RowColor + ">" + SpanClassAdminSmall + "[" + (RecordPointer + 1) + "]</span></td>";
+                                    //DataTable_DataRows += "<td align=right " + RowColor + ">" + SpanClassAdminSmall + "[" + (RecordPointer + 1) + "]</span></td>";
                                     //
                                     // --- Delete Checkbox Columns
                                     if (AllowDelete) {
@@ -1745,9 +1745,9 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // ----- DataTable_FindRow
                             //
-                            string DataTable_FindRow = "<tr><td colspan=" + (3 + IndexConfig.columns.Count) + " style=\"background-color:black;height:1;\"></td></tr>";
+                            string DataTable_FindRow = "<tr><td colspan=" + (2 + IndexConfig.columns.Count) + " style=\"background-color:black;height:1;\"></td></tr>";
                             DataTable_FindRow += "<tr>";
-                            DataTable_FindRow += "<td colspan=3 width=\"60\" class=\"ccPanel\" align=center style=\"text-align:center ! important;\">";
+                            DataTable_FindRow += "<td valign=\"middle\" colspan=2 width=\"60\" class=\"ccPanel\" align=center style=\"vertical-align:middle;padding:8px;text-align:center ! important;\">";
                             DataTable_FindRow += "\r\n<script language=\"javascript\" type=\"text/javascript\">"
                                 + "\r\nfunction KeyCheck(e){"
                                 + "\r\n  var code = e.keyCode;"
@@ -1774,9 +1774,9 @@ namespace Contensive.Core.Addons.AdminSite {
                                         FindWordValue = "false";
                                     }
                                 }
-                                DataTable_FindRow += "\r\n<td valign=\"top\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding-top:2px;padding-bottom:2px;\">"
+                                DataTable_FindRow += "\r\n<td valign=\"middle\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding:8px;\">"
                                     + "<input type=hidden name=\"FindName" + ColumnPointer + "\" value=\"" + FieldName + "\">"
-                                    + "<input onkeypress=\"KeyCheck(event);\"  type=text id=\"F" + ColumnPointer + "\" name=\"FindValue" + ColumnPointer + "\" value=\"" + FindWordValue + "\" style=\"width:98%\">"
+                                    + "<input class=\"form-control\"  onkeypress=\"KeyCheck(event);\"  type=text id=\"F" + ColumnPointer + "\" name=\"FindValue" + ColumnPointer + "\" value=\"" + FindWordValue + "\" style=\"width:98%\">"
                                     + "</td>";
                                 ColumnPointer += 1;
                             }
@@ -7338,7 +7338,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // --- Start a form to make a refresh button
                 //
-                Stream.Add(htmlController.formStart(core));
+                Stream.Add(htmlController.form_start(core));
                 Stream.Add(core.html.getPanelButtons(ButtonCancel + "," + ButtonRefresh, "" + RequestNameButton + ""));
                 Stream.Add("<input TYPE=\"hidden\" NAME=\"asf\" VALUE=\"" + AdminFormQuickStats + "\">");
                 Stream.Add(core.html.getPanel(" "));
@@ -8847,13 +8847,13 @@ namespace Contensive.Core.Addons.AdminSite {
             try {
                 core.html.addScriptCode("var docLoaded=false", "Form loader");
                 core.html.addScriptCode_onLoad("docLoaded=true;", "Form loader");
-                s = htmlController.formStartMultipart(core.doc.refreshQueryString, "", "ccForm", "adminEditForm");
+                s = htmlController.formMultipart_start(core, core.doc.refreshQueryString, "", "ccForm", "adminEditForm");
                 s = genericController.vbReplace(s, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\" autocomplete=\"off\">");
                 s += "\r\n<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
-                s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
-                s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + adminContext.TitleExtension + "\">";
-                s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + adminContext.ignore_legacyMenuDepth + "\">";
-                s = s + "\r\n<input TYPE=\"hidden\" NAME=\"FormEmptyFieldList\" ID=\"FormEmptyFieldList\" VALUE=\",\">";
+                s +=  "\r\n<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
+                s +=  "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + adminContext.TitleExtension + "\">";
+                s +=  "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + adminContext.ignore_legacyMenuDepth + "\">";
+                s +=  "\r\n<input TYPE=\"hidden\" NAME=\"FormEmptyFieldList\" ID=\"FormEmptyFieldList\" VALUE=\",\">";
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
@@ -12609,7 +12609,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 Content = returnForm;
                 //
                 // Assemble LiveWindowTable
-                Stream.Add("\r\n" + htmlController.formStart(core));
+                Stream.Add("\r\n" + htmlController.form_start(core));
                 Stream.Add(ButtonBar);
                 Stream.Add(TitleBar);
                 Stream.Add(Content);

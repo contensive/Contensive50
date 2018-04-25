@@ -2163,7 +2163,7 @@ namespace Contensive.Core.Controllers {
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         return_DialogList = return_DialogList 
                             + "<div class=\"ccCon helpDialogCon\">"
-                            + htmlController.formStartMultipart(core.doc.refreshQueryString,"", "ccForm") 
+                            + htmlController.formMultipart_start(core, core.doc.refreshQueryString,"", "ccForm") 
                             + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
                             + "<tr><td class=\"ccButtonCon\">" + htmlController.getHtmlInputSubmit("Update", "HelpBubbleButton") + "</td></tr>"
@@ -2245,7 +2245,7 @@ namespace Contensive.Core.Controllers {
 
                         Dialog = Dialog 
                             + "<div class=\"ccCon helpDialogCon\">"
-                            + htmlController.formStartMultipart(core.doc.refreshQueryString,"", "ccForm") 
+                            + htmlController.formMultipart_start(core, core.doc.refreshQueryString,"", "ccForm") 
                             + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
                             + "<tr><td class=\"ccButtonCon\">" + htmlController.getHtmlInputSubmit("Update", "HelpBubbleButton") + "</td></tr>"

@@ -890,13 +890,27 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
+        /// returns a multipart form, required for file uploads
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="innerHtml"></param>
+        /// <param name="actionQueryString"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlClass"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
+        public static string formMultipart(coreController core, string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
+            return formMultipart_start(core, actionQueryString, htmlName, htmlClass, htmlId) + innerHtml + "</form>";
+        }
+        //
+        //====================================================================================================
+        /// <summary>
         /// Starts an HTML form for uploads, Should be closed with main_GetUploadFormEnd
         /// </summary>
         /// <param name="actionQueryString"></param>
         /// <returns></returns>
-        public static string formStartMultipart(string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
-            actionQueryString = genericController.modifyQueryString(actionQueryString, RequestNameRequestBinary, true, true);
-            string result = "<form action=\"?" + actionQueryString + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" method=\"post\" style=\"display: inline;\"";
+        public static string formMultipart_start( coreController core, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
+            string result = "<form action=\"?" + ((actionQueryString == "") ? core.doc.refreshQueryString : actionQueryString) + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" method=\"post\" style=\"display: inline;\"";
             if (!string.IsNullOrWhiteSpace(htmlName)) result += " name=\"" + htmlName + "\"";
             if (!string.IsNullOrWhiteSpace(htmlClass)) result += " class=\"" + htmlClass + "\"";
             if (!string.IsNullOrWhiteSpace(htmlId)) result += " id=\"" + htmlId + "\"";
@@ -913,81 +927,22 @@ namespace Contensive.Core.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="htmlMethod"></param>
         /// <returns></returns>
-        public static string form( coreController core,  string innerHtml, string actionQueryString = "", string htmlName = "", string htmlId = "", string htmlMethod = "" ) {
-            return formStart(core, actionQueryString, htmlName, htmlId, htmlMethod) + innerHtml + formEnd();
+        public static string form( coreController core,  string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "" ) {
+            return form_start(core, actionQueryString, htmlName, htmlClass, htmlId, htmlMethod) + innerHtml + formEnd();
         }
         //
         //====================================================================================================
         /// <summary>
         /// </summary>
         [Obsolete("use form()", false)]
-        public static string formStart(coreController core, string ActionQueryString = null, string htmlName = "", string htmlId = "", string htmlMethod = "") {
-            string temphtml_GetFormStart = null;
-            try {
-                //
-                //If Not (true) Then Exit Function
-                //
-                int Ptr = 0;
-                string ActionQS = null;
-                string iMethod = null;
-                string Action = null;
-                string[] QSParts = null;
-                string[] QSNameValues = null;
-                string QSName = null;
-                string QSValue = null;
-                string RefreshHiddens = null;
-                //
-                if (ActionQueryString == null) {
-                    ActionQS = core.doc.refreshQueryString;
-                } else {
-                    ActionQS = ActionQueryString;
-                }
-                iMethod = genericController.vbLCase(htmlMethod);
-                if (string.IsNullOrEmpty(iMethod)) {
-                    iMethod = "post";
-                }
-                RefreshHiddens = "";
-                Action = core.webServer.serverFormActionURL;
-                //
-                if (!string.IsNullOrEmpty(ActionQS)) {
-                    if (iMethod != "main_Get") {
-                        //
-                        // non-main_Get, put Action QS on end of Action
-                        //
-                        Action = Action + "?" + ActionQS;
-                    } else {
-                        //
-                        // main_Get method, build hiddens for actionQS
-                        //
-                        QSParts = ActionQS.Split('&');
-                        for (Ptr = 0; Ptr <= QSParts.GetUpperBound(0); Ptr++) {
-                            QSNameValues = QSParts[Ptr].Split('=');
-                            if (QSNameValues.GetUpperBound(0) == 0) {
-                                QSName = genericController.decodeResponseVariable(QSNameValues[0]);
-                            } else {
-                                QSName = genericController.decodeResponseVariable(QSNameValues[0]);
-                                QSValue = genericController.decodeResponseVariable(QSNameValues[1]);
-                                RefreshHiddens = RefreshHiddens + "\r<input type=\"hidden\" name=\"" + htmlController.encodeHtml(QSName) + "\" value=\"" + htmlController.encodeHtml(QSValue) + "\">";
-                            }
-                        }
-                    }
-                }
-                //
-                temphtml_GetFormStart = ""
-                    + "\r<form name=\"" + htmlName + "\" id=\"" + htmlId + "\" action=\"" + Action + "\" method=\"" + iMethod + "\" style=\"display: inline;\" >"
-                    + RefreshHiddens + "";
-                //
-                return temphtml_GetFormStart;
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                logController.handleError( core,ex);
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
-            //
-            return temphtml_GetFormStart;
+        public static string form_start(coreController core, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post") {
+            if (string.IsNullOrEmpty(actionQueryString)) actionQueryString = core.doc.refreshQueryString;
+            string action = core.webServer.serverFormActionURL + (string.IsNullOrEmpty(actionQueryString) ? "" : "?" + actionQueryString);
+            string result = "<form name=\"" + htmlName + "\" action=\"" + action + "\" method=\"" + htmlMethod + "\" style=\"display: inline;\"";
+            result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
+            result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
+            result += (string.IsNullOrWhiteSpace(htmlClass)) ? "" : "" + " class=\"" + htmlClass + "\"";
+            return result + ">";
         }
         //
         //====================================================================================================
@@ -3359,7 +3314,7 @@ namespace Contensive.Core.Controllers {
                         //helpLink = main_GetHelpLink("2", "Contensive Tools Panel", BubbleCopy)
                         result += getPanelHeader("Contensive Tools Panel" + helpLink);
                         //
-                        ToolsPanel.Add(htmlController.formStart( core,WorkingQueryString));
+                        ToolsPanel.Add(htmlController.form_start( core,WorkingQueryString));
                         ToolsPanel.Add(htmlController.inputHidden("Type", FormTypeToolsPanel));
                         //
                         if (true) {

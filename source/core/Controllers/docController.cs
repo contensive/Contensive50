@@ -661,14 +661,12 @@ namespace Contensive.Core.Controllers {
                 //
                 // Form Wrapper
                 //
-                result = ""
-                    + '\r' + htmlController.formStartMultipart(core.webServer.requestQueryString,"","ccForm") + '\r' + htmlController.inputHidden("Type", FormTypePageAuthoring) + '\r' + htmlController.inputHidden("ID", pageController.page.id) + '\r' + htmlController.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + htmlController.formEnd();
-
-                //& cr & core.html.main_GetPanelHeader("Contensive Quick Editor") _
-
-                result = ""
-                    + "\r<div class=\"ccCon\">"
-                    + genericController.nop(result) + "\r</div>";
+                result += ""
+                    + htmlController.inputHidden("Type", FormTypePageAuthoring)
+                    + htmlController.inputHidden("ID", pageController.page.id)
+                    + htmlController.inputHidden("ContentName", LiveRecordContentName);
+                result = htmlController.formMultipart(core, result, core.webServer.requestQueryString, "", "ccForm");
+                result = "<div class=\"ccCon\">" + result + "</div>";
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }

@@ -474,8 +474,6 @@ namespace Contensive.Core {
         public static string getBody(coreController core, string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
             string result = "";
             try {
-                string ContentCell = "";
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonBar = null;
                 string LeftButtons = "";
                 string RightButtons = "";
@@ -492,16 +490,17 @@ namespace Contensive.Core {
                 ButtonBar = getButtonBar(core, LeftButtons, RightButtons);
                 if (!string.IsNullOrEmpty(ContentSummary)) {
                     CellContentSummary = ""
-                    + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
-                    + nop(core.html.getPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) + "\r</div>";
+                        + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
+                        + core.html.getPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5) 
+                        + "\r</div>";
                 }
-                //
-                ContentCell = ""
-                + "\r<div style=\"padding:" + ContentPadding + "px;\">"
-                + nop(Content) + "\r</div>";
-                result += nop(ButtonBar) + nop(GetTitleBar(core, Caption, Description)) + nop(CellContentSummary) + nop(ContentCell) + nop(ButtonBar) + "";
-
-                result = '\r' + htmlController.formStartMultipart(core.doc.refreshQueryString,"","ccForm") + nop(result) + '\r' + htmlController.formEnd();
+                result += ""
+                    + ButtonBar 
+                    + GetTitleBar(core, Caption, Description)
+                    + CellContentSummary 
+                    + "<div style=\"padding:" + ContentPadding + "px;\">" + Content + "\r</div>"
+                    + ButtonBar;
+                result = htmlController.formMultipart(core, result, core.doc.refreshQueryString,"","ccForm");
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
@@ -1700,7 +1699,7 @@ namespace Contensive.Core {
             string result = "";
             try {
 
-                result = htmlController.formStart(core);
+                result = htmlController.form_start(core);
                 if (!string.IsNullOrEmpty(ButtonList)) {
                     result += core.html.getPanelButtons(ButtonList, "Button");
                 }

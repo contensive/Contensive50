@@ -97,38 +97,11 @@ namespace Contensive.Core {
         // ====================================================================================================
         //Inherits BaseClasses.CPHtmlBaseClass.CheckBox 
         public override string Form(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "", string ActionQueryString = "", string Method = "post") {
-            string FormStart = "";
-            try {
-                if (Method.ToLower() == "get") {
-                    if (InnerHtml.IndexOf("type=\"file", 0, 1, StringComparison.OrdinalIgnoreCase) >= 0) {
-                        logController.handleError( core,new ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"));
-                    }
-                    if (string.IsNullOrEmpty(ActionQueryString)) {
-                        FormStart = htmlController.formStart(core, "", HtmlName, HtmlId, Method);
-                    } else {
-                        FormStart = htmlController.formStart(core, ActionQueryString, HtmlName, HtmlId, Method);
-                    }
-
-                } else {
-                    FormStart = htmlController.formStartMultipart(ActionQueryString, HtmlName, HtmlClass, HtmlId);
-                    //if (string.IsNullOrEmpty(ActionQueryString)) {
-                    //    FormStart = core.html.formStartMultipart();
-                    //} else {
-                    //}
-                    if (!string.IsNullOrEmpty(HtmlName)) {
-                        FormStart = FormStart.Replace(">", " name=\"" + HtmlName + "\">");
-                    }
-                    if (!string.IsNullOrEmpty(HtmlClass)) {
-                        FormStart = FormStart.Replace(">", " class=\"" + HtmlClass + "\">");
-                    }
-                    if (!string.IsNullOrEmpty(HtmlId)) {
-                        FormStart = FormStart.Replace(">", " id=\"" + HtmlId + "\">");
-                    }
-                }
-            } catch (Exception) {
-
+            if (Method.ToLower() == "get") {
+                return htmlController.form(core, InnerHtml, ActionQueryString, HtmlName, HtmlId, Method);
+            } else {
+                return htmlController.formMultipart(core, InnerHtml, ActionQueryString, HtmlName, HtmlClass, HtmlId);
             }
-            return FormStart + InnerHtml + "</form>";
         }
         //
         // ==========================================================================================

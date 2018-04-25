@@ -2535,7 +2535,7 @@ namespace Contensive.Core.Addons.Tools {
                     }
                 }
                 //
-                result += htmlController.formStart(core);
+                result += htmlController.form_start(core);
                 TableColSpan = 3;
                 result += htmlController.tableStart(2, 0, 0);
                 //

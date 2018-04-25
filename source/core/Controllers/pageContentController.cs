@@ -1901,7 +1901,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         internal static string getFormPage(coreController core, string FormPageName, int GroupIDToJoinOnSuccess) {
-            string tempgetFormPage = null;
+            string result = null;
             try {
                 //
                 string RepeatBody = null;
@@ -1984,14 +1984,14 @@ namespace Contensive.Core.Controllers {
                     RepeatBody = RepeatBody + Body;
                 }
                 //
-                tempgetFormPage = ""
+                result = ""
                 + errorController.getUserError(core) 
-                + htmlController.formStartMultipart(core.doc.refreshQueryString,"", "ccForm") 
+                + htmlController.formMultipart_start(core, core.doc.refreshQueryString,"", "ccForm") 
                 + htmlController.inputHidden("ContensiveFormPageID", FormPageID) 
                 + htmlController.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat 
                 + htmlController.formEnd();
                 //
-                return tempgetFormPage;
+                return result;
                 //
                 // ----- Error Trap
                 //
@@ -2000,7 +2000,7 @@ namespace Contensive.Core.Controllers {
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError13("main_GetFormPage")
-            return tempgetFormPage;
+            return result;
         }
         //
         //=============================================================================
