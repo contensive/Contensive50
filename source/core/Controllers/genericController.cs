@@ -1559,7 +1559,7 @@ namespace Contensive.Core.Controllers {
             string returnResult = "";
             Process p = new Process();
             //
-            logController.logError(core, "ccCommonModule.runProcess, cmd=[" + Cmd + "], Arguments=[" + Arguments + "], WaitForReturn=[" + WaitForReturn + "]");
+            logController.logInfo(core, "ccCommonModule.runProcess, cmd=[" + Cmd + "], Arguments=[" + Arguments + "], WaitForReturn=[" + WaitForReturn + "]");
             //
             p.StartInfo.FileName = Cmd;
             p.StartInfo.Arguments = Arguments;

@@ -258,5 +258,16 @@ namespace Contensive.Core.Models.DbModels {
             cs.close();
             return result;
         }
+        /// <summary>
+        /// return the best name available for this record
+        /// </summary>
+        /// <returns></returns>
+        public string getDisplayName() {
+            if (string.IsNullOrWhiteSpace(name)) {
+                return "unnamed #" + id.ToString();
+            } else {
+                return name;
+            }
+        }
     }
 }

@@ -1023,7 +1023,7 @@ namespace Contensive.Core.Controllers {
             bool UpgradeOK = true;
             try {
                 if (string.IsNullOrWhiteSpace(collectionGuid)) {
-                    logController.logError(core, "installCollectionFromRemoteRepo, collectionGuid is null");
+                    logController.logWarn(core, "installCollectionFromRemoteRepo, collectionGuid is null");
                 } else {
                     //
                     // normalize guid
@@ -1386,7 +1386,7 @@ namespace Contensive.Core.Controllers {
                 // process all xml files in this workingfolder
                 //
                 if (allowLogging) {
-                    logController.logError(core, "BuildLocalCollectionFolder(), Enter");
+                    logController.logInfo(core, "BuildLocalCollectionFolder(), Enter");
                 }
                 //
                 core.privateFiles.splitDosPathFilename(collectionPathFilename, ref collectionPath, ref collectionFilename);
@@ -1397,7 +1397,7 @@ namespace Contensive.Core.Controllers {
                     result = false;
                     return_ErrorMessage = "<p>There was a problem with the installation. The installation folder is not valid.</p>";
                     if (allowLogging) {
-                        logController.logError(core, "BuildLocalCollectionFolder(), " + return_ErrorMessage);
+                        logController.logInfo(core, "BuildLocalCollectionFolder(), " + return_ErrorMessage);
                     }
                     logController.logInfo(core, "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" + collectionPath + "]");
                 } else {

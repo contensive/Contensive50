@@ -626,7 +626,7 @@ namespace Contensive.Core.Controllers {
                         logController.logDebug(core, "dbController: " + LogEntry);
                     }
                     if (ElapsedMilliseconds > sqlSlowThreshholdMsec) {
-                        logController.logError(core, ("dbController: Slow Query " + ElapsedMilliseconds + "ms, sql: [" + sql + "]").Replace("\r", "").Replace("\n", ""));
+                        logController.logWarn(core, ("dbController: Slow Query " + ElapsedMilliseconds + "ms, sql: [" + sql + "]").Replace("\r", "").Replace("\n", ""));
                     }
                 }
                 saveTransactionLog_InProcess = false;

@@ -898,7 +898,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (!string.IsNullOrEmpty(list)) {
                         Console.WriteLine("console - adminContext.adminContext.content.contentControlCriteria=" + list);
                         ////Debug.WriteLine("debug - adminContext.adminContext.content.contentControlCriteria=" + list);
-                        logController.logError(core, "appendlog - adminContext.adminContext.content.contentControlCriteria=" + list);
+                        logController.logInfo(core, "appendlog - adminContext.adminContext.content.contentControlCriteria=" + list);
                         ListSplit = list.Split('=');
                         Cnt = ListSplit.GetUpperBound(0) + 1;
                         if (Cnt > 0) {
@@ -1729,13 +1729,13 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 // No records found
                                 //
-                                DataTable_DataRows += ("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">no records were found</td></tr>");
+                                DataTable_DataRows += ("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">no records were found</td></tr>");
                             } else {
                                 if (RecordPointer < RecordLast) {
                                     //
                                     // End of list
                                     //
-                                    DataTable_DataRows += ("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">----- end of list</td></tr>");
+                                    DataTable_DataRows += ("<tr><td " + RowColor + " align=center>-</td><td " + RowColor + " align=center>-</td><td colspan=" + IndexConfig.columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">----- end of list</td></tr>");
                                 }
                                 //
                                 // Add another header to the data rows
@@ -3451,10 +3451,26 @@ namespace Contensive.Core.Addons.AdminSite {
                                     editrecord.modifiedDate = core.db.csGetDate(CSEditRecord, adminContentcontent.nameLc);
                                     break;
                                 case "CREATEDBY":
-                                    editrecord.createByMemberId = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
+                                    int createdByPersonId = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
+                                    if (createdByPersonId == 0) {
+                                        editrecord.createdBy = new personModel() { name = "system" };
+                                    } else {
+                                        editrecord.createdBy = personModel.create(core, createdByPersonId);
+                                        if (editrecord.createdBy == null) {
+                                            editrecord.createdBy = new personModel() { name = "deleted #" + createdByPersonId.ToString() };
+                                        }
+                                    }
                                     break;
                                 case "MODIFIEDBY":
-                                    editrecord.modifiedByMemberID = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
+                                    int modifiedByPersonId = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
+                                    if (modifiedByPersonId == 0) {
+                                        editrecord.modifiedBy = new personModel() { name = "system" };
+                                    } else {
+                                        editrecord.modifiedBy = personModel.create(core, modifiedByPersonId);
+                                        if (editrecord.modifiedBy == null) {
+                                            editrecord.modifiedBy = new personModel() { name = "deleted #" + modifiedByPersonId.ToString() };
+                                        }
+                                    }
                                     break;
                                 case "ACTIVE":
                                     editrecord.active = core.db.csGetBoolean(CSEditRecord, adminContentcontent.nameLc);
@@ -4880,12 +4896,12 @@ namespace Contensive.Core.Addons.AdminSite {
                 }
                 var headerInfo = new recordEditHeaderInfoClass() {
                     recordId = editRecord.id,
-                    recordAddedById = editRecord.createByMemberId,
-                    recordDateAdded = editRecord.dateAdded,
-                    recordDateModified = editRecord.modifiedDate,
+                    //recordAddedById = editRecord.createdBy.id,
+                    //recordDateAdded = editRecord.dateAdded,
+                    //recordDateModified = editRecord.modifiedDate,
                     recordLockById = editRecord.EditLockMemberID,
                     recordLockExpiresDate = editRecord.EditLockExpires,
-                    recordModifiedById = editRecord.modifiedByMemberID,
+                    //recordModifiedById = editRecord.modifiedBy.id,
                     recordName = editRecord.nameLc
                 };
                 string titleBarDetails = adminUIController.getEditForm_TitleBarDetails(core, headerInfo, editRecord);
@@ -6956,7 +6972,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
-                        int FieldValueInteger = editRecord.createByMemberId;
+                        int FieldValueInteger = editRecord.createdBy.id;
                         if (FieldValueInteger == 0) {
                             fieldValue = "unknown";
                         } else {
@@ -6998,7 +7014,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
-                        int FieldValueInteger = editRecord.modifiedByMemberID;
+                        int FieldValueInteger = editRecord.modifiedBy.id;
                         fieldValue = "unknown";
                         if (FieldValueInteger > 0) {
                             int CSPointer = core.db.csOpen2("people", FieldValueInteger, true, false, "name");

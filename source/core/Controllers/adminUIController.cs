@@ -29,10 +29,10 @@ namespace Contensive.Core {
             //public string description;
             public string recordName;
             public int recordId;
-            public DateTime recordDateAdded;
-            public DateTime recordDateModified;
-            public int recordAddedById;
-            public int recordModifiedById;
+            //public DateTime recordDateAdded;
+            //public DateTime recordDateModified;
+            //public int recordAddedById;
+            //public int recordModifiedById;
             public DateTime recordLockExpiresDate;
             public int recordLockById;
         }
@@ -173,9 +173,11 @@ namespace Contensive.Core {
             /// Used for control section display
             /// </summary>
             public DateTime modifiedDate;
-            public int modifiedByMemberID;
+            public personModel modifiedBy;
+            //public int modifiedByMemberID;
             public DateTime dateAdded;
-            public int createByMemberId;
+            //public int createByMemberId;
+            public personModel createdBy;
 
             public int RootPageID;
             public bool SetPageNotFoundPageID;
@@ -236,7 +238,8 @@ namespace Contensive.Core {
                     Description += htmlController.div( errorController.getUserError(core));
                 }
                 if (!string.IsNullOrEmpty(Description)) {
-                    result += htmlController.div( Description, "ccAdminInfoBar ccPanel3DReverse");
+                    result += htmlController.div(Description);
+                    //result += htmlController.div(Description, "ccAdminInfoBar ccPanel3DReverse");
                 }
             } catch (Exception ex) {
                 logController.handleError(core, ex);
@@ -931,6 +934,16 @@ namespace Contensive.Core {
             return result;
         }
         //
+        public static string getEditForm_TitleBarDetails_EditorString(DateTime editDate, personModel editor, string notEditedMessage) {
+            if ((editDate < new DateTime(1990, 1, 1))&(editor.id==0)) {
+                return notEditedMessage;
+            } else if (editDate < new DateTime(1990, 1, 1)) {
+                return "unknown date, by " + editor.getDisplayName();
+            } else {
+                return editDate.ToString() + " by " + editor.getDisplayName();
+            }
+        }
+        //
         // ====================================================================================================
         /// <summary>
         /// The panel at the top of the edit page that describes the content being edited
@@ -945,9 +958,9 @@ namespace Contensive.Core {
                 if (editRecord.id == 0) {
                     result += htmlController.div( "New record" , "col-sm-12");
                 } else {
-                    result += htmlController.div(htmlController.label( editRecord.contentControlId_Name + ":&nbsp;#" ) + headerInfo.recordId + ", " + editRecord.nameLc , "col-sm-4");
-                    result += htmlController.div(htmlController.label("created:&nbsp;" ) + editRecord.dateAdded.ToString(), "col-sm-4");
-                    result += htmlController.div(htmlController.label("modified:&nbsp;") + editRecord.modifiedDate.ToString(), "col-sm-4");
+                    result += htmlController.div(htmlController.strong( editRecord.contentControlId_Name + ":&nbsp;#" ) + headerInfo.recordId + ", " + editRecord.nameLc , "col-sm-4");
+                    result += htmlController.div(htmlController.strong("Created:&nbsp;" ) + getEditForm_TitleBarDetails_EditorString(editRecord.dateAdded, editRecord.createdBy, "unknown"), "col-sm-4");
+                    result += htmlController.div(htmlController.strong("Modified:&nbsp;") + getEditForm_TitleBarDetails_EditorString( editRecord.modifiedDate, editRecord.modifiedBy, "not modified" ), "col-sm-4");
                 }
                 result = htmlController.div(result, "row");
             } else {
@@ -959,25 +972,25 @@ namespace Contensive.Core {
                     + "Name: " + headerInfo.recordName + "<br>Record ID: " + headerInfo.recordId + "</td><td width=\"50%\">";
                     //
                     string CreatedCopy = "";
-                    CreatedCopy = CreatedCopy + " " + headerInfo.recordDateAdded.ToString();
+                    CreatedCopy = CreatedCopy + " " + editRecord.dateAdded.ToString();
                     //
                     string CreatedBy = "the system";
-                    if (headerInfo.recordAddedById != 0) {
-                        int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + headerInfo.recordAddedById);
+                    if ( editRecord.createdBy.id != 0) {
+                        int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + editRecord.createdBy.id);
                         if (core.db.csOk(CS)) {
                             string Name = core.db.csGetText(CS, "name");
                             bool Active = core.db.csGetBoolean(CS, "active");
                             if (!Active && (!string.IsNullOrEmpty(Name))) {
                                 CreatedBy = "Inactive user " + Name;
                             } else if (!Active) {
-                                CreatedBy = "Inactive user #" + headerInfo.recordAddedById;
+                                CreatedBy = "Inactive user #" + editRecord.createdBy.id;
                             } else if (string.IsNullOrEmpty(Name)) {
-                                CreatedBy = "Unnamed user #" + headerInfo.recordAddedById;
+                                CreatedBy = "Unnamed user #" + editRecord.createdBy.id;
                             } else {
                                 CreatedBy = Name;
                             }
                         } else {
-                            CreatedBy = "deleted user #" + headerInfo.recordAddedById;
+                            CreatedBy = "deleted user #" + editRecord.createdBy.id;
                         }
                         core.db.csClose(ref CS);
                     }
@@ -988,27 +1001,27 @@ namespace Contensive.Core {
                     result += "Created:" + CreatedCopy;
                     //
                     string ModifiedCopy = "";
-                    if (headerInfo.recordDateModified == DateTime.MinValue) {
+                    if (editRecord.modifiedDate == DateTime.MinValue) {
                         ModifiedCopy = CreatedCopy;
                     } else {
-                        ModifiedCopy = ModifiedCopy + " " + headerInfo.recordDateModified;
+                        ModifiedCopy = ModifiedCopy + " " + editRecord.modifiedDate;
                         CreatedBy = "the system";
-                        if (headerInfo.recordModifiedById != 0) {
-                            int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + headerInfo.recordModifiedById);
+                        if ( editRecord.modifiedBy.id != 0) {
+                            int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + editRecord.modifiedBy.id);
                             if (core.db.csOk(CS)) {
                                 string Name = core.db.csGetText(CS, "name");
                                 bool Active = core.db.csGetBoolean(CS, "active");
                                 if (!Active && (!string.IsNullOrEmpty(Name))) {
                                     CreatedBy = "Inactive user " + Name;
                                 } else if (!Active) {
-                                    CreatedBy = "Inactive user #" + headerInfo.recordModifiedById;
+                                    CreatedBy = "Inactive user #" + editRecord.modifiedBy.id;
                                 } else if (string.IsNullOrEmpty(Name)) {
-                                    CreatedBy = "Unnamed user #" + headerInfo.recordModifiedById;
+                                    CreatedBy = "Unnamed user #" + editRecord.modifiedBy.id;
                                 } else {
                                     CreatedBy = Name;
                                 }
                             } else {
-                                CreatedBy = "deleted user #" + headerInfo.recordModifiedById;
+                                CreatedBy = "deleted user #" + editRecord.modifiedBy.id;
                             }
                             core.db.csClose(ref CS);
                         }
@@ -1043,7 +1056,7 @@ namespace Contensive.Core {
         /// <param name="htmlValue"></param>
         /// <returns></returns>
         public static string getDefaultEditor_Bool(coreController core, string htmlName, bool htmlValue, bool readOnly = false, string htmlId = "") {
-            string result = htmlController.div(htmlController.checkbox(htmlName, htmlValue, htmlId, readOnly), "checkbox");
+            string result = htmlController.div(htmlController.checkbox(htmlName, htmlValue, htmlId, false, "", readOnly), "checkbox");
             if (readOnly)  result += htmlController.inputHidden(htmlName, htmlValue);
             return result;
         }
@@ -1447,7 +1460,7 @@ namespace Contensive.Core {
         /// <param name="editorHelpRow"></param>
         /// <returns></returns>
         public static string getEditRow(coreController core, string EditorString, string Caption, string editorHelpRow, bool fieldRequired = false, bool ignore = false, string fieldHtmlId = "") {
-            return htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div( htmlController.small( editorHelpRow, "form-text text-muted"), "ml-5"), "p-2 ");
+            return htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div( htmlController.small( editorHelpRow, "form-text text-muted"), "ml-5"), "p-2 ccEditRow");
         }
         //
         // ====================================================================================================

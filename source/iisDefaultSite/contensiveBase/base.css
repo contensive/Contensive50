@@ -12,7 +12,6 @@
 }
 
 .ccBodyAdmin {
-    overflow: auto;
     font-family: 'Catamaran', sans-serif;
     margin: 0;
     padding: 0;
@@ -264,6 +263,12 @@
     background-color: #fff8d0;
     text-align: left;
     vertical-align: baseline;
+}
+/*
+    admin edit form, editor row
+*/
+.ccCon .ccEditRow {
+    border-bottom: 1px solid #ddd;
 }
 
     .ccCon .ccEditFieldCon .ccEditorCon {

@@ -1711,7 +1711,7 @@ namespace Contensive.Core.Controllers {
                             LineEnd = genericController.vbInstr(LineStart, result, EndFlag);
                             string Copy = "";
                             if (LineEnd == 0) {
-                                logController.logError(core, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly");
+                                logController.logWarn(core, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly");
                                 break;
                             } else {
                                 string AddonName = "";

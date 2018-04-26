@@ -2693,58 +2693,26 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string getRecordEditLink(string ContentName, int RecordID, bool AllowCut, string RecordName, bool IsEditing) {
-            string result = null;
+        public string getRecordEditLink(string contentName, int recordID, bool allowCut, string RecordName, bool IsEditing) {
+            string result = "";
             try {
-                int ContentID = 0;
-                string iContentName = null;
-                int iRecordID = 0;
-                string WorkingLink = null;
-                bool iAllowCut = false;
-                string ContentCaption = null;
-                //
-                iContentName = genericController.encodeText(ContentName);
-                iRecordID = genericController.encodeInteger(RecordID);
-                iAllowCut = genericController.encodeBoolean(AllowCut);
-                ContentCaption = htmlController.encodeHtml(iContentName);
-                if (genericController.vbLCase(ContentCaption) == "aggregate functions") {
-                    ContentCaption = "Add-on";
-                }
-                if (genericController.vbLCase(ContentCaption) == "aggregate function objects") {
-                    ContentCaption = "Add-on";
-                }
-                ContentCaption = ContentCaption + " record";
-                if (!string.IsNullOrEmpty(RecordName)) {
-                    ContentCaption = ContentCaption + ", named '" + RecordName + "'";
-                }
-                //
-                result = "";
-                if (string.IsNullOrEmpty(iContentName)) {
-                    throw (new ApplicationException("ContentName [" + ContentName + "] is invalid")); // handleLegacyError14(MethodName, "")
+                string ContentCaption = htmlController.encodeHtml(contentName);
+                ContentCaption += " record";
+                if (!string.IsNullOrEmpty(RecordName)) ContentCaption += ", named '" + RecordName + "'";
+                if (string.IsNullOrEmpty(contentName)) {
+                    throw (new ApplicationException("ContentName [" + contentName + "] is invalid")); 
                 } else {
-                    if (iRecordID < 1) {
-                        throw (new ApplicationException("RecordID [" + RecordID + "] is invalid")); // handleLegacyError14(MethodName, "")
+                    if (recordID < 1) {
+                        throw (new ApplicationException("RecordID [" + recordID + "] is invalid")); 
                     } else {
                         if (IsEditing) {
-                            //
-                            // Edit link, main_Get the CID
-                            var cdef = Models.Complex.cdefModel.getCdef(core, iContentName);
-                            //ContentID = Models.Complex.cdefModel.getContentId(core, iContentName);
-                            result += adminUIController.getIconEditAdminLink(core, cdef);
-
-                            //result = result + "<a"
-                            //    + " class=\"ccRecordEditLink\" "
-                            //    + " TabIndex=-1"
-                            //    + " href=\"" + htmlController.encodeHtml("/" + core.appConfig.adminRoute + "?cid=" + ContentID + "&id=" + iRecordID + "&af=4&aa=2&ad=1") + "\"";
-                            //result = result + ">" + iconEdit + "</a>";
-                            //
-                            // Cut Link if enabled
-                            if (iAllowCut) {
-                                WorkingLink = genericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) + "." + genericController.encodeText(RecordID), true);
+                            var cdef = Models.Complex.cdefModel.getCdef(core, contentName);
+                            result += adminUIController.getIconEditAdminLink(core, cdef, recordID );
+                            if (allowCut) {
+                                int ContentID = 0;
+                                string WorkingLink = genericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) + "." + genericController.encodeText(recordID), true);
                                 result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
                             }
-                            //
-                            // Help link if enabled
                             result = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + result + "</span>";
                         }
                     }
@@ -4195,6 +4163,16 @@ namespace Contensive.Core.Controllers {
                 s += " id=\"" + htmlId + "\"";
             }
             return "<label " + s + ">" + innerHtml + "</label>";
+        }
+        public static string strong(string innerHtml, string htmlClass = "", string htmlId = "") {
+            string s = "";
+            if (!string.IsNullOrEmpty(htmlClass)) {
+                s += " class=\"" + htmlClass + "\"";
+            }
+            if (!string.IsNullOrEmpty(htmlId)) {
+                s += " id=\"" + htmlId + "\"";
+            }
+            return "<strong " + s + ">" + innerHtml + "</strong>";
         }
         //
         // ====================================================================================================

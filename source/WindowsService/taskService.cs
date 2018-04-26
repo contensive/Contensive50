@@ -21,23 +21,23 @@ namespace WindowsService {
             CPClass cp = new CPClass();
             try {
                 //
-                logController.logError(cp.core, "Services.OnStart enter");
+                logController.logInfo(cp.core, "Services.OnStart enter");
                 //
                 if (true) {
                     //
                     // -- start scheduler
-                    logController.logError(cp.core, "Services.OnStart, call taskScheduler.startTimerEvents");
+                    logController.logInfo(cp.core, "Services.OnStart, call taskScheduler.startTimerEvents");
                     taskScheduler = new taskSchedulerController();
                     taskScheduler.startTimerEvents(true, false);
                 }
                 if (true) {
                     //
                     // -- start runner
-                    logController.logError(cp.core, "Services.OnStart, call taskRunner.startTimerEvents");
+                    logController.logInfo(cp.core, "Services.OnStart, call taskRunner.startTimerEvents");
                     taskRunner = new taskRunnerController();
                     taskRunner.startTimerEvents();
                 }
-                logController.logError(cp.core, "Services.OnStart exit");
+                logController.logInfo(cp.core, "Services.OnStart exit");
             } catch (Exception ex) {
                 logController.handleError(cp.core,ex, "taskService.OnStart Exception");
             }
@@ -47,13 +47,13 @@ namespace WindowsService {
             CPClass cp = new CPClass();
             try {
                 //
-                logController.logError(cp.core, "Services.OnStop enter");
+                logController.logInfo(cp.core, "Services.OnStop enter");
                 //
                 if (taskScheduler != null) {
                     //
                     // stop taskscheduler
                     //
-                    logController.logError(cp.core, "Services.OnStop, call taskScheduler.stopTimerEvents");
+                    logController.logInfo(cp.core, "Services.OnStop, call taskScheduler.stopTimerEvents");
                     taskScheduler.stopTimerEvents();
                     taskScheduler.Dispose();
                 }
@@ -61,11 +61,11 @@ namespace WindowsService {
                     //
                     // stop taskrunner
                     //
-                    logController.logError(cp.core, "Services.OnStop, call taskRunner.stopTimerEvents");
+                    logController.logInfo(cp.core, "Services.OnStop, call taskRunner.stopTimerEvents");
                     taskRunner.stopTimerEvents();
                     taskRunner.Dispose();
                 }
-                logController.logError(cp.core, "Services.OnStop exit");
+                logController.logInfo(cp.core, "Services.OnStop exit");
             } catch (Exception ex) {
                 logController.handleError(cp.core,ex, "taskService.OnStop Exception");
             }
