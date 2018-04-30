@@ -770,6 +770,7 @@
     <None Include="My Project\PublishProfiles\aspxtest.pubxml" />
     <None Include="My Project\PublishProfiles\c-pf-kma-c5-resources-iisDefaultSite.pubxml" />
     <None Include="My Project\PublishProfiles\deployToLocalAppPatternsAspnet.pubxml" />
+    <None Include="My Project\PublishProfiles\FolderProfile.pubxml" />
     <None Include="My Project\PublishProfiles\localTestSite.pubxml" />
     <None Include="My Project\PublishProfiles\WebDeploymentPackage.pubxml" />
     <None Include="My Project\Settings.settings">

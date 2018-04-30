@@ -1718,7 +1718,8 @@ namespace Contensive.Core.Controllers {
                                 //
                                 testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname);
                                 //testAssemblyName = testAssembly.FullName
-                            } catch (Exception) {
+                            } catch (Exception ex) {
+                                logController.logWarn(core, "Assembley.LoadFrom failure, adding DLL [" + TestFilePathname + "] to assemblySkipList, ex [" + ex.ToString() + "]");
                                 core.assemblySkipList.Add(TestFilePathname);
                                 testFileIsValidAddonAssembly = false;
                             }
@@ -1846,21 +1847,24 @@ namespace Contensive.Core.Controllers {
                                             // -- not an addon assembly
                                             //core.assemblySkipList.Add(TestFilePathname);
                                         }
-                                    } catch (ReflectionTypeLoadException) {
+                                    } catch (ReflectionTypeLoadException ex) {
                                         //
                                         // exceptin thrown out of application bin folder when xunit library included -- ignore
                                         //
+                                        logController.logWarn(core, "Assembley ReflectionTypeLoadException, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
                                         core.assemblySkipList.Add(TestFilePathname);
-                                    } catch (Exception) {
+                                    } catch (Exception ex) {
                                         //
                                         // problem loading types
                                         //
+                                        logController.logWarn(core, "Assembley exception, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
                                         core.assemblySkipList.Add(TestFilePathname);
                                         string detailedErrorMessage = "While locating assembly for addon [" + AddonDisplayName + "], there was an error loading types for assembly [" + TestFilePathname + "]. This assembly was skipped and should be removed from the folder [" + fullPath + "]";
                                         throw new ApplicationException(detailedErrorMessage);
                                     }
                                 }
                             } catch (System.Reflection.ReflectionTypeLoadException ex) {
+                                logController.logWarn(core, "Assembley ReflectionTypeLoadException-2, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
                                 core.assemblySkipList.Add(TestFilePathname);
                                 string detailedErrorMessage = "A load exception occured for addon [" + AddonDisplayName + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
                                 foreach (Exception exLoader in ex.LoaderExceptions) {
@@ -1871,6 +1875,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // ignore these errors
                                 //
+                                logController.logWarn(core, "Assembley Exception-2, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
                                 core.assemblySkipList.Add(TestFilePathname);
                                 string detailedErrorMessage = "A non-load exception occured while loading the addon [" + AddonDisplayName + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "].";
                                 logController.handleError(core, new ApplicationException(detailedErrorMessage));

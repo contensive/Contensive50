@@ -1,0 +1,55 @@
+
+
+<Collection name="CoreHelptest" guid="{00005DB1-D3F0-40AF-AAC4-4BD78E680FAE}" system="1">
+<CDef name="People">
+	<Field name="name">
+		<HelpDefault>people.name - default help 20180427-1023.</HelpDefault>
+		<HelpCustom>people.name - custom help 20180427-1023.</HelpCustom>
+	</Field>
+	<Field name="AllowBulkEmail">
+		<HelpDefault>When checked, this user can receive group, system and conditional email from the site. This checkbox is cleared if the user clicks the SPAM link at the bottom of any email from the site.</HelpDefault>
+	</Field>
+	<Field name="Admin">
+		<HelpDefault>When selected, this user will have edit access to all content.</HelpDefault>
+	</Field>
+	<Field name="Developer">
+		<HelpDefault>ONLY for developers. When checked, this user has access to all features of the site.</HelpDefault>
+	</Field>
+	<Field name="AutoLogin">
+		<HelpDefault>Auto Login means that the next time this user comes to the site, they will not have to login. This checkbox lets this account have access to this feature. You can check it on their account, or they can check it from the login screen when they log in. It appears right below the username and password.
+
+You can disable this feature site-wide from the security tab of the preferences page. The preferences page is on the navigator under settings.</HelpDefault>
+	</Field>
+	<Field name="AllowToolsPanel">
+		<HelpDefault>Allow Tools Panel is only for content managers. It enables the panel of tools at the bottom of the page. Most administrators want it checked. It does not matter to anyone else.</HelpDefault>
+	</Field>
+	<Field name="ExcludeFromAnalytics">
+		<HelpDefault>When checked, this user will not be summarized in the Contensive Analytics data.</HelpDefault>
+	</Field>
+	<Field name="Visits">
+		<HelpDefault>The number of times this user has visited the site and logged in.</HelpDefault>
+	</Field>
+	<Field name="LastVisit">
+		<HelpDefault>This is the last authenticated visit from this user.</HelpDefault>
+	</Field>
+	<Field name="CreatedByVisit">
+		<HelpDefault>When checked, this user account was created automatically when the user first visited the site.</HelpDefault>
+	</Field>
+	<Field name="LanguageID">
+		<HelpDefault>This is the language selected for the user. If the user was created by a visit, the default is the language from their browser. </HelpDefault>
+	</Field>
+	<Field name="BirthdayDay">
+		<HelpDefault>The user birthday can be used to send a conditional email.</HelpDefault>
+	</Field>
+	<Field name="BirthdayMonth">
+		<HelpDefault>The user birthday can be used to send a conditional email.</HelpDefault>
+	</Field>
+	<Field name="BirthdayYear">
+		<HelpDefault>The user birthday can be used to send a conditional email.</HelpDefault>
+	</Field>
+	<Field name="StyleFilename">
+		<HelpDefault>These styles will only appear when this user is logged into the site. This is powerful when used in combination with an addon.</HelpDefault>
+	</Field>
+</CDef>
+
+</Collection>

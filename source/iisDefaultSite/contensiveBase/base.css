@@ -1,4 +1,5 @@
 
+
 /*
     Body Class Selectors 
 */
@@ -15,7 +16,7 @@
     font-family: 'Catamaran', sans-serif;
     margin: 0;
     padding: 0;
-    color: #444;
+    color: #233;
     BACKGROUND-COLOR: rgb(240,240,240);
     min-height: 100vh;
 }
@@ -46,10 +47,9 @@
 /*
     edit form tweeks
 */
-
 .ccForm label {
     font-weight: 600;
-    color: #444;
+    color: #233;
 }
 /*
     container resets 
@@ -106,14 +106,20 @@
     adminSite
 */
 #desktop {
-    color: #222;
-    Background-color: rgb(240,240,240)
+    color: #333;
+    Background-color: #e8e8e8
+}
+
+.ccWarningBox {
+    width: 300px;
+    margin: 100px auto auto auto;
+    text-align: center;
 }
 
 .ccCon .ccHeaderCon {
     width: 100%;
     COLOR: #eee;
-    BACKGROUND-COLOR: #444;
+    BACKGROUND-COLOR: #233;
     clear: both;
     vertical-align: middle;
     border-bottom: 1px solid #000;
@@ -139,7 +145,7 @@
 
     .ccCon .ccHeaderCon .cchSingle {
         COLOR: #eee;
-        BACKGROUND-COLOR: #444;
+        BACKGROUND-COLOR: #233;
         text-align: left;
         padding: 10px;
         vertical-align: middle;
@@ -147,7 +153,7 @@
 
     .ccCon .ccHeaderCon .cchClosed {
         COLOR: #eee;
-        BACKGROUND-COLOR: #444;
+        BACKGROUND-COLOR: #233;
         text-align: right;
         padding: 10px
     }
@@ -164,25 +170,25 @@
 
     .ccCon .ccToolsCon .ccHeaderCon {
         COLOR: #eee;
-        BACKGROUND-COLOR: #444;
+        BACKGROUND-COLOR: #233;
     }
 
         .ccCon .ccToolsCon .ccHeaderCon .closed {
             COLOR: #eee;
-            BACKGROUND-COLOR: #444;
+            BACKGROUND-COLOR: #233;
             text-align: left;
             padding: 10px;
         }
 
         .ccCon .ccToolsCon .ccHeaderCon .left {
             COLOR: #eee;
-            BACKGROUND-COLOR: #444;
+            BACKGROUND-COLOR: #233;
             text-align: left
         }
 
         .ccCon .ccToolsCon .ccHeaderCon .right {
             COLOR: #eee;
-            BACKGROUND-COLOR: #444;
+            BACKGROUND-COLOR: #233;
             text-align: right
         }
 
@@ -271,77 +277,77 @@
     border-bottom: 1px solid #ddd;
 }
 
-    .ccCon .ccEditFieldCon .ccEditorCon {
+.ccCon .ccEditFieldCon .ccEditorCon {
+}
+
+    .ccCon .ccEditFieldCon .ccEditorCon .checkBox {
+        border: 1px solid #ccc;
+        padding: 4px;
     }
 
-        .ccCon .ccEditFieldCon .ccEditorCon .checkBox {
-            border: 1px solid #ccc;
-            padding: 4px;
-        }
-
-        .ccCon .ccEditFieldCon .ccEditorCon .text {
-            border: 1px solid #ccc;
-            padding: 4px;
-        }
-
-        .ccCon .ccEditFieldCon .ccEditorCon .select {
-            border: 1px solid #ccc;
-            padding: 4px;
-        }
-
-        .ccCon .ccEditFieldCon .ccEditorCon .file {
-            border: 1px solid #ccc;
-            padding: 4px;
-        }
-
-        .ccCon .ccEditFieldCon .ccEditorCon .date {
-            border: 1px solid #ccc;
-            padding: 4px;
-        }
-
-        .ccCon .ccEditFieldCon .ccEditorCon .number {
-            border: 1px solid #ccc;
-            padding: 4px;
-        }
-
-        .ccCon .ccEditFieldCon .ccEditorCon .password {
-            border: 1px solid #ccc;
-            padding: 4px;
-        }
-
-        .ccCon .ccEditFieldCon .ccEditorCon .styles {
-            border: 1px solid #ccc;
-            padding: 4px;
-        }
-
-        .ccCon .ccEditFieldCon .ccEditorCon .link {
-            border: 1px solid #ccc;
-            padding: 4px;
-        }
-
-        .ccCon .ccEditFieldCon .ccEditorCon .resourceLink {
-            border: 1px solid #ccc;
-            padding: 4px;
-        }
-
-    .ccCon .ccEditFieldCon .ccEditorHelpCon {
-        color: #888;
-        padding: 10px;
-        width: 80%;
+    .ccCon .ccEditFieldCon .ccEditorCon .text {
+        border: 1px solid #ccc;
+        padding: 4px;
     }
 
-        .ccCon .ccEditFieldCon .ccEditorHelpCon .opened {
-            display: none;
+    .ccCon .ccEditFieldCon .ccEditorCon .select {
+        border: 1px solid #ccc;
+        padding: 4px;
+    }
+
+    .ccCon .ccEditFieldCon .ccEditorCon .file {
+        border: 1px solid #ccc;
+        padding: 4px;
+    }
+
+    .ccCon .ccEditFieldCon .ccEditorCon .date {
+        border: 1px solid #ccc;
+        padding: 4px;
+    }
+
+    .ccCon .ccEditFieldCon .ccEditorCon .number {
+        border: 1px solid #ccc;
+        padding: 4px;
+    }
+
+    .ccCon .ccEditFieldCon .ccEditorCon .password {
+        border: 1px solid #ccc;
+        padding: 4px;
+    }
+
+    .ccCon .ccEditFieldCon .ccEditorCon .styles {
+        border: 1px solid #ccc;
+        padding: 4px;
+    }
+
+    .ccCon .ccEditFieldCon .ccEditorCon .link {
+        border: 1px solid #ccc;
+        padding: 4px;
+    }
+
+    .ccCon .ccEditFieldCon .ccEditorCon .resourceLink {
+        border: 1px solid #ccc;
+        padding: 4px;
+    }
+
+.ccCon .ccEditFieldCon .ccEditorHelpCon {
+    color: #888;
+    padding: 10px;
+    width: 80%;
+}
+
+    .ccCon .ccEditFieldCon .ccEditorHelpCon .opened {
+        display: none;
+    }
+
+        .ccCon .ccEditFieldCon .ccEditorHelpCon .opened .header {
+            padding-top: 5px;
+            color: #233;
         }
 
-            .ccCon .ccEditFieldCon .ccEditorHelpCon .opened .header {
-                padding-top: 5px;
-                color: #444;
-            }
-
-            .ccCon .ccEditFieldCon .ccEditorHelpCon .opened .body {
-                color: #444;
-            }
+        .ccCon .ccEditFieldCon .ccEditorHelpCon .opened .body {
+            color: #233;
+        }
 
 .ccCon .ccHelpCon {
     width: 95%;
@@ -385,7 +391,7 @@
 }
 
 .ccCon .ccAdminEditBody {
-    BACKGROUND-COLOR: rgb(248,248,250);
+    BACKGROUND-COLOR: #f8f8f8;
     padding: 5px;
 }
 
@@ -406,7 +412,7 @@
 
 .ccCon .ccAdminListCaption {
     padding: 4px;
-    background-color: rgb(140,140,140);
+    background-color: #444;
     COLOR: white;
     border-right: 1px solid white;
     border-bottom: 1px solid black;
@@ -444,7 +450,7 @@
 }
 
 .ccCon .ccAdminTab {
-    background-color: rgb(180,180,180);
+    background-color: #555;
     color: white;
     white-space: nowrap;
 }
@@ -620,8 +626,8 @@ div.ccJumpCon {
         cursor: pointer;
         list-style: none inside none;
         margin: 0;
-        padding: 5px 5px !important;
-        color: #444;
+        padding: 4px 5px !important;
+        color: #233;
         Background-Color: #ccc;
     }
 
@@ -649,7 +655,7 @@ div.ccJumpCon {
 
 .ccBubbleCon {
     position: absolute;
-    border: 2px solid rgb(140,140,140);
+    border: 2px solid #444;
     margin: 0;
     padding: 0;
     Background-color: rgb(240,240,240);
@@ -660,12 +666,12 @@ div.ccJumpCon {
         position: static;
         width: 100%;
         COLOR: white;
-        BACKGROUND-COLOR: rgb(140,140,140);
+        BACKGROUND-COLOR: #444;
     }
 
         .ccBubbleCon .ccHeaderCon .bbLeft {
             COLOR: white;
-            BACKGROUND-COLOR: rgb(140,140,140);
+            BACKGROUND-COLOR: #444;
             text-align: left;
             padding: 5px;
             white-space: nowrap;
@@ -674,7 +680,7 @@ div.ccJumpCon {
 
         .ccBubbleCon .ccHeaderCon .bbRight {
             COLOR: white;
-            BACKGROUND-COLOR: rgb(140,140,140);
+            BACKGROUND-COLOR: #444;
             text-align: right;
             padding: 5px;
             width: 23px
@@ -793,7 +799,7 @@ ul.ccChildList {
 
 ul.ccChildListInactive {
     text-align: left;
-    border-top: 1px solid #444;
+    border-top: 1px solid #233;
 }
 
     ul.ccChildListInactive li.ccListItem {
@@ -1114,7 +1120,7 @@ A.ccFlyoutButton {
 
     A.ccFlyoutButton:hover {
         color: white;
-        Background-color: rgb(140,140,140);
+        Background-color: #444;
     }
 
     A.ccFlyoutButton:visited {
@@ -1122,7 +1128,7 @@ A.ccFlyoutButton {
 
 A.ccFlyoutButtonDown {
     color: white;
-    Background-color: rgb(140,140,140);
+    Background-color: #444;
 }
 
     A.ccFlyoutButtonDown:hover {
@@ -1157,7 +1163,7 @@ A.ccFlyoutPanelButton {
 
     A.ccFlyoutPanelButton:hover {
         COLOR: white;
-        BACKGROUND-COLOR: rgb(140,140,140);
+        BACKGROUND-COLOR: #444;
     }
 
     A.ccFlyoutPanelButton:visited {
@@ -1165,7 +1171,7 @@ A.ccFlyoutPanelButton {
 
 A.ccFlyoutPanelButtonDown {
     COLOR: white;
-    BACKGROUND-COLOR: rgb(140,140,140);
+    BACKGROUND-COLOR: #444;
 }
 
 .ccReport {
@@ -1194,7 +1200,7 @@ A.ccFlyoutPanelButtonDown {
 }
 
 .ccTab {
-    background-color: rgb(140,140,140);
+    background-color: #444;
     color: white;
 }
 
@@ -1318,7 +1324,7 @@ A.ccLiveTabHitLink {
 
 .ccWizardHeader {
     COLOR: white;
-    BACKGROUND-COLOR: rgb(140,140,140);
+    BACKGROUND-COLOR: #444;
     Padding: 5px;
     Border-Top: 1px solid #1330c0;
     Border-Left: 1px solid #1330c0;
@@ -1356,7 +1362,7 @@ A.ccLiveTabHitLink {
 
 .ccTextAreaHead {
     COLOR: white;
-    BACKGROUND-COLOR: rgb(140,140,140);
+    BACKGROUND-COLOR: #444;
     padding: 5px;
 }
 
@@ -1378,7 +1384,7 @@ div.ccTextAreaHead A:hover {
     left: 0px;
     height: 24px;
     width: 100%;
-    background-color: rgb(140,140,140);
+    background-color: #444;
     margin: 0px;
     padding: 5px;
     border-bottom: 2px solid #d0d0d0;
@@ -1398,7 +1404,7 @@ div.ccTextAreaHeadOpened A:hover {
 
 div.ccTestPointMessageCon {
     margin: 10px;
-    border: 1px solid #444;
+    border: 1px solid #233;
     padding: 20px;
     background-color: #eee;
 }

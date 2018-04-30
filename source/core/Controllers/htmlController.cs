@@ -927,7 +927,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="htmlMethod"></param>
         /// <returns></returns>
-        public static string form( coreController core,  string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "" ) {
+        public static string form( coreController core,  string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post" ) {
             return form_start(core, actionQueryString, htmlName, htmlClass, htmlId, htmlMethod) + innerHtml + formEnd();
         }
         //

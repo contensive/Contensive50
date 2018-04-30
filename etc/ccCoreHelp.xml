@@ -1,0 +1,825 @@
+
+<Collection name="CoreHelp" guid="{6E905DB1-D3F0-40AF-AAC4-4BD78E680FAE}" system="1">
+<CDef name="Data Sources">
+	<Field name="Name">
+		<HelpDefault>1 - Data Source names should not be edited.</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Tables">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Content">
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Content Fields">
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Content Field Types">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Sort Methods">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Content Categories">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Visit Summary">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Visitors">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Visits">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Viewings">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Admin Menuing">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Navigator Entries">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Report Rules">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Trap Log">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Site Properties">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Topics">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Topic Habits">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Languages">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="People">
+	<Field name="AllowBulkEmail">
+		<HelpDefault>When checked, this user can receive group, system and conditional email from the site. This checkbox is cleared if the user clicks the SPAM link at the bottom of any email from the site.</HelpDefault>
+	</Field>
+	<Field name="Admin">
+		<HelpDefault>When selected, this user will have edit access to all content.</HelpDefault>
+	</Field>
+	<Field name="Developer">
+		<HelpDefault>ONLY for developers. When checked, this user has access to all features of the site.</HelpDefault>
+	</Field>
+	<Field name="AutoLogin">
+		<HelpDefault>Auto Login means that the next time this user comes to the site, they will not have to login. This checkbox lets this account have access to this feature. You can check it on their account, or they can check it from the login screen when they log in. It appears right below the username and password.
+
+You can disable this feature site-wide from the security tab of the preferences page. The preferences page is on the navigator under settings.</HelpDefault>
+	</Field>
+	<Field name="AllowToolsPanel">
+		<HelpDefault>Allow Tools Panel is only for content managers. It enables the panel of tools at the bottom of the page. Most administrators want it checked. It does not matter to anyone else.</HelpDefault>
+	</Field>
+	<Field name="ExcludeFromAnalytics">
+		<HelpDefault>When checked, this user will not be summarized in the Contensive Analytics data.</HelpDefault>
+	</Field>
+	<Field name="Visits">
+		<HelpDefault>The number of times this user has visited the site and logged in.</HelpDefault>
+	</Field>
+	<Field name="LastVisit">
+		<HelpDefault>This is the last authenticated visit from this user.</HelpDefault>
+	</Field>
+	<Field name="CreatedByVisit">
+		<HelpDefault>When checked, this user account was created automatically when the user first visited the site.</HelpDefault>
+	</Field>
+	<Field name="LanguageID">
+		<HelpDefault>This is the language selected for the user. If the user was created by a visit, the default is the language from their browser. </HelpDefault>
+	</Field>
+	<Field name="BirthdayDay">
+		<HelpDefault>The user birthday can be used to send a conditional email.</HelpDefault>
+	</Field>
+	<Field name="BirthdayMonth">
+		<HelpDefault>The user birthday can be used to send a conditional email.</HelpDefault>
+	</Field>
+	<Field name="BirthdayYear">
+		<HelpDefault>The user birthday can be used to send a conditional email.</HelpDefault>
+	</Field>
+	<Field name="StyleFilename">
+		<HelpDefault>These styles will only appear when this user is logged into the site. This is powerful when used in combination with an addon.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Groups">
+	<Field name="Name">
+		<HelpDefault>The name for this record. If this group was created by an add-on you should not rename it. 
+
+The name will appear in admin page listings etc. The group caption can be used by addons to over-ride the name during display on the public site.
+
+For compatibility with older add-ons, do NOT include special characters such as commas. Valid characters are letters, spaces and numbers.</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+	<Field name="Caption">
+		<HelpDefault>The caption can be used by add-ons to replace the name when displayed on the public site. Not all add-ons will support this.</HelpDefault>
+	</Field>
+	<Field name="CopyFilename">
+		<HelpDefault>Some addons may use this copy to describe a group. For example, if the group is included in a profile form for a list of available newsletters.</HelpDefault>
+	</Field>
+	<Field name="AllowBulkEmail">
+		<HelpDefault>When checked, you can send group email to this group.</HelpDefault>
+	</Field>
+	<Field name="PublicJoin">
+		<HelpDefault>Addons can use this checkbox to display or block the ability to join the group publicly in profile forms.</HelpDefault>
+	</Field>
+	<Field name="MembershipReference">
+		<HelpDefault>Click to see the people in this group.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Organizations">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+	<Field name="CopyFilename">
+		<HelpDefault>This is a longer description of the organization. It could be used on the public site on a detail page for the organization.</HelpDefault>
+	</Field>
+	<Field name="BriefFilename">
+		<HelpDefault>This is a brief description of the organization. It could be used on the public site in a list of organizations.</HelpDefault>
+	</Field>
+	<Field name="ContactMemberID">
+		<HelpDefault>This is the primary contact for the organization.</HelpDefault>
+	</Field>
+	<Field name="Phone">
+		<HelpDefault>The telephone number for this organization. This is generally the main number. The number for the primary contact at the organization should go in the people record for that individual, and that individual should be selected as the organization&#39;s contact</HelpDefault>
+	</Field>
+	<Field name="Web">
+		<HelpDefault>The name of the website for this organization that you want to display on the screen. When you click on this name, you will go to the URL contained in the Link field below. If there is nothing entered in the Link field, then the Web field will also be considered the URL link.</HelpDefault>
+	</Field>
+	<Field name="Email">
+		<HelpDefault>The primary email address for this organization. Like the phone number, the email address for the primary contact should go in that individual&#39;s people record.</HelpDefault>
+	</Field>
+	<Field name="Link">
+		<HelpDefault>The URL that you want the link to go to for the website named in the Web field. If nothing is entered in the Web field, then the URL entered in the Link field will be displayed on the screen as the name of the website.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Page Content">
+	<Field name="Name">
+		<HelpDefault>The name field is used by site administrators to uniquely identify this page. It may also be used as a default for other fields that are visible to the public if other data is missing. For instance, if you set &#39;include in menus&#39; in the menuing tab, but do not set the menu headline, the name will be used as the caption for the menus.</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+	<Field name="Headline">
+		<HelpDefault>By default, headline creates a large bold headline at the top of the page, right above the page copy. It is created with the standard H1 HTML tag. If you leave this field blank, no headline will be added.</HelpDefault>
+	</Field>
+	<Field name="Copyfilename">
+		<HelpDefault>Copy is the main text area on the page. Add your page copy, as well as photos, Add-ons, etc. here.</HelpDefault>
+	</Field>
+	<Field name="ContentPadding">
+		<HelpDefault>This is the space, measured in pixels, between the edges of this content record and the template that holds it. Set it to 0 if you want no space, otherwise, a value from 10 to 20 results in typical page spacing.</HelpDefault>
+	</Field>
+	<Field name="ContactMemberID">
+		<HelpDefault>Select the contact for this content. By itself, this selection has no direct effect. It is used by several other features on this page to determine the page&#39;s contact.</HelpDefault>
+	</Field>
+	<Field name="IsSecure">
+		<HelpDefault>When checked, this page will require a &quot;https://&quot; secure connection. This feature is not inherited, so checking this box will not automatically require a secure connection on child pages.
+
+To require a non-secure &quot;http://&quot; connection, un-check this box and verify the template for this page does not have a link that specifies a &quot;https://&quot; secure connection, and that the template is not checked to require a secure connection.
+
+This feature is disabled if the template used for this page has a link that specifies a &quot;http://&quot; non-secure connection.</HelpDefault>
+	</Field>
+	<Field name="TemplateID">
+		<HelpDefault>The template is the part of the page that surrounds this record. In most cases, the template is determined by the site or the section, and this field can be left as &#39;None&#39; or &#39;Default&#39;. If there is a special template you want this page to use, select it here. Note that all child pages or this page will also this new template.
+
+For instance, if this page requires a secure certificate, you may have a &#39;secure&#39; page that should be selected here.</HelpDefault>
+	</Field>
+	<Field name="AllowHitNotification">
+		<HelpDefault>When checked, the page &#39;Contact&#39; will recieve an email when anyone views this page.
+
+There are several other conditions required to receive email, such as a valid email address, the &#39;Allow Group Email&#39; checkbox, spam filter exculsion, etc. See the Support Knowledge Base http://support.contensive.com/kb under Sending Email for more information...</HelpDefault>
+	</Field>
+	<Field name="AllowReturnLinkDisplay">
+		<HelpDefault>When checked, this page will include a linked breakcrumb list at the top. For example &#39;Return to Home&quot;.</HelpDefault>
+	</Field>
+	<Field name="AllowMetaContentNoFollow">
+		<HelpDefault>If checked, this page will include &#39;meta no-follow&#39;, a hidden block of information that tells search engines not to index this page or the pages it links to.</HelpDefault>
+	</Field>
+	<Field name="Viewings">
+		<HelpDefault>How many times this page was viewed since it was created.</HelpDefault>
+	</Field>
+	<Field name="PubDate">
+		<HelpDefault>If set, this page and it&#39;s child pages will not display until this date. This feature is only available on child pages. </HelpDefault>
+	</Field>
+	<Field name="DateExpires">
+		<HelpDefault>If set, this page and it&#39;s child pages will not display after this date. This feature is only available on child pages.</HelpDefault>
+	</Field>
+	<Field name="DateArchive">
+		<HelpDefault>If this date and the &#39;Archive Parent Page&#39; are set, this page and it&#39;s child pages will by automatically converted to a child page of the &#39;Archive Parent Page&#39; on this date.
+
+This feature is only available on child pages.</HelpDefault>
+	</Field>
+	<Field name="ArchiveParentID">
+		<HelpDefault>If the Archive Date and this selection are set, this page and it&#39;s child pages will by automatically converted to a child page of the &#39;Archive Parent Page&#39; on this date.
+
+This feature is only available on child pages.</HelpDefault>
+	</Field>
+	<Field name="AllowInMenus">
+		<HelpDefault>When checked, this page will appear in flyout menus.</HelpDefault>
+	</Field>
+	<Field name="AllowInChildLists">
+		<HelpDefault>When checked, this page will appear in its parent&#39;s child page list.</HelpDefault>
+	</Field>
+	<Field name="AllowChildListDisplay">
+		<HelpDefault>When checked, this page will include a list of its child pages.</HelpDefault>
+	</Field>
+	<Field name="ChildListSortMethodID">
+		<HelpDefault>Select a method to sort child pages for this page. Another way to sort child pages is to turn on edit mode and drag-and-drop child pages in the order you prefer.</HelpDefault>
+	</Field>
+	<Field name="MenuHeadline">
+		<HelpDefault>If provided, this text will be used as the caption for menus, breadcrumbs, and child page lists.</HelpDefault>
+	</Field>
+	<Field name="SortOrder">
+		<HelpDefault>If child page sort method is set to Alpha Sort Order, this field lets you manually sort this page with respect to its sibling pages in lists.</HelpDefault>
+	</Field>
+	<Field name="AllowBrief">
+		<HelpDefault>When checked, the Child Page Overview will be included in child page lists.</HelpDefault>
+	</Field>
+	<Field name="Link">
+		<HelpDefault>(optional) Enter a URL if you want users directed to another location when they click on links for this page. When included, all menuing with an entry for this page will instead use this URL. The URL should NOT be &#39;URL encoded&#39;, which means it can include spaces and not the &#39; &#39; style equivalents.</HelpDefault>
+	</Field>
+	<Field name="Clicks">
+		<HelpDefault>If a menu Link Override is included, this is the number of times this link has been clicked.</HelpDefault>
+	</Field>
+	<Field name="ParentID">
+		<HelpDefault>The field is automatically generated when you add a page from the Public Site. When None is selected, this page can only be used as a section root page. When any other page is selected, this page will display as a child of that page.</HelpDefault>
+	</Field>
+	<Field name="ParentListName">
+		<HelpDefault>This field is automatically populated when you add a page from the Public site. When parent page is selected and this entry is empty, the page will appear in child page list at the bottom of that page. When a name is entered here this page will display under the child page list with that name on the parent page.</HelpDefault>
+	</Field>
+	<Field name="ChildPagesFound">
+		<HelpDefault>This field indicates that child pages may have been found for this page. it is used internally to speed up rendering.</HelpDefault>
+	</Field>
+	<Field name="PageLink">
+		<HelpDefault>This field contains the most recent URL to this page. It is used internally.</HelpDefault>
+	</Field>
+	<Field name="BlockContent">
+		<HelpDefault>If checked, this page will have restricted access. To see the content of the page, a user will have to be logged in and a member of one of the groups in &#39;Allow Groups through Blocking&#39;. Administrators and Developers will also be given access.
+
+Use the &#39;Custom Blocking Method&#39; to determine what other&#39;s see.</HelpDefault>
+	</Field>
+	<Field name="BlockGroups">
+		<HelpDefault>If &#39;Block Content&#39; is checked, only users in these groups will have access to this content.
+
+What other&#39;s see is determined by the &#39;Custom Blocking Method&#39;</HelpDefault>
+	</Field>
+	<Field name="BlockSourceID">
+		<HelpDefault>If &#39;Block Content&#39; is checked, this selection determines what users will see.
+Custom Blocking Message - the text that follows.
+Login Form - they will see the login form within this page&#39;s template.
+Registration Form - they will see a form that lets them signup for an account. If the signup is completed correctly, they will also be added the group selected under &#39;Register to Group&#39;. If you allow access to this group in the &#39;Allow Groups Through Blocking&#39;, this acts as a simple signup process for this content.</HelpDefault>
+	</Field>
+	<Field name="CustomBlockMessage">
+		<HelpDefault>If this page is blocked, and &#39;Custom Blocking Message&#39; is selected as the Custom Blocking method, uses will see this form. Use it to inform them of the blocked content, or to present you custom login or registration. For instance, you may create a custom multi-page registration process using the Form Wizard and drop it on this form.</HelpDefault>
+	</Field>
+	<Field name="RegistrationGroupID">
+		<HelpDefault>When this page is blocked with the &#39;Registration&#39; blocking method, and a user completes the registration form, they will be added to the group you selecte here. Use this group to let them through this content block.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Email">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Email Groups">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Email Topics">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Email Templates">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Email Wizards">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Content Watch">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Content Watch Lists">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Content Watch List Rules">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="See Also">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Paths">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="States">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+	<Field name="Abbreviation">
+		<HelpDefault>The common two letter abbreviation for this state</HelpDefault>
+	</Field>
+	<Field name="SalesTax">
+		<HelpDefault>The rate to be charged by ecommerce for transaction shipped or billed to customers in this state. For example, for a rate of 5% enter 0.05</HelpDefault>
+	</Field>
+	<Field name="CountryID">
+		<HelpDefault>The country for this state. This is used in ecommerce to determine domestic or foreign shipping.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Countries">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Images">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Properties">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Authoring Controls">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Add-ons">
+	<Field name="OnPageStartEvent">
+		<HelpDefault>When checked, this add-on will be run right before the template&#39;s content box and the output will be displayed there.</HelpDefault>
+	</Field>
+	<Field name="BlockDefaultStyles">
+		<HelpDefault>When checked, the Default Styles will not be delivered when this add-on is executed. Use this option to replace the default styles with your own custom styles.</HelpDefault>
+	</Field>
+	<Field name="CustomStylesFilename">
+		<HelpDefault>Use custom styles to change the appearence of this add-on. If the add-on is managed from the Add-0n Library, this field will NOT be over written. This entry will only be included once no matter how many times this add-on is executed or included.</HelpDefault>
+	</Field>
+	<Field name="JavaScriptBodyEnd">
+		<HelpDefault>Include any javascript that you want included at the end of the body, immediately before the end-of-body tag.  This entry will only be included once no matter how many times this add-on is executed or included.</HelpDefault>
+	</Field>
+	<Field name="RemoteMethod">
+		<HelpDefault>When checked, this add-on will be a remote method. Caution: remote methods are available to the public without authentication. If your add-on provides access to sensative information, do not check this box. Note also that to access a remote method, you use the add-on name as the page name. The add-on name can NOT include spaces or characters incompatible with Internet URLs.</HelpDefault>
+	</Field>
+	<Field name="CopyText">
+		<HelpDefault>This text will be placed directly into the position where the Add-on is placed. It may contain HTML or simple text. It is affected by argument replacement (see arguments in the Features tab.)</HelpDefault>
+	</Field>
+	<Field name="StylesFilename">
+		<HelpDefault>Default Styles are the styles required by this add-on. These styles will download with each add-on update, so do not make changes to this field if the add-on is managed by the Contensive Add-on Library. Use these styles only if you are creating a new add-on, or managing one you created. To make changes to the stylesheet from an add-on managed from the Add-on Library, used the Custom Styles and the Block Default Styles checkbox.  This entry will only be included once no matter how many times this add-on is executed or included.</HelpDefault>
+	</Field>
+	<Field name="OtherHeadTags">
+		<HelpDefault>Add other tags you would like added to the document head. Be sure to include the html tags as well. For instance, if you would like a script tag that references code on a different page, add the entire tag, including the script tags thenselves. NOTE: CSS files are always listed first in the head and javascript files are always listed last. These tags will be in the middle. This may alter the order you wish for your Head section. It is affected by argument replacement (see arguments in the Features tab.)</HelpDefault>
+	</Field>
+	<Field name="MetaKeywordList">
+		<HelpDefault>Add words you would like added to the page&#39;s Meta Keywords. It is affected by argument replacement (see arguments in the Features tab.)</HelpDefault>
+	</Field>
+	<Field name="OnPageEndEvent">
+		<HelpDefault>When checked, this add-on will be run right after the template&#39;s content box and the output will be displayed there.</HelpDefault>
+	</Field>
+	<Field name="PageTitle">
+		<HelpDefault>Add a word or phrase you would like added to the page&#39;s title tag. It is affected by argument replacement (see arguments in the Features tab.)</HelpDefault>
+	</Field>
+	<Field name="JavaScriptOnLoad">
+		<HelpDefault>Enter javascript code that will be run in the body onLoad event. For instance, to add a pop-up window when this a page is display with this add-on, add the string &quot;alert(&#39;hello world&#39;)&quot; to the onLoad Event field. This entry will only be included once no matter how many times this add-on is executed or included.</HelpDefault>
+	</Field>
+	<Field name="Admin">
+		<HelpDefault>This add-on should be displayed in the Admin Navigator on the Manage Add-ons list. If it belongs to a collection, it will be dislayed there, otherwise, it will be displayed under advanced, under Add-ons with no collections. Note that developers see all add-ons regardless of this checkbox.</HelpDefault>
+	</Field>
+	<Field name="Content">
+		<HelpDefault>This add-on can be dropped in any content, such as page content or copy content.</HelpDefault>
+	</Field>
+	<Field name="Template">
+		<HelpDefault>This add-on can be dropped on a site template.</HelpDefault>
+	</Field>
+	<Field name="Email">
+		<HelpDefault>This add-on can be dropped in an email. Currently, this islimited to a very few hard-coded add-ons.</HelpDefault>
+	</Field>
+	<Field name="MetaDescription">
+		<HelpDefault>Add phrases or sentences you would like added tothe page&#39;s Meta Description tag. It is affected by argument replacement (see arguments in the Features tab.)</HelpDefault>
+	</Field>
+	<Field name="ScriptingCode">
+		<HelpDefault>Add code directly by entering it here. This code will be added last, after any code you may include in code modules, below.</HelpDefault>
+	</Field>
+	<Field name="ScriptingTimeout">
+		<HelpDefault>Enter the amount of time in milliseconds you want to give for your script to run.</HelpDefault>
+	</Field>
+	<Field name="inlineScript">
+		<HelpDefault>(PHP only) Script code entered here will be executed on the page in the position where this add-on is placed. Use the &#39;return&#39; statement to place a string on the page.
+&lt;br&gt;
+&lt;br&gt;example 1 - displays &#39;hello&#39; on the page. Add the following line to the &#39;inline script code&#39;.
+&lt;br&gt;return &#39;hello&#39;;
+&lt;br&gt;
+&lt;br&gt;example 2 - displays &#39;hello world&#39; on the page using a function.
+&lt;br&gt;function callMe()
+&lt;br&gt;{
+&lt;br&gt;return &#39;hello from a function&#39;;
+&lt;br&gt;}
+&lt;br&gt;return callMe();</HelpDefault>
+	</Field>
+	<Field name="CollectionID">
+		<HelpDefault>A Collection is a group of features that are distributed together. By assigning an add-on to a collection, it will be included in the collection installation file during a collection export. </HelpDefault>
+	</Field>
+	<Field name="OnBodyStart">
+		<HelpDefault>When checked, this add-on will be run right after the document&#39;s body tag and the output will be displayed there.</HelpDefault>
+	</Field>
+	<Field name="IsInline">
+		<HelpDefault>Check this box if the Add-on is to be treated as an inline HTML element. These are elements that flow with the copy, such as bold tags or images. Uncheck the box to treat the Add-on as an HTML block element, like a div, form or table.</HelpDefault>
+	</Field>
+	<Field name="DotNetClass">
+		<HelpDefault>If this add-on executes a dot net class library, include the full name of the class, including the full namespace. For instance, a class called HelloWorld in a namespace MyProject would be MyProject.HelloWorld. See the Contensive Support site learning center for more information on creating dot net class library add-ons.</HelpDefault>
+	</Field>
+	<Field name="Copy">
+		<HelpDefault>This copy will be placed in the content where the Add-on is located. It is affected by argument replacement (see arguments in the Features tab.)</HelpDefault>
+	</Field>
+	<Field name="ArgumentList">
+		<HelpDefault>This is a carriage return delimited list of name equals value arguments. When the add-on is placed on a page, administrators will be able to modify these values using the Instance Edit Icon. When the add-on is executed, the names will be replaced with the values in html content, wysiwyg content, meta content and the form file. Strings embedded in these fields should be delimited with $...$. See the support site Learning Center for more details.</HelpDefault>
+	</Field>
+	<Field name="Link">
+		<HelpDefault>A URL to a webserver that returns javascript. This URL will be added as the src attribute of a script tag, and placed in the content where this Add-on is inserted. This URL can be to any server-side program on any server, provided it returns javascript.</HelpDefault>
+	</Field>
+	<Field name="OnBodyEnd">
+		<HelpDefault>When checked, this add-on will be run right before document&#39;s /body tag and the output will be displayed there.</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="ObjectProgramID">
+		<HelpDefault>The ProgramID of a class in an ActiveX DLL installed on the server. The class must support one method - Execute( ccCsrv3.ContentServerClass, ccWeb3.MainClass, OptionList ). The text returned from this method will be placed in the content where this Add-on is dropped. See the Knowledge Base for more details about this method.</HelpDefault>
+	</Field>
+	<Field name="JSFilename">
+		<HelpDefault>Any javascript that must be included in a script tag in the head should be added to the In Head section. For instance, you may want to include your javascript functions in the head, then call them from within the add-on code. This entry will only be included once no matter how many times this add-on is executed or included.</HelpDefault>
+	</Field>
+	<Field name="RobotsTxt">
+		<HelpDefault>Add robot.txt compatible line that should be included in the site&#39;s robots.txt file. For instance, if your add-on creates a google compatible sitemap structure, create a reference to it for the robots.txt file.</HelpDefault>
+	</Field>
+	<Field name="IncludedAddons">
+		<HelpDefault>Each add-on checked will be run right before this add-on is run. Use this to include prerequisite add-ons. For instance, if you write add-ons that requires a javascript library, create an add-on that just adds that library to the head, and include it in your add-ons.</HelpDefault>
+	</Field>
+	<Field name="FormXML">
+		<HelpDefault>The Form constructor lets you create forms that interact with the site&#39;s database and site properties using an xml based syntax. This is very useful for creating setting pages for collections. See the support site learning center for more details on this syntax. It is affected by argument replacement (see arguments in the Features tab.)</HelpDefault>
+	</Field>
+	<Field name="InFrame">
+		<HelpDefault>When checked, this add-on will be created within a scrollable frame. Use this with the Remote Asset Link, and you can frame in content from other sites.</HelpDefault>
+	</Field>
+	<Field name="ScriptingLanguageID">
+		<HelpDefault>Select the language your scripts will use. The default is Visual Basic.</HelpDefault>
+	</Field>
+	<Field name="RemoteAssetLink">
+		<HelpDefault>Add a URL to a different page, even a different site, and that page will be displayed where this add-on is dropped.</HelpDefault>
+	</Field>
+	<Field name="BlockEditTools">
+		<HelpDefault>When checked, the add-on toolbar will not be displayed for this add-on when an administrator selects advanced edit. Unchecked, and the toolbar will be displayed.</HelpDefault>
+	</Field>
+	<Field name="AsAjax">
+		<HelpDefault>When checked, this add-on will initially display using ajax methods. This means the page will first delivered to the user without this add-on. When the page first draw, this add-on will be represented as a spinning placeholder. After a moment, the content of this add-on will render</HelpDefault>
+	</Field>
+	<Field name="ScriptingEntryPoint">
+		<HelpDefault>To return a text to the add-on, your script must be a procedure. If there is only one procedure in the script, it will be called. If there is more than one, the first will be called. To call any other, put the name of the procedure here.
+
+
+</HelpDefault>
+	</Field>
+	<Field name="ScriptingModules">
+		<HelpDefault>Check the boxes for any script modules you want to include. They will be included the alpha numeric order of their &quot;Alpha Sort Order&quot; field.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Add-on Collections">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+	<Field name="System">
+		<HelpDefault>System Collections are not visible in the Navigator for either administrators or developers.</HelpDefault>
+	</Field>
+	<Field name="Updatable">
+		<HelpDefault>An updateable collections are checked daily for updates on the Contensive add-on library. When installed, the installation propagates to all sites on the server. When a collection is not Updatable,  it will never be updated by either the Add-on Library or manual uploads from other sites.</HelpDefault>
+	</Field>
+	<Field name="blockNavigatorNode">
+		<HelpDefault>When checked, the collection will not be visible in the Navigator for administrators. Only developers will see the navigator nodes.</HelpDefault>
+	</Field>
+	<Field name="helpLink">
+		<HelpDefault>A link to a help page that describes this collection and all it&#39;s addons.</HelpDefault>
+	</Field>
+	<Field name="Help">
+		<HelpDefault>If Online Help is blank, this field is used to display help for the collection.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Library Folders">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Library Files">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Library File Types">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Library File Log">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Link Forwards">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Link Aliases">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Domains">
+	<Field name="Name">
+		<HelpDefault>The domain name. This entry should be typed out exactly as it appears in the URL, without the protocol (http://) and without any trailing slashes. For instance, support.contensive.com</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>When checked, this record controls this domain.</HelpDefault>
+	</Field>
+	<Field name="TypeID">
+		<HelpDefault>The type of domain. 
+Normal: The site responds to this domain with content. The domain is left in the address bar. 
+Forward-to-Url: Any hits to this domain will be forwarded to the Forward Url.
+Forward-to-Replacement-Domain: hits to this domain will be forwarded to the same page on the domain selected in the replacement domain.</HelpDefault>
+	</Field>
+	<Field name="RootPageID">
+		<HelpDefault>Select a custom landing for this domain. The landing page is the page used when just the domain appears in the address bar. If blank, the landing page selected in Preferences is used.</HelpDefault>
+	</Field>
+	<Field name="DefaultTemplateId">
+		<HelpDefault>Select a template to be used for pages on this domain, if no other template is specified by the page, its parent pages or its section. If blank, the template named &quot;default&quot; is used.</HelpDefault>
+	</Field>
+	<Field name="PageNotFoundPageID">
+		<HelpDefault>Select a custom &#39;Page Not Found&#39; for this domain. This page is used when the URL is not a valid page and contains this domain name. If blank, the Page-not-found selected in Preferences is used.</HelpDefault>
+	</Field>
+	<Field name="ForwardURL">
+		<HelpDefault>If the domain Type is Forward-to-Url, this is where all traffic will be forwarded.</HelpDefault>
+	</Field>
+	<Field name="NoFollow">
+		<HelpDefault>if checked, all hits to this domain will include the no-follow header to prevent search engines bots and other spiders from following the forwarding link.</HelpDefault>
+	</Field>
+	<Field name="Visited">
+		<HelpDefault>read-only. When checked, this domain has been used for this site.</HelpDefault>
+	</Field>
+	<Field name="allowCrossLogin">
+		<HelpDefault>When cheched, hits to this domain and any other domain with this checkbox checked will include special javascript code that lets uses stay logged-in when they move from domain to domain. This is useful when content include links between multiple domains that would otherwise cause you to be logged out.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Page Templates">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="BodyHTML">
+		<HelpDefault>The HTML in this field will be used by the system to construct any page that uses this template. This body should contain one &quot;Content Box&quot; add-on in the position where you want the page&#39;s content to display.</HelpDefault>
+	</Field>
+	<Field name="BodyTag">
+		<HelpDefault>This is an optional field. The default body tag is </HelpDefault>
+	</Field>
+	<Field name="IsSecure">
+		<HelpDefault>If the Link field does not contain a protocol, https:// or http://, checking this box will force pages using this template to use a secure connection. To force a page to use a non-secure connection, uncheck this box and verify the page being displayed also is not checked to require a secure connection. It is better to create a secure connection with this checkbox than to specify a protocol in the link field because the link field would then require a domain name. Checking this box will work with multiple domains. Note: all domains will need a secure certificate.</HelpDefault>
+	</Field>
+	<Field name="Link">
+		<HelpDefault>If this template requires a special host page, specify it here. Do not include a bookmark or query string (no # or ?). If this template requires just the site&#39;s default page, leave this field blank. Use a Root-Relative URL if you require a special page. Use a full URL if this template requires a special domain and/or a special protocol. If you just need a secure connection, consider checking the &quot;Requires Secure SSL Connection&quot;.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Site Sections">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="SortOrder">
+		<HelpDefault>An alphanumeric string that can be used to sort sections on menus.</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+	<Field name="Caption">
+		<HelpDefault>The caption is the text displays on the public site when this section is added to a menu. To create a menu, add the Dynamic Menu Add-on to your template.</HelpDefault>
+	</Field>
+	<Field name="TemplateID">
+		<HelpDefault>This is the template that will be used for this section when no template is set on individual pages. If this selection is blank, or set to Default, the Default template will be used. </HelpDefault>
+	</Field>
+	<Field name="RootPageID">
+		<HelpDefault>This is the page that will display when this section is clicked on the public site. When creating a new menu, leave this entry blank and a Root Page will be created for you the first time the section displays on a menu, with the same name as the section.</HelpDefault>
+	</Field>
+	<Field name="ContentID">
+		<HelpDefault>This selects the type of data that will be used for pages in this section. For new sections, if this is left blank it will automatically be set to Page Content when the section is first displayed. You can select other Content Definitions if you have multiple content managers who each have individual edit rights to different Content Definitions. For instance, if you want one person to edit just the &#39;About Us&#39; section, use the &#39;Create Content Definition&#39; tool to create a new Content Definition for the About Us pages, and assign that content definition to this section.</HelpDefault>
+	</Field>
+	<Field name="MenuImageFilename">
+		<HelpDefault>If your menus use graphic images, upload the image for this section here.</HelpDefault>
+	</Field>
+	<Field name="MenuImageOverFilename">
+		<HelpDefault>If your menus use graphic images, and you want a roll-over for your images, upload the roll-over image here.</HelpDefault>
+	</Field>
+	<Field name="HideMenu">
+		<HelpDefault>Check this box if you want this section to be hidden from the public on all menus in which the section has been included. Those with edit rights to the section will still be able to see it on the menu. This is helpful during development when the section is on multiple menus.</HelpDefault>
+	</Field>
+	<Field name="BlockSection">
+		<HelpDefault>Check this box if you want this section to only be available to administrators, and those people who are in the groups selected in the Section Blocking tab.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Meta Content">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Meta Keywords">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Aggregate Access">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Copy Content">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+	<Field name="Copy">
+		<HelpDefault>This block of HTML enabled copy will be used by the Text Box add-on, or any other add-on that calls out this record by it&#39;s name.</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="User Form Response">
+	<Field name="Active">
+		<HelpDefault>Determines if this record is available to the system. An inactive record will not be displayed on the public site, and will not be available in lists of records. You can however, edit the record from the admin site.</HelpDefault>
+	</Field>
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Dynamic Menus">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+<CDef name="Form Pages">
+	<Field name="Name">
+		<HelpDefault>The name for this record. The name is generally used to identify the record in a list, and is often used as a caption when the record is displayed publicly</HelpDefault>
+	</Field>
+</CDef>
+</Collection>

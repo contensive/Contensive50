@@ -38,21 +38,6 @@ namespace Contensive.Core.Controllers {
         private static bool addMiniCollectionSrcToDst(coreController core, ref miniCollectionModel dstCollection, miniCollectionModel srcCollection) {
             bool returnOk = true;
             try {
-                string HelpSrc = null;
-                bool HelpCustomChanged = false;
-                bool HelpDefaultChanged = false;
-                bool HelpChanged = false;
-                Models.Complex.cdefFieldModel srcCdefField = null;
-                Models.Complex.cdefModel dstCdef = null;
-                Models.Complex.cdefFieldModel dstCdefField = null;
-                bool IsMatch = false;
-                string DstKey = null;
-                string SrcKey = null;
-                string DataBuildVersion = null;
-                bool SrcIsNavigator = false;
-                bool DstIsNavigator = false;
-                
-                string dstName = null;
                 string SrcFieldName = null;
                 bool updateDst = false;
                 Models.Complex.cdefModel srcCdef = null;
@@ -97,6 +82,7 @@ namespace Contensive.Core.Controllers {
                 // -------------------------------------------------------------------------------------------------
                 //
                 logController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_AddSrcToDst");
+                string dstName = null;
                 //
                 foreach (var srcKeyValuePair in srcCollection.cdef) {
                     srcCdef = srcKeyValuePair.Value;
@@ -105,6 +91,7 @@ namespace Contensive.Core.Controllers {
                     // Search for this cdef in the Dst
                     //
                     updateDst = false;
+                    Models.Complex.cdefModel dstCdef = null;
                     if (!dstCollection.cdef.ContainsKey(srcName.ToLower())) {
                         //
                         // add src to dst
@@ -192,7 +179,7 @@ namespace Contensive.Core.Controllers {
                     //
                     //Call AppendClassLogFile(core.app.config.name,"UpgradeCDef_AddSrcToDst", "CollectionSrc.CDef[SrcPtr].fields.count=" & CollectionSrc.CDef[SrcPtr].fields.count)
                     foreach (var srcFieldKeyValuePair in srcCdef.fields) {
-                        srcCdefField = srcFieldKeyValuePair.Value;
+                        Models.Complex.cdefFieldModel srcCdefField = srcFieldKeyValuePair.Value;
                         SrcFieldName = srcCdefField.nameLc;
                         updateDst = false;
                         if (!dstCollection.cdef.ContainsKey(srcName.ToLower())) {
@@ -202,6 +189,8 @@ namespace Contensive.Core.Controllers {
                             throw (new ApplicationException("ERROR - cannot update destination content because it was not found after being added."));
                         } else {
                             dstCdef = dstCollection.cdef[srcName.ToLower()];
+                            bool HelpChanged = false;
+                            Models.Complex.cdefFieldModel dstCdefField = null;
                             if (dstCdef.fields.ContainsKey(SrcFieldName.ToLower())) {
                                 //
                                 // Src field was found in Dst fields
@@ -254,12 +243,8 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // Check Help fields, track changed independantly so frequent help changes will not force timely cdef loads
                                 //
-                                HelpSrc = srcCdefField.helpCustom;
-                                HelpCustomChanged = !textMatch(HelpSrc, srcCdefField.helpCustom);
-                                //
-                                HelpSrc = srcCdefField.helpDefault;
-                                HelpDefaultChanged = !textMatch(HelpSrc, srcCdefField.helpDefault);
-                                //
+                                bool HelpCustomChanged = !textMatch(srcCdefField.helpCustom, srcCdefField.helpCustom);
+                                bool HelpDefaultChanged = !textMatch(srcCdefField.helpDefault, srcCdefField.helpDefault);
                                 HelpChanged = HelpDefaultChanged || HelpCustomChanged;
                             } else {
                                 //
@@ -319,14 +304,13 @@ namespace Contensive.Core.Controllers {
                                 dstCdefField.set_redirectContentName(core, srcCdefField.get_redirectContentName(core));
                                 dstCdefField.installedByCollectionGuid = srcCdefField.installedByCollectionGuid;
                                 dstCdefField.dataChanged = true;
-                                if (HelpChanged) {
-                                    dstCdefField.helpCustom = srcCdefField.helpCustom;
-                                    dstCdefField.helpDefault = srcCdefField.helpDefault;
-                                    dstCdefField.HelpChanged = true;
-                                }
                                 dstCdef.includesAFieldChange = true;
                             }
-                            //
+                            if (HelpChanged) {
+                                dstCdefField.helpCustom = srcCdefField.helpCustom;
+                                dstCdefField.helpDefault = srcCdefField.helpDefault;
+                                dstCdefField.HelpChanged = true;
+                            }
                         }
                     }
                 }
@@ -374,7 +358,7 @@ namespace Contensive.Core.Controllers {
                 // Check menus
                 //-------------------------------------------------------------------------------------------------
                 //
-                DataBuildVersion = core.siteProperties.dataBuildVersion;
+                string DataBuildVersion = core.siteProperties.dataBuildVersion;
                 foreach (var srcKvp in srcCollection.menus) {
                     string srcKey = srcKvp.Key.ToLower() ;
                     miniCollectionModel.miniCollectionMenuModel srcMenu = srcKvp.Value;
@@ -382,12 +366,14 @@ namespace Contensive.Core.Controllers {
                     string srcGuid = srcMenu.Guid;
                     string SrcParentName = genericController.vbLCase(srcMenu.ParentName);
                     string SrcNameSpace = genericController.vbLCase(srcMenu.menuNameSpace);
-                    SrcIsNavigator = srcMenu.IsNavigator;
+                    bool SrcIsNavigator = srcMenu.IsNavigator;
                     updateDst = false;
                     //
                     // Search for match using guid
                     miniCollectionModel.miniCollectionMenuModel dstMenuMatch = new miniCollectionModel.miniCollectionMenuModel() { } ;
-                    IsMatch = false;
+                    bool IsMatch = false;
+                    string DstKey = null;
+                    bool DstIsNavigator = false;
                     foreach (var dstKvp in dstCollection.menus) {
                         string dstKey = dstKvp.Key.ToLower();
                         miniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
@@ -395,6 +381,7 @@ namespace Contensive.Core.Controllers {
                         if (dstGuid == srcGuid) {
                             DstIsNavigator = dstMenu.IsNavigator;
                             DstKey = genericController.vbLCase(dstMenu.Key);
+                            string SrcKey = null;
                             IsMatch = (DstKey == SrcKey) && (SrcIsNavigator == DstIsNavigator);
                             if (IsMatch) {
                                 dstMenuMatch = dstMenu;

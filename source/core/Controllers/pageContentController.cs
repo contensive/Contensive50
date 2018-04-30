@@ -186,7 +186,8 @@ namespace Contensive.Core.Controllers {
                     core.doc.redirectReason = "Redirecting because the page selected could not be found.";
                     core.doc.redirectLink = pageContentController.main_ProcessPageNotFound_GetLink(core, core.doc.redirectReason, "", "", PageID, 0);
                     logController.handleError( core,new ApplicationException("Page could not be determined. Error message displayed."));
-                    return "<div style=\"width:300px; margin: 100px auto auto auto;text-align:center;\">This page is not valid.</div>";
+                    return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
+                    //return "<div style=\"width:300px; margin: 100px auto auto auto;text-align:center;\">This page is not valid.</div>";
                 }
                 //PageID = core.docProperties.getInteger(rnPageId)
                 //If (PageID = 0) Then
@@ -954,7 +955,7 @@ namespace Contensive.Core.Controllers {
                 string[] Fields = null;
                 int FieldCount = 0;
                 string[] NameValues = null;
-                string RedirectLink = "";
+                //string RedirectLink = "";
                 string PageNotFoundReason = "";
                 bool IsPageNotFound = false;
                 //
@@ -1373,13 +1374,13 @@ namespace Contensive.Core.Controllers {
                                     }
                                 }
                                 if (!string.IsNullOrEmpty(tmpLink)) {
-                                    RedirectLink = tmpLink;
+                                    core.doc.redirectLink = tmpLink;
                                 }
                             }
                         }
                         core.db.csClose(ref CSPointer);
                         //
-                        if ((string.IsNullOrEmpty(RedirectLink)) && !isLinkForward) {
+                        if ((string.IsNullOrEmpty(core.doc.redirectLink)) && !isLinkForward) {
                             //
                             // Test for Link Alias
                             //
@@ -1475,19 +1476,23 @@ namespace Contensive.Core.Controllers {
                     if (SecureLink_CurrentURL && (!SecureLink_Required)) {
                         //
                         // -- redirect to non-secure
-                        RedirectLink = genericController.vbReplace(core.webServer.requestUrl, "https://", "http://");
+                        core.doc.redirectLink = genericController.vbReplace(core.webServer.requestUrl, "https://", "http://");
                         core.doc.redirectReason = "Redirecting because neither the page or the template requires a secure link.";
-                        return "";
+                        core.doc.redirectBecausePageNotFound = false;
+                        return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
+                        //return "";
                     } else if ((!SecureLink_CurrentURL) && SecureLink_Required) {
                         //
                         // -- redirect to secure
-                        RedirectLink = genericController.vbReplace(core.webServer.requestUrl, "http://", "https://");
+                        core.doc.redirectLink = genericController.vbReplace(core.webServer.requestUrl, "http://", "https://");
                         if (SecureLink_Page_Required) {
                             core.doc.redirectReason = "Redirecting because this page [" + core.doc.pageController.pageToRootList[0].name + "] requires a secure link.";
                         } else {
                             core.doc.redirectReason = "Redirecting because this template [" + core.doc.pageController.template.name + "] requires a secure link.";
                         }
-                        return "";
+                        core.doc.redirectBecausePageNotFound = false;
+                        return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
+                        //return "";
                     }
                     //
                     // -- check that this template exists on this domain
@@ -1510,10 +1515,12 @@ namespace Contensive.Core.Controllers {
                         if (!allowTemplate) {
                             //
                             // -- must redirect to a domain's landing page
-                            RedirectLink = core.webServer.requestProtocol + core.doc.domain.name;
+                            core.doc.redirectLink = core.webServer.requestProtocol + core.doc.domain.name;
                             core.doc.redirectBecausePageNotFound = false;
                             core.doc.redirectReason = "Redirecting because this domain has template requiements set, and this template is not configured [" + core.doc.pageController.template.name + "].";
-                            return "";
+                            core.doc.redirectBecausePageNotFound = false;
+                            return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
+                            //return "";
                         }
                     }
                     returnHtml += htmlDocBody;
@@ -2040,7 +2047,9 @@ namespace Contensive.Core.Controllers {
                     core.doc.pageController.page.save(core);
                     core.doc.redirectLink = core.doc.pageController.page.PageLink;
                     core.doc.redirectReason = "Redirect required because this page (PageRecordID=" + core.doc.pageController.page.id + ") has a Link Override [" + core.doc.pageController.page.PageLink + "].";
-                    return "";
+                    core.doc.redirectBecausePageNotFound = false;
+                    return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
+                    //return "";
                 }
                 //
                 // -- build list of blocked pages

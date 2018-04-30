@@ -376,6 +376,7 @@ namespace Contensive.Core.Controllers {
                     // verify app config domainlist is in the domainlist cache
                     foreach (string domain in core.appConfig.domainList) {
                         if (!core.domainDictionary.ContainsKey(domain.ToLower())) {
+                            logController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLower() + "]");
                             var newDomain = domainModel.add(core);
                             newDomain.name = domain;
                             newDomain.rootPageId = 0;
@@ -394,6 +395,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- verify request domain
                     if (!core.domainDictionary.ContainsKey(requestDomain.ToLower())) {
+                        logController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLower() + "] not found");
                         var newDomain = domainModel.add( core );
                         newDomain.name = requestDomain;
                         newDomain.rootPageId = 0;
@@ -682,7 +684,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="IsPageNotFound"></param>
         /// <param name="allowDebugMessage">If true, when visit property debugging is enabled, the routine returns </param>
         public string redirect(string NonEncodedLink, string RedirectReason = "No explaination provided", bool IsPageNotFound = false, bool allowDebugMessage = true) {
-            string result = "";
+            string result = htmlController.div( "Redirecting to [" + NonEncodedLink + "], reason [" + RedirectReason + "]", "ccWarningBox" );
             try {
                 const string rnRedirectCycleFlag = "cycleFlag";
                 string EncodedLink = null;
