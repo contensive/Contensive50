@@ -7466,7 +7466,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     Stream.Add(core.html.getPanel(Panel, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 0));
                 }
                 Stream.Add("</td></tr></table>");
-                Stream.Add(htmlController.formEnd());
+                Stream.Add(htmlController.form_end());
                 //
                 tempGetForm_QuickStats = Stream.Text;
                 core.html.addTitle("Quick Stats");

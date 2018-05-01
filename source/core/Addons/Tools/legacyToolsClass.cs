@@ -2570,9 +2570,9 @@ namespace Contensive.Core.Addons.Tools {
                             if (!string.IsNullOrEmpty(IndexName)) {
                                 result += htmlController.tableRowStart();
                                 Copy = htmlController.checkbox("DropIndex." + RowPointer, false) + htmlController.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
-                                result += htmlController.tableCell(Copy,"",0, TableRowEven);
-                                result += htmlController.tableCell(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
-                                result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
+                                result += htmlController.td(Copy,"",0, TableRowEven);
+                                result += htmlController.td(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
+                                result += htmlController.td("&nbsp;","",0, TableRowEven);
                                 result += kmaEndTableRow;
                                 TableRowEven = !TableRowEven;
                             }
@@ -2599,9 +2599,9 @@ namespace Contensive.Core.Addons.Tools {
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             result += htmlController.tableRowStart();
                             Copy = htmlController.checkbox("AddIndex." + RowPointer, false) + htmlController.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
-                            result += htmlController.tableCell(Copy,"",0, TableRowEven);
-                            result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
-                            result += htmlController.tableCell("&nbsp;","",0, TableRowEven);
+                            result += htmlController.td(Copy,"",0, TableRowEven);
+                            result += htmlController.td("&nbsp;","",0, TableRowEven);
+                            result += htmlController.td("&nbsp;","",0, TableRowEven);
                             result += kmaEndTableRow;
                             TableRowEven = !TableRowEven;
                         }
@@ -2611,9 +2611,9 @@ namespace Contensive.Core.Addons.Tools {
                     // Spacers
                     //
                     result += htmlController.tableRowStart();
-                    result += htmlController.tableCell(nop2(300, 1), "200");
-                    result += htmlController.tableCell(nop2(200, 1), "200");
-                    result += htmlController.tableCell("&nbsp;", "100%");
+                    result += htmlController.td(nop2(300, 1), "200");
+                    result += htmlController.td(nop2(200, 1), "200");
+                    result += htmlController.td("&nbsp;", "100%");
                     result += kmaEndTableRow;
                 }
                 result += kmaEndTable;
@@ -2658,9 +2658,9 @@ namespace Contensive.Core.Addons.Tools {
                         result += htmlController.tableRow("<B>" + TableName + "</b>", TableColSpan, TableEvenRow);
                     }
                     result += htmlController.tableRowStart();
-                    result += htmlController.tableCell("&nbsp;","",0, TableEvenRow);
-                    result += htmlController.tableCell(core.db.csGetText(CS, "FieldName"), "", 0, TableEvenRow);
-                    result += htmlController.tableCell(core.db.csGetText(CS, "FieldType"), "", 0, TableEvenRow);
+                    result += htmlController.td("&nbsp;","",0, TableEvenRow);
+                    result += htmlController.td(core.db.csGetText(CS, "FieldName"), "", 0, TableEvenRow);
+                    result += htmlController.td(core.db.csGetText(CS, "FieldType"), "", 0, TableEvenRow);
                     result += kmaEndTableRow;
                     TableEvenRow = !TableEvenRow;
                     core.db.csGoNext(CS);
@@ -2684,9 +2684,9 @@ namespace Contensive.Core.Addons.Tools {
                 // Spacers
                 //
                 result += htmlController.tableRowStart();
-                result += htmlController.tableCell(nop2(20, 1), "20");
-                result += htmlController.tableCell(nop2(300, 1), "300");
-                result += htmlController.tableCell("&nbsp;", "100%");
+                result += htmlController.td(nop2(20, 1), "20");
+                result += htmlController.td(nop2(300, 1), "300");
+                result += htmlController.td("&nbsp;", "100%");
                 result += kmaEndTableRow;
                 result += kmaEndTable;
                 //

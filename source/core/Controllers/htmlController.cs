@@ -928,7 +928,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="htmlMethod"></param>
         /// <returns></returns>
         public static string form( coreController core,  string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post" ) {
-            return form_start(core, actionQueryString, htmlName, htmlClass, htmlId, htmlMethod) + innerHtml + formEnd();
+            return form_start(core, actionQueryString, htmlName, htmlClass, htmlId, htmlMethod) + innerHtml + form_end();
         }
         //
         //====================================================================================================
@@ -952,7 +952,7 @@ namespace Contensive.Core.Controllers {
         /// <returns></returns>
         //
         [Obsolete("use form()", false)]
-        public static  string formEnd() {
+        public static  string form_end() {
             return "</form>";
         }
         ////
@@ -3466,7 +3466,7 @@ namespace Contensive.Core.Controllers {
                         + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
                         + genericController.nop(Copy) + "\r</table>";
                         ToolsPanel.Add(getPanelInput(Copy));
-                        ToolsPanel.Add(htmlController.formEnd());
+                        ToolsPanel.Add(htmlController.form_end());
                         result += getPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         //
                         result += getPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
@@ -4278,7 +4278,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="Align"></param>
         /// <param name="BGColor"></param>
         /// <returns></returns>
-        public static string tableCell(string Copy, string Width = "", int ColSpan = 0, bool EvenRow = false, string Align = "", string BGColor = "") {
+        public static string td(string Copy, string Width = "", int ColSpan = 0, bool EvenRow = false, string Align = "", string BGColor = "") {
             return tableCellStart(Width, ColSpan, EvenRow, Align, BGColor) + Copy + tableCellEnd;
         }
         //
@@ -4291,7 +4291,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="EvenRow"></param>
         /// <returns></returns>
         public static string tableRow(string Cell, int ColSpan = 0, bool EvenRow = false) {
-            return tableRowStart() + tableCell(Cell, "100%", ColSpan, EvenRow) + kmaEndTableRow;
+            return tableRowStart() + td(Cell, "100%", ColSpan, EvenRow) + kmaEndTableRow;
         }
         //
         // ====================================================================================================
