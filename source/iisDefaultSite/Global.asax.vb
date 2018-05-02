@@ -45,7 +45,9 @@ Public Class Global_asax
 
     Sub Application_Error(ByVal sender As Object, ByVal e As EventArgs)
         ' Fires when an error occurs
-        logController.forceNLog("Global.asax, Application_Error [" + e.ToString() + "]", logController.logLevel.Error)
+        'logController.forceNLog("Global.asax, Application_Error [" + e.ToString() + "]", logController.logLevel.Error)
+        logController.forceNLog("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", logController.logLevel.Error)
+        '
     End Sub
 
     Sub Session_End(ByVal sender As Object, ByVal e As EventArgs)
