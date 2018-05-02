@@ -203,7 +203,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         if (result != null) {
-                            //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), remoteCache hit");
+                            logController.logTrace(core, "getCacheWrapper(" + key + "), remoteCache hit");
                         } else {
                             logController.logTrace(core,"getCacheWrapper(" + key + "), remoteCache miss");
                         }
@@ -214,7 +214,7 @@ namespace Contensive.Core.Controllers {
                         //Dim cache As ObjectCache = MemoryCache.Default
                         result = (cacheWrapperClass)MemoryCache.Default[wrapperKey];
                         if (result != null) {
-                            //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), memoryCache hit");
+                            logController.logTrace(core, "getCacheWrapper(" + key + "), memoryCache hit");
                         } else {
                             logController.logTrace(core,"getCacheWrapper(" + key + "), memoryCache miss");
                         }
