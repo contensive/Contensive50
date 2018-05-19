@@ -18,7 +18,7 @@ namespace Contensive.Core {
         public const string iconDelete = "<i alt=\"delete\" title=\"delete\" class=\"fa fa-remove\" style=\"color:#f00\"></i>";
         public const string iconPlus = "<i alt=\"add\" title=\"add\" class=\"fa fa-plus-circle\" style=\"color:#080\"></i>";
         public const string iconClose = "<i alt=\"close\" title=\"close\" class=\"fa fa-remove\" style=\"color:#eee\"></i>";
-        public const string iconEdit = "<i alt=\"edit\" title=\"edit\" class=\"fa fa-edit\" style=\"color: #080;\" valign=absmiddle></i>";
+        public const string iconEdit = "<i alt=\"edit\" title=\"edit\" class=\"fa fa-edit\" style=\"color: #080;background-color: #fff\" valign=absmiddle></i>";
         public const string iconOpen = "<i alt=\"open\" title=\"open\" class=\"fa fa-angle-double-right\" style=\"color:#eee\">";
         public const string iconRefresh = "<i alt=\"refresh\" title=\"refresh\" class=\"fa fa-refresh\" style=\"color:#eee\">";
         // public const string iconEdit = "<img src=\"/ccLib/images/IconContentEdit.gif\" border=0 alt=\"Edit content\" valign=absmiddle>";
