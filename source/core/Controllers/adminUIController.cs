@@ -80,6 +80,7 @@ namespace Contensive.Core {
             //Dim FieldPtr As Integer
             public string fieldName;
             public int direction; // 1=forward, 2=reverse, 0=ignore/remove this sort
+            public int order; // 1...n, if multiple sorts, the order of the sort
         }
         //
         public class indexConfigFindWordClass {
@@ -1730,6 +1731,380 @@ namespace Contensive.Core {
             return getToolFormRow(core, htmlController.label(label) + "<br>" + input);
 
             //"<div class=\"p-1\">Page Number:<br>" + htmlController.inputText(core, "PageNumber", PageNumber.ToString()) + "</div>";
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create UI edit record link
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <param name="AllowCut"></param>
+        /// <returns></returns>
+        public static string getRecordEditLink(coreController core, string ContentName, int RecordID, bool AllowCut = false) {
+            return getRecordEditLink(core, ContentName, RecordID, AllowCut, "", core.session.isEditing(ContentName));
+        }
+        //
+        //===================================================================================================
+        //
+        public static  string getEditWrapper(coreController core, string caption, string content) {
+            string result = content;
+            if (core.session.isEditingAnything()) {
+                result = htmlController.div(result, "ccEditWrapperContent");
+                if (!string.IsNullOrEmpty(caption)) {
+                    result = htmlController.div(caption, "ccEditWrapperCaption") + result;
+                }
+                result = htmlController.div(result, "ccEditWrapper", "editWrapper" + core.doc.editWrapperCnt++);
+                //result = "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccEditWrapper\">";
+                ////result = html_GetLegacySiteStyles() + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccEditWrapper\">";
+                //if (!string.IsNullOrEmpty(Caption)) {
+                //    result += ""
+                //            + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccEditWrapperCaption\">"
+                //            + genericController.encodeText(Caption)
+                //            + "</td></tr></table>";
+                //}
+                //result += ""
+                //        + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccEditWrapperContent\" id=\"editWrapper" + core.doc.editWrapperCnt + "\">"
+                //        + genericController.encodeText(Content) + "</td></tr></table>"
+                //        + "</td></tr></table>";
+                //core.doc.editWrapperCnt = core.doc.editWrapperCnt + 1;
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        //
+        public static string getRecordEditLink(coreController core, string contentName, int recordID, bool allowCut, string RecordName, bool IsEditing) {
+            string result = "";
+            try {
+                string ContentCaption = htmlController.encodeHtml(contentName);
+                ContentCaption += " record";
+                if (!string.IsNullOrEmpty(RecordName)) ContentCaption += ", named '" + RecordName + "'";
+                if (string.IsNullOrEmpty(contentName)) {
+                    throw (new ApplicationException("ContentName [" + contentName + "] is invalid"));
+                } else {
+                    if (recordID < 1) {
+                        throw (new ApplicationException("RecordID [" + recordID + "] is invalid"));
+                    } else {
+                        if (IsEditing) {
+                            var cdef = Models.Complex.cdefModel.getCdef(core, contentName);
+                            result += adminUIController.getIconEditAdminLink(core, cdef, recordID);
+                            if (allowCut) {
+                                int ContentID = 0;
+                                string WorkingLink = genericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) + "." + genericController.encodeText(recordID), true);
+                                result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
+                            }
+                            result = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + result + "</span>";
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        //
+        public static  string getRecordAddLink(coreController core, string ContentName, string PresetNameValueList, bool AllowPaste = false) {
+            return getRecordAddLink2(core, ContentName, PresetNameValueList, AllowPaste, core.session.isEditing(ContentName));
+        }
+        //
+        //====================================================================================================
+        //
+        public static  string getRecordAddLink2( coreController core,  string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
+            string tempmain_GetRecordAddLink2 = null;
+            try {
+                int ParentID = 0;
+                string BufferString = null;
+                string iContentName = null;
+                int iContentID = 0;
+                string iPresetNameValueList = null;
+                string MenuName = null;
+                string LowestRequiredMenuName = "";
+                string ClipBoard = null;
+                string PasteLink = "";
+                int Position = 0;
+                string[] ClipBoardArray = null;
+                int ClipboardContentID = 0;
+                int ClipChildRecordID = 0;
+                bool iAllowPaste = false;
+                bool useFlyout = false;
+                int csChildContent = 0;
+                string Link = null;
+                //
+                tempmain_GetRecordAddLink2 = "";
+                if (IsEditing) {
+                    iContentName = genericController.encodeText(ContentName);
+                    iPresetNameValueList = genericController.encodeText(PresetNameValueList);
+                    iPresetNameValueList = genericController.vbReplace(iPresetNameValueList, "&", ",");
+                    iAllowPaste = genericController.encodeBoolean(AllowPaste);
+
+                    if (string.IsNullOrEmpty(iContentName)) {
+                        throw (new ApplicationException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
+                    } else {
+                        iContentID = Models.Complex.cdefModel.getContentId(core, iContentName);
+                        csChildContent = core.db.csOpen("Content", "ParentID=" + iContentID, "", true, 0, false, false, "id");
+                        useFlyout = core.db.csOk(csChildContent);
+                        core.db.csClose(ref csChildContent);
+                        //
+                        if (!useFlyout) {
+                            Link = "/" + core.appConfig.adminRoute + "?cid=" + iContentID + "&af=4&aa=2&ad=1";
+                            if (!string.IsNullOrEmpty(PresetNameValueList)) {
+                                Link = Link + "&wc=" + genericController.encodeRequestVariable(PresetNameValueList);
+                            }
+                            tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a"
+                                + " TabIndex=-1"
+                                + " href=\"" + htmlController.encodeHtml(Link) + "\"";
+                            tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "><img"
+                                + " src=\"/ccLib/images/IconContentAdd.gif\""
+                                + " border=\"0\""
+                                + " alt=\"Add record\""
+                                + " title=\"Add record\""
+                                + " align=\"absmiddle\""
+                                + "></a>";
+                        } else {
+                            //
+                            MenuName = genericController.GetRandomInteger(core).ToString();
+                            core.menuFlyout.menu_AddEntry(MenuName, "", "/ccLib/images/IconContentAdd.gif", "", "", "", "stylesheet", "stylesheethover");
+                            LowestRequiredMenuName = getRecordAddLink_AddMenuEntry(core, iContentName, iPresetNameValueList, "", MenuName, MenuName);
+                        }
+                        //
+                        // Add in the paste entry, if needed
+                        //
+                        if (iAllowPaste) {
+                            ClipBoard = core.visitProperty.getText("Clipboard", "");
+                            if (!string.IsNullOrEmpty(ClipBoard)) {
+                                Position = genericController.vbInstr(1, ClipBoard, ".");
+                                if (Position != 0) {
+                                    ClipBoardArray = ClipBoard.Split('.');
+                                    if (ClipBoardArray.GetUpperBound(0) > 0) {
+                                        ClipboardContentID = genericController.encodeInteger(ClipBoardArray[0]);
+                                        ClipChildRecordID = genericController.encodeInteger(ClipBoardArray[1]);
+                                        //iContentID = main_GetContentID(iContentName)
+                                        if (Models.Complex.cdefModel.isWithinContent(core, ClipboardContentID, iContentID)) {
+                                            if (genericController.vbInstr(1, iPresetNameValueList, "PARENTID=", 1) != 0) {
+                                                //
+                                                // must test for main_IsChildRecord
+                                                //
+                                                BufferString = iPresetNameValueList;
+                                                BufferString = genericController.vbReplace(BufferString, "(", "");
+                                                BufferString = genericController.vbReplace(BufferString, ")", "");
+                                                BufferString = genericController.vbReplace(BufferString, ",", "&");
+                                                ParentID = genericController.encodeInteger(genericController.main_GetNameValue_Internal(core, BufferString, "Parentid"));
+                                            }
+
+
+                                            if ((ParentID != 0) & (!pageContentController.isChildRecord(core, iContentName, ParentID, ClipChildRecordID))) {
+                                                //
+                                                // Can not paste as child of itself
+                                                //
+                                                PasteLink = core.webServer.requestPage + "?" + core.doc.refreshQueryString;
+                                                PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePaste, "1", true);
+                                                PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, iContentID.ToString(), true);
+                                                PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, ParentID.ToString(), true);
+                                                PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, true);
+                                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste record in clipboard here\" title=\"Paste record in clipboard here\" align=\"absmiddle\"></a>";
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        //
+                        // Add in the available flyout Navigator Entries
+                        //
+                        if (!string.IsNullOrEmpty(LowestRequiredMenuName)) {
+                            tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.getMenu(LowestRequiredMenuName, 0);
+                            tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "class=\"ccFlyoutButton\" ", "", 1, 99, 1);
+                            if (!string.IsNullOrEmpty(PasteLink)) {
+                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + htmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
+                            }
+                        }
+                        //
+                        // Help link if enabled
+                        //
+                        string helpLink = "";
+                        //helpLink = main_GetHelpLink(6, "Adding " & iContentName, "Turn on Edit icons by checking 'Edit' in the tools panel, and click apply.<br><br><img src=""/ccLib/images/IconContentAdd.gif"" " & IconWidthHeight & " style=""vertical-align:middle""> Add-Content icon<br><br>Add-Content icons appear in your content. Click them to add content.")
+                        tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + helpLink;
+                        if (!string.IsNullOrEmpty(tempmain_GetRecordAddLink2)) {
+                            tempmain_GetRecordAddLink2 = ""
+                                + "\r\n\t<div style=\"display:inline;\">"
+                                + genericController.nop(tempmain_GetRecordAddLink2) + "\r\n\t</div>";
+                        }
+                        //
+                        // ----- Add the flyout panels to the content to return
+                        //       This must be here so if the call is made after main_ClosePage, the panels will still deliver
+                        //
+                        if (!string.IsNullOrEmpty(LowestRequiredMenuName)) {
+                            tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.menu_GetClose();
+                            if (genericController.vbInstr(1, tempmain_GetRecordAddLink2, "IconContentAdd.gif", 1) != 0) {
+                                tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "IconContentAdd.gif\" ", "IconContentAdd.gif\" align=\"absmiddle\" ");
+                            }
+                        }
+                        tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "target=", "xtarget=", 1, 99, 1);
+                    }
+                }
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
+            }
+            return tempmain_GetRecordAddLink2;
+        }
+        //
+        //====================================================================================================
+        //
+        private static  string getRecordAddLink_AddMenuEntry( coreController core,  string ContentName, string PresetNameValueList, string ContentNameList, string MenuName, string ParentMenuName) {
+            string result = "";
+            string Copy = null;
+            int CS = 0;
+            string SQL = null;
+            int csChildContent = 0;
+            int ContentID = 0;
+            string Link = null;
+            string MyContentNameList = null;
+            string ButtonCaption = null;
+            bool ContentRecordFound = false;
+            bool ContentAllowAdd = false;
+            bool GroupRulesAllowAdd = false;
+            DateTime MemberRulesDateExpires = default(DateTime);
+            bool MemberRulesAllow = false;
+            int ChildMenuButtonCount = 0;
+            string ChildMenuName = null;
+            string ChildContentName = null;
+            //
+            Link = "";
+            MyContentNameList = ContentNameList;
+            if (string.IsNullOrEmpty(ContentName)) {
+                throw (new ApplicationException("main_GetRecordAddLink, ContentName is empty")); // handleLegacyError14(MethodName, "")
+            } else {
+                if (MyContentNameList.IndexOf("," + genericController.vbUCase(ContentName) + ",") + 1 >= 0) {
+                    throw (new ApplicationException("result , Content Child [" + ContentName + "] is one of its own parents")); // handleLegacyError14(MethodName, "")
+                } else {
+                    MyContentNameList = MyContentNameList + "," + genericController.vbUCase(ContentName) + ",";
+                    //
+                    // ----- Select the Content Record for the Menu Entry selected
+                    //
+                    ContentRecordFound = false;
+                    if (core.session.isAuthenticatedAdmin(core)) {
+                        //
+                        // ----- admin member, they have access, main_Get ContentID and set markers true
+                        //
+                        SQL = "SELECT ID as ContentID, AllowAdd as ContentAllowAdd, 1 as GroupRulesAllowAdd, null as MemberRulesDateExpires"
+                            + " FROM ccContent"
+                            + " WHERE ("
+                            + " (ccContent.Name=" + core.db.encodeSQLText(ContentName) + ")"
+                            + " AND(ccContent.active<>0)"
+                            + " );";
+                        CS = core.db.csOpenSql(SQL);
+                        if (core.db.csOk(CS)) {
+                            //
+                            // Entry was found
+                            //
+                            ContentRecordFound = true;
+                            ContentID = core.db.csGetInteger(CS, "ContentID");
+                            ContentAllowAdd = core.db.csGetBoolean(CS, "ContentAllowAdd");
+                            GroupRulesAllowAdd = true;
+                            MemberRulesDateExpires = DateTime.MinValue;
+                            MemberRulesAllow = true;
+                        }
+                        core.db.csClose(ref CS);
+                    } else {
+                        //
+                        // non-admin member, first check if they have access and main_Get true markers
+                        //
+                        SQL = "SELECT ccContent.ID as ContentID, ccContent.AllowAdd as ContentAllowAdd, ccGroupRules.AllowAdd as GroupRulesAllowAdd, ccMemberRules.DateExpires as MemberRulesDateExpires"
+                            + " FROM (((ccContent"
+                                + " LEFT JOIN ccGroupRules ON ccGroupRules.ContentID=ccContent.ID)"
+                                + " LEFT JOIN ccgroups ON ccGroupRules.GroupID=ccgroups.ID)"
+                                + " LEFT JOIN ccMemberRules ON ccgroups.ID=ccMemberRules.GroupID)"
+                                + " LEFT JOIN ccMembers ON ccMemberRules.MemberID=ccMembers.ID"
+                            + " WHERE ("
+                            + " (ccContent.Name=" + core.db.encodeSQLText(ContentName) + ")"
+                            + " AND(ccContent.active<>0)"
+                            + " AND(ccGroupRules.active<>0)"
+                            + " AND(ccMemberRules.active<>0)"
+                            + " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
+                            + " AND(ccgroups.active<>0)"
+                            + " AND(ccMembers.active<>0)"
+                            + " AND(ccMembers.ID=" + core.session.user.id + ")"
+                            + " );";
+                        CS = core.db.csOpenSql(SQL);
+                        if (core.db.csOk(CS)) {
+                            //
+                            // ----- Entry was found, member has some kind of access
+                            //
+                            ContentRecordFound = true;
+                            ContentID = core.db.csGetInteger(CS, "ContentID");
+                            ContentAllowAdd = core.db.csGetBoolean(CS, "ContentAllowAdd");
+                            GroupRulesAllowAdd = core.db.csGetBoolean(CS, "GroupRulesAllowAdd");
+                            MemberRulesDateExpires = core.db.csGetDate(CS, "MemberRulesDateExpires");
+                            MemberRulesAllow = false;
+                            if (MemberRulesDateExpires == DateTime.MinValue) {
+                                MemberRulesAllow = true;
+                            } else if (MemberRulesDateExpires > core.doc.profileStartTime) {
+                                MemberRulesAllow = true;
+                            }
+                        } else {
+                            //
+                            // ----- No entry found, this member does not have access, just main_Get ContentID
+                            //
+                            ContentRecordFound = true;
+                            ContentID = Models.Complex.cdefModel.getContentId(core, ContentName);
+                            ContentAllowAdd = false;
+                            GroupRulesAllowAdd = false;
+                            MemberRulesAllow = false;
+                        }
+                        core.db.csClose(ref CS);
+                    }
+                    if (ContentRecordFound) {
+                        //
+                        // Add the Menu Entry* to the current menu (MenuName)
+                        //
+                        Link = "";
+                        ButtonCaption = ContentName;
+                        result = MenuName;
+                        if (ContentAllowAdd && GroupRulesAllowAdd && MemberRulesAllow) {
+                            Link = "/" + core.appConfig.adminRoute + "?cid=" + ContentID + "&af=4&aa=2&ad=1";
+                            if (!string.IsNullOrEmpty(PresetNameValueList)) {
+                                string NameValueList = PresetNameValueList;
+                                Link = Link + "&wc=" + genericController.encodeRequestVariable(PresetNameValueList);
+                            }
+                        }
+                        core.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName, "", "", Link, ButtonCaption, "", "", true);
+                        //
+                        // Create child submenu if Child Entries found
+                        //
+                        csChildContent = core.db.csOpen("Content", "ParentID=" + ContentID, "", true, 0, false, false, "name");
+                        if (!core.db.csOk(csChildContent)) {
+                            //
+                            // No child menu
+                            //
+                        } else {
+                            //
+                            // Add the child menu
+                            //
+                            ChildMenuName = MenuName + ":" + ContentName;
+                            ChildMenuButtonCount = 0;
+                            //
+                            // ----- Create the ChildPanel with all Children found
+                            //
+                            while (core.db.csOk(csChildContent)) {
+                                ChildContentName = core.db.csGetText(csChildContent, "name");
+                                Copy = getRecordAddLink_AddMenuEntry(core, ChildContentName, PresetNameValueList, MyContentNameList, MenuName, ParentMenuName);
+                                if (!string.IsNullOrEmpty(Copy)) {
+                                    ChildMenuButtonCount = ChildMenuButtonCount + 1;
+                                }
+                                if ((string.IsNullOrEmpty(result)) && (!string.IsNullOrEmpty(Copy))) {
+                                    result = Copy;
+                                }
+                                core.db.csGoNext(csChildContent);
+                            }
+                        }
+                    }
+                }
+                core.db.csClose(ref csChildContent);
+            }
+            return result;
         }
     }
 }

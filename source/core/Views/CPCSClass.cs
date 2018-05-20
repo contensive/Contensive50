@@ -280,7 +280,7 @@ namespace Contensive.Core {
         //
         public override string GetAddLink(string PresetNameValueList = "", bool AllowPaste = false) {
             try {
-                return core.html.cs_getRecordAddLink(cs, PresetNameValueList, AllowPaste);
+                return dbController.csGetRecordAddLink(core, cs, PresetNameValueList, AllowPaste);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;

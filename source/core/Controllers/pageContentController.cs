@@ -112,7 +112,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Add template editing
                         if (core.visitProperty.getBoolean("AllowAdvancedEditor") & core.session.isEditing("Page Templates")) {
-                            returnBody = core.html.getEditWrapper("Page Template [" + LocalTemplateName + "]", core.html.getRecordEditLink("Page Templates", LocalTemplateID, false, LocalTemplateName, core.session.isEditing("Page Templates")) + returnBody);
+                            returnBody = adminUIController.getEditWrapper( core, "Page Template [" + LocalTemplateName + "]", adminUIController.getRecordEditLink(core, "Page Templates", LocalTemplateID, false, LocalTemplateName, core.session.isEditing("Page Templates")) + returnBody);
                         }
                     }
                     //
@@ -179,7 +179,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Display Admin Warnings with Edits for record errors
                     if (core.doc.adminWarningPageID != 0) {
-                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + core.html.getRecordEditLink("Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
+                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + adminUIController.getRecordEditLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
                     }
                     //
@@ -192,7 +192,7 @@ namespace Contensive.Core.Controllers {
                 if (core.doc.redirectLink != "") {
                     return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
                 } else if (AllowEditWrapper) {
-                    returnHtml = core.html.getEditWrapper("Page Content", returnHtml);
+                    returnHtml = adminUIController.getEditWrapper( core, "Page Content", returnHtml);
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -2121,7 +2121,7 @@ namespace Contensive.Core.Controllers {
                 if (core.doc.adminWarning != "") {
                     //
                     if (core.doc.adminWarningPageID != 0) {
-                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + core.html.getRecordEditLink("Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
+                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + adminUIController.getRecordEditLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
                     }
                     returnHtml = ""
@@ -2161,9 +2161,9 @@ namespace Contensive.Core.Controllers {
                         string LiveBody = getContentBox_content_Body(core, OrderByClause, AllowChildPageList, false, core.doc.pageController.pageToRootList.Last().id, AllowReturnLink, pageContentModel.contentName, ArchivePages);
                         bool isRootPage = (core.doc.pageController.pageToRootList.Count == 1);
                         if (core.session.isAdvancedEditing(core, "")) {
-                            result += core.html.getRecordEditLink(pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody;
+                            result += adminUIController.getRecordEditLink(core, pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody;
                         } else if (isEditing) {
-                            result += core.html.getEditWrapper("", core.html.getRecordEditLink(pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody);
+                            result += adminUIController.getEditWrapper( core, "", adminUIController.getRecordEditLink(core, pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody);
                         } else {
                             result += LiveBody;
                         }
@@ -2282,7 +2282,7 @@ namespace Contensive.Core.Controllers {
                         if (!allowChildListComposite) {
                             Cell = Cell + core.html.getAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
                         }
-                        addonModel addon = addonModel.create(core, core.siteProperties.childListAddonID);
+                        addonModel addon = addonModel.create(core, addonGuidChildList);
                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                             hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
@@ -2403,7 +2403,7 @@ namespace Contensive.Core.Controllers {
                                     SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
                                 }
                                 if (IsEditingLocal) {
-                                    result += core.html.getRecordEditLink("See Also", (core.db.csGetInteger(CS, "ID")), false, "", core.session.isEditing("See Also"));
+                                    result += adminUIController.getRecordEditLink(core, "See Also", (core.db.csGetInteger(CS, "ID")), false, "", core.session.isEditing("See Also"));
                                 }
                                 result += "<a href=\"" + htmlController.encodeHtml(SeeAlsoLink) + "\" target=\"_blank\">" + (core.db.csGetText(CS, "Name")) + "</A>";
                                 string Copy = (core.db.csGetText(CS, "Brief"));
@@ -2419,7 +2419,7 @@ namespace Contensive.Core.Controllers {
                         //
                         if (IsEditingLocal) {
                             SeeAlsoCount = SeeAlsoCount + 1;
-                            result += "\r<li class=\"ccListItem\">" + core.html.getRecordAddLink("See Also", "RecordID=" + RecordID + ",ContentID=" + ContentID) + "</LI>";
+                            result += "\r<li class=\"ccListItem\">" + adminUIController.getRecordAddLink(core, "See Also", "RecordID=" + RecordID + ",ContentID=" + ContentID) + "</LI>";
                         }
                     }
                     //
@@ -2436,15 +2436,6 @@ namespace Contensive.Core.Controllers {
         }
         //
         //========================================================================
-        // Print the "for more information, please contact" line
-        //
-        //========================================================================
-        //
-        public string main_GetMoreInfo(coreController core, int contactMemberID) {
-            return getMoreInfoHtml(core, genericController.encodeInteger(contactMemberID));
-        }
-        //
-        //========================================================================
         // ----- prints a link to the feedback popup form
         //
         //   Creates a sub-form that when submitted, is logged by the notes
@@ -2453,7 +2444,7 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //
-        public static string main_GetFeedbackForm(coreController core, string ContentName, int RecordID, int ToMemberID, string headline = "") {
+        public static string getFeedbackForm(coreController core, string ContentName, int RecordID, int ToMemberID, string headline = "") {
             string result = "";
             try {
                 const string FeedbackButtonSubmit = "Submit";
@@ -2558,6 +2549,197 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
+            }
+            return result;
+        }
+        //
+        //=============================================================================
+        //   Creates the child page list used by PageContent
+        //
+        //   RequestedListName is the name of the ChildList (ActiveContent Child Page List)
+        //       ----- New
+        //       RequestedListName = "", same as "ORPHAN", same as "NONE"
+        //           prints orphan list (child pages that have not printed so far (orphan list))
+        //       AllowChildListDisplay - if false, no Child Page List is displayed, but authoring tags are still there
+        //       Changed to friend, not public
+        //       ----- Old
+        //       "NONE" returns child pages with no RequestedListName
+        //       "" same as "NONE"
+        //       "ORPHAN" returns all child pages that have not been printed on this page
+        //           - uses ChildPageListTracking to track what has been seen
+        //=============================================================================
+        //
+        public static string getChildPageList( coreController core,  string RequestedListName, string ContentName, int parentPageID, bool allowChildListDisplay, bool ArchivePages = false) {
+            string result = "";
+            try {
+                if (string.IsNullOrEmpty(ContentName)) {
+                    ContentName = pageContentModel.contentName;
+                }
+                bool isAuthoring = core.session.isEditing(ContentName);
+                //
+                int ChildListCount = 0;
+                string UcaseRequestedListName = genericController.vbUCase(RequestedListName);
+                if ((UcaseRequestedListName == "NONE") || (UcaseRequestedListName == "ORPHAN")) {
+                    UcaseRequestedListName = "";
+                }
+                //
+                string archiveLink = core.webServer.requestPathPage;
+                archiveLink = genericController.ConvertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.webServer.requestVirtualFilePath);
+                archiveLink = genericController.encodeVirtualPath(archiveLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                //
+                //string sqlCriteria = "(parentId=" + parentPageID + ")";
+                //string sqlCriteria = "(parentId=" + core.doc.pageController.page.id + ")";
+                //string sqlOrderBy = "sortOrder";
+                List<pageContentModel> childPageList = pageContentModel.createList(core, "(parentId=" + parentPageID + ")", "sortOrder");
+                string inactiveList = "";
+                string activeList = "";
+                foreach (pageContentModel childPage in childPageList) {
+                    string PageLink = pageContentController.getPageLink(core, childPage.id, "", true, false);
+                    string pageMenuHeadline = childPage.MenuHeadline;
+                    if (string.IsNullOrEmpty(pageMenuHeadline)) {
+                        pageMenuHeadline = childPage.name.Trim(' ');
+                        if (string.IsNullOrEmpty(pageMenuHeadline)) {
+                            pageMenuHeadline = "Related Page";
+                        }
+                    }
+                    string pageEditLink = "";
+                    if (core.session.isEditing(ContentName)) {
+                        pageEditLink = adminUIController.getRecordEditLink(core, ContentName, childPage.id, true, childPage.name, true);
+                    }
+                    //
+                    string link = PageLink;
+                    if (ArchivePages) {
+                        link = genericController.modifyLinkQuery(archiveLink, rnPageId, encodeText(childPage.id), true);
+                    }
+                    bool blockContentComposite = false;
+                    if (childPage.BlockContent | childPage.BlockPage) {
+                        blockContentComposite = !core.doc.bypassContentBlock(childPage.contentControlID, childPage.id);
+                    }
+                    string LinkedText = genericController.csv_GetLinkedText("<a href=\"" + htmlController.encodeHtml(link) + "\">", pageMenuHeadline);
+                    if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.ParentListName != "") & (!isAuthoring)) {
+                        //
+                        // ----- Requested orphan list, and this record is in a named list, and not editing, do not display
+                        //
+                    } else if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.ParentListName != "")) {
+                        //
+                        // ----- Requested orphan list, and this record is in a named list, but authoring, list it
+                        //
+                        if (isAuthoring) {
+                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\" name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                            inactiveList = inactiveList + pageEditLink;
+                            inactiveList = inactiveList + "[from Child Page List '" + childPage.ParentListName + "': " + LinkedText + "]";
+                            inactiveList = inactiveList + "</li>";
+                        }
+                    } else if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (!allowChildListDisplay) && (!isAuthoring)) {
+                        //
+                        // ----- Requested orphan List, Not AllowChildListDisplay, not Authoring, do not display
+                        //
+                    } else if ((!string.IsNullOrEmpty(UcaseRequestedListName)) & (UcaseRequestedListName != genericController.vbUCase(childPage.ParentListName))) {
+                        //
+                        // ----- requested named list and wrong RequestedListName, do not display
+                        //
+                    } else if (!childPage.AllowInChildLists) {
+                        //
+                        // ----- Allow in Child Page Lists is false, display hint to authors
+                        //
+                        if (isAuthoring) {
+                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                            inactiveList = inactiveList + pageEditLink;
+                            inactiveList = inactiveList + "[Hidden (Allow in Child Lists is not checked): " + LinkedText + "]";
+                            inactiveList = inactiveList + "</li>";
+                        }
+                    } else if (!childPage.active) {
+                        //
+                        // ----- Not active record, display hint if authoring
+                        //
+                        if (isAuthoring) {
+                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                            inactiveList = inactiveList + pageEditLink;
+                            inactiveList = inactiveList + "[Hidden (Inactive): " + LinkedText + "]";
+                            inactiveList = inactiveList + "</li>";
+                        }
+                    } else if ((childPage.PubDate != DateTime.MinValue) && (childPage.PubDate > core.doc.profileStartTime)) {
+                        //
+                        // ----- Child page has not been published
+                        //
+                        if (isAuthoring) {
+                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                            inactiveList = inactiveList + pageEditLink;
+                            inactiveList = inactiveList + "[Hidden (To be published " + childPage.PubDate + "): " + LinkedText + "]";
+                            inactiveList = inactiveList + "</li>";
+                        }
+                    } else if ((childPage.DateExpires != DateTime.MinValue) && (childPage.DateExpires < core.doc.profileStartTime)) {
+                        //
+                        // ----- Child page has expired
+                        //
+                        if (isAuthoring) {
+                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                            inactiveList = inactiveList + pageEditLink;
+                            inactiveList = inactiveList + "[Hidden (Expired " + childPage.DateExpires + "): " + LinkedText + "]";
+                            inactiveList = inactiveList + "</li>";
+                        }
+                    } else {
+                        //
+                        // ----- display list (and authoring links)
+                        //
+                        activeList = activeList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                        if (!string.IsNullOrEmpty(pageEditLink)) {
+                            activeList = activeList + pageEditLink + "&nbsp;";
+                        }
+                        activeList = activeList + LinkedText;
+                        //
+                        // include authoring mark for content block
+                        //
+                        if (isAuthoring) {
+                            if (childPage.BlockContent) {
+                                activeList = activeList + "&nbsp;[Content Blocked]";
+                            }
+                            if (childPage.BlockPage) {
+                                activeList = activeList + "&nbsp;[Page Blocked]";
+                            }
+                        }
+                        //
+                        // include overview
+                        // if AllowBrief is false, BriefFilename is not loaded
+                        //
+                        if ((childPage.BriefFilename != "") & (childPage.AllowBrief)) {
+                            string Brief = encodeText(core.cdnFiles.readFileText(childPage.BriefFilename)).Trim(' ');
+                            if (!string.IsNullOrEmpty(Brief)) {
+                                activeList = activeList + "<div class=\"ccListCopy\">" + Brief + "</div>";
+                            }
+                        }
+                        activeList = activeList + "</li>";
+                        ChildListCount = ChildListCount + 1;
+                        //.IsDisplayed = True
+                    }
+                }
+                //
+                // ----- Add Link
+                //
+                if (!ArchivePages) {
+                    string AddLink = adminUIController.getRecordAddLink(core, ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true);
+                    if (!string.IsNullOrEmpty(AddLink)) {
+                        inactiveList = inactiveList + "\r<li class=\"ccListItem\">" + AddLink + "</LI>";
+                    }
+                }
+                //
+                // ----- If there is a list, add the list start and list end
+                //
+                result = "";
+                if (!string.IsNullOrEmpty(activeList)) {
+                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + genericController.nop(activeList) + "\r</ul>";
+                }
+                if (!string.IsNullOrEmpty(inactiveList)) {
+                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + genericController.nop(inactiveList) + "\r</ul>";
+                }
+                //
+                // ----- if non-orphan list, authoring and none found, print none message
+                //
+                if ((!string.IsNullOrEmpty(UcaseRequestedListName)) & (ChildListCount == 0) & isAuthoring) {
+                    result = "[Child Page List with no pages]</p><p>" + result;
+                }
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
             }
             return result;
         }

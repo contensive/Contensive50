@@ -585,25 +585,25 @@ namespace Contensive.Core.Controllers {
                                                     }
                                                     break;
                                                 }
-                                            case ACTypeChildList: {
-                                                    //
-                                                    // Child List
-                                                    //
-                                                    string ListName = genericController.encodeText((KmaHTML.ElementAttribute(ElementPointer, "name")));
+                                            //case ACTypeChildList: {
+                                            //        //
+                                            //        // Child List
+                                            //        //
+                                            //        string ListName = genericController.encodeText((KmaHTML.ElementAttribute(ElementPointer, "name")));
 
-                                                    if (encodeForWysiwygEditor) {
-                                                        string IconIDControlString = "AC," + ACType + ",," + ACName;
-                                                        Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0);
-                                                        //Copy = IconImg;
-                                                    } else if (EncodeCachableTags) {
-                                                        //
-                                                        // Handle in webclient
-                                                        //
-                                                        // removed sort method because all child pages are read in together in the order set by the parent - improve this later
-                                                        Copy = "{{" + ACTypeChildList + "?name=" + genericController.encodeNvaArgument(ListName) + "}}";
-                                                    }
-                                                    break;
-                                                }
+                                            //        if (encodeForWysiwygEditor) {
+                                            //            string IconIDControlString = "AC," + ACType + ",," + ACName;
+                                            //            Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0);
+                                            //            //Copy = IconImg;
+                                            //        } else if (EncodeCachableTags) {
+                                            //            //
+                                            //            // Handle in webclient
+                                            //            //
+                                            //            // removed sort method because all child pages are read in together in the order set by the parent - improve this later
+                                            //            Copy = "{{" + ACTypeChildList + "?name=" + genericController.encodeNvaArgument(ListName) + "}}";
+                                            //        }
+                                            //        break;
+                                            //    }
                                             case ACTypeContact: {
                                                     //
                                                     // Formatting Tag
@@ -1100,7 +1100,7 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     ElementText = "<AC type=\"" + ACType + "\" ACInstanceID=\"" + ACInstanceID + "\" field=\"" + ACFieldName + "\">";
                                                                     break;
-                                                                case ACTypeChildList:
+                                                                //case ACTypeChildList:
                                                                 case ACTypeLanguage:
                                                                     //
                                                                     // ChildList, Language
@@ -1639,14 +1639,14 @@ namespace Contensive.Core.Controllers {
                                                 addonModel addon = addonModel.create(core, addonGuidDynamicForm);
                                                 result += core.addon.execute(addon, executeContext);
                                                 break;
-                                            case ACTypeChildList:
-                                                //
-                                                // Child Page List
-                                                //
-                                                //hint = hint & ",320"
-                                                string ListName = addonController.getAddonOption("name", addonOptionString);
-                                                result += core.doc.getChildPageList(ListName, ContextContentName, ContextRecordID, true);
-                                                break;
+                                            //case ACTypeChildList:
+                                            //    //
+                                            //    // Child Page List
+                                            //    //
+                                            //    //hint = hint & ",320"
+                                            //    string ListName = addonController.getAddonOption("name", addonOptionString);
+                                            //    result += pageContentController.getChildPageList(core, ListName, ContextContentName, ContextRecordID, true);
+                                            //    break;
                                             case ACTypeTemplateText:
                                                 //
                                                 // Text Box = copied here from gethtmlbody
@@ -1665,7 +1665,7 @@ namespace Contensive.Core.Controllers {
                                                 // Watch List
                                                 //
                                                 //hint = hint & ",330"
-                                                ListName = addonController.getAddonOption("LISTNAME", addonOptionString);
+                                                string ListName = addonController.getAddonOption("LISTNAME", addonOptionString);
                                                 string SortField = addonController.getAddonOption("SORTFIELD", addonOptionString);
                                                 bool SortReverse = genericController.encodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString));
                                                 result += core.doc.main_GetWatchList(core, ListName, SortField, SortReverse);
@@ -1758,10 +1758,8 @@ namespace Contensive.Core.Controllers {
                                     };
                                     if (!string.IsNullOrEmpty(AddonGuid)) {
                                         Copy = core.addon.execute(Models.DbModels.addonModel.create(core, AddonGuid), executeContext);
-                                        //Copy = core.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                     } else {
                                         Copy = core.addon.execute(Models.DbModels.addonModel.createByName(core, AddonName), executeContext);
-                                        //Copy = core.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                     }
                                 }
                             }
@@ -1799,82 +1797,26 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                     }
-                    //
-                    // only valid for a webpage
-                    //
-                    if (true) {
-                        //
-                        // Add in EditWrappers for Aggregate scripts and replacements
-                        //   This is also old -- used here because csv encode content can create replacements and links, but can not
-                        //   insert wrappers. This is all done in GetAddonContents() now. This routine is left only to
-                        //   handle old style calls in cache.
-                        //
-                        //hint = hint & ",500, Adding edit wrappers"
-                        if (isEditingAnything) {
-                            if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
-                                //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
-                                string Copy = core.html.getEditWrapper("Aggregate Script", "##MARKER##");
-                                string[] Wrapper = genericController.stringSplit(Copy, "##MARKER##");
-                                result = genericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
-                                result = genericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
-                            }
-                            if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
-                                //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
-                                string Copy = core.html.getEditWrapper("Aggregate Replacement", "##MARKER##");
-                                string[] Wrapper = genericController.stringSplit(Copy, "##MARKER##");
-                                result = genericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, 1);
-                                result = genericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, 1);
-                            }
+                    if (isEditingAnything) {
+                        if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
+                            string Copy = adminUIController.getEditWrapper(core, "Aggregate Script", "##MARKER##");
+                            string[] Wrapper = genericController.stringSplit(Copy, "##MARKER##");
+                            result = genericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
+                            result = genericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
                         }
-                        //
-                        // Process Feedback form
-                        //
-                        //hint = hint & ",600, Handle webclient features"
-                        if (genericController.vbInstr(1, result, FeedbackFormNotSupportedComment, 1) != 0) {
-                            result = genericController.vbReplace(result, FeedbackFormNotSupportedComment, pageContentController.main_GetFeedbackForm(core, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, 1);
+                        if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
+                            string Copy = adminUIController.getEditWrapper(core, "Aggregate Replacement", "##MARKER##");
+                            string[] Wrapper = genericController.stringSplit(Copy, "##MARKER##");
+                            result = genericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, 1);
+                            result = genericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, 1);
                         }
-                        //
-                        // If any javascript or styles were added during encode, pick them up now
-                        //
-                        //Copy = core.doc.getNextJavascriptBodyEnd()
-                        //Do While Copy <> ""
-                        //    Call addScriptCode_body(Copy, "embedded content")
-                        //    Copy = core.doc.getNextJavascriptBodyEnd()
-                        //Loop
-                        //
-                        // current
-                        //
-                        //Copy = core.doc.getNextJSFilename()
-                        //Do While Copy <> ""
-                        //    If genericController.vbInstr(1, Copy, "://") <> 0 Then
-                        //    ElseIf Left(Copy, 1) = "/" Then
-                        //    Else
-                        //        Copy = core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, Copy)
-                        //    End If
-                        //    Call addScriptLink_Head(Copy, "embedded content")
-                        //    Copy = core.doc.getNextJSFilename()
-                        //Loop
-                        //
-                        //Copy = core.doc.getJavascriptOnLoad()
-                        //Do While Copy <> ""
-                        //    Call addOnLoadJs(Copy, "")
-                        //    Copy = core.doc.getJavascriptOnLoad()
-                        //Loop
-                        //
-                        //Copy = core.doc.getNextStyleFilenames()
-                        //Do While Copy <> ""
-                        //    If genericController.vbInstr(1, Copy, "://") <> 0 Then
-                        //    ElseIf Left(Copy, 1) = "/" Then
-                        //    Else
-                        //        Copy = core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, Copy)
-                        //    End If
-                        //    Call addStyleLink(Copy, "")
-                        //    Copy = core.doc.getNextStyleFilenames()
-                        //Loop
+                    }
+                    //
+                    // Process Feedback form
+                    if (genericController.vbInstr(1, result, FeedbackFormNotSupportedComment, 1) != 0) {
+                        result = genericController.vbReplace(result, FeedbackFormNotSupportedComment, pageContentController.getFeedbackForm(core, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, 1);
                     }
                 }
-                //
-                //result = result;
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }

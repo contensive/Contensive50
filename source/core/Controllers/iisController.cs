@@ -476,6 +476,19 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                     }
+                    //
+                    // -- add default CORS headers to approved domains
+                    Uri originUri = httpContext.Request.UrlReferrer;
+                    if ( originUri != null ) {
+                        if( core.domainDictionary.ContainsKey(originUri.Host.ToLower())) {
+                            if ( core.domainDictionary[originUri.Host.ToLower()].allowCORS ) {
+                                httpContext.Response.AddHeader("Access-Control-Allow-Credentials", "true");
+                                httpContext.Response.AddHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
+                                httpContext.Response.AddHeader("Access-Control-Headers", "Content-Type,soapaction,X-Requested-With");
+                                httpContext.Response.AddHeader("Access-Control-Allow-Origin", originUri.GetLeftPart(UriPartial.Authority));
+                            }
+                        }
+                    }
                     if (core.domain.noFollow) {
                         response_NoFollow = true;
                     }

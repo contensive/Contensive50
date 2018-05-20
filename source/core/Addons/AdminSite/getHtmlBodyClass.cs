@@ -1623,16 +1623,15 @@ namespace Contensive.Core.Addons.AdminSite {
                                 string SortTitle = "Sort A-Z";
                                 //
                                 if (IndexConfig.Sorts.ContainsKey(FieldName)) {
+                                    string sortSuffix = ((IndexConfig.Sorts.Count < 2) ? "" : IndexConfig.Sorts[FieldName].order.ToString()) ;
                                     switch (IndexConfig.Sorts[FieldName].direction) {
                                         case 1:
-                                            ButtonFace = ButtonFace + "<img src=\"/ccLib/images/arrowdown.gif\" width=8 height=8 border=0>";
+                                            ButtonFace = iconArrowDown + sortSuffix + "&nbsp;" + ButtonFace;
                                             SortTitle = "Sort Z-A";
                                             break;
                                         case 2:
-                                            ButtonFace = ButtonFace + "<img src=\"/ccLib/images/arrowup.gif\" width=8 height=8 border=0>";
+                                            ButtonFace = iconArrowUp + sortSuffix + "&nbsp;" + ButtonFace;
                                             SortTitle = "Remove Sort";
-                                            break;
-                                        default:
                                             break;
                                     }
                                 }
@@ -11589,19 +11588,21 @@ namespace Contensive.Core.Addons.AdminSite {
                                     break;
                                 case "sorts":
                                     Ptr = Ptr + 1;
+                                    int orderPtr = 0;
                                     while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
                                         string[] LineSplit = ConfigListLines[Ptr].Split('\t');
                                         if (LineSplit.GetUpperBound(0) == 1) {
                                             string fieldName = LineSplit[0].Trim().ToLower();
                                             if (!string.IsNullOrWhiteSpace(fieldName)) {
-                                                if (adminContext.adminContent.fields.ContainsKey(fieldName)) {
-                                                    if (adminContext.adminContent.fields[fieldName].authorable) {
-                                                        returnIndexConfig.Sorts.Add(fieldName, new indexConfigSortClass {
-                                                            fieldName = fieldName,
-                                                            direction = (genericController.encodeBoolean(LineSplit[1]) ? 1 : 2)
-                                                        });
-                                                    }
-                                                }
+                                                returnIndexConfig.Sorts.Add(fieldName, new indexConfigSortClass {
+                                                    fieldName = fieldName,
+                                                    direction = (genericController.encodeBoolean(LineSplit[1]) ? 1 : 2),
+                                                    order = ++orderPtr
+                                                });
+                                                //if (adminContext.adminContent.fields.ContainsKey(fieldName)) {
+                                                //    //if (adminContext.adminContent.fields[fieldName].authorable) {
+                                                //    //}
+                                                //}
                                             }
                                         }
                                         Ptr = Ptr + 1;
@@ -12091,17 +12092,24 @@ namespace Contensive.Core.Addons.AdminSite {
                     } else {
                         //
                         // SortField
-                        VarText = core.docProperties.getText("SetSortField").ToLower();
-                        if (!string.IsNullOrEmpty(VarText)) {
-                            if (IndexConfig.Sorts.ContainsKey(VarText)) {
-                                IndexConfig.Sorts.Remove(VarText);
-                            }
+                        string setSortField = core.docProperties.getText("SetSortField").ToLower();
+                        if (!string.IsNullOrEmpty(setSortField)) {
+                            bool sortFound = IndexConfig.Sorts.ContainsKey(setSortField);
                             int sortDirection = core.docProperties.getInteger("SetSortDirection");
-                            if (sortDirection > 0) {
-                                IndexConfig.Sorts.Add(VarText, new indexConfigSortClass {
-                                    fieldName = VarText,
-                                    direction = sortDirection
+                            if (!sortFound) {
+                                IndexConfig.Sorts.Add(setSortField, new indexConfigSortClass {
+                                    fieldName = setSortField,
+                                    direction = 1,
+                                    order = IndexConfig.Sorts.Count + 1
                                 });
+                            } else if (sortDirection > 0) {
+                                IndexConfig.Sorts[setSortField].direction = sortDirection;
+                            } else {
+                                IndexConfig.Sorts.Remove(setSortField);
+                                int sortOrder = 1;
+                                foreach ( var kvp in IndexConfig.Sorts) {
+                                    kvp.Value.order = sortOrder++;
+                                }
                             }
                         }
                     }

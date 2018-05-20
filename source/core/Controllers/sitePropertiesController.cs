@@ -201,50 +201,50 @@ namespace Contensive.Core.Controllers {
             }
         }
         private bool? _allowLinkAlias_Local = null;
-        //
-        //====================================================================================================
-        //
-        internal int childListAddonID {
-            get {
-                try {
-                    if (dbNotReady) {
-                        //
-                        // -- db not ready, return 0
-                        return 0;
-                    } else {
-                        if (_childListAddonID == null) {
-                            _childListAddonID = getInteger("ChildListAddonID", 0);
-                            if (_childListAddonID == 0) {
-                                int CS = core.db.csOpen(cnAddons, "ccguid='" + addonGuidChildList + "'", "", true, 0, false, false, "ID");
-                                if (core.db.csOk(CS)) {
-                                    _childListAddonID = core.db.csGetInteger(CS, "ID");
-                                }
-                                core.db.csClose(ref CS);
-                                if (_childListAddonID == 0) {
-                                    CS = core.db.csInsertRecord(cnAddons);
-                                    if (core.db.csOk(CS)) {
-                                        _childListAddonID = core.db.csGetInteger(CS, "ID");
-                                        core.db.csSet(CS, "name", "Child Page List");
-                                        core.db.csSet(CS, "ArgumentList", "Name");
-                                        core.db.csSet(CS, "CopyText", "<ac type=\"childlist\" name=\"$name$\">");
-                                        core.db.csSet(CS, "Content", "1");
-                                        core.db.csSet(CS, "StylesFilename", "");
-                                        core.db.csSet(CS, "ccguid", addonGuidChildList);
-                                    }
-                                    core.db.csClose(ref CS);
-                                }
-                                setProperty("ChildListAddonID", encodeText(_childListAddonID));
-                            }
-                        }
-                    }
-                } catch (Exception ex) {
-                    logController.handleError( core,ex);
-                    throw;
-                }
-                return encodeInteger(_childListAddonID);
-            }
-        }
-        private int? _childListAddonID = null;
+        ////
+        ////====================================================================================================
+        ////
+        //internal int childListAddonID {
+        //    get {
+        //        try {
+        //            if (dbNotReady) {
+        //                //
+        //                // -- db not ready, return 0
+        //                return 0;
+        //            } else {
+        //                if (_childListAddonID == null) {
+        //                    _childListAddonID = getInteger("ChildListAddonID", 0);
+        //                    if (_childListAddonID == 0) {
+        //                        int CS = core.db.csOpen(cnAddons, "ccguid='" + addonGuidChildList + "'", "", true, 0, false, false, "ID");
+        //                        if (core.db.csOk(CS)) {
+        //                            _childListAddonID = core.db.csGetInteger(CS, "ID");
+        //                        }
+        //                        core.db.csClose(ref CS);
+        //                        if (_childListAddonID == 0) {
+        //                            CS = core.db.csInsertRecord(cnAddons);
+        //                            if (core.db.csOk(CS)) {
+        //                                _childListAddonID = core.db.csGetInteger(CS, "ID");
+        //                                core.db.csSet(CS, "name", "Child Page List");
+        //                                core.db.csSet(CS, "ArgumentList", "Name");
+        //                                core.db.csSet(CS, "CopyText", "<ac type=\"childlist\" name=\"$name$\">");
+        //                                core.db.csSet(CS, "Content", "1");
+        //                                core.db.csSet(CS, "StylesFilename", "");
+        //                                core.db.csSet(CS, "ccguid", addonGuidChildList);
+        //                            }
+        //                            core.db.csClose(ref CS);
+        //                        }
+        //                        setProperty("ChildListAddonID", encodeText(_childListAddonID));
+        //                    }
+        //                }
+        //            }
+        //        } catch (Exception ex) {
+        //            logController.handleError( core,ex);
+        //            throw;
+        //        }
+        //        return encodeInteger(_childListAddonID);
+        //    }
+        //}
+        //private int? _childListAddonID = null;
         //
         //====================================================================================================
         //

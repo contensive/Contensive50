@@ -57,7 +57,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetAddLink(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
-            return core.html.getRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing);
+            return adminUIController.getRecordAddLink2(core, ContentName, PresetNameValueList, AllowPaste, IsEditing);
         }
         //
         //====================================================================================================
@@ -93,7 +93,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetEditLink(string ContentName, string RecordID, bool AllowCut, string RecordName, bool IsEditing) {
-            return core.html.getRecordEditLink(ContentName, genericController.encodeInteger(RecordID), AllowCut, RecordName, IsEditing);
+            return adminUIController.getRecordEditLink(core,ContentName, genericController.encodeInteger(RecordID), AllowCut, RecordName, IsEditing);
         }
         //
         //====================================================================================================

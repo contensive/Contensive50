@@ -4861,7 +4861,7 @@ namespace Contensive.Core.Controllers {
                     ContentControlID = (core.db.csGetInteger(iCSPointer, "contentcontrolid"));
                     ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentControlID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        result = core.html.getRecordEditLink(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
+                        result = adminUIController.getRecordEditLink(core,ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
                     }
                 }
             }
@@ -4961,6 +4961,25 @@ namespace Contensive.Core.Controllers {
                 tempGetDbObjectTableName = tempGetDbObjectTableName.Substring(Position);
             }
             return tempGetDbObjectTableName;
+        }
+        //
+        //====================================================================================================
+        //
+        public static  string csGetRecordAddLink( coreController core,  int csPtr, string PresetNameValueList = "", bool AllowPaste = false) {
+            string result = "";
+            try {
+                if (csPtr >= 0) {
+                    string ContentName = core.db.csGetContentName(csPtr);
+                    if (string.IsNullOrEmpty(ContentName)) {
+                        logController.logWarn(core, "getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.");
+                    } else {
+                        result = adminUIController.getRecordAddLink(core,ContentName, PresetNameValueList, AllowPaste);
+                    }
+                }
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
+            }
+            return result;
         }
 
 

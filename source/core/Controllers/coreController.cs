@@ -355,7 +355,9 @@ namespace Contensive.Core.Controllers {
             }
         }
         private domainModel _domains = null;
-        //
+        /// <summary>
+        /// domains configured for this app. keys are lowercase
+        /// </summary>
         public Dictionary<string, domainModel> domainDictionary;
         //
         //===================================================================================================
@@ -561,7 +563,6 @@ namespace Contensive.Core.Controllers {
                     if (!string.IsNullOrEmpty(AjaxFunction)) {
                         //
                         // -- Need to be converted to Url parameter addons
-                        result = "";
                         switch ((AjaxFunction)) {
                             case ajaxGetFieldEditorPreferenceForm:
                                 //

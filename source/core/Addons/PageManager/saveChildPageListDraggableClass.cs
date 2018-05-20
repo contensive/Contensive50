@@ -19,23 +19,18 @@ namespace Contensive.Core.Addons.PageManager {
         //
         //====================================================================================================
         /// <summary>
-        /// pageManager addon interface
+        /// pageManager addon interface. decode: "sortlist=childPageList_{parentId}_{listName},page{idOfChild},page{idOfChild},etc"
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
-            object tempexecute = null;
             string returnHtml = "";
             try {
                 coreController core = ((CPClass)cp).core;
-                //
-                // decode: "sortlist=childPageList_{parentId}_{listName},page{idOfChild},page{idOfChild},etc"
-                //
                 string pageCommaList = cp.Doc.GetText("sortlist");
                 List<string> pageList = new List<string>(pageCommaList.Split(','));
-                string[] ParentPageValues = null;
                 if (pageList.Count > 1) {
-                    ParentPageValues = pageList[0].Split('_');
+                    string[] ParentPageValues = pageList[0].Split('_');
                     if (ParentPageValues.Count() < 3) {
                         //
                         // -- parent page is not valid
@@ -104,7 +99,6 @@ namespace Contensive.Core.Addons.PageManager {
                         }
                     }
                 }
-                tempexecute = "";
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

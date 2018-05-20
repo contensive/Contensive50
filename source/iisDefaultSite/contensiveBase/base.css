@@ -412,12 +412,11 @@
 
 .ccCon .ccAdminListCaption {
     padding: 4px;
-    background-color: #444;
+    background-color: #666;
     COLOR: white;
     border-right: 1px solid white;
     border-bottom: 1px solid black;
     border-top: 0px solid white;
-    !important;
 }
 
 .ccCon A.ccAdminListCaption {
@@ -426,12 +425,12 @@
     border: 0px;
     padding: 0px;
 }
+.ccCon A.ccAdminListCaption:Hover {}
+.ccCon A.ccAdminListCaption:Visited {}
 
-    .ccCon A.ccAdminListCaption:Hover {
-    }
-
-    .ccCon A.ccAdminListCaption:Visited {
-    }
+.ccCon .ccAdminListCaption input {
+    vertical-align:middle;
+}
 
 .ccCon .ccAdminListRowEven {
     BACKGROUND-COLOR: rgb(248,248,250);
@@ -874,19 +873,18 @@ ul.ccFilterList {
     padding: 0;
 }
 
-    ul.ccFilterList li {
-        margin: 0;
-        padding: 0;
-        padding-left: 10px;
-    }
+ul.ccFilterList li {
+    margin: 0;
+    padding: 0;
+    padding-left: 10px;
+}
 
-        ul.ccFilterList li a {
-            !important;
-            color: black !important;
-        }
+ul.ccFilterList li a {
+    color: black !important;
+}
 
 .ccRecordLinkCon {
-    position: absolute;
+    /*position: absolute;*/
     z-index: 999;
 }
 
@@ -898,22 +896,6 @@ ul.ccFilterList {
 }
 
 .ccRecordLinkCon a.ccRecordCutLink {
-}
-
-.ccEditWrapper {
-    border: 1px dashed #808080;
-}
-
-.ccEditWrapperCaption {
-    text-align: left;
-    border-bottom: 1px solid #808080;
-    padding: 4px;
-    color: black;
-    background-color: #4c4;
-}
-
-.ccEditWrapperContent {
-    padding: 4px;
 }
 
 .ccDisabledReason {
@@ -1411,27 +1393,23 @@ div.ccTestPointMessageCon {
 /*
 for hints created with getAdminHintWrapper
 */
-.ccEditWrapper {
-    border: 1px dashed #808080;
-}
-
 .ccEditWrapperCaption {
     text-align: left;
     border-bottom: 1px solid #808080;
     padding: 4px;
-    background-color: #40C040;
     color: black;
+    background-color: #4c4;
 }
-
 .ccEditWrapperContent {
     padding: 4px;
 }
-
+.ccEditWrapper {
+    border: 1px dashed #808080;
+}
 .ccHintWrapper {
     border: 1px dashed #808080;
     margin-bottom: 10px
 }
-
 .ccHintWrapperContent {
     padding: 10px;
     background-color: #80E080;
