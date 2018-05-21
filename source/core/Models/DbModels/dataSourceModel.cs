@@ -503,7 +503,6 @@ namespace Contensive.Core.Models.DbModels {
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
-                throw;
             }
             return result;
         }
@@ -531,7 +530,6 @@ namespace Contensive.Core.Models.DbModels {
                 result.username = core.serverConfig.username;
             } catch (Exception ex) {
                 logController.handleError( core,ex);
-                throw;
                 throw;
             }
             return result;

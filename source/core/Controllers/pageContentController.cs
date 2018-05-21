@@ -2249,7 +2249,7 @@ namespace Contensive.Core.Controllers {
                 //
                 string Cell = "";
                 if (core.session.isQuickEditing(core, pageContentModel.contentName)) {
-                    Cell = Cell + core.doc.getQuickEditing(rootPageId, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, core.doc.pageController.page.ContactMemberID, core.doc.pageController.page.ChildListSortMethodID, allowChildListComposite, ArchivePage);
+                    Cell = Cell + quickEditController.getQuickEditing(core, rootPageId, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, core.doc.pageController.page.ContactMemberID, core.doc.pageController.page.ChildListSortMethodID, allowChildListComposite, ArchivePage);
                 } else {
                     //
                     // ----- Headline

@@ -223,6 +223,7 @@
     <Compile Include="Controllers\workflowController.cs" />
     <Compile Include="Controllers\collectionXmlController.cs" />
     <Compile Include="Controllers\xmlController.cs" />
+    <Compile Include="Controllers\quickEditController.cs" />
     <Compile Include="Controllers\_blankStaticController.cs" />
     <Compile Include="Extensions\extensionMethodsClass.cs" />
     <Compile Include="Extensions\webClientExtensionClass.cs" />

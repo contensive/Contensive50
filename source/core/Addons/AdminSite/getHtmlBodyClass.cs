@@ -11599,10 +11599,6 @@ namespace Contensive.Core.Addons.AdminSite {
                                                     direction = (genericController.encodeBoolean(LineSplit[1]) ? 1 : 2),
                                                     order = ++orderPtr
                                                 });
-                                                //if (adminContext.adminContent.fields.ContainsKey(fieldName)) {
-                                                //    //if (adminContext.adminContent.fields[fieldName].authorable) {
-                                                //    //}
-                                                //}
                                             }
                                         }
                                         Ptr = Ptr + 1;

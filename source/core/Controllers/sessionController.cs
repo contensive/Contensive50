@@ -115,8 +115,8 @@ namespace Contensive.Core.Controllers {
         private string contentAccessRights_List = ""; // If ContentId in this list, they are a content manager
         private string contentAccessRights_AllowAddList = ""; // If in _List, test this for allowAdd
         private string contentAccessRights_AllowDeleteList = ""; // If in _List, test this for allowDelete
-        public string main_IsEditingContentList = "";
-        public string main_IsNotEditingContentList = "";
+        private List<string> localCache_IsEditingContentList = new List<string>();
+        private List<string> localCache_NotEditingContentList = new List<string>();
         //
         //====================================================================================================
         /// <summary>
@@ -1361,44 +1361,43 @@ namespace Contensive.Core.Controllers {
         /// <param name="contentNameOrId"></param>
         /// <returns></returns>
         public bool isEditing(string contentNameOrId) {
-            bool returnResult = false;
+            bool result = false;
             try {
-                string cacheTestName = contentNameOrId.ToLower();
-                if (string.IsNullOrEmpty(cacheTestName)) {
-                    cacheTestName = "iseditingall";
-                }
-                if (genericController.isInDelimitedString(main_IsEditingContentList, cacheTestName, ",")) {
-                    //
-                    // -- 
-                    returnResult = true;
-                } else if (genericController.isInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",")) {
-                    //
-                    // -- 
-                    //Call debugController.debug_testPoint(core, "...is in main_IsNotEditingContentList")
-                } else {
-                    if (isAuthenticated) {
-                        if (true) {
-                            if (core.visitProperty.getBoolean("AllowEditing") | core.visitProperty.getBoolean("AllowAdvancedEditor")) {
-                                if (!string.IsNullOrEmpty(contentNameOrId)) {
-                                    if (contentNameOrId.IsNumeric()) {
-                                        contentNameOrId = cdefModel.getContentNameByID(core, encodeInteger(contentNameOrId));
-                                    }
-                                }
-                                returnResult = isAuthenticatedContentManager(core, contentNameOrId);
-                            }
-                        }
+                if (isAuthenticated) {
+                    string cacheTestName = contentNameOrId;
+                    if (string.IsNullOrEmpty(cacheTestName)) {
+                        cacheTestName = "iseditingall";
                     }
-                    if (returnResult) {
-                        main_IsEditingContentList = main_IsEditingContentList + "," + cacheTestName;
+                    cacheTestName = cacheTestName.ToLower();
+                    if (localCache_IsEditingContentList.Contains(cacheTestName)) {
+                        //
+                        // -- 
+                        return true;
+                    } else if (localCache_NotEditingContentList.Contains(cacheTestName)) {
+                        //
+                        // -- 
+                        return false;
                     } else {
-                        main_IsNotEditingContentList = main_IsNotEditingContentList + "," + cacheTestName;
+                        if (core.visitProperty.getBoolean("AllowEditing") | core.visitProperty.getBoolean("AllowAdvancedEditor")) {
+                            if (!string.IsNullOrEmpty(contentNameOrId)) {
+                                if (contentNameOrId.IsNumeric()) {
+                                    contentNameOrId = cdefModel.getContentNameByID(core, encodeInteger(contentNameOrId));
+                                }
+                            }
+                            result = isAuthenticatedContentManager(core, contentNameOrId);
+                        }
+                        if (result) {
+                            localCache_IsEditingContentList.Add(cacheTestName);
+                        } else {
+                            localCache_NotEditingContentList.Add(cacheTestName);
+                        }
                     }
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
             }
-            return returnResult;
+            return result;
         }
         //
         //========================================================================
