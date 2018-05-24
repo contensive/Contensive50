@@ -199,9 +199,9 @@
     <Compile Include="UnitTests\Views\cpApi\NumericHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\core\core.csproj">
+    <ProjectReference Include="..\core\contensive.csproj">
       <Project>{46657d07-74bc-4ddc-8fdd-9078eb1a1cd2}</Project>
-      <Name>core</Name>
+      <Name>contensive</Name>
     </ProjectReference>
     <ProjectReference Include="..\CPBase50\CPBase50.csproj">
       <Project>{0619E0E6-1565-47E7-B8FE-F8BD1C8EB48B}</Project>

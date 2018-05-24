@@ -36,7 +36,7 @@
             // 
             this.taskService.Description = "Contensive Task Service";
             this.taskService.DisplayName = "Contensive";
-            this.taskService.ServiceName = "Service1";
+            this.taskService.ServiceName = "ContensiveTaskService";
             // 
             // ProjectInstaller
             // 

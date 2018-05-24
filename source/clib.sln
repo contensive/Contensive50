@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{00272301-E2B1-4F5A-841E-A7718F0029ED}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,7 +18,7 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup3", "Setup3\Setup3.vdp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CPBase50", "CPBase50\CPBase50.csproj", "{0619E0E6-1565-47E7-B8FE-F8BD1C8EB48B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core", "core\core.csproj", "{46657D07-74BC-4DDC-8FDD-9078EB1A1CD2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "contensive", "core\contensive.csproj", "{46657D07-74BC-4DDC-8FDD-9078EB1A1CD2}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CPBase41", "CPBase41\CPBase41.vbproj", "{E873F18E-47EF-46A9-AEA1-5A8B0F8BEB01}"
 EndProject
@@ -26,7 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core.tests", "coreTests\cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "monitorService", "monitorService\monitorService.csproj", "{591DB653-B853-4AE6-AFB5-91C86C492563}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsService", "WindowsService\WindowsService.csproj", "{3FE1D5E9-411B-4713-81CF-D6E439CAEFB0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskService", "WindowsService\TaskService.csproj", "{3FE1D5E9-411B-4713-81CF-D6E439CAEFB0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -480,6 +480,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CFDBC334-7DCF-4555-A1D9-B45FE0E7DEA6}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = ccCoreDotnet.vsmdi
