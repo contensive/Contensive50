@@ -3033,32 +3033,32 @@ namespace Contensive.Core.Addons.AdminSite {
                         adminContext.editRecord.menuHeadline = genericController.encodeText(adminContext.editRecord.fieldsLc["menuheadline"].value);
                     }
                     //
-                    adminContext.editRecord.menuHeadline = "";
+                    //adminContext.editRecord.menuHeadline = "";
                     if (adminContext.editRecord.fieldsLc.ContainsKey("name")) {
                         //Dim editRecordField As editRecordFieldClass = editRecord.fieldsLc["name")
                         //editRecord.nameLc = editRecordField.value.ToString()
                         adminContext.editRecord.nameLc = genericController.encodeText(adminContext.editRecord.fieldsLc["name"].value);
                     }
                     //
-                    adminContext.editRecord.menuHeadline = "";
+                    //adminContext.editRecord.menuHeadline = "";
                     if (adminContext.editRecord.fieldsLc.ContainsKey("active")) {
                         adminContext.editRecord.active = genericController.encodeBoolean(adminContext.editRecord.fieldsLc["active"].value);
                     }
                     //
-                    adminContext.editRecord.menuHeadline = "";
+                    //adminContext.editRecord.menuHeadline = "";
                     if (adminContext.editRecord.fieldsLc.ContainsKey("contentcontrolid")) {
                         adminContext.editRecord.contentControlId = genericController.encodeInteger(adminContext.editRecord.fieldsLc["contentcontrolid"].value);
                     }
                     //
-                    adminContext.editRecord.menuHeadline = "";
+                    //adminContext.editRecord.menuHeadline = "";
                     if (adminContext.editRecord.fieldsLc.ContainsKey("parentid")) {
                         adminContext.editRecord.parentID = genericController.encodeInteger(adminContext.editRecord.fieldsLc["parentid"].value);
                     }
                     //
-                    adminContext.editRecord.menuHeadline = "";
-                    if (adminContext.editRecord.fieldsLc.ContainsKey("rootpageid")) {
-                        adminContext.editRecord.RootPageID = genericController.encodeInteger(adminContext.editRecord.fieldsLc["rootpageid"].value);
-                    }
+                    //adminContext.editRecord.menuHeadline = "";
+                    //if (adminContext.editRecord.fieldsLc.ContainsKey("rootpageid")) {
+                    //    adminContext.editRecord.RootPageID = genericController.encodeInteger(adminContext.editRecord.fieldsLc["rootpageid"].value);
+                    //}
                     //
                     // ----- Set the local global copy of Edit Record Locks
                     //
@@ -3573,28 +3573,29 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
                         //
-                        if (genericController.vbLCase(adminContext.adminContent.contentTableName) == "ccpagecontent") {
-                            //
-                            PageNotFoundPageID = (core.siteProperties.getInteger("PageNotFoundPageID", 0));
-                            if (core.docProperties.getBoolean("PageNotFound")) {
-                                editRecord.SetPageNotFoundPageID = true;
-                            } else if (editRecord.id == PageNotFoundPageID) {
-                                core.siteProperties.setProperty("PageNotFoundPageID", "0");
-                            }
-                            //
-                            if (core.docProperties.getBoolean("LandingPageID")) {
-                                editRecord.SetLandingPageID = true;
-                            } else if (editRecord.id == 0) {
-                                //
-                                // New record, allow it to be set, but do not compare it to LandingPageID
-                                //
-                            } else if (editRecord.id == core.siteProperties.landingPageID) {
-                                //
-                                // Do not reset the LandingPageID from here -- set another instead
-                                //
-                                errorController.addUserError(core, "This page was marked As the Landing Page For the website, And the checkbox has been cleared. This Is Not allowed. To remove this page As the Landing Page, locate a New landing page And Select it, Or go To Settings &gt; Page Settings And Select a New Landing Page.");
-                            }
-                        }
+                        //if (genericController.vbLCase(adminContext.adminContent.contentTableName) == "ccpagecontent") {
+                        //    ////
+                        //    //PageNotFoundPageID = (core.siteProperties.getInteger("PageNotFoundPageID", 0));
+                        //    //if (core.docProperties.getBoolean("PageNotFound")) {
+                        //    //    editRecord.SetPageNotFoundPageID = true;
+                        //    //} else if (editRecord.id == PageNotFoundPageID) {
+                        //    //    core.siteProperties.setProperty("PageNotFoundPageID", "0");
+                        //    //}
+                        //    //
+                        //    //if (core.docProperties.getBoolean("LandingPageID")) {
+                        //    //    editRecord.SetLandingPageID = true;
+                        //    //} else 
+                        //    //if (editRecord.id == 0) {
+                        //    //    //
+                        //    //    // New record, allow it to be set, but do not compare it to LandingPageID
+                        //    //    //
+                        //    //} else if (editRecord.id == core.siteProperties.landingPageID) {
+                        //    //    //
+                        //    //    // Do not reset the LandingPageID from here -- set another instead
+                        //    //    //
+                        //    //    errorController.addUserError(core, "This page was marked As the Landing Page For the website, And the checkbox has been cleared. This Is Not allowed. To remove this page As the Landing Page, locate a New landing page And Select it, Or go To Settings &gt; Page Settings And Select a New Landing Page.");
+                        //    //}
+                        //}
                     }
                 }
             } catch (Exception ex) {
@@ -4596,18 +4597,18 @@ namespace Contensive.Core.Addons.AdminSite {
                             }
 
                         }
-                        //
-                        // ----- Clear/Set PageNotFound
-                        //
-                        if (editRecord.SetPageNotFoundPageID) {
-                            core.siteProperties.setProperty("PageNotFoundPageID", genericController.encodeText(editRecord.id));
-                        }
-                        //
-                        // ----- Clear/Set LandingPageID
-                        //
-                        if (editRecord.SetLandingPageID) {
-                            core.siteProperties.setProperty("LandingPageID", genericController.encodeText(editRecord.id));
-                        }
+                        ////
+                        //// ----- Clear/Set PageNotFound
+                        ////
+                        //if (editRecord.SetPageNotFoundPageID) {
+                        //    core.siteProperties.setProperty("PageNotFoundPageID", genericController.encodeText(editRecord.id));
+                        //}
+                        ////
+                        //// ----- Clear/Set LandingPageID
+                        ////
+                        //if (editRecord.SetLandingPageID) {
+                        //    core.siteProperties.setProperty("LandingPageID", genericController.encodeText(editRecord.id));
+                        //}
                         //
                         // ----- clear/set authoring controls
                         //

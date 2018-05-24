@@ -165,6 +165,9 @@ namespace Contensive.Core {
             /// ContentControlID of the edit record
             /// </summary>
             public int contentControlId;
+            /// <summary>
+            /// denormalized name from contentControlId property
+            /// </summary>
             public string contentControlId_Name;
             /// <summary>
             /// Used for Content Watch Link Label if default
@@ -175,22 +178,14 @@ namespace Contensive.Core {
             /// </summary>
             public DateTime modifiedDate;
             public personModel modifiedBy;
-            //public int modifiedByMemberID;
             public DateTime dateAdded;
-            //public int createByMemberId;
             public personModel createdBy;
-
-            public int RootPageID;
-            public bool SetPageNotFoundPageID;
-            public bool SetLandingPageID;
-
-            //
+            //public int RootPageID;
+            //public bool SetPageNotFoundPageID;
+            //public bool SetLandingPageID;
             public bool Loaded; // true/false - set true when the field array values are loaded
             public bool Saved; // true if edit record was saved during this page
             public bool Read_Only; // set if this record can not be edited, for various reasons
-                                   //
-                                   // From core.main_GetAuthoringStatus
-                                   //
             public bool IsDeleted; // true means the edit record has been deleted
             public bool IsInserted; // set if Workflow authoring insert
             public bool IsModified; // record has been modified since last published
@@ -202,9 +197,6 @@ namespace Contensive.Core {
             public bool ApproveLock; // set if an approve Lock
             public string ApprovedName; // member who approved the record
             public DateTime ApprovedDate; // Date when record was approved
-                                          //
-                                          // From core.main_GetAuthoringPermissions
-                                          //
             public bool AllowInsert;
             public bool AllowCancel;
             public bool AllowSave;
@@ -213,14 +205,10 @@ namespace Contensive.Core {
             public bool AllowAbort;
             public bool AllowSubmit;
             public bool AllowApprove;
-            //
-            // From core.main_GetEditLock
-            //
             public bool EditLock; // set if an edit Lock by anyone else besides the current user
             public int EditLockMemberID; // Member who edit locked the record
             public string EditLockMemberName; // Member who edit locked the record
             public DateTime EditLockExpires; // Time when the edit lock expires
-
         }
         //
         // ====================================================================================================
