@@ -468,9 +468,9 @@ namespace Contensive.Core.Controllers {
                         //
                         string forwardDomain = core.db.getRecordName("domains", core.domain.forwardDomainId);
                         if (!string.IsNullOrEmpty(forwardDomain)) {
-                            int pos = requestUrlSource.IndexOf( requestDomain ,0,1,StringComparison.CurrentCultureIgnoreCase);
+                            int pos = requestUrlSource.ToLower().IndexOf( requestDomain.ToLower() );
                             if (pos > 0) {
-                                core.domain.forwardUrl = requestUrlSource.ToString().Left( pos - 1) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length) - 1);
+                                core.domain.forwardUrl = requestUrlSource.ToString().Left( pos) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length));
                                 redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
                                 return core.doc.continueProcessing;
                             }

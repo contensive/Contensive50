@@ -868,7 +868,7 @@ namespace Contensive.Core.Controllers {
             } catch (Exception ex) {
                 logController.handleError( this,ex);
             } finally {
-                //
+                // if (doc.routeDictionaryChanges) { DefaultSite.configurationClass.loadRouteMap(cp))}
             }
             return result;
         }

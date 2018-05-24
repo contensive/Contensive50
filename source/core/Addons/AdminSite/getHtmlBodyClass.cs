@@ -6751,9 +6751,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                 }
                 //
-                //
                 // ----- Authoring status
-                //
                 bool FieldRequired = false;
                 //
                 // ----- RecordID
@@ -6770,58 +6768,36 @@ namespace Contensive.Core.Addons.AdminSite {
                     string fieldHelp = "When unchecked, add-ons can ignore this record as if it was temporarily deleted.";
                     tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Active", fieldHelp, false, false, ""));
                 }
-                //
-                // ----- If Page Content , check if this is the default PageNotFound page
-                if (adminContext.adminContent.contentTableName.ToLower() == "ccpagecontent") {
-                    //
-                    // Landing Page
-                    {
-                        string fieldHelp = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docore.main_";
-                        bool Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("LandingPageID", 0))));
-                        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? htmlController.checkbox("LandingPageID", Checked) : "<b>" + genericController.getYesNo(Checked) + "</b>" + htmlController.inputHidden("LandingPageID", Checked);
-                        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Set Default Landing Page", fieldHelp, false, false, ""));
-                    }
-                    //
-                    // Page Not Found
-                    {
-                        string fieldHelp = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked.";
-                        bool isPageNotFoundRecord = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("PageNotFoundPageID", 0))));
-                        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? htmlController.checkbox("PageNotFound", isPageNotFoundRecord) : "<b>" + genericController.getYesNo(isPageNotFoundRecord) + "</b>" + htmlController.inputHidden("PageNotFound", isPageNotFoundRecord);
-                        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Set Page Not Found", fieldHelp, false, false, ""));
-                    }
-                    //
-                    // ----- Last Known Public Site URL
-                    {
-                        string FieldHelp = "This is the URL where this record was last displayed on the site. It may be blank if the record has not been displayed yet.";
-                        string fieldValue = linkAliasController.getLinkAlias(core, editRecord.id, "", "");
-                        string fieldEditor = (string.IsNullOrEmpty(fieldValue)) ? "unknown" : "<a href=\"" + htmlController.encodeHtml(fieldValue) + "\" target=\"_blank\">" + fieldValue + "</a>";
-                        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Last Known Public URL", FieldHelp, false, false, ""));
-                    }
-                }
                 ////
-                //// ----- Add-on remote method widget code
-                //if (adminContext.content.contentTableName.ToLower() == "ccaggregatefunctions") {
+                //// ----- If Page Content , check if this is the default PageNotFound page
+                //if (adminContext.adminContent.contentTableName.ToLower() == "ccpagecontent") {
                 //    //
-                //    // ----- Widget Code
-                //    if (!genericController.encodeBoolean(editRecord.fieldsLc["remotemethod"].value)) {
-                //        FieldHelp = "If you wish to use this add-on as a widget, enable 'Is Remote Method' on the 'Placement' tab and save the record. The necessary html code, or 'embed code' will be created here for you to cut-and-paste into the website.";
-                //        HTMLFieldString = "";
-                //        HTMLFieldString = core.html.inputTextExpandable("ignore", HTMLFieldString, 1, "100%", "", false, true);
-                //        tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
-                //    } else {
-                //        FieldHelp = "If you wish to use this add-on as a widget, cut and paste the 'Widget Code' into the website content. If any code appears in the 'Widget Head', this will need to be pasted into the head section of the website.";
-                //        HTMLFieldString = ""
-                //            + "<SCRIPT type=text/javascript>"
-                //            + "\r\nvar ccProto=(('https:'==document.location.protocol) ? 'https:// : 'http://);"
-                //            + "\r\ndocument.write(unescape(\"%3Cscript src='\" + ccProto + \"" + core.webServer.requestDomain + "/ccLib/ClientSide/Core.js' type='text/javascript'%3E%3C/script%3E\"));"
-                //            + "\r\ndocument.write(unescape(\"%3Cscript src='\" + ccProto + \"" + core.webServer.requestDomain + "/" + genericController.encodeURL(editRecord.nameLc) + "?requestjsform=1' type='text/javascript'%3E%3C/script%3E\"));"
-                //            + "\r\n</SCRIPT>";
-                //        HTMLFieldString = core.html.inputTextExpandable("ignore", HTMLFieldString, 8);
-                //        tabPanel.Add(adminUIController.getEditRow(core, HTMLFieldString, "Widget Code", FieldHelp, true, false, ""));
+                //    // Landing Page
+                //    {
+                //        string fieldHelp = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docore.main_";
+                //        bool Checked = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("LandingPageID", 0))));
+                //        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? htmlController.checkbox("LandingPageID", Checked) : "<b>" + genericController.getYesNo(Checked) + "</b>" + htmlController.inputHidden("LandingPageID", Checked);
+                //        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Default Landing Page", fieldHelp, false, false, ""));
+                //    }
+                //    //
+                //    // Page Not Found
+                //    {
+                //        string fieldHelp = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked.";
+                //        bool isPageNotFoundRecord = ((editRecord.id != 0) && (editRecord.id == (core.siteProperties.getInteger("PageNotFoundPageID", 0))));
+                //        string fieldEditor = (core.session.isAuthenticatedAdmin(core)) ? htmlController.checkbox("PageNotFound", isPageNotFoundRecord) : "<b>" + genericController.getYesNo(isPageNotFoundRecord) + "</b>" + htmlController.inputHidden("PageNotFound", isPageNotFoundRecord);
+                //        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Default Page Not Found", fieldHelp, false, false, ""));
+                //    }
+                //    //
+                //    // ----- Last Known Public Site URL
+                //    {
+                //        string FieldHelp = "This is the URL where this record was last displayed on the site. It may be blank if the record has not been displayed yet.";
+                //        string fieldValue = linkAliasController.getLinkAlias(core, editRecord.id, "", "");
+                //        string fieldEditor = (string.IsNullOrEmpty(fieldValue)) ? "unknown" : "<a href=\"" + htmlController.encodeHtml(fieldValue) + "\" target=\"_blank\">" + fieldValue + "</a>";
+                //        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Last Known Public URL", FieldHelp, false, false, ""));
                 //    }
                 //}
-                ////
-                // ----- GUID
+                //
+                // -- GUID
                 {
                     string fieldValue = genericController.encodeText(editRecord.fieldsLc["ccguid"].value);
                     string FieldHelp = "This is a unique number that identifies this record globally. A GUID is not required, but when set it should never be changed. GUIDs are used to synchronize records. When empty, you can create a new guid. Only Developers can modify the guid.";
@@ -6833,45 +6809,38 @@ namespace Contensive.Core.Addons.AdminSite {
                         string buttonCell = htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='{" + Guid.NewGuid().ToString() + "}';this.disabled=true;}"), "col-xs-1");
                         string inputCell = htmlController.div(adminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId), "col-xs-11");
                         fieldEditor = htmlController.div(htmlController.div(buttonCell + inputCell, "row"), "container-fluid");
-                        //fieldEditor = htmlController.div(htmlController.div(buttonCell + inputCell, "row"), "container");
-                        //fieldEditor = htmlController.div(htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + fieldValue + "';this.disabled=true;}")));
-                        //sfieldEditor = adminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId) + htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + fieldValue + "';this.disabled=true;}"));
                     } else {
                         //
                         // field is read-only except for developers
                         fieldEditor = adminUIController.getDefaultEditor_Text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(core), "");
-                        //if (core.session.isAuthenticatedDeveloper(core)) {
-                        //    fieldEditor = htmlController.inputText( core,"ccguid", fieldValue, -1, -1, "", false, false) + "";
-                        //} else {
-                        //    fieldEditor = htmlController.inputText( core,"ccguid_disabled", fieldValue, -1, -1, "", false, true) + htmlController.inputHidden("ccguid", fieldValue);
-                        //}
                     }
                     tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "GUID", FieldHelp, false, false, ""));
                 }
                 //
                 // ----- EID (Encoded ID)
                 {
-
-                }
-                if (genericController.vbUCase(adminContext.adminContent.contentTableName) == genericController.vbUCase("ccMembers")) {
-                    bool AllowEID = (core.siteProperties.getBoolean("AllowLinkLogin", true)) | (core.siteProperties.getBoolean("AllowLinkRecognize", true));
-                    string fieldHelp = "";
-                    string fieldEditor = "";
-                    if (!AllowEID) {
-                        fieldEditor = "(link login and link recognize are disabled in security preferences)";
-                    } else if (editRecord.id == 0) {
-                        fieldEditor = "(available after save)";
-                    } else {
-                        string fieldValue = genericController.encodeText(Core.Controllers.securityController.encodeToken(core, editRecord.id, core.doc.profileStartTime));
-                        if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
-                            fieldHelp = "Any visitor who hits the site with eid=" + fieldValue + " will be logged in as this member.";
+                    if (genericController.vbUCase(adminContext.adminContent.contentTableName) == genericController.vbUCase("ccMembers")) {
+                        bool AllowEID = (core.siteProperties.getBoolean("AllowLinkLogin", true)) | (core.siteProperties.getBoolean("AllowLinkRecognize", true));
+                        string fieldHelp = "";
+                        string fieldEditor = "";
+                        if (!AllowEID) {
+                            fieldEditor = "(link login and link recognize are disabled in security preferences)";
+                        } else if (editRecord.id == 0) {
+                            fieldEditor = "(available after save)";
                         } else {
-                            fieldHelp = "Any visitor who hits the site with eid=" + fieldValue + " will be recognized as this member, but not logged in.";
+                            string eidQueryString = "eid=" + Core.Controllers.securityController.encodeToken(core, editRecord.id, core.doc.profileStartTime);
+                            string sampleUrl = cp.Request.Protocol + cp.Request.Host + cp.Site.AppRootPath + cp.Site.PageDefault + "?" + eidQueryString;
+                            if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
+                                fieldHelp = "If " + eidQueryString + " is added to a url querystring for this site, the user be logged in as this person.";
+                            } else {
+                                fieldHelp = "If " + eidQueryString + " is added to a url querystring for this site, the user be recognized in as this person, but not logged in.";
+                            }
+                            fieldHelp += " To enable, disable or modify this feature, use the security tab on the Preferences page.";
+                            fieldHelp += "<br>For example: " + sampleUrl;
+                            fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_eid", eidQueryString, true, "");
                         }
-                        fieldHelp += " To enable, disable or modify this feature, use the security tab on the Preferences page.";
-                        fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_eid", fieldValue, true, "");
+                        tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Member Link Login Querystring", fieldHelp, true, false, ""));
                     }
-                    tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Member Link Login EID", fieldHelp, true, false, ""));
                 }
                 //
                 // ----- Controlling Content
@@ -6973,18 +6942,20 @@ namespace Contensive.Core.Addons.AdminSite {
                     } else {
                         int FieldValueInteger = editRecord.createdBy.id;
                         if (FieldValueInteger == 0) {
-                            fieldValue = "unknown";
+                            fieldValue = "(not set)";
                         } else {
-                            int CSPointer = core.db.csOpen2("people", FieldValueInteger, true);
+                            int CSPointer = core.db.csOpen("people", "(id=" + FieldValueInteger + ")","name,active",false);
                             if (!core.db.csOk(CSPointer)) {
-                                fieldValue = "unknown";
+                                fieldValue = "#" + FieldValueInteger + ", (deleted)";
                             } else {
-                                fieldValue = core.db.csGet(CSPointer, "name");
+                                fieldValue = "#" + FieldValueInteger + ", " + core.db.csGet(CSPointer, "name");
+                                if (!core.db.csGetBoolean(CSPointer, "active")) {
+                                    fieldValue += " (inactive)";
+                                }
                             }
                             core.db.csClose(ref CSPointer);
                         }
                     }
-                    //string fieldEditor = htmlController.inputText( core,"ignore", fieldValue, -1, -1, "", false, true);
                     string fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_createdBy", fieldValue, true, "");
                     tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Created By", FieldHelp, FieldRequired, false, ""));
                 }
@@ -6996,9 +6967,10 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
-                        fieldValue = genericController.encodeText(genericController.encodeDate(editRecord.dateAdded));
-                        if (fieldValue == "12:00:00 AM") {
-                            fieldValue = "unknown";
+                        if (encodeDateMinValue(editRecord.dateAdded) == DateTime.MinValue) {
+                            fieldValue = "(not set)";
+                        } else {
+                            fieldValue = editRecord.dateAdded.ToString();
                         }
                     }
                     string fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_createdDate", fieldValue, true, "");
@@ -7014,36 +6986,40 @@ namespace Contensive.Core.Addons.AdminSite {
                         fieldValue = "(available after save)";
                     } else {
                         int FieldValueInteger = editRecord.modifiedBy.id;
-                        fieldValue = "unknown";
-                        if (FieldValueInteger > 0) {
-                            int CSPointer = core.db.csOpen2("people", FieldValueInteger, true, false, "name");
-                            if (core.db.csOk(CSPointer)) {
-                                fieldValue = core.db.csGet(CSPointer, "name");
+                        if (FieldValueInteger == 0) {
+                            fieldValue = "(not set)";
+                        } else {
+                            int CSPointer = core.db.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
+                            if (!core.db.csOk(CSPointer)) {
+                                fieldValue = "#" + FieldValueInteger + ", (deleted)";
+                            } else {
+                                fieldValue = "#" + FieldValueInteger + ", " + core.db.csGet(CSPointer, "name");
+                                if (!core.db.csGetBoolean(CSPointer, "active")) {
+                                    fieldValue += " (inactive)";
+                                }
                             }
                             core.db.csClose(ref CSPointer);
                         }
                     }
                     string fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_modifiedBy", fieldValue, true, "");
-                    //string fieldEditor = htmlController.inputText( core,"ignore", fieldValue, -1, -1, "", false, true);
                     tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Modified By", FieldHelp, FieldRequired, false, ""));
                 }
                 //
                 // ----- Modified Date
                 {
-                    string FieldHelp = "The date and time when this record was last modified";
+                    string FieldHelp = "The date and time when this record was last modified.";
                     string fieldValue = "";
                     if (editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
-                        fieldValue = genericController.encodeText(genericController.encodeDate(editRecord.modifiedDate));
-                        if (fieldValue == "12:00:00 AM") {
-                            fieldValue = "unknown";
+                        if (encodeDateMinValue(editRecord.modifiedDate)==DateTime.MinValue) {
+                            fieldValue = "(not set)";
+                        } else {
+                            fieldValue = editRecord.modifiedDate.ToString();
                         }
                     }
                     string fieldEditor = adminUIController.getDefaultEditor_Text(core, "ignore_modifiedBy", fieldValue, true, "");
-                    //string fieldEditor = htmlController.inputText( core,"ignore", fieldValue, -1, -1, "", false, true);
                     tabPanel.Add(adminUIController.getEditRow(core, fieldEditor, "Modified Date", FieldHelp, false, false, ""));
-
                 }
                 string s = adminUIController.EditTableOpen + tabPanel.Text + adminUIController.EditTableClose;
                 result = adminUIController.GetEditPanel(core, (!adminContext.allowAdminTabs), "Control Information", "", s);

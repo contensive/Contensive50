@@ -82,14 +82,22 @@ namespace Contensive.Core {
                 return core.appConfig.appStatus;
             }
         }
+        /// <summary>
+        /// When a change is make data used for the route table, this flag is set in core. Use this flag to reload the webserver's route tables
+        /// </summary>
+        public bool routeDictionaryChanges {
+            get {
+                return core.doc.routeDictionaryChanges;
+            }
+        }
         //
         //=========================================================================================================
         //
         public string statusMessage {
-            get {
-                return GetApplicationStatusMessage(core.appConfig.appStatus);
+                get {
+                    return GetApplicationStatusMessage(core.appConfig.appStatus);
+                }
             }
-        }
         //
         //====================================================================================================
         /// <summary>

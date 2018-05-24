@@ -50,8 +50,8 @@ namespace Contensive.Core.Controllers {
             bool returnOk = false;
             try {
                 fileSystem.copyRemoteToLocal(pathFilename);
-                if (System.IO.File.Exists(fileSystem.localAbsRootPath + pathFilename)) {
-                    src = pathFilename;
+                src = fileSystem.localAbsRootPath + pathFilename;
+                if (System.IO.File.Exists(src)) {
                     srcImage = System.Drawing.Image.FromFile(src);
                     setWidth = srcImage.Width;
                     setHeight = srcImage.Height;

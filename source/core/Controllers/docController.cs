@@ -10,7 +10,7 @@ using Contensive.BaseClasses;
 //
 namespace Contensive.Core.Controllers {
     /// <summary>
-    /// persistence object during document construction
+    /// persistence object during document construction. Values persist only for this document.
     /// </summary>
     public class docController {
         /// <summary>
@@ -26,6 +26,10 @@ namespace Contensive.Core.Controllers {
         /// If no addon executed is an html addon, the result is returned as-is.
         /// </summary>
         public bool isHtml { get; set; } = false;
+        /// <summary>
+        /// route dictionary needs to be reloaded - this is a short-term solution. when true, the route Dictionary was updated during this document process and should be updated on exit. Long-term, each webserver instance has to flush cache
+        /// </summary>
+        public bool routeDictionaryChanges = false;
         /// <summary>
         /// head tags, script tags, style tags, etc
         /// </summary>
@@ -1367,14 +1371,17 @@ namespace Contensive.Core.Controllers {
                 case linkForwardModel.contentTableName:
                     //
                     Models.Complex.routeDictionaryModel.invalidateCache(core);
+                    routeDictionaryChanges = true;
                     break;
                 case linkAliasModel.contentTableName:
                     //
                     Models.Complex.routeDictionaryModel.invalidateCache(core);
+                    routeDictionaryChanges = true;
                     break;
                 case addonModel.contentTableName:
                     //
                     Models.Complex.routeDictionaryModel.invalidateCache(core);
+                    routeDictionaryChanges = true;
                     core.cache.invalidate("addonCache");
                     core.cache.invalidateContent_Entity(core, TableName, RecordID);
                     break;

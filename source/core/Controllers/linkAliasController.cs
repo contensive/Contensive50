@@ -223,6 +223,10 @@ namespace Contensive.Core.Controllers {
                             int linkAliasId = core.db.csGetInteger(CS, "id");
                             core.db.csClose(ref CS);
                             core.cache.invalidateContent_Entity(core, linkAliasModel.contentTableName, linkAliasId);
+                            //
+                            // -- force route reload if this is a webserver page
+                            Models.Complex.routeDictionaryModel.invalidateCache(core);
+                            core.doc.routeDictionaryChanges = true;
                         }
                     }
                 }
