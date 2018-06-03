@@ -499,7 +499,7 @@ namespace Contensive.Core.Controllers {
                         // This field is default true, and non-authorable
                         // It will be true in all cases, except a possible unforseen exception
                         //
-                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + htmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + requestAppRootPath + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + htmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                         EmailBody = genericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress");
                     }
                     //

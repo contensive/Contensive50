@@ -314,6 +314,10 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // -- recognize by the main_VisitorMemberID
                                     if (recognizeById(core, resultSessionContext.visitor.MemberID, ref resultSessionContext)) {
+                                    //    //
+                                    //    // -- id presented, but did not work. create dummy user
+                                    //    resultSessionContext.user = new personModel();
+                                    //} else {
                                         //
                                         // -- if successful, now test for autologin (authentication)
                                         if (core.siteProperties.AllowAutoLogin & resultSessionContext.user.AutoLogin & resultSessionContext.visit.CookieSupport) {
@@ -443,7 +447,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // -- new visit, update the persistant visitor cookie
                                 if (trackVisits) {
-                                    core.webServer.addResponseCookie(main_appNameCookiePrefix + main_cookieNameVisitor, securityController.encodeToken( core,resultSessionContext.visitor.id, resultSessionContext.visit.StartTime), resultSessionContext.visit.StartTime.AddYears(1), "", requestAppRootPath, false);
+                                    core.webServer.addResponseCookie(main_appNameCookiePrefix + main_cookieNameVisitor, securityController.encodeToken( core,resultSessionContext.visitor.id, resultSessionContext.visit.StartTime), resultSessionContext.visit.StartTime.AddYears(1), "", appRootPath, false);
                                 }
                                 //
                                 // -- OnNewVisit Add-on call
@@ -472,8 +476,11 @@ namespace Contensive.Core.Controllers {
                             } else if (MemberLinkRecognizeID != 0) {
                                 //
                                 // -- Link Recognize
-                                recognizeById(core, MemberLinkRecognizeID, ref resultSessionContext);
-                                logController.addSiteActivity(core, "link recognize with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                if ( recognizeById(core, MemberLinkRecognizeID, ref resultSessionContext)) {
+                                    logController.addSiteActivity(core, "Successful link recognize with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                } else {
+                                    logController.addSiteActivity(core, "Unsuccessful link recognize with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                }
                             }
                             //
                             // -- create guest identity if no identity
@@ -579,7 +586,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- Write Visit Cookie
                         visitCookie = securityController.encodeToken( core,resultSessionContext.visit.id, core.doc.profileStartTime);
-                        core.webServer.addResponseCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit, visitCookie, default(DateTime), "", requestAppRootPath, false);
+                        core.webServer.addResponseCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit, visitCookie, default(DateTime), "", appRootPath, false);
                     }
                 }
             } catch (Exception ex) {
@@ -1132,24 +1139,27 @@ namespace Contensive.Core.Controllers {
                 if (sessionContext.visit.id == 0) {
                     sessionContext.visit = visitModel.add(core);
                 }
-                sessionContext.user = personModel.create(core, userId);
-                sessionContext.visitor.MemberID = sessionContext.user.id;
-                sessionContext.visit.MemberID = sessionContext.user.id;
-                sessionContext.visit.VisitAuthenticated = false;
-                sessionContext.visit.VisitorID = sessionContext.visitor.id;
-                sessionContext.visit.LoginAttempts = 0;
-                sessionContext.user.Visits = sessionContext.user.Visits + 1;
-                if (sessionContext.user.Visits == 1) {
-                    sessionContext.visit.MemberNew = true;
-                } else {
-                    sessionContext.visit.MemberNew = false;
+                personModel contextUser = personModel.create(core, userId);
+                if (contextUser != null) {
+                    sessionContext.user = contextUser;
+                    sessionContext.visitor.MemberID = sessionContext.user.id;
+                    sessionContext.visit.MemberID = sessionContext.user.id;
+                    sessionContext.visit.VisitAuthenticated = false;
+                    sessionContext.visit.VisitorID = sessionContext.visitor.id;
+                    sessionContext.visit.LoginAttempts = 0;
+                    sessionContext.user.Visits = sessionContext.user.Visits + 1;
+                    if (sessionContext.user.Visits == 1) {
+                        sessionContext.visit.MemberNew = true;
+                    } else {
+                        sessionContext.visit.MemberNew = false;
+                    }
+                    sessionContext.user.LastVisit = core.doc.profileStartTime;
+                    sessionContext.visit.ExcludeFromAnalytics = sessionContext.visit.ExcludeFromAnalytics | sessionContext.visit.Bot | sessionContext.user.ExcludeFromAnalytics | sessionContext.user.Admin | sessionContext.user.Developer;
+                    sessionContext.visit.save(core);
+                    sessionContext.visitor.save(core);
+                    sessionContext.user.save(core);
+                    result = true;
                 }
-                sessionContext.user.LastVisit = core.doc.profileStartTime;
-                sessionContext.visit.ExcludeFromAnalytics = sessionContext.visit.ExcludeFromAnalytics | sessionContext.visit.Bot | sessionContext.user.ExcludeFromAnalytics | sessionContext.user.Admin | sessionContext.user.Developer;
-                sessionContext.visit.save(core);
-                sessionContext.visitor.save(core);
-                sessionContext.user.save(core);
-                result = true;
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;

@@ -101,13 +101,13 @@ namespace Contensive.Core.Controllers {
         /// <param name="encodeForWysiwygEditor">When true, active content (and addons?) are converted to images for the editor. process</param>
         /// <param name="EncodeNonCachableTags">to be deprecated: some tags could be cached and some not, this was a way to divide them.</param>
         /// <param name="queryStringToAppendToAllLinks">If provided, this querystring will be added to all anchor tags that link back to the domains for this application</param>
-        /// <param name="ProtocolHostLink">The protocol plus domain desired if encoding Resource Library Images or encoding for the Wysiwyg editor</param>
+        /// <param name="protocolHost">The protocol plus domain desired if encoding Resource Library Images or encoding for the Wysiwyg editor</param>
         /// <param name="IsEmailContent">If true, this rendering is for an email.</param>
         /// <param name="AdminURL"></param>
         /// <param name="personalizationIsAuthenticated"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private static string renderActiveContent(coreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool addLinkAuthenticationToAllLinks, bool EncodeCachableTags, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string ProtocolHostLink, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
+        private static string renderActiveContent(coreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool addLinkAuthenticationToAllLinks, bool EncodeCachableTags, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string protocolHost, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = "";
             try {
                 int csPeople = -1;
@@ -172,7 +172,7 @@ namespace Contensive.Core.Controllers {
                     if (KmaHTML.ElementCount > 0) {
                         ElementPointer = 0;
                         workingContent = "";
-                        serverFilePath = ProtocolHostLink + "/" + core.appConfig.name + "/files/";
+                        serverFilePath = protocolHost + "/" + core.appConfig.name + "/files/";
                         while (ElementPointer < KmaHTML.ElementCount) {
                             string Copy = KmaHTML.Text(ElementPointer).ToString();
                             if (KmaHTML.IsTag(ElementPointer)) {
@@ -737,7 +737,7 @@ namespace Contensive.Core.Controllers {
                                                             if (string.IsNullOrEmpty(ACAttrAlt)) {
                                                                 ACAttrAlt = genericController.encodeText(file.altText);
                                                             }
-                                                            Copy = "<a href=\"" + ProtocolHostLink + requestAppRootPath + core.siteProperties.serverPageDefault + "?" + RequestNameDownloadID + "=" + ACAttrRecordID + "\" target=\"_blank\"><img src=\"" + ProtocolHostLink + "/ccLib/images/IconDownload3.gif\" width=\"16\" height=\"16\" border=\"0\" alt=\"" + ACAttrAlt + "\"></a>";
+                                                            Copy = "<a href=\"" + protocolHost + "/" + core.siteProperties.serverPageDefault + "?" + RequestNameDownloadID + "=" + ACAttrRecordID + "\" target=\"_blank\"><img src=\"" + protocolHost + "/ccLib/images/IconDownload3.gif\" width=\"16\" height=\"16\" border=\"0\" alt=\"" + ACAttrAlt + "\"></a>";
                                                         }
                                                     }
                                                     break;

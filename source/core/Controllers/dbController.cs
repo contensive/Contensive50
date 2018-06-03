@@ -4714,7 +4714,7 @@ namespace Contensive.Core.Controllers {
                                                 }
                                             }
                                             if (string.IsNullOrEmpty(result)) {
-                                                DefaultTemplateLink = core.siteProperties.getText("SectionLandingLink", requestAppRootPath + core.siteProperties.serverPageDefault);
+                                                DefaultTemplateLink = core.siteProperties.getText("SectionLandingLink", "/" + core.siteProperties.serverPageDefault);
                                             }
                                         }
                                     }
@@ -4731,7 +4731,7 @@ namespace Contensive.Core.Controllers {
                     result = DefaultLink;
                 }
                 //
-                result = genericController.encodeVirtualPath(result, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                result = genericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }

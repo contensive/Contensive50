@@ -451,9 +451,11 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // use request object to build link
                                     if (RemoteAssetLink.Left(1) == "/") {
+                                        // asset starts with a slash, add to appRoot
                                         RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + RemoteAssetLink;
                                     } else {
-                                        RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + core.webServer.requestVirtualFilePath + RemoteAssetLink;
+                                        // asset is public files
+                                        RemoteAssetLink =  core.webServer.requestProtocol + core.webServer.requestDomain + core.appConfig.cdnFileUrl + RemoteAssetLink;
                                     }
                                 }
                                 int PosStart = 0;
@@ -484,7 +486,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // -- Script Callback
                             if (addon.Link != "") {
-                                string callBackLink = encodeVirtualPath(addon.Link, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                                string callBackLink = encodeVirtualPath(addon.Link, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                                 foreach (var key in core.docProperties.getKeyList()) {
                                     callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(key), encodeRequestVariable(core.docProperties.getText(key)), true);
                                 }

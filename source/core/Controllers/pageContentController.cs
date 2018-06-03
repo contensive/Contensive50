@@ -506,7 +506,7 @@ namespace Contensive.Core.Controllers {
                 if (genericController.vbInstr(1, result, "://") != 0) {
                     //
                     // protocol provided, do not fixup
-                    result = genericController.encodeVirtualPath(result, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                    result = genericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 } else {
                     //
                     // no protocol, convert to short link
@@ -515,8 +515,8 @@ namespace Contensive.Core.Controllers {
                         // page entered without path, assume it is in root path
                         result = "/" + result;
                     }
-                    result = genericController.ConvertLinkToShortLink(result, core.webServer.requestDomain, core.webServer.requestVirtualFilePath);
-                    result = genericController.encodeVirtualPath(result, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                    result = genericController.ConvertLinkToShortLink(result, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
+                    result = genericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 }
             }
             return result;
@@ -2584,8 +2584,8 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 string archiveLink = core.webServer.requestPathPage;
-                archiveLink = genericController.ConvertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.webServer.requestVirtualFilePath);
-                archiveLink = genericController.encodeVirtualPath(archiveLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                archiveLink = genericController.ConvertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
+                archiveLink = genericController.encodeVirtualPath(archiveLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 //
                 //string sqlCriteria = "(parentId=" + parentPageID + ")";
                 //string sqlCriteria = "(parentId=" + core.doc.pageController.page.id + ")";

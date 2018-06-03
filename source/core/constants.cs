@@ -31,8 +31,10 @@ namespace Contensive.Core {
         public const string cnPeople = "people";
         public const string cnAddons = "Add-ons";
         public const string cnNavigatorEntries = "Navigator Entries";
-        //
-        public const string requestAppRootPath = "/";
+        /// <summary>
+        /// deprecated. legacy was "/" and it was used in path in front of path. Path now includes a leading slash
+        /// </summary>
+        public const string appRootPath = "";
         //
         // -- buttons
         public const string ButtonCreateFields = " Create Fields ";

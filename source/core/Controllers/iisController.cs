@@ -47,9 +47,15 @@ namespace Contensive.Core.Controllers {
         public string requestxWapProfile { get; set; } = "";
         public string requestHTTPVia { get; set; } = ""; // informs the server of proxies used during the request
         public string requestHTTPFrom { get; set; } = ""; // contains the email address of the requestor
-        public string requestPathPage { get; set; } = ""; // The Path and Page part of the current URI
+        /// <summary>
+        /// The path and page of the current request, without the leading slash which comes from the appRootPath
+        /// </summary>
+        public string requestPathPage { get; set; } = "";
         public string requestReferrer { get; set; } = "";
-        public string requestDomain { get; set; } = ""; // The Host part of the current URI
+        /// <summary>
+        /// The domain part of the current request URL
+        /// </summary>
+        public string requestDomain { get; set; } = "";
         public bool requestSecure { get; set; } = false; // Set in InitASPEnvironment, true if https
         public string requestRemoteIP { get; set; } = "";
         public string requestBrowser { get; set; } = ""; // The browser for this visit
@@ -73,11 +79,26 @@ namespace Contensive.Core.Controllers {
         public string requestReferer { get; set; } = "";
         public string serverFormActionURL { get; set; } = ""; // The Action for all internal forms, if not set, default
         public string requestContentWatchPrefix { get; set; } = ""; // The different between the URL and the main_ContentWatch Pathpage
-        public string requestProtocol { get; set; } = ""; // Set in InitASPEnvironment, http or https
-        public string requestUrl { get; set; } = ""; // The current URL, from protocol to end of quesrystring
-        public string requestVirtualFilePath { get; set; } = ""; // The Virtual path for the site (host+main_ServerVirtualPath+"/" is site URI)
-        public string requestPath { get; set; } = ""; // The path part of the current URI
-        public string requestPage { get; set; } = ""; // The page part of the current URI
+        /// <summary>
+        /// The protocol used in the current quest
+        /// </summary>
+        public string requestProtocol { get; set; } = "";
+        /// <summary>
+        /// The requesting URL, from protocol to end of quesrystring
+        /// </summary>
+        public string requestUrl { get; set; } = "";
+        ///// <summary>
+        ///// use file.cdnFileUrl instead. This was legacy path to the content file folder
+        ///// </summary>
+        //public string requestVirtualFilePath { get; set; } = "";
+        /// <summary>
+        /// The path between the requestDomain and the requestPage. NOTE - breaking change: this used to follow appRootPath and never started with /
+        /// </summary>
+        public string requestPath { get; set; } = "";
+        /// <summary>
+        /// The page or script name, typicall index.html or default.aspx or myPage.aspx
+        /// </summary>
+        public string requestPage { get; set; } = "";
         public string requestSecureURLRoot { get; set; } = ""; // The URL to the root of the secure area for this site
                                                                //
                                                                // -- response
@@ -493,23 +514,26 @@ namespace Contensive.Core.Controllers {
                         response_NoFollow = true;
                     }
                     //
-                    requestVirtualFilePath = "/" + core.appConfig.name;
-                    //
-                    requestContentWatchPrefix = requestProtocol + requestDomain + requestAppRootPath;
+                    requestContentWatchPrefix = requestProtocol + requestDomain + "/";
                     requestContentWatchPrefix = requestContentWatchPrefix.Left( requestContentWatchPrefix.Length - 1);
                     //
                     requestPath = "/";
-                    requestPage = core.siteProperties.serverPageDefault;
-                    int TextStartPointer = requestPathPage.ToString().LastIndexOf("/") + 1;
-                    if (TextStartPointer != 0) {
-                        requestPath = requestPathPage.ToString().Left( TextStartPointer);
-                        requestPage = requestPathPage.ToString().Substring(TextStartPointer);
+                    if (string.IsNullOrWhiteSpace(requestPathPage)) {
+                        requestPage = core.siteProperties.serverPageDefault;
+                    } else {
+                        requestPage = requestPathPage;
+                        int slashPtr = requestPathPage.LastIndexOf("/");
+                        if (slashPtr >=0) {
+                            requestPage = "";
+                            requestPath = requestPathPage.Left(slashPtr+1);
+                            if(requestPathPage.Length>1) requestPage = requestPathPage.Substring(slashPtr+1);
+                        }
                     }
-                    requestSecureURLRoot = "https://" + requestDomain + requestAppRootPath;
+                    requestSecureURLRoot = "https://" + requestDomain + "/";
                     //
                     // ----- Create Server Link property
                     //
-                    requestUrl = requestProtocol + requestDomain + requestAppRootPath + requestPath + requestPage;
+                    requestUrl = requestProtocol + requestDomain + requestPath + requestPage;
                     if (requestQueryString != "") {
                         requestUrl = requestUrl + "?" + requestQueryString;
                     }
@@ -520,7 +544,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Style tag
                     adminMessage = "For more information, please contact the <a href=\"mailto:" + core.siteProperties.emailAdmin + "?subject=Re: " + requestDomain + "\">Site Administrator</A>.";
                     //
-                    requestUrl = requestProtocol + requestDomain + requestAppRootPath + requestPath + requestPage;
+                    requestUrl = requestProtocol + requestDomain + requestPath + requestPage;
                     if (requestQueryString != "") {
                         requestUrl = requestUrl + "?" + requestQueryString;
                     }
@@ -725,8 +749,8 @@ namespace Contensive.Core.Controllers {
                             NonEncodedLink = requestPath + NonEncodedLink;
                         }
                         ShortLink = NonEncodedLink;
-                        ShortLink = genericController.ConvertLinkToShortLink(ShortLink, requestDomain, requestVirtualFilePath);
-                        ShortLink = genericController.encodeVirtualPath(ShortLink, requestVirtualFilePath, requestAppRootPath, requestDomain);
+                        ShortLink = genericController.ConvertLinkToShortLink(ShortLink, requestDomain, core.appConfig.cdnFileUrl);
+                        ShortLink = genericController.encodeVirtualPath(ShortLink, core.appConfig.cdnFileUrl, appRootPath, requestDomain);
                         FullLink = requestProtocol + requestDomain + ShortLink;
                     }
 

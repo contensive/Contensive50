@@ -261,9 +261,9 @@ namespace Contensive.Core.Controllers {
         internal string landingLink {
             get {
                 if (_landingLink == "") {
-                    _landingLink = core.siteProperties.getText("SectionLandingLink", requestAppRootPath + core.siteProperties.serverPageDefault);
-                    _landingLink = genericController.ConvertLinkToShortLink(_landingLink, core.webServer.requestDomain, core.webServer.requestVirtualFilePath);
-                    _landingLink = genericController.encodeVirtualPath(_landingLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                    _landingLink = core.siteProperties.getText("SectionLandingLink", "/" + core.siteProperties.serverPageDefault);
+                    _landingLink = genericController.ConvertLinkToShortLink(_landingLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
+                    _landingLink = genericController.encodeVirtualPath(_landingLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 }
                 return _landingLink;
             }
@@ -449,7 +449,7 @@ namespace Contensive.Core.Controllers {
                         if (!string.IsNullOrEmpty(LinkLabel)) {
                             result += "\r<li id=\"main_ContentWatch" + RecordID + "\" class=\"ccListItem\">";
                             if (!string.IsNullOrEmpty(Link)) {
-                                result += "<a href=\"http://" + this.core.webServer.requestDomain + requestAppRootPath + this.core.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID + "\">" + LinkLabel + "</a>";
+                                result += "<a href=\"http://" + this.core.webServer.requestDomain + "/" + this.core.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID + "\">" + LinkLabel + "</a>";
                             } else {
                                 result += LinkLabel;
                             }
@@ -1068,7 +1068,7 @@ namespace Contensive.Core.Controllers {
                 }
                 core.db.csClose(ref CSPointer);
                 //
-                return genericController.encodeVirtualPath(tempgetContentWatchLinkByKey, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                return genericController.encodeVirtualPath(tempgetContentWatchLinkByKey, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 //
                 //
             } catch (Exception ex) {
@@ -1233,7 +1233,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                resultLink = genericController.encodeVirtualPath(resultLink, core.webServer.requestVirtualFilePath, requestAppRootPath, core.webServer.requestDomain);
+                resultLink = genericController.encodeVirtualPath(resultLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
