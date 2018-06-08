@@ -1,11 +1,11 @@
 ﻿
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Core.Controllers;
+using Contensive.Processor.Controllers;
 using Microsoft.Web.Administration;
-using static Contensive.Core.Tests.testConstants;
+using static Contensive.Processor.Tests.testConstants;
 
-namespace Contensive.Core.Tests.UnitTests.Controllers {
+namespace Contensive.Processor.Tests.UnitTests.Controllers {
     [TestClass]
     public class iisControllerUnitTests {
         [TestMethod]
@@ -14,7 +14,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
             string appPoolName = "testAppPool";
             using (ServerManager serverManager = new ServerManager()) {
                 // act
-                using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass()) {
+                using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass()) {
                     iisController.verifyAppPool(cp.core, appPoolName);
                 }
             }

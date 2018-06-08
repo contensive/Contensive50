@@ -7,17 +7,17 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 
-using Contensive.Core;
-using static Contensive.Core.constants;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
+using Contensive.Processor;
+using static Contensive.Processor.constants;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
 using System.Reflection;
 using System.Timers;
 using System.Threading;
-using Contensive.Core.Models.Complex;
-using Contensive.Core.Models.Context;
+using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Context;
 
-namespace Contensive.WindowsServices {
+namespace Contensive.MonitorService {
     public class siteCheckClass {
         //========================================================================
         //
@@ -102,7 +102,7 @@ namespace Contensive.WindowsServices {
                 return_needsErrorRecovery = false;
                 kmaHTTP.userAgent = "Contensive Monitor";
                 HTTPLastError = 0;
-                URLWorking = Contensive.Core.Controllers.genericController.encodeURL(Link);
+                URLWorking = Contensive.Processor.Controllers.genericController.encodeURL(Link);
                 kmaHTTP.timeout = RequestTimeout;
                 tempGetDoc = kmaHTTP.getURL(ref URLWorking);
                 HTTPLastError = 0;

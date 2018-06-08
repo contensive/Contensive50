@@ -2,17 +2,17 @@
 using System;
 using System.Xml;
 using System.Collections.Generic;
-using Contensive.Core.Models.DbModels;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor.Models.DbModels;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 using System.IO;
 using System.Data;
 using System.Threading;
-using Contensive.Core.Models.Complex;
+using Contensive.Processor.Models.Complex;
 using System.Linq;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     // todo: rework how adds are installed, this change can be done after weave launch
     // - current addon folder is called local addon folder and not in shared environment /local/addons
     // - add a node to the (local) collection.xml with last collection installation datetime (files added after this starts install)
@@ -1344,39 +1344,21 @@ namespace Contensive.Core.Controllers {
             bool tempBuildLocalCollectionRepoFromFile = false;
             bool result = true;
             try {
-                string CollectionVersionFolderName = "";
-                DateTime ChildCollectionLastChangeDate = default(DateTime);
-                string ChildWorkingPath = null;
-                string ChildCollectionGUID = null;
-                string ChildCollectionName = null;
-                bool Found = false;
-                XmlDocument CollectionFile = new XmlDocument();
-                string Collectionname = "";
-                DateTime NowTime = default(DateTime);
-                int NowPart = 0;
-                string TimeStamp = null;
-                int Pos = 0;
-                string CollectionFolder = null;
-                string CollectionGuid = "";
-                bool IsFound = false;
-                string Filename = null;
-                XmlDocument Doc = new XmlDocument();
-                bool StatusOK = false;
-                string CollectionFileBaseName = null;
-                collectionXmlController XMLTools = new collectionXmlController(core);
-                string CollectionFolderName = "";
-                bool CollectionFileFound = false;
-                bool ZipFileFound = false;
-                string collectionPath = "";
-                string collectionFilename = "";
+                //XmlDocument Doc = new XmlDocument();
+                //collectionXmlController XMLTools = new collectionXmlController(core);
                 //
                 // process all xml files in this workingfolder
                 //
                 if (allowLogging) {
                     logController.logInfo(core, "BuildLocalCollectionFolder(), Enter");
                 }
+                string collectionPath = "";
+                string collectionFilename = "";
                 //
                 core.privateFiles.splitDosPathFilename(collectionPathFilename, ref collectionPath, ref collectionFilename);
+                string CollectionVersionFolderName = "";
+                string Collectionname = "";
+                string CollectionGuid = "";
                 if (!core.privateFiles.pathExists(collectionPath)) {
                     //
                     // The working folder is not there
@@ -1392,7 +1374,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // move collection file to a temp directory
                     //
-                    string tmpInstallPath = "tmpInstallCollection" + genericController.createGuid().Replace("{", "").Replace("}", "").Replace("-", "") + "\\";
+                    string tmpInstallPath = "tmpInstallCollection" + genericController.getGUIDString() + "\\";
                     core.privateFiles.copyFile(collectionPathFilename, tmpInstallPath + collectionFilename);
                     if (collectionFilename.ToLower().Substring(collectionFilename.Length - 4) == ".zip") {
                         core.privateFiles.UnzipFile(tmpInstallPath + collectionFilename);
@@ -1403,15 +1385,17 @@ namespace Contensive.Core.Controllers {
                     //
                     List<FileDetail> SrcFileNamelist = core.privateFiles.getFileList(tmpInstallPath);
                     if (true) {
+                        bool CollectionFileFound = false;
                         //
                         // Process all non-zip files
                         //
                         foreach (FileDetail file in SrcFileNamelist) {
-                            Filename = file.Name;
+                            string Filename = file.Name;
                             logController.logInfo(core, "BuildLocalCollectionFolder, processing files, filename=[" + Filename + "]");
                             if (genericController.vbLCase(Filename.Substring(Filename.Length - 4)) == ".xml") {
                                 //
                                 logController.logInfo(core, "BuildLocalCollectionFolder, processing xml file [" + Filename + "]");
+                                XmlDocument CollectionFile = new XmlDocument();
                                 //hint = hint & ",320"
                                 CollectionFile = new XmlDocument();
                                 bool loadOk = true;
@@ -1430,18 +1414,19 @@ namespace Contensive.Core.Controllers {
                                 }
                                 if (loadOk) {
                                     //hint = hint & ",400"
-                                    CollectionFileBaseName = genericController.vbLCase(CollectionFile.DocumentElement.Name);
+                                    string CollectionFileBaseName = genericController.vbLCase(CollectionFile.DocumentElement.Name);
                                     if ((CollectionFileBaseName != "contensivecdef") & (CollectionFileBaseName != CollectionFileRootNode) & (CollectionFileBaseName != genericController.vbLCase(CollectionFileRootNodeOld))) {
                                         //
                                         // Not a problem, this is just not a collection file
                                         //
                                         logController.logInfo(core, "BuildLocalCollectionFolder, xml base name wrong [" + CollectionFileBaseName + "]");
                                     } else {
+                                        bool IsFound = false;
                                         //
                                         // Collection File
                                         //
                                         //hint = hint & ",420"
-                                        Collectionname =xmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "name", "");
+                                        Collectionname = xmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "name", "");
                                         if (string.IsNullOrEmpty(Collectionname)) {
                                             //
                                             // ----- Error condition -- it must have a collection name
@@ -1457,7 +1442,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             //hint = hint & ",440"
                                             CollectionFileFound = true;
-                                            CollectionGuid =xmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "guid", Collectionname);
+                                            CollectionGuid = xmlController.GetXMLAttribute(core, IsFound, CollectionFile.DocumentElement, "guid", Collectionname);
                                             if (string.IsNullOrEmpty(CollectionGuid)) {
                                                 //
                                                 // I hope I do not regret this
@@ -1466,13 +1451,14 @@ namespace Contensive.Core.Controllers {
                                             }
                                             CollectionGuid = CollectionGuid.ToLower();
                                             CollectionVersionFolderName = GetCollectionPath(core, CollectionGuid);
+                                            string CollectionFolderName = "";
                                             if (!string.IsNullOrEmpty(CollectionVersionFolderName)) {
                                                 //
                                                 // This is an upgrade
                                                 //
-                                                Pos = genericController.vbInstr(1, CollectionVersionFolderName, "\\");
+                                                int Pos = genericController.vbInstr(1, CollectionVersionFolderName, "\\");
                                                 if (Pos > 0) {
-                                                    CollectionFolderName = CollectionVersionFolderName.Left( Pos - 1);
+                                                    CollectionFolderName = CollectionVersionFolderName.Left(Pos - 1);
                                                 }
                                             } else {
                                                 //
@@ -1487,13 +1473,14 @@ namespace Contensive.Core.Controllers {
                                                 CollectionFolderName = Collectionname + "_" + CollectionFolderName;
                                                 CollectionFolderName = CollectionFolderName.ToLower();
                                             }
-                                            CollectionFolder = core.addon.getPrivateFilesAddonPath() + CollectionFolderName + "\\";
+                                            string CollectionFolder = core.addon.getPrivateFilesAddonPath() + CollectionFolderName + "\\";
                                             core.privateFiles.verifyPath(CollectionFolder);
                                             //
                                             // create a collection 'version' folder for these new files
-                                            TimeStamp = "";
+                                            string TimeStamp = "";
+                                            DateTime NowTime = default(DateTime);
                                             NowTime = DateTime.Now;
-                                            NowPart = NowTime.Year;
+                                            int NowPart = NowTime.Year;
                                             TimeStamp += NowPart.ToString();
                                             NowPart = NowTime.Month;
                                             if (NowPart < 10) {
@@ -1532,6 +1519,9 @@ namespace Contensive.Core.Controllers {
                                             //
                                             //hint = hint & ",500"
                                             foreach (XmlNode CDefSection in CollectionFile.DocumentElement.ChildNodes) {
+                                                string ChildCollectionGUID = null;
+                                                string ChildCollectionName = null;
+                                                bool Found = false;
                                                 switch (genericController.vbLCase(CDefSection.Name)) {
                                                     case "resource":
                                                         //
@@ -1597,8 +1587,8 @@ namespace Contensive.Core.Controllers {
                                                     case "importcollection":
                                                         //
                                                         // -- Download Collection file into install folder
-                                                        ChildCollectionName =xmlController.GetXMLAttribute(core, Found, CDefSection, "name", "");
-                                                        ChildCollectionGUID =xmlController.GetXMLAttribute(core, Found, CDefSection, "guid", CDefSection.InnerText);
+                                                        ChildCollectionName = xmlController.GetXMLAttribute(core, Found, CDefSection, "name", "");
+                                                        ChildCollectionGUID = xmlController.GetXMLAttribute(core, Found, CDefSection, "guid", CDefSection.InnerText);
                                                         if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                             ChildCollectionGUID = CDefSection.InnerText;
                                                         }
@@ -1616,11 +1606,12 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // If it is not already installed, download and install it also
                                                                 //
-                                                                ChildWorkingPath = CollectionVersionPath + "\\" + ChildCollectionGUID + "\\";
+                                                                string ChildWorkingPath = CollectionVersionPath + "\\" + ChildCollectionGUID + "\\";
+                                                                DateTime ChildCollectionLastChangeDate = default(DateTime);
                                                                 //
                                                                 // down an imported collection file
                                                                 //
-                                                                StatusOK = downloadCollectionFiles(core, ChildWorkingPath, ChildCollectionGUID, ref ChildCollectionLastChangeDate, ref return_ErrorMessage);
+                                                                bool StatusOK = downloadCollectionFiles(core, ChildWorkingPath, ChildCollectionGUID, ref ChildCollectionLastChangeDate, ref return_ErrorMessage);
                                                                 if (!StatusOK) {
 
                                                                     logController.logInfo(core, "BuildLocalCollectionFolder, [" + statusMsg + "], downloadCollectionFiles returned error state, message [" + return_ErrorMessage + "]");
@@ -1678,6 +1669,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         if ((string.IsNullOrEmpty(return_ErrorMessage)) && (!CollectionFileFound)) {
+                            bool ZipFileFound = false;
                             //
                             // no errors, but the collection file was not found
                             //
@@ -2086,7 +2078,7 @@ namespace Contensive.Core.Controllers {
                                                         //
                                                         // -- Use the upgrade code to import this part
                                                         CollectionWrapper = "<" + CollectionFileRootNode + ">" + CollectionWrapper + "</" + CollectionFileRootNode + ">";
-                                                        bool isBaseCollection = (baseCollectionGuid == CollectionGuid);
+                                                        bool isBaseCollection = (baseCollectionGuid.ToLower() == CollectionGuid.ToLower());
                                                         installCollectionFromLocalRepo_BuildDbFromXmlData(core, CollectionWrapper, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList);
                                                         //
                                                         // -- Process nodes to save Collection data
@@ -2990,54 +2982,24 @@ namespace Contensive.Core.Controllers {
         //
         private static void InstallCollectionFromLocalRepo_addonNode_Phase1(coreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool return_UpgradeOK, ref string return_ErrorMessage) {
             try {
-                //
-                int fieldTypeID = 0;
-                string fieldType = null;
-                string test = null;
-                int TriggerContentID = 0;
-                string ContentNameorGuid = null;
-                int navTypeId = 0;
-                int scriptinglanguageid = 0;
-                string ScriptingCode = null;
-                string FieldName = null;
-                string NodeName = null;
-                string NewValue = null;
-                string NavIconTypeString = null;
-                string menuNameSpace = null;
-                string FieldValue = "";
-                int CS2 = 0;
-                string ScriptingEntryPoint = null;
-                int ScriptingTimeout = 0;
-                string ScriptingLanguage = null;
-                XmlNode PageInterface = null;
-                string StyleSheet = null;
-                string ArgumentList = null;
-                int CS = 0;
-                string Criteria = null;
-                bool IsFound = false;
-                string addonName = null;
-                string addonGuid = null;
-                string navTypeName = null;
-                int addonId = 0;
-                string Basename;
-                //
-                Basename = genericController.vbLCase(AddonNode.Name);
+                string Basename = genericController.vbLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
-                    addonName =xmlController.GetXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
+                    bool IsFound = false;
+                    string addonName = xmlController.GetXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
                     if (string.IsNullOrEmpty(addonName)) {
                         addonName = "No Name";
                     }
-                    addonGuid =xmlController.GetXMLAttribute(core, IsFound, AddonNode, "guid", addonName);
+                    string addonGuid = xmlController.GetXMLAttribute(core, IsFound, AddonNode, "guid", addonName);
                     if (string.IsNullOrEmpty(addonGuid)) {
                         addonGuid = addonName;
                     }
-                    navTypeName =xmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
-                    navTypeId = GetListIndex(navTypeName, navTypeIDList);
+                    string navTypeName = xmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
+                    int navTypeId = GetListIndex(navTypeName, navTypeIDList);
                     if (navTypeId == 0) {
                         navTypeId = NavTypeIDAddon;
                     }
-                    Criteria = "(" + AddonGuidFieldName + "=" + core.db.encodeSQLText(addonGuid) + ")";
-                    CS = core.db.csOpen(cnAddons, Criteria,"", false);
+                    string Criteria = "(" + AddonGuidFieldName + "=" + core.db.encodeSQLText(addonGuid) + ")";
+                    int CS = core.db.csOpen(cnAddons, Criteria, "", false);
                     if (core.db.csOk(CS)) {
                         //
                         // Update the Addon
@@ -3070,7 +3032,7 @@ namespace Contensive.Core.Controllers {
                         //
                         logController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                     } else {
-                        addonId = core.db.csGetInteger(CS, "ID");
+                        int addonId = core.db.csGetInteger(CS, "ID");
                         //
                         // Initialize the add-on
                         // Delete any existing related records - so if this is an update with removed relationships, those are removed
@@ -3084,11 +3046,23 @@ namespace Contensive.Core.Controllers {
                         core.db.csSet(CS, AddonGuidFieldName, addonGuid);
                         core.db.csSet(CS, "name", addonName);
                         core.db.csSet(CS, "navTypeId", navTypeId);
-                        ArgumentList = "";
-                        StyleSheet = "";
+                        string ArgumentList = "";
+                        string StyleSheet = "";
                         if (AddonNode.ChildNodes.Count > 0) {
                             foreach (XmlNode PageInterfaceWithinLoop in AddonNode.ChildNodes) {
-                                PageInterface = PageInterfaceWithinLoop;
+                                XmlNode PageInterface = PageInterfaceWithinLoop;
+                                string test = null;
+                                int scriptinglanguageid = 0;
+                                string ScriptingCode = null;
+                                string FieldName = null;
+                                string NodeName = null;
+                                string NewValue = null;
+                                string menuNameSpace = null;
+                                string FieldValue = "";
+                                int CS2 = 0;
+                                string ScriptingEntryPoint = null;
+                                int ScriptingTimeout = 0;
+                                string ScriptingLanguage = null;
                                 switch (genericController.vbLCase(PageInterfaceWithinLoop.Name)) {
                                     case "activexdll":
                                         //
@@ -3100,6 +3074,9 @@ namespace Contensive.Core.Controllers {
                                         // list of editors
                                         //
                                         foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
+                                            //
+                                            int fieldTypeID = 0;
+                                            string fieldType = null;
                                             switch (genericController.vbLCase(TriggerNode.Name)) {
                                                 case "type":
                                                     fieldType = TriggerNode.InnerText;
@@ -3126,14 +3103,16 @@ namespace Contensive.Core.Controllers {
                                         // list of events that trigger a process run for this addon
                                         //
                                         foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
+                                            int TriggerContentID = 0;
+                                            string ContentNameorGuid = null;
                                             switch (genericController.vbLCase(TriggerNode.Name)) {
                                                 case "contentchange":
                                                     TriggerContentID = 0;
                                                     ContentNameorGuid = TriggerNode.InnerText;
                                                     if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                        ContentNameorGuid =xmlController.GetXMLAttribute(core, IsFound, TriggerNode, "guid", "");
+                                                        ContentNameorGuid = xmlController.GetXMLAttribute(core, IsFound, TriggerNode, "guid", "");
                                                         if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                            ContentNameorGuid =xmlController.GetXMLAttribute(core, IsFound, TriggerNode, "name", "");
+                                                            ContentNameorGuid = xmlController.GetXMLAttribute(core, IsFound, TriggerNode, "name", "");
                                                         }
                                                     }
                                                     Criteria = "(ccguid=" + core.db.encodeSQLText(ContentNameorGuid) + ")";
@@ -3182,10 +3161,10 @@ namespace Contensive.Core.Controllers {
                                         // include add-ons - NOTE - import collections must be run before interfaces
                                         // when importing a collectin that will be used for an include
                                         //
-                                        ScriptingLanguage =xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
+                                        ScriptingLanguage = xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
                                         scriptinglanguageid = core.db.getRecordID("scripting languages", ScriptingLanguage);
                                         core.db.csSet(CS, "scriptinglanguageid", scriptinglanguageid);
-                                        ScriptingEntryPoint =xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
+                                        ScriptingEntryPoint = xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
                                         core.db.csSet(CS, "ScriptingEntryPoint", ScriptingEntryPoint);
                                         ScriptingTimeout = genericController.encodeInteger(xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
                                         core.db.csSet(CS, "ScriptingTimeout", ScriptingTimeout);
@@ -3253,9 +3232,9 @@ namespace Contensive.Core.Controllers {
                                         // create a navigator entry with a parent set to this
                                         //
                                         core.db.csSave(CS);
-                                        menuNameSpace =xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "NameSpace", "");
+                                        menuNameSpace = xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "NameSpace", "");
                                         if (!string.IsNullOrEmpty(menuNameSpace)) {
-                                            NavIconTypeString =xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "type", "");
+                                            string NavIconTypeString = xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "type", "");
                                             if (string.IsNullOrEmpty(NavIconTypeString)) {
                                                 NavIconTypeString = "Addon";
                                             }
@@ -3281,9 +3260,9 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // import exclusive style
                                         //
-                                        NodeName =xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "name", "");
+                                        NodeName = xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "name", "");
                                         NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
-                                        if (NewValue.Left( 1) != "{") {
+                                        if (NewValue.Left(1) != "{") {
                                             NewValue = "{" + NewValue;
                                         }
                                         if (NewValue.Substring(NewValue.Length - 1) != "}") {
@@ -3370,7 +3349,7 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // icon
                                         //
-                                        FieldValue =xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "link", "");
+                                        FieldValue = xmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "link", "");
                                         if (!string.IsNullOrEmpty(FieldValue)) {
                                             //
                                             // Icons can be either in the root of the website or in content files
@@ -3381,13 +3360,13 @@ namespace Contensive.Core.Controllers {
                                                 // the link is an absolute URL, leave it link this
                                                 //
                                             } else {
-                                                if (FieldValue.Left( 1) != "/") {
+                                                if (FieldValue.Left(1) != "/") {
                                                     //
                                                     // make sure it starts with a slash to be consistance
                                                     //
                                                     FieldValue = "/" + FieldValue;
                                                 }
-                                                if (FieldValue.Left( 17) == "/contensivefiles/") {
+                                                if (FieldValue.Left(17) == "/contensivefiles/") {
                                                     //
                                                     // in content files, start link without the slash
                                                     //
@@ -3447,7 +3426,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             // Bad field name - need to report it somehow
                                             //
-                                            logController.handleError( core,new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + core.db.getRecordName("add-on collections", CollectionID) + "]"));
+                                            logController.handleError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + core.db.getRecordName("add-on collections", CollectionID) + "]"));
                                         } else {
                                             core.db.csSet(CS, FieldName, FieldValue);
                                         }
@@ -4261,29 +4240,6 @@ namespace Contensive.Core.Controllers {
         private static void installCollection_BuildDbFromMiniCollection(coreController core, miniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
             try {
                 //
-                int FieldHelpID = 0;
-                int FieldHelpCID = 0;
-                int fieldId = 0;
-                string FieldName = null;
-                //Dim AddonClass As addonInstallClass
-                string StyleSheetAdd = "";
-                string NewStyleValue = null;
-                string SiteStyles = null;
-                int PosNameLineEnd = 0;
-                int PosNameLineStart = 0;
-                int SiteStylePtr = 0;
-                string StyleLine = null;
-                string[] SiteStyleSplit = { };
-                int SiteStyleCnt = 0;
-                string NewStyleName = null;
-                string TestStyleName = null;
-                string SQL = null;
-                DataTable rs = null;
-                string Copy = null;
-                string ContentName = null;
-                string TableName = null;
-                bool Found = false;
-                //
                 logController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
                 //
                 //----------------------------------------------------------------------------------------------------------------------
@@ -4294,6 +4250,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 logController.logInfo(core, "CDef Load, stage 2: create SQL tables in default datasource");
+                string ContentName = null;
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 if (true) {
@@ -4304,7 +4261,7 @@ namespace Contensive.Core.Controllers {
                         if (workingCdef.dataChanged) {
                             logController.logInfo(core, "creating sql table [" + workingCdef.contentTableName + "], datasource [" + workingCdef.contentDataSourceName + "]");
                             if (genericController.vbLCase(workingCdef.contentDataSourceName) == "default" || workingCdef.contentDataSourceName == "") {
-                                TableName = workingCdef.contentTableName;
+                                string TableName = workingCdef.contentTableName;
                                 if (genericController.vbInstr(1, "," + UsedTables + ",", "," + TableName + ",", 1) != 0) {
                                     //TableName = TableName;
                                 } else {
@@ -4323,11 +4280,12 @@ namespace Contensive.Core.Controllers {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 List<string> installedContentList = new List<string>();
-                rs = core.db.executeQuery("SELECT Name from ccContent where (active<>0)");
+                DataTable rs = core.db.executeQuery("SELECT Name from ccContent where (active<>0)");
                 if (dbController.isDataTableOk(rs)) {
                     installedContentList = new List<string>(convertDataTableColumntoItemList(rs));
                 }
                 rs.Dispose();
+                string SQL = null;
                 //
                 foreach (var keypairvalue in Collection.cdef) {
                     if (keypairvalue.Value.dataChanged) {
@@ -4380,17 +4338,17 @@ namespace Contensive.Core.Controllers {
                 logController.logInfo(core, "CDef Load, stage 7: Verify all field help");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                FieldHelpCID = core.db.getRecordID("content", "Content Field Help");
+                int FieldHelpCID = core.db.getRecordID("content", "Content Field Help");
                 foreach (var keypairvalue in Collection.cdef) {
                     Models.Complex.cdefModel workingCdef = keypairvalue.Value;
-                    ContentName = workingCdef.name;
+                    //ContentName = workingCdef.name;
                     foreach (var fieldKeyValuePair in workingCdef.fields) {
-                        Models.Complex.cdefFieldModel field = fieldKeyValuePair.Value;
-                        FieldName = field.nameLc;
-                        var tempVar = Collection.cdef[ContentName.ToLower()].fields[FieldName.ToLower()];
-                        if (tempVar.HelpChanged) {
-                            fieldId = 0;
-                            SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + core.db.encodeSQLText(FieldName) + ")and(c.name=" + core.db.encodeSQLText(ContentName) + ") order by f.id";
+                        Models.Complex.cdefFieldModel workingField = fieldKeyValuePair.Value;
+                        //string FieldName = field.nameLc;
+                        //var field2 = Collection.cdef[ContentName.ToLower()].fields[((string)null).ToLower()];
+                        if (workingField.HelpChanged) {
+                            int fieldId = 0;
+                            SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + core.db.encodeSQLText(workingField.nameLc) + ")and(c.name=" + core.db.encodeSQLText(workingCdef.name) + ") order by f.id";
                             rs = core.db.executeQuery(SQL);
                             if (dbController.isDataTableOk(rs)) {
                                 fieldId = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "id"));
@@ -4401,6 +4359,8 @@ namespace Contensive.Core.Controllers {
                             } else {
                                 SQL = "select id from ccfieldhelp where fieldid=" + fieldId + " order by id";
                                 rs = core.db.executeQuery(SQL);
+                                //
+                                int FieldHelpID = 0;
                                 if (dbController.isDataTableOk(rs)) {
                                     FieldHelpID = genericController.encodeInteger(rs.Rows[0]["id"]);
                                 } else {
@@ -4408,9 +4368,9 @@ namespace Contensive.Core.Controllers {
                                 }
                                 rs.Dispose();
                                 if (FieldHelpID != 0) {
-                                    Copy = tempVar.helpCustom;
+                                    string Copy = workingField.helpCustom;
                                     if (string.IsNullOrEmpty(Copy)) {
-                                        Copy = tempVar.helpDefault;
+                                        Copy = workingField.helpDefault;
                                         if (!string.IsNullOrEmpty(Copy)) {
                                             //Copy = Copy;
                                         }
@@ -4482,7 +4442,9 @@ namespace Contensive.Core.Controllers {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 if (Collection.styleCnt > 0) {
-                    SiteStyles = core.cdnFiles.readFileText("templates/styles.css");
+                    string SiteStyles = core.cdnFiles.readFileText("templates/styles.css");
+                    string[] SiteStyleSplit = { };
+                    int SiteStyleCnt = 0;
                     if (!string.IsNullOrEmpty(SiteStyles.Trim(' '))) {
                         //
                         // Split with an extra character at the end to guarantee there is an extra split at the end
@@ -4490,26 +4452,29 @@ namespace Contensive.Core.Controllers {
                         SiteStyleSplit = (SiteStyles + " ").Split('}');
                         SiteStyleCnt = SiteStyleSplit.GetUpperBound(0) + 1;
                     }
+                    //Dim AddonClass As addonInstallClass
+                    string StyleSheetAdd = "";
                     for (var Ptr = 0; Ptr < Collection.styleCnt; Ptr++) {
-                        Found = false;
+                        bool Found = false;
                         var tempVar4 = Collection.styles[Ptr];
                         if (tempVar4.dataChanged) {
-                            NewStyleName = tempVar4.Name;
-                            NewStyleValue = tempVar4.Copy;
+                            string NewStyleName = tempVar4.Name;
+                            string NewStyleValue = tempVar4.Copy;
                             NewStyleValue = genericController.vbReplace(NewStyleValue, "}", "");
                             NewStyleValue = genericController.vbReplace(NewStyleValue, "{", "");
                             if (SiteStyleCnt > 0) {
+                                int SiteStylePtr = 0;
                                 for (SiteStylePtr = 0; SiteStylePtr < SiteStyleCnt; SiteStylePtr++) {
-                                    StyleLine = SiteStyleSplit[SiteStylePtr];
-                                    PosNameLineEnd = StyleLine.LastIndexOf("{") + 1;
+                                    string StyleLine = SiteStyleSplit[SiteStylePtr];
+                                    int PosNameLineEnd = StyleLine.LastIndexOf("{") + 1;
                                     if (PosNameLineEnd > 0) {
-                                        PosNameLineStart = StyleLine.LastIndexOf("\r\n", PosNameLineEnd - 1) + 1;
+                                        int PosNameLineStart = StyleLine.LastIndexOf("\r\n", PosNameLineEnd - 1) + 1;
                                         if (PosNameLineStart > 0) {
                                             //
                                             // Check this site style for a match with the NewStyleName
                                             //
                                             PosNameLineStart = PosNameLineStart + 2;
-                                            TestStyleName = (StyleLine.Substring(PosNameLineStart - 1, PosNameLineEnd - PosNameLineStart)).Trim(' ');
+                                            string TestStyleName = (StyleLine.Substring(PosNameLineStart - 1, PosNameLineEnd - PosNameLineStart)).Trim(' ');
                                             if (genericController.vbLCase(TestStyleName) == genericController.vbLCase(NewStyleName)) {
                                                 Found = true;
                                                 if (tempVar4.Overwrite) {
@@ -4563,7 +4528,7 @@ namespace Contensive.Core.Controllers {
                 bool ContentIsBaseContent = false;
                 int FieldHelpCID = Models.Complex.cdefModel.getContentId(core, "Content Field Help");
                 var tmpList = new List<string> { };
-                Contensive.Core.Models.DbModels.dataSourceModel datasource = dataSourceModel.createByName(core, cdef.contentDataSourceName, ref tmpList);
+                Contensive.Processor.Models.DbModels.dataSourceModel datasource = dataSourceModel.createByName(core, cdef.contentDataSourceName, ref tmpList);
                 {
                     //
                     // -- get contentid and protect content with IsBaseContent true

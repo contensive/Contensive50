@@ -8,15 +8,15 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
 using Contensive.BaseClasses;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     //
     // ====================================================================================================
     //
@@ -86,7 +86,7 @@ namespace Contensive.Core {
         // ====================================================================================================
         //
         public override string CreateGuid() {
-            return genericController.createGuid();
+            return genericController.getGUID();
         }
         //
         // ====================================================================================================
@@ -195,7 +195,8 @@ namespace Contensive.Core {
             IdGuidOrName,
             new addonExecuteContext() {
                 addonType = addonContext.ContextPage,
-                wrapperID = WrapperId
+                wrapperID = WrapperId,
+                instanceGuid = CP.core.docProperties.getText("instanceId")
             }
         );
         //
@@ -204,7 +205,8 @@ namespace Contensive.Core {
         public override string ExecuteAddon(string IdGuidOrName) => ExecuteAddon(
             IdGuidOrName,
             new addonExecuteContext() {
-                addonType = addonContext.ContextPage
+                addonType = addonContext.ContextPage,
+                instanceGuid = CP.core.docProperties.getText("instanceId")
             }
         );
         //
@@ -213,7 +215,8 @@ namespace Contensive.Core {
         public override string ExecuteAddon(string IdGuidOrName, addonContext context) => ExecuteAddon(
             IdGuidOrName,
             new addonExecuteContext() {
-                addonType = context
+                addonType = context,
+                instanceGuid = CP.core.docProperties.getText("instanceId")
             }
         );
         //

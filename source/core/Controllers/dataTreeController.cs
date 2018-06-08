@@ -5,13 +5,13 @@ using System.Xml;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     public class dataTreeController {
         //========================================================================
         // This page and its contents are copyright by Kidwell McGowan Associates.
@@ -68,7 +68,7 @@ namespace Contensive.Core.Controllers {
             //
             Private_IsEmpty = true;
             tempLoad = false;
-            Tier = new Contensive.Core.Controllers.dataTreeController.TierNode[1];
+            Tier = new Contensive.Processor.Controllers.dataTreeController.TierNode[1];
             TierPtr = 0;
             Tier[0].Node = null;
             //Set Tier(0).Element = Nothing
@@ -158,7 +158,7 @@ namespace Contensive.Core.Controllers {
                 if (Private_IsEmpty) {
                     TierPtr = 1;
                     MSxml = new XmlDocument();
-                    Tier = new Contensive.Core.Controllers.dataTreeController.TierNode[TierPtr + 1];
+                    Tier = new Contensive.Processor.Controllers.dataTreeController.TierNode[TierPtr + 1];
                     Tier[TierPtr].Node = MSxml.CreateElement(value);
                     Private_IsEmpty = false;
                     //Call AddChild(vNewValue)

@@ -2,10 +2,10 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Contensive.Core.Models.DbModels;
-using static Contensive.Core.constants;
+using Contensive.Processor.Models.DbModels;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
     /// <summary>

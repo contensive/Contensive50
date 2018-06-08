@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Contensive.Core.Properties {
+namespace Contensive.Processor.Properties {
     using System;
     
     
@@ -19,7 +19,7 @@ namespace Contensive.Core.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -39,7 +39,7 @@ namespace Contensive.Core.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Contensive.Core.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Contensive.Processor.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,13 +61,14 @@ namespace Contensive.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;div class=&quot;container&quot;&gt;
-        ///	&lt;h2 class=&quot;form-signin-heading&quot;&gt;Forget Your Password&lt;/h2&gt;
-        ///	&lt;p&gt;If you are a member of the system and cannot remember your password, enter your email address below and we will email your matching username(s) and password(s).&lt;/p&gt;
-        ///	&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only pt-2&quot;&gt;Email address&lt;/label&gt;
-        ///	&lt;input type=&quot;email&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control pt-2&quot; placeholder=&quot;Username&quot; required autofocus&gt;
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///	&lt;h4 class=&quot;form-signin-heading&quot;&gt;Forget Your Password&lt;/h4&gt;
+        ///	&lt;!--&lt;p&gt;If you are a member of the system and cannot remember your password, enter your email address below and we will email your matching username(s) and password(s).&lt;/p&gt;--&gt;
         ///	&lt;div class=&quot;pt-2&quot;&gt;
-        ///		&lt;button class=&quot;btn btn-lg btn-primary btn- [rest of string was truncated]&quot;;.
+        ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only pt-2&quot;&gt;Email address&lt;/label&gt;
+        ///		&lt;input type=&quot;email&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control pt-2&quot; placeholder=&quot;Username&quot; required autofocus&gt;
+        ///	&lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;        /// [rest of string was truncated]&quot;;.
         /// </summary>
         public static string defaultForgetPassword_html {
             get {
@@ -76,15 +77,17 @@ namespace Contensive.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;div class=&quot;container&quot;&gt;
-        ///    &lt;h2 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h2&gt;
-        ///    &lt;label for=&quot;inputUsername&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
-        ///    &lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputUsername&quot; class=&quot;form-control&quot; placeholder=&quot;Username&quot; required autofocus&gt;
-        ///    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
-        ///    &lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
-        ///    &lt;div class=&quot;checkbox pt-2&quot;&gt;
-        ///        &lt;label&gt;
-        ///        &lt;input [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputUsername&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputUsername&quot; class=&quot;form-control&quot; placeholder=&quot;Username&quot; required autofocus&gt;
+        ///	&lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///	    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///	&lt;/div&gt;
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         public static string defaultLogin_autoLogin_html {
             get {
@@ -93,15 +96,15 @@ namespace Contensive.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;div class=&quot;container&quot;&gt;
-        ///    &lt;h2 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h2&gt;
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
         ///    &lt;label for=&quot;inputEmail&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
         ///    &lt;input type=&quot;email&quot; name=&quot;email&quot; id=&quot;inputEmail&quot; class=&quot;form-control&quot; placeholder=&quot;Username or Email&quot; required autofocus&gt;
         ///    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
         ///    &lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
         ///    &lt;div class=&quot;checkbox pt-2&quot;&gt;
         ///        &lt;label&gt;
-        ///        &lt;inpu [rest of string was truncated]&quot;;.
+        ///        [rest of string was truncated]&quot;;.
         /// </summary>
         public static string defaultLogin_email_autoLogin_html {
             get {
@@ -110,13 +113,16 @@ namespace Contensive.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;div class=&quot;container&quot;&gt;
-        ///    &lt;h2 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h2&gt;
-        ///    &lt;label for=&quot;inputEmail&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
-        ///    &lt;input type=&quot;email&quot; name=&quot;email&quot; id=&quot;inputEmail&quot; class=&quot;form-control&quot; placeholder=&quot;Username or Email&quot; required autofocus&gt;
-        ///    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
-        ///    &lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
-        ///    &lt;button class=&quot;btn btn-lg btn-primary btn-block pt-2&quot; type= [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control&quot; placeholder=&quot;Username or Email&quot; required autofocus&gt;
+        ///    &lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///    &lt;/div [rest of string was truncated]&quot;;.
         /// </summary>
         public static string defaultLogin_email_html {
             get {
@@ -125,13 +131,17 @@ namespace Contensive.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;div class=&quot;container&quot;&gt;
-        ///    &lt;h2 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h2&gt;
-        ///    &lt;label for=&quot;inputUsername&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
-        ///    &lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputUsername&quot; class=&quot;form-control&quot; placeholder=&quot;Username&quot; required autofocus&gt;
-        ///    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
-        ///    &lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
-        ///    &lt;button class=&quot;btn btn-lg btn-primary btn-block pt-2&quot; type=&quot; [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputUsername&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputUsername&quot; class=&quot;form-control&quot; placeholder=&quot;Username&quot; required autofocus&gt;
+        ///	&lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///	    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///	&lt;/div&gt;
+        ///	&lt;d [rest of string was truncated]&quot;;.
         /// </summary>
         public static string defaultLogin_html {
             get {

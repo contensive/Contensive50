@@ -1,12 +1,12 @@
 ﻿
-using Contensive.Core;
+using Contensive.Processor;
 using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Contensive.Core.Tests.testConstants;
+using static Contensive.Processor.Tests.testConstants;
 
-namespace Contensive.Core.Tests.UnitTests.Views {
+namespace Contensive.Processor.Tests.UnitTests.Views {
     [TestClass()]
     public class cpTests {
         //====================================================================================================
@@ -59,7 +59,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
             string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
             string echoText = "text added to document";
             //
-            if (cs.Insert(Contensive.Core.constants.cnAddons)) {
+            if (cs.Insert(Contensive.Processor.constants.cnAddons)) {
                 recordId = cs.GetInteger("id");
                 cs.SetField("name", addonName);
                 cs.SetField("copytext", htmlText);
@@ -77,7 +77,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
             //
             Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeAddon(recordId.ToString()));
             //dispose
-            cp.Content.Delete(Contensive.Core.constants.cnAddons, "id=" + recordId.ToString());
+            cp.Content.Delete(Contensive.Processor.constants.cnAddons, "id=" + recordId.ToString());
             cp.Dispose();
         }
         //====================================================================================================
@@ -98,7 +98,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
             string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
             string echoText = "text added to document";
             //
-            if (cs.Insert(Contensive.Core.constants.cnAddons)) {
+            if (cs.Insert(Contensive.Processor.constants.cnAddons)) {
                 recordId = cs.GetInteger("id");
                 cs.SetField("name", addonName);
                 cs.SetField("copytext", htmlText);
@@ -114,7 +114,7 @@ namespace Contensive.Core.Tests.UnitTests.Views {
             // assert
             Assert.AreEqual(htmlText + wysiwygText + echoText, result);
             //dispose
-            cp.Content.Delete(Contensive.Core.constants.cnAddons, "id=" + recordId.ToString());
+            cp.Content.Delete(Contensive.Processor.constants.cnAddons, "id=" + recordId.ToString());
             cp.Dispose();
         }
     }

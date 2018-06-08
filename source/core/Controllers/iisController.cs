@@ -8,16 +8,16 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
 using Microsoft.Web.Administration;
-using Contensive.Core.Models.Context;
+using Contensive.Processor.Models.Context;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     /// <summary>
     /// Code dedicated to processing iis input and output. lazy Constructed. (see coreHtmlClass for html processing)
     /// What belongs here is everything that would have to change if we converted to apache
@@ -279,7 +279,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- handle files
                 int filePtr = 0;
-                string instanceId = genericController.createGuid().Replace("{", "").Replace("-", "").Replace("}", "");
+                string instanceId = genericController.getGUIDString();
                 string[] formNames = iisContext.Request.Files.AllKeys;
                 foreach (string formName in formNames) {
                     System.Web.HttpPostedFile file = iisContext.Request.Files[formName];

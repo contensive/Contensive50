@@ -8,15 +8,15 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
-using Contensive.Core.Models.Complex;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
+using Contensive.Processor.Models.Complex;
 using Contensive.BaseClasses;
 //
-namespace Contensive.Core.Addons.Email {
+namespace Contensive.Addons.Email {
     public class processEmailClass  : Contensive.BaseClasses.AddonBaseClass{
         //
         //====================================================================================================
@@ -562,7 +562,7 @@ namespace Contensive.Core.Addons.Email {
         //====================================================================================================
         //
         private string getEmailTemplate(coreController core, int EmailTemplateID) {
-            var emailTemplate = Models.DbModels.emailTemplateModel.create(core, EmailTemplateID);
+            var emailTemplate = Processor.Models.DbModels.emailTemplateModel.create(core, EmailTemplateID);
             if ( emailTemplate != null ) {
                 return emailTemplate.BodyHTML;
             }

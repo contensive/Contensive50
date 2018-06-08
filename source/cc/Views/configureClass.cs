@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
 using Amazon;
 
 namespace Contensive.CLI {

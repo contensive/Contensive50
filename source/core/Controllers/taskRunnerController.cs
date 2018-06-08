@@ -8,14 +8,14 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
-using Contensive.Core.Models.Context;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
+using Contensive.Processor.Models.Context;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     public class taskRunnerController : IDisposable {
         //
         //==================================================================================================
@@ -54,8 +54,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="core"></param>
         /// <remarks></remarks>
         public taskRunnerController() {
-            //Me.core = core
-            runnerGuid = Guid.NewGuid().ToString();
+            runnerGuid = genericController.getGUID();
         }
         //
         //========================================================================================================

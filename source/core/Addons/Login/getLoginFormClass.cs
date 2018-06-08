@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Addons.Login {
+namespace Contensive.Addons.Login {
     public class getLoginFormClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
@@ -26,9 +26,8 @@ namespace Contensive.Core.Addons.Login {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string returnHtml = "";
             try {
-                CPClass processor = (CPClass)cp;
                 bool forceDefaultLogin = cp.Doc.GetBoolean("Force Default Login");
-                returnHtml = loginController.getLoginForm(processor.core, forceDefaultLogin);
+                returnHtml = loginController.getLoginForm(((CPClass)cp).core, forceDefaultLogin);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

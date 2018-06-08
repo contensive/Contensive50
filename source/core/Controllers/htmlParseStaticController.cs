@@ -11,13 +11,13 @@ using System.Data;
 using System.Data.SqlClient;
 
 using Contensive.BaseClasses;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     /// <summary>
     /// Tools used to assemble html document elements. This is not a storage for assembling a document (see docController)
     /// </summary>

@@ -8,17 +8,17 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 using System.Net;
 using System.Text;
-using Contensive.Core.Models.Context;
+using Contensive.Processor.Models.Context;
 using System.Web;
 
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
     /// <summary>
@@ -26,10 +26,13 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class genericController {
         //
+        //====================================================================================================
+        //
+        public static string createGuid() => getGUID(true);
         //
         //====================================================================================================
         /// <summary>
-        /// return a normalized guid in registry format
+        /// return a normalized guid in registry format (which include the {})
         /// </summary>
         /// <param name="CP"></param>
         /// <param name="registryFormat"></param>
@@ -38,22 +41,27 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// rturn a normalized guid
+        /// return a normalized guid.
         /// </summary>
-        /// <param name="registryFormat"></param>
+        /// <param name="includeBraces">If true, it includes the {}, else it does not</param>
         /// <returns></returns>
-        public static string getGUID(bool registryFormat) {
+        public static string getGUID(bool includeBraces) {
             string result = "";
             Guid g = Guid.NewGuid();
             if (g != Guid.Empty) {
                 result = g.ToString();
                 //
                 if (!string.IsNullOrEmpty(result)) {
-                    result = registryFormat ? "{" + result + "}" : result;
+                    result = includeBraces ? "{" + result + "}" : result;
                 }
             }
             return result;
         }
+        /// <summary>
+        /// Get a GUID with no braces or dashes, just a simple string of characters
+        /// </summary>
+        /// <returns></returns>
+        public static string getGUIDString() => getGUID(false).Replace("-", "");
         //
         //====================================================================================================
         /// <summary>
@@ -2081,12 +2089,6 @@ namespace Contensive.Core.Controllers {
                 a = genericController.vbReplace(a, ":", "#0058#");
             }
             return a;
-        }
-        //
-        //====================================================================================================
-        //
-        public static string createGuid() {
-            return "{" + Guid.NewGuid().ToString() + "}";
         }
         //
         //====================================================================================================

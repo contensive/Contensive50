@@ -3,7 +3,7 @@
 '
 Namespace Contensive.BaseClasses
     Public MustInherit Class CPVisitBaseClass
-        'Public Sub New(ByVal cmcObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPBaseClass)
+        'Public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
         Public MustOverride ReadOnly Property CookieSupport() As Boolean 'Implements BaseClasses.CPVisitBaseClass.CookieSupport
         Public MustOverride Function GetProperty(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetVisitId As Integer = 0) As String 'Implements BaseClasses.CPVisitBaseClass.GetProperty
         Public MustOverride Function GetText(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As String

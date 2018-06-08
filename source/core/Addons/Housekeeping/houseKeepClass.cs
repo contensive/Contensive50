@@ -9,16 +9,16 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.BaseClasses;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
 using System.IO;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 //
-namespace Contensive.Core.Addons.Housekeeping {
+namespace Contensive.Addons.Housekeeping {
     /// <summary>
     /// support for housekeeping functions
     /// </summary>
@@ -97,7 +97,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     int DataSourceType = core.db.getDataSourceType("default");
                     //
                     string DefaultMemberName = "";
-                    int PeopleCID = Models.Complex.cdefModel.getContentId(core, "people");
+                    int PeopleCID = Processor.Models.Complex.cdefModel.getContentId(core, "people");
                     string SQL = "select defaultvalue from ccfields where name='name' and contentid=(" + PeopleCID + ")";
                     int CS = core.db.csOpenSql(SQL,"Default");
                     if (core.db.csOk(CS)) {
@@ -423,9 +423,9 @@ namespace Contensive.Core.Addons.Housekeeping {
                 TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
                 //
-                SQLTablePeople = Models.Complex.cdefModel.getContentTablename(core, "People");
-                SQLTableMemberRules = Models.Complex.cdefModel.getContentTablename(core, "Member Rules");
-                SQLTableGroups = Models.Complex.cdefModel.getContentTablename(core, "Groups");
+                SQLTablePeople = Processor.Models.Complex.cdefModel.getContentTablename(core, "People");
+                SQLTableMemberRules = Processor.Models.Complex.cdefModel.getContentTablename(core, "Member Rules");
+                SQLTableGroups = Processor.Models.Complex.cdefModel.getContentTablename(core, "Groups");
                 SQLDateMidnightTwoDaysAgo = core.db.encodeSQLDate(MidnightTwoDaysAgo);
                 //
                 // Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
@@ -1273,7 +1273,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
                 //
-                SQLTablePeople = Models.Complex.cdefModel.getContentTablename(core, "People");
+                SQLTablePeople = Processor.Models.Complex.cdefModel.getContentTablename(core, "People");
                 //
                 appName = core.appConfig.name;
                 DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);
@@ -1339,7 +1339,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
                 //
-                SQLTablePeople = Models.Complex.cdefModel.getContentTablename(core, "People");
+                SQLTablePeople = Processor.Models.Complex.cdefModel.getContentTablename(core, "People");
                 //
                 appName = core.appConfig.name;
                 DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);

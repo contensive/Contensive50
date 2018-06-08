@@ -10,14 +10,14 @@ using System.Xml.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Contensive.Core;
-using static Contensive.Core.constants;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
+using Contensive.Processor;
+using static Contensive.Processor.constants;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
 using Contensive.BaseClasses;
-using static Contensive.Core.Tests.testConstants;
+using static Contensive.Processor.Tests.testConstants;
 
-namespace Contensive.Core.Tests.UnitTests.Views {
+namespace Contensive.Processor.Tests.UnitTests.Views {
 
     [TestClass()]
     public class cpBlockTests {

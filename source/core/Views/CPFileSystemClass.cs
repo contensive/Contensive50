@@ -8,18 +8,18 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
 using Contensive.BaseClasses;
 using System.Runtime.InteropServices;
 using System.IO;
-using static Contensive.Core.Controllers.fileController;
+using static Contensive.Processor.Controllers.fileController;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     public class CPFileSystemClass : BaseClasses.CPFileSystemBaseClass, IDisposable {
         //
         #region COM GUIDs
@@ -28,7 +28,7 @@ namespace Contensive.Core {
         public const string EventsId = "987E6DDE-E9E6-46C5-9467-BAE79A129A15";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController core;
+        private Contensive.Processor.Controllers.coreController core;
         protected bool disposed = false;
         //
         private fileController fileSystem;
@@ -38,7 +38,7 @@ namespace Contensive.Core {
         /// Constructor
         /// </summary>
         /// <param name="core"></param>
-        public CPFileSystemClass(Contensive.Core.Controllers.coreController core, fileController fileSystem) : base() {
+        public CPFileSystemClass(Contensive.Processor.Controllers.coreController core, fileController fileSystem) : base() {
             this.core = core;
             this.fileSystem = fileSystem;
         }

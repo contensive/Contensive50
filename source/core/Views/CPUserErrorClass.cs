@@ -8,12 +8,12 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
-namespace Contensive.Core {
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
+namespace Contensive.Processor {
     public class CPUserErrorClass : BaseClasses.CPUserErrorBaseClass, IDisposable {
         //
         #region COM GUIDs
@@ -22,12 +22,12 @@ namespace Contensive.Core {
         public const string EventsId = "B784BFEF-127B-48D5-8C99-B075984227DB";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController core;
+        private Contensive.Processor.Controllers.coreController core;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
-        public CPUserErrorClass(Contensive.Core.Controllers.coreController coreObj) : base() {
+        public CPUserErrorClass(Contensive.Processor.Controllers.coreController coreObj) : base() {
             core = coreObj;
         }
         //

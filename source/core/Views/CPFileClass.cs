@@ -8,16 +8,16 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
 using System.IO;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     //
     // comVisible to be activeScript and compatible
     //
@@ -33,7 +33,7 @@ namespace Contensive.Core {
         public const string EventsId = "8757DE11-C04D-4765-B46B-458E281BAE19";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController core;
+        private Contensive.Processor.Controllers.coreController core;
         protected bool disposed = false;
         //
         //==========================================================================================
@@ -41,7 +41,7 @@ namespace Contensive.Core {
         /// Constructor
         /// </summary>
         /// <param name="core"></param>
-        public CPFileClass(Contensive.Core.Controllers.coreController core) : base() {
+        public CPFileClass(Contensive.Processor.Controllers.coreController core) : base() {
             this.core = core;
         }
         //

@@ -7,16 +7,16 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 
-using Contensive.Core;
-using Contensive.Core.Controllers;
-using Contensive.Core.Models.Complex;
-using Contensive.Core.Models.Context;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
-using static Contensive.WindowsServices.constants;
+using Contensive.Processor;
+using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Context;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
+using static Contensive.MonitorService.constants;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 
-namespace Contensive.WindowsServices {
+namespace Contensive.MonitorService {
     public class statusServerClass {
         private ipDaemonController cmdListener = new ipDaemonController();
         private coreController cpCore;

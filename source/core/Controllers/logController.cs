@@ -8,7 +8,7 @@ using NLog.Targets;
 using System.Diagnostics;
 using System.Collections.Generic;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
     /// <summary>

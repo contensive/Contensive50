@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Addons.PageManager {
+namespace Contensive.Addons.PageManager {
     public class getChildPageList : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
@@ -27,7 +27,7 @@ namespace Contensive.Core.Addons.PageManager {
             string result = "";
             try {
                 coreController core = ((CPClass)cp).core;
-                result = pageContentController.getChildPageList(core, cp.Doc.GetText("List Name"),Models.DbModels.pageContentModel.contentName, core.doc.pageController.page.id, true);
+                result = pageContentController.getChildPageList(core, cp.Doc.GetText("List Name"), Processor.Models.DbModels.pageContentModel.contentName, core.doc.pageController.page.id, true);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

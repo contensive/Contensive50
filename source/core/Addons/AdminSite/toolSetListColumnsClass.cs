@@ -8,16 +8,16 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
-using Contensive.Core.Models.Complex;
-using Contensive.Core.Addons.Tools;
-using static Contensive.Core.adminUIController;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
+using Contensive.Processor.Models.Complex;
+using Contensive.Addons.Tools;
+using static Contensive.Processor.adminUIController;
 //
-namespace Contensive.Core.Addons.AdminSite {
+namespace Contensive.Addons.AdminSite {
     public class toolSetListColumnsClass {
         //
         //=============================================================================

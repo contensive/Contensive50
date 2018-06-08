@@ -7,8 +7,8 @@
     <ProjectGuid>{591DB653-B853-4AE6-AFB5-91C86C492563}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Contensive.WindowsServices</RootNamespace>
-    <AssemblyName>monitorService</AssemblyName>
+    <RootNamespace>ContensiveMonitorService</RootNamespace>
+    <AssemblyName>ContensiveMonitorService</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -178,9 +178,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\core\contensive.csproj">
+    <ProjectReference Include="..\core\Processor.csproj">
       <Project>{46657d07-74bc-4ddc-8fdd-9078eb1a1cd2}</Project>
-      <Name>contensive</Name>
+      <Name>Processor</Name>
     </ProjectReference>
     <ProjectReference Include="..\CPBase50\CPBase50.csproj">
       <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>

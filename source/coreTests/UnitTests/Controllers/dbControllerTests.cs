@@ -1,15 +1,15 @@
 ﻿
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Core.Controllers;
+using Contensive.Processor.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Contensive.Core.Tests.testConstants;
+using static Contensive.Processor.Tests.testConstants;
 using Contensive.BaseClasses;
 
-namespace Contensive.Core.Tests.UnitTests.Controllers {
+namespace Contensive.Processor.Tests.UnitTests.Controllers {
     //
     //====================================================================================================
     //
@@ -39,7 +39,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod()]
         public void Controllers_db_csSetCloseOpenGetTest() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
                 //
@@ -67,8 +67,8 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                     cp.core.db.csClose(ref cs3);
                 }
                 // assert
-                var person_test1 = Contensive.Core.Models.DbModels.personModel.create(cp.core, testId_test1);
-                var person_test2 = Contensive.Core.Models.DbModels.personModel.create(cp.core, testId_test2);
+                var person_test1 = Contensive.Processor.Models.DbModels.personModel.create(cp.core, testId_test1);
+                var person_test2 = Contensive.Processor.Models.DbModels.personModel.create(cp.core, testId_test2);
                 //
                 Assert.AreEqual("a", person_test1.Username);
                 Assert.AreEqual("b", person_test1.Password);
@@ -83,7 +83,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod()]
         public void Controllers_db_csSetGetTest() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
                 //
@@ -105,7 +105,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod()]
         public void Controllers_db_csSetSaveGetTest() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
                 //
@@ -127,12 +127,12 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod()]
         public void Controllers_db_csGetRowCount() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 CPCSBaseClass cs = cp.CSNew();
                 string impossibleName = cp.Utils.CreateGuid();
                 // act
-                cs.Open(Contensive.Core.Models.DbModels.personModel.contentName, "(name=" + cp.Db.EncodeSQLText(impossibleName) + ")");
+                cs.Open(Contensive.Processor.Models.DbModels.personModel.contentName, "(name=" + cp.Db.EncodeSQLText(impossibleName) + ")");
                 int resultNoData = cs.GetRowCount();
                 cs.Close();
                 // assert
@@ -144,7 +144,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod()]
         public void Controllers_db_isSqlTableField() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 // act
                 // assert
@@ -158,9 +158,9 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod()]
         public void Controllers_db_csGoNext() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                string name = genericController.createGuid();
+                string name = genericController.getGUID();
                 //
                 // -- add three records
                 int cs = cp.core.db.csInsertRecord("people");
@@ -198,9 +198,9 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod()]
         public void Controllers_db_csGoFirst() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                string name = genericController.createGuid();
+                string name = genericController.getGUID();
                 //
                 // -- add three records
                 int cs = cp.core.db.csInsertRecord("people");

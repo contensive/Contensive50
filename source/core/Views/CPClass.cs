@@ -8,16 +8,16 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
 using Contensive.BaseClasses;
-using Contensive.Core.Models.Context;
+using Contensive.Processor.Models.Context;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     public class CPClass : CPBaseClass, IDisposable {
         #region COM GUIDs
         public const string ClassId = "2EF01C6F-5288-411D-A5DE-76C8923CE1D3";
@@ -25,7 +25,7 @@ namespace Contensive.Core {
         public const string EventsId = "4FADD1C2-6A89-4A8E-ADD0-9850D3EB6DBC";
         #endregion
         //
-        public Contensive.Core.Controllers.coreController core { get; set; }
+        public Contensive.Processor.Controllers.coreController core { get; set; }
         private int MyAddonID { get; set; }
         //
         //=========================================================================================================

@@ -8,14 +8,14 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Models.Complex;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     //
     // comVisible to be activeScript compatible
     //
@@ -28,12 +28,12 @@ namespace Contensive.Core {
         public const string EventsId = "C8938AB2-26F0-41D2-A282-3313FD7BA490";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController core;
+        private Contensive.Processor.Controllers.coreController core;
         protected bool disposed = false;
         //
         //====================================================================================================
         // Constructor
-        public CPRequestClass(Contensive.Core.Controllers.coreController coreObj) : base() {
+        public CPRequestClass(Contensive.Processor.Controllers.coreController coreObj) : base() {
             core = coreObj;
         }
         //

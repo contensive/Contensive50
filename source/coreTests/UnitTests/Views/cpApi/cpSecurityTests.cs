@@ -1,12 +1,12 @@
 ﻿
-using Contensive.Core;
+using Contensive.Processor;
 using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Contensive.Core.Tests.testConstants;
+using static Contensive.Processor.Tests.testConstants;
 
-namespace Contensive.Core.Tests.UnitTests.Views {
+namespace Contensive.Processor.Tests.UnitTests.Views {
     [TestClass]
     public class cpSecurityTests {
         //====================================================================================================
@@ -23,13 +23,13 @@ namespace Contensive.Core.Tests.UnitTests.Views {
             //
             // act
             //
-            string token = Core.Controllers.securityController.encodeToken(cp.core,testNumber, testDate);
+            string token = Processor.Controllers.securityController.encodeToken(cp.core,testNumber, testDate);
             //
             // assert
             //
             int resultNumber = 0;
             DateTime resultDate = DateTime.MinValue;
-            Core.Controllers.securityController.decodeToken(cp.core,token, ref resultNumber, ref resultDate);
+            Processor.Controllers.securityController.decodeToken(cp.core,token, ref resultNumber, ref resultDate);
             Assert.AreEqual(testNumber, resultNumber);
             Assert.AreEqual(testDate, resultDate);
             //

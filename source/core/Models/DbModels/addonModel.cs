@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Models.DbModels {
+namespace Contensive.Processor.Models.DbModels {
     public class addonModel : baseModel {
         //
         //====================================================================================================
@@ -95,7 +95,7 @@ namespace Contensive.Core.Models.DbModels {
             addonModel result = create<addonModel>(core, recordId);
             if (result != null) {
                 if (string.IsNullOrEmpty(result.ccguid)) {
-                    result.ccguid = genericController.createGuid();
+                    result.ccguid = genericController.getGUID();
                 }
             }
             return result;
@@ -106,7 +106,7 @@ namespace Contensive.Core.Models.DbModels {
             addonModel result = create<addonModel>(core, recordId, ref callersCacheNameList);
             if (result != null) {
                 if (string.IsNullOrEmpty(result.ccguid)) {
-                    result.ccguid = genericController.createGuid();
+                    result.ccguid = genericController.getGUID();
                 }
             }
             return result;
@@ -280,7 +280,7 @@ namespace Contensive.Core.Models.DbModels {
                 if (!dictIdAddon.ContainsKey(addon.id)) {
                     dictIdAddon.Add(addon.id, addon);
                     if (string.IsNullOrEmpty(addon.ccguid)) {
-                        addon.ccguid = genericController.createGuid();
+                        addon.ccguid = genericController.getGUID();
                         addon.save(core);
                     }
                     if (!dictGuidId.ContainsKey(addon.ccguid.ToLower())) {

@@ -8,15 +8,15 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
 using Contensive.BaseClasses;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     public class CPContentClass : CPContentBaseClass, IDisposable {
         //
         #region COM GUIDs
@@ -26,7 +26,7 @@ namespace Contensive.Core {
         #endregion
         //
         private CPClass cp { get; set; }
-        private Contensive.Core.Controllers.coreController core { get; set; }
+        private Contensive.Processor.Controllers.coreController core { get; set; }
         protected bool disposed { get; set; } = false;
         //
         //====================================================================================================

@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     public class htmlParserController {
         //
         //====================================================================================================
@@ -99,7 +99,7 @@ namespace Contensive.Core.Controllers {
                 WorkingSrc = HTMLSource;
                 LocalElementCount = 0;
                 LocalElementSize = 0;
-                LocalElements = new Contensive.Core.Controllers.htmlParserController.Element[LocalElementSize + 1];
+                LocalElements = new Contensive.Processor.Controllers.htmlParserController.Element[LocalElementSize + 1];
                 tempLoad = true;
                 Ptr = 0;
                 //
@@ -173,7 +173,7 @@ namespace Contensive.Core.Controllers {
                 SplitStore = WorkingSrc.Split('<');
                 SplitStoreCnt = SplitStore.GetUpperBound(0) + 1;
                 LocalElementCount = (SplitStoreCnt * 2);
-                LocalElements = new Contensive.Core.Controllers.htmlParserController.Element[LocalElementCount + 1];
+                LocalElements = new Contensive.Processor.Controllers.htmlParserController.Element[LocalElementCount + 1];
                 return tempLoad;
             } catch( Exception ex ) {
                 logController.handleError( core,ex);
@@ -405,7 +405,7 @@ namespace Contensive.Core.Controllers {
                 //TagString = genericController.vbReplace(TagString, "'", """")
                 LocalElements[ElementPointer].AttributeCount = 0;
                 LocalElements[ElementPointer].AttributeSize = 1;
-                LocalElements[ElementPointer].Attributes = new Contensive.Core.Controllers.htmlParserController.ElementAttributeStructure[1]; // allocates the first
+                LocalElements[ElementPointer].Attributes = new Contensive.Processor.Controllers.htmlParserController.ElementAttributeStructure[1]; // allocates the first
                                                                                                                                               //ClosePosition = Len(TagString)
                                                                                                                                               //If ClosePosition <= 2 Then
                                                                                                                                               //    '

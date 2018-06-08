@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Addons.Tools {
+namespace Contensive.Addons.Tools {
     //
     public class manualQueryClass : Contensive.BaseClasses.AddonBaseClass {
         //
@@ -191,7 +191,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // -- data source
                 bool isEmptyList = false;
-                Stream.Add(adminUIController.getToolFormInputRow(core, "Data Source", adminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.ID, Models.Complex.cdefModel.getContentId(core, "data sources"), ref isEmptyList)));
+                Stream.Add(adminUIController.getToolFormInputRow(core, "Data Source", adminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.ID, Processor.Models.Complex.cdefModel.getContentId(core, "data sources"), ref isEmptyList)));
                 {
                     //
                     // -- sql list

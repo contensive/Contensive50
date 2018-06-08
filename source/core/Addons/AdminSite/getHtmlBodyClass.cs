@@ -8,16 +8,16 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
-using Contensive.Core.Models.Complex;
-using Contensive.Core.Addons.Tools;
-using static Contensive.Core.adminUIController;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
+using Contensive.Processor.Models.Complex;
+using Contensive.Addons.Tools;
+using static Contensive.Processor.adminUIController;
 //
-namespace Contensive.Core.Addons.AdminSite {
+namespace Contensive.Addons.AdminSite {
     public class getHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
@@ -41,7 +41,7 @@ namespace Contensive.Core.Addons.AdminSite {
         /// get the admin content
         /// </summary>
         /// <param name="core"></param>
-        public getHtmlBodyClass(Contensive.Core.CPClass cp) : base() {
+        public getHtmlBodyClass(Contensive.Processor.CPClass cp) : base() {
             this.cp = cp;
             core = this.cp.core;
         }
@@ -4854,10 +4854,10 @@ namespace Contensive.Core.Addons.AdminSite {
                 Stream.Add(GetForm_EditFormStart(adminContext, AdminFormEdit));
                 bool IsLandingPageParent = false;
                 int TemplateIDForStyles = 0;
-                bool IsTemplateTable = (adminContext.adminContent.contentTableName.ToLower() == Models.DbModels.pageTemplateModel.contentTableName);
-                bool IsPageContentTable = (adminContext.adminContent.contentTableName.ToLower() == Models.DbModels.pageContentModel.contentTableName);
-                bool IsSectionTable = (adminContext.adminContent.contentTableName.ToLower() == Models.DbModels.siteSectionModel.contentTableName);
-                bool IsEmailTable = (adminContext.adminContent.contentTableName.ToLower() == Models.DbModels.emailModel.contentTableName);
+                bool IsTemplateTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.DbModels.pageTemplateModel.contentTableName);
+                bool IsPageContentTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.DbModels.pageContentModel.contentTableName);
+                bool IsSectionTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.DbModels.siteSectionModel.contentTableName);
+                bool IsEmailTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.DbModels.emailModel.contentTableName);
                 int emailIdForStyles = IsEmailTable ? editRecord.id : 0;
                 bool IsLandingPage = false;
                 bool IsRootPage = false;
@@ -6807,7 +6807,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         // add a set button
                         string fieldId = "setGuid" + genericController.GetRandomInteger(core).ToString();
-                        string buttonCell = htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='{" + Guid.NewGuid().ToString() + "}';this.disabled=true;}"), "col-xs-1");
+                        string buttonCell = htmlController.div(adminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='{" + genericController.getGUIDString() + "}';this.disabled=true;}"), "col-xs-1");
                         string inputCell = htmlController.div(adminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId), "col-xs-11");
                         fieldEditor = htmlController.div(htmlController.div(buttonCell + inputCell, "row"), "container-fluid");
                     } else {
@@ -6829,7 +6829,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         } else if (editRecord.id == 0) {
                             fieldEditor = "(available after save)";
                         } else {
-                            string eidQueryString = "eid=" + Core.Controllers.securityController.encodeToken(core, editRecord.id, core.doc.profileStartTime);
+                            string eidQueryString = "eid=" + Processor.Controllers.securityController.encodeToken(core, editRecord.id, core.doc.profileStartTime);
                             string sampleUrl = cp.Request.Protocol + cp.Request.Host + cp.Site.AppRootPath + cp.Site.PageDefault + "?" + eidQueryString;
                             if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
                                 fieldHelp = "If " + eidQueryString + " is added to a url querystring for this site, the user be logged in as this person.";
@@ -6897,7 +6897,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 string sqlFilter = "(ContentTableID=" + TableID + ")";
-                                int contentCID = core.db.getRecordID(Models.DbModels.contentModel.contentName, Models.DbModels.contentModel.contentName);
+                                int contentCID = core.db.getRecordID(Processor.Models.DbModels.contentModel.contentName, Processor.Models.DbModels.contentModel.contentName);
                                 HTMLFieldString += adminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
                                 FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
                             } else {
@@ -6921,7 +6921,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 if (!string.IsNullOrEmpty(CIDList)) {
                                     CIDList = CIDList.Substring(1);
                                     string sqlFilter = "(id in (" + CIDList + "))";
-                                    int contentCID = core.db.getRecordID(Models.DbModels.contentModel.contentName, Models.DbModels.contentModel.contentName);
+                                    int contentCID = core.db.getRecordID(Processor.Models.DbModels.contentModel.contentName, Processor.Models.DbModels.contentModel.contentName);
                                     HTMLFieldString += adminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
                                     FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited. This record includes a Parent field, so your choices for controlling content are limited to those compatible with the parent of this record.)";
                                 }
@@ -10100,7 +10100,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 // block fields that must be unique
                                 //
-                                foreach (KeyValuePair<string, Contensive.Core.Models.Complex.cdefFieldModel> keyValuePair in adminContext.adminContent.fields) {
+                                foreach (KeyValuePair<string, Contensive.Processor.Models.Complex.cdefFieldModel> keyValuePair in adminContext.adminContent.fields) {
                                     cdefFieldModel field = keyValuePair.Value;
                                     if (genericController.vbLCase(field.nameLc) == "email") {
                                         if ((adminContext.adminContent.contentTableName.ToLower() == "ccmembers") && (genericController.encodeBoolean(core.siteProperties.getBoolean("allowemaillogin", false)))) {
@@ -11087,7 +11087,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 switch (ExportType) {
                                     case 1:
-                                        var ExportCSVAddon = Models.DbModels.addonModel.create(core, addonGuidExportCSV);
+                                        var ExportCSVAddon = Processor.Models.DbModels.addonModel.create(core, addonGuidExportCSV);
                                         if (ExportCSVAddon == null) {
                                             logController.handleError(core, new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
                                         } else {
@@ -11105,7 +11105,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         }
                                         break;
                                     default:
-                                        var ExportXMLAddon = Models.DbModels.addonModel.create(core, addonGuidExportXML);
+                                        var ExportXMLAddon = Processor.Models.DbModels.addonModel.create(core, addonGuidExportXML);
                                         if (ExportXMLAddon == null) {
                                             logController.handleError(core, new ApplicationException(message: "ExportXML addon not found. Task could not be added to task queue."));
                                         } else {

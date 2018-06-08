@@ -1,5 +1,5 @@
-﻿using Contensive.Core;
-using Contensive.Core.Controllers;
+﻿using Contensive.Processor;
+using Contensive.Processor.Controllers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 
-namespace WindowsService {
+namespace ContensiveTaskService {
     public partial class taskService : ServiceBase {
         public taskService() {
             InitializeComponent();

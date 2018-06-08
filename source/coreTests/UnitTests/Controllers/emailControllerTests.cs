@@ -1,25 +1,25 @@
 ﻿
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Core.Controllers;
+using Contensive.Processor.Controllers;
 using Microsoft.Web.Administration;
-using static Contensive.Core.Tests.testConstants;
+using static Contensive.Processor.Tests.testConstants;
 using System.Linq;
 
-namespace Contensive.Core.Tests.UnitTests.Controllers {
+namespace Contensive.Processor.Tests.UnitTests.Controllers {
     [TestClass]
     public class emailControllerTests {
         //
         [TestMethod]
         public void Controllers_Email_GetBlockedList_test1() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
                 string test1 = genericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 string test2 = genericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 // act
                 emailController.addToBlockList(cp.core, test1);
-                string blockList = Contensive.Core.Controllers.emailController.getBlockList(cp.core);
+                string blockList = Contensive.Processor.Controllers.emailController.getBlockList(cp.core);
                 // assert
                 Assert.IsTrue(emailController.isOnBlockedList(cp.core, test1));
                 Assert.IsFalse(emailController.isOnBlockedList(cp.core, test2));
@@ -28,7 +28,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_Email_VerifyEmailAddress_test1() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
                 // act
@@ -43,7 +43,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_Email_queueAdHocEmail_test1() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
                 string body = genericController.GetRandomInteger(cp.core).ToString() ;
@@ -51,7 +51,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 string ResultLogFilename = "";
                 // act
                 emailController.queueAdHocEmail(cp.core, "to@kma.net", "from@kma.net", "subject", body,"bounce@kma.net","replyTo@kma.net", ResultLogFilename, true, true, 0, ref sendStatus);
-                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Core.Addons.Email.processEmailClass();
+                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.processEmailClass();
                 addon.Execute(cp);
                 // assert
                 Assert.AreEqual(1, cp.core.mockSmtpList.Count);
@@ -68,11 +68,11 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_Email_queuePersonEmail_test1() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
                 string body = genericController.GetRandomInteger(cp.core).ToString();
-                var toPerson = Core.Models.DbModels.personModel.add(cp.core);
+                var toPerson = Processor.Models.DbModels.personModel.add(cp.core);
                 Assert.IsNotNull(toPerson);
                 toPerson.Email = genericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 toPerson.FirstName = genericController.GetRandomInteger(cp.core).ToString();
@@ -81,7 +81,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
                 string sendStatus = "";
                 // act
                 Assert.IsTrue( emailController.queuePersonEmail(cp.core, toPerson, "from@kma.net", "subject", body, "bounce@kma.net", "replyTo@kma.net", true, true, 0, "", true, ref sendStatus, ""));
-                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Core.Addons.Email.processEmailClass();
+                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.processEmailClass();
                 addon.Execute(cp);
                 // assert
                 Assert.AreEqual(1, cp.core.mockSmtpList.Count);

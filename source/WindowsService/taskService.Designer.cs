@@ -1,4 +1,4 @@
-﻿namespace WindowsService {
+﻿namespace ContensiveTaskService {
     partial class taskService {
         /// <summary> 
         /// Required designer variable.

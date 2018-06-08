@@ -1,4 +1,4 @@
-﻿namespace WindowsService {
+﻿namespace ContensiveTaskService {
     partial class ProjectInstaller {
         /// <summary>
         /// Required designer variable.

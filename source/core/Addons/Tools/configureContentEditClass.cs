@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Addons.Tools {
+namespace Contensive.Addons.Tools {
     //
     public class configureContentEditClass : Contensive.BaseClasses.AddonBaseClass {
         //
@@ -43,14 +43,14 @@ namespace Contensive.Core.Addons.Tools {
                 int ContentID = cp.Doc.GetInteger("" + RequestNameToolContentID + "");
                 string DataSourceName = "";
                 string ContentName = "";
-                Models.Complex.cdefModel CDef = null;
+                Processor.Models.Complex.cdefModel CDef = null;
                 string TableName = "";
                 if (ContentID > 0) {
                     ContentName = cp.Content.GetRecordName("content", ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         TableName = cp.Content.GetTable(ContentName);
                         DataSourceName = cp.Content.GetDataSource(ContentName);
-                        CDef = Models.Complex.cdefModel.getCdef(core, ContentID, true, true);
+                        CDef = Processor.Models.Complex.cdefModel.getCdef(core, ContentID, true, true);
                     }
                 }
                 int RecordCount = 0;
@@ -84,7 +84,7 @@ namespace Contensive.Core.Addons.Tools {
                                     // problem - looking for the name in the Db using the form's name, but it could have changed.
                                     // have to look field up by id
                                     //
-                                    foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> cdefFieldKvp in CDef.fields) {
+                                    foreach (KeyValuePair<string, Processor.Models.Complex.cdefFieldModel> cdefFieldKvp in CDef.fields) {
                                         if (cdefFieldKvp.Value.id == formFieldId) {
                                             //
                                             // Field was found in CDef
@@ -233,19 +233,19 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add( htmlController.div( "There was a problem saving these changes" + "<UL>" + ErrorMessage + "</UL>","ccError"));
                 }
                 if (ReloadCDef) {
-                    CDef = Models.Complex.cdefModel.getCdef(core, ContentID, true, true);
+                    CDef = Processor.Models.Complex.cdefModel.getCdef(core, ContentID, true, true);
                 }
                 if (ContentID == 0) {
                     //
                     // content tables that have edit forms to Configure
                     bool isEmptyList = false;
-                    Stream.Add(adminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", adminUIController.getDefaultEditor_LookupContent(core,RequestNameToolContentID, ContentID, Models.Complex.cdefModel.getContentId( core,"Content" ), ref isEmptyList)));
+                    Stream.Add(adminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", adminUIController.getDefaultEditor_LookupContent(core,RequestNameToolContentID, ContentID, Processor.Models.Complex.cdefModel.getContentId( core,"Content" ), ref isEmptyList)));
                 } else {
                     //
                     // Configure edit form
                     Stream.Add(htmlController.inputHidden(RequestNameToolContentID, ContentID));
 Stream.Add(core.html.getPanelTop());
-                    ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
+                    ContentName = Processor.Models.Complex.cdefModel.getContentNameByID(core, ContentID);
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd;
                     //
                     // Get a new copy of the content definition
@@ -255,13 +255,13 @@ Stream.Add(core.html.getPanelTop());
                     //
                     int ParentContentID = CDef.parentID;
                     bool AllowCDefInherit = false;
-                    Models.Complex.cdefModel ParentCDef = null;
+                    Processor.Models.Complex.cdefModel ParentCDef = null;
                     if (ParentContentID == -1) {
                         AllowCDefInherit = false;
                     } else {
                         AllowCDefInherit = true;
-                        string ParentContentName = Models.Complex.cdefModel.getContentNameByID(core, ParentContentID);
-                        ParentCDef = Models.Complex.cdefModel.getCdef(core, ParentContentID, true, true);
+                        string ParentContentName = Processor.Models.Complex.cdefModel.getContentNameByID(core, ParentContentID);
+                        ParentCDef = Processor.Models.Complex.cdefModel.getCdef(core, ParentContentID, true, true);
                     }
                     bool NeedFootNote1 = false;
                     bool NeedFootNote2 = false;
@@ -326,7 +326,7 @@ Stream.Add(core.html.getPanelTop());
                         }
                         fieldList.Sort((p1, p2) => p1.sort.CompareTo(p2.sort));
                         stringBuilderLegacyController StreamValidRows = new stringBuilderLegacyController();
-                        var contentFieldsCdef = Models.Complex.cdefModel.getCdef(core, "content fields");
+                        var contentFieldsCdef = Processor.Models.Complex.cdefModel.getCdef(core, "content fields");
                         foreach (fieldSortClass fieldsort in fieldList) {
                             stringBuilderLegacyController streamRow = new stringBuilderLegacyController();
                             bool rowValid = true;
@@ -358,12 +358,12 @@ Stream.Add(core.html.getPanelTop());
                                 //
                                 streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + htmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                             } else {
-                                Models.Complex.cdefFieldModel parentField = null;
+                                Processor.Models.Complex.cdefFieldModel parentField = null;
                                 //
                                 // CDef has a parent, but the field is non-inherited, test for a matching Parent Field
                                 //
                                 if (ParentCDef == null) {
-                                    foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> kvp in ParentCDef.fields) {
+                                    foreach (KeyValuePair<string, Processor.Models.Complex.cdefFieldModel> kvp in ParentCDef.fields) {
                                         if (kvp.Value.nameLc == fieldsort.field.nameLc) {
                                             parentField = kvp.Value;
                                             break;
@@ -552,7 +552,7 @@ Stream.Add(core.html.getPanelTop());
         //
         private class fieldSortClass {
             public string sort;
-            public Models.Complex.cdefFieldModel field;
+            public Processor.Models.Complex.cdefFieldModel field;
         }
     }
 }

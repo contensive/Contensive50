@@ -7,15 +7,15 @@ using System.Collections.Generic;
 using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
 using System.Threading.Tasks;
-using Contensive.Core.Models;
-using Contensive.Core.Models.Context;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor.Models;
+using Contensive.Processor.Models.Context;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 using Amazon.Runtime;
 using System.Linq;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     //
     //==============================================================================================================
     /// <summary>

@@ -1,11 +1,11 @@
 ﻿
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Tests.testConstants;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Tests.testConstants;
 using System.Collections.Generic;
 
-namespace Contensive.Core.Tests.UnitTests.Controllers {
+namespace Contensive.Processor.Tests.UnitTests.Controllers {
     [TestClass]
     public class genericControllerUnitTests {
         //
@@ -179,7 +179,7 @@ namespace Contensive.Core.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_getRandomInteger_test() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 // act
                 int test1 = genericController.GetRandomInteger(cp.core);

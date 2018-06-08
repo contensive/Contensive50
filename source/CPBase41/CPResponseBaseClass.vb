@@ -3,7 +3,7 @@
 '
 Namespace Contensive.BaseClasses
     Public MustInherit Class CPResponseBaseClass
-        'Public Sub New(ByVal cmcObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPBaseClass)
+        'Public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
         Public MustOverride Property ContentType() As String
         Public MustOverride ReadOnly Property Cookies() As String
         Public MustOverride ReadOnly Property Header() As String

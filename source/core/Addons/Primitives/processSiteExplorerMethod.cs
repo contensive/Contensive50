@@ -8,14 +8,14 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 using Contensive.BaseClasses;
 //
-namespace Contensive.Core.Addons.Primitives {
+namespace Contensive.Addons.Primitives {
     public class processSiteExplorerMethodClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
@@ -27,8 +27,7 @@ namespace Contensive.Core.Addons.Primitives {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string result = "";
             try {
-                CPClass processor = (CPClass)cp;
-                coreController core = processor.core;
+                coreController core = ((CPClass)cp).core;
                 //
                 core.doc.addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer);
                 string LinkObjectName = core.docProperties.getText("LinkObjectName");

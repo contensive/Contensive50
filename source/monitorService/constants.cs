@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace Contensive.WindowsServices {
+namespace Contensive.MonitorService {
     public static class constants {
         //
         // Global Configuration Variables

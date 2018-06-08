@@ -2,8 +2,8 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Contensive.Core.Controllers;
-using Contensive.Core.Models.Context;
+using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Context;
 
 namespace Contensive.CLI {
     class mainClass {
@@ -19,7 +19,7 @@ namespace Contensive.CLI {
                 } else {
                     //
                     // -- create an instance of cp to execute commands
-                    using (Core.CPClass cp = new Core.CPClass()) {
+                    using (Processor.CPClass cp = new Processor.CPClass()) {
                         //
                         // -- if logging enabled, tell user the output includes log append
                         if (cp.core.serverConfig.enableLogging) {
@@ -59,7 +59,7 @@ namespace Contensive.CLI {
                                     if (!string.IsNullOrEmpty(appName)) {
                                         //
                                         // -- flush this app
-                                        using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
+                                        using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
                                             cpApp.Cache.InvalidateAll();
                                         }
                                     } else {
@@ -67,7 +67,7 @@ namespace Contensive.CLI {
                                         // -- flush all apps
                                         foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
                                             String housekeepAppName = kvp.Key;
-                                            using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(housekeepAppName)) {
+                                            using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
                                                 cpApp.Cache.InvalidateAll();
                                             }
                                         }
@@ -109,7 +109,7 @@ namespace Contensive.CLI {
                                         } else {
                                             if (string.IsNullOrEmpty(appName)) {
                                                 foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
-                                                    using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(kvp.Key)) {
+                                                    using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(kvp.Key)) {
                                                         string returnErrorMessage = "";
                                                         collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
                                                         if (!string.IsNullOrEmpty(returnErrorMessage)) {
@@ -118,7 +118,7 @@ namespace Contensive.CLI {
                                                     }
                                                 }
                                             } else {
-                                                using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
+                                                using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
                                                     string returnErrorMessage = "";
                                                     collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
                                                     if (!string.IsNullOrEmpty(returnErrorMessage)) {
@@ -134,18 +134,18 @@ namespace Contensive.CLI {
                                     if (!string.IsNullOrEmpty(appName)) {
                                         //
                                         // -- housekeep app
-                                        using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName)) {
+                                        using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
                                             cpApp.Doc.SetProperty("force", "1");
-                                            cpApp.executeAddon(Contensive.Core.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
+                                            cpApp.executeAddon(Contensive.Processor.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
                                         }
                                     } else {
                                         //
                                         // -- housekeep all apps
                                         foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
                                             String housekeepAppName = kvp.Key;
-                                            using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(housekeepAppName)) {
+                                            using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
                                                 cpApp.Doc.SetProperty("force", "1");
-                                                cpApp.executeAddon(Contensive.Core.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
+                                                cpApp.executeAddon(Contensive.Processor.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
                                             }
                                         }
                                     }
@@ -259,7 +259,7 @@ namespace Contensive.CLI {
                                         } else {
                                             //
                                             // turn the windows service scheduler on/off
-                                            cp.core.serverConfig.allowTaskSchedulerService = Contensive.Core.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
                                             cp.core.serverConfig.saveObject(cp.core);
                                             Console.WriteLine("allowtaskscheduler set " + cp.core.serverConfig.allowTaskSchedulerService.ToString());
                                         }
@@ -282,7 +282,7 @@ namespace Contensive.CLI {
                                         } else {
                                             //
                                             // -- turn the windows service scheduler on/off
-                                            cp.core.serverConfig.allowTaskRunnerService = Contensive.Core.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
                                             cp.core.serverConfig.saveObject(cp.core);
                                             Console.WriteLine("allowtaskrunner set " + cp.core.serverConfig.allowTaskRunnerService.ToString());
                                         }
@@ -314,8 +314,8 @@ namespace Contensive.CLI {
                                             //
                                             // turn the windows service scheduler on/off
                                             //
-                                            cp.core.serverConfig.allowTaskSchedulerService = Contensive.Core.Controllers.genericController.encodeBoolean(args[argPtr]);
-                                            cp.core.serverConfig.allowTaskRunnerService = Contensive.Core.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
                                             cp.core.serverConfig.saveObject(cp.core);
                                             Console.WriteLine("allowTaskScheduler set " + cp.core.serverConfig.allowTaskSchedulerService.ToString());
                                             Console.WriteLine("allowTaskRunner set " + cp.core.serverConfig.allowTaskRunnerService.ToString());
@@ -402,19 +402,19 @@ namespace Contensive.CLI {
         /// </summary>
         /// <param name="appName"></param>
         /// <param name="repair"></param>
-        private static void upgrade( Contensive.Core.CPClass cp, string appName, bool repair) {
+        private static void upgrade( Contensive.Processor.CPClass cp, string appName, bool repair) {
             if (!string.IsNullOrEmpty(appName)) {
                 //
                 // -- upgrade app
-                using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(appName)) {
-                    Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false, repair);
+                using (Contensive.Processor.CPClass upgradeApp = new Contensive.Processor.CPClass(appName)) {
+                    Processor.Controllers.appBuilderController.upgrade(upgradeApp.core, false, repair);
                 }
             } else {
                 //
                 // -- upgrade all apps
                 foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
-                    using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(kvp.Key)) {
-                        Core.Controllers.appBuilderController.upgrade(upgradeApp.core, false, repair);
+                    using (Contensive.Processor.CPClass upgradeApp = new Contensive.Processor.CPClass(kvp.Key)) {
+                        Processor.Controllers.appBuilderController.upgrade(upgradeApp.core, false, repair);
                     }
                 }
             }

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Contensive.Core {
+namespace Contensive.Processor {
     public static class constants {
         //
         // code version for this build. This is saved in a site property and checked in the housekeeping event - checkDataVersion
@@ -89,6 +89,8 @@ namespace Contensive.Core {
         public const string addonGuidPageManager = "{3a01572e-0f08-4feb-b189-18371752a3c3}";
         public const string addonGuidExportCSV = "{5C25F35D-A2A8-4791-B510-B1FFE0645004}";
         public const string addonGuidExportXML = "{DC7EF1EE-20EE-4468-BEB1-0DC30AC8DAD6}";
+        //
+        public const int addonRecursionLimit = 5;
         //
         // -- content
         public const string DefaultLandingPageGuid = "{925F4A57-32F7-44D9-9027-A91EF966FB0D}";

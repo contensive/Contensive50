@@ -4,13 +4,13 @@ using System.Reflection;
 using System.Xml;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
     /// <summary>

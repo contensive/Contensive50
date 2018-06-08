@@ -8,14 +8,14 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
-using Contensive.Core.Models.Context;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
+using Contensive.Processor.Models.Context;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     public class CPUserClass : BaseClasses.CPUserBaseClass, IDisposable {
         //
         #region COM GUIDs
@@ -24,13 +24,13 @@ namespace Contensive.Core {
         public const string EventsId = "DBE2B6CB-6339-4FFB-92D7-BE37AEA841CC";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController core;
+        private Contensive.Processor.Controllers.coreController core;
         private CPClass CP;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
-        public CPUserClass(Contensive.Core.Controllers.coreController coreObj, CPClass CPParent) : base() {
+        public CPUserClass(Contensive.Processor.Controllers.coreController coreObj, CPClass CPParent) : base() {
             core = coreObj;
             CP = CPParent;
         }

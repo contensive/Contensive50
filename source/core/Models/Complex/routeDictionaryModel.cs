@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Models.Complex {
+namespace Contensive.Processor.Models.Complex {
     public class routeDictionaryModel {
         //
         private const string cacheNameRouteDictionary = "routeDictionary";
@@ -39,8 +39,8 @@ namespace Contensive.Core.Models.Complex {
                     }
                     //
                     // -- remote methods
-                    List<Contensive.Core.Models.DbModels.addonModel> remoteMethods = Contensive.Core.Models.DbModels.addonModel.createList_RemoteMethods(core, new List<string>());
-                    foreach (Contensive.Core.Models.DbModels.addonModel remoteMethod in remoteMethods) {
+                    List<Contensive.Processor.Models.DbModels.addonModel> remoteMethods = Contensive.Processor.Models.DbModels.addonModel.createList_RemoteMethods(core, new List<string>());
+                    foreach (Contensive.Processor.Models.DbModels.addonModel remoteMethod in remoteMethods) {
                         string route = genericController.normalizeRoute(remoteMethod.name);
                         if (!string.IsNullOrWhiteSpace(route)) {
                             if (result.ContainsKey(route)) {

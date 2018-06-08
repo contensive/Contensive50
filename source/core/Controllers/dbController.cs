@@ -7,15 +7,15 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using Contensive.Core.Models.Complex;
-using Contensive.Core.Models.Context;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Context;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     //
     // todo - convert so each datasource has its own dbController - removing the datasource argument from every call
     // todo - this is only a type of database. Need support for noSql datasources also, and maybe read-only static file datasources (like a json file, or xml file)
@@ -371,44 +371,44 @@ namespace Contensive.Core.Controllers {
             }
             return returnData;
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Execute a command via ADO and return a recordset. Note the recordset must be disposed by the caller.
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
-        /// <param name="startRecord"></param>
-        /// <param name="maxRecords"></param>
-        /// <returns>You must close the recordset after use.</returns>
-        public ADODB.Recordset executeSql_getRecordSet(string sql, string dataSourceName = "", int startRecord = 0, int maxRecords = 9999) {
-            //
-            // from - https://support.microsoft.com/en-us/kb/308611
-            //
-            // REFACTOR 
-            // - add start recrod And max record in
-            // - add dataSourceName into the getConnectionString call - if no dataSourceName, return catalog in cluster Db, else return connstring
-            //
-            //Dim cn As ADODB.Connection = New ADODB.Connection()
-            ADODB.Recordset rs = new ADODB.Recordset();
-            string connString = getConnectionStringOLEDB(core.appConfig.name, dataSourceName);
-            try {
-                if (dbEnabled) {
-                    if (maxRecords > 0) {
-                        rs.MaxRecords = maxRecords;
-                    }
-                    // Open Recordset without connection object.
-                    rs.Open(sql, connString, ADODB.CursorTypeEnum.adOpenKeyset, ADODB.LockTypeEnum.adLockOptimistic, -1);
-                    // REFACTOR -- dbVerified Is only for the datasource. Need one for each...
-                    dbVerified = true;
-                }
-            } catch (Exception ex) {
-                ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
-                logController.handleError( core,newEx);
-                throw newEx;
-            }
-            return rs;
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// Execute a command via ADO and return a recordset. Note the recordset must be disposed by the caller.
+        ///// </summary>
+        ///// <param name="sql"></param>
+        ///// <param name="dataSourceName"></param>
+        ///// <param name="startRecord"></param>
+        ///// <param name="maxRecords"></param>
+        ///// <returns>You must close the recordset after use.</returns>
+        //public ADODB.Recordset executeSql_getRecordSet(string sql, string dataSourceName = "", int startRecord = 0, int maxRecords = 9999) {
+        //    //
+        //    // from - https://support.microsoft.com/en-us/kb/308611
+        //    //
+        //    // REFACTOR 
+        //    // - add start recrod And max record in
+        //    // - add dataSourceName into the getConnectionString call - if no dataSourceName, return catalog in cluster Db, else return connstring
+        //    //
+        //    //Dim cn As ADODB.Connection = New ADODB.Connection()
+        //    ADODB.Recordset rs = new ADODB.Recordset();
+        //    string connString = getConnectionStringOLEDB(core.appConfig.name, dataSourceName);
+        //    try {
+        //        if (dbEnabled) {
+        //            if (maxRecords > 0) {
+        //                rs.MaxRecords = maxRecords;
+        //            }
+        //            // Open Recordset without connection object.
+        //            rs.Open(sql, connString, ADODB.CursorTypeEnum.adOpenKeyset, ADODB.LockTypeEnum.adLockOptimistic, -1);
+        //            // REFACTOR -- dbVerified Is only for the datasource. Need one for each...
+        //            dbVerified = true;
+        //        }
+        //    } catch (Exception ex) {
+        //        ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
+        //        logController.handleError( core,newEx);
+        //        throw newEx;
+        //    }
+        //    return rs;
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -527,7 +527,7 @@ namespace Contensive.Core.Controllers {
                 sqlFieldListClass sqlList = new sqlFieldListClass();
                 //string CreateKeyString = null;
                 //string sqlDateAdded = null;
-                string sqlGuid = encodeSQLText( genericController.createGuid());
+                string sqlGuid = encodeSQLText( genericController.getGUID());
                 string sqlDateAdded = encodeSQLDate(DateTime.Now);
                 //CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
                 sqlList.add("ccguid", sqlGuid);
@@ -1578,7 +1578,7 @@ namespace Contensive.Core.Controllers {
             try {
                 returnCs = csInit(core.session.user.id);
                 {
-                    Contensive.Core.Controllers.dbController.ContentSetClass contentSet = contentSetStore[returnCs];
+                    Contensive.Processor.Controllers.dbController.ContentSetClass contentSet = contentSetStore[returnCs];
                     contentSet.Updateable = false;
                     contentSet.ContentName = "";
                     contentSet.PageNumber = pageNumber;
@@ -2425,7 +2425,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         //
-                        string sqlGuid = encodeSQLText(genericController.createGuid());
+                        string sqlGuid = encodeSQLText(genericController.getGUID());
                         //string CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
                         string sqlDateAdded = encodeSQLDate(DateTime.Now);
                         //

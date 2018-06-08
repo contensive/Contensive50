@@ -4,7 +4,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 
-namespace Contensive.WindowsServices {
+namespace Contensive.MonitorService {
     static class Program {
         /// <summary>
         /// The main entry point for the application.

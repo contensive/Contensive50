@@ -2,14 +2,14 @@
 using System;
 using System.Xml;
 using System.Collections.Generic;
-using Contensive.Core.Models.DbModels;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor.Models.DbModels;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 using System.Data;
 using System.Linq;
-using Contensive.Core.Models.Context;
+using Contensive.Processor.Models.Context;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
     /// <summary>

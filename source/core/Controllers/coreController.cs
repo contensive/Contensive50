@@ -2,15 +2,15 @@
 using System;
 using System.Reflection;
 using Contensive.BaseClasses;
-using Contensive.Core.Controllers;
-using Contensive.Core.Models.Context;
-using Contensive.Core.Models.DbModels;
+using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.DbModels;
 using System.Collections.Generic;
-using static Contensive.Core.constants;
+using static Contensive.Processor.constants;
 using System.Diagnostics;
 using System.Linq;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     //
     //===================================================================================================
     /// <summary>
@@ -1084,7 +1084,7 @@ namespace Contensive.Core.Controllers {
         private void constructorInitialize(bool allowVisit) {
             try {
                 //
-                doc.docGuid = genericController.createGuid();
+                doc.docGuid = genericController.getGUID();
                 doc.allowDebugLog = true;
                 doc.profileStartTime = DateTime.Now;
                 doc.visitPropertyAllowDebugging = true;

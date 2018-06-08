@@ -3,12 +3,12 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
-using Contensive.Core.Models.DbModels;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor.Models.DbModels;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 using Contensive.BaseClasses;
 //
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     /// <summary>
     /// persistence object during document construction. Values persist only for this document.
     /// </summary>
@@ -205,8 +205,10 @@ namespace Contensive.Core.Controllers {
         // -- todo
         internal List<int> addonIdListRunInThisDoc { get; set; } = new List<int>();
         //
-        // -- todo
-        internal List<int> addonsCurrentlyRunningIdList { get; set; } = new List<int>();
+        /// <summary>
+        /// Dictionary of addons running to track recursion, addonId and count of recursive entries. When executing an addon, check if it is in the list, if so, check if the recursion count is under the limit (addonRecursionDepthLimit). If not add it or increment the count. On exit, decrement the count and remove if 0.
+        /// </summary>
+        internal Dictionary<int,int> addonRecursionDepth { get; set; } = new Dictionary<int, int>();
         //
         public Stack<Models.DbModels.addonModel> addonModelStack = new Stack<addonModel>();
         //

@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     //
     // comVisible to be activeScript compatible
     //
@@ -27,12 +27,12 @@ namespace Contensive.Core {
         public const string EventsId = "C7FCA224-8542-46F2-9019-52A7B5BAE4DB";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController core;
+        private Contensive.Processor.Controllers.coreController core;
         protected bool disposed = false;
         //
         // Constructor
         //
-        public CPResponseClass(Contensive.Core.Controllers.coreController coreObj) : base() {
+        public CPResponseClass(Contensive.Processor.Controllers.coreController coreObj) : base() {
             core = coreObj;
         }
         //

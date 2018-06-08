@@ -17,7 +17,7 @@ Namespace Contensive.BaseClasses
             PublicUser = 4
             CurrentUser = 5
         End Enum
-        'Public Sub New(ByVal cmcObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPBaseClass)
+        'Public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
         Public MustOverride Function div(ByVal InnerHtml As String, Optional ByVal HtmlName As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Implements BaseClasses.CPHtmlBaseClass.div
         Public MustOverride Function p(ByVal InnerHtml As String, Optional ByVal HtmlName As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Implements BaseClasses.CPHtmlBaseClass.p
         Public MustOverride Function li(ByVal InnerHtml As String, Optional ByVal HtmlName As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Implements BaseClasses.CPHtmlBaseClass.li

@@ -6,10 +6,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
-using Contensive.Core;
+using Contensive.Processor;
 
 
-namespace Contensive.WindowsServices {
+namespace Contensive.MonitorService {
     public partial class monitorService : ServiceBase {
         public monitorService() {
             InitializeComponent();

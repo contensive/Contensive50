@@ -7,12 +7,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 
-using Contensive.Core;
-using static Contensive.Core.constants;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
+using Contensive.Processor;
+using static Contensive.Processor.constants;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
 
-namespace Contensive.WindowsServices {
+namespace Contensive.MonitorService {
     public class monitorConfigClass {
         //
         public const int Port_SiteMonitorDefault = 4532;

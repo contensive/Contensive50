@@ -18,7 +18,7 @@ namespace Contensive.BaseClasses
 {
 	public abstract class CPVisitBaseClass
 	{
-		//Public Sub New(ByVal cmcObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPBaseClass)
+		//Public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
 		public abstract bool CookieSupport {get;} //Implements BaseClasses.CPVisitBaseClass.CookieSupport
 		public abstract string GetProperty(string PropertyName, string DefaultValue = "", int TargetVisitId = 0); //Implements BaseClasses.CPVisitBaseClass.GetProperty
 		public abstract string GetText(string PropertyName, string DefaultValue = "");

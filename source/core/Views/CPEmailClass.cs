@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     public class CPEmailClass : BaseClasses.CPEmailBaseClass, IDisposable {
         //
         #region COM GUIDs
@@ -23,12 +23,12 @@ namespace Contensive.Core {
         public const string EventsId = "32E893C5-165B-4088-8D9E-CE82524A5000";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController core;
+        private Contensive.Processor.Controllers.coreController core;
         protected bool disposed = false;
         //
         //==========================================================================================
         //
-        public CPEmailClass(Contensive.Core.Controllers.coreController coreObj) : base() {
+        public CPEmailClass(Contensive.Processor.Controllers.coreController coreObj) : base() {
             core = coreObj;
         }
         //

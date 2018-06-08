@@ -1,9 +1,9 @@
 ﻿
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Core.Controllers;
+using Contensive.Processor.Controllers;
 
-namespace Contensive.Core.Tests.UnitTests {
+namespace Contensive.Processor.Tests.UnitTests {
     [TestClass]
     public class extensionMethodsUnitTests {
         //

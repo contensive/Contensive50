@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Contensive.Core;
+using Contensive.Processor;
 using System.Security.Permissions;
 using System.Security;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using Contensive.Core.Models.Context;
+using Contensive.Processor.Models.Context;
 
 namespace Contensive.CLI {
     class createAppClass {
@@ -53,7 +53,7 @@ namespace Contensive.CLI {
                     bool routeOk = false;
                     do {
                         appConfig.adminRoute = cliController.promptForReply("Admin Route (non-blank, no leading or trailing slash)", "admin");
-                        appConfig.adminRoute = Contensive.Core.Controllers.genericController.convertToUnixSlash(appConfig.adminRoute);
+                        appConfig.adminRoute = Contensive.Processor.Controllers.genericController.convertToUnixSlash(appConfig.adminRoute);
                         if (!string.IsNullOrEmpty(appConfig.adminRoute)) {
                             if (!appConfig.adminRoute.Substring(0, 1).Equals("/")) {
                                 if (!appConfig.adminRoute.Substring(appConfig.adminRoute.Length - 1, 1).Equals("/")) {
@@ -68,7 +68,7 @@ namespace Contensive.CLI {
                     domainName = cliController.promptForReply("Primary Domain Name", "www." + appName + ".com");
                     appConfig.domainList.Add(domainName);
                     appConfig.enabled = true;
-                    appConfig.privateKey = Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");
+                    appConfig.privateKey = Processor.Controllers.genericController.getGUIDString();
                     //Console.Write("\n\rApplication Architecture");
                     //Console.Write("\n\r\t1 Local Mode, compatible with v4.1, cdn is virtual folder /" + appName + "/files/");
                     //Console.Write("\n\r\t2 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket");
@@ -139,7 +139,7 @@ namespace Contensive.CLI {
                             //    cdnDomainName = domainName;
                             //    break;
                     }
-                    Contensive.Core.Controllers.logController.logInfo(cp.core, "Create local folders.");
+                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Create local folders.");
                     setupDirectory(appConfig.localWwwPath);
                     setupDirectory(appConfig.localFilesPath);
                     setupDirectory(appConfig.localPrivatePath);
@@ -196,7 +196,7 @@ namespace Contensive.CLI {
 
                     //
                     // -- save the app configuration and reload the server using this app
-                    Contensive.Core.Controllers.logController.logInfo(cp.core, "Save app configuration.");
+                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Save app configuration.");
                     appConfig.appStatus = appConfigModel.appStatusEnum.maintenance;
                     cp.core.serverConfig.apps.Add(appName, appConfig);
                     cp.core.serverConfig.saveObject(cp.core);
@@ -206,7 +206,7 @@ namespace Contensive.CLI {
                     // update local host file
                     //
                     try {
-                        Contensive.Core.Controllers.logController.logInfo(cp.core, "Update host file to add domain [127.0.0.1 " + appName + "].");
+                        Contensive.Processor.Controllers.logController.logInfo(cp.core, "Update host file to add domain [127.0.0.1 " + appName + "].");
                         File.AppendAllText("c:\\windows\\system32\\drivers\\etc\\hosts", System.Environment.NewLine + "127.0.0.1\t" + appName);
                     } catch (Exception ex) {
                         Console.Write("Error attempting to update local host file:" + ex.ToString());
@@ -215,7 +215,7 @@ namespace Contensive.CLI {
                     //
                     // create the database on the server
                     //
-                    Contensive.Core.Controllers.logController.logInfo(cp.core, "Create database.");
+                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Create database.");
                     cp.core.dbServer.createCatalog(appName);
                     //
                     // copy in the pattern files 
@@ -223,12 +223,12 @@ namespace Contensive.CLI {
                     //  - this is cc running, so they are setting up new application which may or may not have a webrole here.
                     //  - setup a basic webrole just in case this will include one -- maybe later make it an option
                     //
-                    Contensive.Core.Controllers.logController.logInfo(cp.core, "Copy default site to www folder.");
+                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Copy default site to www folder.");
                     cp.core.programFiles.copyFolder("resources\\iisDefaultSite\\", "\\", cp.core.appRootFiles);
                     //
                     // replace "appName" with blank to use iis siteName as appName, or the name of this app in the default document in the apps public folder
                     //
-                    //Contensive.Core.Controllers.logController.logInfo(cp.core, "Update web.config.");
+                    //Contensive.Processor.Controllers.logController.logInfo(cp.core, "Update web.config.");
                     //string defaultContent = cp.core.appRootFiles.readFileText("web.config");
                     //defaultContent = defaultContent.Replace("{{appName}}", appName);
                     //cp.core.appRootFiles.saveFile("web.config", defaultContent);
@@ -237,17 +237,17 @@ namespace Contensive.CLI {
                 // initialize the new app, use the save authentication that was used to authorize this object
                 //
                 using (CPClass cp = new CPClass(appName)) {
-                    Contensive.Core.Controllers.logController.logInfo(cp.core, "Verify website.");
-                    Core.Controllers.iisController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
+                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Verify website.");
+                    Processor.Controllers.iisController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
                     //
-                    Contensive.Core.Controllers.logController.logInfo(cp.core, "Run db upgrade.");
-                    Core.Controllers.appBuilderController.upgrade(cp.core, true, true);
+                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Run db upgrade.");
+                    Processor.Controllers.appBuilderController.upgrade(cp.core, true, true);
                     //
                     // -- set the application back to normal mode
                     cp.core.serverConfig.saveObject(cp.core);
                     cp.core.siteProperties.setProperty(constants.siteproperty_serverPageDefault_name, iisDefaultDoc);
                     //
-                    Contensive.Core.Controllers.logController.logInfo(cp.core, "Upgrad complete.");
+                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Upgrad complete.");
                 }
                 //
             } catch (Exception ex) {

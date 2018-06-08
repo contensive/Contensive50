@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Contensive.Core;
+using Contensive.Processor;
 //
 namespace  Contensive.CLI {
     static class installClass {

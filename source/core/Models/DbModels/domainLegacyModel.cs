@@ -9,12 +9,12 @@
 //using System.Data;
 //using System.Data.SqlClient;
 //using Contensive.Core;
-//using Contensive.Core.Models.DbModels;
-//using Contensive.Core.Controllers;
-//using static Contensive.Core.Controllers.genericController;
-//using static Contensive.Core.constants;
+//using Contensive.Processor.Models.DbModels;
+//using Contensive.Processor.Controllers;
+//using static Contensive.Processor.Controllers.genericController;
+//using static Contensive.Processor.constants;
 ////
-//namespace Contensive.Core.Models.DbModels {
+//namespace Contensive.Processor.Models.DbModels {
 //    //
 //    //====================================================================================================
 //    /// <summary>

@@ -1,10 +1,10 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Core.Controllers;
+using Contensive.Processor.Controllers;
 using Contensive.BaseClasses;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     //
     //==========================================================================================
     /// <summary>
@@ -12,7 +12,7 @@ namespace Contensive.Core {
     /// </summary>
     public class csController : IDisposable {
         //
-        private Contensive.Core.Controllers.coreController core;
+        private Contensive.Processor.Controllers.coreController core;
         private int csPtr;
         private int openingMemberID;
         protected bool disposed = false;

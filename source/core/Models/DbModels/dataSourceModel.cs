@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Text;
 using Contensive.BaseClasses;
 using Newtonsoft.Json;
-using Contensive.Core.Controllers;
+using Contensive.Processor.Controllers;
 
-namespace Contensive.Core.Models.DbModels {
+namespace Contensive.Processor.Models.DbModels {
     public class dataSourceModel {
         //
         //-- const

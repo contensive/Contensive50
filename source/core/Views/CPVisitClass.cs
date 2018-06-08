@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
-namespace Contensive.Core {
+namespace Contensive.Processor {
     public class CPVisitClass : BaseClasses.CPVisitBaseClass, IDisposable {
         //
         #region COM GUIDs
@@ -23,11 +23,11 @@ namespace Contensive.Core {
         public const string EventsId = "2AFEB1A8-5B27-45AC-A9DF-F99849BE1FAE";
         #endregion
         //
-        private Contensive.Core.Controllers.coreController core;
+        private Contensive.Processor.Controllers.coreController core;
         private CPClass cp;
         protected bool disposed = false;
         //
-        public CPVisitClass(Contensive.Core.Controllers.coreController coreObj, CPClass cpParent) : base() {
+        public CPVisitClass(Contensive.Processor.Controllers.coreController coreObj, CPClass cpParent) : base() {
             this.core = coreObj;
             cp = cpParent;
         }

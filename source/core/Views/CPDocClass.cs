@@ -8,14 +8,14 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 //
 
-namespace Contensive.Core {
+namespace Contensive.Processor {
     public class CPDocClass : BaseClasses.CPDocBaseClass, IDisposable {
         #region COM GUIDs
         public const string ClassId = "414BD6A9-195F-4E0F-AE24-B7BF56749CDD";
@@ -24,7 +24,7 @@ namespace Contensive.Core {
         #endregion
         //
         private CPClass cp;
-        private Contensive.Core.Controllers.coreController core;
+        private Contensive.Processor.Controllers.coreController core;
         protected bool disposed = false;
         //
         //====================================================================================================

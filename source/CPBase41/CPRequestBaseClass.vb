@@ -3,7 +3,7 @@
 '
 Namespace Contensive.BaseClasses
     Public MustInherit Class CPRequestBaseClass
-        'Public Sub New(ByVal cmcObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPBaseClass)
+        'Public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
         Public MustOverride ReadOnly Property Browser() As String 'Implements BaseClasses.CPRequestBaseClass.Browser
         Public MustOverride ReadOnly Property BrowserIsIE() As Boolean 'Implements BaseClasses.CPRequestBaseClass.BrowserIsIE
         Public MustOverride ReadOnly Property BrowserIsMac() As Boolean 'Implements BaseClasses.CPRequestBaseClass.BrowserIsMac

@@ -1,11 +1,11 @@
 ﻿
 using System;
 using Contensive.BaseClasses;
-using Contensive.Core.Models.DbModels;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor.Models.DbModels;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     /// <summary>
     /// interpret dynamic elements with content including <AC></AC> tags and {% {} %} JSON-based content commands.
     /// </summary>
@@ -1022,9 +1022,7 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             ACInstanceID = DHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
                                                             if (string.IsNullOrEmpty(ACInstanceID)) {
-                                                                //GUIDGenerator = New guidClass
-                                                                ACInstanceID = Guid.NewGuid().ToString();
-                                                                //ACInstanceID = Guid.NewGuid.ToString()
+                                                                ACInstanceID = genericController.getGUID();
                                                             }
                                                             ElementText = "";
                                                             //----------------------------- change to ACType

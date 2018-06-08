@@ -3,7 +3,7 @@
 '
 Namespace Contensive.BaseClasses
     Public MustInherit Class CPVisitorBaseClass
-        'Public Sub New(ByVal cmcObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPBaseClass)
+        'Public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
         Public MustOverride ReadOnly Property ForceBrowserMobile() As Boolean 'Implements BaseClasses.CPVisitorBaseClass.ForceBrowserMobile
         Public MustOverride Function GetProperty(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetVisitorId As Integer = 0) As String 'Implements BaseClasses.CPVisitorBaseClass.GetProperty
         Public MustOverride Function GetText(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As String

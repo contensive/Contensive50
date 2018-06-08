@@ -1,4 +1,4 @@
-﻿namespace Contensive.WindowsServices {
+﻿namespace Contensive.MonitorService {
     partial class monitorService {
         /// <summary> 
         /// Required designer variable.

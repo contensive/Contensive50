@@ -4,7 +4,7 @@ Option Strict On
 
 Imports System.Web.SessionState
 Imports System.Web.Routing
-Imports Contensive.Core.Controllers
+Imports Contensive.Processor.Controllers
 
 Public Class Global_asax
     Inherits System.Web.HttpApplication
@@ -20,11 +20,11 @@ Public Class Global_asax
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         Try
             logController.forceNLog("Global.asax, Application_Start", logController.logLevel.Trace)
-            Using cp As New Contensive.Core.CPClass(DefaultSite.configurationClass.getAppName())
+            Using cp As New Contensive.Processor.CPClass(DefaultSite.configurationClass.getAppName())
                 DefaultSite.configurationClass.loadRouteMap(cp)
             End Using
         Catch ex As Exception
-            Contensive.Core.Controllers.logController.forceNLog(getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Core.Controllers.logController.logLevel.Fatal)
+            Contensive.Processor.Controllers.logController.forceNLog(getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Processor.Controllers.logController.logLevel.Fatal)
         End Try
     End Sub
 

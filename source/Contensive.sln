@@ -10,21 +10,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cc", "cc\cc.csproj", "{744280CA-E8A3-4B6A-BA3F-2BF638433F65}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cli", "cc\Cli.csproj", "{744280CA-E8A3-4B6A-BA3F-2BF638433F65}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "iisDefaultSite", "iisDefaultSite\iisDefaultSite.vbproj", "{9DB3DACD-45E8-496B-96DA-F939ABE7DB34}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup3", "Setup3\Setup3.vdproj", "{6D74F50C-EECA-4B40-B1E0-22DE9736F3BA}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CliSetup", "Setup3\Setup3.vdproj", "{6D74F50C-EECA-4B40-B1E0-22DE9736F3BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CPBase50", "CPBase50\CPBase50.csproj", "{0619E0E6-1565-47E7-B8FE-F8BD1C8EB48B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "contensive", "core\contensive.csproj", "{46657D07-74BC-4DDC-8FDD-9078EB1A1CD2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Processor", "core\Processor.csproj", "{46657D07-74BC-4DDC-8FDD-9078EB1A1CD2}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CPBase41", "CPBase41\CPBase41.vbproj", "{E873F18E-47EF-46A9-AEA1-5A8B0F8BEB01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core.tests", "coreTests\core.tests.csproj", "{36E017D4-C4EB-4C0E-8E2B-1F97150B07D9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessorTests", "coreTests\ProcessorTests.csproj", "{36E017D4-C4EB-4C0E-8E2B-1F97150B07D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "monitorService", "monitorService\monitorService.csproj", "{591DB653-B853-4AE6-AFB5-91C86C492563}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonitorService", "monitorService\MonitorService.csproj", "{591DB653-B853-4AE6-AFB5-91C86C492563}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskService", "WindowsService\TaskService.csproj", "{3FE1D5E9-411B-4713-81CF-D6E439CAEFB0}"
 EndProject

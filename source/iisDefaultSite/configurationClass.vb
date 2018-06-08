@@ -2,13 +2,13 @@
 Option Explicit On
 Option Strict On
 
-Imports Contensive.Core
-Imports Contensive.Core.Controllers
-Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Processor
+Imports Contensive.Processor.Controllers
+Imports Contensive.Processor.Controllers.genericController
 Imports System.Web.Routing
 Imports System.IO
-Imports Contensive.Core.Models.Complex
-Imports Contensive.Core.Models.Context
+Imports Contensive.Processor.Models.Complex
+Imports Contensive.Processor.Models.Context
 
 Public Class configurationClass
     '

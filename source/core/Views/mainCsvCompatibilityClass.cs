@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 // 
-namespace Contensive.Core {
+namespace Contensive.Processor {
     public class mainCsvScriptCompatibilityClass {
         public const string ClassId = "D9099AAE-3FCB-4398-B94C-19EE7FA97B2B";
         public const string InterfaceId = "CE342EA5-339F-4C31-9F90-F878F527E17A";

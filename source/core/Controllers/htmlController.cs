@@ -11,14 +11,14 @@ using System.Data;
 using System.Data.SqlClient;
 
 using Contensive.BaseClasses;
-using Contensive.Core;
-using Contensive.Core.Models.DbModels;
-using Contensive.Core.Controllers;
-using static Contensive.Core.Controllers.genericController;
-using static Contensive.Core.constants;
+using Contensive.Processor;
+using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.constants;
 using System.Net;
 
-namespace Contensive.Core.Controllers {
+namespace Contensive.Processor.Controllers {
     /// <summary>
     /// Tools used to assemble html document elements. This is not a storage for assembling a document (see docController)
     /// </summary>
@@ -2416,31 +2416,6 @@ namespace Contensive.Core.Controllers {
         public string getCheckList(string htmlNamePrefix, string PrimaryContentName, int PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectCriteria = "", string CaptionFieldName = "", bool readOnlyfield = false, bool IncludeContentFolderDivs = false, string DefaultSecondaryIDList = "") {
             string returnHtml = "";
             try {
-                string[] main_MemberShipText = null;
-                int Ptr = 0;
-                int main_MemberShipID = 0;
-                string javaScriptRequired = "";
-                string DivName = null;
-                string OldFolderVar = null;
-                string EndDiv = null;
-                string RuleCopyCaption = null;
-                string RuleCopy = null;
-                string SQL = null;
-                int CS = 0;
-                int main_MemberShipCount = 0;
-                int main_MemberShipSize = 0;
-                int main_MemberShipPointer = 0;
-                int CheckBoxCnt = 0;
-                int DivCheckBoxCnt = 0;
-                int[] main_MemberShip = { };
-                string[] main_MemberShipRuleCopy = { };
-                int PrimaryContentID = 0;
-                string SecondaryTablename = null;
-                int SecondaryContentID = 0;
-                string rulesTablename = null;
-                string OptionName = null;
-                string OptionCaption = null;
-                string optionCaptionHtmlEncoded = null;
                 bool CanSeeHiddenFields = false;
                 Models.Complex.cdefModel SecondaryCDef = null;
                 List<int> ContentIDList = new List<int>();
@@ -2471,33 +2446,39 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     //
-                    PrimaryContentID = Models.Complex.cdefModel.getContentId(core, PrimaryContentName);
+                    int PrimaryContentID = Models.Complex.cdefModel.getContentId(core, PrimaryContentName);
                     SecondaryCDef = Models.Complex.cdefModel.getCdef(core, SecondaryContentName);
-                    SecondaryTablename = SecondaryCDef.contentTableName;
-                    SecondaryContentID = SecondaryCDef.id;
+                    string SecondaryTablename = SecondaryCDef.contentTableName;
+                    int SecondaryContentID = SecondaryCDef.id;
                     ContentIDList.Add(SecondaryContentID);
                     ContentIDList.AddRange(SecondaryCDef.get_childIdList(core));
                     //
                     //
                     //
-                    rulesTablename = Models.Complex.cdefModel.getContentTablename(core, RulesContentName);
+                    string rulesTablename = Models.Complex.cdefModel.getContentTablename(core, RulesContentName);
                     SingularPrefixHtmlEncoded = htmlController.encodeHtml(genericController.getSingular_Sortof(SecondaryContentName)) + "&nbsp;";
                     //
-                    main_MemberShipCount = 0;
-                    main_MemberShipSize = 0;
+                    int main_MemberShipCount = 0;
+                    int main_MemberShipSize = 0;
                     returnHtml = "";
                     if ((!string.IsNullOrEmpty(SecondaryTablename)) & (!string.IsNullOrEmpty(rulesTablename))) {
-                        OldFolderVar = "OldFolder" + core.doc.checkListCnt;
+                        string OldFolderVar = "OldFolder" + core.doc.checkListCnt;
+                        string javaScriptRequired = "";
                         javaScriptRequired += "var " + OldFolderVar + ";";
+                        string SQL = null;
+                        int CS = 0;
+                        int[] main_MemberShip = { };
+                        string[] main_MemberShipRuleCopy = { };
                         if (PrimaryRecordID == 0) {
                             //
                             // New record, use the DefaultSecondaryIDList
                             //
                             if (!string.IsNullOrEmpty(DefaultSecondaryIDList)) {
 
-                                main_MemberShipText = DefaultSecondaryIDList.Split(',');
+                                string[] main_MemberShipText = DefaultSecondaryIDList.Split(',');
+                                int Ptr = 0;
                                 for (Ptr = 0; Ptr <= main_MemberShipText.GetUpperBound(0); Ptr++) {
-                                    main_MemberShipID = genericController.encodeInteger(main_MemberShipText[Ptr]);
+                                    int main_MemberShipID = genericController.encodeInteger(main_MemberShipText[Ptr]);
                                     if (main_MemberShipID != 0) {
                                         Array.Resize(ref main_MemberShip, Ptr + 1);
                                         main_MemberShip[Ptr] = main_MemberShipID;
@@ -2577,24 +2558,25 @@ namespace Contensive.Core.Controllers {
                             returnHtml = "(No choices are available.)";
                         } else {
                             if (true) {
-                                EndDiv = "";
-                                CheckBoxCnt = 0;
-                                DivCheckBoxCnt = 0;
+                                string EndDiv = "";
+                                int CheckBoxCnt = 0;
+                                int DivCheckBoxCnt = 0;
                                 CanSeeHiddenFields = core.session.isAuthenticatedDeveloper(core);
-                                DivName = htmlNamePrefix + ".All";
+                                string DivName = htmlNamePrefix + ".All";
                                 while (core.db.csOk(CS)) {
-                                    OptionName = core.db.csGetText(CS, "OptionName");
+                                    string OptionName = core.db.csGetText(CS, "OptionName");
                                     if ((OptionName.Left(1) != "_") || CanSeeHiddenFields) {
                                         //
                                         // Current checkbox is visible
                                         //
                                         RecordID = core.db.csGetInteger(CS, "ID");
                                         AllowRuleCopy = core.db.csGetBoolean(CS, "AllowRuleCopy");
-                                        RuleCopyCaption = core.db.csGetText(CS, "RuleCopyCaption");
-                                        OptionCaption = core.db.csGetText(CS, "OptionCaption");
+                                        string RuleCopyCaption = core.db.csGetText(CS, "RuleCopyCaption");
+                                        string OptionCaption = core.db.csGetText(CS, "OptionCaption");
                                         if (string.IsNullOrEmpty(OptionCaption)) {
                                             OptionCaption = OptionName;
                                         }
+                                        string optionCaptionHtmlEncoded = null;
                                         if (string.IsNullOrEmpty(OptionCaption)) {
                                             optionCaptionHtmlEncoded = SingularPrefixHtmlEncoded + RecordID;
                                         } else {
@@ -2604,9 +2586,10 @@ namespace Contensive.Core.Controllers {
                                             // leave this between checkboxes - it is searched in the admin page
                                             //returnHtml += "<br>\r\n";
                                         }
-                                        RuleCopy = "";
+                                        string RuleCopy = "";
                                         Found = false;
                                         if (main_MemberShipCount != 0) {
+                                            int main_MemberShipPointer = 0;
                                             for (main_MemberShipPointer = 0; main_MemberShipPointer < main_MemberShipCount; main_MemberShipPointer++) {
                                                 if (main_MemberShip[main_MemberShipPointer] == (RecordID)) {
                                                     //s = s & main_GetFormInputHidden(TagName & "." & CheckBoxCnt, True)

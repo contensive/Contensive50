@@ -4,18 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Core.Controllers;
-using Contensive.Core.Models;
-using Contensive.Core.Models.Complex;
-using Contensive.Core.Models.DbModels;
-using static Contensive.Core.Tests.testConstants;
+using Contensive.Processor.Controllers;
+using Contensive.Processor.Models;
+using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.DbModels;
+using static Contensive.Processor.Tests.testConstants;
 
-namespace Contensive.Core.Tests.UnitTests.Models {
+namespace Contensive.Processor.Tests.UnitTests.Models {
     [TestClass()]
     public class routeDictionaryModelTests {
         [TestMethod()]
         public void Models_RouteDictionary_NoRoutes() {
-            using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass(testAppName)) {
+            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 cp.core.db.executeNonQuery("delete from " + addonModel.contentTableName);
                 cp.core.db.executeNonQuery("delete from " + linkAliasModel.contentTableName);
