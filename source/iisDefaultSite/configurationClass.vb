@@ -69,7 +69,7 @@ Public Class configurationClass
     End Function
     '
     Public Shared Sub loadRouteMap(cp As Contensive.BaseClasses.CPBaseClass)
-        logController.forceNLog("configurationClass, loadRouteMap", logController.logLevel.Trace)
+        logController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "]", logController.logLevel.Trace)
         ' 20180307, added clear to resolve error 
         RouteTable.Routes.Clear()
         For Each kvp In cp.Site.getRouteDictionary()
@@ -77,7 +77,7 @@ Public Class configurationClass
                 Dim newRouteName As String = kvp.Key
                 Dim newRoute As Contensive.BaseClasses.CPSiteBaseClass.routeClass = kvp.Value
                 '
-                logController.forceNLog("configurationClass, loadRouteMap [" + newRoute.virtualRoute + "], [" + newRoute.physicalRoute + "]", logController.logLevel.Trace)
+                logController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRoute.virtualRoute + "], [" + newRoute.physicalRoute + "]", logController.logLevel.Trace)
                 '
                 RouteTable.Routes.Remove(RouteTable.Routes(newRouteName))
                 RouteTable.Routes.MapPageRoute(newRoute.virtualRoute, newRoute.virtualRoute, newRoute.physicalRoute)

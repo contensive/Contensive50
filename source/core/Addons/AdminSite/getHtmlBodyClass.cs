@@ -11572,9 +11572,14 @@ namespace Contensive.Addons.AdminSite {
                                             if (!string.IsNullOrWhiteSpace(fieldName)) {
                                                 returnIndexConfig.Sorts.Add(fieldName, new indexConfigSortClass {
                                                     fieldName = fieldName,
-                                                    direction = (genericController.encodeBoolean(LineSplit[1]) ? 1 : 2),
+                                                    direction =  ((LineSplit[1]=="1") ? 1 : 2),
                                                     order = ++orderPtr
                                                 });
+                                                //returnIndexConfig.Sorts.Add(fieldName, new indexConfigSortClass {
+                                                //    fieldName = fieldName,
+                                                //    direction = (genericController.encodeBoolean(LineSplit[1]) ? 1 : 2),
+                                                //    order = ++orderPtr
+                                                //});
                                             }
                                         }
                                         Ptr = Ptr + 1;

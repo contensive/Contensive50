@@ -180,7 +180,11 @@ namespace Contensive.Processor.Controllers {
                     if (core.useNlog) {
                         //
                         // -- log to Nlog
-                        forceNLog(message, level);
+                        if (core.appConfig != null) {
+                            forceNLog("app [" + core.appConfig.name + "], " + message, level);
+                        } else {
+                            forceNLog("non-app instance, " + message, level);
+                        }
                     } else {
                         //
                         // -- legacy logging
