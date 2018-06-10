@@ -76,12 +76,19 @@ namespace Contensive.Processor {
         /// </summary>
         public override int Id {
             get {
-                int localId = CP.core.session.user.id;
-                if (localId == 0) {
-                    localId = CP.core.db.insertContentRecordGetID("people", 0);
-                    sessionController.recognizeById(core, localId, ref CP.core.session);
+                if (CP.core.session.user.id==0) {
+                    var user = personModel.add(core);
+                    user.CreatedByVisit = true;
+                    user.save(core);
+                    sessionController.recognizeById(core, user.id, ref CP.core.session);
                 }
-                return localId;
+                return core.session.user.id;
+                //int localId = CP.core.session.user.id;
+                //if (localId == 0) {
+                //    localId = CP.core.db.insertContentRecordGetID("people", 0);
+                //    sessionController.recognizeById(core, localId, ref CP.core.session);
+                //}
+                //return localId;
             }
         }
         //

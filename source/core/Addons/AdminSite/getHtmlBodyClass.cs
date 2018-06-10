@@ -3514,7 +3514,6 @@ namespace Contensive.Addons.AdminSite {
             try {
                 // todo
                 adminUIController.editRecordClass editRecord = adminContext.editRecord;
-                int PageNotFoundPageID = 0;
                 //
                 // List of fields that were created for the form, and should be verified (starts and ends with a comma)
                 var FormFieldLcListToBeLoaded = new List<string> { };
@@ -4870,23 +4869,23 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
                 //
-                bool IsLandingSection = false;
-                bool IsLandingPageTemp = false;
-                //
-                // ----- special case messages
-                //
-                string CustomDescription = "";
-                if (IsLandingSection) {
-                    CustomDescription = "<div>This is the default Landing Section for this website. This section is displayed when no specific page is requested. It should not be deleted, renamed, marked inactive, blocked or hidden.</div>";
-                } else if (IsLandingPageTemp) {
-                    CustomDescription = "<div>This page is being used as the default Landing Page for this website, although it has not been set. This may be because a landing page has not been created, or it has been deleted. To make this page the permantent landing page, check the appropriate box in the control tab.</div>";
-                } else if (IsLandingPage) {
-                    CustomDescription = "<div>This is the default Landing Page for this website. It should not be deleted. You can not mark this record inactive, or use the Publish Date, Expire Date or Archive Date features.</div>";
-                } else if (IsLandingPageParent) {
-                    CustomDescription = "<div>This page is a parent of the default Landing Page for this website. It should not be deleted. You can not mark this record inactive, or use the Publish Date, Expire Date or Archive Date features.</div>";
-                } else if (IsRootPage) {
-                    CustomDescription = "<div>This page is a Root Page. A Root Page is the primary page of a section. If you delete or inactivate this page, the section will create a new blank page in its place.</div>";
-                }
+                //bool IsLandingSection = false;
+                //bool IsLandingPageTemp = false;
+                ////
+                //// ----- special case messages
+                ////
+                //string CustomDescription = "";
+                //if (IsLandingSection) {
+                //    CustomDescription = "<div>This is the default Landing Section for this website. This section is displayed when no specific page is requested. It should not be deleted, renamed, marked inactive, blocked or hidden.</div>";
+                //} else if (IsLandingPageTemp) {
+                //    CustomDescription = "<div>This page is being used as the default Landing Page for this website, although it has not been set. This may be because a landing page has not been created, or it has been deleted. To make this page the permantent landing page, check the appropriate box in the control tab.</div>";
+                //} else if (IsLandingPage) {
+                //    CustomDescription = "<div>This is the default Landing Page for this website. It should not be deleted. You can not mark this record inactive, or use the Publish Date, Expire Date or Archive Date features.</div>";
+                //} else if (IsLandingPageParent) {
+                //    CustomDescription = "<div>This page is a parent of the default Landing Page for this website. It should not be deleted. You can not mark this record inactive, or use the Publish Date, Expire Date or Archive Date features.</div>";
+                //} else if (IsRootPage) {
+                //    CustomDescription = "<div>This page is a Root Page. A Root Page is the primary page of a section. If you delete or inactivate this page, the section will create a new blank page in its place.</div>";
+                //}
                 //
                 // ----- Determine TemplateIDForStyles
                 if (IsTemplateTable) {
@@ -5741,11 +5740,11 @@ namespace Contensive.Addons.AdminSite {
                 stringBuilderLegacyController resultBody = new stringBuilderLegacyController();
                 int FieldRows = 0;
                 string EditorString = null;
-                string MTMContent0 = null;
-                string MTMContent1 = null;
-                string MTMRuleContent = null;
-                string MTMRuleField0 = null;
-                string MTMRuleField1 = null;
+                //string MTMContent0 = null;
+                //string MTMContent1 = null;
+                //string MTMRuleContent = null;
+                //string MTMRuleField0 = null;
+                //string MTMRuleField1 = null;
                 string AlphaSort = null;
                 bool needUniqueEmailMessage = false;
                 //
@@ -6619,7 +6618,7 @@ namespace Contensive.Addons.AdminSite {
                 int RecordCount = 0;
                 int ContentWatchListID = 0;
                 stringBuilderLegacyController FastString = null;
-                string Copy = null;
+                //string Copy = null;
                 //adminUIController Adminui = new adminUIController(core);
                 //
                 if (adminContext.adminContent.allowContentTracking) {
@@ -7330,7 +7329,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // --- Start a form to make a refresh button
                 //
-                Stream.Add(htmlController.form_start(core));
+                //Stream.Add(htmlController.form_start(core));
                 Stream.Add(core.html.getPanelButtons(ButtonCancel + "," + ButtonRefresh, "" + RequestNameButton + ""));
                 Stream.Add("<input TYPE=\"hidden\" NAME=\"asf\" VALUE=\"" + AdminFormQuickStats + "\">");
                 Stream.Add(core.html.getPanel(" "));
@@ -7442,9 +7441,9 @@ namespace Contensive.Addons.AdminSite {
                     Stream.Add(core.html.getPanel(Panel, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 0));
                 }
                 Stream.Add("</td></tr></table>");
-                Stream.Add(htmlController.form_end());
+                //Stream.Add(htmlController.form_end());
                 //
-                tempGetForm_QuickStats = Stream.Text;
+                tempGetForm_QuickStats = htmlController.form(core, Stream.Text);
                 core.html.addTitle("Quick Stats");
                 return tempGetForm_QuickStats;
                 //
@@ -12606,7 +12605,7 @@ namespace Contensive.Addons.AdminSite {
                 Content = returnForm;
                 //
                 // Assemble LiveWindowTable
-                Stream.Add("\r\n" + htmlController.form_start(core));
+                //Stream.Add("\r\n" + htmlController.form_start(core));
                 Stream.Add(ButtonBar);
                 Stream.Add(TitleBar);
                 Stream.Add(Content);
@@ -12614,10 +12613,10 @@ namespace Contensive.Addons.AdminSite {
                 Stream.Add("<input type=hidden name=fieldcnt VALUE=" + FieldCnt + ">");
                 //Stream.Add( "<input type=hidden name=af VALUE=" & AdminFormIndex & ">")
                 Stream.Add("<input type=hidden name=" + RequestNameAdminSubForm + " VALUE=" + AdminFormIndex_SubFormAdvancedSearch + ">");
-                Stream.Add("</form>");
+                //Stream.Add("</form>");
                 //        Stream.Add( CloseLiveWindowTable)
                 //
-                returnForm = Stream.Text;
+                returnForm = htmlController.form( core, Stream.Text );
                 core.html.addTitle(adminContext.adminContent.name + " Advanced Search");
             } catch (Exception ex) {
                 logController.handleError(core, ex);

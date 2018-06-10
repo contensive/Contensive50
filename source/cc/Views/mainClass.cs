@@ -250,9 +250,7 @@ namespace Contensive.CLI {
                                             // run the taskscheduler in the console
                                             Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
                                             taskSchedulerController taskScheduler = new taskSchedulerController();
-                                            taskScheduler.allowVerboseLogging = true;
-                                            taskScheduler.allowConsoleWrite = true;
-                                            taskScheduler.startTimerEvents(true, false);
+                                            taskScheduler.startTimerEvents();
                                             object keyStroke = Console.ReadKey();
                                             taskScheduler.stopTimerEvents();
                                             exitArgumentProcessing = true;
@@ -274,11 +272,12 @@ namespace Contensive.CLI {
                                             //
                                             // -- run the taskrunner in the console
                                             Console.WriteLine("Beginning command line taskRunner. Hit any key to exit");
-                                            taskRunnerController taskRunner = new taskRunnerController();
-                                            taskRunner.startTimerEvents();
-                                            object keyStroke = Console.ReadKey();
-                                            taskRunner.stopTimerEvents();
-                                            exitArgumentProcessing = true;
+                                            using (taskRunnerController taskRunner = new taskRunnerController()) {
+                                                taskRunner.startTimerEvents();
+                                                object keyStroke = Console.ReadKey();
+                                                taskRunner.stopTimerEvents();
+                                                exitArgumentProcessing = true;
+                                            }
                                         } else {
                                             //
                                             // -- turn the windows service scheduler on/off
@@ -300,15 +299,13 @@ namespace Contensive.CLI {
                                             Console.WriteLine("Beginning command line taskScheduler and taskRunner. Hit any key to exit");
                                             //
                                             taskSchedulerController taskScheduler = new taskSchedulerController();
-                                            taskScheduler.allowVerboseLogging = true;
-                                            taskScheduler.allowConsoleWrite = true;
-                                            taskScheduler.startTimerEvents(true, false);
+                                            taskScheduler.startTimerEvents();
                                             //
-                                            taskRunnerController taskRunner = new taskRunnerController();
-                                            taskRunner.startTimerEvents();
-                                            //
-                                            object keyStroke = Console.ReadKey();
-                                            taskRunner.stopTimerEvents();
+                                            using (taskRunnerController taskRunner = new taskRunnerController()) {
+                                                taskRunner.startTimerEvents();
+                                                object keyStroke = Console.ReadKey();
+                                                taskRunner.stopTimerEvents();
+                                            }
                                             exitArgumentProcessing = true;
                                         } else {
                                             //

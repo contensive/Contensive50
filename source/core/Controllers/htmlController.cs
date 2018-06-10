@@ -899,32 +899,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlMethod"></param>
         /// <returns></returns>
         public static string form( coreController core,  string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post" ) {
-            return form_start(core, actionQueryString, htmlName, htmlClass, htmlId, htmlMethod) + innerHtml + form_end();
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// </summary>
-        [Obsolete("use form()", false)]
-        public static string form_start(coreController core, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post") {
             if (string.IsNullOrEmpty(actionQueryString)) actionQueryString = core.doc.refreshQueryString;
             string action = core.webServer.serverFormActionURL + (string.IsNullOrEmpty(actionQueryString) ? "" : "?" + actionQueryString);
             string result = "<form name=\"" + htmlName + "\" action=\"" + action + "\" method=\"" + htmlMethod + "\" style=\"display: inline;\"";
             result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
             result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
             result += (string.IsNullOrWhiteSpace(htmlClass)) ? "" : "" + " class=\"" + htmlClass + "\"";
-            return result + ">";
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Ends an HTML form
-        /// </summary>
-        /// <returns></returns>
-        //
-        [Obsolete("use form()", false)]
-        public static  string form_end() {
-            return "</form>";
+            result += ">";
+            return result + innerHtml + "</form>";
         }
         ////
         ////====================================================================================================
@@ -2422,7 +2404,7 @@ namespace Contensive.Processor.Controllers {
                 bool Found = false;
                 int RecordID = 0;
                 string SingularPrefixHtmlEncoded = null;
-                bool IsRuleCopySupported = false;
+                //bool IsRuleCopySupported = false;
                 bool AllowRuleCopy = false;
                 ////
                 //// IsRuleCopySupported - if true, the rule records include an allow button, and copy
@@ -2852,7 +2834,7 @@ namespace Contensive.Processor.Controllers {
                         //helpLink = main_GetHelpLink("2", "Contensive Tools Panel", BubbleCopy)
                         result += getPanelHeader("Contensive Tools Panel" + helpLink);
                         //
-                        ToolsPanel.Add(htmlController.form_start( core,WorkingQueryString));
+                        //ToolsPanel.Add(htmlController.form_start( core,WorkingQueryString));
                         ToolsPanel.Add(htmlController.inputHidden("Type", FormTypeToolsPanel));
                         //
                         if (true) {
@@ -3036,8 +3018,8 @@ namespace Contensive.Processor.Controllers {
                         + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
                         + genericController.nop(Copy) + "\r</table>";
                         ToolsPanel.Add(getPanelInput(Copy));
-                        ToolsPanel.Add(htmlController.form_end());
-                        result += getPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                        //ToolsPanel.Add(htmlController.form_end());
+                        result += getPanel(htmlController.form( core,  ToolsPanel.Text ), "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         //
                         result += getPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         //

@@ -23,14 +23,14 @@ namespace ContensiveTaskService {
                 //
                 logController.logInfo(cp.core, "Services.OnStart enter");
                 //
-                if (true) {
+                {
                     //
                     // -- start scheduler
                     logController.logInfo(cp.core, "Services.OnStart, call taskScheduler.startTimerEvents");
                     taskScheduler = new taskSchedulerController();
-                    taskScheduler.startTimerEvents(true, false);
+                    taskScheduler.startTimerEvents();
                 }
-                if (true) {
+                {
                     //
                     // -- start runner
                     logController.logInfo(cp.core, "Services.OnStart, call taskRunner.startTimerEvents");

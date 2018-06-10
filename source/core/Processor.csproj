@@ -243,6 +243,7 @@
     <Compile Include="Models\DbModels\memberRuleModel.cs" />
     <Compile Include="Models\DbModels\emailModel.cs" />
     <Compile Include="Models\DbModels\siteSectionModel.cs" />
+    <Compile Include="Models\DbModels\taskModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

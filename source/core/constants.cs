@@ -1366,7 +1366,7 @@ namespace Contensive.Processor {
         //
         public const string cache_linkForward_cacheName = "cache_linkForward";
         //
-        public const string main_cookieNameVisit = "visit";
+        public const string cookieNameVisit = "visit";
         public const string main_cookieNameVisitor = "visitor";
         public const string html_quickEdit_fpo = "<quickeditor>";
         //

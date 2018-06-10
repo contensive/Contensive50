@@ -389,7 +389,8 @@ namespace Contensive.Addons.Tools {
                         }
                     }
                 }
-                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -431,7 +432,8 @@ namespace Contensive.Addons.Tools {
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminFormToolRestart, "Contensive Application Restart", "Restart the Contensive Applicaiton. This will stop your site on the server for a short period."));
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminformToolCreateGUID, "Create GUID", "Use this tool to create a new GUID. This is useful when creating a new core.addon."));
                 Stream.Add("</table>");
-                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -1144,7 +1146,8 @@ namespace Contensive.Addons.Tools {
                 //
                 core.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
                 Stream.Add(htmlController.inputHidden("ReloadCDef", ReloadCDef));
-                result =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //result =  adminUIController.getToolFormOpen(core, ButtonList) +  + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -1569,7 +1572,8 @@ namespace Contensive.Addons.Tools {
                     ButtonList = ButtonList + "," + ButtonFix;
                     ButtonList = ButtonList + "," + ButtonFixAndRun;
                 }
-                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -1778,7 +1782,8 @@ namespace Contensive.Addons.Tools {
                 //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
                 Stream.Add("</SPAN>");
                 //
-                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -1809,7 +1814,8 @@ namespace Contensive.Addons.Tools {
                     Stream.Add("<br>Content Watch Link field cleared.");
                 }
                 Stream.Add("</span>");
-                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -1863,7 +1869,8 @@ namespace Contensive.Addons.Tools {
                     core.db.csClose(ref CSContent);
                 }
                 //
-                returnValue = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                returnValue = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //returnValue = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -2110,7 +2117,8 @@ namespace Contensive.Addons.Tools {
                 }
                 //
                 // Print Start Button
-                result =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //result =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -2454,7 +2462,8 @@ namespace Contensive.Addons.Tools {
                 //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
                 Stream.Add("</SPAN>");
                 //
-                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -2535,7 +2544,7 @@ namespace Contensive.Addons.Tools {
                     }
                 }
                 //
-                result += htmlController.form_start(core);
+                //result += htmlController.form_start(core);
                 TableColSpan = 3;
                 result += htmlController.tableStart(2, 0, 0);
                 //
@@ -2620,7 +2629,8 @@ namespace Contensive.Addons.Tools {
                 //
                 // Buttons
                 //
-                result = adminUIController.getToolFormOpen(core, ButtonList) + result + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, result, ButtonList);
+                //result = adminUIController.getToolFormOpen(core, ButtonList) + result + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -2691,7 +2701,8 @@ namespace Contensive.Addons.Tools {
                 result += kmaEndTable;
                 //
                 //GetForm_ContentDbSchema = GetForm_ContentDbSchema & core.main_GetFormInputHidden("af", AdminFormToolContentDbSchema)
-                result =  (adminUIController.getToolFormOpen(core, ButtonList)) + result + (adminUIController.getToolFormClose(core, ButtonList));
+                result = adminUIController.getToolForm(core, result, ButtonList);
+                //result =  (adminUIController.getToolFormOpen(core, ButtonList)) + result + (adminUIController.getToolFormClose(core, ButtonList));
                 //
                 //
                 // ----- Error Trap
@@ -2717,7 +2728,8 @@ namespace Contensive.Addons.Tools {
                 string QueryNew = genericController.modifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
                 tempGetForm_LogFiles = tempGetForm_LogFiles + genericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
                 //
-                tempGetForm_LogFiles = adminUIController.getToolFormOpen(core, ButtonList) + tempGetForm_LogFiles + (adminUIController.getToolFormClose(core, ButtonList));
+                tempGetForm_LogFiles = adminUIController.getToolForm(core, tempGetForm_LogFiles, ButtonList);
+                //tempGetForm_LogFiles = adminUIController.getToolFormOpen(core, ButtonList) + tempGetForm_LogFiles + (adminUIController.getToolFormClose(core, ButtonList));
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -2927,7 +2939,8 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("<br>");
                 Stream.Add("</span>");
                 //
-                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -2978,7 +2991,8 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("<br>");
                 Stream.Add("</SPAN>");
                 //
-                tempGetForm_Restart =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                tempGetForm_Restart = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //tempGetForm_Restart =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -3064,7 +3078,8 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("</SPAN>");
                 //
                 ButtonList = ButtonCancel + "," + ButtonImportTemplates;
-                result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -3496,7 +3511,8 @@ namespace Contensive.Addons.Tools {
                 core.db.csClose(ref CS);
                 Stream.Add(TopHalf + BottomHalf + htmlController.inputHidden("CDefRowCnt", RowPtr));
                 //
-                result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonFindAndReplace);
+                result = adminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonFindAndReplace);
+                //result = adminUIController.getToolFormOpen(core, ) + Stream.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -3535,7 +3551,8 @@ namespace Contensive.Addons.Tools {
                 //
                 // Display form
                 //
-                result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonIISReset) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonIISReset);
+                result = adminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonIISReset);
+                //result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonIISReset) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -3560,7 +3577,8 @@ namespace Contensive.Addons.Tools {
                 s.Add(htmlController.inputText( core,"GUID", genericController.getGUID(), 1, 80));
                 //
                 // Display form
-                result= adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonCreateGUID);
+                result = adminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonCreateGUID);
+                //result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonCreateGUID);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }

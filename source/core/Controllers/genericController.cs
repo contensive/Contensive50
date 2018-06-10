@@ -2110,8 +2110,8 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         // main_encodeCookieName, replace invalid cookie characters with %hex
         //
-        public static string main_encodeCookieName(string Source) {
-            return encodeURL(Source);
+        public static string encodeCookieName(string Source) {
+            return encodeURL(Source).ToLower();
         }
         //
         // ====================================================================================================

@@ -71,6 +71,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        [Obsolete("Only Sql Server currently supported", true)]
         public override int GetDataSourceType(string DataSourcename) {
             return cp.core.db.getDataSourceType(DataSourcename);
         }

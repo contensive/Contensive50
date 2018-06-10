@@ -1656,12 +1656,15 @@ namespace Contensive.Processor.Controllers {
                     RepeatBody = RepeatBody + Body;
                 }
                 //
-                result = ""
-                    + errorController.getUserError(core) 
-                    + htmlController.formMultipart_start(core, core.doc.refreshQueryString,"", "ccForm") 
+                string innerHtml = ""
                     + htmlController.inputHidden("ContensiveFormPageID", FormPageID) 
-                    + htmlController.inputHidden("SuccessID", securityController.encodeToken( core,GroupIDToJoinOnSuccess, core.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat 
-                    + htmlController.form_end();
+                    + htmlController.inputHidden("SuccessID", securityController.encodeToken(core, GroupIDToJoinOnSuccess, core.doc.profileStartTime)) 
+                    + f.PreRepeat 
+                    + RepeatBody 
+                    + f.PostRepeat;
+                result = ""
+                    + errorController.getUserError(core)
+                    + htmlController.formMultipart(core, innerHtml, core.doc.refreshQueryString, "", "ccForm");
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }

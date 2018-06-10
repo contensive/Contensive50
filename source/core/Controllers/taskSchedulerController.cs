@@ -17,9 +17,6 @@ using Contensive.Processor.Models.Context;
 //
 namespace Contensive.Processor.Controllers {
     public class taskSchedulerController : IDisposable {
-        private const string LogMsg = "For more information, see the Contensive Trace Log.";
-        public bool allowVerboseLogging = true;
-        public bool allowConsoleWrite = false;
         private System.Timers.Timer processTimer;
         private const int ProcessTimerMsecPerTick = 5000;
         private bool ProcessTimerInProcess;
@@ -42,7 +39,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // cp  creates and destroys cmc
                 //
-                GC.Collect();
+                //GC.Collect(); -- no more activeX, so let GC take care of itself
             }
         }
         //
@@ -70,9 +67,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="setVerbose"></param>
         /// <param name="singleThreaded"></param>
         /// <returns></returns>
-        public bool startTimerEvents(bool setVerbose, bool singleThreaded) {
+        public bool startTimerEvents() {
             bool returnStartedOk = false;
             try {
+                // todo StartServiceInProgress does nothing. windows will not call it twice
                 if (!StartServiceInProgress) {
                     StartServiceInProgress = true;
                     processTimer = new System.Timers.Timer(ProcessTimerMsecPerTick);
@@ -99,10 +97,9 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public void processTimerTick(object sender, EventArgs e) {
             try {
+                // windows holds one instance of this class. This check needs a lock to catch the non-threadsafe check-then-set here
                 if (!ProcessTimerInProcess) {
                     ProcessTimerInProcess = true;
-                    Stopwatch sw = new Stopwatch();
-                    sw.Start();
                     using (CPClass cp = new CPClass()) {
                         if (cp.core.serverConfig.allowTaskSchedulerService) {
                             scheduleTasks(cp.core);

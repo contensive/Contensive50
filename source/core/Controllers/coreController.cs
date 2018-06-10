@@ -1102,7 +1102,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     session = sessionController.create(this, allowVisit && siteProperties.allowVisitTracking);
                     //
-                    // -- debug printed defaults on, so if not on, set it off and clear what was collected
+                    // -- debug defaults on, so if not on, set it off and clear what was collected
                     doc.visitPropertyAllowDebugging = visitProperty.getBoolean("AllowDebugging");
                     if (!doc.visitPropertyAllowDebugging) {
                         doc.testPointMessage = "";

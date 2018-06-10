@@ -19,7 +19,8 @@ namespace Contensive.Processor.Controllers {
     public class taskRunnerController : IDisposable {
         //
         //==================================================================================================
-        //   Code copied from workerClass to both taskScheduler and taskRunner - remove what does not apply
+        //
+        // Only a single instance of this class exists, held by the taskService, which windows only creates once during service start.
         //
         //   taskScheduler queries each application from addons that need to run and adds them to the tasks queue (tasks sql table or SQS queue)
         //       taskScheduleTimer
@@ -27,8 +28,6 @@ namespace Contensive.Processor.Controllers {
         //   taskRunner polls the task queue and runs commands when found
         //       taskRunnerTimer
         //==================================================================================================
-        //
-        //Private core As coreClass
         //
         private string runnerGuid { get; set; } // set in constructor. used to tag tasks assigned to this runner
         //
@@ -70,12 +69,11 @@ namespace Contensive.Processor.Controllers {
                     //
                     // call .dispose for managed objects
                     //
-                    // core.dispose()
                 }
                 //
                 // cp  creates and destroys cmc
                 //
-                GC.Collect();
+                //GC.Collect(); -- no more activeX, so let GC take care of itself
             }
         }
         //
@@ -109,6 +107,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         protected void processTimerTick(object sender, EventArgs e) {
             try {
+                // non-thread safe. Use lock to prevent re-entry?
                 if (ProcessTimerInProcess) {
                     //
                     Console.WriteLine("taskRunner.processTimerTick, skip -- processTimerInProcess true");
@@ -142,52 +141,38 @@ namespace Contensive.Processor.Controllers {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 //
-                string command = null;
-                cmdDetailClass cmdDetail = null;
-                string cmdDetailText = null;
-                bool recordsRemaining = false;
-                int CS = 0;
-                string sql = null;
-                string AppName = null;
-                //
-                foreach (KeyValuePair<string, Models.Context.appConfigModel> kvp in serverCore.serverConfig.apps) {
-                    AppName = kvp.Value.name;
-                    //
-                    logController.logTrace(serverCore, "runTasks, appname=[" + AppName + "]");
+                foreach (KeyValuePair<string, Models.Context.appConfigModel> appKVP in serverCore.serverConfig.apps) {
                     //
                     // query tasks that need to be run
                     //
-                    using (CPClass cpApp = new CPClass(AppName)) {
-                        coreController appCore = cpApp.core;
-                        if (appCore.appConfig.appStatus == appConfigModel.appStatusEnum.ok) {
-                            //if ((appCore.appConfig.appStatus == appConfigModel.appStatusEnum.OK) && (appCore.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
+                    using (CPClass cpApp = new CPClass(appKVP.Value.name)) {
+                        //
+                        logController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "]");
+                        //
+                        if (cpApp.core.appConfig.appStatus == appConfigModel.appStatusEnum.ok) {
                             try {
+                                bool tasksRemaining = false;
                                 do {
                                     //
                                     // for now run an sql to get processes, eventually cache in variant cache
-                                    recordsRemaining = false;
-                                    sql = ""
-                                    + "\r\n BEGIN TRANSACTION"
-                                    + "\r\n update cctasks set cmdRunner=" + appCore.db.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
-                                    + "\r\n COMMIT TRANSACTION";
-                                    appCore.db.executeQuery(sql);
-                                    CS = appCore.db.csOpen("tasks", "(cmdRunner=" + appCore.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id");
-                                    if (appCore.db.csOk(CS)) {
+                                    tasksRemaining = false;
+                                    string sql = ""
+                                        + "\r\n BEGIN TRANSACTION"
+                                        + "\r\n update cctasks set cmdRunner=" + cpApp.core.db.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
+                                        + "\r\n COMMIT TRANSACTION";
+                                    cpApp.core.db.executeQuery(sql);
+                                    var taskList = taskModel.createList(cpApp.core, "(cmdRunner=" + cpApp.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)","id");
+                                    foreach (var task in taskList) {
                                         //
-                                        // -- execute a task
-                                        recordsRemaining = true;
-                                        appCore.db.csSet(CS, "datestarted", DateTime.Now);
-                                        appCore.db.csSave(CS);
+                                        logController.logTrace(cpApp.core, "runTasks, task [" + task.name + "], command [" + task.Command + "], cmdDetail [" + task.cmdDetail + "]");
                                         //
-                                        command = appCore.db.csGetText(CS, "command");
-                                        cmdDetailText = appCore.db.csGetText(CS, "cmdDetail");
-                                        cmdDetail = appCore.json.Deserialize<cmdDetailClass>(cmdDetailText);
-                                        //
-                                        logController.logTrace(appCore, "runTasks, task [" + appCore.db.csGetText(CS, "name") + "], command=[" + command + "], cmdDetailText=[" + cmdDetailText + "]");
-                                        //
-                                        switch ((command.ToLower())) {
+                                        tasksRemaining = true;
+                                        task.DateStarted = DateTime.Now;
+                                        task.save(cpApp.core);
+                                        cmdDetailClass cmdDetail = cpApp.core.json.Deserialize<cmdDetailClass>( task.cmdDetail);
+                                        switch ((task.Command.ToLower())) {
                                             case taskQueueCommandEnumModule.runAddon:
-                                                appCore.addon.execute(Models.DbModels.addonModel.create(appCore, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                                                cpApp.core.addon.execute(addonModel.create(cpApp.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                                     backgroundProcess = true,
                                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
                                                     instanceArguments = cmdDetail.docProperties,
@@ -195,12 +180,12 @@ namespace Contensive.Processor.Controllers {
                                                 });
                                                 break;
                                         }
-                                        appCore.db.csSet(CS, "datecompleted", DateTime.Now);
+                                        task.DateCompleted = DateTime.Now;
+                                        task.save(cpApp.core);
                                     }
-                                    appCore.db.csClose(ref CS);
-                                } while (recordsRemaining);
+                                } while (tasksRemaining);
                             } catch (Exception ex) {
-                                logController.handleError(appCore, ex);
+                                logController.handleError(cpApp.core, ex);
                             }
                         }
                     }

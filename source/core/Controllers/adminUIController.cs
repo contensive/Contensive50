@@ -1667,11 +1667,30 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public static string getToolForm(coreController core, string innerHtml, string buttonList) {
-            return ""
-                + getToolFormOpen(core, buttonList)
-                + htmlController.div(innerHtml, "p-4 bg-light")  
-                + getToolFormClose(core, buttonList);
+            string buttonHtml = (string.IsNullOrWhiteSpace(buttonList)) ? "" : core.html.getPanelButtons(buttonList, "Button");
+            string result = ""
+                + buttonHtml 
+                + htmlController.div(innerHtml, "p-4 bg-light") 
+                + buttonHtml;
+            return htmlController.form(core, result);
         }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// legacy compatibility
+        ///// </summary>
+        ///// <param name="core"></param>
+        ///// <param name="ButtonList"></param>
+        ///// <returns></returns>
+        //public static string getToolFormClose(coreController core, string ButtonList) {
+        //    string templegacy_closeFormTable = null;
+        //    if (!string.IsNullOrEmpty(ButtonList)) {
+        //        templegacy_closeFormTable = core.html.getPanelButtons(ButtonList, "Button") + "</form>";
+        //    } else {
+        //        templegacy_closeFormTable = "</form>";
+        //    }
+        //    return templegacy_closeFormTable;
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -1680,36 +1699,19 @@ namespace Contensive.Processor {
         /// <param name="core"></param>
         /// <param name="ButtonList"></param>
         /// <returns></returns>
-        public static string getToolFormClose(coreController core, string ButtonList) {
-            string templegacy_closeFormTable = null;
-            if (!string.IsNullOrEmpty(ButtonList)) {
-                templegacy_closeFormTable = core.html.getPanelButtons(ButtonList, "Button") + "</form>";
-            } else {
-                templegacy_closeFormTable = "</form>";
-            }
-            return templegacy_closeFormTable;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// legacy compatibility
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="ButtonList"></param>
-        /// <returns></returns>
-        public static string getToolFormOpen(coreController core, string ButtonList) {
-            string result = "";
-            try {
+        //public static string getToolFormOpen(coreController core, string ButtonList) {
+        //    string result = "";
+        //    try {
 
-                result = htmlController.form_start(core);
-                if (!string.IsNullOrEmpty(ButtonList)) {
-                    result += core.html.getPanelButtons(ButtonList, "Button");
-                }
-            } catch (Exception ex) {
-                logController.handleError(core, ex);
-            }
-            return result;
-        }
+        //        result = htmlController.form_start(core);
+        //        if (!string.IsNullOrEmpty(ButtonList)) {
+        //            result += core.html.getPanelButtons(ButtonList, "Button");
+        //        }
+        //    } catch (Exception ex) {
+        //        logController.handleError(core, ex);
+        //    }
+        //    return result;
+        //}
         //
         public static string getToolFormRow( coreController core, string asdf) {
             return htmlController.div(asdf, "p-1"); 
