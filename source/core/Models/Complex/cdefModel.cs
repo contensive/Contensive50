@@ -1532,7 +1532,7 @@ namespace Contensive.Processor.Models.Complex {
                         //
                         // Content Definition not found
                         //
-                        throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] was Not found In ccContent Table."));
+                        throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] was not found In ccContent Table."));
                     } else if (TableID <= 0) {
                         //
                         // Content Definition not found
@@ -1550,7 +1550,7 @@ namespace Contensive.Processor.Models.Complex {
                         TableName = "";
                         rs = core.db.executeQuery("Select Name, DataSourceID from ccTables where ID=" + core.db.encodeSQLNumber(TableID) + ";");
                         if (!dbController.isDataTableOk(rs)) {
-                            throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because table For tableID [" + TableID + "] was Not found."));
+                            throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because table For tableID [" + TableID + "] was not found."));
                         } else {
                             DataSourceID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
                             TableName = genericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
@@ -1570,7 +1570,7 @@ namespace Contensive.Processor.Models.Complex {
                                     // change condition to successful -- the goal is 1) deliver pages 2) report problems
                                     // this problem, if translated to default, is really no longer a problem, unless the
                                     // resulting datasource does not have this data, then other errors will be generated anyway.
-                                    //Call csv_HandleClassInternalError(MethodName, "Could Not create Field [" & field.name & "] because datasource For ID [" & DataSourceID & "] was Not found.")
+                                    //Call csv_HandleClassInternalError(MethodName, "Could Not create Field [" & field.name & "] because datasource For ID [" & DataSourceID & "] was not found.")
                                 } else {
                                     DataSourceName = genericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
                                 }

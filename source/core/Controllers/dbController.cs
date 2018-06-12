@@ -1338,7 +1338,7 @@ namespace Contensive.Processor.Controllers {
                                 SortField = SortField.Trim(' ');
                                 if (!CDef.selectList.Contains(SortField)) {
                                     //throw (New ApplicationException("Unexpected exception"))
-                                    throw (new ApplicationException("The field [" + SortField + "] was used In a sort method For content [" + ContentName + "], but the content does Not include this field."));
+                                    throw (new ApplicationException("The field [" + SortField + "] was used In a sort method For content [" + ContentName + "], but the content does not include this field."));
                                 }
                             }
                         }
@@ -1397,9 +1397,9 @@ namespace Contensive.Processor.Controllers {
                         // ----- Check for blank Tablename or DataSource
                         //
                         if (string.IsNullOrEmpty(TableName)) {
-                            throw (new Exception("Error opening csv_ContentSet because Content Definition [" + ContentName + "] does Not reference a valid table"));
+                            throw (new Exception("Error opening csv_ContentSet because Content Definition [" + ContentName + "] does not reference a valid table"));
                         } else if (string.IsNullOrEmpty(DataSourceName)) {
-                            throw (new Exception("Error opening csv_ContentSet because Table Definition [" + TableName + "] does Not reference a valid datasource"));
+                            throw (new Exception("Error opening csv_ContentSet because Table Definition [" + TableName + "] does not reference a valid datasource"));
                         }
                         //
                         // ----- If no select list, use *
@@ -1753,7 +1753,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 string fieldNameTrim = FieldName.Trim();
                 if (!csOk(CSPointer)) {
-                    throw new ApplicationException("Attempt To GetValue fieldname[" + fieldNameTrim + "], but the dataset Is empty Or does Not point To a valid row");
+                    throw new ApplicationException("Attempt To GetValue fieldname[" + fieldNameTrim + "], but the dataset Is empty Or does not point To a valid row");
                 } else {
                     var contentSet = contentSetStore[CSPointer];
                     bool fieldFound = false;
@@ -1954,7 +1954,7 @@ namespace Contensive.Processor.Controllers {
                 int Pos = 0;
                 //
                 if (!csOk(CSPointer)) {
-                    throw new ArgumentException("CSPointer does Not point To a valid dataset, it Is empty, Or it Is Not pointing To a valid row.");
+                    throw new ArgumentException("CSPointer does not point To a valid dataset, it Is empty, Or it Is Not pointing To a valid row.");
                 } else if (string.IsNullOrEmpty(FieldName)) {
                     throw new ArgumentException("Fieldname Is blank");
                 } else {
@@ -2275,9 +2275,9 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                     if (CDef == null) {
-                        throw new ArgumentException("ContentName [" + ContentName + "] was Not found");
+                        throw new ArgumentException("ContentName [" + ContentName + "] was not found");
                     } else if (CDef.id == 0) {
-                        throw new ArgumentException("ContentName [" + ContentName + "] was Not found");
+                        throw new ArgumentException("ContentName [" + ContentName + "] was not found");
                     } else {
                         //
                         // -- treat all deletes one at a time to invalidate the primary cache

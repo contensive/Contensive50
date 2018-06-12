@@ -2906,7 +2906,7 @@ namespace Contensive.Addons.AdminSite {
                     if (adminContext.adminContent.id == 0) {
                         throw (new Exception("The record can Not be edited because no content definition was specified."));
                     } else {
-                        throw (new Exception("The record can Not be edited because a content definition For ID [" + adminContext.adminContent.id + "] was Not found."));
+                        throw (new Exception("The record can Not be edited because a content definition For ID [" + adminContext.adminContent.id + "] was not found."));
                     }
                 } else {
                     //
@@ -3238,8 +3238,8 @@ namespace Contensive.Addons.AdminSite {
                     //        ' ----- Error: load blocked by UserAllowContentEdit
                     //        '
                     //        BlockEditForm = True
-                    //        Call core.htmldoc.main_AddUserError("Your account On this system does Not have access rights To edit this content.")
-                    //        Call HandleInternalError("AdminClass.LoadEditRecord_Dbase", "User does Not have access To this content")
+                    //        Call core.htmldoc.main_AddUserError("Your account On this system does not have access rights To edit this content.")
+                    //        Call HandleInternalError("AdminClass.LoadEditRecord_Dbase", "User does not have access To this content")
                 } else if (adminContent.fields.Count == 0) {
                     //
                     // ----- Error: content definition is not complete
@@ -3264,7 +3264,7 @@ namespace Contensive.Addons.AdminSite {
                         errorController.addUserError(core, "The information you have requested could not be found. The record could have been deleted, Or there may be a system Error.");
                         // removed because it was throwing too many false positives (1/14/04 - tried to do it again)
                         // If a CM hits the edit tag for a deleted record, this is hit. It should not cause the Developers to spend hours running down.
-                        //Call HandleInternalError("AdminClass.LoadEditRecord_Dbase", "Content edit record For [" & adminContent.Name & "." & EditRecord.ID & "] was Not found.")
+                        //Call HandleInternalError("AdminClass.LoadEditRecord_Dbase", "Content edit record For [" & adminContent.Name & "." & EditRecord.ID & "] was not found.")
                     } else {
                         //
                         // Read database values into RecordValuesVariant array
@@ -3534,7 +3534,7 @@ namespace Contensive.Addons.AdminSite {
         //            End If
         //        End If
         //    If Not FieldFound Then
-        //        Call HandleInternalError("AdminClass.LoadEditResponseByName", "Field [" & FieldName & "] was Not found In content [" & adminContext.content.Name & "]")
+        //        Call HandleInternalError("AdminClass.LoadEditResponseByName", "Field [" & FieldName & "] was not found In content [" & adminContext.content.Name & "]")
         //        End If
         //    '
         //    '''Dim th as integer: Exit Sub

@@ -871,7 +871,7 @@ namespace Contensive.Processor.Controllers {
                     // continue if no errors
                     //
                     if (Doc.DocumentElement.Name.ToLower() != genericController.vbLCase(DownloadFileRootNode)) {
-                        return_ErrorMessage = "The collection file from the server was Not valid for collection [" + CollectionGuid + "]";
+                        return_ErrorMessage = "The collection file from the server was not valid for collection [" + CollectionGuid + "]";
                         tempDownloadCollectionFiles = false;
                         logController.logInfo(core, errorPrefix + "The response has a basename [" + Doc.DocumentElement.Name + "] but [" + DownloadFileRootNode + "] was expected.");
                     } else {
@@ -924,7 +924,7 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // Skip this file because the collecion file link has no slash (no file)
                                                             //
-                                                            logController.logInfo(core, errorPrefix + "Collection [" + Collectionname + "] was Not installed because the Collection File Link does Not point to a valid file [" + CollectionFileLink + "]");
+                                                            logController.logInfo(core, errorPrefix + "Collection [" + Collectionname + "] was not installed because the Collection File Link does not point to a valid file [" + CollectionFileLink + "]");
                                                         } else {
                                                             CollectionFilePath = workingPath + CollectionFileLink.Substring(Pos);
                                                             core.privateFiles.saveHttpRequestToFile(CollectionFileLink, CollectionFilePath);

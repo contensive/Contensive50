@@ -172,7 +172,7 @@ function fixDialog(p_bEnableContextMenu){
 				break;
 			}
 
-			//==== fix keyboard navigation (does Not work, history object is always empty..) ====
+			//==== fix keyboard navigation (does not work, history object is always empty..) ====
 			case 8: {	// backspace
 				history.back();
 				break;
