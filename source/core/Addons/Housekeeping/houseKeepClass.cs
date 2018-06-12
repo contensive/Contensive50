@@ -1326,41 +1326,31 @@ namespace Contensive.Addons.Housekeeping {
         //====================================================================================================
         //
         private void HouseKeep_App_Daily_RemoveGuestRecords(coreController core, DateTime DeleteBeforeDate, int DataSourceType) {
+            int TimeoutSave = core.db.sqlCommandTimeout;
             try {
                 //
-                int TimeoutSave = 0;
-                string SQLCriteria = null;
-                string DeleteBeforeDateSQL = null;
-                string appName = null;
-                string SQLTablePeople = null;
-                //
                 // Set long timeout (30 min) needed for heavy work on big tables
-                //
-                TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
-                //
-                SQLTablePeople = Processor.Models.Complex.cdefModel.getContentTablename(core, "People");
-                //
-                appName = core.appConfig.name;
-                DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);
+                string SQLTablePeople = Processor.Models.Complex.cdefModel.getContentTablename(core, "People");
+                string DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);
                 //
                 logHousekeeping(core, "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");
-                SQLCriteria = ""
+                //
+                string SQLCriteria = ""
                     + " (LastVisit<" + DeleteBeforeDateSQL + ")"
                     + " and(createdbyvisit=1)"
                     + " and(Visits=1)"
                     + " and(Username is null)"
                     + " and(email is null)";
                 core.db.DeleteTableRecordChunks("default", "" + SQLTablePeople + "", SQLCriteria, 1000, 10000);
+            } catch (Exception ex) {
+                logController.handleError(core, ex);
+            }  finally { 
                 //
                 // restore sved timeout
-                //
                 core.db.sqlCommandTimeout = TimeoutSave;
-                return;
-                //
-            } catch (Exception ex) {
-                logController.handleError( core,ex);
             }
+            return;
         }
         //
         //=========================================================================================

@@ -488,51 +488,6 @@ namespace Contensive.Processor.Controllers {
                                 resultSessionContext.visit.VisitAuthenticated = false;
                                 resultSessionContext.visit.MemberID = 0;
                                 visit_changes = true;
-
-                                ////resultAuthContext.isAuthenticatedAdmin_cache_isLoaded = False
-                                ////resultAuthContext.property_user_isMember_isLoaded = False
-                                ////resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
-                                //bool TrackGuests = core.siteProperties.getBoolean("track guests", false);
-                                //if (!false) {
-                                //    //
-                                //    // -- do not track guests at all
-                                //    resultSessionContext.user = new personModel();
-                                //    resultSessionContext.user.name = DefaultMemberName;
-                                //    user_changes = false;
-                                //    resultSessionContext.visitor.MemberID = 0;
-                                //    visitor_changes = true;
-                                //    resultSessionContext.visit.VisitAuthenticated = false;
-                                //    resultSessionContext.visit.MemberID = 0;
-                                //    visit_changes = true;
-                                //    //
-                                //} else {
-                                //    if (resultSessionContext.visit.CookieSupport) {
-                                //        //
-                                //        // -- cookies supported, not first hit and not spider
-                                //        resultSessionContext.user = personModel.add(core);
-                                //        user_changes = true;
-                                //        resultSessionContext.visitor.MemberID = resultSessionContext.user.id;
-                                //        visitor_changes = true;
-                                //        resultSessionContext.visit.VisitAuthenticated = false;
-                                //        visit_changes = true;
-                                //    } else {
-                                //        if (core.siteProperties.trackGuestsWithoutCookies) {
-                                //            //
-                                //            // -- create people for non-cookies too
-                                //            //
-                                //            resultSessionContext.user = personModel.add(core);
-                                //            resultSessionContext.user.name = resultSessionContext.visit.name;
-                                //            user_changes = true;
-                                //        } else {
-                                //            //
-                                //            // set defaults for people object, but no record
-                                //            //
-                                //            resultSessionContext.user = new personModel();
-                                //            resultSessionContext.user.name = DefaultMemberName;
-                                //            user_changes = true;
-                                //        }
-                                //    }
-                                //}
                             }
                             //
                             // -- check for changes in interrelationships

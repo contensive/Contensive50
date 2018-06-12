@@ -137,14 +137,6 @@ namespace Contensive.Addons.Tools {
         //   dtdam       DefaultAddMenu
         //   dtblank     DefaultCreateBlankRecord
         //
-        //Dependencies:
-        //   LibCommon2.asp
-        //   LibAdmin3.asp
-        //   site field definitions
-        //
-        //   This file and its contents are copyright by Kidwell McGowan Associates.
-        //========================================================================
-        //
         //====================================================================================================
         /// <summary>
         /// constructor
@@ -156,10 +148,11 @@ namespace Contensive.Addons.Tools {
         }
         //
         //========================================================================
-        // Print the Tools page
-        //========================================================================
-        //
-        public string GetForm() {
+        /// <summary>
+        /// Print the Tools page from the admin site
+        /// </summary>
+        /// <returns></returns>
+        public string getToolsList() {
             string tempGetForm = null;
             try {
                 //
@@ -225,7 +218,7 @@ namespace Contensive.Addons.Tools {
                                 break;
                             case AdminFormToolDefineContentFieldsFromTable:
                                 //
-                                Stream.Add(GetForm_DefineContentFieldsFromTable());
+                                Stream.Add((new DefineContentFieldsFromTableClass()).Execute(core.cp_forAddonExecutionOnly).ToString());
                                 break;
                             case AdminFormToolConfigureListing:
                                 //
@@ -317,84 +310,6 @@ namespace Contensive.Addons.Tools {
                 logController.handleError( core,ex);
             }
             return tempGetForm;
-        }
-        //
-        //=============================================================================
-        //   Remove all Content Fields and rebuild them from the fields found in a table
-        //=============================================================================
-        //
-        private string GetForm_DefineContentFieldsFromTable() {
-            string result = "";
-            try {
-                //
-                string ContentName = null;
-                int ContentID = 0;
-                int ItemCount = 0;
-                int CSPointer = 0;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                string ButtonList = "";
-                //
-                Stream.Add(SpanClassAdminNormal + "<strong><A href=\"" + core.webServer.requestPage + "?af=" + AdminFormToolRoot + "\">Tools</A></strong></SPAN>");
-                Stream.Add(SpanClassAdminNormal + ":Create Content Fields from Table</SPAN>");
-                //
-                //   print out the submit form
-                //
-                Stream.Add("<table border=\"0\" cellpadding=\"11\" cellspacing=\"0\" width=\"100%\">");
-                //
-                Stream.Add("<tr><td colspan=\"2\">" + SpanClassAdminNormal);
-                Stream.Add("Delete the current content field definitions for this Content Definition, and recreate them from the table referenced by this content.");
-                Stream.Add("</SPAN></td></tr>");
-                //
-                Stream.Add("<tr>");
-                Stream.Add("<TD>" + SpanClassAdminNormal + "Content Name</SPAN></td>");
-                Stream.Add("<TD><Select name=\"ContentName\">");
-                ItemCount = 0;
-                CSPointer = core.db.csOpen("Content", "", "name");
-                while (core.db.csOk(CSPointer)) {
-                    Stream.Add("<option value=\"" + core.db.csGetText(CSPointer, "name") + "\">" + core.db.csGetText(CSPointer, "name") + "</option>");
-                    ItemCount = ItemCount + 1;
-                    core.db.csGoNext(CSPointer);
-                }
-                if (ItemCount == 0) {
-                    Stream.Add("<option value=\"-1\">System</option>");
-                }
-                Stream.Add("</select></td>");
-                Stream.Add("</tr>");
-                //
-                Stream.Add("<tr>");
-                Stream.Add("<TD>&nbsp;</td>");
-                Stream.Add("<TD>" + htmlController.getHtmlInputSubmit(ButtonCreateFields) + "</td>");
-                //Stream.Add("<TD><INPUT type=\"submit\" value=\"" + ButtonCreateFields + "\" name=\"Button\"></td>");
-                Stream.Add("</tr>");
-                //
-                Stream.Add("<tr>");
-                Stream.Add("<td width=\"150\"><IMG alt=\"\" src=\"/ccLib/Images/spacer.gif\" width=\"150\" height=\"1\"></td>");
-                Stream.Add("<td width=\"99%\"><IMG alt=\"\" src=\"/ccLib/Images/spacer.gif\" width=\"100%\" height=\"1\"></td>");
-                Stream.Add("</tr>");
-                Stream.Add("</TABLE>");
-                Stream.Add("</form>");
-                //
-                //   process the button if present
-                //
-                if (Button == ButtonCreateFields) {
-                    ContentName = core.docProperties.getText("ContentName");
-                    if (string.IsNullOrEmpty(ContentName)) {
-                        Stream.Add("Select a content before submitting. Fields were not changed.");
-                    } else {
-                        ContentID = Local_GetContentID(ContentName);
-                        if (ContentID == 0) {
-                            Stream.Add("GetContentID failed. Fields were not changed.");
-                        } else {
-                            core.db.deleteContentRecords("Content Fields", "ContentID=" + core.db.encodeSQLNumber(ContentID));
-                        }
-                    }
-                }
-                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
-            } catch (Exception ex) {
-                logController.handleError( core,ex);
-            }
-            return result;
         }
         //
         //=============================================================================

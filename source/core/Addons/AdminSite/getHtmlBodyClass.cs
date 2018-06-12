@@ -22,6 +22,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //====================================================================================================
         // objects passed in - do not dispose, sets cp from argument For use In calls To other objects, Then core because cp cannot be used since that would be a circular depenancy
+        //
         private CPClass cp; // local cp set in constructor
         private coreController core; // core -- short term, this is the migration solution from a built-in tool, to an addon
         //
@@ -125,7 +126,11 @@ namespace Contensive.Addons.AdminSite {
         }
         //
         //========================================================================
-        //
+        /// <summary>
+        /// return the html body for the admin site
+        /// </summary>
+        /// <param name="forceAdminContent"></param>
+        /// <returns></returns>
         private string getHtmlBody(string forceAdminContent = "") {
             string result = "";
             try {
@@ -305,7 +310,7 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminContext.AdminForm == AdminFormSecurityControl) {
                             AddonGuid = AddonGuidPreferences;
                         } else if (adminContext.AdminForm == AdminFormMetaKeywordTool) {
-                            adminBody = GetForm_MetaKeywordTool();
+                            adminBody = (new Contensive.Addons.Tools.MetakeywordToolClass()).Execute( cp ) as string;
                         } else if ((adminContext.AdminForm == AdminFormMobileBrowserControl) || (adminContext.AdminForm == AdminFormPageControl) || (adminContext.AdminForm == AdminFormEmailControl)) {
                             adminBody = core.addon.execute(AddonGuidPreferences, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
@@ -336,7 +341,7 @@ namespace Contensive.Addons.AdminSite {
                             adminBody = (GetForm_HouseKeepingControl());
                         } else if ((adminContext.AdminForm == AdminFormTools) || (adminContext.AdminForm >= 100 && adminContext.AdminForm <= 199)) {
                             legacyToolsClass Tools = new legacyToolsClass(core);
-                            adminBody = Tools.GetForm();
+                            adminBody = Tools.getToolsList();
                         } else if (adminContext.AdminForm == AdminFormStyleEditor) {
                             adminBody = (admin_GetForm_StyleEditor());
                         } else if (adminContext.AdminForm == AdminFormDownloads) {
@@ -445,107 +450,6 @@ namespace Contensive.Addons.AdminSite {
             return result;
         }
         //
-        //========================================================================
-        // Tool to enter multiple Meta Keywords
-        //========================================================================
-        //
-        private string GetForm_MetaKeywordTool() {
-            string tempGetForm_MetaKeywordTool = null;
-            try {
-                stringBuilderLegacyController Content = new stringBuilderLegacyController();
-                string Copy = null;
-                string Button = null;
-                //adminUIController Adminui = new adminUIController(core);
-                string Description = null;
-                string ButtonList = null;
-                string KeywordList = null;
-                //
-                Button = core.docProperties.getText(RequestNameButton);
-                if (Button == ButtonCancel) {
-                    //
-                    // Cancel just exits with no content
-                    //
-                    return tempGetForm_MetaKeywordTool;
-                } else if (!core.session.isAuthenticatedAdmin(core)) {
-                    //
-                    // Not Admin Error
-                    //
-                    ButtonList = ButtonCancel;
-                    Content.Add(adminUIController.GetFormBodyAdminOnly());
-                } else {
-                    Content.Add(adminUIController.EditTableOpen);
-                    //
-                    // Process Requests
-                    //
-                    switch (Button) {
-                        case ButtonSave:
-                        case ButtonOK:
-                            //
-                            string[] Keywords = null;
-                            string Keyword = null;
-                            int Cnt = 0;
-                            int Ptr = 0;
-                            DataTable dt = null;
-                            int CS = 0;
-                            KeywordList = core.docProperties.getText("KeywordList");
-                            if (!string.IsNullOrEmpty(KeywordList)) {
-                                KeywordList = genericController.vbReplace(KeywordList, "\r\n", ",");
-                                Keywords = KeywordList.Split(',');
-                                Cnt = Keywords.GetUpperBound(0) + 1;
-                                for (Ptr = 0; Ptr < Cnt; Ptr++) {
-                                    Keyword = Keywords[Ptr].Trim(' ');
-                                    if (!string.IsNullOrEmpty(Keyword)) {
-                                        //Dim dt As DataTable
-
-                                        dt = core.db.executeQuery("select top 1 ID from ccMetaKeywords where name=" + core.db.encodeSQLText(Keyword));
-                                        if (dt.Rows.Count == 0) {
-                                            CS = core.db.csInsertRecord("Meta Keywords");
-                                            if (core.db.csOk(CS)) {
-                                                core.db.csSet(CS, "name", Keyword);
-                                            }
-                                            core.db.csClose(ref CS);
-                                        }
-                                    }
-                                }
-                            }
-                            break;
-                    }
-                    if (Button == ButtonOK) {
-                        //
-                        // Exit on OK or cancel
-                        //
-                        return tempGetForm_MetaKeywordTool;
-                    }
-                    //
-                    // KeywordList
-                    //
-                    Copy = htmlController.inputTextarea(core, "KeywordList", "", 10);
-                    Copy += "<div>Paste your Meta Keywords into this text box, separated by either commas or enter keys. When you hit Save or OK, Meta Keyword records will be made out of each word. These can then be checked on any content page.</div>";
-                    Content.Add(adminUIController.getEditRowLegacy(core, Copy, "Paste Meta Keywords", "", false, false, ""));
-                    //
-                    // Buttons
-                    //
-                    ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK;
-                    //
-                    // Close Tables
-                    //
-                    Content.Add(adminUIController.EditTableClose);
-                    Content.Add(htmlController.inputHidden(rnAdminSourceForm, AdminFormSecurityControl));
-                }
-                //
-                Description = "Use this tool to enter multiple Meta Keywords";
-                tempGetForm_MetaKeywordTool = adminUIController.getBody(core, "Meta Keyword Entry Tool", ButtonList, "", true, true, Description, "", 0, Content.Text);
-                Content = null;
-                //
-                ///Dim th as integer: Exit Function
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                logController.handleError(core, ex);
-            }
-            return tempGetForm_MetaKeywordTool;
-        }
         //
         //
         //
@@ -12102,53 +12006,29 @@ namespace Contensive.Addons.AdminSite {
         //
         public static void SetIndexSQL_SaveIndexConfig(coreController core, indexConfigClass IndexConfig) {
             //
-            string FilterText = null;
-            string SubList = null;
-            int Ptr = 0;
-            //
-            // ----- Save filter state to the visit property
-            //
-            //
-            // -----------------------------------------------------------------------------------------------
-            //   Visit Properties (non-persistant)
-            // -----------------------------------------------------------------------------------------------
-            //
-            FilterText = "";
-            //
-            // Find words
-            //
-            SubList = "";
+            // --Find words
+            string SubList = "";
             foreach (var kvp in IndexConfig.FindWords) {
                 indexConfigFindWordClass findWord = kvp.Value;
                 if ((!string.IsNullOrEmpty(findWord.Name)) & (findWord.MatchOption != FindWordMatchEnum.MatchIgnore)) {
                     SubList = SubList + "\r\n" + findWord.Name + "\t" + findWord.Value + "\t" + (int)findWord.MatchOption;
                 }
             }
+            string FilterText = "";
             if (!string.IsNullOrEmpty(SubList)) {
-                FilterText = FilterText + "\r\nFindWordList" + SubList + "\r\n";
+                FilterText += "\r\nFindWordList" + SubList + "\r\n";
             }
             //
-            // CDef List
-            //
+            // --CDef List
             if (IndexConfig.SubCDefID > 0) {
-                FilterText = FilterText + "\r\nCDefList\r\n" + IndexConfig.SubCDefID + "\r\n";
+                FilterText += "\r\nCDefList\r\n" + IndexConfig.SubCDefID + "\r\n";
             }
-            //        SubList = ""
-            //        If .SubCDefCnt > 0 Then
-            //            For Ptr = 0 To .SubCDefCnt - 1
-            //                If .SubCDefs[Ptr] <> 0 Then
-            //                    SubList = SubList & vbCrLf & .SubCDefs[Ptr]
-            //                End If
-            //            Next
-            //        End If
-            //        If SubList <> "" Then
-            //            FilterText = FilterText & vbCrLf & "CDefList" & SubList & vbCrLf
-            //        End If
             //
-            // Group List
-            //
+            // -- Group List
             SubList = "";
             if (IndexConfig.GroupListCnt > 0) {
+                //
+                int Ptr = 0;
                 for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
                     if (!string.IsNullOrEmpty(IndexConfig.GroupList[Ptr])) {
                         SubList = SubList + "\r\n" + IndexConfig.GroupList[Ptr];
@@ -12156,63 +12036,57 @@ namespace Contensive.Addons.AdminSite {
                 }
             }
             if (!string.IsNullOrEmpty(SubList)) {
-                FilterText = FilterText + "\r\nGroupList" + SubList + "\r\n";
+                FilterText += "\r\nGroupList" + SubList + "\r\n";
             }
             //
             // PageNumber and Records Per Page
-            //
-            FilterText = FilterText + "\r\n"
+            FilterText += "\r\n"
                 + "\r\npagenumber"
                 + "\r\n" + IndexConfig.PageNumber;
-            FilterText = FilterText + "\r\n"
+            FilterText += "\r\n"
                 + "\r\nrecordsperpage"
                 + "\r\n" + IndexConfig.RecordsPerPage;
             //
             // misc filters
-            //
             if (IndexConfig.ActiveOnly) {
-                FilterText = FilterText + "\r\n"
+                FilterText += "\r\n"
                     + "\r\nIndexFilterActiveOnly";
             }
             if (IndexConfig.LastEditedByMe) {
-                FilterText = FilterText + "\r\n"
+                FilterText += "\r\n"
                     + "\r\nIndexFilterLastEditedByMe";
             }
             if (IndexConfig.LastEditedToday) {
-                FilterText = FilterText + "\r\n"
+                FilterText += "\r\n"
                     + "\r\nIndexFilterLastEditedToday";
             }
             if (IndexConfig.LastEditedPast7Days) {
-                FilterText = FilterText + "\r\n"
+                FilterText += "\r\n"
                     + "\r\nIndexFilterLastEditedPast7Days";
             }
             if (IndexConfig.LastEditedPast30Days) {
-                FilterText = FilterText + "\r\n"
+                FilterText += "\r\n"
                     + "\r\nIndexFilterLastEditedPast30Days";
             }
             if (IndexConfig.Open) {
-                FilterText = FilterText + "\r\n"
+                FilterText += "\r\n"
                     + "\r\nIndexFilterOpen";
             }
             //
             core.visitProperty.setProperty(adminContextClass.IndexConfigPrefix + encodeText(IndexConfig.ContentID), FilterText);
             //
-            // -----------------------------------------------------------------------------------------------
             //   Member Properties (persistant)
-            // -----------------------------------------------------------------------------------------------
-            //
-            FilterText = "";
             //
             // Save Admin Column
-            //
             SubList = "";
             foreach (var column in IndexConfig.columns) {
                 if (!string.IsNullOrEmpty(column.Name)) {
                     SubList = SubList + "\r\n" + column.Name + "\t" + column.Width;
                 }
             }
+            FilterText = "";
             if (!string.IsNullOrEmpty(SubList)) {
-                FilterText = FilterText + "\r\nColumns" + SubList + "\r\n";
+                FilterText += "\r\nColumns" + SubList + "\r\n";
             }
             //
             // Sorts
@@ -12225,7 +12099,7 @@ namespace Contensive.Addons.AdminSite {
                 }
             }
             if (!string.IsNullOrEmpty(SubList)) {
-                FilterText = FilterText + "\r\nSorts" + SubList + "\r\n";
+                FilterText += "\r\nSorts" + SubList + "\r\n";
             }
             core.userProperty.setProperty(adminContextClass.IndexConfigPrefix + encodeText(IndexConfig.ContentID), FilterText);
             //

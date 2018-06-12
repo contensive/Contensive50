@@ -120,15 +120,13 @@ namespace Contensive.Addons.Email {
                         // Send the email to all selected people
                         //
                         string LastEmail = null;
-                        string Email = null;
-                        string PeopleName = null;
                         string EmailStatusList = "";
                         LastEmail = "empty";
                         while (core.db.csOk(CSPeople)) {
                             int PeopleID = core.db.csGetInteger(CSPeople, "MemberID");
-                            Email = core.db.csGetText(CSPeople, "Email");
+                            string Email = core.db.csGetText(CSPeople, "Email");
                             if (Email == LastEmail) {
-                                PeopleName = core.db.getRecordName("people", PeopleID);
+                                string PeopleName = core.db.getRecordName("people", PeopleID);
                                 if (string.IsNullOrEmpty(PeopleName)) {
                                     PeopleName = "user #" + PeopleID;
                                 }
@@ -147,34 +145,6 @@ namespace Contensive.Addons.Email {
                         string EmailCopy = core.db.csGet(CSEmail, "copyfilename");
                         int ConfirmationMemberID = core.db.csGetInteger(CSEmail, "testmemberid");
                         queueConfirmationEmail(core, ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, PrimaryLink, EmailSubject, EmailCopy, "", EmailFrom, EmailStatusList);
-                        //            CSPeople = core.asv.csOpenRecord("people", ConfirmationMemberID)
-                        //            If core.asv.csv_IsCSOK(CSPeople) Then
-                        //                ClickFlagQuery = RequestNameEmailClickFlag & "=" & EmailDropID & "&" & RequestNameEmailMemberID & "=" & ConfirmationMemberID
-                        //                EmailTemplate = core.csv_EncodeContent(EmailTemplate, ConfirmationMemberID, -1, False, EmailAddLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink)
-                        //                EmailSubject = core.csv_EncodeContent(core.csv_cs_get(CSEmail, "Subject"), ConfirmationMemberID, , True, False, False, False, False, True, , "http://" & GetPrimaryDomainName())
-                        //                EmailBody = core.csv_EncodeContent(core.csv_cs_get(CSEmail, "CopyFilename"), ConfirmationMemberID, , False, EmailAddLinkEID, True, True, False, True, , "http://" & GetPrimaryDomainName())
-                        //                'EmailFrom = core.csv_cs_get(CSEmail, "FromAddress")
-                        //                Confirmation = "<HTML><Head>" _
-                        //                    & "<Title>Email Confirmation</Title>" _
-                        //                    & "<Base href=""http://" & GetPrimaryDomainName() & core.csv_RootPath & """>" _
-                        //                    & emailStyles _
-                        //                    & "</Head><BODY>" _
-                        //                    & "The follow email has been sent" & BR & BR _
-                        //                    & "Subject: " & EmailSubject & BR _
-                        //                    & "From: " & EmailFrom & BR _
-                        //                    & "Body" & BR _
-                        //                    & "----------------------------------------------------------------------" & BR _
-                        //                    & core.csv_MergeTemplate(EmailTemplate, EmailBody, ConfirmationMemberID) & BR _
-                        //                    & "----------------------------------------------------------------------" & BR _
-                        //                    & "--- email list ---" & BR _
-                        //                    & EmailStatusList _
-                        //                    & "--- end email list ---" & BR _
-                        //                    & "</BODY></HTML>"
-                        //                Confirmation = ConvertLinksToAbsolute(Confirmation, PrimaryLink & "/")
-                        //                Call core.csv_SendEmail2(core.asv.csv_cs_getText(CSPeople, "Email"), EmailFrom, "Email Confirmation from " & GetPrimaryDomainName(), Confirmation, "", "", , True, True)
-                        //                End If
-                        //            Call core.asv.csv_CloseCS(CSPeople)
-                        //
                         core.db.csGoNext(CSEmail);
                     }
                 }
