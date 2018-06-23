@@ -33,6 +33,25 @@ namespace Contensive.Processor.Controllers {
         public sitePropertiesController(coreController core) : base() {
             this.core = core;
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// if true, add a login icon to the lower right corner
+        /// </summary>
+        public bool allowLoginIcon {
+            get {
+                if (_allowLoginIcon==null) {
+                    // 20180622 - default false not true
+                    _allowLoginIcon = getBoolean("AllowLoginIcon", false);
+                }
+                return Convert.ToBoolean(_allowLoginIcon);
+            }
+        } private bool? _allowLoginIcon = null;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The id of the addon to run with no specific route is found
+        /// </summary>
         public int defaultRouteId {
             get {
                 return getInteger(spDefaultRouteAddonId);

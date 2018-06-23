@@ -192,13 +192,18 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="SQL"></param>
         /// <param name="DataSourcename"></param>
-        /// <param name="Retries"></param>
-        /// <param name="PageSize"></param>
-        /// <param name="PageNumber"></param>
+        /// <param name="ignoreRetries"></param>
+        /// <param name="ignorePageSize"></param>
+        /// <param name="ignorePageNumber"></param>
         /// <returns></returns>
         [Obsolete("deprecated. Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
-        public override object ExecuteSQL(string SQL, string DataSourcename = "Default", string Retries = "0", string PageSize = "10", string PageNumber = "1") {
-            throw new NotImplementedException("ADODB is not supported. Convert to executeQuery, executeNonQuery and executeNonQueryAsync");
+        public override object ExecuteSQL(string SQL, string DataSourcename = "Default", string ignoreRetries = "0", string ignorePageSize = "10", string ignorePageNumber = "1") {
+            int recordsAffected = 0;
+            cp.core.db.executeNonQuery(SQL, DataSourcename,ref recordsAffected);
+            if ( !recordsAffected.Equals(0)) {
+                throw new NotImplementedException("ExecuteSql no longer supports returning recordsets, as ADODB is not supported. Convert to executeQuery, executeNonQuery and executeNonQueryAsync");
+            }
+            return null;
             //return cp.core.db.executeSql_getRecordSet(SQL, DataSourcename, Controllers.genericController.encodeInteger(PageNumber) * Controllers.genericController.encodeInteger(PageSize), Controllers.genericController.encodeInteger(PageSize));
         }
         //

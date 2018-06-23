@@ -781,7 +781,7 @@ namespace Contensive.Processor.Controllers {
                 string Link = null;
                 string IconFilename = null;
                 //
-                if (core.siteProperties.getBoolean("AllowLoginIcon", true)) {
+                if (core.siteProperties.allowLoginIcon) {
                     result += "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">";
                     result += "<tr><td align=\"right\">";
                     if (core.session.isAuthenticatedContentManager(core)) {

@@ -161,7 +161,7 @@ namespace Contensive.BaseClasses
         //
         // deprecated
         //
-        [Obsolete("deprecated. Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
+        [Obsolete("deprecated. Executes non-query calls, but no longer returns a recordset. Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL, string DataSourcename = "Default", string Retries = "0", string PageSize = "10", string PageNumber = "1");
         //
 		public abstract int SQLTimeout {get; set;}
