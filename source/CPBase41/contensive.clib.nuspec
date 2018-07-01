@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>contensive.clib</id>
-    <version>5.0.1</version>
+    <id>Contensive.BaseClasses</id>
+    <version>4.1.2</version>
     <title>Contensive Addon API</title>
     <authors>Contensive</authors>
     <owners>Contensive</owners>
-    <licenseUrl>http://clib.io</licenseUrl>
-    <projectUrl>http://clib.io</projectUrl>
-    <iconUrl>http://clib.io/img/ContensiveLogo2-385x60.png</iconUrl>
+    <licenseUrl>http://contensive.io</licenseUrl>
+    <projectUrl>http://contensive.io</projectUrl>
+    <iconUrl>http://contensive.io/img/ContensiveLogo2-385x60.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>This package adds a reference to the Contensive cp base classes. See project URL for how to configure a project.</description>
+    <description>Contensive 4.1.2 is legacy and no longer supported. Please use Contensive 5.0+. This package adds a reference to the Contensive CP base classes. References to these classes are neccessary to create Contensive Addons.</description>
     <releaseNotes></releaseNotes>
-    <copyright>Copyright 2017</copyright>
+    <copyright>Copyright 2018</copyright>
     <tags></tags>
   </metadata>
     <files>

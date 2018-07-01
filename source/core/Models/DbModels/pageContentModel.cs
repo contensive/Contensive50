@@ -27,7 +27,6 @@ namespace Contensive.Processor.Models.DbModels {
         // -- instance properties
         public bool AllowBrief { get; set; }
         public bool AllowChildListDisplay { get; set; }
-        public bool AllowEmailPage { get; set; }
         public bool AllowFeedback { get; set; }
         public bool AllowHitNotification { get; set; }
         public bool AllowInChildLists { get; set; }
@@ -36,7 +35,8 @@ namespace Contensive.Processor.Models.DbModels {
         public bool AllowMessageFooter { get; set; }
         public bool AllowMetaContentNoFollow { get; set; }
         public bool AllowMoreInfo { get; set; }
-        public bool AllowPrinterVersion { get; set; }
+        //// deprecated 20180701
+        //public bool AllowPrinterVersion { get; set; }
         public bool AllowReturnLinkDisplay { get; set; }
         public bool AllowReviewedFooter { get; set; }
         public bool AllowSeeAlso { get; set; }

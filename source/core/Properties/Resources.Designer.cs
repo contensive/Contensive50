@@ -68,7 +68,8 @@ namespace Contensive.Processor.Properties {
         ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only pt-2&quot;&gt;Email address&lt;/label&gt;
         ///		&lt;input type=&quot;email&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control pt-2&quot; placeholder=&quot;Username&quot; required autofocus&gt;
         ///	&lt;/div&gt;
-        ///	&lt;div class=&quot;pt-2&quot;&gt;        /// [rest of string was truncated]&quot;;.
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         public static string defaultForgetPassword_html {
             get {
@@ -146,6 +147,26 @@ namespace Contensive.Processor.Properties {
         public static string defaultLogin_html {
             get {
                 return ResourceManager.GetString("defaultLogin_html", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;nav class=&quot;navbar navbar-default&quot; role=&quot;navigation&quot;&gt;
+        ///    &lt;div class=&quot;navbar-collapse collapse&quot;&gt;
+        ///        {% {&quot;addon&quot;:{&quot;addon&quot;:&quot;Menu Pages&quot;,&quot;instanceId&quot;:&quot;Home Top Nav&quot;}} %}
+        ///    &lt;/div&gt;
+        ///&lt;/nav&gt;
+        ///&lt;div class=&quot;container&quot;&gt;
+        ///    &lt;div class=&quot;row&quot;&gt;
+        ///        &lt;div class=&quot;col-lg-12&quot;&gt;
+        ///            {% &quot;Content Box&quot; %}
+        ///        &lt;/div&gt;
+        ///    &lt;/div&gt;
+        ///&lt;/div&gt;.
+        /// </summary>
+        public static string DefaultTemplateHtml {
+            get {
+                return ResourceManager.GetString("DefaultTemplateHtml", resourceCulture);
             }
         }
     }

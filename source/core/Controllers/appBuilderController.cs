@@ -243,6 +243,7 @@ namespace Contensive.Processor.Controllers {
                         pageContentModel landingPage = pageContentModel.create(core, DefaultLandingPageGuid);
                         if (landingPage == null) {
                             landingPage = pageContentModel.add(core);
+                            landingPage.name = "Home";
                             landingPage.ccguid = DefaultLandingPageGuid;
                         }
                         //
@@ -252,6 +253,9 @@ namespace Contensive.Processor.Controllers {
                             defaultTemplate = pageTemplateModel.add(core);
                             defaultTemplate.name = "Default";
                         }
+                        defaultTemplate.bodyHTML = Properties.Resources.DefaultTemplateHtml;
+                        defaultTemplate.save(core);
+                        //
                         domain.defaultTemplateId = defaultTemplate.id;
                         domain.name = primaryDomain;
                         domain.pageNotFoundPageId = landingPage.id;
@@ -263,9 +267,6 @@ namespace Contensive.Processor.Controllers {
                         landingPage.TemplateID = defaultTemplate.id;
                         landingPage.Copyfilename.content = constants.defaultLandingPageHtml;
                         landingPage.save(core);
-                        //
-                        defaultTemplate.bodyHTML = core.appRootFiles.readFileText(defaultTemplateHomeFilename);
-                        defaultTemplate.save(core);
                         //
                         if (core.siteProperties.getInteger("LandingPageID", landingPage.id) == 0) {
                             core.siteProperties.setProperty("LandingPageID", landingPage.id);

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>contensive.clib</id>
+    <id>Contensive.BaseClasses</id>
     <version>5.0.2</version>
-    <title>Contensive Addon API</title>
+    <title>Contensive Addon API Base Classes</title>
     <authors>Contensive</authors>
     <owners>Contensive</owners>
     <licenseUrl>http://contensive.io</licenseUrl>

@@ -83,7 +83,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     string LocalTemplateBody = core.doc.pageController.template.bodyHTML;
                     if (string.IsNullOrEmpty(LocalTemplateBody)) {
-                        LocalTemplateBody = TemplateDefaultBody;
+                        LocalTemplateBody = Properties.Resources.DefaultTemplateHtml;
                     }
                     //
                     // -- no section block, continue
@@ -2216,37 +2216,38 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 result += breadCrumb;
-                //
-                if (true) {
-                    string IconRow = "";
-                    if ((!core.session.visit.Bot) & (core.doc.pageController.page.AllowPrinterVersion | core.doc.pageController.page.AllowEmailPage)) {
-                        //
-                        // not a bot, and either print or email allowed
-                        //
-                        if (core.doc.pageController.page.AllowPrinterVersion) {
-                            string QueryString = core.doc.refreshQueryString;
-                            QueryString = genericController.modifyQueryString(QueryString, rnPageId, genericController.encodeText(core.doc.pageController.page.id), true);
-                            QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, true);
-                            string Caption = core.siteProperties.getText("PagePrinterVersionCaption", "Printer Version");
-                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;");
-                            IconRow = IconRow + "\r&nbsp;&nbsp;<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\"><img alt=\"image\" src=\"/ccLib/images/IconSmallPrinter.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
-                        }
-                        if (core.doc.pageController.page.AllowEmailPage) {
-                            string QueryString = core.doc.refreshQueryString;
-                            if (!string.IsNullOrEmpty(QueryString)) {
-                                QueryString = "?" + QueryString;
-                            }
-                            string EmailBody = core.webServer.requestProtocol + core.webServer.requestDomain + core.webServer.requestPathPage + QueryString;
-                            string Caption = core.siteProperties.getText("PageAllowEmailCaption", "Email This Page");
-                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;");
-                            IconRow = IconRow + "\r&nbsp;&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\"><img alt=\"image\" src=\"/ccLib/images/IconSmallEmail.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(IconRow)) {
-                        result += "\r<div style=\"text-align:right;\">"
-                        + genericController.nop(IconRow) + "\r</div>";
-                    }
-                }
+                // deprected 20180701
+                ////
+                //if (true) {
+                //    string IconRow = "";
+                //    if ((!core.session.visit.Bot) & (core.doc.pageController.page.AllowPrinterVersion | core.doc.pageController.page.AllowEmailPage)) {
+                //        //
+                //        // not a bot, and either print or email allowed
+                //        //
+                //        if (core.doc.pageController.page.AllowPrinterVersion) {
+                //            string QueryString = core.doc.refreshQueryString;
+                //            QueryString = genericController.modifyQueryString(QueryString, rnPageId, genericController.encodeText(core.doc.pageController.page.id), true);
+                //            QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, true);
+                //            string Caption = core.siteProperties.getText("PagePrinterVersionCaption", "Printer Version");
+                //            Caption = genericController.vbReplace(Caption, " ", "&nbsp;");
+                //            IconRow = IconRow + "\r&nbsp;&nbsp;<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\"><img alt=\"image\" src=\"/ccLib/images/IconSmallPrinter.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
+                //        }
+                //        if (core.doc.pageController.page.AllowEmailPage) {
+                //            string QueryString = core.doc.refreshQueryString;
+                //            if (!string.IsNullOrEmpty(QueryString)) {
+                //                QueryString = "?" + QueryString;
+                //            }
+                //            string EmailBody = core.webServer.requestProtocol + core.webServer.requestDomain + core.webServer.requestPathPage + QueryString;
+                //            string Caption = core.siteProperties.getText("PageAllowEmailCaption", "Email This Page");
+                //            Caption = genericController.vbReplace(Caption, " ", "&nbsp;");
+                //            IconRow = IconRow + "\r&nbsp;&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\"><img alt=\"image\" src=\"/ccLib/images/IconSmallEmail.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
+                //        }
+                //    }
+                //    if (!string.IsNullOrEmpty(IconRow)) {
+                //        result += "\r<div style=\"text-align:right;\">"
+                //        + genericController.nop(IconRow) + "\r</div>";
+                //    }
+                //}
                 //
                 // ----- Start Text Search
                 //

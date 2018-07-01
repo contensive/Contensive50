@@ -388,7 +388,8 @@ namespace Contensive.Processor {
         public const string LegacyInterceptPageSNImageUpload = "ka983lm039";
         public const string LegacyInterceptPageSNMyProfile = "k09ddk9105";
         public const string LegacyInterceptPageSNLogin = "6ge42an09a";
-        public const string LegacyInterceptPageSNPrinterVersion = "l6d09a10sP";
+        // deprecated 20180701
+        //public const string LegacyInterceptPageSNPrinterVersion = "l6d09a10sP";
         public const string LegacyInterceptPageSNUploadEditor = "k0hxp2aiOZ";
         //
         //-----------------------------------------------------------------------
@@ -460,7 +461,8 @@ namespace Contensive.Processor {
         public const string HardCodedPageLogin = "login";
         public const string HardCodedPageLoginDefault = "logindefault";
         public const string HardCodedPageMyProfile = "myprofile";
-        public const string HardCodedPagePrinterVersion = "printerversion";
+        // deprecated 20180701
+        //public const string HardCodedPagePrinterVersion = "printerversion";
         public const string HardCodedPageResourceLibrary = "resourcelibrary";
         public const string HardCodedPageLogoutLogin = "logoutlogin";
         public const string HardCodedPageLogout = "logout";
@@ -486,7 +488,8 @@ namespace Contensive.Processor {
         public const string PageOptionForceMobile = "forcemobile";
         public const string PageOptionForceNonMobile = "forcenonmobile";
         public const string PageOptionLogout = "logout";
-        public const string PageOptionPrinterVersion = "printerversion";
+        // deprecated 20180701
+        //public const string PageOptionPrinterVersion = "printerversion";
         //
         // convert to options later
         //
@@ -1169,12 +1172,12 @@ namespace Contensive.Processor {
         //
         public const string TemplateDefaultName = "Default";
         //Public Const TemplateDefaultBody As String = "<!--" & vbCrLf & "Default Template - edit this Page Template, or select a different template for your page or section" & vbCrLf & "-->{{DYNAMICMENU?MENU=}}<br>{{CONTENT}}"
-        public const string TemplateDefaultBody = ""
-            + "\r\n\t<!--"
-            + "\r\n\tDefault Template - edit this Page Template, or select a different template for your page or section"
-            + "\r\n\t-->"
-            + "\r\n\t{% {\"addon\":{\"addon\":\"menu\",\"menu\":\"Default\"}} %}"
-            + "\r\n\t{% \"content box\" %}";
+        //public const string TemplateDefaultBody = ""
+        //    + "\r\n\t<!--"
+        //    + "\r\n\tDefault Template - edit this Page Template, or select a different template for your page or section"
+        //    + "\r\n\t-->"
+        //    + "\r\n\t{% {\"addon\":{\"addon\":\"menu\",\"menu\":\"Default\"}} %}"
+        //    + "\r\n\t{% \"content box\" %}";
         public const string TemplateDefaultBodyTag = "<body class=\"ccBodyWeb\">";
         //
         //=======================================================================

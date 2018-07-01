@@ -68,7 +68,8 @@ namespace Contensive.Processor.Models.Context {
         public string username = "";
         public string password = "";
         //
-        // -- used by applications to enable/disable features, like ecommerce batch
+        // -- used by applications to enable/disable features, like 
+        //      - ecommerce batch should only run in production
         // todo figure out how to expose this, add it to configuration setup
         public bool productionEnvironment = true;
         public bool enableLogging = false;

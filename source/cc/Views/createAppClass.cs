@@ -25,7 +25,6 @@ namespace Contensive.CLI {
 
 
                 DateTime rightNow = DateTime.Now;
-                System.Web.Script.Serialization.JavaScriptSerializer json = new System.Web.Script.Serialization.JavaScriptSerializer();
                 authToken = authTokenDefault;
                 //
                 using (CPClass cp = new CPClass()) {
@@ -218,13 +217,14 @@ namespace Contensive.CLI {
                     Contensive.Processor.Controllers.logController.logInfo(cp.core, "Create database.");
                     cp.core.dbServer.createCatalog(appName);
                     //
-                    // copy in the pattern files 
-                    //  - the only pattern is aspx
-                    //  - this is cc running, so they are setting up new application which may or may not have a webrole here.
-                    //  - setup a basic webrole just in case this will include one -- maybe later make it an option
-                    //
-                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Copy default site to www folder.");
-                    cp.core.programFiles.copyFolder("resources\\iisDefaultSite\\", "\\", cp.core.appRootFiles);
+                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "When app creating is complete, use IIS Import Application to install either you web application, or the Contensive IISDefault.zip application.");
+                    //// copy in the pattern files 
+                    ////  - the only pattern is aspx
+                    ////  - this is cc running, so they are setting up new application which may or may not have a webrole here.
+                    ////  - setup a basic webrole just in case this will include one -- maybe later make it an option
+                    ////
+                    //Contensive.Processor.Controllers.logController.logInfo(cp.core, "Copy default site to www folder.");
+                    //cp.core.programFiles.copyFolder("resources\\iisDefaultSite\\", "\\", cp.core.appRootFiles);
                     //
                     // replace "appName" with blank to use iis siteName as appName, or the name of this app in the default document in the apps public folder
                     //
@@ -247,7 +247,8 @@ namespace Contensive.CLI {
                     cp.core.serverConfig.saveObject(cp.core);
                     cp.core.siteProperties.setProperty(constants.siteproperty_serverPageDefault_name, iisDefaultDoc);
                     //
-                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Upgrad complete.");
+                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Upgrade complete.");
+                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Use IIS Import Application to install either you web application, or the Contensive IISDefault.zip application.");
                 }
                 //
             } catch (Exception ex) {

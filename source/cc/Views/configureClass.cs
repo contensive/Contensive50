@@ -16,7 +16,6 @@ namespace Contensive.CLI {
                 // if you get a cluster object from cp with a key, and the key gives you access, you have a cluster object to create an app
                 //
                 //System.IO.DriveInfo drive;
-                System.Web.Script.Serialization.JavaScriptSerializer json = new System.Web.Script.Serialization.JavaScriptSerializer();
                 String reply;
                 String prompt;
                 String defaultValue;
