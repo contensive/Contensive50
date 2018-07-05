@@ -1,19 +1,11 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
 using Contensive.Processor.Models.DbModels;
-using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
-//
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Complex;
 //
@@ -102,12 +94,9 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         // -- legacy
         public bool visit_browserIsIE = false; // if detail includes msie
-        public bool visit_browserIsNS = false; // if detail or detailtail is netscape
         public string visit_browserVersion = "";
         public bool visit_browserIsWindows = false; // if any browser detail includes "windows"
         public bool visit_browserIsMac = false; // if any browser deail includes "mac"
-        public bool visit_browserIsLinux = false; // not sure
-        public bool visit_browserIsMobile = false; // if a WAP Mobile device
         public bool visit_isBadBot = false;
         public bool visit_stateOK = false; // if false, page is out of state (sequence)
         private string contentAccessRights_NotList = ""; // If ContentId in this list, they are not a content manager

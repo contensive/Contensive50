@@ -333,7 +333,9 @@ namespace Contensive.Processor.Controllers {
                     EmailToConfirmationMemberID = email.TestMemberID;
                     EmailFrom = email.FromAddress;
                     EmailSubjectSource = email.Subject;
-                    EmailBodySource = core.cdnFiles.readFileText(email.CopyFilename) + appendedCopy;
+                    // 20180703 -- textFilename fields when configured in the model as a text are read with .getText() which populates the property with the content, not the filename
+                    EmailBodySource = email.CopyFilename + appendedCopy;
+                    // EmailBodySource = core.cdnFiles.readFileText(email.CopyFilename) + appendedCopy;
                     EmailAllowLinkEID = email.AddLinkEID;
                     BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
                     if (string.IsNullOrEmpty(BounceAddress)) {
