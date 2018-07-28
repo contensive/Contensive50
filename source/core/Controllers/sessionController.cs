@@ -128,6 +128,9 @@ namespace Contensive.Processor.Controllers {
         /// </param>
         /// <returns></returns>
         public static sessionController create(coreController core, bool trackVisits) {
+            //
+            logController.logTrace(core, "SessionController.create(), enter");
+            //
             sessionController resultSessionContext = null;
             var sw = Stopwatch.StartNew();
             try {
@@ -141,37 +144,43 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- no application, this is a server-only call not related to a 
                         resultSessionContext = new sessionController(core);
+                        logController.logTrace(core, "SessionController.create(), app.config null, create server session");
                     } else {
                         //
                         resultSessionContext = new sessionController(core);
                         DateTime visitCookieTimestamp = DateTime.MinValue;
                         string appNameCookiePrefix = encodeCookieName(core.appConfig.name);
                         string visitCookie = core.webServer.getRequestCookie(appNameCookiePrefix + cookieNameVisit);
-                        string MemberLinkinEID = core.docProperties.getText("eid");
-                        int MemberLinkLoginID = 0;
-                        int MemberLinkRecognizeID = 0;
+                        string memberLinkinEID = core.docProperties.getText("eid");
+                        int memberLinkLoginID = 0;
+                        int memberLinkRecognizeID = 0;
                         DateTime tokenDate = default(DateTime);
-                        if (!string.IsNullOrEmpty(MemberLinkinEID)) {
+                        //
+                        logController.logTrace(core, "SessionController.create(), visitCookie [" + visitCookie + "], MemberLinkinEID [" + memberLinkinEID + "]");
+                        //
+                        if (!string.IsNullOrEmpty(memberLinkinEID)) {
                             //
                             // -- attempt link authentication
                             if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
                                 //
                                 // -- allow Link Login
-                                securityController.decodeToken(core, MemberLinkinEID, ref MemberLinkLoginID, ref tokenDate);
+                                securityController.decodeToken(core, memberLinkinEID, ref memberLinkLoginID, ref tokenDate);
                             } else if (core.siteProperties.getBoolean("AllowLinkRecognize", true)) {
                                 //
                                 // -- allow Link Recognize
-                                securityController.decodeToken(core, MemberLinkinEID, ref MemberLinkRecognizeID, ref tokenDate);
+                                securityController.decodeToken(core, memberLinkinEID, ref memberLinkRecognizeID, ref tokenDate);
                             } else {
                                 //
                                 // -- block link login
-                                MemberLinkinEID = "";
+                                memberLinkinEID = "";
                             }
                         }
                         bool AllowOnNewVisitEvent = false;
-                        if ((trackVisits) || (!string.IsNullOrEmpty(visitCookie)) | (MemberLinkLoginID != 0) | (MemberLinkRecognizeID != 0)) {
+                        if ((trackVisits) || (!string.IsNullOrEmpty(visitCookie)) | (memberLinkLoginID != 0) | (memberLinkRecognizeID != 0)) {
                             //
                             // -- Visit Tracking
+                            //
+                            logController.logTrace(core, "SessionController.create(), visittracking");
                             int cookieVisitId = 0;
                             if (!string.IsNullOrEmpty(visitCookie)) {
                                 //
@@ -181,19 +190,23 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- Bad Cookie, clear it so a new one will be written
                                     visitCookie = "";
+                                    logController.logInfo(core, "SessionController.create(), BAD COOKIE");
                                 }
                             }
                             if (cookieVisitId != 0) {
                                 //
                                 // -- Visit is good, setup visit, then secondary visitor/user if possible
+                                logController.logTrace(core, "SessionController.create(), valid cookieVisit [" + cookieVisitId + "]");
                                 resultSessionContext.visit = visitModel.create(core, cookieVisitId);
                                 if (resultSessionContext.visit == null) {
                                     //
                                     // -- visit record is missing, create a new visit
+                                    logController.logTrace(core, "SessionController.create(), visit record is missing, create a new visit");
                                     resultSessionContext.visit = visitModel.add(core);
                                 } else if (resultSessionContext.visit.LastVisitTime.AddHours(1) < core.doc.profileStartTime) {
                                     //
                                     // -- visit has expired, create new visit
+                                    logController.logTrace(core, "SessionController.create(), visit has expired, create new visit");
                                     resultSessionContext.visit = visitModel.add(core);
                                 } else {
                                     //
@@ -220,6 +233,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     if (((visitCookieTimestamp - resultSessionContext.visit.LastVisitTime).TotalSeconds) > 2) {
+                                        logController.logTrace(core, "SessionController.create(), visit cookie timestamp [" + visitCookieTimestamp + "] does not match lastvisittime [" + resultSessionContext.visit.LastVisitTime + "]");
                                         resultSessionContext.visit_stateOK = false;
                                     }
                                 }
@@ -230,6 +244,7 @@ namespace Contensive.Processor.Controllers {
                             if (resultSessionContext.visit.id == 0) {
                                 //
                                 // -- create new visit record
+                                logController.logTrace(core, "SessionController.create(), visit id=0, create new visit");
                                 resultSessionContext.visit = visitModel.add(core);
                                 if (string.IsNullOrEmpty(resultSessionContext.visit.name)) {
                                     resultSessionContext.visit.name = "User";
@@ -444,19 +459,19 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // -- Attempt Link-in recognize or login
-                            if (MemberLinkLoginID != 0) {
+                            if (memberLinkLoginID != 0) {
                                 //
                                 // -- Link Login
-                                if (authenticateById(core, MemberLinkLoginID, resultSessionContext)) {
-                                    logController.addSiteActivity(core, "link login with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                if (authenticateById(core, memberLinkLoginID, resultSessionContext)) {
+                                    logController.addSiteActivity(core, "link login with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                 }
-                            } else if (MemberLinkRecognizeID != 0) {
+                            } else if (memberLinkRecognizeID != 0) {
                                 //
                                 // -- Link Recognize
-                                if (recognizeById(core, MemberLinkRecognizeID, ref resultSessionContext)) {
-                                    logController.addSiteActivity(core, "Successful link recognize with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                if (recognizeById(core, memberLinkRecognizeID, ref resultSessionContext)) {
+                                    logController.addSiteActivity(core, "Successful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                 } else {
-                                    logController.addSiteActivity(core, "Unsuccessful link recognize with eid " + MemberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                    logController.addSiteActivity(core, "Unsuccessful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                 }
                             }
                             //
@@ -536,6 +551,8 @@ namespace Contensive.Processor.Controllers {
                 logController.handleError( core,ex);
                 throw;
             } finally {
+                //
+                logController.logTrace(core, "SessionController.create(), finally");
                 //
             }
             return resultSessionContext;

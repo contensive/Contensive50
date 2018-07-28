@@ -149,7 +149,7 @@ namespace Contensive.Addons.AdminSite {
                     adminContext.JavaScriptString = "";
                     adminContext.ContentWatchLoaded = false;
                     //
-                    if (string.Compare(core.siteProperties.dataBuildVersion, cp.Version) > 0) {
+                    if (string.Compare(core.siteProperties.dataBuildVersion, cp.Version) < 0) {
                         logController.handleError(core, new ApplicationException("Application code version (" + cp.Version + ") is newer than Db version (" + core.siteProperties.dataBuildVersion + "). Upgrade site code."));
                     }
                     //
@@ -7148,28 +7148,19 @@ namespace Contensive.Addons.AdminSite {
                         addonId = genericController.encodeInteger(AddonIDText);
                         //
                         // Verify it so there is no error when it runs
-                        //
-                        CS = core.db.csOpenRecord(cnAddons, addonId);
-                        if (!core.db.csOk(CS)) {
-                            //
-                            // it was set, but the add-on is not available, auto set to dashboard
-                            //
+                        if (addonModel.create(core, addonId)==null) {
                             addonId = -1;
                             core.siteProperties.setProperty("AdminRootAddonID", "");
                         }
-                        core.db.csClose(ref CS);
                     }
                     if (addonId == -1) {
                         //
                         // This has never been set, try to get the dashboard ID
-                        //
-                        //$$$$$ cache this
-                        CS = core.db.csOpen(cnAddons, "ccguid=" + core.db.encodeSQLText(addonGuidDashboard));
-                        if (core.db.csOk(CS)) {
-                            addonId = core.db.csGetInteger(CS, "id");
-                            core.siteProperties.setProperty("AdminRootAddonID", genericController.encodeText(addonId));
+                        var addon = addonModel.create(core, addonGuidDashboard);
+                        if ( addon != null ) {
+                            addonId = addon.id;
+                            core.siteProperties.setProperty("AdminRootAddonID", addonId);
                         }
-                        core.db.csClose(ref CS);
                     }
                 }
                 if (addonId != 0) {

@@ -1778,13 +1778,17 @@ namespace Contensive.Processor {
                     } else {
                         if (IsEditing) {
                             var cdef = Models.Complex.cdefModel.getCdef(core, contentName);
-                            result += adminUIController.getIconEditAdminLink(core, cdef, recordID);
-                            if (allowCut) {
-                                int ContentID = 0;
-                                string WorkingLink = genericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) + "." + genericController.encodeText(recordID), true);
-                                result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
+                            if ( cdef==null) {
+                                throw new ApplicationException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
+                            } else {
+                                result += adminUIController.getIconEditAdminLink(core, cdef, recordID);
+                                if (allowCut) {
+                                    int ContentID = 0;
+                                    string WorkingLink = genericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) + "." + genericController.encodeText(recordID), true);
+                                    result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
+                                }
+                                result = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + result + "</span>";
                             }
-                            result = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + result + "</span>";
                         }
                     }
                 }

@@ -1669,35 +1669,12 @@ namespace Contensive.Processor.Controllers {
                 const string ACFunctionList3 = "selectcontentname";
                 const string ACFunctionListID = "ListID";
                 const string ACFunctionListFields = "ListFields";
-                //
-                int CID = 0;
-                bool IsContentList = false;
-                bool IsListField = false;
-                string Choice = null;
-                string[] Choices = null;
-                int ChoiceCnt = 0;
-                int Ptr = 0;
-                bool IncludeID = false;
-                int FnLen = 0;
-                int RecordID = 0;
-                int CS = 0;
-                string ContentName = null;
-                int Pos = 0;
-                string list = null;
-                string FnArgList = null;
-                string[] FnArgs = null;
-                int FnArgCnt = 0;
-                string ContentCriteria = null;
-                string RecordName = null;
-                string SrcSelectorInner = null;
-                string SrcSelectorSuffix = "";
-                object[,] Cell = null;
-                int RowCnt = 0;
-                int RowPtr = 0;
+                //string SrcSelectorInner = null;
                 string SrcSelector = SrcOptionValueSelector.Trim(' ');
                 //
-                SrcSelectorInner = SrcSelector;
+                string SrcSelectorInner = SrcSelector;
                 int PosLeft = genericController.vbInstr(1, SrcSelector, "[");
+                string SrcSelectorSuffix = "";
                 if (PosLeft != 0) {
                     int PosRight = genericController.vbInstr(1, SrcSelector, "]");
                     if (PosRight != 0) {
@@ -1708,21 +1685,24 @@ namespace Contensive.Processor.Controllers {
                         SrcSelectorInner = (SrcSelector.Substring(1, SrcSelector.Length - 2)).Trim(' ');
                     }
                 }
-                list = "";
                 //
                 // Break SrcSelectorInner up into individual choices to detect functions
                 //
+                string list = "";
+                int Pos = 0;
                 if (!string.IsNullOrEmpty(SrcSelectorInner)) {
-                    Choices = SrcSelectorInner.Split('|');
-                    ChoiceCnt = Choices.GetUpperBound(0) + 1;
+                    string[] Choices = SrcSelectorInner.Split('|');
+                    int ChoiceCnt = Choices.GetUpperBound(0) + 1;
+                    int Ptr = 0;
                     for (Ptr = 0; Ptr < ChoiceCnt; Ptr++) {
-                        Choice = Choices[Ptr];
-                        IsContentList = false;
-                        IsListField = false;
+                        bool IsContentList = false;
+                        bool IsListField = false;
                         //
                         // List Function (and all the indecision that went along with it)
                         //
-                        Pos = 0;
+                        bool IncludeID = false;
+                        int FnLen = 0;
+                        string Choice = Choices[Ptr];
                         if (Pos == 0) {
                             Pos = genericController.vbInstr(1, Choice, ACFunctionList1 + "(", 1);
                             if (Pos > 0) {
@@ -1774,16 +1754,16 @@ namespace Contensive.Processor.Controllers {
                         //
                         if (Pos > 0) {
                             //
-                            FnArgList = (Choice.Substring((Pos + FnLen) - 1)).Trim(' ');
-                            ContentName = "";
-                            ContentCriteria = "";
+                            string FnArgList = (Choice.Substring((Pos + FnLen) - 1)).Trim(' ');
+                            string ContentName = "";
+                            string ContentCriteria = "";
                             if ((FnArgList.Left(1) == "(") && (FnArgList.Substring(FnArgList.Length - 1) == ")")) {
                                 //
                                 // set ContentName and ContentCriteria from argument list
                                 //
                                 FnArgList = FnArgList.Substring(1, FnArgList.Length - 2);
-                                FnArgs = genericController.SplitDelimited(FnArgList, ",");
-                                FnArgCnt = FnArgs.GetUpperBound(0) + 1;
+                                string[] FnArgs = genericController.SplitDelimited(FnArgList, ",");
+                                int FnArgCnt = FnArgs.GetUpperBound(0) + 1;
                                 if (FnArgCnt > 0) {
                                     ContentName = FnArgs[0].Trim(' ');
                                     if ((ContentName.Left(1) == "\"") && (ContentName.Substring(ContentName.Length - 1) == "\"")) {
@@ -1801,34 +1781,28 @@ namespace Contensive.Processor.Controllers {
                                     }
                                 }
                             }
-                            CS = -1;
+                            int CS = -1;
                             if (IsContentList) {
                                 //
                                 // ContentList - Open the Content and build the options from the names
-                                //
-                                if (!string.IsNullOrEmpty(ContentCriteria)) {
-                                    CS = core.db.csOpen(ContentName, ContentCriteria, "name", true, 0, false, false, "ID,Name");
-                                } else {
-                                    CS = core.db.csOpen(ContentName, "", "name", true, 0, false, false, "ID,Name");
-                                }
+                                CS = core.db.csOpen(ContentName, ContentCriteria, "name", true, 0, false, false, "ID,Name");
                             } else if (IsListField) {
                                 //
-                                // ListField
                                 //
-                                CID = Models.Complex.cdefModel.getContentId(core, ContentName);
-                                if (CID > 0) {
-                                    CS = core.db.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, false, false, "ID,Name");
-                                }
+                                // ListField
+                                int CID = Models.Complex.cdefModel.getContentId(core, ContentName);
+                                CS = core.db.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, false, false, "ID,Name");
                             }
 
                             if (core.db.csOk(CS)) {
-                                Cell = core.db.csGetRows(CS);
-                                RowCnt = Cell.GetUpperBound(1) + 1;
+                                object[,] Cell = core.db.csGetRows(CS);
+                                int RowCnt = Cell.GetUpperBound(1) + 1;
+                                int RowPtr = 0;
                                 for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                     //
-                                    RecordName = genericController.encodeText(Cell[1, RowPtr]);
+                                    string RecordName = genericController.encodeText(Cell[1, RowPtr]);
                                     RecordName = genericController.vbReplace(RecordName, "\r\n", " ");
-                                    RecordID = genericController.encodeInteger(Cell[0, RowPtr]);
+                                    int RecordID = genericController.encodeInteger(Cell[0, RowPtr]);
                                     if (string.IsNullOrEmpty(RecordName)) {
                                         RecordName = "record " + RecordID;
                                     } else if (RecordName.Length > 50) {
