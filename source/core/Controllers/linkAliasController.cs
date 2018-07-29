@@ -34,7 +34,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Returns the Alias link (SourceLink) from the actual link (DestinationLink)
         /// </summary>
-        public static string getLinkAlias(coreController core, int PageID, string QueryStringSuffix, string DefaultLink) {
+        public static string getLinkAlias(CoreController core, int PageID, string QueryStringSuffix, string DefaultLink) {
             string linkAlias = DefaultLink;
             List<Models.DbModels.linkAliasModel> linkAliasList = linkAliasModel.createList(core, PageID, QueryStringSuffix);
             if (linkAliasList.Count > 0) {
@@ -48,21 +48,21 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static void addLinkAlias(coreController core, string linkAlias, int PageID, string QueryStringSuffix, bool OverRideDuplicate, bool DupCausesWarning) {
+        public static void addLinkAlias(CoreController core, string linkAlias, int PageID, string QueryStringSuffix, bool OverRideDuplicate, bool DupCausesWarning) {
             string tempVar = "";
             addLinkAlias(core, linkAlias, PageID, QueryStringSuffix, OverRideDuplicate, DupCausesWarning, ref tempVar);
         }
         //
         //====================================================================================================
         //
-        public static void addLinkAlias(coreController core, string linkAlias, int PageID, string QueryStringSuffix, bool OverRideDuplicate) {
+        public static void addLinkAlias(CoreController core, string linkAlias, int PageID, string QueryStringSuffix, bool OverRideDuplicate) {
             string tempVar = "";
             addLinkAlias(core, linkAlias, PageID, QueryStringSuffix, OverRideDuplicate, false, ref tempVar);
         }
         //
         //====================================================================================================
         //
-        public static void addLinkAlias(coreController core, string linkAlias, int PageID, string QueryStringSuffix) {
+        public static void addLinkAlias(CoreController core, string linkAlias, int PageID, string QueryStringSuffix) {
             string tempVar = "";
             addLinkAlias(core, linkAlias, PageID, QueryStringSuffix, false, false, ref tempVar);
         }
@@ -71,7 +71,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// add a link alias to a page as the primary
         /// </summary>
-        public static void addLinkAlias(coreController core, string linkAlias, int PageID, string QueryStringSuffix, bool OverRideDuplicate, bool DupCausesWarning, ref string return_WarningMessage) {
+        public static void addLinkAlias(CoreController core, string linkAlias, int PageID, string QueryStringSuffix, bool OverRideDuplicate, bool DupCausesWarning, ref string return_WarningMessage) {
             try {
                 const string SafeStringLc = "0123456789abcdefghijklmnopqrstuvwxyz-_/";
                 bool AllowLinkAlias = core.siteProperties.getBoolean("allowLinkAlias", false);

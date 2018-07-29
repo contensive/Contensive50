@@ -28,97 +28,97 @@ namespace Contensive.Processor.Models.DbModels {
         public int DataSourceID { get; set; }
         //
         //====================================================================================================
-        public static tableModel add(coreController core) {
+        public static tableModel add(CoreController core) {
             return add<tableModel>(core);
         }
         //
         //====================================================================================================
-        public static tableModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static tableModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<tableModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static tableModel create(coreController core, int recordId) {
+        public static tableModel create(CoreController core, int recordId) {
             return create<tableModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static tableModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static tableModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<tableModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static tableModel create(coreController core, string recordGuid) {
+        public static tableModel create(CoreController core, string recordGuid) {
             return create<tableModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static tableModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static tableModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<tableModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static tableModel createByName(coreController core, string recordName) {
+        public static tableModel createByName(CoreController core, string recordName) {
             return createByName<tableModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static tableModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static tableModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<tableModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<tableModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<tableModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<tableModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<tableModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<tableModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<tableModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<tableModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<tableModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<tableModel> createList(coreController core, string sqlCriteria) {
+        public static List<tableModel> createList(CoreController core, string sqlCriteria) {
             return createList<tableModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<tableModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<tableModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<tableModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<tableModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static tableModel createDefault(coreController core) {
+        public static tableModel createDefault(CoreController core) {
             return createDefault<tableModel>(core);
         }
     }

@@ -280,7 +280,7 @@ namespace Contensive.Processor.Models.Complex {
         /// For redirect types, the content id where the field will redirect.
         /// </summary>
         public int redirectContentID { get; set; } // If TYPEREDIRECT, this is new contentID
-        public string get_redirectContentName(coreController core) {
+        public string get_redirectContentName(CoreController core) {
             if (_redirectContentName == null) {
                 if (redirectContentID > 0) {
                     _redirectContentName = "";
@@ -292,7 +292,7 @@ namespace Contensive.Processor.Models.Complex {
             }
             return _redirectContentName;
         }
-        public void set_redirectContentName(coreController core, string value) {
+        public void set_redirectContentName(CoreController core, string value) {
             _redirectContentName = value;
         }
         private string _redirectContentName = null;
@@ -305,7 +305,7 @@ namespace Contensive.Processor.Models.Complex {
         /// Rule content is the table that has two foreign keys, one for the primary and one for the secondary
         /// </summary>
         public int manyToManyContentID { get; set; } // Content containing Secondary Records
-        public string get_manyToManyContentName(coreController core) {
+        public string get_manyToManyContentName(CoreController core) {
             if (_manyToManyRuleContentName == null) {
                 if (manyToManyContentID > 0) {
                     _manyToManyRuleContentName = "";
@@ -317,7 +317,7 @@ namespace Contensive.Processor.Models.Complex {
             }
             return _manyToManyContentName;
         }
-        public void set_manyToManyContentName(coreController core, string value) {
+        public void set_manyToManyContentName(CoreController core, string value) {
             _manyToManyContentName = value;
         }
         private string _manyToManyContentName = null;
@@ -330,7 +330,7 @@ namespace Contensive.Processor.Models.Complex {
         /// Rule content is the table that has two foreign keys, one for the primary and one for the secondary
         /// </summary>
         public int manyToManyRuleContentID { get; set; }
-        public string get_manyToManyRuleContentName(coreController core) {
+        public string get_manyToManyRuleContentName(CoreController core) {
             if (_manyToManyRuleContentName == null) {
                 if (manyToManyRuleContentID > 0) {
                     _manyToManyRuleContentName = "";
@@ -342,7 +342,7 @@ namespace Contensive.Processor.Models.Complex {
             }
             return _manyToManyRuleContentName;
         }
-        public void set_manyToManyRuleContentName(coreController core, string value) {
+        public void set_manyToManyRuleContentName(CoreController core, string value) {
             _manyToManyRuleContentName = value;
         }
         private string _manyToManyRuleContentName = null;
@@ -352,7 +352,7 @@ namespace Contensive.Processor.Models.Complex {
         /// For lookup types, this is the contentid for the connected table. This represents a foreignKey in this content
         /// </summary>
         public int lookupContentID { get; set; }
-        public string get_lookupContentName(coreController core) {
+        public string get_lookupContentName(CoreController core) {
             if (_lookupContentName == null) {
                 if (lookupContentID > 0) {
                     _lookupContentName = "";
@@ -364,7 +364,7 @@ namespace Contensive.Processor.Models.Complex {
             }
             return _lookupContentName;
         }
-        public void set_lookupContentName(coreController core, string value) {
+        public void set_lookupContentName(CoreController core, string value) {
             _lookupContentName = value;
         }
         private string _lookupContentName = null;
@@ -373,7 +373,7 @@ namespace Contensive.Processor.Models.Complex {
         /// <summary>
         /// For memberSelect type content. memberSelectGroup, name set by xml file load, name get for xml file save, id and name get and set in code
         /// </summary>
-        public void memberSelectGroupName_set(coreController core, string memberSelectGroupName) {
+        public void memberSelectGroupName_set(CoreController core, string memberSelectGroupName) {
             if (_memberSelectGroupName != memberSelectGroupName) {
                 _memberSelectGroupName = memberSelectGroupName;
                 _memberSelectGroupId = null;
@@ -382,7 +382,7 @@ namespace Contensive.Processor.Models.Complex {
         /// <summary>
         /// For memberSelect type content. memberSelectGroup, name set by xml file load, name get for xml file save, id and name get and set in code
         /// </summary>
-        public string memberSelectGroupName_get(coreController core) {
+        public string memberSelectGroupName_get(CoreController core) {
             if (_memberSelectGroupName == null) {
                 if (_memberSelectGroupId != null) {
                     _memberSelectGroupName = core.db.getRecordName("groups", genericController.encodeInteger(_memberSelectGroupId));
@@ -393,7 +393,7 @@ namespace Contensive.Processor.Models.Complex {
         /// <summary>
         /// For memberSelect type content. memberSelectGroup, name set by xml file load, name get for xml file save, id and name get and set in code
         /// </summary>
-        public void memberSelectGroupId_set(coreController core, int memberSelectGroupId) {
+        public void memberSelectGroupId_set(CoreController core, int memberSelectGroupId) {
             if (memberSelectGroupId != _memberSelectGroupId) {
                 _memberSelectGroupId = memberSelectGroupId;
                 _memberSelectGroupName = null;
@@ -402,7 +402,7 @@ namespace Contensive.Processor.Models.Complex {
         /// <summary>
         /// For memberSelect type content. memberSelectGroup, name set by xml file load, name get for xml file save, id and name get and set in code
         /// </summary>
-        public int memberSelectGroupId_get(coreController core) {
+        public int memberSelectGroupId_get(CoreController core) {
             if (_memberSelectGroupId == null) {
                 if (_memberSelectGroupName != null) {
                     _memberSelectGroupId = core.db.getRecordID("groups", genericController.encodeText(_memberSelectGroupName));

@@ -20,7 +20,7 @@ namespace Contensive.Processor.Controllers {
         // ----- global scope variables
         //
         private const string ApplicationNameLocal = "unknown";
-        private coreController core;
+        private CoreController core;
         //
         private const string ContentSelectList = ""
             + " id,name,active,adminonly,allowadd"
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        public collectionXmlController(coreController core) {
+        public collectionXmlController(CoreController core) {
             this.core = core;
         }
         //
@@ -604,7 +604,7 @@ namespace Contensive.Processor.Controllers {
                 string appName = core.appConfig.name;
                 int MenuContentID = core.db.getRecordID("Content", cnNavigatorEntries);
                 DataTable rs = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
-                if (dbController.isDataTableOk(rs)) {
+                if (DbController.isDataTableOk(rs)) {
                     if (true) {
                         foreach (DataRow dr in rs.Rows) {
                             string RecordName = genericController.encodeText(dr["Name"]);
@@ -729,11 +729,11 @@ namespace Contensive.Processor.Controllers {
                         ParentID = 0;
                         if (RecordID != 0) {
                             rs = core.db.executeQuery("select Name,ParentID from ccMenuEntries where ID=" + RecordID);
-                            if (dbController.isDataTableOk(rs)) {
+                            if (DbController.isDataTableOk(rs)) {
                                 ParentID = genericController.encodeInteger(rs.Rows[0]["ParentID"]);
                                 RecordName = genericController.encodeText(rs.Rows[0]["Name"]);
                             }
-                            if (dbController.isDataTableOk(rs)) {
+                            if (DbController.isDataTableOk(rs)) {
                                 if (false) {
                                     //RS.Close()
                                 }

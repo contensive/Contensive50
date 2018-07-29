@@ -37,97 +37,97 @@ namespace Contensive.Processor.Models.DbModels {
         public string cmdDetail { get; set; }
         //
         //====================================================================================================
-        public static taskModel add(coreController core) {
+        public static taskModel add(CoreController core) {
             return add<taskModel>(core);
         }
         //
         //====================================================================================================
-        public static taskModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static taskModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<taskModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static taskModel create(coreController core, int recordId) {
+        public static taskModel create(CoreController core, int recordId) {
             return create<taskModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static taskModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static taskModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<taskModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static taskModel create(coreController core, string recordGuid) {
+        public static taskModel create(CoreController core, string recordGuid) {
             return create<taskModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static taskModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static taskModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<taskModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static taskModel createByName(coreController core, string recordName) {
+        public static taskModel createByName(CoreController core, string recordName) {
             return createByName<taskModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static taskModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static taskModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<taskModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<taskModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<taskModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<taskModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<taskModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<taskModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<taskModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<taskModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<taskModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<taskModel> createList(coreController core, string sqlCriteria) {
+        public static List<taskModel> createList(CoreController core, string sqlCriteria) {
             return createList<taskModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<taskModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<taskModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<taskModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<taskModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static taskModel createDefault(coreController core) {
+        public static taskModel createDefault(CoreController core) {
             return createDefault<taskModel>(core);
         }
     }

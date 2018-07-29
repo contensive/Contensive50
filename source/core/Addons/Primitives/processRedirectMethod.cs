@@ -27,7 +27,7 @@ namespace Contensive.Addons.Primitives {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string result = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 //
                 // ----- Redirect with RC and RI
                 //
@@ -36,7 +36,7 @@ namespace Contensive.Addons.Primitives {
                 if (core.doc.redirectContentID != 0 & core.doc.redirectRecordID != 0) {
                     string ContentName = cdefModel.getContentNameByID(core, core.doc.redirectContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        iisController.main_RedirectByRecord_ReturnStatus(core, ContentName, core.doc.redirectRecordID);
+                        IisController.main_RedirectByRecord_ReturnStatus(core, ContentName, core.doc.redirectRecordID);
                         result = "";
                         core.doc.continueProcessing = false;
                     }

@@ -28,97 +28,97 @@ namespace Contensive.Processor.Models.DbModels {
         public string HTTP_Accept_Language { get; set; }
         //
         //====================================================================================================
-        public static languageModel add(coreController core) {
+        public static languageModel add(CoreController core) {
             return add<languageModel>(core);
         }
         //
         //====================================================================================================
-        public static languageModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static languageModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<languageModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static languageModel create(coreController core, int recordId) {
+        public static languageModel create(CoreController core, int recordId) {
             return create<languageModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static languageModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static languageModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<languageModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static languageModel create(coreController core, string recordGuid) {
+        public static languageModel create(CoreController core, string recordGuid) {
             return create<languageModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static languageModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static languageModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<languageModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static languageModel createByName(coreController core, string recordName) {
+        public static languageModel createByName(CoreController core, string recordName) {
             return createByName<languageModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static languageModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static languageModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<languageModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<languageModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<languageModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<languageModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<languageModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<languageModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<languageModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<languageModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<languageModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<languageModel> createList(coreController core, string sqlCriteria) {
+        public static List<languageModel> createList(CoreController core, string sqlCriteria) {
             return createList<languageModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<languageModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<languageModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<languageModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<languageModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static languageModel createDefault(coreController core) {
+        public static languageModel createDefault(CoreController core) {
             return createDefault<languageModel>(core);
         }
     }

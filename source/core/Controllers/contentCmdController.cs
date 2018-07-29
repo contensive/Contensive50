@@ -181,7 +181,7 @@ namespace Contensive.Processor.Controllers {
     //           setOuter findLocation replace
     //           user firstname
     //           site propertyname
-    public class contentCmdController {
+    public class ContentCmdController {
         //
         //============================================================================================
         /// <summary>
@@ -193,7 +193,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="personalizationPeopleId"></param>
         /// <param name="personalizationIsAuthenticated"></param>
         /// <returns></returns>
-        public static string executeContentCommands(coreController core,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        public static string executeContentCommands(CoreController core,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 bool badCmd = false;
@@ -339,7 +339,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// convert a single command in the command formats to call the execute
         /// </summary>
-        private static string executeSingleCommand(coreController core, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        private static string executeSingleCommand(CoreController core, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 //
@@ -518,20 +518,23 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 cmdCollection.Add(cmdDictionaryOrCollection);
                             }
-                            cmdDef = new Dictionary<string, object>();
-                            cmdDef.Add(cmdText, cmdDictionaryOrCollection);
-                            cmdCollection = new List<object>();
-                            //cmdCollection = new Collection<object>();
-                            cmdCollection.Add(cmdDef);
+                            cmdDef = new Dictionary<string, object> {
+                                { cmdText, cmdDictionaryOrCollection }
+                            };
+                            cmdCollection = new List<object> {
+                                //cmdCollection = new Collection<object>();
+                                cmdDef
+                            };
                         } else {
                             //
                             // command and arguments are strings
                             //
-                            cmdDef = new Dictionary<string, object>();
-                            cmdDef.Add(cmdText, cmdArg);
-                            cmdCollection = new List<object>();
-                            //cmdCollection = new Collection<object>();
-                            cmdCollection.Add(cmdDef);
+                            cmdDef = new Dictionary<string, object> {
+                                { cmdText, cmdArg }
+                            };
+                            cmdCollection = new List<object> {
+                                cmdDef
+                            };
                         }
                     }
                     //
@@ -578,8 +581,9 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // command definition with default argument
                                     //
-                                    cmdArgDef = new Dictionary<string, object>();
-                                    cmdArgDef.Add("default", cmdDef[cmdDefKey]);
+                                    cmdArgDef = new Dictionary<string, object> {
+                                        { "default", cmdDef[cmdDefKey] }
+                                    };
                                 } else if ((cmdDefValueTypeName == "dictionary") || (cmdDefValueTypeName == "dictionary(of string,object)") || (cmdTypeName.Left(37) == "system.collections.generic.dictionary")) {
                                     cmdArgDef = (Dictionary<string, object>)cmdDef[cmdDefKey];
                                 } else {

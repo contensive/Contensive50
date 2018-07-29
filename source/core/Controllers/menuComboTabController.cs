@@ -55,7 +55,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public string GetTabs(coreController core ) {
+        public string GetTabs(CoreController core ) {
             string result = "";
             try {
                 //

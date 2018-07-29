@@ -27,7 +27,7 @@ namespace Contensive.Addons.AdminSite {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string result = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
 
                 //
                 // When editing in admin site, if a field has multiple editors (addons as editors), you main_Get an icon

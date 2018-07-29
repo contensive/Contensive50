@@ -37,97 +37,97 @@ namespace Contensive.Processor.Models.DbModels {
         public int TestMemberID { get; set; }
         //
         //====================================================================================================
-        public static systemEmailModel add(coreController core) {
+        public static systemEmailModel add(CoreController core) {
             return add<systemEmailModel>(core);
         }
         //
         //====================================================================================================
-        public static systemEmailModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static systemEmailModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<systemEmailModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static systemEmailModel create(coreController core, int recordId) {
+        public static systemEmailModel create(CoreController core, int recordId) {
             return create<systemEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static systemEmailModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static systemEmailModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<systemEmailModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static systemEmailModel create(coreController core, string recordGuid) {
+        public static systemEmailModel create(CoreController core, string recordGuid) {
             return create<systemEmailModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static systemEmailModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static systemEmailModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<systemEmailModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static systemEmailModel createByName(coreController core, string recordName) {
+        public static systemEmailModel createByName(CoreController core, string recordName) {
             return createByName<systemEmailModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static systemEmailModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static systemEmailModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<systemEmailModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<systemEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<systemEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<systemEmailModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<systemEmailModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<systemEmailModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<systemEmailModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<systemEmailModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<systemEmailModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<systemEmailModel> createList(coreController core, string sqlCriteria) {
+        public static List<systemEmailModel> createList(CoreController core, string sqlCriteria) {
             return createList<systemEmailModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<systemEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<systemEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<systemEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<systemEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static systemEmailModel createDefault(coreController core) {
+        public static systemEmailModel createDefault(CoreController core) {
             return createDefault<systemEmailModel>(core);
         }
     }

@@ -20,7 +20,7 @@ namespace Contensive.Processor.Controllers {
         // 
         //=========================================================================
         //
-        public static void upgrade(coreController core, bool isNewBuild, bool repair) {
+        public static void upgrade(CoreController core, bool isNewBuild, bool repair) {
             try {
                 if (core.doc.upgradeInProgress) {
                     // leftover from 4.1
@@ -53,11 +53,11 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- verify base collection
                     logController.logInfo(core, "Install base collection");
-                    collectionController.installBaseCollection(core, isNewBuild, repair, ref  nonCriticalErrorList);
+                    CollectionController.installBaseCollection(core, isNewBuild, repair, ref  nonCriticalErrorList);
                     //
                     // -- verify iis configuration
                     logController.logInfo(core, "Verify iis configuration");
-                    Controllers.iisController.verifySite(core, core.appConfig.name, primaryDomain, core.appConfig.localWwwPath, "default.aspx");
+                    Controllers.IisController.verifySite(core, core.appConfig.name, primaryDomain, core.appConfig.localWwwPath, "default.aspx");
                     //
                     // -- verify root developer
                     logController.logInfo(core, "verify developer user");
@@ -297,7 +297,7 @@ namespace Contensive.Processor.Controllers {
                             //RegisterList = ""
                             logController.logInfo(core, "Upgrading All Local Collections to new server build.");
                             string tmpString = "";
-                            bool UpgradeOK = collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, repair, ref  nonCriticalErrorList);
+                            bool UpgradeOK = CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, repair, ref  nonCriticalErrorList);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
                                 throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             } else if (!UpgradeOK) {
@@ -355,7 +355,7 @@ namespace Contensive.Processor.Controllers {
                             logController.logInfo(core, "...Open collectons.xml");
                             try {
                                 XmlDocument Doc = new XmlDocument();
-                                Doc.LoadXml(collectionController.getLocalCollectionStoreListXml(core));
+                                Doc.LoadXml(CollectionController.getLocalCollectionStoreListXml(core));
                                 if (true) {
                                     if (genericController.vbLCase(Doc.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
                                         throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
@@ -427,7 +427,7 @@ namespace Contensive.Processor.Controllers {
                                                         ErrorMessage = "";
                                                         if (!localCollectionFound) {
                                                             logController.logInfo(core, "...site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
-                                                            bool addonInstallOk = collectionController.installCollectionFromRemoteRepo(core, CollectionGuid, ref  ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList);
+                                                            bool addonInstallOk = CollectionController.installCollectionFromRemoteRepo(core, CollectionGuid, ref  ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList);
                                                             if (!addonInstallOk) {
                                                                 //
                                                                 // this may be OK so log, but do not call it an error
@@ -437,7 +437,7 @@ namespace Contensive.Processor.Controllers {
                                                         } else {
                                                             if (upgradeCollection) {
                                                                 logController.logInfo(core, "...upgrading collection");
-                                                                collectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList);
+                                                                CollectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList);
                                                             }
                                                         }
                                                     }
@@ -466,7 +466,7 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-        private static void VerifyAdminMenus(coreController core, string DataBuildVersion) {
+        private static void VerifyAdminMenus(CoreController core, string DataBuildVersion) {
             try {
                 DataTable dt = null;
                 //
@@ -496,7 +496,7 @@ namespace Contensive.Processor.Controllers {
         //
         // Get the Menu for FormInputHTML
         //
-        private static void VerifyRecord(coreController core, string ContentName, string Name, string CodeFieldName = "", string Code = "", bool InActive = false) {
+        private static void VerifyRecord(CoreController core, string ContentName, string Name, string CodeFieldName = "", string Code = "", bool InActive = false) {
             try {
                 bool Active = false;
                 DataTable dt = null;
@@ -532,7 +532,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="DataBuildVersion"></param>
-        private static void VerifySqlfieldCompatibility(coreController core) {
+        private static void VerifySqlfieldCompatibility(CoreController core) {
             try {
                 //
                 // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
@@ -592,7 +592,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="DataBuildVersion"></param>
-        private static void Upgrade_Conversion(coreController core, string DataBuildVersion) {
+        private static void Upgrade_Conversion(CoreController core, string DataBuildVersion) {
             try {
                 //
                 // -- Roll the style sheet cache if it is setup
@@ -610,7 +610,7 @@ namespace Contensive.Processor.Controllers {
         //=========================================================================================
         //
         //
-        public static void VerifyScriptingRecords(coreController core) {
+        public static void VerifyScriptingRecords(CoreController core) {
             try {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.");
@@ -625,7 +625,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyLanguageRecords(coreController core) {
+        public static void VerifyLanguageRecords(CoreController core) {
             try {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.");
@@ -642,7 +642,7 @@ namespace Contensive.Processor.Controllers {
         //
         //   Verify Library Folder records
         //
-        private static void VerifyLibraryFolders(coreController core) {
+        private static void VerifyLibraryFolders(CoreController core) {
             try {
                 DataTable dt = null;
                 //
@@ -661,7 +661,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================================
         //
-        private static int GetIDBYName(coreController core, string TableName, string RecordName) {
+        private static int GetIDBYName(CoreController core, string TableName, string RecordName) {
             int tempGetIDBYName = 0;
             int returnid = 0;
             try {
@@ -669,7 +669,7 @@ namespace Contensive.Processor.Controllers {
                 DataTable rs;
                 //
                 rs = core.db.executeQuery("Select ID from " + TableName + " where name=" + core.db.encodeSQLText(RecordName));
-                if (dbController.isDataTableOk(rs)) {
+                if (DbController.isDataTableOk(rs)) {
                     tempGetIDBYName = genericController.encodeInteger(rs.Rows[0]["ID"]);
                 }
                 rs.Dispose();
@@ -682,7 +682,7 @@ namespace Contensive.Processor.Controllers {
         //
         //   Verify Library Folder records
         //
-        private static void VerifyLibraryFileTypes(coreController core) {
+        private static void VerifyLibraryFileTypes(CoreController core) {
             try {
                 //
                 // Load basic records -- default images are handled in the REsource Library through the /ccLib/config/DefaultValues.txt GetDefaultValue(key) mechanism
@@ -766,7 +766,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================
         //
-        private static void VerifyState(coreController core, string Name, string Abbreviation, double SaleTax, int CountryID, string FIPSState) {
+        private static void VerifyState(CoreController core, string Name, string Abbreviation, double SaleTax, int CountryID, string FIPSState) {
             try {
                 //
                 int CS = 0;
@@ -800,7 +800,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyStates(coreController core) {
+        public static void VerifyStates(CoreController core) {
             try {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyStates", "Verify States");
@@ -872,7 +872,7 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //
-        private static void VerifyCountry(coreController core, string Name, string Abbreviation) {
+        private static void VerifyCountry(CoreController core, string Name, string Abbreviation) {
             try {
                 int CS;
                 //
@@ -900,7 +900,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyCountries(coreController core) {
+        public static void VerifyCountries(CoreController core) {
             try {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCountries", "Verify Countries");
@@ -925,7 +925,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyDefaultGroups(coreController core) {
+        public static void VerifyDefaultGroups(CoreController core) {
             try {
                 //
                 int GroupID = 0;
@@ -950,7 +950,7 @@ namespace Contensive.Processor.Controllers {
         //       it will fail if they are not up to date.
         //===================================================================================================================
         //
-        internal static void VerifyBasicTables(coreController core) {
+        internal static void VerifyBasicTables(CoreController core) {
             try {
                 //
                 if (!false) {
@@ -1054,7 +1054,7 @@ namespace Contensive.Processor.Controllers {
         //
         //===========================================================================
         //   Append Log File
-        private static void appendUpgradeLog(coreController core, string appName, string Method, string Message) {
+        private static void appendUpgradeLog(CoreController core, string appName, string Method, string Message) {
             logController.logInfo(core, "app [" + appName + "], Method [" + Method + "], Message [" + Message + "]");
         }
         //
@@ -1062,7 +1062,7 @@ namespace Contensive.Processor.Controllers {
         //   Get a ContentID from the ContentName using just the tables
         //=============================================================================
         //
-        private static void appendUpgradeLogAddStep(coreController core, string appName, string Method, string Message) {
+        private static void appendUpgradeLogAddStep(CoreController core, string appName, string Method, string Message) {
             appendUpgradeLog(core, appName, Method, Message);
         }
         //
@@ -1073,7 +1073,7 @@ namespace Contensive.Processor.Controllers {
         //       returns the entry id
         //=============================================================================
         //
-        public static int verifyNavigatorEntry(coreController core, string ccGuid, string menuNameSpace, string EntryName, string ContentName, string LinkPage, string SortOrder, bool AdminOnly, bool DeveloperOnly, bool NewWindow, bool Active, string AddonName, string NavIconType, string NavIconTitle, int InstalledByCollectionID) {
+        public static int verifyNavigatorEntry(CoreController core, string ccGuid, string menuNameSpace, string EntryName, string ContentName, string LinkPage, string SortOrder, bool AdminOnly, bool DeveloperOnly, bool NewWindow, bool Active, string AddonName, string NavIconType, string NavIconTitle, int InstalledByCollectionID) {
             int returnEntry = 0;
             try {
                 if (!string.IsNullOrEmpty(EntryName.Trim())) {
@@ -1116,7 +1116,7 @@ namespace Contensive.Processor.Controllers {
             return returnEntry;
         }
              //
-        public static int verifyNavigatorEntry_getParentIdFromNameSpace(coreController core, string menuNameSpace) {
+        public static int verifyNavigatorEntry_getParentIdFromNameSpace(CoreController core, string menuNameSpace) {
             int parentRecordId = 0;
             try {
                 if (!string.IsNullOrEmpty(menuNameSpace.Trim())) {

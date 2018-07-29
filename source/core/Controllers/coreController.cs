@@ -16,7 +16,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// central object, passed for dependancy injection, provides access to persistent objects (document persistence/scope)
     /// </summary>
-    public class coreController : IDisposable {
+    public class CoreController : IDisposable {
         //
         //===================================================================================================
         /// <summary>
@@ -35,7 +35,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// An instance of the sessionController, populated for the current session (user state, visit state, etc)
         /// </summary>
-        public sessionController session;
+        public SessionController session;
         //
         //===================================================================================================
         // todo - this should be a pointer into the serverConfig
@@ -107,15 +107,15 @@ namespace Contensive.Processor.Controllers {
         private Dictionary<string, dataSourceModel> _dataSources = null;
         //
         //===================================================================================================
-        public docController doc {
+        public DocController doc {
             get {
                 if (_doc == null) {
-                    _doc = new docController(this);
+                    _doc = new DocController(this);
                 }
                 return _doc;
             }
         }
-        private docController _doc;
+        private DocController _doc;
         ////
         ////===================================================================================================
         //public menuTabController menuTab {
@@ -140,15 +140,15 @@ namespace Contensive.Processor.Controllers {
         private Controllers.htmlController _html;
         //
         //===================================================================================================
-        public Controllers.addonController addon {
+        public Controllers.AddonController addon {
             get {
                 if (_addon == null) {
-                    _addon = new Controllers.addonController(this);
+                    _addon = new Controllers.AddonController(this);
                 }
                 return _addon;
             }
         }
-        private Controllers.addonController _addon;
+        private Controllers.AddonController _addon;
         //
         //===================================================================================================
         public menuFlyoutController menuFlyout {
@@ -223,15 +223,15 @@ namespace Contensive.Processor.Controllers {
         private sitePropertiesController _siteProperties = null;
         //
         //===================================================================================================
-        public iisController webServer {
+        public IisController webServer {
             get {
                 if (_webServer == null) {
-                    _webServer = new iisController(this);
+                    _webServer = new IisController(this);
                 }
                 return _webServer;
             }
         }
-        private iisController _webServer;
+        private IisController _webServer;
         //
         //===================================================================================================
         public fileController appRootFiles {
@@ -398,15 +398,15 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// controller for the application's database
         /// </summary>
-        public dbController db {
+        public DbController db {
             get {
                 if (_db == null) {
-                    _db = new dbController(this);
+                    _db = new DbController(this);
                 }
                 return _db;
             }
         }
-        private dbController _db;
+        private DbController _db;
         //
         //===================================================================================================
         /// <summary>
@@ -428,11 +428,11 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public coreController(CPClass cp) : base() {
+        public CoreController(CPClass cp) : base() {
             cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
-            session = new sessionController(this);
+            session = new SessionController(this);
             //
             serverConfig = Models.Context.serverConfigModel.getObject(this);
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -446,11 +446,11 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public coreController(CPClass cp, string applicationName) : base() {
+        public CoreController(CPClass cp, string applicationName) : base() {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
-            session = new sessionController(this);
+            session = new SessionController(this);
             //
             serverConfig = serverConfigModel.getObject(this);
             serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -467,11 +467,11 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public coreController(CPClass cp, string applicationName, serverConfigModel serverConfig) : base() {
+        public CoreController(CPClass cp, string applicationName, serverConfigModel serverConfig) : base() {
             cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
-            session = new sessionController(this);
+            session = new SessionController(this);
             //
             this.serverConfig = serverConfig;
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -487,11 +487,11 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public coreController(CPClass cp, string applicationName, serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
+        public CoreController(CPClass cp, string applicationName, serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
-            session = new sessionController(this);
+            session = new SessionController(this);
             //
             this.serverConfig = serverConfig;
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -504,11 +504,11 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// coreClass constructor for a web request/response environment. coreClass is the primary object internally, created by cp.
         /// </summary>
-        public coreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
+        public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
-            session = new sessionController(this);
+            session = new SessionController(this);
             //
             serverConfig = serverConfigModel.getObject(this);
             serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
@@ -540,7 +540,7 @@ namespace Contensive.Processor.Controllers {
                 if (appConfig != null) {
                     //
                     // -- test fix for 404 response during routing - could it be a response left over from processing before we are called
-                    webServer.setResponseStatus(iisController.httpResponseStatus200);
+                    webServer.setResponseStatus(IisController.httpResponseStatus200);
                     //
                     // -- execute intercept methods first, like login, that run before the route that returns the page
                     // -- intercept routes should be addons alos
@@ -1093,14 +1093,14 @@ namespace Contensive.Processor.Controllers {
                 if (appConfig == null) {
                     //
                     // -- server mode, there is no application
-                    session = sessionController.create(this, false);
+                    session = SessionController.create(this, false);
                 } else if (appConfig.appStatus != appConfigModel.appStatusEnum.ok) {
                     //} else if ((appConfig.appMode != appConfigModel.appModeEnum.normal) | (appConfig.appStatus != appConfigModel.appStatusEnum.OK)) {
                     //
                     // -- application is not ready, might be error, or in maintainence mode
-                    session = sessionController.create(this, false);
+                    session = SessionController.create(this, false);
                 } else {
-                    session = sessionController.create(this, allowVisit && siteProperties.allowVisitTracking);
+                    session = SessionController.create(this, allowVisit && siteProperties.allowVisitTracking);
                     //
                     // -- debug defaults on, so if not on, set it off and clear what was collected
                     doc.visitPropertyAllowDebugging = visitProperty.getBoolean("AllowDebugging");
@@ -1120,7 +1120,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <remarks></remarks>
         public string codeVersion() {
-            Type myType = typeof(coreController);
+            Type myType = typeof(CoreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();
             Version myVersion = myAssemblyname.Version;
@@ -1160,7 +1160,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~coreController() {
+        ~CoreController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

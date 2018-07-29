@@ -24,13 +24,13 @@ namespace Contensive.Processor {
         public const string EventsId = "DBE2B6CB-6339-4FFB-92D7-BE37AEA841CC";
         #endregion
         //
-        private Contensive.Processor.Controllers.coreController core;
+        private Contensive.Processor.Controllers.CoreController core;
         private CPClass CP;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
-        public CPUserClass(Contensive.Processor.Controllers.coreController coreObj, CPClass CPParent) : base() {
+        public CPUserClass(Contensive.Processor.Controllers.CoreController coreObj, CPClass CPParent) : base() {
             core = coreObj;
             CP = CPParent;
         }
@@ -80,7 +80,7 @@ namespace Contensive.Processor {
                     var user = personModel.add(core);
                     user.CreatedByVisit = true;
                     user.save(core);
-                    sessionController.recognizeById(core, user.id, ref CP.core.session);
+                    SessionController.recognizeById(core, user.id, ref CP.core.session);
                 }
                 return core.session.user.id;
                 //int localId = CP.core.session.user.id;
@@ -257,19 +257,19 @@ namespace Contensive.Processor {
         //
         [Obsolete("Use LoginById(integer) instead", false)]
         public override bool LoginByID(string RecordID, bool SetAutoLogin = false) {
-            return sessionController.authenticateById(core, encodeInteger(RecordID), CP.core.session);
+            return SessionController.authenticateById(core, encodeInteger(RecordID), CP.core.session);
         }
         //
         //====================================================================================================
         //
         public override bool LoginByID(int RecordID) {
-            return sessionController.authenticateById(core, RecordID, CP.core.session);
+            return SessionController.authenticateById(core, RecordID, CP.core.session);
         }
         //
         //====================================================================================================
         //
         public override bool LoginByID(int RecordID, bool SetAutoLogin) {
-            bool result = sessionController.authenticateById(core, RecordID, CP.core.session);
+            bool result = SessionController.authenticateById(core, RecordID, CP.core.session);
             if (result) {
                 CP.core.session.user.AutoLogin = SetAutoLogin;
                 CP.core.session.user.save(core);
@@ -332,7 +332,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool Recognize(int UserID) {
-            return sessionController.recognizeById(core, UserID, ref CP.core.session);
+            return SessionController.recognizeById(core, UserID, ref CP.core.session);
         }
         //
         //====================================================================================================

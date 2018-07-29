@@ -25,7 +25,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public static string main_GetRemoteQueryKey(coreController core, string SQL, string DataSourceName = "", int maxRows = 1000) {
+        public static string main_GetRemoteQueryKey(CoreController core, string SQL, string DataSourceName = "", int maxRows = 1000) {
             //
             int CS = 0;
             string RemoteKey = "";
@@ -53,7 +53,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public static string main_FormatRemoteQueryOutput(coreController core, GoogleDataType gd, RemoteFormatEnum RemoteFormat) {
+        public static string main_FormatRemoteQueryOutput(CoreController core, GoogleDataType gd, RemoteFormatEnum RemoteFormat) {
             //
             stringBuilderLegacyController s = null;
             string ColDelim = null;

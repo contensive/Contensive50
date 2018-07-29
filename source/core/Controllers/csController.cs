@@ -12,7 +12,7 @@ namespace Contensive.Processor {
     /// </summary>
     public class csController : IDisposable {
         //
-        private Contensive.Processor.Controllers.coreController core;
+        private Contensive.Processor.Controllers.CoreController core;
         private int csPtr;
         private int openingMemberID;
         protected bool disposed = false;
@@ -22,7 +22,7 @@ namespace Contensive.Processor {
         /// constructor
         /// </summary>
         /// <param name="core"></param>
-        public csController(coreController core) {
+        public csController(CoreController core) {
             this.core = core;
             openingMemberID = core.session.user.id;
         }
@@ -224,7 +224,7 @@ namespace Contensive.Processor {
         //
         //========================================================================
         //
-        public static string getTextEncoded(coreController core, int CSPointer, string FieldName) {
+        public static string getTextEncoded(CoreController core, int CSPointer, string FieldName) {
             string ContentName = "";
             int RecordID = 0;
             if (core.db.csIsFieldSupported(CSPointer, "id") & core.db.csIsFieldSupported(CSPointer, "contentcontrolId")) {

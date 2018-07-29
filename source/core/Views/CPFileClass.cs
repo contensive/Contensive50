@@ -33,7 +33,7 @@ namespace Contensive.Processor {
         public const string EventsId = "8757DE11-C04D-4765-B46B-458E281BAE19";
         #endregion
         //
-        private Contensive.Processor.Controllers.coreController core;
+        private Contensive.Processor.Controllers.CoreController core;
         protected bool disposed = false;
         //
         //==========================================================================================
@@ -41,7 +41,7 @@ namespace Contensive.Processor {
         /// Constructor
         /// </summary>
         /// <param name="core"></param>
-        public CPFileClass(Contensive.Processor.Controllers.coreController core) : base() {
+        public CPFileClass(Contensive.Processor.Controllers.CoreController core) : base() {
             this.core = core;
         }
         //

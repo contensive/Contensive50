@@ -19,14 +19,14 @@ namespace Contensive.Processor.Models.Context {
     //====================================================================================================
     public class _blankModel {
         //
-        private coreController core;
+        private CoreController core;
         //
         //====================================================================================================
         /// <summary>
         /// new
         /// </summary>
         /// <param name="core"></param>
-        public _blankModel(coreController core) : base() {
+        public _blankModel(CoreController core) : base() {
             this.core = core;
         }
         //

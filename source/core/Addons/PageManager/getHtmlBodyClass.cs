@@ -27,7 +27,7 @@ namespace Contensive.Addons.PageManager {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string returnHtml = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 returnHtml = "<div class=\"ccBodyWeb\">" + pageContentController.getHtmlBody(core) + "</div>";
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

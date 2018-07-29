@@ -23,9 +23,9 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// Manage an individual catalog within a server.
     /// </summary>
-    public partial class dbController : IDisposable {
+    public partial class DbController : IDisposable {
         //
-        private coreController core;
+        private CoreController core;
         //
         /// <summary>
         /// default page size. Page size is how many records are read in a single fetch.
@@ -175,7 +175,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        public dbController(coreController core) : base() {
+        public DbController(CoreController core) : base() {
             this.core = core;
         }
         //
@@ -480,7 +480,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="TableName"></param>
         /// <param name="Criteria"></param>
         /// <param name="sqlList"></param>
-        public void updateTableRecord(string DataSourceName, string TableName, string Criteria, sqlFieldListClass sqlList) {
+        public void updateTableRecord(string DataSourceName, string TableName, string Criteria, SqlFieldListClass sqlList) {
             try {
                 string SQL = "update " + TableName + " set " + sqlList.getNameValueList() + " where " + Criteria + ";";
                 executeNonQuery(SQL, DataSourceName);
@@ -524,7 +524,7 @@ namespace Contensive.Processor.Controllers {
         public DataTable insertTableRecordGetDataTable(string DataSourceName, string TableName, int MemberID = 0) {
             DataTable returnDt = null;
             try {
-                sqlFieldListClass sqlList = new sqlFieldListClass();
+                SqlFieldListClass sqlList = new SqlFieldListClass();
                 //string CreateKeyString = null;
                 //string sqlDateAdded = null;
                 string sqlGuid = encodeSQLText( genericController.getGUID());
@@ -557,7 +557,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <param name="sqlList"></param>
-        public void insertTableRecord(string DataSourceName, string TableName, sqlFieldListClass sqlList) {
+        public void insertTableRecord(string DataSourceName, string TableName, SqlFieldListClass sqlList) {
             try {
                 if (sqlList.count > 0) {
                     string sql = "INSERT INTO " + TableName + "(" + sqlList.getNameList() + ")values(" + sqlList.getValueList() + ")";
@@ -1098,7 +1098,7 @@ namespace Contensive.Processor.Controllers {
             bool returnOk = false;
             try {
                 DataTable dt = executeQuery("Select top 1 id from ccFields where name=" + encodeSQLText(FieldName) + " And contentid=" + ContentID);
-                tempisCdefField = dbController.isDataTableOk(dt);
+                tempisCdefField = DbController.isDataTableOk(dt);
                 dt.Dispose();
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -1411,7 +1411,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- Open the csv_ContentSet
                         returnCs = csInit(iMemberID);
                         {
-                            dbController.ContentSetClass contentSet = contentSetStore[returnCs];
+                            DbController.ContentSetClass contentSet = contentSetStore[returnCs];
                             contentSet.Updateable = true;
                             contentSet.ContentName = ContentName;
                             contentSet.DataSource = DataSourceName;
@@ -1578,7 +1578,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 returnCs = csInit(core.session.user.id);
                 {
-                    Contensive.Processor.Controllers.dbController.ContentSetClass contentSet = contentSetStore[returnCs];
+                    Contensive.Processor.Controllers.DbController.ContentSetClass contentSet = contentSetStore[returnCs];
                     contentSet.Updateable = false;
                     contentSet.ContentName = "";
                     contentSet.PageNumber = pageNumber;
@@ -2321,7 +2321,7 @@ namespace Contensive.Processor.Controllers {
                 int Ptr = 0;
                 string[] lookups = null;
                 string UCaseDefaultValueText = null;
-                sqlFieldListClass sqlList = new sqlFieldListClass();
+                SqlFieldListClass sqlList = new SqlFieldListClass();
                 //
                 if (string.IsNullOrEmpty(ContentName.Trim())) {
                     throw new ArgumentException("ContentName cannot be blank");
@@ -2682,7 +2682,7 @@ namespace Contensive.Processor.Controllers {
                                     DbTable = Models.Complex.cdefModel.getContentTablename(core, ContentName);
                                     SQL = "Select " + field.ManyToManyRuleSecondaryField + " from " + DbTable + " where " + field.ManyToManyRulePrimaryField + "=" + RecordID;
                                     rs = executeQuery(SQL);
-                                    if (dbController.isDataTableOk(rs)) {
+                                    if (DbController.isDataTableOk(rs)) {
                                         foreach (DataRow dr in rs.Rows) {
                                             fieldValue += "," + dr[0].ToString();
                                         }
@@ -3472,7 +3472,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="source"></param>
         /// <returns></returns>
-        public string encodeSqlTextLike(coreController core, string source) {
+        public string encodeSqlTextLike(CoreController core, string source) {
             return encodeSQLText("%" + source + "%");
         }
         //
@@ -3551,7 +3551,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         //========================================================================
         //
-        public string GetVirtualFilename(string ContentName, string FieldName, int RecordID, string OriginalFilename = "") {
+        public string getVirtualFilename(string ContentName, string FieldName, int RecordID, string OriginalFilename = "") {
             string returnResult = "";
             try {
                 int fieldTypeId = 0;
@@ -3673,7 +3673,7 @@ namespace Contensive.Processor.Controllers {
             int returnResult = 0;
             try {
                 DataTable dt = executeQuery("select ContentTableID from ccContent where name=" + encodeSQLText(ContentName));
-                if (!dbController.isDataTableOk(dt)) {
+                if (!DbController.isDataTableOk(dt)) {
                     throw new ApplicationException("Content [" + ContentName + "] was not found in ccContent table");
                 } else {
                     returnResult = genericController.encodeInteger(dt.Rows[0]["ContentTableID"]);
@@ -3701,7 +3701,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (RecordID <= 0) {
                     throw new ApplicationException("record id is not valid [" + RecordID + "]");
                 } else {
-                    DeleteTableRecords(TableName, "ID=" + RecordID, DataSourceName);
+                    deleteTableRecords(TableName, "ID=" + RecordID, DataSourceName);
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -3849,7 +3849,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="TableName"></param>
         /// <param name="Criteria"></param>
         //
-        public void DeleteTableRecords(string TableName, string Criteria, string DataSourceName) {
+        public void deleteTableRecords(string TableName, string Criteria, string DataSourceName) {
             try {
                 if (string.IsNullOrEmpty(DataSourceName)) {
                     throw new ArgumentException("dataSourceName cannot be blank");
@@ -3992,7 +3992,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         //=============================================================
         //
-        public int GetRecordIDByGuid(string ContentName, string RecordGuid) {
+        public int getRecordIDByGuid(string ContentName, string RecordGuid) {
             int returnResult = 0;
             try {
                 if (string.IsNullOrEmpty(ContentName)) {
@@ -4017,7 +4017,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public string[,] GetContentRows(string ContentName, string Criteria = "", string SortFieldList = "", bool ActiveOnly = true, int MemberID = SystemMemberID, bool WorkflowRenderingMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "", int PageSize = 9999, int PageNumber = 1) {
+        public string[,] getContentRows(string ContentName, string Criteria = "", string SortFieldList = "", bool ActiveOnly = true, int MemberID = SystemMemberID, bool WorkflowRenderingMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "", int PageSize = 9999, int PageNumber = 1) {
             string[,] returnRows = { { } };
             try {
                 //
@@ -4045,7 +4045,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="GroupBy"></param>
         /// <param name="RecordLimit"></param>
         /// <returns></returns>
-        public string GetSQLSelect(string DataSourceName, string From, string FieldList = "", string Where = "", string OrderBy = "", string GroupBy = "", int RecordLimit = 0) {
+        public string getSQLSelect(string DataSourceName, string From, string FieldList = "", string Where = "", string OrderBy = "", string GroupBy = "", int RecordLimit = 0) {
             string SQL = "SELECT";
             if (RecordLimit != 0) {
                 SQL += " TOP " + RecordLimit;
@@ -4322,17 +4322,17 @@ namespace Contensive.Processor.Controllers {
         public void createContentFieldFromTableField(string ContentName, string FieldName, int ADOFieldType) {
             try {
                 //
-                Models.Complex.cdefFieldModel field = new Models.Complex.cdefFieldModel();
-                //
-                field.fieldTypeId = core.db.getFieldTypeIdByADOType(ADOFieldType);
-                field.caption = FieldName;
-                field.editSortPriority = 1000;
-                field.readOnly = false;
-                field.authorable = true;
-                field.adminOnly = false;
-                field.developerOnly = false;
-                field.textBuffered = false;
-                field.htmlContent = false;
+                cdefFieldModel field = new cdefFieldModel {
+                    fieldTypeId = core.db.getFieldTypeIdByADOType(ADOFieldType),
+                    caption = FieldName,
+                    editSortPriority = 1000,
+                    readOnly = false,
+                    authorable = true,
+                    adminOnly = false,
+                    developerOnly = false,
+                    textBuffered = false,
+                    htmlContent = false
+                };
                 //
                 switch (genericController.vbUCase(FieldName)) {
                     //
@@ -4565,7 +4565,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Criteria"></param>
         /// <param name="ChunkSize"></param>
         /// <param name="MaxChunkCount"></param>
-        public void DeleteTableRecordChunks(string DataSourceName, string TableName, string Criteria, int ChunkSize = 1000, int MaxChunkCount = 1000) {
+        public void deleteTableRecordChunks(string DataSourceName, string TableName, string Criteria, int ChunkSize = 1000, int MaxChunkCount = 1000) {
             //
             int PreviousCount = 0;
             int CurrentCount = 0;
@@ -4581,7 +4581,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // If not SQL server, just delete them
                 //
-                DeleteTableRecords(TableName, Criteria, DataSourceName);
+                deleteTableRecords(TableName, Criteria, DataSourceName);
             } else {
                 //
                 // ----- Clear up to date for the properties
@@ -4811,7 +4811,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public void SetContentCopy(string CopyName, string Content) {
+        public void setContentCopy(string CopyName, string Content) {
             //
             int CS = 0;
             string iCopyName = null;
@@ -4870,7 +4870,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static void csSetFormInput(coreController core, int CSPointer, string FieldName, string RequestName = "") {
+        public static void csSetFormInput(CoreController core, int CSPointer, string FieldName, string RequestName = "") {
             string LocalRequestName = null;
             string Filename = null;
             string Path = null;
@@ -4951,7 +4951,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="DbObject"></param>
         /// <returns></returns>
-        public static string GetDbObjectTableName(string DbObject) {
+        public static string getDbObjectTableName(string DbObject) {
             string tempGetDbObjectTableName = null;
             int Position = 0;
             //
@@ -4965,7 +4965,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static  string csGetRecordAddLink( coreController core,  int csPtr, string PresetNameValueList = "", bool AllowPaste = false) {
+        public static  string csGetRecordAddLink( CoreController core,  int csPtr, string PresetNameValueList = "", bool AllowPaste = false) {
             string result = "";
             try {
                 if (csPtr >= 0) {
@@ -5024,7 +5024,7 @@ namespace Contensive.Processor.Controllers {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~dbController() {
+        ~DbController() {
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();
@@ -5032,7 +5032,7 @@ namespace Contensive.Processor.Controllers {
         #endregion
     }
     //
-    public class sqlFieldListClass {
+    public class SqlFieldListClass {
         private List<NameValuePairType> _sqlList = new List<NameValuePairType>();
         public void add(string name, string value) {
             NameValuePairType nameValue;

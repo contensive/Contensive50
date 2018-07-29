@@ -38,97 +38,97 @@ namespace Contensive.Processor.Models.DbModels {
         public string body { get; set; }
         //
         //====================================================================================================
-        public static emailLogModel add(coreController core) {
+        public static emailLogModel add(CoreController core) {
             return add<emailLogModel>(core);
         }
         //
         //====================================================================================================
-        public static emailLogModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static emailLogModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<emailLogModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static emailLogModel create(coreController core, int recordId) {
+        public static emailLogModel create(CoreController core, int recordId) {
             return create<emailLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static emailLogModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static emailLogModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<emailLogModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static emailLogModel create(coreController core, string recordGuid) {
+        public static emailLogModel create(CoreController core, string recordGuid) {
             return create<emailLogModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static emailLogModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static emailLogModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<emailLogModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static emailLogModel createByName(coreController core, string recordName) {
+        public static emailLogModel createByName(CoreController core, string recordName) {
             return createByName<emailLogModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static emailLogModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static emailLogModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<emailLogModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<emailLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<emailLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<emailLogModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<emailLogModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<emailLogModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<emailLogModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<emailLogModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<emailLogModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<emailLogModel> createList(coreController core, string sqlCriteria) {
+        public static List<emailLogModel> createList(CoreController core, string sqlCriteria) {
             return createList<emailLogModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<emailLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<emailLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<emailLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<emailLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static emailLogModel createDefault(coreController core) {
+        public static emailLogModel createDefault(CoreController core) {
             return createDefault<emailLogModel>(core);
         }
     }

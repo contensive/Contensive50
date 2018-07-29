@@ -26,7 +26,7 @@ namespace Contensive.Addons.PageManager {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string returnHtml = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 string pageCommaList = cp.Doc.GetText("sortlist");
                 List<string> pageList = new List<string>(pageCommaList.Split(','));
                 if (pageList.Count > 1) {

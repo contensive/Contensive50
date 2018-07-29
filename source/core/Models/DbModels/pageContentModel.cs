@@ -87,97 +87,97 @@ namespace Contensive.Processor.Models.DbModels {
         public int Viewings { get; set; }
         //
         //====================================================================================================
-        public static pageContentModel add(coreController core) {
+        public static pageContentModel add(CoreController core) {
             return add<pageContentModel>(core);
         }
         //
         //====================================================================================================
-        public static pageContentModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static pageContentModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<pageContentModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static pageContentModel create(coreController core, int recordId) {
+        public static pageContentModel create(CoreController core, int recordId) {
             return create<pageContentModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static pageContentModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static pageContentModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<pageContentModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static pageContentModel create(coreController core, string recordGuid) {
+        public static pageContentModel create(CoreController core, string recordGuid) {
             return create<pageContentModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static pageContentModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static pageContentModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<pageContentModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static pageContentModel createByName(coreController core, string recordName) {
+        public static pageContentModel createByName(CoreController core, string recordName) {
             return createByName<pageContentModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static pageContentModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static pageContentModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<pageContentModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<pageContentModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<pageContentModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<pageContentModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<pageContentModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<pageContentModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<pageContentModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<pageContentModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<pageContentModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<pageContentModel> createList(coreController core, string sqlCriteria) {
+        public static List<pageContentModel> createList(CoreController core, string sqlCriteria) {
             return createList<pageContentModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<pageContentModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<pageContentModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<pageContentModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<pageContentModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static pageContentModel createDefault(coreController core) {
+        public static pageContentModel createDefault(CoreController core) {
             return createDefault<pageContentModel>(core);
         }
     }

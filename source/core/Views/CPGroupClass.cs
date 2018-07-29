@@ -27,7 +27,7 @@ namespace Contensive.Processor {
         public const string EventsId = "B9E3C450-CDC4-4590-8BCD-FEDDF7338D4B";
         #endregion
         //
-        private Contensive.Processor.Controllers.coreController core;
+        private Contensive.Processor.Controllers.CoreController core;
         private CPClass cp;
         protected bool disposed = false;
         //

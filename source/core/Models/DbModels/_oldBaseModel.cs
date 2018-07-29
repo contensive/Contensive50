@@ -57,7 +57,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public static oldBaseModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static oldBaseModel add(CoreController core, ref List<string> callersCacheNameList) {
             oldBaseModel result = null;
             try {
                 result = create(core, core.db.insertContentRecordGetID(primaryContentName, core.session.user.id), ref callersCacheNameList);
@@ -76,7 +76,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="core"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        public static oldBaseModel create(coreController core, int recordId) {
+        public static oldBaseModel create(CoreController core, int recordId) {
             var tempVar = new List<string>();
             return create(core, recordId, ref tempVar);
         }
@@ -88,7 +88,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="recordId">The id of the record to be read into the new object</param>
         /// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        public static oldBaseModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static oldBaseModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             oldBaseModel result = null;
             try {
                 if (recordId > 0) {
@@ -117,7 +117,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
-        public static oldBaseModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static oldBaseModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             oldBaseModel result = null;
             try {
                 if (!string.IsNullOrEmpty(recordGuid)) {
@@ -171,7 +171,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordName"></param>
-        public static oldBaseModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static oldBaseModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             oldBaseModel result = null;
             try {
                 if (!string.IsNullOrEmpty(recordName)) {
@@ -199,7 +199,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
-        private static oldBaseModel loadRecord(coreController core, csController cs, ref List<string> callersCacheNameList) {
+        private static oldBaseModel loadRecord(CoreController core, csController cs, ref List<string> callersCacheNameList) {
             oldBaseModel instance = null;
             try {
                 if (cs.ok()) {
@@ -261,7 +261,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public int save(coreController core) {
+        public int save(CoreController core) {
             try {
                 csController cs = new csController(core);
                 if (id > 0) {
@@ -343,7 +343,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             try {
                 if (recordId > 0) {
                     core.db.deleteContentRecords(primaryContentName, "id=" + recordId.ToString());
@@ -362,7 +362,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="ccguid"></param>
-        public static void delete(coreController core, string ccguid) {
+        public static void delete(CoreController core, string ccguid) {
             try {
                 if (!string.IsNullOrEmpty(ccguid)) {
                     var tempVar = new List<string>();
@@ -408,7 +408,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        public static List<oldBaseModel> createList(coreController core, string sqlCriteria, List<string> callersCacheNameList) {
+        public static List<oldBaseModel> createList(CoreController core, string sqlCriteria, List<string> callersCacheNameList) {
             List<oldBaseModel> result = new List<oldBaseModel>();
             try {
                 csController cs = new csController(core);
@@ -437,7 +437,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="recordId"></param>
-        public static void invalidatePrimaryCache(coreController core, int recordId) {
+        public static void invalidatePrimaryCache(CoreController core, int recordId) {
             core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
             //
             // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
@@ -466,7 +466,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="recordId"></param>record
         /// <returns></returns>
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             var tempVar = new List<string>();
             return oldBaseModel.create(core, recordId, ref tempVar).name;
         }
@@ -478,7 +478,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="ccGuid"></param>record
         /// <returns></returns>
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             var tempVar = new List<string>();
             return oldBaseModel.create(core, ccGuid, ref tempVar).name;
         }
@@ -490,14 +490,14 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="ccGuid"></param>record
         /// <returns></returns>
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             var tempVar = new List<string>();
             return oldBaseModel.create(core, ccGuid, ref tempVar).id;
         }
         //
         //====================================================================================================
         //
-        public static oldBaseModel createDefault(coreController core) {
+        public static oldBaseModel createDefault(CoreController core) {
             oldBaseModel instance = new oldBaseModel();
             try {
                 Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(core, primaryContentName);

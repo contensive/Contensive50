@@ -27,7 +27,7 @@ namespace Contensive.Processor.Controllers {
         //       If main_PageTestPointPrinting print a string, value paior
         //========================================================================
         //
-        public static void testPoint(coreController core, string message) {
+        public static void testPoint(CoreController core, string message) {
             //
             if ((core != null) && (core.serverConfig != null) && (core.appConfig != null)) {
                 bool debugging = core.doc.visitPropertyAllowDebugging;

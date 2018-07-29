@@ -60,7 +60,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logDebug(coreController core, string message) {
+        public static void logDebug(CoreController core, string message) {
             log(core, message, logLevel.Debug);
         }
         //
@@ -71,7 +71,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logError(coreController core, string message) {
+        public static void logError(CoreController core, string message) {
             log(core, message, logLevel.Error);
         }
         //
@@ -82,7 +82,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logFatal(coreController core, string message) {
+        public static void logFatal(CoreController core, string message) {
             log(core, message, logLevel.Fatal);
         }
         //
@@ -93,7 +93,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logInfo(coreController core, string message) {
+        public static void logInfo(CoreController core, string message) {
             log(core, message, logLevel.Info);
         }
         //
@@ -104,7 +104,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logTrace(coreController core, string message) {
+        public static void logTrace(CoreController core, string message) {
             log(core, message, logLevel.Trace);
         }
         //
@@ -115,7 +115,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <remarks></remarks>
-        public static void logWarn(coreController core, string message) {
+        public static void logWarn(CoreController core, string message) {
             log(core, message, logLevel.Warn);
         }
         //
@@ -172,7 +172,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <param name="level"></param>
-        public static void log(coreController core, string message, logLevel level) {
+        public static void log(CoreController core, string message, logLevel level) {
             try {
                 if ((level >= logLevel.Error) || core.serverConfig.enableLogging) {
                     //
@@ -281,7 +281,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Link"></param>
         /// <param name="VisitorID"></param>
         /// <param name="VisitID"></param>
-        public static void addSiteActivity(coreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
+        public static void addSiteActivity(CoreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
             try {
                 //
                 if (Message.Length > 255) Message = Message.Substring(0, 255);
@@ -314,7 +314,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Message"></param>
         /// <param name="SubjectMemberID"></param>
         /// <param name="SubjectOrganizationID"></param>
-        public static void addSiteActivity(coreController core, string Message, int SubjectMemberID, int SubjectOrganizationID) {
+        public static void addSiteActivity(CoreController core, string Message, int SubjectMemberID, int SubjectOrganizationID) {
             addSiteActivity(core, Message, core.session.user.id, SubjectMemberID, SubjectOrganizationID, core.webServer.requestUrl, core.session.visitor.id, core.session.visit.id);
         }
         //
@@ -352,7 +352,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="generalKey"></param>
         /// <param name="specificKey"></param>
         //
-        public static void addSiteWarning(coreController core, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
+        public static void addSiteWarning(CoreController core, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
             string SQL = null;
             int warningId = 0;
             int CS = 0;
@@ -401,7 +401,7 @@ namespace Contensive.Processor.Controllers {
         /// not implemented, as current logging system does not need to be housekeeped. Keep the hood here for the future
         /// </summary>
         /// <param name="core"></param>
-        public static void housekeepLogs(coreController core) {
+        public static void housekeepLogs(CoreController core) {
             try {
                 // -- deprecated, NLog handles housekeeping
                 return;
@@ -418,7 +418,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="stackPtr">How far down in the stack to look for the method error. Pass 1 if the method calling has the error, 2 if there is an intermediate routine.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static void handleException(coreController core, Exception ex, logLevel level, string cause, int stackPtr) {
+        public static void handleException(CoreController core, Exception ex, logLevel level, string cause, int stackPtr) {
             if (!core._handlingExceptionRecursionBlock) {
                 core._handlingExceptionRecursionBlock = true;
                 StackFrame frame = new StackFrame(stackPtr);
@@ -448,37 +448,37 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static void handleError(coreController core, Exception ex, string cause) {
+        public static void handleError(CoreController core, Exception ex, string cause) {
             handleException(core, ex, logLevel.Error, cause, 2);
         }
         //
         //====================================================================================================
         //
-        public static void handleError(coreController core, Exception ex) {
+        public static void handleError(CoreController core, Exception ex) {
             handleException(core, ex, logLevel.Error, "n/a", 2);
         }
         //
         //====================================================================================================
         //
-        public static void handleWarn(coreController core, Exception ex, string cause) {
+        public static void handleWarn(CoreController core, Exception ex, string cause) {
             handleException(core, ex, logLevel.Warn, cause, 2);
         }
         //
         //====================================================================================================
         //
-        public static void handleWarn(coreController core, Exception ex) {
+        public static void handleWarn(CoreController core, Exception ex) {
             handleException(core, ex, logLevel.Warn, "n/a", 2);
         }
         //
         //====================================================================================================
         //
-        public static void handleFatal(coreController core, Exception ex, string cause) {
+        public static void handleFatal(CoreController core, Exception ex, string cause) {
             handleException(core, ex, logLevel.Fatal, cause, 2);
         }
         //
         //====================================================================================================
         //
-        public static void handleFatal(coreController core, Exception ex) {
+        public static void handleFatal(CoreController core, Exception ex) {
             handleException(core, ex, logLevel.Fatal, "n/a", 2);
         }
     }

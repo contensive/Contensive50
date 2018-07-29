@@ -26,7 +26,7 @@ namespace Contensive.Addons.Primitives {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string result = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 int emailDropId = core.docProperties.getInteger(rnEmailOpenFlag);
                 if (emailDropId != 0) {
                     //

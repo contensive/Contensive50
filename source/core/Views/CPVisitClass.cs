@@ -23,11 +23,11 @@ namespace Contensive.Processor {
         public const string EventsId = "2AFEB1A8-5B27-45AC-A9DF-F99849BE1FAE";
         #endregion
         //
-        private Contensive.Processor.Controllers.coreController core;
+        private Contensive.Processor.Controllers.CoreController core;
         private CPClass cp;
         protected bool disposed = false;
         //
-        public CPVisitClass(Contensive.Processor.Controllers.coreController coreObj, CPClass cpParent) : base() {
+        public CPVisitClass(Contensive.Processor.Controllers.CoreController coreObj, CPClass cpParent) : base() {
             this.core = coreObj;
             cp = cpParent;
         }

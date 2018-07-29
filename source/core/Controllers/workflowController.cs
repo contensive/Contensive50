@@ -21,7 +21,7 @@ namespace Contensive.Processor.Controllers {
         // objects passed in that are not disposed
         //------------------------------------------------------------------------------------------------------------------------
         //
-        private coreController core;
+        private CoreController core;
         //
         //------------------------------------------------------------------------------------------------------------------------
         // objects created within class to dispose in dispose
@@ -64,7 +64,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cluster"></param>
         /// <param name="appName"></param>
         /// <remarks></remarks>
-        public workflowController(coreController core) : base() {
+        public workflowController(CoreController core) : base() {
             try {
                 //
                 this.core = core;

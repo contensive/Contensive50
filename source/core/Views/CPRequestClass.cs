@@ -28,12 +28,12 @@ namespace Contensive.Processor {
         public const string EventsId = "C8938AB2-26F0-41D2-A282-3313FD7BA490";
         #endregion
         //
-        private Contensive.Processor.Controllers.coreController core;
+        private Contensive.Processor.Controllers.CoreController core;
         protected bool disposed = false;
         //
         //====================================================================================================
         // Constructor
-        public CPRequestClass(Contensive.Processor.Controllers.coreController coreObj) : base() {
+        public CPRequestClass(Contensive.Processor.Controllers.CoreController coreObj) : base() {
             core = coreObj;
         }
         //
@@ -63,19 +63,11 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         [Obsolete]
-        public override bool BrowserIsIE {
-            get {
-                return core.session.visit_browserIsIE;
-            }
-        }
+        public override bool BrowserIsIE { get { return false; } }
         //
         //====================================================================================================
         [Obsolete]
-        public override bool BrowserIsMac {
-            get {
-                return core.session.visit_browserIsMac;
-            }
-        }
+        public override bool BrowserIsMac { get { return false; } }
         //
         //====================================================================================================
         public override bool BrowserIsMobile {
@@ -88,14 +80,15 @@ namespace Contensive.Processor {
         [Obsolete]
         public override bool BrowserIsWindows {
             get {
-                return core.session.visit_browserIsWindows;
+                return false;
             }
         }
         //
         //====================================================================================================
-        [Obsolete] public override string BrowserVersion {
+        [Obsolete]
+        public override string BrowserVersion {
             get {
-                return core.session.visit_browserVersion;
+                return "";
             }
         }
         //
@@ -112,7 +105,7 @@ namespace Contensive.Processor {
         public override string CookieString {
             get {
                 string returnCookies = "";
-                foreach (KeyValuePair<string, iisController.cookieClass> kvp in core.webServer.requestCookies) {
+                foreach (KeyValuePair<string, IisController.CookieClass> kvp in core.webServer.requestCookies) {
                     returnCookies += "&" + kvp.Key + "=" + kvp.Value.value;
                 }
                 if (returnCookies.Length > 0) {

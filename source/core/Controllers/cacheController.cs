@@ -69,7 +69,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         // ----- objects passed in constructor, do not dispose
         //
-        private coreController core;
+        private CoreController core;
         //
         // ====================================================================================================
         // ----- objects constructed that must be disposed
@@ -568,7 +568,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void invalidateContent_Entity(coreController core, string tableName, int recordId) {
+        public void invalidateContent_Entity(CoreController core, string tableName, int recordId) {
             //
             invalidate(getCacheKey_Entity(tableName, recordId));
             if (tableName.ToLower() == linkAliasModel.contentTableName.ToLower()) {
@@ -646,7 +646,7 @@ namespace Contensive.Processor.Controllers {
         /// Initializes cache client
         /// </summary>
         /// <remarks></remarks>
-        public cacheController(coreController core) {
+        public cacheController(CoreController core) {
             try {
                 this.core = core;
                 //

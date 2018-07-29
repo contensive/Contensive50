@@ -27,7 +27,7 @@ namespace Contensive.Addons.AdminSite {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string returnHtml = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 //
                 // return the addons defult AddonOption_String
                 // used in wysiwyg editor - addons in select list have no defaultOption_String
@@ -42,7 +42,7 @@ namespace Contensive.Addons.AdminSite {
                 if (core.db.csOk(CS)) {
                     addonArgumentList = core.db.csGetText(CS, "argumentlist");
                     addonIsInline = core.db.csGetBoolean(CS, "IsInline");
-                    returnHtml = addonController.getDefaultAddonOptions(core, addonArgumentList, AddonGuid, addonIsInline);
+                    returnHtml = AddonController.getDefaultAddonOptions(core, addonArgumentList, AddonGuid, addonIsInline);
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {

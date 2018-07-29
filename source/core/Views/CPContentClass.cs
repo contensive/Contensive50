@@ -26,7 +26,7 @@ namespace Contensive.Processor {
         #endregion
         //
         private CPClass cp { get; set; }
-        private Contensive.Processor.Controllers.coreController core { get; set; }
+        private Contensive.Processor.Controllers.CoreController core { get; set; }
         protected bool disposed { get; set; } = false;
         //
         //====================================================================================================
@@ -51,7 +51,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void SetCopy(string CopyName, string Content) {
-            core.db.SetContentCopy(CopyName, Content);
+            core.db.setContentCopy(CopyName, Content);
         }
         //
         //====================================================================================================

@@ -22,7 +22,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         ///  Get an XML nodes attribute based on its name
         /// </summary>
-        public static string GetXMLAttribute(coreController core, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
+        public static string GetXMLAttribute(CoreController core, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
             string returnAttr = "";
             try {
                 //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
@@ -57,19 +57,19 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static double GetXMLAttributeNumber(coreController core, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
+        public static double GetXMLAttributeNumber(CoreController core, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
             return encodeNumber(GetXMLAttribute(core, Found, Node, Name, DefaultIfNotFound));
         }
         //
         //====================================================================================================
         //
-        public static bool GetXMLAttributeBoolean(coreController core, bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
+        public static bool GetXMLAttributeBoolean(CoreController core, bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
             return genericController.encodeBoolean(GetXMLAttribute(core, Found, Node, Name, encodeText(DefaultIfNotFound)));
         }
         //
         //====================================================================================================
         //
-        public static int GetXMLAttributeInteger(coreController core, bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
+        public static int GetXMLAttributeInteger(CoreController core, bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
             return genericController.encodeInteger(GetXMLAttribute(core, Found, Node, Name, DefaultIfNotFound.ToString()));
         }
 

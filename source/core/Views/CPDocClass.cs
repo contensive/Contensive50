@@ -24,7 +24,7 @@ namespace Contensive.Processor {
         #endregion
         //
         private CPClass cp;
-        private Contensive.Processor.Controllers.coreController core;
+        private Contensive.Processor.Controllers.CoreController core;
         protected bool disposed = false;
         //
         //====================================================================================================

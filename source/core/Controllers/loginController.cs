@@ -28,7 +28,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="forceDefaultLogin"></param>
         /// <returns></returns>
-        public static string getLoginPage(coreController core, bool forceDefaultLogin) {
+        public static string getLoginPage(CoreController core, bool forceDefaultLogin) {
             string result = "";
             try {
                 if (forceDefaultLogin) {
@@ -59,7 +59,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static string getLoginForm_Default(coreController core) {
+        public static string getLoginForm_Default(CoreController core) {
             string result = "";
             try {
                 //
@@ -124,7 +124,7 @@ namespace Contensive.Processor.Controllers {
         /// A login form that can be added to any page. This is just form with no surrounding border, etc. 
         /// </summary>
         /// <returns></returns>
-        public static string getLoginForm(coreController core, bool forceDefaultLoginForm = false) {
+        public static string getLoginForm(CoreController core, bool forceDefaultLoginForm = false) {
             string returnHtml = "";
             try {
                 int loginAddonID = 0;
@@ -169,7 +169,7 @@ namespace Contensive.Processor.Controllers {
         /// a simple email password form
         /// </summary>
         /// <returns></returns>
-        public static string getSendPasswordForm(coreController core) {
+        public static string getSendPasswordForm(CoreController core) {
             string returnResult = "";
             try {
                 string QueryString = null;
@@ -213,7 +213,7 @@ namespace Contensive.Processor.Controllers {
         // ----- Process the login form
         //========================================================================
         //
-        public static bool processFormLoginDefault(coreController core) {
+        public static bool processFormLoginDefault(CoreController core) {
             bool returnREsult = false;
             try {
                 int LocalMemberID = 0;
@@ -232,7 +232,7 @@ namespace Contensive.Processor.Controllers {
                         core.session.visit.LoginAttempts = core.session.visit.LoginAttempts + 1;
                         core.session.visit.save(core);
                     } else {
-                        returnREsult = sessionController.authenticateById(core, LocalMemberID, core.session);
+                        returnREsult = SessionController.authenticateById(core, LocalMemberID, core.session);
                         if (returnREsult) {
                             logController.addSiteActivity(core, "successful username/password login", core.session.user.id, core.session.user.OrganizationID);
                         } else {
@@ -251,7 +251,7 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         // ----- Process the send password form
         //
-        public static void processFormSendPassword(coreController core) {
+        public static void processFormSendPassword(CoreController core) {
             try {
                 string returnUserMessage = "";
                 sendPassword(core, core.docProperties.getText("email"), ref returnUserMessage);
@@ -267,7 +267,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="Email"></param>
         /// <returns></returns>
-        public static bool sendPassword(coreController core, string Email, ref string returnUserMessage) {
+        public static bool sendPassword(CoreController core, string Email, ref string returnUserMessage) {
             bool result = false;
             returnUserMessage = "";
             try {
@@ -459,7 +459,7 @@ namespace Contensive.Processor.Controllers {
         // ----- Process the send password form
         //========================================================================
         //
-        public static void processFormJoin(coreController core) {
+        public static void processFormJoin(CoreController core) {
             try {
                 string ErrorMessage = "";
                 int CS = 0;
@@ -500,7 +500,7 @@ namespace Contensive.Processor.Controllers {
                                 core.db.csSet(CS, "Name", FullName);
                                 core.db.csSet(CS, "username", loginForm_Username);
                                 core.db.csSet(CS, "password", loginForm_Password);
-                                sessionController.authenticateById(core, core.session.user.id, core.session);
+                                SessionController.authenticateById(core, core.session.user.id, core.session);
                             }
                             core.db.csClose(ref CS);
                         }

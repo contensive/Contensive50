@@ -36,7 +36,7 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 // -- ok to cast cpbase to cp because they build from the same solution
                 //this.cp = (CPClass)cp;
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 HouseKeep(core, core.docProperties.getBoolean("force"));
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
@@ -46,7 +46,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        public void HouseKeep(coreController core, bool force) {
+        public void HouseKeep(CoreController core, bool force) {
             try {
                 DateTime LastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default(DateTime));
                 int ServerHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2);
@@ -78,7 +78,7 @@ namespace Contensive.Addons.Housekeeping {
                     string ignoreRefactorText = "";
                     bool ignoreRefactorBoolean = false;
                     List<string> nonCriticalErrorList = new List<string>();
-                    if (!collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref ignoreRefactorText, ref ignoreRefactorBoolean, false, false, ref nonCriticalErrorList)) {
+                    if (!CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref ignoreRefactorText, ref ignoreRefactorBoolean, false, false, ref nonCriticalErrorList)) {
                         if (string.IsNullOrEmpty(ErrorMessage)) {
                             ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
                         }
@@ -87,7 +87,7 @@ namespace Contensive.Addons.Housekeeping {
                     //
                     // Verify core installation
                     //
-                    collectionController.installCollectionFromRemoteRepo(core, CoreCollectionGuid, ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
+                    CollectionController.installCollectionFromRemoteRepo(core, CoreCollectionGuid, ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
                     //
                     string DomainNamePrimary = core.appConfig.domainList[0];
                     int Pos = genericController.vbInstr(1, DomainNamePrimary, ",");
@@ -185,7 +185,7 @@ namespace Contensive.Addons.Housekeeping {
                             //
                             // Find missing daily summaries, summarize that date
                             //
-                            SQL = core.db.GetSQLSelect("default", "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
+                            SQL = core.db.getSQLSelect("default", "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
                             CS = core.db.csOpenSql(SQL,"Default");
                             DateTime datePtr = OldestVisitSummaryWeCareAbout;
                             while (datePtr <= Yesterday) {
@@ -244,7 +244,7 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         {
                             DateTime datePtr = default(DateTime);
-                            SQL = core.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1);
+                            SQL = core.db.getSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1);
                             CS = core.db.csOpenSql(SQL, "Default");
                             if (!core.db.csOk(CS)) {
                                 datePtr = OldestVisitSummaryWeCareAbout;
@@ -267,7 +267,7 @@ namespace Contensive.Addons.Housekeeping {
                         // Set NextSummaryStartDate based on the last time we ran hourly summarization
                         //
                         DateTime LastTimeSummaryWasRun = VisitArchiveDate;
-                        SQL = core.db.GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + core.db.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1);
+                        SQL = core.db.getSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + core.db.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1);
                         CS = core.db.csOpenSql(SQL,"Default");
                         if (core.db.csOk(CS)) {
                             LastTimeSummaryWasRun = core.db.csGetDate(CS, "DateAdded");
@@ -286,7 +286,7 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         DateTime StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
                         DateTime OldestDateAdded = StartOfHour;
-                        SQL = core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + core.db.encodeSQLDate(StartOfHour), "dateadded", "", 1);
+                        SQL = core.db.getSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + core.db.encodeSQLDate(StartOfHour), "dateadded", "", 1);
                         //SQL = "select top 1 Dateadded from ccvisits where LastVisitTime>" & encodeSQLDate(StartOfHour) & " order by DateAdded"
                         CS = core.db.csOpenSql(SQL,"Default");
                         if (core.db.csOk(CS)) {
@@ -376,7 +376,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        private void HouseKeep_App_Daily(coreController core, int VisitArchiveAgeDays, int GuestArchiveAgeDays, int EmailDropArchiveAgeDays, string DefaultMemberName, string BuildVersion) {
+        private void HouseKeep_App_Daily(CoreController core, int VisitArchiveAgeDays, int GuestArchiveAgeDays, int EmailDropArchiveAgeDays, string DefaultMemberName, string BuildVersion) {
             try {
                 //
                 DateTime ArchiveEmailDropDate = default(DateTime);
@@ -567,28 +567,28 @@ namespace Contensive.Addons.Housekeeping {
                     // delete visits from the non-cookie visits
                     //
                     logHousekeeping(core, "Deleting visits with no cookie support older than Midnight, Two Days Ago");
-                    core.db.DeleteTableRecordChunks("default", "ccvisits", "(CookieSupport=0)and(LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")", 1000, 10000);
+                    core.db.deleteTableRecordChunks("default", "ccvisits", "(CookieSupport=0)and(LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")", 1000, 10000);
                 }
                 //
                 // Visits with no DateAdded
                 //
                 logHousekeeping(core, "Deleting visits with no DateAdded");
-                core.db.DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" + core.db.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
+                core.db.deleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" + core.db.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
                 //
                 // Visits with no visitor
                 //
                 logHousekeeping(core, "Deleting visits with no DateAdded");
-                core.db.DeleteTableRecordChunks("default", "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000);
+                core.db.deleteTableRecordChunks("default", "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000);
                 //
                 // viewings with no visit
                 //
                 logHousekeeping(core, "Deleting viewings with null or invalid VisitID");
-                core.db.DeleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000);
+                core.db.deleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000);
                 //
                 // Get Oldest Visit
                 //
                 //SQL = "select top 1 DateAdded from ccVisits where dateadded>0 order by DateAdded"
-                SQL = core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "", "dateadded", "", 1);
+                SQL = core.db.getSQLSelect("default", "ccVisits", "DateAdded", "", "dateadded", "", 1);
                 CS = core.db.csOpenSql(SQL,"Default");
                 if (core.db.csOk(CS)) {
                     OldestVisitDate = core.db.csGetDate(CS, "DateAdded").Date;
@@ -1260,7 +1260,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        private void HouseKeep_App_Daily_RemoveVisitRecords(coreController core, DateTime DeleteBeforeDate, int DataSourceType) {
+        private void HouseKeep_App_Daily_RemoveVisitRecords(CoreController core, DateTime DeleteBeforeDate, int DataSourceType) {
             try {
                 //
                 int TimeoutSave = 0;
@@ -1281,12 +1281,12 @@ namespace Contensive.Addons.Housekeeping {
                 // Visits older then archive age
                 //
                 logHousekeeping(core, "Deleting visits before [" + DeleteBeforeDateSQL + "]");
-                core.db.DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" + DeleteBeforeDateSQL + ")", 1000, 10000);
+                core.db.deleteTableRecordChunks("default", "ccVisits", "(DateAdded<" + DeleteBeforeDateSQL + ")", 1000, 10000);
                 //
                 // Viewings with visits before the first
                 //
                 logHousekeeping(core, "Deleting viewings with visitIDs lower then the lowest ccVisits.ID");
-                core.db.DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
+                core.db.deleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
                 //
                 // Visitors with no visits
                 //
@@ -1325,7 +1325,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        private void HouseKeep_App_Daily_RemoveGuestRecords(coreController core, DateTime DeleteBeforeDate, int DataSourceType) {
+        private void HouseKeep_App_Daily_RemoveGuestRecords(CoreController core, DateTime DeleteBeforeDate, int DataSourceType) {
             int TimeoutSave = core.db.sqlCommandTimeout;
             try {
                 //
@@ -1342,7 +1342,7 @@ namespace Contensive.Addons.Housekeeping {
                     + " and(Visits=1)"
                     + " and(Username is null)"
                     + " and(email is null)";
-                core.db.DeleteTableRecordChunks("default", "" + SQLTablePeople + "", SQLCriteria, 1000, 10000);
+                core.db.deleteTableRecordChunks("default", "" + SQLTablePeople + "", SQLCriteria, 1000, 10000);
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }  finally { 
@@ -1388,7 +1388,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //=========================================================================================
         //
-        public void HouseKeep_VisitSummary(coreController core, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
+        public void HouseKeep_VisitSummary(CoreController core, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
             try {
                 double StartTimeHoursSinceMidnight = 0;
                 DateTime PeriodStart = default(DateTime);
@@ -1626,13 +1626,13 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        public void logHousekeeping(coreController core, string LogCopy) {
+        public void logHousekeeping(CoreController core, string LogCopy) {
             logController.logInfo(core, "housekeeping: " + LogCopy);
         }
         //
         //====================================================================================================
         //
-        private void HouseKeep_App_Daily_LogFolder(coreController core, string FolderName, DateTime LastMonth) {
+        private void HouseKeep_App_Daily_LogFolder(CoreController core, string FolderName, DateTime LastMonth) {
             try {
                 logHousekeeping(core, "Deleting files from folder [" + FolderName + "] older than " + LastMonth);
                 List<CPFileSystemBaseClass.FileDetail> FileList = core.privateFiles.getFileList(FolderName);
@@ -1650,7 +1650,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        private bool DownloadUpdates(coreController core) {
+        private bool DownloadUpdates(CoreController core) {
             bool loadOK = true;
             try {
                 XmlDocument Doc = null;
@@ -1705,7 +1705,7 @@ namespace Contensive.Addons.Housekeeping {
         /// <param name="BuildVersion"></param>
         /// <param name="OldestVisitSummaryWeCareAbout"></param>
         //
-        public void HouseKeep_PageViewSummary(coreController core, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
+        public void HouseKeep_PageViewSummary(CoreController core, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
             int hint = 0;
             string hinttxt = "";
             try {
@@ -1943,7 +1943,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        public void housekeepAddonFolder(coreController core) {
+        public void housekeepAddonFolder(CoreController core) {
             try {
                 string RegisterPathList = null;
                 string RegisterPath = null;

@@ -50,97 +50,97 @@ namespace Contensive.Processor.Models.DbModels {
         public int ParentID { get; set; }
         //
         //====================================================================================================
-        public static contentModel add(coreController core) {
+        public static contentModel add(CoreController core) {
             return add<contentModel>(core);
         }
         //
         //====================================================================================================
-        public static contentModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static contentModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<contentModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static contentModel create(coreController core, int recordId) {
+        public static contentModel create(CoreController core, int recordId) {
             return create<contentModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static contentModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static contentModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<contentModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static contentModel create(coreController core, string recordGuid) {
+        public static contentModel create(CoreController core, string recordGuid) {
             return create<contentModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static contentModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static contentModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<contentModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static contentModel createByName(coreController core, string recordName) {
+        public static contentModel createByName(CoreController core, string recordName) {
             return createByName<contentModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static contentModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static contentModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<contentModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<contentModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<contentModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<contentModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<contentModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<contentModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<contentModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<contentModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<contentModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<contentModel> createList(coreController core, string sqlCriteria) {
+        public static List<contentModel> createList(CoreController core, string sqlCriteria) {
             return createList<contentModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<contentModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<contentModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<contentModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<contentModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static contentModel createDefault(coreController core) {
+        public static contentModel createDefault(CoreController core) {
             return createDefault<contentModel>(core);
         }
         //
@@ -151,7 +151,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="someCriteria"></param>
         /// <returns></returns>
-        public static Dictionary<int, contentModel> createDict(coreController core, List<string> callersCacheNameList) {
+        public static Dictionary<int, contentModel> createDict(CoreController core, List<string> callersCacheNameList) {
             Dictionary<int, contentModel> result = new Dictionary<int, contentModel>();
             try {
                 foreach (contentModel content in createList(core, "")) {

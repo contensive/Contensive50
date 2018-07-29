@@ -41,7 +41,7 @@ namespace Contensive.Processor.Models.Complex {
         //   returns -1 if the table is not found
         //=================================================================================
         //
-        public static Models.Complex.TableSchemaModel getTableSchema(coreController core, string TableName, string DataSourceName) {
+        public static Models.Complex.TableSchemaModel getTableSchema(CoreController core, string TableName, string DataSourceName) {
             Models.Complex.TableSchemaModel tableSchema = null;
             try {
                 DataTable dt = null;
@@ -125,7 +125,7 @@ namespace Contensive.Processor.Models.Complex {
         }
         //
         //====================================================================================================
-        public static void tableSchemaListClear(coreController core) {
+        public static void tableSchemaListClear(CoreController core) {
             core.doc.tableSchemaDictionary.Clear();
         }
     }

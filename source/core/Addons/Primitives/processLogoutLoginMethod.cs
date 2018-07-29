@@ -27,7 +27,7 @@ namespace Contensive.Addons.Primitives {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string result = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 //
                 // -- login
                 core.session.logout(core);

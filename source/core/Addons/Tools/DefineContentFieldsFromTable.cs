@@ -35,7 +35,7 @@ namespace Contensive.Addons.Tools {
         /// <param name="core"></param>
         /// <returns></returns>
         //
-        private string GetForm_DefineContentFieldsFromTable(coreController core) {
+        private string GetForm_DefineContentFieldsFromTable(CoreController core) {
             string result = "";
             try {
                 string Button = core.docProperties.getText("Button");

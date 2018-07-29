@@ -83,97 +83,97 @@ namespace Contensive.Processor.Models.DbModels {
         public string Zip { get; set; }
         //
         //====================================================================================================
-        public static personModel add(coreController core) {
+        public static personModel add(CoreController core) {
             return add<personModel>(core);
         }
         //
         //====================================================================================================
-        public static personModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static personModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<personModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static personModel create(coreController core, int recordId) {
+        public static personModel create(CoreController core, int recordId) {
             return create<personModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static personModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static personModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<personModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static personModel create(coreController core, string recordGuid) {
+        public static personModel create(CoreController core, string recordGuid) {
             return create<personModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static personModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static personModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<personModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static personModel createByName(coreController core, string recordName) {
+        public static personModel createByName(CoreController core, string recordName) {
             return createByName<personModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static personModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static personModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<personModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<personModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<personModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<personModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<personModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<personModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<personModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<personModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<personModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<personModel> createList(coreController core, string sqlCriteria) {
+        public static List<personModel> createList(CoreController core, string sqlCriteria) {
             return createList<personModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<personModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<personModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<personModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<personModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static personModel createDefault(coreController core) {
+        public static personModel createDefault(CoreController core) {
             return createDefault<personModel>(core);
         }
         //
@@ -185,7 +185,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="groupList"></param>
         /// <param name="requireBulkEmail"></param>
         /// <returns></returns>
-        public static List<personModel> createListFromGroupList( coreController core, List<string> groupList, bool requireBulkEmail ) {
+        public static List<personModel> createListFromGroupList( CoreController core, List<string> groupList, bool requireBulkEmail ) {
             var personList = new List<personModel> { };
             try {
                 string sqlGroups = "";
@@ -219,7 +219,7 @@ namespace Contensive.Processor.Models.DbModels {
             return personList;
         }
         //
-        public static List<int> createidListForEmail(coreController core, int emailId) {
+        public static List<int> createidListForEmail(CoreController core, int emailId) {
             var result = new List<int> { };
             string sqlCriteria = ""
                     + " select"

@@ -28,14 +28,14 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// install addon collections.
     /// </summary>
-    public class collectionController {
+    public class CollectionController {
         //
         //====================================================================================================
         /// <summary>
         /// Overlay a Src CDef on to the current one (Dst). Any Src CDEf entries found in Src are added to Dst.
         /// if SrcIsUserCDef is true, then the Src is overlayed on the Dst if there are any changes -- and .CDefChanged flag set
         /// </summary>
-        private static bool addMiniCollectionSrcToDst(coreController core, ref miniCollectionModel dstCollection, miniCollectionModel srcCollection) {
+        private static bool addMiniCollectionSrcToDst(CoreController core, ref miniCollectionModel dstCollection, miniCollectionModel srcCollection) {
             bool returnOk = true;
             try {
                 string SrcFieldName = null;
@@ -568,7 +568,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private static miniCollectionModel installCollection_GetApplicationMiniCollection(coreController core, bool isNewBuild) {
+        private static miniCollectionModel installCollection_GetApplicationMiniCollection(CoreController core, bool isNewBuild) {
             miniCollectionModel returnColl = new miniCollectionModel();
             try {
                 //
@@ -596,7 +596,7 @@ namespace Contensive.Processor.Controllers {
        //
         //====================================================================================================
         //
-        private static string GetMenuNameSpace(coreController core, Dictionary<string,miniCollectionModel.miniCollectionMenuModel> menus, miniCollectionModel.miniCollectionMenuModel menu, string UsedIDList) {
+        private static string GetMenuNameSpace(CoreController core, Dictionary<string,miniCollectionModel.miniCollectionMenuModel> menus, miniCollectionModel.miniCollectionMenuModel menu, string UsedIDList) {
             string returnAttr = "";
             try {
                 string ParentName = null;
@@ -635,11 +635,11 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Create an entry in the Sort Methods Table
         /// </summary>
-        private static void VerifySortMethod(coreController core, string Name, string OrderByCriteria) {
+        private static void VerifySortMethod(CoreController core, string Name, string OrderByCriteria) {
             try {
                 //
                 DataTable dt = null;
-                sqlFieldListClass sqlList = new sqlFieldListClass();
+                SqlFieldListClass sqlList = new SqlFieldListClass();
                 //
                 sqlList.add("name", core.db.encodeSQLText(Name));
                 sqlList.add("CreatedBy", "0");
@@ -667,7 +667,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static void VerifySortMethods(coreController core) {
+        public static void verifySortMethods(CoreController core) {
             try {
                 //
                 logController.logInfo(core, "Verify Sort Records");
@@ -687,7 +687,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Get a ContentID from the ContentName using just the tables
         /// </summary>
-        private static void VerifyContentFieldTypes(coreController core) {
+        private static void VerifyContentFieldTypes(CoreController core) {
             try {
                 //
                 int RowsFound = 0;
@@ -700,7 +700,7 @@ namespace Contensive.Processor.Controllers {
                 TableBad = false;
                 RowsFound = 0;
                 using (DataTable rs = core.db.executeQuery("Select ID from ccFieldTypes order by id")) {
-                    if (!dbController.isDataTableOk(rs)) {
+                    if (!DbController.isDataTableOk(rs)) {
                         //
                         // problem
                         //
@@ -782,7 +782,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static void exportApplicationCDefXml(coreController core, string privateFilesPathFilename, bool IncludeBaseFields) {
+        public static void exportApplicationCDefXml(CoreController core, string privateFilesPathFilename, bool IncludeBaseFields) {
             try {
                 collectionXmlController XML = new collectionXmlController(core);
                 string Content = XML.getApplicationCollectionXml(IncludeBaseFields);
@@ -796,7 +796,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private static bool downloadCollectionFiles(coreController core, string workingPath, string CollectionGuid, ref DateTime return_CollectionLastChangeDate, ref string return_ErrorMessage) {
+        private static bool downloadCollectionFiles(CoreController core, string workingPath, string CollectionGuid, ref DateTime return_CollectionLastChangeDate, ref string return_ErrorMessage) {
             bool tempDownloadCollectionFiles = false;
             tempDownloadCollectionFiles = false;
             try {
@@ -996,7 +996,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static bool installCollectionFromRemoteRepo(coreController core, string collectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionFromRemoteRepo(CoreController core, string collectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
             bool UpgradeOK = true;
             try {
                 if (string.IsNullOrWhiteSpace(collectionGuid)) {
@@ -1055,7 +1055,7 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        public static bool installCollectionFromRemoteRepo(coreController core, string CollectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair) {
+        public static bool installCollectionFromRemoteRepo(CoreController core, string CollectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair) {
             var tmpList = new List<string> { };
             return installCollectionFromRemoteRepo(core, CollectionGuid, ref return_ErrorMessage,ImportFromCollectionsGuidList, IsNewBuild, repair, ref tmpList);
         }
@@ -1064,7 +1064,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Upgrades all collections, registers and resets the server if needed
         /// </summary>
-        public static bool UpgradeLocalCollectionRepoFromRemoteCollectionRepo(coreController core, ref string return_ErrorMessage, ref string return_RegisterList, ref bool return_IISResetRequired, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static bool upgradeLocalCollectionRepoFromRemoteCollectionRepo(CoreController core, ref string return_ErrorMessage, ref string return_RegisterList, ref bool return_IISResetRequired, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
             bool returnOk = true;
             try {
                 bool localCollectionUpToDate = false;
@@ -1087,7 +1087,7 @@ namespace Contensive.Processor.Controllers {
                 //   Load LocalCollections from the Collections.xml file
                 //-----------------------------------------------------------------------------------------------
                 //
-                var localCollectionStoreList = new List<collectionStoreClass>();
+                var localCollectionStoreList = new List<CollectionStoreClass>();
                 if ( getLocalCollectionStoreList(core, ref localCollectionStoreList, ref return_ErrorMessage)) {
                     if (localCollectionStoreList.Count > 0) {
                         //
@@ -1307,7 +1307,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Upgrade a collection from the files in a working folder
         /// </summary>
-        public static bool buildLocalCollectionReposFromFolder(coreController core, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> return_CollectionGUIDList, ref string return_ErrorMessage, bool allowLogging) {
+        public static bool buildLocalCollectionReposFromFolder(CoreController core, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> return_CollectionGUIDList, ref string return_ErrorMessage, bool allowLogging) {
             bool success = false;
             try {
                 if (core.privateFiles.pathExists(sourcePrivateFolderPath)) {
@@ -1330,7 +1330,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static bool buildLocalCollectionRepoFromFile(coreController core, string collectionPathFilename, DateTime CollectionLastChangeDate, ref string return_CollectionGUID, ref string return_ErrorMessage, bool allowLogging) {
+        public static bool buildLocalCollectionRepoFromFile(CoreController core, string collectionPathFilename, DateTime CollectionLastChangeDate, ref string return_CollectionGUID, ref string return_ErrorMessage, bool allowLogging) {
             bool tempBuildLocalCollectionRepoFromFile = false;
             bool result = true;
             try {
@@ -1710,13 +1710,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Upgrade Application from a local collection
         /// </summary>
-        public static bool installCollectionFromLocalRepo(coreController core, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionFromLocalRepo(CoreController core, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
             bool result = true;
             try {
                 string CollectionVersionFolderName = "";
                 DateTime CollectionLastChangeDate = default(DateTime);
                 string tempVar = "";
-                GetCollectionConfig(core, CollectionGuid, ref CollectionVersionFolderName, ref CollectionLastChangeDate, ref tempVar);
+                getCollectionConfig(core, CollectionGuid, ref CollectionVersionFolderName, ref CollectionLastChangeDate, ref tempVar);
                 if (string.IsNullOrEmpty(CollectionVersionFolderName)) {
                     result = false;
                     return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
@@ -2507,7 +2507,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                                     if ((FieldValue.Left(1) == "{") && (FieldValue.Substring(FieldValue.Length - 1) == "}") && Models.Complex.cdefModel.isContentFieldSupported(core, FieldLookupContentName, "ccguid")) {
                                                                                                                         //
                                                                                                                         // Lookup by guid
-                                                                                                                        int fieldLookupId = genericController.encodeInteger(core.db.GetRecordIDByGuid(FieldLookupContentName, FieldValue));
+                                                                                                                        int fieldLookupId = genericController.encodeInteger(core.db.getRecordIDByGuid(FieldLookupContentName, FieldValue));
                                                                                                                         if (fieldLookupId <= 0) {
                                                                                                                             return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
                                                                                                                         } else {
@@ -2592,7 +2592,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private static void UpdateConfig(coreController core, string Collectionname, string CollectionGuid, DateTime CollectionUpdatedDate, string CollectionVersionFolderName) {
+        private static void UpdateConfig(CoreController core, string Collectionname, string CollectionGuid, DateTime CollectionUpdatedDate, string CollectionVersionFolderName) {
             try {
                 //
                 bool loadOK = true;
@@ -2688,12 +2688,12 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private static string GetCollectionPath(coreController core, string CollectionGuid) {
+        private static string GetCollectionPath(CoreController core, string CollectionGuid) {
             string result = "";
             try {
                 DateTime LastChangeDate = default(DateTime);
                 string Collectionname = "";
-                GetCollectionConfig(core, CollectionGuid, ref result, ref LastChangeDate, ref Collectionname);
+                getCollectionConfig(core, CollectionGuid, ref result, ref LastChangeDate, ref Collectionname);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -2705,7 +2705,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Return the collection path, lastChangeDate, and collectionName given the guid
         /// </summary>
-        public static void GetCollectionConfig(coreController core, string CollectionGuid, ref string return_CollectionPath, ref DateTime return_LastChagnedate, ref string return_CollectionName) {
+        public static void getCollectionConfig(CoreController core, string CollectionGuid, ref string return_CollectionPath, ref DateTime return_LastChagnedate, ref string return_CollectionName) {
             try {
                 string LocalGuid = "";
                 XmlDocument Doc = new XmlDocument();
@@ -2779,7 +2779,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Installs Addons in a source folder
         /// </summary>
-        public static bool InstallCollectionsFromPrivateFolder(coreController core, string privateFolder, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionsFromPrivateFolder(CoreController core, string privateFolder, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
@@ -2813,7 +2813,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Installs Addons in a source file
         /// </summary>
-        public static bool installCollectionsFromPrivateFile(coreController core, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionsFromPrivateFile(CoreController core, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
@@ -2848,7 +2848,7 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================================
         //
-        private static int getNavIDByGuid(coreController core, string ccGuid) {
+        private static int getNavIDByGuid(CoreController core, string ccGuid) {
             int navId = 0;
             try {
                 int CS;
@@ -2869,7 +2869,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// copy resources from install folder to www folder
         /// </summary>
-        private static void copyInstallPathToDstPath(coreController core, string SrcPath, string DstPath, string BlockFileList, string BlockFolderList) {
+        private static void copyInstallPathToDstPath(CoreController core, string SrcPath, string DstPath, string BlockFileList, string BlockFolderList) {
             try {
                 
                 string SrcFolder = null;
@@ -2923,7 +2923,7 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================================
         //
-        private static string GetCollectionFileList(coreController core, string SrcPath, string SubFolder, string ExcludeFileList) {
+        private static string GetCollectionFileList(CoreController core, string SrcPath, string SubFolder, string ExcludeFileList) {
             string result = "";
             try {
                 string SrcFolder;
@@ -2970,7 +2970,7 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================================
         //
-        private static void InstallCollectionFromLocalRepo_addonNode_Phase1(coreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool return_UpgradeOK, ref string return_ErrorMessage) {
+        private static void InstallCollectionFromLocalRepo_addonNode_Phase1(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool return_UpgradeOK, ref string return_ErrorMessage) {
             try {
                 string Basename = genericController.vbLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
@@ -3549,7 +3549,7 @@ namespace Contensive.Processor.Controllers {
         /// this is the second pass, so all add-ons should be added
         /// no errors for missing addones, except the include add-on case
         /// </summary>
-        private static string installCollectionFromLocalRepo_addonNode_Phase2(coreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool ReturnUpgradeOK, ref string ReturnErrorMessage) {
+        private static string installCollectionFromLocalRepo_addonNode_Phase2(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool ReturnUpgradeOK, ref string ReturnErrorMessage) {
             string result = "";
             try {
                 bool AddRule = false;
@@ -3670,7 +3670,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Import CDef on top of current configuration and the base configuration
         /// </summary>
-        public static void installBaseCollection(coreController core, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static void installBaseCollection(CoreController core, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
             try {
                 //
                 // -- new build
@@ -3692,7 +3692,7 @@ namespace Contensive.Processor.Controllers {
                     core.programFiles.copyFile(baseCollectionFilename, tmpFolderPath + baseCollectionFilename, core.privateFiles);
                     List<string> ignoreList = new List<string>();
                     string returnErrorMessage = "";
-                    if (!InstallCollectionsFromPrivateFolder(core, tmpFolderPath, ref returnErrorMessage, ref ignoreList, isNewBuild, repair, ref nonCriticalErrorList)) {
+                    if (!installCollectionsFromPrivateFolder(core, tmpFolderPath, ref returnErrorMessage, ref ignoreList, isNewBuild, repair, ref nonCriticalErrorList)) {
                         throw new ApplicationException(returnErrorMessage);
                     }
                     core.privateFiles.deleteFolder(tmpFolderPath);
@@ -3705,7 +3705,7 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================================
         //
-        public static void installCollectionFromLocalRepo_BuildDbFromXmlData(coreController core, string XMLText, bool isNewBuild, bool repair, bool isBaseCollection, ref List<string> nonCriticalErrorList) {
+        public static void installCollectionFromLocalRepo_BuildDbFromXmlData(CoreController core, string XMLText, bool isNewBuild, bool repair, bool isBaseCollection, ref List<string> nonCriticalErrorList) {
             try {
                 //
                 logController.logInfo(core, "Application: " + core.appConfig.name);
@@ -3726,7 +3726,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// create a collection class from a collection xml file, cdef are added to the cdefs in the application collection
         /// </summary>
-        private static miniCollectionModel installCollection_LoadXmlToMiniCollection(coreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, miniCollectionModel defaultCollection) {
+        private static miniCollectionModel installCollection_LoadXmlToMiniCollection(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, miniCollectionModel defaultCollection) {
             miniCollectionModel result = null;
             try {
                 Models.Complex.cdefModel DefaultCDef = null;
@@ -4030,11 +4030,12 @@ namespace Contensive.Processor.Controllers {
                                     if (removeDup) {
                                         result.sqlIndexes.Remove(dupToRemove);
                                     }
-                                    miniCollectionModel.miniCollectionSQLIndexModel newIndex = new miniCollectionModel.miniCollectionSQLIndexModel();
-                                    newIndex.IndexName = IndexName;
-                                    newIndex.TableName = TableName;
-                                    newIndex.DataSourceName = DataSourceName;
-                                    newIndex.FieldNameList =xmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "FieldNameList", "");
+                                    miniCollectionModel.miniCollectionSQLIndexModel newIndex = new miniCollectionModel.miniCollectionSQLIndexModel {
+                                        IndexName = IndexName,
+                                        TableName = TableName,
+                                        DataSourceName = DataSourceName,
+                                        FieldNameList = xmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "FieldNameList", "")
+                                    };
                                     result.sqlIndexes.Add(newIndex);
                                     break;
                                 case "adminmenu":
@@ -4215,7 +4216,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Verify ccContent and ccFields records from the cdef nodes of a a collection file. This is the last step of loading teh cdef nodes of a collection file. ParentId field is set based on ParentName node.
         /// </summary>
-        private static void installCollection_BuildDbFromMiniCollection(coreController core, miniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        private static void installCollection_BuildDbFromMiniCollection(CoreController core, miniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
             try {
                 //
                 logController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
@@ -4259,7 +4260,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 List<string> installedContentList = new List<string>();
                 DataTable rs = core.db.executeQuery("SELECT Name from ccContent where (active<>0)");
-                if (dbController.isDataTableOk(rs)) {
+                if (DbController.isDataTableOk(rs)) {
                     installedContentList = new List<string>(convertDataTableColumntoItemList(rs));
                 }
                 rs.Dispose();
@@ -4282,7 +4283,7 @@ namespace Contensive.Processor.Controllers {
                 logController.logInfo(core, "CDef Load, stage 4: Verify content records required for Content Server");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                VerifySortMethods(core);
+                verifySortMethods(core);
                 VerifyContentFieldTypes(core);
                 core.doc.clearMetaData();
                 core.cache.invalidateAll();
@@ -4328,7 +4329,7 @@ namespace Contensive.Processor.Controllers {
                             int fieldId = 0;
                             SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + core.db.encodeSQLText(workingField.nameLc) + ")and(c.name=" + core.db.encodeSQLText(workingCdef.name) + ") order by f.id";
                             rs = core.db.executeQuery(SQL);
-                            if (dbController.isDataTableOk(rs)) {
+                            if (DbController.isDataTableOk(rs)) {
                                 fieldId = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "id"));
                             }
                             rs.Dispose();
@@ -4339,7 +4340,7 @@ namespace Contensive.Processor.Controllers {
                                 rs = core.db.executeQuery(SQL);
                                 //
                                 int FieldHelpID = 0;
-                                if (dbController.isDataTableOk(rs)) {
+                                if (DbController.isDataTableOk(rs)) {
                                     FieldHelpID = genericController.encodeInteger(rs.Rows[0]["id"]);
                                 } else {
                                     FieldHelpID = core.db.insertTableRecordGetId("default", "ccfieldhelp", 0);
@@ -4397,7 +4398,7 @@ namespace Contensive.Processor.Controllers {
                     string CollectionPath = "";
                     DateTime lastChangeDate = new DateTime();
                     string emptyString = "";
-                    GetCollectionConfig(core, import.Guid , ref CollectionPath, ref lastChangeDate, ref emptyString);
+                    getCollectionConfig(core, import.Guid , ref CollectionPath, ref lastChangeDate, ref emptyString);
                     string errorMessage = "";
                     if (!string.IsNullOrEmpty(CollectionPath)) {
                         //
@@ -4497,7 +4498,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Update a table from a collection cdef node
         /// </summary>
-        private static void installCollection_BuildDbFromCollection_AddCDefToDb(coreController core, Models.Complex.cdefModel cdef, string BuildVersion) {
+        private static void installCollection_BuildDbFromCollection_AddCDefToDb(CoreController core, Models.Complex.cdefModel cdef, string BuildVersion) {
             try {
                 //
                 logController.logInfo(core, "Update db cdef [" + cdef.name + "]");
@@ -4510,9 +4511,9 @@ namespace Contensive.Processor.Controllers {
                 {
                     //
                     // -- get contentid and protect content with IsBaseContent true
-                    string SQL = core.db.GetSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" + core.db.encodeSQLText(cdef.name), "ID", "", 1);
+                    string SQL = core.db.getSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" + core.db.encodeSQLText(cdef.name), "ID", "", 1);
                     DataTable dt = core.db.executeQuery(SQL);
-                    if (dbController.isDataTableOk(dt)) {
+                    if (DbController.isDataTableOk(dt)) {
                         if (dt.Rows.Count > 0) {
                             ContentID = genericController.encodeInteger(core.db.getDataRowColumnName(dt.Rows[0], "ID"));
                             ContentIsBaseContent = genericController.encodeBoolean(core.db.getDataRowColumnName(dt.Rows[0], "IsBaseContent"));
@@ -4544,7 +4545,7 @@ namespace Contensive.Processor.Controllers {
                         int EditorGroupID = 0;
                         if (cdef.editorGroupName != "") {
                             DataTable dt = core.db.executeQuery("select ID from ccGroups where name=" + core.db.encodeSQLText(cdef.editorGroupName));
-                            if (dbController.isDataTableOk(dt)) {
+                            if (DbController.isDataTableOk(dt)) {
                                 if (dt.Rows.Count > 0) {
                                     EditorGroupID = genericController.encodeInteger(core.db.getDataRowColumnName(dt.Rows[0], "ID"));
                                 }
@@ -4574,7 +4575,7 @@ namespace Contensive.Processor.Controllers {
                         if (field.HelpChanged) {
                             int FieldHelpID = 0;
                             DataTable dt = core.db.executeQuery("select ID from ccFieldHelp where fieldid=" + fieldId);
-                            if (dbController.isDataTableOk(dt)) {
+                            if (DbController.isDataTableOk(dt)) {
                                 if (dt.Rows.Count > 0) {
                                     FieldHelpID = genericController.encodeInteger(core.db.getDataRowColumnName(dt.Rows[0], "ID"));
                                 }
@@ -4608,7 +4609,7 @@ namespace Contensive.Processor.Controllers {
         /// Return the collectionList file stored in the root of the addon folder.
         /// </summary>
         /// <returns></returns>
-        public static string getLocalCollectionStoreListXml(coreController core) {
+        public static string getLocalCollectionStoreListXml(CoreController core) {
             string returnXml = "";
             try {
                 string LastChangeDate = "";
@@ -4663,7 +4664,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get a list of collections available on the server
         /// </summary>
-        public static bool getLocalCollectionStoreList(coreController core, ref List<collectionStoreClass> localCollectionStoreList, ref string return_ErrorMessage) {
+        public static bool getLocalCollectionStoreList(CoreController core, ref List<CollectionStoreClass> localCollectionStoreList, ref string return_ErrorMessage) {
             bool returnOk = true;
             try {
                 //
@@ -4696,7 +4697,7 @@ namespace Contensive.Processor.Controllers {
                                 foreach (XmlNode LocalListNode in LocalCollections.DocumentElement.ChildNodes) {
                                     switch (genericController.vbLCase(LocalListNode.Name)) {
                                         case "collection":
-                                            var collection = new collectionStoreClass();
+                                            var collection = new CollectionStoreClass();
                                             localCollectionStoreList.Add(collection);
                                             foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
                                                 if (CollectionNode.Name.ToLower() == "name") {
@@ -4727,7 +4728,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// return a list of collections on the 
         /// </summary>
-        public static bool getRemoteCollectionStoreList(coreController core, ref List<collectionStoreClass> remoteCollectionStoreList) {
+        public static bool getRemoteCollectionStoreList(CoreController core, ref List<CollectionStoreClass> remoteCollectionStoreList) {
             bool result = false;
             try {
                 var LibCollections = new XmlDocument();
@@ -4747,7 +4748,7 @@ namespace Contensive.Processor.Controllers {
                         errorController.addUserError(core, UserError);
                     } else {
                         foreach (XmlNode CDef_Node in LibCollections.DocumentElement.ChildNodes) {
-                            var collection = new collectionStoreClass();
+                            var collection = new CollectionStoreClass();
                             remoteCollectionStoreList.Add(collection);
                             switch (genericController.vbLCase(CDef_Node.Name)) {
                                 case "collection":
@@ -4791,7 +4792,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// data from local collection repository
         /// </summary>
-        public class collectionStoreClass {
+        public class CollectionStoreClass {
             public string name;
             public string guid;
             public string path;

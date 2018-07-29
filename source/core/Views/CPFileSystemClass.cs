@@ -28,7 +28,7 @@ namespace Contensive.Processor {
         public const string EventsId = "987E6DDE-E9E6-46C5-9467-BAE79A129A15";
         #endregion
         //
-        private Contensive.Processor.Controllers.coreController core;
+        private Contensive.Processor.Controllers.CoreController core;
         protected bool disposed = false;
         //
         private fileController fileSystem;
@@ -38,7 +38,7 @@ namespace Contensive.Processor {
         /// Constructor
         /// </summary>
         /// <param name="core"></param>
-        public CPFileSystemClass(Contensive.Processor.Controllers.coreController core, fileController fileSystem) : base() {
+        public CPFileSystemClass(Contensive.Processor.Controllers.CoreController core, fileController fileSystem) : base() {
             this.core = core;
             this.fileSystem = fileSystem;
         }

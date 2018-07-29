@@ -72,9 +72,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultWrapperID"></param>
         /// <param name="addonContext"></param>
         /// <returns></returns>
-        public static string renderHtmlForWeb(coreController core, string Source, string ContextContentName = "", int ContextRecordID = 0, int ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
+        public static string renderHtmlForWeb(CoreController core, string Source, string ContextContentName = "", int ContextRecordID = 0, int ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = Source;
-            result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, core.session.user.id, core.session.visit.VisitAuthenticated);
+            result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, core.session.user.id, core.session.visit.VisitAuthenticated);
             result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.session.isAuthenticated, null, core.session.isEditingAnything());
             return result;
         }
@@ -107,7 +107,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="personalizationIsAuthenticated"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private static string renderActiveContent(coreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool addLinkAuthenticationToAllLinks, bool EncodeCachableTags, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string protocolHost, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
+        private static string renderActiveContent(CoreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool addLinkAuthenticationToAllLinks, bool EncodeCachableTags, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string protocolHost, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = "";
             try {
                 int csPeople = -1;
@@ -459,7 +459,7 @@ namespace Contensive.Processor.Controllers {
                                                             string ACNameCaption = genericController.vbReplace(ACName, "\"", "");
                                                             ACNameCaption = htmlController.encodeHtml(ACNameCaption);
                                                             string IDControlString = "AC," + ACType + "," + NotUsedID + "," + genericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
-                                                            Copy = addonController.GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0);
+                                                            Copy = AddonController.getAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0);
                                                         } else if (EncodeNonCachableTags) {
                                                             //
                                                             // Add-on Experiment - move all processing to the Webclient
@@ -500,7 +500,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     if (encodeForWysiwygEditor) {
                                                         string IconIDControlString = "AC," + ACTypeDate;
-                                                        Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0);
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/ccLib/images/ACDate.GIF"">"
                                                     } else if (EncodeNonCachableTags) {
@@ -515,7 +515,7 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     if (encodeForWysiwygEditor) {
                                                         string IconIDControlString = "AC," + ACType + "," + fieldName;
-                                                        Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Organization " + fieldName, "Renders as [User's Organization " + fieldName + "]", ACInstanceID, 0);
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Organization " + fieldName, "Renders as [User's Organization " + fieldName + "]", ACInstanceID, 0);
                                                     } else if (EncodeNonCachableTags) {
                                                         if ( !core.db.csOk(csOrganization)) {
                                                             if (!core.db.csOk(csPeople)) {
@@ -550,21 +550,21 @@ namespace Contensive.Processor.Controllers {
                                                             case "FIRSTNAME":
                                                                 //
                                                                 string IconIDControlString = "AC," + ACType + "," + fieldNameInitialCaps;
-                                                                Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0);
+                                                                Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0);
                                                                 //Copy = IconImg;
                                                                 //
                                                                 break;
                                                             case "LASTNAME":
                                                                 //
                                                                 IconIDControlString = "AC," + ACType + "," + fieldNameInitialCaps;
-                                                                Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0);
+                                                                Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0);
                                                                 //Copy = IconImg;
                                                                 //
                                                                 break;
                                                             default:
                                                                 //
                                                                 IconIDControlString = "AC," + ACType + "," + fieldNameInitialCaps;
-                                                                Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's " + fieldNameInitialCaps, "Renders as [User's " + fieldNameInitialCaps + "]", ACInstanceID, 0);
+                                                                Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's " + fieldNameInitialCaps, "Renders as [User's " + fieldNameInitialCaps + "]", ACInstanceID, 0);
                                                                 //Copy = IconImg;
                                                                 //
                                                                 break;
@@ -611,7 +611,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType;
-                                                        Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0);
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                         //
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
@@ -629,7 +629,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType;
-                                                        Copy = addonController.GetAddonIconImg(AdminURL, 0, 0, 0, false, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0);
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, false, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                         //
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/ccLib/images/ACFeedBack.GIF"">"
@@ -726,7 +726,7 @@ namespace Contensive.Processor.Controllers {
                                                         //
                                                         // Encoding the edit icons for the active editor form
                                                         string IconIDControlString = "AC," + ACTypeDownload + ",," + ACAttrRecordID;
-                                                        Copy = addonController.GetAddonIconImg(AdminURL, 16, 16, 0, true, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0);
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 16, 16, 0, true, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                         //
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
@@ -751,7 +751,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        Copy = addonController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0);
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                     } else if (EncodeNonCachableTags) {
                                                         //
@@ -769,7 +769,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        Copy = addonController.GetAddonIconImg(AdminURL, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0);
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                         //
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
@@ -793,7 +793,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        Copy = addonController.GetAddonIconImg(AdminURL, 109, 10, 0, true, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" + ACName + "]", ACInstanceID, 0);
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 109, 10, 0, true, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" + ACName + "]", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                     } else if (EncodeNonCachableTags) {
                                                         Copy = "{{" + ACTypeWatchList + "?" + addonOptionString + "}}";
@@ -842,7 +842,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="sourceHtmlContent"></param>
         /// <returns></returns>
-        public static string processWysiwygResponseForSave(coreController core, string sourceHtmlContent) {
+        public static string processWysiwygResponseForSave(CoreController core, string sourceHtmlContent) {
             string result = "";
             try {
                 string imageNewLink = null;
@@ -1532,7 +1532,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="isEditingAnything"></param>
         /// <returns></returns>
         //
-        public static string encode(coreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
+        public static string encode(CoreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
             string result = sourceHtmlContent;
             try {
                 const string StartFlag = "<!-- ADDON";
@@ -1649,9 +1649,9 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // Text Box = copied here from gethtmlbody
                                                 //
-                                                string CopyName = addonController.getAddonOption("new", addonOptionString);
+                                                string CopyName = AddonController.getAddonOption("new", addonOptionString);
                                                 if (string.IsNullOrEmpty(CopyName)) {
-                                                    CopyName = addonController.getAddonOption("name", addonOptionString);
+                                                    CopyName = AddonController.getAddonOption("name", addonOptionString);
                                                     if (string.IsNullOrEmpty(CopyName)) {
                                                         CopyName = "Default";
                                                     }
@@ -1663,9 +1663,9 @@ namespace Contensive.Processor.Controllers {
                                                 // Watch List
                                                 //
                                                 //hint = hint & ",330"
-                                                string ListName = addonController.getAddonOption("LISTNAME", addonOptionString);
-                                                string SortField = addonController.getAddonOption("SORTFIELD", addonOptionString);
-                                                bool SortReverse = genericController.encodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString));
+                                                string ListName = AddonController.getAddonOption("LISTNAME", addonOptionString);
+                                                string SortField = AddonController.getAddonOption("SORTFIELD", addonOptionString);
+                                                bool SortReverse = genericController.encodeBoolean(AddonController.getAddonOption("SORTDIRECTION", addonOptionString));
                                                 result += core.doc.main_GetWatchList(core, ListName, SortField, SortReverse);
                                                 break;
                                             default:
@@ -1825,7 +1825,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// for html content, this routine optimizes images referenced in the html if they are from library file
         /// </summary>
-        public static string optimizeLibraryFileImagesInHtmlContent(coreController core, string htmlContent) {
+        public static string optimizeLibraryFileImagesInHtmlContent(CoreController core, string htmlContent) {
             string result = htmlContent;
             try {
                 // todo - upgradeActiveContent runs every render, can it be eliminated/minimized
@@ -2150,7 +2150,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Convert an active content field (html data stored with <ac></ac> html tags) to a wysiwyg editor request (html with edit icon <img> for <ac></ac>)
         /// </summary>
-        public static string renderHtmlForWysiwygEditor(coreController core, string editorValue) {
+        public static string renderHtmlForWysiwygEditor(CoreController core, string editorValue) {
             string result = editorValue;
             result = encode(core, result, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, null, false);
             return result;
@@ -2158,18 +2158,18 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string renderJSONForRemoteMethod(coreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
+        public static string renderJSONForRemoteMethod(CoreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
             string result = Source;
-            result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, ContextContactPeopleID, false);
+            result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, ContextContactPeopleID, false);
             result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.session.isAuthenticated, null, core.session.isEditingAnything());
             return result;
         }
         //
         //====================================================================================================
         //
-        public static string renderHtmlForEmail(coreController core, string Source, int personalizationPeopleID, string queryStringForLinkAppend) {
+        public static string renderHtmlForEmail(CoreController core, string Source, int personalizationPeopleID, string queryStringForLinkAppend) {
             string result = Source;
-            result = contentCmdController.executeContentCommands(core, result, CPUtilsClass.addonContext.ContextEmail, personalizationPeopleID, true);
+            result = ContentCmdController.executeContentCommands(core, result, CPUtilsClass.addonContext.ContextEmail, personalizationPeopleID, true);
             result = encode(core, result, personalizationPeopleID, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
             return result;
         }

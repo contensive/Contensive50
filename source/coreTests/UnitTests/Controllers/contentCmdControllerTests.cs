@@ -27,7 +27,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string cmd = "<div>{% \"" + addon.name + "\" %}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div>foo</div>", result);
                 //throw new NotImplementedException();
@@ -53,7 +53,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string cmd = "<div>{% \"" + addonFoo.name + "\" %}{% \"" + addonBar.name + "\" %}+{% \"" + addonFoo.name + "\" %}\n{% \"" + addonBar.name + "\" %}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div>fooBar+foo\nBar</div>", result);
             }
@@ -78,7 +78,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string cmd = "<div>{%[{\"" + addonFoo.name + "\":\"commandArgument\"}]%}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div>foo</div>", result);
                 //throw new NotImplementedException();
@@ -104,7 +104,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string cmd = "<div>{%[{\"" + addonFoo.name + "\":\"commandArgument\"},{\"" + addonBar.name + "\":\"commandArgument\"}]%}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div>fooBar</div>", result);
             }
@@ -124,7 +124,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addonFoo.name + "\"}} %}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div class=\"sample\">foo</div>", result);
             }
@@ -144,7 +144,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addonFoo.name + "\",\"ReplaceMe\":\"BAR\"}} %}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div class=\"sample\">fooBAR</div>", result);
             }
@@ -164,7 +164,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addon.name + "\",\"insert\":\"bar\"}} %}</div>";
                 BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.contentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div class=\"sample\">foobar</div>", result);
                 //throw new NotImplementedException();

@@ -238,7 +238,7 @@ namespace Contensive.Addons.AdminSite {
         /// loads the context for the admin site, controlled by request inputs like rnContent (cid) and rnRecordId (id)
         /// </summary>
         /// <param name="core"></param>
-        public adminContextClass( coreController core) {
+        public adminContextClass( CoreController core) {
             try {
                 //
                 // Tab Control
@@ -484,7 +484,7 @@ namespace Contensive.Addons.AdminSite {
         //       if not null recordid in blocking query, use RecordIDs in result for Where clause on this lookup
         //========================================================================
         //
-        public static  bool userHasContentAccess(coreController core, int ContentID) {
+        public static  bool userHasContentAccess(CoreController core, int ContentID) {
             bool result = false;
             try {
                 string ContentName = cdefModel.getContentNameByID(core, ContentID);

@@ -131,7 +131,7 @@ namespace Contensive.Processor.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static appConfigModel getObject(coreController core, serverConfigModel serverConfig, string appName) {
+        public static appConfigModel getObject(CoreController core, serverConfigModel serverConfig, string appName) {
             appConfigModel returnModel = null;
             try {
                 if (!string.IsNullOrEmpty(appName)) {
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public void saveObject(coreController core) {
+        public void saveObject(CoreController core) {
             try {
                 if (!string.IsNullOrEmpty(name)) {
                     if (!core.serverConfig.apps.ContainsKey(name.ToLower())) {

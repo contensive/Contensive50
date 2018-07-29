@@ -10,13 +10,13 @@ using Contensive.BaseClasses;
 //
 namespace Contensive.Processor.Controllers {
     /// <summary>
-    /// persistence object during document construction. Values persist only for this document.
+    /// persistence object during a single request handle. Part of the current document construction. Values persist only for this document.
     /// </summary>
-    public class docController {
+    public class DocController {
         /// <summary>
         /// parent object
         /// </summary>
-        private coreController core;
+        private CoreController core;
         /// <summary>
         /// this documents unique guid (created on the fly)
         /// </summary>
@@ -78,13 +78,13 @@ namespace Contensive.Processor.Controllers {
         public int menuSystemCloseCount { get; set; } = 0;
         //
         // -- todo
-        internal class helpStuff {
+        internal class HelpStuff {
             public String code;
             public String caption;
         }
         //
         // -- In advanced edit, each addon edit header has several help-bubble popups. This is a list for them.
-        internal List<helpStuff> helpCodes { get; set; } = new List<helpStuff>();
+        internal List<HelpStuff> helpCodes { get; set; } = new List<HelpStuff>();
         //
         // -- todo
         internal int helpDialogCnt { get; set; } = 0;
@@ -204,6 +204,30 @@ namespace Contensive.Processor.Controllers {
         //
         // -- todo
         internal List<int> addonIdListRunInThisDoc { get; set; } = new List<int>();
+        /// <summary>
+        /// If ContentId in this list, they are not a content manager
+        /// </summary>
+        internal string contentAccessRights_NotList = "";
+        /// <summary>
+        /// If ContentId in this list, they are a content manager
+        /// </summary>
+        internal string contentAccessRights_List = "";
+        /// <summary>
+        /// If in _List, test this for allowAdd
+        /// </summary>
+        internal string contentAccessRights_AllowAddList = "";
+        /// <summary>
+        /// If in _List, test this for allowDelete
+        /// </summary>
+        internal string contentAccessRights_AllowDeleteList = "";
+        /// <summary>
+        /// list of content names that have been verified editable by this user
+        /// </summary>
+        internal List<string> contentIsEditingList = new List<string>();
+        /// <summary>
+        /// list of content names verified that this user CAN NOT edit
+        /// </summary>
+        internal List<string> contentNotEditingList = new List<string>();
         //
         /// <summary>
         /// Dictionary of addons running to track recursion, addonId and count of recursive entries. When executing an addon, check if it is in the list, if so, check if the recursion count is under the limit (addonRecursionDepthLimit). If not add it or increment the count. On exit, decrement the count and remove if 0.
@@ -281,7 +305,7 @@ namespace Contensive.Processor.Controllers {
         /// this will eventuall be an addon, but lets do this first to keep the converstion complexity down
         /// </summary>
         /// <param name="core"></param>
-        public docController(coreController core) {
+        public DocController(CoreController core) {
             this.core = core;
             //
             pageController = new pageContentController();
@@ -295,7 +319,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public int main_OpenCSWhatsNew(coreController core, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
+        public int main_OpenCSWhatsNew(CoreController core, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
             int result = -1;
             try {
                 result = main_OpenCSContentWatchList(core, "What's New", SortFieldList, ActiveOnly, PageSize, PageNumber);
@@ -309,7 +333,7 @@ namespace Contensive.Processor.Controllers {
         //   Open a content set with the current whats new list
         //========================================================================
         //
-        public int main_OpenCSContentWatchList(coreController core, string ListName, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
+        public int main_OpenCSContentWatchList(CoreController core, string ListName, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
             int result = -1;
             try {
                 string SQL = null;
@@ -388,7 +412,7 @@ namespace Contensive.Processor.Controllers {
         //   Prints a linked list of new content
         //========================================================================
         //
-        public string main_GetWhatsNew(coreController core, string SortFieldList = "") {
+        public string main_GetWhatsNew(CoreController core, string SortFieldList = "") {
             string result = "";
             try {
                 int CSPointer = 0;
@@ -427,7 +451,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public string main_GetWatchList(coreController core, string ListName, string SortField, bool SortReverse) {
+        public string main_GetWatchList(CoreController core, string ListName, string SortField, bool SortReverse) {
             string result = "";
             try {
                 int CS = 0;
@@ -1253,7 +1277,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================================
         //
-        public void verifyRegistrationFormPage(coreController core) {
+        public void verifyRegistrationFormPage(CoreController core) {
             try {
                 //
                 int CS = 0;

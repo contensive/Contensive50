@@ -434,7 +434,7 @@ namespace Contensive.Processor {
             string ignoreUserMessage = "";
             string ignoreGuid = "";
             var ignoreList = new List<string> { };
-            collectionController.installCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, true, ref ignoreList);
+            CollectionController.installCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, true, ref ignoreList);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status
@@ -450,7 +450,7 @@ namespace Contensive.Processor {
             string ignoreUserMessage = "";
             List<string> ignoreList1 = new List<string>();
             List<string> ignoreList2 = new List<string>();
-            collectionController.InstallCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, false, ref ignoreList2);
+            CollectionController.installCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, false, ref ignoreList2);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status
@@ -471,7 +471,7 @@ namespace Contensive.Processor {
         public override int installCollectionFromLibrary(string collectionGuid) {
             int taskId = 0;
             string ignoreUserMessage = "";
-            collectionController.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false, false);
+            CollectionController.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false, false);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status

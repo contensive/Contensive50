@@ -17,7 +17,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string getBlockList(coreController core) {
+        public static string getBlockList(CoreController core) {
             if (!core.doc.emailBlockListStoreLoaded) {
                 core.doc.emailBlockListStore = core.privateFiles.readFileText(emailBlockListFilename);
                 core.doc.emailBlockListStoreLoaded = true;
@@ -28,13 +28,13 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static bool isOnBlockedList(coreController core, string emailAddress) {
+        public static bool isOnBlockedList(CoreController core, string emailAddress) {
             return (getBlockList(core).IndexOf("\r\n" + emailAddress + "\t", StringComparison.CurrentCultureIgnoreCase) >= 0);
         }
         //
         //====================================================================================================
         //
-        public static void addToBlockList(coreController core, string EmailAddress) {
+        public static void addToBlockList(CoreController core, string EmailAddress) {
             var blockList = getBlockList(core);
             if (!verifyEmailAddress(core, EmailAddress)) {
                 //
@@ -56,7 +56,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static bool verifyEmail(coreController core, emailClass email, ref string returnUserWarning) {
+        public static bool verifyEmail(CoreController core, emailClass email, ref string returnUserWarning) {
             bool result = false;
             try {
                 if (!verifyEmailAddress(core, email.toAddress)) {
@@ -79,7 +79,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// email address must have at least one character before the @, and have a valid email domain
         /// </summary>
-        public static bool verifyEmailAddress(coreController core, string EmailAddress) {
+        public static bool verifyEmailAddress(CoreController core, string EmailAddress) {
             bool result = false;
             try {
                 if (!string.IsNullOrWhiteSpace(EmailAddress)) {
@@ -101,7 +101,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Server must have at least 3 digits, and one dot in the middle
         /// </summary>
-        public static bool verifyEmailDomain(coreController core, string emailDomain) {
+        public static bool verifyEmailDomain(CoreController core, string emailDomain) {
             bool result = false;
             try {
                 //
@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
         /// Add an email to the queue
         /// </summary>
         /// <returns>false if the email is not sent successfully and the returnUserWarning argument contains a user compatible message. If true, the returnUserWanting may contain a user compatible message about email issues.</returns>
-        public static bool queueAdHocEmail(coreController core, string toAddress, string fromAddress, string subject, string body, string bounceAddress, string replyToAddress, string ResultLogFilename, bool isImmediate, bool isHTML, int emailIdOrZeroForLog, ref string returnSendStatus) {
+        public static bool queueAdHocEmail(CoreController core, string toAddress, string fromAddress, string subject, string body, string bounceAddress, string replyToAddress, string ResultLogFilename, bool isImmediate, bool isHTML, int emailIdOrZeroForLog, ref string returnSendStatus) {
             bool result = false;
             try {
                 if (!verifyEmailAddress(core, toAddress)) {
@@ -218,7 +218,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="template"></param>
         /// <param name="EmailAllowLinkEID"></param>
         /// <returns> returns ok if send is successful, otherwise returns the principle issue as a user error</returns>
-        public static bool queuePersonEmail(coreController core, personModel person, string fromAddress, string subject, string body, string bounceAddress, string replyToAddress, bool Immediate, bool isHTML, int emailIdOrZeroForLog, string template, bool EmailAllowLinkEID, ref string returnSendStatus, string queryStringForLinkAppend) {
+        public static bool queuePersonEmail(CoreController core, personModel person, string fromAddress, string subject, string body, string bounceAddress, string replyToAddress, bool Immediate, bool isHTML, int emailIdOrZeroForLog, string template, bool EmailAllowLinkEID, ref string returnSendStatus, string queryStringForLinkAppend) {
             bool result = false;
             try {
                 if (person == null) {
@@ -297,7 +297,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="appendedCopy"></param>
         /// <param name="AdditionalMemberIDOrZero"></param>
         /// <returns></returns>
-        public static string queueSystemEmail(coreController core, string emailName, string appendedCopy = "", int AdditionalMemberIDOrZero = 0) {
+        public static string queueSystemEmail(CoreController core, string emailName, string appendedCopy = "", int AdditionalMemberIDOrZero = 0) {
             string returnString = "";
             try {
                 //
@@ -443,7 +443,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="EmailID"></param>
         /// <param name="ConfirmationMemberID"></param>
-        public static void queueConfirmationTestEmail(coreController core, int EmailID, int ConfirmationMemberID) {
+        public static void queueConfirmationTestEmail(CoreController core, int EmailID, int ConfirmationMemberID) {
             try {
                 string ConfirmFooter = "";
                 int TotalCnt = 0;
@@ -613,7 +613,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="toAddress"></param>
         /// <param name="fromAddress"></param>
         /// <param name="emailSubject"></param>
-        public static void queueFormEmail(coreController core, string toAddress, string fromAddress, string emailSubject) {
+        public static void queueFormEmail(CoreController core, string toAddress, string fromAddress, string emailSubject) {
             try {
                 string Message = "";
                 if ((toAddress.IndexOf("@") == -1)) {
@@ -656,7 +656,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Body"></param>
         /// <param name="Immediate"></param>
         /// <param name="HTML"></param>
-        public static void queueGroupEmail(coreController core, string groupCommaList, string FromAddress, string subject, string Body, bool Immediate, bool HTML) {
+        public static void queueGroupEmail(CoreController core, string groupCommaList, string FromAddress, string subject, string Body, bool Immediate, bool HTML) {
             try {
                 if (!string.IsNullOrWhiteSpace(groupCommaList)) {
                     List<string> groupList = groupCommaList.Split(',').ToList<string>().FindAll(t => !string.IsNullOrWhiteSpace(t));
@@ -678,7 +678,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// add email to the email queue
         /// </summary>
-        private static void queueEmail(coreController core, bool immediate, emailClass email) {
+        private static void queueEmail(CoreController core, bool immediate, emailClass email) {
             try {
                 var record = emailQueueModel.add(core);
                 record.immediate = immediate;
@@ -696,7 +696,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Send the emails in the current Queue
         /// </summary>
-        public static void sendEmailInQueue(coreController core) {
+        public static void sendEmailInQueue(CoreController core) {
             try {
                 List<emailQueueModel> queue = emailQueueModel.createList(core, "", "immediate,id desc");
                 foreach (emailQueueModel queueRecord in queue) {

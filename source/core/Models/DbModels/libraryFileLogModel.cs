@@ -30,97 +30,97 @@ namespace Contensive.Processor.Models.DbModels {
         public int VisitID { get; set; }
         //
         //====================================================================================================
-        public static libraryFileLogModel add(coreController core) {
+        public static libraryFileLogModel add(CoreController core) {
             return add<libraryFileLogModel>(core);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static libraryFileLogModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<libraryFileLogModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel create(coreController core, int recordId) {
+        public static libraryFileLogModel create(CoreController core, int recordId) {
             return create<libraryFileLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static libraryFileLogModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<libraryFileLogModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel create(coreController core, string recordGuid) {
+        public static libraryFileLogModel create(CoreController core, string recordGuid) {
             return create<libraryFileLogModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static libraryFileLogModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<libraryFileLogModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel createByName(coreController core, string recordName) {
+        public static libraryFileLogModel createByName(CoreController core, string recordName) {
             return createByName<libraryFileLogModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static libraryFileLogModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<libraryFileLogModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<libraryFileLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<libraryFileLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<libraryFileLogModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<libraryFileLogModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<libraryFileLogModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<libraryFileLogModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<libraryFileLogModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<libraryFileLogModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<libraryFileLogModel> createList(coreController core, string sqlCriteria) {
+        public static List<libraryFileLogModel> createList(CoreController core, string sqlCriteria) {
             return createList<libraryFileLogModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<libraryFileLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<libraryFileLogModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<libraryFileLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<libraryFileLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static libraryFileLogModel createDefault(coreController core) {
+        public static libraryFileLogModel createDefault(CoreController core) {
             return createDefault<libraryFileLogModel>(core);
         }
     }

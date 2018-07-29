@@ -17,7 +17,7 @@ using static Contensive.Processor.constants;
 namespace Contensive.Processor.Models.Context {
     public class propertyModelClass {
         //
-        private coreController core;
+        private CoreController core;
         //
         // visit property cache
         //
@@ -34,7 +34,7 @@ namespace Contensive.Processor.Models.Context {
         /// <param name="cp"></param>
         /// <param name="propertyTypeId"></param>
         /// <remarks></remarks>
-        public propertyModelClass(coreController core, int propertyTypeId) {
+        public propertyModelClass(CoreController core, int propertyTypeId) {
             this.core = core;
             this.propertyTypeId = propertyTypeId;
         }
@@ -113,7 +113,7 @@ namespace Contensive.Processor.Models.Context {
                 int RecordID = 0;
                 int CS = 0;
                 string SQLNow = null;
-                dbController db = core.db;
+                DbController db = core.db;
                 //
                 Ptr = -1;
                 if (!propertyCacheLoaded) {
@@ -428,7 +428,7 @@ namespace Contensive.Processor.Models.Context {
             try {
                 //
                 string Name = null;
-                dbController db = core.db;
+                DbController db = core.db;
                 //
                 propertyCache_nameIndex = new keyPtrController();
                 propertyCacheCnt = 0;

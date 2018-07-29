@@ -24,7 +24,7 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class htmlController {
         //
-        private coreController core;
+        private CoreController core;
         //
         //====================================================================================================
         /// <summary>
@@ -32,7 +32,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <remarks></remarks>
-        public htmlController(coreController core) {
+        public htmlController(CoreController core) {
             this.core = core;
         }
         //
@@ -674,7 +674,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="HtmlClass"></param>
         /// <returns></returns>
-        public static string selectFromList(coreController core, string MenuName, string CurrentValue, List<nameValueClass> lookupList, string NoneCaption, string htmlId, string HtmlClass = "") {
+        public static string selectFromList(CoreController core, string MenuName, string CurrentValue, List<nameValueClass> lookupList, string NoneCaption, string htmlId, string HtmlClass = "") {
             string result = "";
             try {
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
@@ -712,7 +712,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="HtmlClass"></param>
         /// <returns></returns>
-        public static string selectFromList(coreController core, string MenuName, int CurrentValue, string[] lookups, string NoneCaption, string htmlId, string HtmlClass = "") {
+        public static string selectFromList(CoreController core, string MenuName, int CurrentValue, string[] lookups, string NoneCaption, string htmlId, string HtmlClass = "") {
             string result = "";
             try {
                 //
@@ -870,7 +870,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlClass"></param>
         /// <param name="htmlId"></param>
         /// <returns></returns>
-        public static string formMultipart(coreController core, string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
+        public static string formMultipart(CoreController core, string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
             return formMultipart_start(core, actionQueryString, htmlName, htmlClass, htmlId) + innerHtml + "</form>";
         }
         //
@@ -880,7 +880,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="actionQueryString"></param>
         /// <returns></returns>
-        public static string formMultipart_start( coreController core, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
+        public static string formMultipart_start( CoreController core, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
             string result = "<form action=\"?" + ((actionQueryString == "") ? core.doc.refreshQueryString : actionQueryString) + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" method=\"post\" style=\"display: inline;\"";
             if (!string.IsNullOrWhiteSpace(htmlName)) result += " name=\"" + htmlName + "\"";
             if (!string.IsNullOrWhiteSpace(htmlClass)) result += " class=\"" + htmlClass + "\"";
@@ -898,7 +898,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="htmlMethod"></param>
         /// <returns></returns>
-        public static string form( coreController core,  string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post" ) {
+        public static string form( CoreController core,  string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post" ) {
             if (string.IsNullOrEmpty(actionQueryString)) actionQueryString = core.doc.refreshQueryString;
             string action = core.webServer.serverFormActionURL + (string.IsNullOrEmpty(actionQueryString) ? "" : "?" + actionQueryString);
             string result = "<form name=\"" + htmlName + "\" action=\"" + action + "\" method=\"" + htmlMethod + "\" style=\"display: inline;\"";
@@ -917,7 +917,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string inputText( coreController core, string htmlName, string defaultValue, int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false ) {
+        public static string inputText( CoreController core, string htmlName, string defaultValue, int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false ) {
             string result = "";
             try {
                 if ((heightRows>1) & !passwordField) {
@@ -958,7 +958,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="disabled"></param>
         /// <param name="htmlClass"></param>
         /// <returns></returns>
-        public static string inputTextarea( coreController core, string htmlName, string defaultValue = "", int heightRows = 4, int widthCharacters = -1, string htmlId = "", bool ignore = false, bool readOnly = false, string htmlClass = "", bool disabled = false, int maxLength = 0) {
+        public static string inputTextarea( CoreController core, string htmlName, string defaultValue = "", int heightRows = 4, int widthCharacters = -1, string htmlId = "", bool ignore = false, bool readOnly = false, string htmlClass = "", bool disabled = false, int maxLength = 0) {
             string result = "";
             try {
                 defaultValue = htmlController.encodeHtml(defaultValue);
@@ -978,7 +978,7 @@ namespace Contensive.Processor.Controllers {
             return result;
         }
         //
-        public static string inputDateTime(coreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
+        public static string inputDateTime(CoreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
             string result = "";
             try {
                 // {0:s}
@@ -1013,7 +1013,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="required"></param>
         /// <param name="disabled"></param>
         /// <returns></returns>
-        public static string inputDate( coreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
+        public static string inputDate( CoreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
             string result = "";
             try {
                 // {0:s} 
@@ -1427,7 +1427,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- AC StartBlockText
                     string IconIDControlString = "AC," + ACTypeAggregateFunction + ",0,Block Text,";
-                    string IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0);
+                    string IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0);
                     IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                     Items[ItemsCnt] = "['Block Text','" + IconImg + "']";
                     Index.setPtr("Block Text", ItemsCnt);
@@ -1436,7 +1436,7 @@ namespace Contensive.Processor.Controllers {
                     // AC EndBlockText
                     //
                     IconIDControlString = "AC," + ACTypeAggregateFunction + ",0,Block Text End,";
-                    IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block End", "End of text block", "", 0);
+                    IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block End", "End of text block", "", 0);
                     IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                     Items[ItemsCnt] = "['Block Text End','" + IconImg + "']";
                     Index.setPtr("Block Text", ItemsCnt);
@@ -1453,7 +1453,7 @@ namespace Contensive.Processor.Controllers {
                         string FieldList = Models.Complex.cdefModel.GetContentProperty(core, "people", "SelectFieldList");
                         FieldList = genericController.vbReplace(FieldList, ",", "|");
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + FieldList + "]";
-                        IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
+                        IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
                         IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                         Items[ItemsCnt] = "['Personalization','" + IconImg + "']";
                         Index.setPtr("Personalization", ItemsCnt);
@@ -1468,7 +1468,7 @@ namespace Contensive.Processor.Controllers {
                             //   Need a more consistant solution later
                             //
                             IconIDControlString = "AC," + ACTypeTemplateContent + ",0,Template Content,";
-                            IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
+                            IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
                             IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                             Items[ItemsCnt] = "['Content Box','" + IconImg + "']";
                             //Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
@@ -1476,7 +1476,7 @@ namespace Contensive.Processor.Controllers {
                             ItemsCnt += 1;
                             //
                             IconIDControlString = "AC," + ACTypeTemplateText + ",0,Template Text,Name=Default";
-                            IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
+                            IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
                             IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                             Items[ItemsCnt] = "['Template Text','" + IconImg + "']";
                             //Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
@@ -1496,7 +1496,7 @@ namespace Contensive.Processor.Controllers {
                                 if (!string.IsNullOrEmpty(FieldName)) {
                                     string FieldCaption = "Watch List [" + FieldName + "]";
                                     IconIDControlString = "AC,WATCHLIST,0," + FieldName + ",ListName=" + FieldName + "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]";
-                                    IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, FieldCaption, "Rendered as the " + FieldCaption, "", 0);
+                                    IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, FieldCaption, "Rendered as the " + FieldCaption, "", 0);
                                     IconImg = genericController.EncodeJavascriptStringSingleQuote(IconImg);
                                     FieldCaption = genericController.EncodeJavascriptStringSingleQuote(FieldCaption);
                                     Items[ItemsCnt] = "['" + FieldCaption + "','" + IconImg + "']";
@@ -1565,7 +1565,7 @@ namespace Contensive.Processor.Controllers {
                                     // Calculate DefaultAddonOption_String
                                     //
                                     string ArgumentList = core.db.csGet(CSAddons, "ArgumentList").Trim(' ');
-                                    string defaultAddonOptions = addonController.getDefaultAddonOptions(core, ArgumentList, addonGuid, IsInline);
+                                    string defaultAddonOptions = AddonController.getDefaultAddonOptions(core, ArgumentList, addonGuid, IsInline);
                                     defaultAddonOptions = encodeHtml(defaultAddonOptions);
                                     //UseAjaxDefaultAddonOptions = false;
                                     //if (UseAjaxDefaultAddonOptions) {
@@ -1582,7 +1582,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     LastAddonName = addonName;
                                     IconIDControlString = "AC,AGGREGATEFUNCTION,0," + addonName + "," + defaultAddonOptions + "," + addonGuid;
-                                    IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, core.appConfig.cdnFileUrl, addonName, "Rendered as the Add-on [" + addonName + "]", "", 0);
+                                    IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, core.appConfig.cdnFileUrl, addonName, "Rendered as the Add-on [" + addonName + "]", "", 0);
                                     Items[ItemsCnt] = "['" + genericController.EncodeJavascriptStringSingleQuote(addonName) + "','" + genericController.EncodeJavascriptStringSingleQuote(IconImg) + "']";
                                     Index.setPtr(addonName, ItemsCnt);
                                     ItemsCnt += 1;

@@ -34,7 +34,7 @@ namespace Contensive.Addons.Tools {
         //
         public static string configureContentEdit( CPClass cp) {
             string result = "";
-            coreController core = cp.core;
+            CoreController core = cp.core;
             try {
                 keyPtrController Index = new keyPtrController();
                 string ButtonList = ButtonCancel + "," + ButtonSelect;

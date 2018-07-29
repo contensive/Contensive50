@@ -27,7 +27,7 @@ namespace Contensive.Addons.Login {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string returnHtml = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 returnHtml = loginController.getLoginPage(core, false);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

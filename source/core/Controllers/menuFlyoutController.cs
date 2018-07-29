@@ -60,14 +60,14 @@ namespace Contensive.Processor.Controllers {
         //
         private string MenuFlyoutNamePrefix; // Random prefix added to element IDs to avoid namespace collision
         private string MenuFlyoutIcon_Local; // string used to mark a button that has a non-hover flyout
-        private coreController core;
+        private CoreController core;
         //
         //==================================================================================================
         /// <summary>
         /// constructor
         /// </summary>
         /// <remarks></remarks>
-        public menuFlyoutController(coreController core) : base() {
+        public menuFlyoutController(CoreController core) : base() {
             this.core = core;
             //
             EntryIndexName = new keyPtrController();

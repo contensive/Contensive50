@@ -19,7 +19,7 @@ using static Contensive.BaseClasses.CPFileSystemBaseClass;
 namespace Contensive.MonitorService {
     public class statusServerClass {
         private ipDaemonController cmdListener = new ipDaemonController();
-        private coreController cpCore;
+        private CoreController cpCore;
         //
         public static AppLogType[] AppLog;
         public static int AppLogCnt;
@@ -434,7 +434,7 @@ namespace Contensive.MonitorService {
             appendMonitorLog("unexepected error in " + methodName + ", " + exToString);
         }
 
-        public statusServerClass(coreController cpCore) : base() {
+        public statusServerClass(CoreController cpCore) : base() {
             this.cpCore = cpCore;
         }
     }

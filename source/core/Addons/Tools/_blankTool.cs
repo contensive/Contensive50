@@ -36,7 +36,7 @@ namespace Contensive.Addons.Tools {
         //
         public static string sampleTool(CPClass cp) {
             string returnHtml = "";
-            coreController core = cp.core;
+            CoreController core = cp.core;
             try {
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 Stream.Add(adminUIController.getToolFormTitle("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));

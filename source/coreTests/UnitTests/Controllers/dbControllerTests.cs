@@ -20,16 +20,16 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             // act
             // assert
-            Assert.AreEqual("", dbController.encodeSqlTableName(""));
-            Assert.AreEqual("", dbController.encodeSqlTableName("-----"));
-            Assert.AreEqual("", dbController.encodeSqlTableName("01234567879"));
-            Assert.AreEqual("a", dbController.encodeSqlTableName("a"));
-            Assert.AreEqual("aa", dbController.encodeSqlTableName("a a"));
-            Assert.AreEqual("aA", dbController.encodeSqlTableName(" aA"));
-            Assert.AreEqual("aA", dbController.encodeSqlTableName(" aA "));
-            Assert.AreEqual("aA", dbController.encodeSqlTableName("aA "));
-            Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", dbController.encodeSqlTableName("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"));
-            Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", dbController.encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"));
+            Assert.AreEqual("", DbController.encodeSqlTableName(""));
+            Assert.AreEqual("", DbController.encodeSqlTableName("-----"));
+            Assert.AreEqual("", DbController.encodeSqlTableName("01234567879"));
+            Assert.AreEqual("a", DbController.encodeSqlTableName("a"));
+            Assert.AreEqual("aa", DbController.encodeSqlTableName("a a"));
+            Assert.AreEqual("aA", DbController.encodeSqlTableName(" aA"));
+            Assert.AreEqual("aA", DbController.encodeSqlTableName(" aA "));
+            Assert.AreEqual("aA", DbController.encodeSqlTableName("aA "));
+            Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", DbController.encodeSqlTableName("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+            Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", DbController.encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"));
             //
         }
         //

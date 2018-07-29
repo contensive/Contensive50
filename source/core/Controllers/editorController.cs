@@ -27,7 +27,7 @@ namespace Contensive.Processor.Controllers {
         // ----- Process the active editor form
         //========================================================================
         //
-        public static void processActiveEditor(coreController core) {
+        public static void processActiveEditor(CoreController core) {
             //
             int CS = 0;
             string Button = null;
@@ -75,7 +75,7 @@ namespace Contensive.Processor.Controllers {
         // Print the active editor form
         //========================================================================
         //
-        public static string main_GetActiveEditor(coreController core, string ContentName, int RecordID, string FieldName, string FormElements = "") {
+        public static string main_GetActiveEditor(CoreController core, string ContentName, int RecordID, string FieldName, string FormElements = "") {
             //
             int ContentID = 0;
             int CSPointer = 0;
@@ -133,7 +133,7 @@ namespace Contensive.Processor.Controllers {
         //   to use it, split the list on comma and use the fieldtype as index
         //========================================================================
         //
-        public static string getFieldTypeDefaultEditorAddonIdList(coreController core) {
+        public static string getFieldTypeDefaultEditorAddonIdList(CoreController core) {
             string result = "";
             try {
                 string[] editorAddonIds = null;

@@ -23,7 +23,7 @@ namespace Contensive.Processor {
         public const string EventsId = "5911548D-7637-4021-BD08-C7676F3E12C6";
         #endregion
         //
-        private coreController core { get; set; }
+        private CoreController core { get; set; }
         private CPClass cp { get; set; }
         private string accum { get; set; }
         private Controllers.htmlController htmlDoc { get; set; }

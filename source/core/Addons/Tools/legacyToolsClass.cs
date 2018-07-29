@@ -28,7 +28,7 @@ namespace Contensive.Addons.Tools {
         // ----- data fields
         //
         private string[] Findstring = new string[51]; 
-        private coreController core;
+        private CoreController core;
         private string ToolsTable;
         private string ToolsContentName;
         private bool DefaultReadOnly;
@@ -143,7 +143,7 @@ namespace Contensive.Addons.Tools {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public legacyToolsClass(coreController core) : base() {
+        public legacyToolsClass(CoreController core) : base() {
             this.core = core;
         }
         //
@@ -2114,13 +2114,13 @@ namespace Contensive.Addons.Tools {
                     + " Left Join ccDataSources on ccTables.DataSourceID=ccDataSources.ID"
                     + " where ccContent.name=" + core.db.encodeSQLText(ContentName);
                 DataTable RS = core.db.executeQuery(SQL);
-                if (dbController.isDataTableOk(RS)) {
+                if (DbController.isDataTableOk(RS)) {
                     tempLocal_GetContentDataSource = genericController.encodeText(RS.Rows[0]["Name"]);
                 }
                 if (string.IsNullOrEmpty(tempLocal_GetContentDataSource)) {
                     tempLocal_GetContentDataSource = "Default";
                 }
-                dbController.closeDataTable(RS);
+                DbController.closeDataTable(RS);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -2179,7 +2179,7 @@ namespace Contensive.Addons.Tools {
                     //
                     RSSchema = core.db.getTableSchemaData(TableName);
                     Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
-                    if (!dbController.isDataTableOk(RSSchema)) {
+                    if (!DbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
@@ -2241,7 +2241,7 @@ namespace Contensive.Addons.Tools {
                     Stream.Add(DateTime.Now + " Opening Index Schema<br>");
                     //
                     RSSchema = core.db.getIndexSchemaData(TableName);
-                    if (!dbController.isDataTableOk(RSSchema)) {
+                    if (!DbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
@@ -2303,7 +2303,7 @@ namespace Contensive.Addons.Tools {
                     //
                     RSSchema = core.db.getColumnSchemaData(TableName);
                     Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
-                    if (dbController.isDataTableOk(RSSchema)) {
+                    if (DbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //

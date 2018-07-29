@@ -35,7 +35,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="main_AllowChildListComposite"></param>
         /// <param name="ArchivePage"></param>
         /// <returns></returns>
-        internal static string getQuickEditing( coreController core, int rootPageId, string OrderByClause, bool AllowPageList, bool AllowReturnLink, bool ArchivePages, int contactMemberID, int childListSortMethodId, bool main_AllowChildListComposite, bool ArchivePage) {
+        internal static string getQuickEditing( CoreController core, int rootPageId, string OrderByClause, bool AllowPageList, bool AllowReturnLink, bool ArchivePages, int contactMemberID, int childListSortMethodId, bool main_AllowChildListComposite, bool ArchivePage) {
             string result = "";
             try {
                 core.html.addStyleLink("/quickEditor/styles.css", "Quick Editor");
@@ -204,7 +204,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        internal static string getQuickEditingBody(coreController core, string ContentName, string OrderByClause, bool AllowChildList, bool Authoring, int rootPageId, bool readOnlyField, bool AllowReturnLink, string RootPageContentName, bool ArchivePage, int contactMemberID) {
+        internal static string getQuickEditingBody(CoreController core, string ContentName, string OrderByClause, bool AllowChildList, bool Authoring, int rootPageId, bool readOnlyField, bool AllowReturnLink, string RootPageContentName, bool ArchivePage, int contactMemberID) {
             string pageCopy = core.doc.pageController.page.Copyfilename.content;
             //
             // ----- Page Copy

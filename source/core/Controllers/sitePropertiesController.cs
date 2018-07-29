@@ -23,14 +23,14 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class sitePropertiesController {
         //
-        private coreController core;
+        private CoreController core;
         //
         //====================================================================================================
         /// <summary>
         /// new
         /// </summary>
         /// <param name="core"></param>
-        public sitePropertiesController(coreController core) : base() {
+        public sitePropertiesController(CoreController core) : base() {
             this.core = core;
         }
         //

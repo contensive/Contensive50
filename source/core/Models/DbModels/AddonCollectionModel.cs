@@ -38,97 +38,97 @@ namespace Contensive.Processor.Models.DbModels {
         public string wwwFileList { get; set; }
         //
         //====================================================================================================
-        public static AddonCollectionModel add(coreController core) {
+        public static AddonCollectionModel add(CoreController core) {
             return add<AddonCollectionModel>(core);
         }
         //
         //====================================================================================================
-        public static AddonCollectionModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static AddonCollectionModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<AddonCollectionModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static AddonCollectionModel create(coreController core, int recordId) {
+        public static AddonCollectionModel create(CoreController core, int recordId) {
             return create<AddonCollectionModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static AddonCollectionModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static AddonCollectionModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<AddonCollectionModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static AddonCollectionModel create(coreController core, string recordGuid) {
+        public static AddonCollectionModel create(CoreController core, string recordGuid) {
             return create<AddonCollectionModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static AddonCollectionModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static AddonCollectionModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<AddonCollectionModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static AddonCollectionModel createByName(coreController core, string recordName) {
+        public static AddonCollectionModel createByName(CoreController core, string recordName) {
             return createByName<AddonCollectionModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static AddonCollectionModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static AddonCollectionModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<AddonCollectionModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<AddonCollectionModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<AddonCollectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<AddonCollectionModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<AddonCollectionModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<AddonCollectionModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<AddonCollectionModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<AddonCollectionModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<AddonCollectionModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<AddonCollectionModel> createList(coreController core, string sqlCriteria) {
+        public static List<AddonCollectionModel> createList(CoreController core, string sqlCriteria) {
             return createList<AddonCollectionModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<AddonCollectionModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<AddonCollectionModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<AddonCollectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<AddonCollectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static AddonCollectionModel createDefault(coreController core) {
+        public static AddonCollectionModel createDefault(CoreController core) {
             return createDefault<AddonCollectionModel>(core);
         }
     }

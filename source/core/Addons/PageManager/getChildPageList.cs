@@ -26,7 +26,7 @@ namespace Contensive.Addons.PageManager {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string result = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 result = pageContentController.getChildPageList(core, cp.Doc.GetText("List Name"), Processor.Models.DbModels.pageContentModel.contentName, core.doc.pageController.page.id, true);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

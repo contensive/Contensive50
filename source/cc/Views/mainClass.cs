@@ -95,8 +95,8 @@ namespace Contensive.CLI {
                                     } else {
                                         //
                                         // -- determine guid of collection
-                                        var collectionList = new List<collectionController.collectionStoreClass>();
-                                        collectionController.getRemoteCollectionStoreList(cp.core, ref collectionList);
+                                        var collectionList = new List<CollectionController.CollectionStoreClass>();
+                                        CollectionController.getRemoteCollectionStoreList(cp.core, ref collectionList);
                                         string collectionGuid = "";
                                         foreach (var collection in collectionList) {
                                             if (collection.name.ToLower() == collectionName.ToLower()) {
@@ -111,7 +111,7 @@ namespace Contensive.CLI {
                                                 foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
                                                     using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(kvp.Key)) {
                                                         string returnErrorMessage = "";
-                                                        collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
+                                                        CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
                                                         if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                             Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                         }
@@ -120,7 +120,7 @@ namespace Contensive.CLI {
                                             } else {
                                                 using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
                                                     string returnErrorMessage = "";
-                                                    collectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
+                                                    CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
                                                     if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                         Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                     }
@@ -162,7 +162,7 @@ namespace Contensive.CLI {
                                 case "-n":
                                     //
                                     // -- start the new app wizard
-                                    createAppClass createApp = new createAppClass();
+                                    CreateAppClass createApp = new CreateAppClass();
                                     createApp.createApp();
                                     exitArgumentProcessing = true;
                                     break;

@@ -23,13 +23,13 @@ namespace Contensive.Processor {
         public const string EventsId = "5E88DB23-E8D7-4CE8-9793-9C7A20F4CF3A";
         #endregion
         //
-        private Contensive.Processor.Controllers.coreController core;
+        private Contensive.Processor.Controllers.CoreController core;
         private CPClass CP;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
-        public CPSiteClass(Contensive.Processor.Controllers.coreController coreObj, CPClass CPParent) : base() {
+        public CPSiteClass(Contensive.Processor.Controllers.CoreController coreObj, CPClass CPParent) : base() {
             core = coreObj;
             CP = CPParent;
         }
@@ -332,7 +332,7 @@ namespace Contensive.Processor {
             try {
                 string ignoreReturnedCollectionGuid = "";
                 var tmpList = new List<string> { };
-                returnOk = collectionController.installCollectionsFromPrivateFile(core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList);
+                returnOk = CollectionController.installCollectionsFromPrivateFile(core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 if (!core.siteProperties.trapErrors) {

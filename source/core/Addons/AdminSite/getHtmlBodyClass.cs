@@ -24,7 +24,7 @@ namespace Contensive.Addons.AdminSite {
         // objects passed in - do not dispose, sets cp from argument For use In calls To other objects, Then core because cp cannot be used since that would be a circular depenancy
         //
         private CPClass cp; // local cp set in constructor
-        private coreController core; // core -- short term, this is the migration solution from a built-in tool, to an addon
+        private CoreController core; // core -- short term, this is the migration solution from a built-in tool, to an addon
         //
         const string FilterClosedLabel = "<div style=\"font-size:9px;text-align:center;\">&nbsp;<br>F<br>i<br>l<br>t<br>e<br>r<br>s</div>";
         //
@@ -361,7 +361,7 @@ namespace Contensive.Addons.AdminSite {
                                 errorContextMessage = "get Form Wizard for Admin"
                             });
                         } else if (adminContext.AdminForm == AdminFormLegacyAddonManager) {
-                            adminBody = addonController.GetAddonManager(core);
+                            adminBody = AddonController.getAddonManager(core);
                         } else if (adminContext.AdminForm == AdminFormEditorConfig) {
                             adminBody = GetForm_EditConfig();
                         } else {
@@ -376,7 +376,7 @@ namespace Contensive.Addons.AdminSite {
                             // Special case, call the routine that provides a backup
                             //
                             core.doc.addRefreshQueryString("addonguid", addonGuidAddonManager);
-                            adminBody = addonController.GetAddonManager(core);
+                            adminBody = AddonController.getAddonManager(core);
                         } else {
                             addonModel addon = null;
                             string executeContextErrorCaption = "unknown";
@@ -501,7 +501,7 @@ namespace Contensive.Addons.AdminSite {
                         IconHeight = core.db.csGetInteger(CS, "IconHeight");
                         IconSprites = core.db.csGetInteger(CS, "IconSprites");
                         IconIsInline = core.db.csGetBoolean(CS, "IsInline");
-                        IconImg = addonController.GetAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, core.appConfig.cdnFileUrl, AddonName, AddonName, "", 0);
+                        IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, core.appConfig.cdnFileUrl, AddonName, AddonName, "", 0);
                         helpLink = core.db.csGet(CS, "helpLink");
                     }
                     core.db.csClose(ref CS);
@@ -2007,7 +2007,7 @@ namespace Contensive.Addons.AdminSite {
                 TableName = cdefModel.getContentTablename(core, ContentName);
                 SubFilterList = "";
                 if (genericController.vbLCase(TableName) == genericController.vbLCase("ccMembers")) {
-                    SQL = core.db.GetSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");
+                    SQL = core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");
                     CS = core.db.csOpenSql(SQL, "Default");
                     while (core.db.csOk(CS)) {
                         string Name = core.db.csGetText(CS, "Name");
@@ -10662,7 +10662,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     Copy = "unknown";
                     AgeInDays = "unknown";
-                    SQL = core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "", "ID", "", 1);
+                    SQL = core.db.getSQLSelect("default", "ccVisits", "DateAdded", "", "ID", "", 1);
                     CSServers = core.db.csOpenSql(SQL, "Default");
                     //SQL = "SELECT Top 1 DateAdded FROM ccVisits order by ID;"
                     //CSServers = core.app_openCsSql_Rev_Internal("Default", SQL)
@@ -11400,7 +11400,7 @@ namespace Contensive.Addons.AdminSite {
         //       if it is empty, setup defaults
         //=================================================================================
         //
-        public static indexConfigClass LoadIndexConfig(coreController core, adminContextClass adminContext) {
+        public static indexConfigClass LoadIndexConfig(CoreController core, adminContextClass adminContext) {
             indexConfigClass returnIndexConfig = new indexConfigClass();
             try {
                 // refactor this out
@@ -11995,7 +11995,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //=================================================================================
         //
-        public static void SetIndexSQL_SaveIndexConfig(coreController core, indexConfigClass IndexConfig) {
+        public static void SetIndexSQL_SaveIndexConfig(CoreController core, indexConfigClass IndexConfig) {
             //
             // --Find words
             string SubList = "";

@@ -76,7 +76,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="core"></param>
         /// <param name="cacheNameList"></param>
         /// <returns></returns>
-        public static visitModelx add(coreController core, ref List<string> cacheNameList) {
+        public static visitModelx add(CoreController core, ref List<string> cacheNameList) {
             visitModelx result = null;
             try {
                 result = create(core, core.db.insertContentRecordGetID(primaryContentName, 0), ref cacheNameList);
@@ -86,7 +86,7 @@ namespace Contensive.Processor.Models.DbModels {
             }
             return result;
         }
-        public static visitModelx add(coreController core) { var tmpList = new List<string> { }; return add(core, ref tmpList); }
+        public static visitModelx add(CoreController core) { var tmpList = new List<string> { }; return add(core, ref tmpList); }
         //
         //====================================================================================================
         /// <summary>
@@ -95,7 +95,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="recordId">The id of the record to be read into the new object</param>
         /// <param name="cacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        public static visitModelx create(coreController core, int recordId, ref List<string> cacheNameList) {
+        public static visitModelx create(CoreController core, int recordId, ref List<string> cacheNameList) {
             visitModelx result = null;
             try {
                 if (recordId > 0) {
@@ -111,7 +111,7 @@ namespace Contensive.Processor.Models.DbModels {
             }
             return result;
         }
-        public static visitModelx create(coreController core, int recordId) { var tmpList = new List<string> { }; return create(core, recordId, ref tmpList); }
+        public static visitModelx create(CoreController core, int recordId) { var tmpList = new List<string> { }; return create(core, recordId, ref tmpList); }
         //
         //====================================================================================================
         /// <summary>
@@ -119,7 +119,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
-        public static visitModelx create(coreController core, string recordGuid, ref List<string> cacheNameList) {
+        public static visitModelx create(CoreController core, string recordGuid, ref List<string> cacheNameList) {
             visitModelx result = null;
             try {
                 if (!string.IsNullOrEmpty(recordGuid)) {
@@ -142,7 +142,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
-        private static visitModelx loadObject(coreController core, string sqlCriteria, ref List<string> cacheNameList, string sortOrder = "id") {
+        private static visitModelx loadObject(CoreController core, string sqlCriteria, ref List<string> cacheNameList, string sortOrder = "id") {
             visitModelx result = null;
             try {
                 csController cs = new csController(core);
@@ -219,7 +219,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public int saveObject(coreController core) {
+        public int saveObject(CoreController core) {
             try {
                 csController cs = new csController(core);
                 if (id > 0) {
@@ -300,7 +300,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             try {
                 if (recordId > 0) {
                     core.db.deleteContentRecords(primaryContentName, "id=" + recordId.ToString());
@@ -318,7 +318,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static void delete(coreController core, string guid) {
+        public static void delete(CoreController core, string guid) {
             try {
                 if (!string.IsNullOrEmpty(guid)) {
                     core.db.deleteContentRecords(primaryContentName, "(ccguid=" + core.db.encodeSQLText(guid) + ")");
@@ -337,7 +337,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="cp"></param>
         /// <param name="someCriteria"></param>
         /// <returns></returns>
-        public static List<visitModelx> getObjectList(coreController core, int someCriteria) {
+        public static List<visitModelx> getObjectList(CoreController core, int someCriteria) {
             List<visitModelx> result = new List<visitModelx>();
             try {
                 csController cs = new csController(core);
@@ -366,7 +366,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="recordId"></param>
-        public static void invalidateIdCache(coreController core, int recordId) {
+        public static void invalidateIdCache(CoreController core, int recordId) {
             core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
             //
             // -- always clear the cache with the content name
@@ -379,7 +379,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="guid"></param>
-        public static void invalidateGuidCache(coreController core, string guid) {
+        public static void invalidateGuidCache(CoreController core, string guid) {
             core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", guid));
             //
             // -- always clear the cache with the content name
@@ -405,7 +405,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="visitId"></param>
         /// <param name="visitorId"></param>
         /// <returns></returns>
-        public static visitModelx getLastVisitByVisitor(coreController core, int visitId, int visitorId) {
+        public static visitModelx getLastVisitByVisitor(CoreController core, int visitId, int visitorId) {
             var tempVar = new List<string>();
             visitModelx result = loadObject(core, "(id<>" + visitId + ")and(VisitorID=" + visitorId + ")", ref tempVar, "id desc");
             return result;

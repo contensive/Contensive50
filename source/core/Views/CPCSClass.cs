@@ -28,7 +28,7 @@ namespace Contensive.Processor {
         public const string EventsId = "04B8E338-ABB7-44FE-A8DF-2681A36DCA46";
         #endregion
         //
-        private Contensive.Processor.Controllers.coreController core;
+        private Contensive.Processor.Controllers.CoreController core;
         private int cs;
         private int OpeningMemberID;
         private CPClass cp;
@@ -280,7 +280,7 @@ namespace Contensive.Processor {
         //
         public override string GetAddLink(string PresetNameValueList = "", bool AllowPaste = false) {
             try {
-                return dbController.csGetRecordAddLink(core, cs, PresetNameValueList, AllowPaste);
+                return DbController.csGetRecordAddLink(core, cs, PresetNameValueList, AllowPaste);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -511,7 +511,7 @@ namespace Contensive.Processor {
         //
         public override void SetFormInput(string FieldName, string RequestName = "") {
             try {
-                dbController.csSetFormInput(core, cs, FieldName, RequestName);
+                DbController.csSetFormInput(core, cs, FieldName, RequestName);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;

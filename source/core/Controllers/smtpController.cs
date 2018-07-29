@@ -25,7 +25,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Send email by SMTP. return 'ok' if success, else return a user compatible error message
         /// </summary>
-        public static bool sendSmtp( coreController core, emailController.emailClass email, ref string returnErrorMessage, string AttachmentFilename = "") {
+        public static bool sendSmtp( CoreController core, emailController.emailClass email, ref string returnErrorMessage, string AttachmentFilename = "") {
             bool status = false;
             returnErrorMessage = "";
             try {
@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.mockSmtp) {
                     //
                     // -- for unit tests, mock interface by adding email to core.mockSmptList
-                    core.mockSmtpList.Add(new coreController.smtpEmailClass() {
+                    core.mockSmtpList.Add(new CoreController.smtpEmailClass() {
                         AttachmentFilename = AttachmentFilename,
                         email = email,
                         smtpServer = smtpServer

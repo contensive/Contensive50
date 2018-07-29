@@ -32,97 +32,97 @@ namespace Contensive.Processor.Models.DbModels {
         public int attempts { get; set; }
         //
         //====================================================================================================
-        public static emailQueueModel add(coreController core) {
+        public static emailQueueModel add(CoreController core) {
             return add<emailQueueModel>(core);
         }
         //
         //====================================================================================================
-        public static emailQueueModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static emailQueueModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<emailQueueModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static emailQueueModel create(coreController core, int recordId) {
+        public static emailQueueModel create(CoreController core, int recordId) {
             return create<emailQueueModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static emailQueueModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static emailQueueModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<emailQueueModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static emailQueueModel create(coreController core, string recordGuid) {
+        public static emailQueueModel create(CoreController core, string recordGuid) {
             return create<emailQueueModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static emailQueueModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static emailQueueModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<emailQueueModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static emailQueueModel createByName(coreController core, string recordName) {
+        public static emailQueueModel createByName(CoreController core, string recordName) {
             return createByName<emailQueueModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static emailQueueModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static emailQueueModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<emailQueueModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<emailQueueModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<emailQueueModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<emailQueueModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<emailQueueModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<emailQueueModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<emailQueueModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<emailQueueModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<emailQueueModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<emailQueueModel> createList(coreController core, string sqlCriteria) {
+        public static List<emailQueueModel> createList(CoreController core, string sqlCriteria) {
             return createList<emailQueueModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<emailQueueModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<emailQueueModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<emailQueueModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<emailQueueModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static emailQueueModel createDefault(coreController core) {
+        public static emailQueueModel createDefault(CoreController core) {
             return createDefault<emailQueueModel>(core);
         }
     }

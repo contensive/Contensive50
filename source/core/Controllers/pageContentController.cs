@@ -50,7 +50,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public static string getHtmlBodyTemplate(coreController core) {
+        public static string getHtmlBodyTemplate(CoreController core) {
             string returnBody = "";
             try {
                 //
@@ -136,7 +136,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================================
         //
-        public static string getHtmlBodyTemplateContent(coreController core, bool AllowChildPageList, bool AllowReturnLink, bool AllowEditWrapper, ref bool return_blockSiteWithLogin) {
+        public static string getHtmlBodyTemplateContent(CoreController core, bool AllowChildPageList, bool AllowReturnLink, bool AllowEditWrapper, ref bool return_blockSiteWithLogin) {
             string returnHtml = "";
             try {
                 //
@@ -203,7 +203,7 @@ namespace Contensive.Processor.Controllers {
         //=============================================================================
         //   Add content padding around content
         //
-        internal static string getContentBoxWrapper(coreController core, string Content, int ContentPadding) {
+        internal static string getContentBoxWrapper(CoreController core, string Content, int ContentPadding) {
             string result = Content;
             if (core.siteProperties.getBoolean("Compatibility ContentBox Pad With Table")) {
                 //
@@ -224,7 +224,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        internal static string getDefaultBlockMessage(coreController core, bool UseContentWatchLink) {
+        internal static string getDefaultBlockMessage(CoreController core, bool UseContentWatchLink) {
             string result = "";
             try {
                 var copyRecord = copyContentModel.createByName(core, ContentBlockCopyName);  
@@ -261,7 +261,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public static string getMoreInfoHtml(coreController core, int PeopleID) {
+        public static string getMoreInfoHtml(CoreController core, int PeopleID) {
             string result = "";
             try {
                 string Copy = "";
@@ -320,7 +320,7 @@ namespace Contensive.Processor.Controllers {
                 + kmaEndTableRow;
         }
         //
-        public static void loadPage(coreController core, int requestedPageId, domainModel domain) {
+        public static void loadPage(CoreController core, int requestedPageId, domainModel domain) {
             try {
                 if (domain == null) {
                     //
@@ -434,7 +434,7 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        public static int getPageNotFoundPageId(coreController core) {
+        public static int getPageNotFoundPageId(CoreController core) {
             int pageId = core.domain.pageNotFoundPageId;
             if (pageId == 0) {
                 //
@@ -446,7 +446,7 @@ namespace Contensive.Processor.Controllers {
         //
         //---------------------------------------------------------------------------
         //
-        public static pageContentModel getLandingPage(coreController core, domainModel domain) {
+        public static pageContentModel getLandingPage(CoreController core, domainModel domain) {
             pageContentModel landingPage = null;
             try {
                 if (domain == null) {
@@ -499,7 +499,7 @@ namespace Contensive.Processor.Controllers {
         //
         // Verify a link from the template link field to be used as a Template Link
         //
-        internal static string verifyTemplateLink(coreController core, string linkSrc) {
+        internal static string verifyTemplateLink(CoreController core, string linkSrc) {
             string result = null;
             result = linkSrc;
             if (!string.IsNullOrEmpty(result)) {
@@ -524,7 +524,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        internal static string main_ProcessPageNotFound_GetLink(coreController core, string adminMessage, string BackupPageNotFoundLink = "", string PageNotFoundLink = "", int EditPageID = 0, int EditSectionID = 0) {
+        internal static string main_ProcessPageNotFound_GetLink(CoreController core, string adminMessage, string BackupPageNotFoundLink = "", string PageNotFoundLink = "", int EditPageID = 0, int EditSectionID = 0) {
             string result = "";
             try {
                 int PageNotFoundPageID = getPageNotFoundPageId(core);
@@ -599,7 +599,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string getPageLink(coreController core, int PageID, string QueryStringSuffix, bool AllowLinkAliasIfEnabled = true, bool UseContentWatchNotDefaultPage = false) {
+        public static string getPageLink(CoreController core, int PageID, string QueryStringSuffix, bool AllowLinkAliasIfEnabled = true, bool UseContentWatchNotDefaultPage = false) {
             string result = "";
             try {
                 //
@@ -689,7 +689,7 @@ namespace Contensive.Processor.Controllers {
         //   If you already have all the info, lik the parents templateid, etc, call the ...WithArgs call
         //====================================================================================================
         //
-        public static string main_GetPageLink3(coreController core, int PageID, string QueryStringSuffix, bool AllowLinkAlias) {
+        public static string main_GetPageLink3(CoreController core, int PageID, string QueryStringSuffix, bool AllowLinkAlias) {
             return getPageLink(core, PageID, QueryStringSuffix, AllowLinkAlias, false);
         }
         //
@@ -702,7 +702,7 @@ namespace Contensive.Processor.Controllers {
         //   Tests if this record is in the ParentID->ID chain for this content
         //========================================================================
         //
-        public static bool isChildRecord(coreController core, string ContentName, int ChildRecordID, int ParentRecordID) {
+        public static bool isChildRecord(CoreController core, string ContentName, int ChildRecordID, int ParentRecordID) {
             bool result = false;
             try {
                 result = (ChildRecordID == ParentRecordID);
@@ -724,7 +724,7 @@ namespace Contensive.Processor.Controllers {
         //   Tests if this record is in the ParentID->ID chain for this content
         //========================================================================
         //
-        internal static bool main_IsChildRecord_Recurse(coreController core, string DataSourceName, string TableName, int ChildRecordID, int ParentRecordID, string History) {
+        internal static bool main_IsChildRecord_Recurse(CoreController core, string DataSourceName, string TableName, int ChildRecordID, int ParentRecordID, string History) {
             bool result = false;
             try {
                 string SQL ="select ParentID from " + TableName + " where id=" + ChildRecordID;
@@ -754,7 +754,7 @@ namespace Contensive.Processor.Controllers {
         //   This code is based on the GoMethod site script
         //========================================================================
         //
-        public static string getHtmlBody(coreController core) {
+        public static string getHtmlBody(CoreController core) {
             string result = "";
             try {
                 bool IsPageNotFound = false;
@@ -879,7 +879,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.redirectRecordID != 0) {
                             string contentName = Models.Complex.cdefModel.getContentNameByID(core, core.doc.redirectContentID);
                             if (!string.IsNullOrEmpty(contentName)) {
-                                if (iisController.main_RedirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID)) {
+                                if (IisController.main_RedirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID)) {
                                     //
                                     //Call AppendLog("main_init(), 3210 - exit for rc/ri redirect ")
                                     //
@@ -1126,7 +1126,7 @@ namespace Contensive.Processor.Controllers {
                             + "or(SourceLink=" + core.db.encodeSQLText(LinkFullPath) + ")"
                             + "or(SourceLink=" + core.db.encodeSQLText(LinkFullPathNoSlash) + ")"
                             + ")";
-                        Sql = core.db.GetSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", "", 1);
+                        Sql = core.db.getSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", "", 1);
                         int CSPointer = core.db.csOpenSql(Sql);
                         bool IsInLinkForwardTable = false;
                         bool isLinkForward = false;
@@ -1306,7 +1306,7 @@ namespace Contensive.Processor.Controllers {
                     // new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                     //
                     logController.addSiteWarning(core, "Page Not Found", "Page Not Found", "", 0, "Page Not Found from [" + core.webServer.requestUrlSource + "]", "Page Not Found", "Page Not Found");
-                    core.webServer.setResponseStatus(iisController.httpResponseStatus404);
+                    core.webServer.setResponseStatus(IisController.httpResponseStatus404);
                     core.docProperties.setProperty(rnPageId, getPageNotFoundPageId(core));
                     //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
                     if (core.session.isAuthenticatedAdmin(core)) {
@@ -1329,7 +1329,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        private static void processForm(coreController core, int FormPageID) {
+        private static void processForm(CoreController core, int FormPageID) {
             try {
                 //
                 // main_Get the instructions from the record
@@ -1456,7 +1456,7 @@ namespace Contensive.Processor.Controllers {
                         // Authenticate
                         //
                         if (f.AuthenticateOnFormProcess) {
-                            sessionController.authenticateById(core, core.session.user.id, core.session);
+                            SessionController.authenticateById(core, core.session.user.id, core.session);
                         }
                         //
                         // Join Group requested by page that created form
@@ -1509,7 +1509,7 @@ namespace Contensive.Processor.Controllers {
         //   {{CAPTION}} tags -- main_Gets the caption for each instruction line
         //   {{FIELD}} tags -- main_Gets the form field for each instruction line
         //
-        internal static main_FormPagetype loadFormPageInstructions(coreController core, string FormInstructions, string Formhtml) {
+        internal static main_FormPagetype loadFormPageInstructions(CoreController core, string FormInstructions, string Formhtml) {
             main_FormPagetype result = new main_FormPagetype();
             try {
                 //
@@ -1582,7 +1582,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        internal static string getFormPage(coreController core, string FormPageName, int GroupIDToJoinOnSuccess) {
+        internal static string getFormPage(CoreController core, string FormPageName, int GroupIDToJoinOnSuccess) {
             string result = null;
             try {
                 main_FormPagetype f;
@@ -1678,7 +1678,7 @@ namespace Contensive.Processor.Controllers {
         //   RootPageID has to be the ID of the root page for PageID
         //=============================================================================
         //
-        public static string getContentBox(coreController core, string OrderByClause, bool AllowChildPageList, bool AllowReturnLink, bool ArchivePages, int ignoreme, bool UseContentWatchLink, bool allowPageWithoutSectionDisplay) {
+        public static string getContentBox(CoreController core, string OrderByClause, bool AllowChildPageList, bool AllowReturnLink, bool ArchivePages, int ignoreme, bool UseContentWatchLink, bool allowPageWithoutSectionDisplay) {
             string returnHtml = "";
             try {
                 core.html.addHeadTag("<meta name=\"contentId\" content=\"" + core.doc.pageController.page.id + "\" >", "page content");
@@ -2153,7 +2153,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="allowPageWithoutSectionDisplay"></param>
         /// <returns></returns>
         //
-        internal static string getContentBox_content(coreController core, string OrderByClause, bool AllowChildPageList, bool AllowReturnLink, bool ArchivePages, int ignoreMe, bool UseContentWatchLink, bool allowPageWithoutSectionDisplay) {
+        internal static string getContentBox_content(CoreController core, string OrderByClause, bool AllowChildPageList, bool AllowReturnLink, bool ArchivePages, int ignoreMe, bool UseContentWatchLink, bool allowPageWithoutSectionDisplay) {
             string result = "";
             try {
                 if (core.doc.continueProcessing) {
@@ -2193,7 +2193,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ArchivePage"></param>
         /// <returns></returns>
 
-        internal static string getContentBox_content_Body(coreController core, string OrderByClause, bool AllowChildList, bool Authoring, int rootPageId, bool AllowReturnLink, string RootPageContentName, bool ArchivePage) {
+        internal static string getContentBox_content_Body(CoreController core, string OrderByClause, bool AllowChildList, bool Authoring, int rootPageId, bool AllowReturnLink, string RootPageContentName, bool ArchivePage) {
             string result = "";
             try {
                 bool allowChildListComposite = AllowChildList && core.doc.pageController.page.AllowChildListDisplay;
@@ -2380,7 +2380,7 @@ namespace Contensive.Processor.Controllers {
         //   RecordID is the parent RecordID
         //=============================================================================
         //
-        public static string getSeeAlso(coreController core, string ContentName, int RecordID) {
+        public static string getSeeAlso(CoreController core, string ContentName, int RecordID) {
             string result = "";
             try {
                 if (RecordID > 0) {
@@ -2448,7 +2448,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public static string getFeedbackForm(coreController core, string ContentName, int RecordID, int ToMemberID, string headline = "") {
+        public static string getFeedbackForm(CoreController core, string ContentName, int RecordID, int ToMemberID, string headline = "") {
             string result = "";
             try {
                 const string FeedbackButtonSubmit = "Submit";
@@ -2573,7 +2573,7 @@ namespace Contensive.Processor.Controllers {
         //           - uses ChildPageListTracking to track what has been seen
         //=============================================================================
         //
-        public static string getChildPageList( coreController core,  string RequestedListName, string ContentName, int parentPageID, bool allowChildListDisplay, bool ArchivePages = false) {
+        public static string getChildPageList( CoreController core,  string RequestedListName, string ContentName, int parentPageID, bool allowChildListDisplay, bool ArchivePages = false) {
             string result = "";
             try {
                 if (string.IsNullOrEmpty(ContentName)) {

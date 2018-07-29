@@ -26,7 +26,7 @@ namespace Contensive.Addons.AdminSite {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string returnHtml = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 //
                 core.visitProperty.setProperty("IndexFilterOpen", "1");
             } catch (Exception ex) {

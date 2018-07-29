@@ -219,7 +219,7 @@ namespace Contensive.Processor {
         /// <param name="Title"></param>
         /// <param name="Description"></param>
         /// <returns></returns>
-        public static string GetTitleBar(coreController core, string Title, string Description) {
+        public static string GetTitleBar(CoreController core, string Title, string Description) {
             string result = "";
             try {
                 result = Title;
@@ -241,7 +241,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// Get the Normal Edit Button Bar String, used on Normal Edit and others
         /// </summary>
-        public static string getButtonBarForEdit(coreController core, editButtonBarInfoClass info) {
+        public static string getButtonBarForEdit(CoreController core, editButtonBarInfoClass info) {
             string buttonsLeft = "";
             string buttonsRight = "";
             try {
@@ -279,7 +279,7 @@ namespace Contensive.Processor {
         /// <param name="HeaderMessage"></param>
         /// <param name="RightSideMessage"></param>
         /// <returns></returns>
-        public static string GetHeader(coreController core, string HeaderMessage, string RightSideMessage = "") {
+        public static string GetHeader(CoreController core, string HeaderMessage, string RightSideMessage = "") {
             string s = "";
             try {
                 if (string.IsNullOrEmpty(RightSideMessage)) {
@@ -313,7 +313,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string getButtonsFromList(coreController core, List<buttonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
+        public static string getButtonsFromList(CoreController core, List<buttonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
             string s = "";
             try {
                 foreach (buttonMetadata button in ButtonList) {
@@ -337,7 +337,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string GetButtonsFromList(coreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
+        public static string GetButtonsFromList(CoreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
             return getButtonsFromList(core, buttonStringToButtonList(ButtonList), AllowDelete, AllowAdd);
         }
         //
@@ -348,7 +348,7 @@ namespace Contensive.Processor {
         /// <param name="LeftButtons"></param>
         /// <param name="RightButtons"></param>
         /// <returns></returns>
-        public static string getButtonBar(coreController core, string LeftButtons, string RightButtons) {
+        public static string getButtonBar(CoreController core, string LeftButtons, string RightButtons) {
             if (string.IsNullOrWhiteSpace(LeftButtons + RightButtons)) {
                 return "";
             } else if (string.IsNullOrWhiteSpace(RightButtons)) {
@@ -370,7 +370,7 @@ namespace Contensive.Processor {
         /// <param name="recordCnt"></param>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public static string getForm_Index_ButtonBar(coreController core, bool AllowAdd, bool AllowDelete, int pageNumber, int recordsPerPage, int recordCnt, string contentName) {
+        public static string getForm_Index_ButtonBar(CoreController core, bool AllowAdd, bool AllowDelete, int pageNumber, int recordsPerPage, int recordCnt, string contentName) {
             string result = "";
             string LeftButtons = "";
             string RightButtons = "";
@@ -406,7 +406,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string getForm_index_pageNavigation(coreController core, int PageNumber, int recordsPerPage, int recordCnt, string contentName) {
+        public static string getForm_index_pageNavigation(CoreController core, int PageNumber, int recordsPerPage, int recordCnt, string contentName) {
             string result = null;
             try {
                 int PageCount = 1;
@@ -463,7 +463,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string getBody(coreController core, string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
+        public static string getBody(CoreController core, string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
             string result = "";
             try {
                 string ButtonBar = null;
@@ -501,14 +501,14 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string GetEditSubheadRow(coreController core, string Caption) {
+        public static string GetEditSubheadRow(CoreController core, string Caption) {
             return "<tr><td colspan=2 class=\"ccAdminEditSubHeader\">" + Caption + "</td></tr>";
         }
         //
         // ====================================================================================================
         // GetEditPanel, An edit panel is a section of an admin page, under a subhead. When in tab mode, the subhead is blocked, and the panel is assumed to go in its own tab windows
         //
-        public static string GetEditPanel(coreController core, bool AllowHeading, string PanelHeading, string PanelDescription, string PanelBody) {
+        public static string GetEditPanel(CoreController core, bool AllowHeading, string PanelHeading, string PanelDescription, string PanelBody) {
             string result = "";
             try {
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
@@ -559,7 +559,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        private static string GetReport_Cell(coreController core, string Copy, string Align, int Columns, int RowPointer) {
+        private static string GetReport_Cell(CoreController core, string Copy, string Align, int Columns, int RowPointer) {
             string tempGetReport_Cell = null;
             string iAlign = null;
             string Style = null;
@@ -597,7 +597,7 @@ namespace Contensive.Processor {
         //       RQS
         //       SortingState
         //
-        private static string GetReport_CellHeader(coreController core, int ColumnPtr, string Title, string Width, string Align, string ClassStyle, string RefreshQueryString, SortingStateEnum SortingState) {
+        private static string GetReport_CellHeader(CoreController core, int ColumnPtr, string Title, string Width, string Align, string ClassStyle, string RefreshQueryString, SortingStateEnum SortingState) {
             string result = "";
             try {
                 string Style = null;
@@ -659,7 +659,7 @@ namespace Contensive.Processor {
         /// <param name="core"></param>
         /// <param name="DefaultSortColumnPtr"></param>
         /// <returns></returns>
-        public static int GetReportSortColumnPtr(coreController core, int DefaultSortColumnPtr) {
+        public static int GetReportSortColumnPtr(CoreController core, int DefaultSortColumnPtr) {
             int tempGetReportSortColumnPtr = 0;
             string VarText;
             //
@@ -683,7 +683,7 @@ namespace Contensive.Processor {
         //   It is up to the calling program to call GetReportOrderBy to get the orderby and use it in the query to generate the cells
         //   This call returns a comma delimited list of integers representing the columns to sort
         //
-        public static int GetReportSortType(coreController core) {
+        public static int GetReportSortType(CoreController core) {
             int tempGetReportSortType = 0;
             string VarText;
             //
@@ -701,7 +701,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string GetReport(coreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle) {
+        public static string GetReport(CoreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle) {
             string result = "";
             try {
                 int ColCnt = Cells.GetUpperBound(1);
@@ -719,7 +719,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string GetReport2(coreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle, bool[] ColSortable, int DefaultSortColumnPtr) {
+        public static string GetReport2(CoreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle, bool[] ColSortable, int DefaultSortColumnPtr) {
             string result = "";
             try {
                 string RQS = null;
@@ -940,7 +940,7 @@ namespace Contensive.Processor {
         /// <param name="core"></param>
         /// <param name="headerInfo"></param>
         /// <returns></returns>
-        public static string getEditForm_TitleBarDetails(coreController core, recordEditHeaderInfoClass headerInfo, editRecordClass editRecord) {
+        public static string getEditForm_TitleBarDetails(CoreController core, recordEditHeaderInfoClass headerInfo, editRecordClass editRecord) {
             string result = "";
             bool alt = true;
             if (alt) {
@@ -1044,7 +1044,7 @@ namespace Contensive.Processor {
         /// <param name="htmlName"></param>
         /// <param name="htmlValue"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Bool(coreController core, string htmlName, bool htmlValue, bool readOnly = false, string htmlId = "") {
+        public static string getDefaultEditor_Bool(CoreController core, string htmlName, bool htmlValue, bool readOnly = false, string htmlId = "") {
             string result = htmlController.div(htmlController.checkbox(htmlName, htmlValue, htmlId, false, "", readOnly), "checkbox");
             if (readOnly)  result += htmlController.inputHidden(htmlName, htmlValue);
             return result;
@@ -1061,7 +1061,7 @@ namespace Contensive.Processor {
         /// <param name="htmlId"></param>
         /// <param name="isPassword"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Text(coreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
+        public static string getDefaultEditor_Text(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
             if ((fieldValue.IndexOf("\n") == -1) && (fieldValue.Length < 80)) {
                 //
                 // text field shorter then 40 characters without a CR
@@ -1081,7 +1081,7 @@ namespace Contensive.Processor {
         /// <param name="htmlId"></param>
         /// <param name="isPassword"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_TextArea(coreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
+        public static string getDefaultEditor_TextArea(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
             //
             // longer text data, or text that contains a CR
             return htmlController.inputTextarea(core, fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false, 255);
@@ -1089,7 +1089,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_Html( coreController core, string fieldName, string fieldValue, string editorAddonListJSON, string styleList, string styleOptionList, bool readONly = false, string htmlId = "" ) {
+        public static string getDefaultEditor_Html( CoreController core, string fieldName, string fieldValue, string editorAddonListJSON, string styleList, string styleOptionList, bool readONly = false, string htmlId = "" ) {
             string result = "";
             if (readONly) {
                 result += htmlController.inputHidden(fieldName, fieldValue);
@@ -1113,7 +1113,7 @@ namespace Contensive.Processor {
         /// <param name="readOnly"></param>
         /// <param name="htmlId"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_Password(coreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
+        public static string getDefaultEditor_Password(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
             return htmlController.inputText( core,fieldName, fieldValue, -1, -1, htmlId, true, readOnly, "password form-control", 255);
         }
         //
@@ -1131,7 +1131,7 @@ namespace Contensive.Processor {
         /// <param name="fieldRequired"></param>
         /// <param name="IsEmptyList"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_LookupContent( coreController core, string fieldName, int fieldValue, int lookupContentID, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
+        public static string getDefaultEditor_LookupContent( CoreController core, string fieldName, int fieldValue, int lookupContentID, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
             string result = "";
             string LookupContentName = "";
             if (lookupContentID != 0) LookupContentName = genericController.encodeText(Models.Complex.cdefModel.getContentNameByID(core, lookupContentID));
@@ -1186,7 +1186,7 @@ namespace Contensive.Processor {
         /// <param name="WhyReadOnlyMsg"></param>
         /// <param name="fieldRequired"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_LookupList(coreController core, string htmlName, int defaultLookupIndexBaseOne, string[] lookupArray, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
+        public static string getDefaultEditor_LookupList(CoreController core, string htmlName, int defaultLookupIndexBaseOne, string[] lookupArray, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
             string result = "";
             if (readOnly) {
                 //
@@ -1210,7 +1210,7 @@ namespace Contensive.Processor {
             }
             return result;
         }
-        public static string getDefaultEditor_LookupList(coreController core, string htmlName, string defaultValue, List<nameValueClass> lookupList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
+        public static string getDefaultEditor_LookupList(CoreController core, string htmlName, string defaultValue, List<nameValueClass> lookupList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
             string result = "";
             if (readOnly) {
                 //
@@ -1237,7 +1237,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_Date( coreController core, string fieldName, DateTime FieldValueDate, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
+        public static string getDefaultEditor_Date( CoreController core, string fieldName, DateTime FieldValueDate, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
             string result = "";
             string fieldValue_text = "";
             if (FieldValueDate == DateTime.MinValue) {
@@ -1261,7 +1261,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_memberSelect(coreController core, string htmlName, int selectedRecordId, int groupId, string groupName, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
+        public static string getDefaultEditor_memberSelect(CoreController core, string htmlName, int selectedRecordId, int groupId, string groupName, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
             string EditorString = "";
             if (readOnly) {
                 //
@@ -1299,7 +1299,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_manyToMany(coreController core, cdefFieldModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly = false, string WhyReadOnlyMsg = "" ) {
+        public static string getDefaultEditor_manyToMany(CoreController core, cdefFieldModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly = false, string WhyReadOnlyMsg = "" ) {
             string result = "";
             //
             string MTMContent0 =   cdefModel.getContentNameByID(core, field.contentId);
@@ -1315,7 +1315,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public static string getDefaultEditor_SelectorString(coreController core, string SitePropertyName, string SitePropertyValue, string selector) {
+        public static string getDefaultEditor_SelectorString(CoreController core, string SitePropertyName, string SitePropertyValue, string selector) {
             string result = "";
             try {
                 Dictionary<string, string> instanceOptions = new Dictionary<string, string> {
@@ -1448,13 +1448,13 @@ namespace Contensive.Processor {
         /// <param name="EditorString"></param>
         /// <param name="editorHelpRow"></param>
         /// <returns></returns>
-        public static string getEditRow(coreController core, string EditorString, string Caption, string editorHelpRow, bool fieldRequired = false, bool ignore = false, string fieldHtmlId = "") {
+        public static string getEditRow(CoreController core, string EditorString, string Caption, string editorHelpRow, bool fieldRequired = false, bool ignore = false, string fieldHtmlId = "") {
             return htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div( htmlController.small( editorHelpRow, "form-text text-muted"), "ml-5"), "p-2 ccEditRow");
         }
         //
         // ====================================================================================================
         //
-        public static string getEditRowLegacy(coreController core, string HTMLFieldString, string Caption, string HelpMessage = "", bool FieldRequired = false, bool AllowActiveEdit = false, string ignore0 = "") {
+        public static string getEditRowLegacy(CoreController core, string HTMLFieldString, string Caption, string HelpMessage = "", bool FieldRequired = false, bool AllowActiveEdit = false, string ignore0 = "") {
             return getEditRow(core, HTMLFieldString, Caption, HelpMessage, FieldRequired, AllowActiveEdit, ignore0);
             //string tempGetEditRow = null;
             //try {
@@ -1495,7 +1495,7 @@ namespace Contensive.Processor {
         /// <param name="recordCnt"></param>
         /// <param name="ContentAccessLimitMessage"></param>
         /// <returns></returns>
-        public static string getForm_Index_Header(coreController core, indexConfigClass IndexConfig, cdefModel content, int recordCnt, string ContentAccessLimitMessage) {
+        public static string getForm_Index_Header(CoreController core, indexConfigClass IndexConfig, cdefModel content, int recordCnt, string ContentAccessLimitMessage) {
             //
             // ----- TitleBar
             //
@@ -1655,8 +1655,8 @@ namespace Contensive.Processor {
         /// <param name="core"></param>
         /// <param name="cdef"></param>
         /// <returns></returns>
-        public static string getIconEditAdminLink(coreController core, Models.Complex.cdefModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
-        public static string getIconEditAdminLink(coreController core, Models.Complex.cdefModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, Models.Complex.cdefModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, Models.Complex.cdefModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
         //
         //====================================================================================================
         //
@@ -1666,7 +1666,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public static string getToolForm(coreController core, string innerHtml, string buttonList) {
+        public static string getToolForm(CoreController core, string innerHtml, string buttonList) {
             string buttonHtml = (string.IsNullOrWhiteSpace(buttonList)) ? "" : core.html.getPanelButtons(buttonList, "Button");
             string result = ""
                 + buttonHtml 
@@ -1713,11 +1713,11 @@ namespace Contensive.Processor {
         //    return result;
         //}
         //
-        public static string getToolFormRow( coreController core, string asdf) {
+        public static string getToolFormRow( CoreController core, string asdf) {
             return htmlController.div(asdf, "p-1"); 
         }
         //
-        public static string getToolFormInputRow( coreController core, string label, string input ) {
+        public static string getToolFormInputRow( CoreController core, string label, string input ) {
             return getToolFormRow(core, htmlController.label(label) + "<br>" + input);
 
             //"<div class=\"p-1\">Page Number:<br>" + htmlController.inputText(core, "PageNumber", PageNumber.ToString()) + "</div>";
@@ -1731,13 +1731,13 @@ namespace Contensive.Processor {
         /// <param name="RecordID"></param>
         /// <param name="AllowCut"></param>
         /// <returns></returns>
-        public static string getRecordEditLink(coreController core, string ContentName, int RecordID, bool AllowCut = false) {
+        public static string getRecordEditLink(CoreController core, string ContentName, int RecordID, bool AllowCut = false) {
             return getRecordEditLink(core, ContentName, RecordID, AllowCut, "", core.session.isEditing(ContentName));
         }
         //
         //===================================================================================================
         //
-        public static  string getEditWrapper(coreController core, string caption, string content) {
+        public static  string getEditWrapper(CoreController core, string caption, string content) {
             string result = content;
             if (core.session.isEditingAnything()) {
                 result = htmlController.div(result, "ccEditWrapperContent");
@@ -1764,7 +1764,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public static string getRecordEditLink(coreController core, string contentName, int recordID, bool allowCut, string RecordName, bool IsEditing) {
+        public static string getRecordEditLink(CoreController core, string contentName, int recordID, bool allowCut, string RecordName, bool IsEditing) {
             string result = "";
             try {
                 string ContentCaption = htmlController.encodeHtml(contentName);
@@ -1800,13 +1800,13 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public static  string getRecordAddLink(coreController core, string ContentName, string PresetNameValueList, bool AllowPaste = false) {
+        public static  string getRecordAddLink(CoreController core, string ContentName, string PresetNameValueList, bool AllowPaste = false) {
             return getRecordAddLink2(core, ContentName, PresetNameValueList, AllowPaste, core.session.isEditing(ContentName));
         }
         //
         //====================================================================================================
         //
-        public static  string getRecordAddLink2( coreController core,  string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
+        public static  string getRecordAddLink2( CoreController core,  string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
             string tempmain_GetRecordAddLink2 = null;
             try {
                 int ParentID = 0;
@@ -1947,7 +1947,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        private static  string getRecordAddLink_AddMenuEntry( coreController core,  string ContentName, string PresetNameValueList, string ContentNameList, string MenuName, string ParentMenuName) {
+        private static  string getRecordAddLink_AddMenuEntry( CoreController core,  string ContentName, string PresetNameValueList, string ContentNameList, string MenuName, string ParentMenuName) {
             string result = "";
             string Copy = null;
             int CS = 0;

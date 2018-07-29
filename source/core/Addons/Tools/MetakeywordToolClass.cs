@@ -34,7 +34,7 @@ namespace Contensive.Addons.Tools {
         //
         private string GetForm_MetaKeywordTool( CPClass cp) {
             string tempGetForm_MetaKeywordTool = "";
-                coreController core = cp.core;
+                CoreController core = cp.core;
             try {
                 stringBuilderLegacyController Content = new stringBuilderLegacyController();
                 string Copy = null;

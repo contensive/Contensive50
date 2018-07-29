@@ -26,7 +26,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static  string oneWayEncrypt(coreController core, string password) {
+        public static  string oneWayEncrypt(CoreController core, string password) {
             string returnResult = "";
             try {
                 returnResult = hashEncode.ComputeHash(password, "SHA512", null);
@@ -43,7 +43,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sourceToTest"></param>
         /// <returns></returns>
-        public static bool oneWayVerify(coreController core, string sourceToTest, string encryptedTaken) {
+        public static bool oneWayVerify(CoreController core, string sourceToTest, string encryptedTaken) {
             bool returnResult = false;
             try {
                 returnResult = hashEncode.VerifyHash(sourceToTest, "SHA512", encryptedTaken);
@@ -60,7 +60,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sourceToEncrypt"></param>
         /// <returns></returns>
-        public static  string twoWayEncrypt(coreController core, string sourceToEncrypt) {
+        public static  string twoWayEncrypt(CoreController core, string sourceToEncrypt) {
             string returnResult = "";
             try {
                 byte[] Buffer = null;
@@ -96,7 +96,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sourceToDecrypt"></param>
         /// <returns></returns>
-        public static  string twoWayDecrypt(coreController core, string sourceToDecrypt) {
+        public static  string twoWayDecrypt(CoreController core, string sourceToDecrypt) {
             string returnResult = "";
             try {
                 byte[] buffer = null;
@@ -392,7 +392,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public static string encodeToken(coreController core, int keyInteger, DateTime keyDate) {
+        public static string encodeToken(CoreController core, int keyInteger, DateTime keyDate) {
             string returnToken = "";
             try {
                 string sourceText = keyInteger.ToString() + "\t" + keyDate.ToString();
@@ -409,7 +409,7 @@ namespace Contensive.Processor.Controllers {
         //       result is 0 if there was a decode error
         //========================================================================
         //
-        public static void decodeToken(coreController core, string token, ref int returnNumber, ref DateTime returnDate) {
+        public static void decodeToken(CoreController core, string token, ref int returnNumber, ref DateTime returnDate) {
             try {
                 string decodedString = "";
                 string[] parts = null;

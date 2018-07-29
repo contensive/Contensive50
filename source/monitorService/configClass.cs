@@ -17,7 +17,7 @@ namespace Contensive.MonitorService {
         //
         public const int Port_SiteMonitorDefault = 4532;
         //
-        private coreController cpCore;
+        private CoreController cpCore;
         //
         public int TimerIntervalSec;
         public bool allowErrorRecovery;
@@ -36,7 +36,7 @@ namespace Contensive.MonitorService {
         //
         //
         //
-        public monitorConfigClass(coreController cpCore) {
+        public monitorConfigClass(CoreController cpCore) {
             try {
                 //
                 string Filename = null;

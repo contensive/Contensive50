@@ -26,7 +26,7 @@ namespace Contensive.Addons.Primitives {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string result = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 //
                 // -- Should be a remote method in commerce
                 if (!core.session.isAuthenticatedAdmin(core)) {

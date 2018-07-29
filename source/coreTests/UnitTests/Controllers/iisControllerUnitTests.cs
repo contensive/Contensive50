@@ -15,7 +15,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (ServerManager serverManager = new ServerManager()) {
                 // act
                 using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass()) {
-                    iisController.verifyAppPool(cp.core, appPoolName);
+                    IisController.verifyAppPool(cp.core, appPoolName);
                 }
             }
             // assert

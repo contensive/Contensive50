@@ -26,13 +26,13 @@ namespace Contensive.Addons.Primitives {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string result = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
                 string Filename = core.siteProperties.getText("FaviconFilename", "");
                 if (string.IsNullOrEmpty(Filename)) {
                     //
                     // no favicon, 404 the call
                     //
-                    core.webServer.setResponseStatus(iisController.httpResponseStatus404);
+                    core.webServer.setResponseStatus(IisController.httpResponseStatus404);
                     core.webServer.setResponseContentType("image/gif");
                     core.doc.continueProcessing = false;
                     return string.Empty;

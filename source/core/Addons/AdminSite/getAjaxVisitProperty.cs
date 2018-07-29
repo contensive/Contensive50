@@ -27,7 +27,7 @@ namespace Contensive.Addons.AdminSite {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string result = "";
             try {
-                coreController core = ((CPClass)cp).core;
+                CoreController core = ((CPClass)cp).core;
 
                 string ArgList = core.docProperties.getText("args");
                 string[] Args = ArgList.Split('&');

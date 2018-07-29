@@ -851,7 +851,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static int GetRandomInteger(coreController core) {
+        public static int GetRandomInteger(CoreController core) {
             return core.random.Next(Int32.MaxValue);
         }
         //
@@ -1563,7 +1563,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static string runProcess(coreController core, string Cmd, string Arguments = "", bool WaitForReturn = false) {
+        public static string runProcess(CoreController core, string Cmd, string Arguments = "", bool WaitForReturn = false) {
             string returnResult = "";
             Process p = new Process();
             //
@@ -2131,7 +2131,7 @@ namespace Contensive.Processor.Controllers {
         //   If Name present but no value, returns true (as if Name=true)
         //   If Name = Value, it returns value
         //
-        public static string main_GetNameValue_Internal(coreController core, string NameValueString, string Name) {
+        public static string main_GetNameValue_Internal(CoreController core, string NameValueString, string Name) {
             string result = "";
             //
             string NameValueStringWorking = NameValueString;
@@ -2182,7 +2182,7 @@ namespace Contensive.Processor.Controllers {
         //       if it starts with "/", it is already root relative, leave it alone
         //       else (if it start with a file or a path), add the serverFilePath
         //
-        public static string getCdnFileLink(coreController core, string virtualFile) {
+        public static string getCdnFileLink(CoreController core, string virtualFile) {
             string returnLink = virtualFile;
             returnLink = genericController.vbReplace(returnLink, "\\", "/");
             if (genericController.vbInstr(1, returnLink, "://") != 0) {
@@ -2317,7 +2317,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="SrcOptionList"></param>
         /// <returns></returns>
-        public static Dictionary<string, string> convertAddonArgumentstoDocPropertiesList(coreController core, string SrcOptionList) {
+        public static Dictionary<string, string> convertAddonArgumentstoDocPropertiesList(CoreController core, string SrcOptionList) {
             Dictionary<string, string> returnList = new Dictionary<string, string>();
             try {
                 string[] SrcOptions = null;
@@ -2354,7 +2354,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="Copy"></param>
         /// <returns></returns>
-        public static string TextDeScramble(coreController core, string Copy) {
+        public static string TextDeScramble(CoreController core, string Copy) {
             string result = "";
             try {
                 result = securityController.twoWayDecrypt(core, Copy);
@@ -2428,7 +2428,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================================
         // 
-        public static string TextScramble(coreController core, string Copy) {
+        public static string TextScramble(CoreController core, string Copy) {
             return securityController.twoWayEncrypt(core, Copy);
         }
         //

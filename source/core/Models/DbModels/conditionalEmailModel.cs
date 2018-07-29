@@ -32,97 +32,97 @@ namespace Contensive.Processor.Models.DbModels {
         public bool Submitted { get; set; }
         //
         //====================================================================================================
-        public static conditionalEmailModel add(coreController core) {
+        public static conditionalEmailModel add(CoreController core) {
             return add<conditionalEmailModel>(core);
         }
         //
         //====================================================================================================
-        public static conditionalEmailModel add(coreController core, ref List<string> callersCacheNameList) {
+        public static conditionalEmailModel add(CoreController core, ref List<string> callersCacheNameList) {
             return add<conditionalEmailModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static conditionalEmailModel create(coreController core, int recordId) {
+        public static conditionalEmailModel create(CoreController core, int recordId) {
             return create<conditionalEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static conditionalEmailModel create(coreController core, int recordId, ref List<string> callersCacheNameList) {
+        public static conditionalEmailModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return create<conditionalEmailModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static conditionalEmailModel create(coreController core, string recordGuid) {
+        public static conditionalEmailModel create(CoreController core, string recordGuid) {
             return create<conditionalEmailModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static conditionalEmailModel create(coreController core, string recordGuid, ref List<string> callersCacheNameList) {
+        public static conditionalEmailModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
             return create<conditionalEmailModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static conditionalEmailModel createByName(coreController core, string recordName) {
+        public static conditionalEmailModel createByName(CoreController core, string recordName) {
             return createByName<conditionalEmailModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static conditionalEmailModel createByName(coreController core, string recordName, ref List<string> callersCacheNameList) {
+        public static conditionalEmailModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return createByName<conditionalEmailModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public new void save(coreController core) {
+        public new void save(CoreController core) {
             base.save(core);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, int recordId) {
+        public static void delete(CoreController core, int recordId) {
             delete<conditionalEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static void delete(coreController core, string ccGuid) {
+        public static void delete(CoreController core, string ccGuid) {
             delete<conditionalEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<conditionalEmailModel> createList(coreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+        public static List<conditionalEmailModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<conditionalEmailModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<conditionalEmailModel> createList(coreController core, string sqlCriteria, string sqlOrderBy) {
+        public static List<conditionalEmailModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
             return createList<conditionalEmailModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<conditionalEmailModel> createList(coreController core, string sqlCriteria) {
+        public static List<conditionalEmailModel> createList(CoreController core, string sqlCriteria) {
             return createList<conditionalEmailModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(coreController core, int recordId) {
+        public void invalidatePrimaryCache(CoreController core, int recordId) {
             invalidateCacheSingleRecord<conditionalEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, int recordId) {
+        public static string getRecordName(CoreController core, int recordId) {
             return baseModel.getRecordName<conditionalEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static string getRecordName(coreController core, string ccGuid) {
+        public static string getRecordName(CoreController core, string ccGuid) {
             return baseModel.getRecordName<conditionalEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static int getRecordId(coreController core, string ccGuid) {
+        public static int getRecordId(CoreController core, string ccGuid) {
             return baseModel.getRecordId<conditionalEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static conditionalEmailModel createDefault(coreController core) {
+        public static conditionalEmailModel createDefault(CoreController core) {
             return createDefault<conditionalEmailModel>(core);
         }
     }

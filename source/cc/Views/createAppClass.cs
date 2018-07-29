@@ -12,7 +12,7 @@ using System.Security.Principal;
 using Contensive.Processor.Models.Context;
 
 namespace Contensive.CLI {
-    class createAppClass {
+    class CreateAppClass {
         public void createApp() {
             try {
                 //
@@ -238,7 +238,7 @@ namespace Contensive.CLI {
                 //
                 using (CPClass cp = new CPClass(appName)) {
                     Contensive.Processor.Controllers.logController.logInfo(cp.core, "Verify website.");
-                    Processor.Controllers.iisController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
+                    Processor.Controllers.IisController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
                     //
                     Contensive.Processor.Controllers.logController.logInfo(cp.core, "Run db upgrade.");
                     Processor.Controllers.appBuilderController.upgrade(cp.core, true, true);

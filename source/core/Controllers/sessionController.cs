@@ -15,11 +15,11 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// session context -- the identity, visit, visitor, view
     /// </summary>
-    public class sessionController {
+    public class SessionController {
         //
         //====================================================================================================
         // -- this class stores state, so it can hold a pointer to the core instance
-        private coreController core { get; set; }
+        private CoreController core { get; set; }
         //
         //====================================================================================================
         // -- the visit is the collection of pages, constructor creates default non-authenticated instance
@@ -49,7 +49,7 @@ namespace Contensive.Processor.Controllers {
                     if (_language == null) {
                         //
                         // -- try browser language if available
-                        string HTTP_Accept_Language = Controllers.iisController.getBrowserAcceptLanguage(core);
+                        string HTTP_Accept_Language = Controllers.IisController.getBrowserAcceptLanguage(core);
                         if (!string.IsNullOrEmpty(HTTP_Accept_Language)) {
                             List<languageModel> languageList = languageModel.createList(core, "(HTTP_Accept_Language='" + HTTP_Accept_Language + "')");
                             if (languageList.Count > 0) {
@@ -92,25 +92,20 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        // -- legacy
-        public bool visit_browserIsIE = false; // if detail includes msie
-        public string visit_browserVersion = "";
-        public bool visit_browserIsWindows = false; // if any browser detail includes "windows"
-        public bool visit_browserIsMac = false; // if any browser deail includes "mac"
+        /// <summary>
+        /// browser is identified as a bot, and is not on the friendly-bot list
+        /// </summary>
         public bool visit_isBadBot = false;
+        /// <summary>
+        /// The current request carries a cookie from the last request (use to detect back-button)
+        /// </summary>
         public bool visit_stateOK = false; // if false, page is out of state (sequence)
-        private string contentAccessRights_NotList = ""; // If ContentId in this list, they are not a content manager
-        private string contentAccessRights_List = ""; // If ContentId in this list, they are a content manager
-        private string contentAccessRights_AllowAddList = ""; // If in _List, test this for allowAdd
-        private string contentAccessRights_AllowDeleteList = ""; // If in _List, test this for allowDelete
-        private List<string> localCache_IsEditingContentList = new List<string>();
-        private List<string> localCache_NotEditingContentList = new List<string>();
         //
         //====================================================================================================
         /// <summary>
         /// constructor, no arguments, created default authentication model for use without user, and before user is available
         /// </summary>
-        public sessionController(coreController core) {
+        public SessionController(CoreController core) {
             this.core = core;
             visit = new visitModel();
             visitor = new visitorModel();
@@ -127,11 +122,11 @@ namespace Contensive.Processor.Controllers {
         /// When false, a visit can be configured on the fly by any application that attempts to access the cp.user.id
         /// </param>
         /// <returns></returns>
-        public static sessionController create(coreController core, bool trackVisits) {
+        public static SessionController create(CoreController core, bool trackVisits) {
             //
             logController.logTrace(core, "SessionController.create(), enter");
             //
-            sessionController resultSessionContext = null;
+            SessionController resultSessionContext = null;
             var sw = Stopwatch.StartNew();
             try {
                 if (core.serverConfig == null) {
@@ -143,11 +138,11 @@ namespace Contensive.Processor.Controllers {
                     if (core.appConfig == null) {
                         //
                         // -- no application, this is a server-only call not related to a 
-                        resultSessionContext = new sessionController(core);
+                        resultSessionContext = new SessionController(core);
                         logController.logTrace(core, "SessionController.create(), app.config null, create server session");
                     } else {
                         //
-                        resultSessionContext = new sessionController(core);
+                        resultSessionContext = new SessionController(core);
                         DateTime visitCookieTimestamp = DateTime.MinValue;
                         string appNameCookiePrefix = encodeCookieName(core.appConfig.name);
                         string visitCookie = core.webServer.getRequestCookie(appNameCookiePrefix + cookieNameVisit);
@@ -484,8 +479,9 @@ namespace Contensive.Processor.Controllers {
                                 if (DefaultMemberName.Left(5).ToLower() == "visit") {
                                     DefaultMemberName = cdefModel.GetContentFieldProperty(core, "people", "name", "default");
                                 }
-                                resultSessionContext.user = new personModel();
-                                resultSessionContext.user.name = DefaultMemberName;
+                                resultSessionContext.user = new personModel {
+                                    name = DefaultMemberName
+                                };
                                 user_changes = false;
                                 resultSessionContext.visitor.MemberID = 0;
                                 visitor_changes = true;
@@ -544,7 +540,9 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- Write Visit Cookie
                         visitCookie = securityController.encodeToken( core,resultSessionContext.visit.id, core.doc.profileStartTime);
-                        core.webServer.addResponseCookie(appNameCookiePrefix + constants.cookieNameVisit, visitCookie, default(DateTime), "", appRootPath, false);
+                        // -- very trial-error fix - W4S site does not send cookies from ajax calls right after changing from requestAppRootPath to appRootPath
+                        core.webServer.addResponseCookie(appNameCookiePrefix + constants.cookieNameVisit, visitCookie, default(DateTime), "", @"/", false);
+                        //core.webServer.addResponseCookie(appNameCookiePrefix + constants.cookieNameVisit, visitCookie, default(DateTime), "", appRootPath, false);
                     }
                 }
             } catch (Exception ex) {
@@ -564,7 +562,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public bool isAuthenticatedAdmin(coreController core) {
+        public bool isAuthenticatedAdmin(CoreController core) {
             bool result = false;
             try {
                 result = visit.VisitAuthenticated & (user.Admin | user.Developer);
@@ -581,7 +579,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public bool isAuthenticatedDeveloper(coreController core) {
+        public bool isAuthenticatedDeveloper(CoreController core) {
             bool result = false;
             try {
                 result = visit.VisitAuthenticated & (user.Admin | user.Developer);
@@ -599,7 +597,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAuthenticatedContentManager(coreController core, string ContentName = "") {
+        public bool isAuthenticatedContentManager(CoreController core, string ContentName = "") {
             bool returnIsContentManager = false;
             try {
                 string SQL = null;
@@ -659,7 +657,7 @@ namespace Contensive.Processor.Controllers {
         /// logout user
         /// </summary>
         /// <param name="core"></param>
-        public void logout(coreController core) {
+        public void logout(CoreController core) {
             try {
                 logController.addSiteActivity(core, "logout", user.id, user.OrganizationID);
                 //
@@ -684,7 +682,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public int getUserIdForCredentials(coreController core, string username, string password) {
+        public int getUserIdForCredentials(CoreController core, string username, string password) {
             int returnUserId = 0;
             try {
                 //
@@ -822,7 +820,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="returnErrorMessage"></param>
         /// <param name="returnErrorCode"></param>
         /// <returns></returns>
-        public bool isNewCredentialOK(coreController core, string Username, string Password, ref string returnErrorMessage, ref int returnErrorCode) {
+        public bool isNewCredentialOK(CoreController core, string Username, string Password, ref string returnErrorMessage, ref int returnErrorCode) {
             bool returnOk = false;
             try {
                 int CSPointer = 0;
@@ -876,7 +874,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="returnAllowEdit"></param>
         /// <param name="returnAllowAdd"></param>
         /// <param name="returnAllowDelete"></param>
-        public void getContentAccessRights(coreController core, string ContentName, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete) {
+        public void getContentAccessRights(CoreController core, string ContentName, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete) {
             try {
                 int ContentID = 0;
                 returnAllowEdit = false;
@@ -936,7 +934,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="usedContentIdList"></param>
         //========================================================================
         //
-        private void getContentAccessRights_NonAdminByContentId(coreController core, int ContentID, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete, string usedContentIdList) {
+        private void getContentAccessRights_NonAdminByContentId(CoreController core, int ContentID, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete, string usedContentIdList) {
             try {
                 string SQL = null;
                 int CSPointer = 0;
@@ -956,17 +954,17 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- not a valid contentname
                     //
-                } else if (genericController.isInDelimitedString(contentAccessRights_NotList, ContentID.ToString(), ",")) {
+                } else if (genericController.isInDelimitedString(core.doc.contentAccessRights_NotList, ContentID.ToString(), ",")) {
                     //
                     // ----- was previously found to not be a Content Manager
                     //
-                } else if (genericController.isInDelimitedString(contentAccessRights_List, ContentID.ToString(), ",")) {
+                } else if (genericController.isInDelimitedString(core.doc.contentAccessRights_List, ContentID.ToString(), ",")) {
                     //
                     // ----- was previously found to be a Content Manager
                     //
                     returnAllowEdit = true;
-                    returnAllowAdd = genericController.isInDelimitedString(contentAccessRights_AllowAddList, ContentID.ToString(), ",");
-                    returnAllowDelete = genericController.isInDelimitedString(contentAccessRights_AllowDeleteList, ContentID.ToString(), ",");
+                    returnAllowAdd = genericController.isInDelimitedString(core.doc.contentAccessRights_AllowAddList, ContentID.ToString(), ",");
+                    returnAllowDelete = genericController.isInDelimitedString(core.doc.contentAccessRights_AllowDeleteList, ContentID.ToString(), ",");
                 } else {
                     //
                     // ----- Must test it
@@ -1005,18 +1003,18 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Was found to be true
                         //
-                        contentAccessRights_List += "," + ContentID.ToString();
+                        core.doc.contentAccessRights_List += "," + ContentID.ToString();
                         if (returnAllowAdd) {
-                            contentAccessRights_AllowAddList += "," + ContentID.ToString();
+                            core.doc.contentAccessRights_AllowAddList += "," + ContentID.ToString();
                         }
                         if (returnAllowDelete) {
-                            contentAccessRights_AllowDeleteList += "," + ContentID.ToString();
+                            core.doc.contentAccessRights_AllowDeleteList += "," + ContentID.ToString();
                         }
                     } else {
                         //
                         // ----- Was found to be false
                         //
-                        contentAccessRights_NotList += "," + ContentID.ToString();
+                        core.doc.contentAccessRights_NotList += "," + ContentID.ToString();
                     }
                 }
             } catch (Exception ex) {
@@ -1034,7 +1032,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="password"></param>
         /// <param name="AllowAutoLogin"></param>
         /// <returns></returns>
-        public bool authenticate(coreController core, string username, string password, bool AllowAutoLogin = false) {
+        public bool authenticate(CoreController core, string username, string password, bool AllowAutoLogin = false) {
             bool result = false;
             try {
                 int userId = getUserIdForCredentials(core, username, password);
@@ -1061,7 +1059,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="userId"></param>
         /// <param name="authContext"></param>
         /// <returns></returns>
-        public static bool authenticateById(coreController core, int userId, sessionController authContext) {
+        public static bool authenticateById(CoreController core, int userId, SessionController authContext) {
             bool result = false;
             try {
                 result = recognizeById(core, userId, ref authContext);
@@ -1090,7 +1088,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sessionContext"></param>
         /// <returns></returns>
         //
-        public static bool recognizeById(coreController core, int userId, ref sessionController sessionContext) {
+        public static bool recognizeById(CoreController core, int userId, ref SessionController sessionContext) {
             bool result = false;
             try {
                 if (sessionContext.visitor.id == 0) {
@@ -1136,7 +1134,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="checkMemberID"></param>
         /// <returns></returns>
         //
-        public bool isMemberOfGroup(coreController core, string GroupName, int checkMemberID = 0) {
+        public bool isMemberOfGroup(CoreController core, string GroupName, int checkMemberID = 0) {
             bool result = false;
             try {
                 int iMemberID = genericController.encodeInteger(checkMemberID);
@@ -1155,7 +1153,7 @@ namespace Contensive.Processor.Controllers {
         // ----- Returns true if the visitor is an admin, or authenticated and in the group list
         //========================================================================
         //
-        public bool isMemberOfGroupList(coreController core, string GroupIDList, int checkMemberID = 0, bool adminReturnsTrue = false) {
+        public bool isMemberOfGroupList(CoreController core, string GroupIDList, int checkMemberID = 0, bool adminReturnsTrue = false) {
             bool result = false;
             try {
                 if (checkMemberID == 0) {
@@ -1174,7 +1172,7 @@ namespace Contensive.Processor.Controllers {
         //   true if the user is authenticated and is a trusted people (member content)
         //========================================================================
         //
-        public bool isAuthenticatedMember(coreController core) {
+        public bool isAuthenticatedMember(CoreController core) {
             bool result = false;
             try {
                 result = visit.VisitAuthenticated & (Models.Complex.cdefModel.isWithinContent(core, user.contentControlID, cdefModel.getContentId(core, "members")));
@@ -1197,7 +1195,7 @@ namespace Contensive.Processor.Controllers {
         //   admins are always returned true
         //===============================================================================================================================
         //
-        public bool isMemberOfGroupIdList(coreController core, int MemberID, bool isAuthenticated, string GroupIDList) {
+        public bool isMemberOfGroupIdList(CoreController core, int MemberID, bool isAuthenticated, string GroupIDList) {
             return isMemberOfGroupIdList(core, MemberID, isAuthenticated, GroupIDList, true);
         }
         //
@@ -1205,7 +1203,7 @@ namespace Contensive.Processor.Controllers {
         //   Is Group Member of a GroupIDList
         //===============================================================================================================================
         //
-        public bool isMemberOfGroupIdList(coreController core, int MemberID, bool isAuthenticated, string GroupIDList, bool adminReturnsTrue) {
+        public bool isMemberOfGroupIdList(CoreController core, int MemberID, bool isAuthenticated, string GroupIDList, bool adminReturnsTrue) {
             bool returnREsult = false;
             try {
                 //
@@ -1302,7 +1300,7 @@ namespace Contensive.Processor.Controllers {
         /// is Guest
         /// </summary>
         /// <returns></returns>
-        public bool isGuest(coreController core) {
+        public bool isGuest(CoreController core) {
             return !isRecognized(core);
         }
         //
@@ -1311,7 +1309,7 @@ namespace Contensive.Processor.Controllers {
         /// Is Recognized (not new and not authenticted)
         /// </summary>
         /// <returns></returns>
-        public bool isRecognized(coreController core) {
+        public bool isRecognized(CoreController core) {
             return !visit.MemberNew;
         }
         //
@@ -1339,11 +1337,11 @@ namespace Contensive.Processor.Controllers {
                         cacheTestName = "iseditingall";
                     }
                     cacheTestName = cacheTestName.ToLower();
-                    if (localCache_IsEditingContentList.Contains(cacheTestName)) {
+                    if (core.doc.contentIsEditingList.Contains(cacheTestName)) {
                         //
                         // -- 
                         return true;
-                    } else if (localCache_NotEditingContentList.Contains(cacheTestName)) {
+                    } else if (core.doc.contentNotEditingList.Contains(cacheTestName)) {
                         //
                         // -- 
                         return false;
@@ -1357,9 +1355,9 @@ namespace Contensive.Processor.Controllers {
                             result = isAuthenticatedContentManager(core, contentNameOrId);
                         }
                         if (result) {
-                            localCache_IsEditingContentList.Add(cacheTestName);
+                            core.doc.contentIsEditingList.Add(cacheTestName);
                         } else {
-                            localCache_NotEditingContentList.Add(cacheTestName);
+                            core.doc.contentNotEditingList.Add(cacheTestName);
                         }
                     }
                 }
@@ -1376,7 +1374,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isQuickEditing(coreController core, string ContentName) {
+        public bool isQuickEditing(CoreController core, string ContentName) {
             bool returnResult = false;
             try {
                 if (isAuthenticatedContentManager(core, ContentName)) {
@@ -1396,7 +1394,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAdvancedEditing(coreController core, string ContentName) {
+        public bool isAdvancedEditing(CoreController core, string ContentName) {
             bool returnResult = false;
             try {
                 if (isAuthenticatedContentManager(core, ContentName)) {
@@ -1419,7 +1417,7 @@ namespace Contensive.Processor.Controllers {
         //
         //   Checks the username and password
         //
-        public bool isLoginOK(coreController core, string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
+        public bool isLoginOK(CoreController core, string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
             bool result = (getUserIdForCredentials(core, Username, Password) != 0);
             if (!result) {
                 ErrorMessage = errorController.getUserError(core);
@@ -1431,7 +1429,7 @@ namespace Contensive.Processor.Controllers {
         //   conversion pass 2
         // ================================================================================================
         //
-        public string getAuthoringStatusMessage(coreController core, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
+        public string getAuthoringStatusMessage(CoreController core, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
             string result = "";
             //
             string Copy = null;

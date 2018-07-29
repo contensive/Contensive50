@@ -137,7 +137,7 @@ namespace Contensive.Processor.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static serverConfigModel getObject(coreController core) {
+        public static serverConfigModel getObject(CoreController core) {
             serverConfigModel returnModel = null;
             try {
                 System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -199,7 +199,7 @@ namespace Contensive.Processor.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public int saveObject(coreController core) {
+        public int saveObject(CoreController core) {
             try {
                 string jsonTemp = core.json.Serialize(this);
                 core.programDataFiles.saveFile("config.json", jsonTemp);

@@ -28,18 +28,18 @@ namespace Contensive.Processor.Controllers {
     /// - disposable region at end
     /// - if disposable is not needed add: not IDisposable - not contained classes that need to be disposed
     /// </summary>
-    public class addonController : IDisposable {
+    public class AddonController : IDisposable {
         //
         // ----- objects passed in constructor, do not dispose
         //
-        private coreController core;
+        private CoreController core;
         //
         // ====================================================================================================
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="core"></param>
-        public addonController(coreController core) : base() {
+        public AddonController(CoreController core) : base() {
             this.core = core;
         }
         //
@@ -595,7 +595,7 @@ namespace Contensive.Processor.Controllers {
                                         string HelpIcon = getHelpBubble(addon.id, addon.Help, addon.CollectionID, ref DialogList);
                                         if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                             string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
-                                            string AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
+                                            string AddonEditIcon = getIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
                                             AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + cdefModel.getContentId(core, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
                                             string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
                                             string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
@@ -974,9 +974,10 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 // Use Editor Addon
                                                                 //
-                                                                Dictionary<string, string> arguments = new Dictionary<string, string>();
-                                                                arguments.Add("FieldName", FieldName);
-                                                                arguments.Add("FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue));
+                                                                Dictionary<string, string> arguments = new Dictionary<string, string> {
+                                                                    { "FieldName", FieldName },
+                                                                    { "FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue) }
+                                                                };
                                                                 //OptionString = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(core.siteProperties.getText(FieldName, FieldDefaultValue))
                                                                 addonModel addon = addonModel.createByName(core, FieldAddon);
                                                                 Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
@@ -1260,7 +1261,7 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                                                                 Copy = "Error: ";
-                                                            } else if (!dbController.isDataTableOk(dt)) {
+                                                            } else if (!DbController.isDataTableOk(dt)) {
                                                                 //
                                                                 // ----- no result
                                                                 //
@@ -1696,7 +1697,7 @@ namespace Contensive.Processor.Controllers {
                             string AddonVersionPath = "";
                             var tmpDate = new DateTime();
                             string tmpName = "";
-                            collectionController.GetCollectionConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
+                            CollectionController.getCollectionConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
                             if (string.IsNullOrEmpty(AddonVersionPath)) {
                                 throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection");
                             } else {
@@ -1750,8 +1751,7 @@ namespace Contensive.Processor.Controllers {
                                     try {
                                         bool isAddonAssembly = false;
                                         var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
-                                        Type addonType;
-                                        if (typeMap.TryGetValue(typeFullName, out addonType)) {
+                                        if (typeMap.TryGetValue(typeFullName, out Type addonType)) {
                                             if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
                                                 //
                                                 // -- assembly is public, not abstract, based on a base type
@@ -1944,10 +1944,11 @@ namespace Contensive.Processor.Controllers {
                     //
                     string cmdQueryString = ""
                         + "appname=" + encodeNvaArgument(encodeRequestVariable(core.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(encodeRequestVariable(OptionString));
-                    cmdDetailClass cmdDetail = new cmdDetailClass();
-                    cmdDetail.addonId = addon.id;
-                    cmdDetail.addonName = addon.name;
-                    cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString);
+                    cmdDetailClass cmdDetail = new cmdDetailClass {
+                        addonId = addon.id,
+                        addonName = addon.name,
+                        docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString)
+                    };
                     taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
                     logController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
@@ -2197,10 +2198,10 @@ namespace Contensive.Processor.Controllers {
                             + "</div>";
                         tempgetInstanceBubble = ""
                             + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + ">"
-                            + GetIconSprite("", 0, "/ccLib/images/toolsettings.png", 22, 22, "Edit options used just for this instance of the " + AddonName + " Add-on", "Edit options used just for this instance of the " + AddonName + " Add-on", "", true, "") + "</a>"
+                            + getIconSprite("", 0, "/ccLib/images/toolsettings.png", 22, 22, "Edit options used just for this instance of the " + AddonName + " Add-on", "Edit options used just for this instance of the " + AddonName + " Add-on", "", true, "") + "</a>"
                             + ""
                             + "";
-                        core.doc.helpCodes.Add(new docController.helpStuff() {
+                        core.doc.helpCodes.Add(new DocController.HelpStuff() {
                             caption = AddonName,
                             code = LocalCode
                         });
@@ -2280,8 +2281,8 @@ namespace Contensive.Processor.Controllers {
                         return_DialogList = return_DialogList + Dialog;
                         result = ""
                             + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + ">"
-                            + GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " + addon.name + " Stylesheets", "Edit " + addon.name + " Stylesheets", "", true, "") + "</a>";
-                        core.doc.helpCodes.Add(new docController.helpStuff {
+                            + getIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " + addon.name + " Stylesheets", "Edit " + addon.name + " Stylesheets", "", true, "") + "</a>";
+                        core.doc.helpCodes.Add(new DocController.HelpStuff {
                             caption = addon.name,
                             code = LocalCode
                         });
@@ -2354,7 +2355,7 @@ namespace Contensive.Processor.Controllers {
                         + "</table>"
                         + "</div>";
                     BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
-                    core.doc.helpCodes.Add(new docController.helpStuff {
+                    core.doc.helpCodes.Add(new DocController.HelpStuff {
                         code = LocalCode,
                         caption = AddonName
                     });
@@ -2365,7 +2366,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.helpDialogCnt = core.doc.helpDialogCnt + 1;
                     result = ""
                         + "&nbsp;<a href=\"#\" tabindex=-1 tarGet=\"_blank\"" + BubbleJS + " >"
-                        + GetIconSprite("", 0, "/ccLib/images/toolhelp.png", 22, 22, "View help resources for this Add-on", "View help resources for this Add-on", "", true, "") + "</a>";
+                        + getIconSprite("", 0, "/ccLib/images/toolhelp.png", 22, 22, "View help resources for this Add-on", "View help resources for this Add-on", "", true, "") + "</a>";
                 }
             }
             return result;
@@ -2418,7 +2419,7 @@ namespace Contensive.Processor.Controllers {
                             + "</table>"
                             + "</div>";
                         BubbleJS = " onClick=\"var d=document.getElementById('" + HTMLViewerBubbleID + "_dst');if(d){var s=document.getElementById('" + HTMLSourceID + "');if(s){d.value=s.innerHTML;HelpBubbleOn( '" + HTMLViewerBubbleID + "',this)}};return false;\" ";
-                        core.doc.helpCodes.Add(new docController.helpStuff {
+                        core.doc.helpCodes.Add(new DocController.HelpStuff {
                             code = LocalCode,
                             caption = AddonName
                         });
@@ -2429,7 +2430,7 @@ namespace Contensive.Processor.Controllers {
                         core.doc.helpDialogCnt = core.doc.helpDialogCnt + 1;
                         tempgetHTMLViewerBubble = ""
                             + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + " >"
-                            + GetIconSprite("", 0, "/ccLib/images/toolhtml.png", 22, 22, "View the source HTML produced by this Add-on", "View the source HTML produced by this Add-on", "", true, "") + "</A>";
+                            + getIconSprite("", 0, "/ccLib/images/toolhtml.png", 22, 22, "View the source HTML produced by this Add-on", "View the source HTML produced by this Add-on", "", true, "") + "</A>";
                     }
                 }
                 //
@@ -3529,7 +3530,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="AddonGuid"></param>
         /// <param name="IsInline"></param>
         /// <returns></returns>
-        public static string getDefaultAddonOptions(coreController core, string ArgumentList, string AddonGuid, bool IsInline) {
+        public static string getDefaultAddonOptions(CoreController core, string ArgumentList, string AddonGuid, bool IsInline) {
             string result = "";
             //
             string NameValuePair = null;
@@ -3678,7 +3679,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private string getAddonDescription(coreController core, addonModel addon) {
+        private string getAddonDescription(CoreController core, addonModel addon) {
             string addonDescription = "[invalid addon]";
             if (addon != null) {
                 string collectionName = "invalid collection or collection not set";
@@ -3696,7 +3697,7 @@ namespace Contensive.Processor.Controllers {
         /// Special case addon as it is a required core service. This method attempts the addon call and it if fails, calls the safe-mode version, tested for this build
         /// </summary>
         /// <returns></returns>
-        public static string GetAddonManager(coreController core) {
+        public static string getAddonManager(CoreController core) {
             string result = "";
             try {
                 bool AddonStatusOK = true;
@@ -3832,7 +3833,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ACInstanceID"></param>
         /// <param name="IconSpriteColumn"></param>
         /// <returns></returns>
-        public static string GetAddonIconImg(string AdminURL, int IconWidth, int IconHeight, int IconSprites, bool IconIsInline, string IconImgID, string IconFilename, string serverFilePath, string IconAlt, string IconTitle, string ACInstanceID, int IconSpriteColumn) {
+        public static string getAddonIconImg(string AdminURL, int IconWidth, int IconHeight, int IconSprites, bool IconIsInline, string IconImgID, string IconFilename, string serverFilePath, string IconAlt, string IconTitle, string ACInstanceID, int IconSpriteColumn) {
             string tempGetAddonIconImg = "";
             try {
                 if (string.IsNullOrEmpty(IconAlt)) {
@@ -3905,7 +3906,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Sprite Icon
                     //
-                    tempGetAddonIconImg = GetIconSprite(IconImgID, IconSpriteColumn, IconFilename, IconWidth, IconHeight, IconAlt, IconTitle, "window.parent.OpenAddonPropertyWindow(this,'" + AdminURL + "');", IconIsInline, ACInstanceID);
+                    tempGetAddonIconImg = getIconSprite(IconImgID, IconSpriteColumn, IconFilename, IconWidth, IconHeight, IconAlt, IconTitle, "window.parent.OpenAddonPropertyWindow(this,'" + AdminURL + "');", IconIsInline, ACInstanceID);
                 }
             } catch (Exception) {
                 throw;
@@ -3928,7 +3929,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IconIsInline"></param>
         /// <param name="ACInstanceID"></param>
         /// <returns></returns>
-        public static string GetIconSprite(string TagID, int SpriteColumn, string IconSrc, int IconWidth, int IconHeight, string IconAlt, string IconTitle, string onDblClick, bool IconIsInline, string ACInstanceID) {
+        public static string getIconSprite(string TagID, int SpriteColumn, string IconSrc, int IconWidth, int IconHeight, string IconAlt, string IconTitle, string onDblClick, bool IconIsInline, string ACInstanceID) {
             string tempGetIconSprite = "";
             try {
                 tempGetIconSprite = "<img"
@@ -3974,7 +3975,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~addonController() {
+        ~AddonController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

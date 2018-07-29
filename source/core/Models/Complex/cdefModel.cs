@@ -229,7 +229,7 @@ namespace Contensive.Processor.Models.Complex {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public List<int> get_childIdList(coreController core) {
+        public List<int> get_childIdList(CoreController core) {
             if (_childIdList == null) {
                 string Sql = "select id from cccontent where parentid=" + id;
                 DataTable dt = core.db.executeQuery(Sql);
@@ -243,7 +243,7 @@ namespace Contensive.Processor.Models.Complex {
             }
             return _childIdList;
         }
-        public void set_childIdList(coreController core, List<int> value) {
+        public void set_childIdList(CoreController core, List<int> value) {
             _childIdList = value;
         }
         private List<int> _childIdList = null;
@@ -264,7 +264,7 @@ namespace Contensive.Processor.Models.Complex {
         //
         //====================================================================================================
         //
-        public static cdefModel create(coreController core, int contentId, bool loadInvalidFields = false, bool forceDbLoad = false) {
+        public static cdefModel create(CoreController core, int contentId, bool loadInvalidFields = false, bool forceDbLoad = false) {
             cdefModel result = null;
             try {
                 List<string> dependantCacheNameList = new List<string>();
@@ -549,7 +549,6 @@ namespace Contensive.Processor.Models.Complex {
                                         field.helpMessage = field.helpCustom;
                                     }
                                     field.HelpChanged = false;
-                                    dt.Dispose();
                                     result.fields.Add(fieldNameLower, field);
                                     //REFACTOR
                                     if ((field.fieldTypeId != FieldTypeIdManyToMany) & (field.fieldTypeId != FieldTypeIdRedirect) && (!result.selectList.Contains(fieldNameLower))) {
@@ -561,6 +560,7 @@ namespace Contensive.Processor.Models.Complex {
                             }
                             result.selectCommaList = string.Join(",", result.selectList);
                         }
+                                    dt.Dispose();
                         //
                         // ----- Create the ContentControlCriteria
                         //
@@ -578,7 +578,7 @@ namespace Contensive.Processor.Models.Complex {
         //
         //====================================================================================================
         //
-        private static void getCdef_SetAdminColumns(coreController core, Models.Complex.cdefModel cdef) {
+        private static void getCdef_SetAdminColumns(CoreController core, Models.Complex.cdefModel cdef) {
             try {
                 bool FieldActive = false;
                 int FieldWidth = 0;
@@ -644,7 +644,7 @@ namespace Contensive.Processor.Models.Complex {
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public static int getContentId(coreController core, string contentName) {
+        public static int getContentId(CoreController core, string contentName) {
             int returnId = 0;
             try {
                 if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLower())) {
@@ -663,7 +663,7 @@ namespace Contensive.Processor.Models.Complex {
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public static Models.Complex.cdefModel getCdef(coreController core, string contentName) {
+        public static Models.Complex.cdefModel getCdef(CoreController core, string contentName) {
             Models.Complex.cdefModel returnCdef = null;
             try {
                 int ContentId = getContentId(core, contentName);
@@ -683,7 +683,7 @@ namespace Contensive.Processor.Models.Complex {
         /// </summary>
         /// <param name="contentId"></param>
         /// <returns></returns>
-        public static Models.Complex.cdefModel getCdef(coreController core, int contentId, bool forceDbLoad = false, bool loadInvalidFields = false) {
+        public static Models.Complex.cdefModel getCdef(CoreController core, int contentId, bool forceDbLoad = false, bool loadInvalidFields = false) {
             Models.Complex.cdefModel returnCdef = null;
             try {
                 if (contentId <= 0) {
@@ -726,7 +726,7 @@ namespace Contensive.Processor.Models.Complex {
         // will include both the content, and its child contents.
         //========================================================================
         //
-        internal static string getContentControlCriteria(coreController core, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
+        internal static string getContentControlCriteria(CoreController core, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
             string returnCriteria = "";
             try {
                 //
@@ -757,7 +757,7 @@ namespace Contensive.Processor.Models.Complex {
         //       Returns true if ChildContentID is in ParentContentID
         //========================================================================
         //
-        public static bool isWithinContent(coreController core, int ChildContentID, int ParentContentID) {
+        public static bool isWithinContent(CoreController core, int ChildContentID, int ParentContentID) {
             bool returnOK = false;
             try {
                 Models.Complex.cdefModel cdef = null;
@@ -791,7 +791,7 @@ namespace Contensive.Processor.Models.Complex {
         //       returns a comma delimited list of ContentIDs that the Member can author
         //===========================================================================
         //
-        public static List<int> getEditableCdefIdList(coreController core) {
+        public static List<int> getEditableCdefIdList(CoreController core) {
             List<int> returnList = new List<int>();
             try {
                 string SQL = null;
@@ -834,7 +834,7 @@ namespace Contensive.Processor.Models.Complex {
         //   If child already exists, add any missing fields from parent
         //=============================================================================
         //
-        public static void createContentChild(coreController core, string ChildContentName, string ParentContentName, int MemberID) {
+        public static void createContentChild(CoreController core, string ChildContentName, string ParentContentName, int MemberID) {
             try {
                 string DataSourceName = "";
                 string SQL = null;
@@ -851,28 +851,28 @@ namespace Contensive.Processor.Models.Complex {
                 DateNow = DateTime.MinValue;
                 SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ChildContentName) + ";";
                 rs = core.db.executeQuery(SQL);
-                if (dbController.isDataTableOk(rs)) {
+                if (DbController.isDataTableOk(rs)) {
                     ChildContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                     //
                     // mark the record touched so upgrade will not delete it
                     //
                     core.db.executeQuery("update ccContent set CreateKey=0 where ID=" + ChildContentID);
                 }
-                dbController.closeDataTable(rs);
+                DbController.closeDataTable(rs);
                 if (ChildContentID == 0) {
                     //
                     // Get ContentID of parent
                     //
                     SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ParentContentName) + ";";
                     rs = core.db.executeQuery(SQL, DataSourceName);
-                    if (dbController.isDataTableOk(rs)) {
+                    if (DbController.isDataTableOk(rs)) {
                         ParentContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                         //
                         // mark the record touched so upgrade will not delete it
                         //
                         core.db.executeQuery("update ccContent set CreateKey=0 where ID=" + ParentContentID);
                     }
-                    dbController.closeDataTable(rs);
+                    DbController.closeDataTable(rs);
                     //
                     if (ParentContentID == 0) {
                         throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] was not found."));
@@ -948,7 +948,7 @@ namespace Contensive.Processor.Models.Complex {
         // Get a Contents Tablename from the ContentPointer
         //========================================================================
         //
-        public static string getContentTablename(coreController core, string ContentName) {
+        public static string getContentTablename(CoreController core, string ContentName) {
             string returnTableName = "";
             try {
                 Models.Complex.cdefModel CDef;
@@ -967,7 +967,7 @@ namespace Contensive.Processor.Models.Complex {
         //========================================================================
         // ----- Get a DataSource Name from its ContentName
         //
-        public static string getContentDataSource(coreController core, string ContentName) {
+        public static string getContentDataSource(CoreController core, string ContentName) {
             string returnDataSource = "";
             try {
                 Models.Complex.cdefModel CDef;
@@ -990,7 +990,7 @@ namespace Contensive.Processor.Models.Complex {
         //   Bad ContentID returns blank
         //========================================================================
         //
-        public static string getContentNameByID(coreController core, int ContentID) {
+        public static string getContentNameByID(CoreController core, int ContentID) {
             string returnName = "";
             try {
                 Models.Complex.cdefModel cdef;
@@ -1011,7 +1011,7 @@ namespace Contensive.Processor.Models.Complex {
         //       called from upgrade and DeveloperTools
         //========================================================================
         //
-        public static int addContent(coreController core, bool Active, dataSourceModel datasource, string TableName, string contentName, bool AdminOnly = false, bool DeveloperOnly = false, bool AllowAdd = true, bool AllowDelete = true, string ParentName = "", string DefaultSortMethod = "", string DropDownFieldList = "", bool AllowWorkflowAuthoring = false, bool AllowCalendarEvents = false, bool AllowContentTracking = false, bool AllowTopicRules = false, bool AllowContentChildTool = false, bool ignore1 = false, string IconLink = "", int IconWidth = 0, int IconHeight = 0, int IconSprites = 0, string ccGuid = "", bool IsBaseContent = false, string installedByCollectionGuid = "", bool clearMetaCache = false) {
+        public static int addContent(CoreController core, bool Active, dataSourceModel datasource, string TableName, string contentName, bool AdminOnly = false, bool DeveloperOnly = false, bool AllowAdd = true, bool AllowDelete = true, string ParentName = "", string DefaultSortMethod = "", string DropDownFieldList = "", bool AllowWorkflowAuthoring = false, bool AllowCalendarEvents = false, bool AllowContentTracking = false, bool AllowTopicRules = false, bool AllowContentChildTool = false, bool ignore1 = false, string IconLink = "", int IconWidth = 0, int IconHeight = 0, int IconSprites = 0, string ccGuid = "", bool IsBaseContent = false, string installedByCollectionGuid = "", bool clearMetaCache = false) {
             int returnContentId = 0;
             try {
                 //
@@ -1028,7 +1028,7 @@ namespace Contensive.Processor.Models.Complex {
                 int DefaultSortMethodID = 0;
                 bool CDefFound = false;
                 int InstalledByCollectionID = 0;
-                sqlFieldListClass sqlList = null;
+                SqlFieldListClass sqlList = null;
                 Models.Complex.cdefFieldModel field = null;
                 int ContentIDofContent = 0;
                 //
@@ -1136,7 +1136,7 @@ namespace Contensive.Processor.Models.Complex {
                                 //End If
                                 TableID = core.db.insertTableRecordGetId("Default", "ccTables", SystemMemberID);
                                 //
-                                sqlList = new sqlFieldListClass();
+                                sqlList = new SqlFieldListClass();
                                 sqlList.add("name", core.db.encodeSQLText(TableName));
                                 sqlList.add("active", SQLTrue);
                                 sqlList.add("DATASOURCEID", core.db.encodeSQLNumber(datasource.ID));
@@ -1177,7 +1177,7 @@ namespace Contensive.Processor.Models.Complex {
                             //
                             // ----- update record
                             //
-                            sqlList = new sqlFieldListClass();
+                            sqlList = new SqlFieldListClass();
                             sqlList.add("name", core.db.encodeSQLText(contentName));
                             sqlList.add("CREATEKEY", "0");
                             sqlList.add("active", core.db.encodeSQLBoolean(Active));
@@ -1407,7 +1407,7 @@ namespace Contensive.Processor.Models.Complex {
         //
         // ====================================================================================================================
         //
-        public static int verifyCDefField_ReturnID(coreController core, string ContentName, Models.Complex.cdefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
+        public static int verifyCDefField_ReturnID(CoreController core, string ContentName, Models.Complex.cdefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
         {
             int returnId = 0;
             try {
@@ -1472,7 +1472,7 @@ namespace Contensive.Processor.Models.Complex {
                 TableID = 0;
                 SQL = "select ID,ContentTableID from ccContent where name=" + core.db.encodeSQLText(ContentName) + ";";
                 rs = core.db.executeQuery(SQL);
-                if (dbController.isDataTableOk(rs)) {
+                if (DbController.isDataTableOk(rs)) {
                     ContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                     TableID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
                 }
@@ -1483,7 +1483,7 @@ namespace Contensive.Processor.Models.Complex {
                 RecordIsBaseField = false;
                 SQL = "select ID,IsBaseField from ccFields where (ContentID=" + core.db.encodeSQLNumber(ContentID) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ");";
                 rs = core.db.executeQuery(SQL);
-                if (dbController.isDataTableOk(rs)) {
+                if (DbController.isDataTableOk(rs)) {
                     isNewFieldRecord = false;
                     RecordID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                     RecordIsBaseField = genericController.encodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
@@ -1549,7 +1549,7 @@ namespace Contensive.Processor.Models.Complex {
                         //
                         TableName = "";
                         rs = core.db.executeQuery("Select Name, DataSourceID from ccTables where ID=" + core.db.encodeSQLNumber(TableID) + ";");
-                        if (!dbController.isDataTableOk(rs)) {
+                        if (!DbController.isDataTableOk(rs)) {
                             throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because table For tableID [" + TableID + "] was not found."));
                         } else {
                             DataSourceID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
@@ -1564,7 +1564,7 @@ namespace Contensive.Processor.Models.Complex {
                                 DataSourceName = "Default";
                             } else {
                                 rs = core.db.executeQuery("Select Name from ccDataSources where ID=" + core.db.encodeSQLNumber(DataSourceID) + ";");
-                                if (!dbController.isDataTableOk(rs)) {
+                                if (!DbController.isDataTableOk(rs)) {
 
                                     DataSourceName = "Default";
                                     // change condition to successful -- the goal is 1) deliver pages 2) report problems
@@ -1582,7 +1582,7 @@ namespace Contensive.Processor.Models.Complex {
                             InstalledByCollectionID = 0;
                             if (!string.IsNullOrEmpty(installedByCollectionGuid)) {
                                 rs = core.db.executeQuery("Select id from ccAddonCollections where ccguid=" + core.db.encodeSQLText(installedByCollectionGuid) + ";");
-                                if (dbController.isDataTableOk(rs)) {
+                                if (DbController.isDataTableOk(rs)) {
                                     InstalledByCollectionID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "Id"));
                                 }
                                 rs.Dispose();
@@ -1607,7 +1607,7 @@ namespace Contensive.Processor.Models.Complex {
                             //
                             // create or update the field
                             //
-                            sqlFieldListClass sqlList = new sqlFieldListClass();
+                            SqlFieldListClass sqlList = new SqlFieldListClass();
                             sqlList.add("ACTIVE", core.db.encodeSQLBoolean(field.active)); // Pointer)
                             sqlList.add("MODIFIEDBY", core.db.encodeSQLNumber(SystemMemberID)); // Pointer)
                             sqlList.add("MODIFIEDDATE", core.db.encodeSQLDate(DateTime.Now)); // Pointer)
@@ -1727,7 +1727,7 @@ namespace Contensive.Processor.Models.Complex {
         //
         //=============================================================
         //
-        public static bool isContentFieldSupported(coreController core, string ContentName, string FieldName) {
+        public static bool isContentFieldSupported(CoreController core, string ContentName, string FieldName) {
             bool returnOk = false;
             try {
                 Models.Complex.cdefModel cdef;
@@ -1747,7 +1747,7 @@ namespace Contensive.Processor.Models.Complex {
         // Get a tables first ContentID from Tablename
         //========================================================================
         //
-        public static int getContentIDByTablename(coreController core, string TableName) {
+        public static int getContentIDByTablename(CoreController core, string TableName) {
             int tempgetContentIDByTablename = 0;
             //
             string SQL = null;
@@ -1767,7 +1767,7 @@ namespace Contensive.Processor.Models.Complex {
         //
         //========================================================================
         //
-        public static string getContentControlCriteria(coreController core, string ContentName) {
+        public static string getContentControlCriteria(CoreController core, string ContentName) {
             return Models.Complex.cdefModel.getCdef(core, ContentName).contentControlCriteria;
         }
         //
@@ -1778,7 +1778,7 @@ namespace Contensive.Processor.Models.Complex {
         //   read it first to main_Get the correct contentid
         //============================================================================================================
         //
-        public static void setContentControlId(coreController core, int ContentID, int RecordID, int NewContentControlID, string UsedIDString = "") {
+        public static void setContentControlId(CoreController core, int ContentID, int RecordID, int NewContentControlID, string UsedIDString = "") {
             string SQL = null;
             int CS = 0;
             string RecordTableName = null;
@@ -1830,7 +1830,7 @@ namespace Contensive.Processor.Models.Complex {
         //
         //========================================================================
         //
-        public static string GetContentFieldProperty(coreController core, string ContentName, string FieldName, string PropertyName) {
+        public static string GetContentFieldProperty(CoreController core, string ContentName, string FieldName, string PropertyName) {
             string result = "";
             try {
                 cdefModel Contentdefinition = cdefModel.getCdef(core, ContentName);
@@ -1894,7 +1894,7 @@ namespace Contensive.Processor.Models.Complex {
         //
         //========================================================================
         //
-        public static string GetContentProperty(coreController core, string ContentName, string PropertyName) {
+        public static string GetContentProperty(CoreController core, string ContentName, string PropertyName) {
             string result = "";
             Models.Complex.cdefModel Contentdefinition;
             //
@@ -1981,7 +1981,7 @@ namespace Contensive.Processor.Models.Complex {
         //
         //====================================================================================================
         //
-        public static cdefModel getCache(coreController core, int contentId) {
+        public static cdefModel getCache(CoreController core, int contentId) {
             cdefModel result = null;
             try {
                 try {
@@ -1996,7 +1996,7 @@ namespace Contensive.Processor.Models.Complex {
         //
         //====================================================================================================
         //
-        public static void setCache(coreController core, int contentId, cdefModel cdef) {
+        public static void setCache(CoreController core, int contentId, cdefModel cdef) {
             string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
             //
             // -- make it dependant on cacheNameInvalidateAll. If invalidated, all cdef will invalidate
@@ -2007,14 +2007,14 @@ namespace Contensive.Processor.Models.Complex {
         //
         //====================================================================================================
         //
-        public static void invalidateCache(coreController core, int contentId) {
+        public static void invalidateCache(CoreController core, int contentId) {
             string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
             core.cache.invalidate(cacheName);
         }
         //
         //====================================================================================================
         //
-        public static void invalidateCacheAll(coreController core) {
+        public static void invalidateCacheAll(CoreController core) {
             core.cache.invalidate(cacheNameInvalidateAll);
         }
     }

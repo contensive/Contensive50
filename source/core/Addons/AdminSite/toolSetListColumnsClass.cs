@@ -24,7 +24,7 @@ namespace Contensive.Addons.AdminSite {
         //   Print the Configure Index Form
         //=============================================================================
         //
-        public static string GetForm_Index_SetColumns(coreController core, adminContextClass adminContext) {
+        public static string GetForm_Index_SetColumns(CoreController core, adminContextClass adminContext) {
             string result = "";
             try {
                 // todo refactor out

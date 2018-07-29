@@ -31,7 +31,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// core object
         /// </summary>
-        private coreController core;
+        private CoreController core;
         /// <summary>
         /// true if the filesystem is local, false if files transfered through the local system to the remote system
         /// </summary>
@@ -75,7 +75,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="isLocal">If true, thie object reads/saves to the local filesystem</param>
         /// <param name="rootLocalPath"></param>
         /// <param name="remotePathPrefix">If not isLocal, this is added to the remote content path. Ex a\ with content b\c.txt = a\b\c.txt</param>
-        public fileController(coreController core, bool isLocal, string rootLocalPath, string remotePathPrefix) {
+        public fileController(CoreController core, bool isLocal, string rootLocalPath, string remotePathPrefix) {
             if (string.IsNullOrEmpty(rootLocalPath)) {
                 logController.handleError( core,new ArgumentException("Blank file system root path not permitted."));
             } else {

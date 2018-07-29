@@ -37,7 +37,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string exportAscii_GetAsciiExport(coreController core, string ContentName, int PageSize = 1000, int PageNumber = 1) {
+        public static string exportAscii_GetAsciiExport(CoreController core, string ContentName, int PageSize = 1000, int PageNumber = 1) {
             string result = "";
             try {
                 string Delimiter = null;
@@ -65,7 +65,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 core.webServer.setResponseContentType("text/plain");
                 core.html.enableOutputBuffer(false);
-                TableName = dbController.GetDbObjectTableName(Models.Complex.cdefModel.getContentTablename(core, iContentName));
+                TableName = DbController.getDbObjectTableName(Models.Complex.cdefModel.getContentTablename(core, iContentName));
                 switch (genericController.vbUCase(TableName)) {
                     case "CCMEMBERS":
                         //

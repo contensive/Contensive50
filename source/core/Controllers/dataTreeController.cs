@@ -19,7 +19,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ----- global scope variables
         //
-        private coreController core;
+        private CoreController core;
         private XmlDocument MSxml;
         //
         // ----- Tracking values, should be set before each exit
@@ -51,7 +51,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <remarks></remarks>
-        public dataTreeController(coreController core) : base() {
+        public dataTreeController(CoreController core) : base() {
             this.core = core;
         }
         //

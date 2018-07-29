@@ -19,7 +19,7 @@ namespace Contensive.Addons.SafeAddonManager {
         //
         // constructor sets cp from argument for use in calls to other objects, then core because cp cannot be uses since that would be a circular depenancy
         //
-        private coreController core;
+        private CoreController core;
         //
         // To interigate Add-on Collections to check for re-use
         //
@@ -49,7 +49,7 @@ namespace Contensive.Addons.SafeAddonManager {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public addonManagerClass(coreController core) : base() {
+        public addonManagerClass(CoreController core) : base() {
             this.core = core;
         }
         //
@@ -454,7 +454,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             //---------------------------------------------------------------------------------------------
                             //
                             if (core.session.isAuthenticatedDeveloper(core) & core.docProperties.getBoolean("InstallCore")) {
-                                UpgradeOK = collectionController.installCollectionFromRemoteRepo(core, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
+                                UpgradeOK = CollectionController.installCollectionFromRemoteRepo(core, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
                             }
                             //
                             //---------------------------------------------------------------------------------------------
@@ -490,7 +490,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             Cnt = LibGuids.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 RegisterList = "";
-                                UpgradeOK = collectionController.installCollectionFromRemoteRepo(core, LibGuids[Ptr], ref ErrorMessage, "", false, true, ref nonCriticalErrorList);
+                                UpgradeOK = CollectionController.installCollectionFromRemoteRepo(core, LibGuids[Ptr], ref ErrorMessage, "", false, true, ref nonCriticalErrorList);
                                 if (!UpgradeOK) {
                                     //
                                     // block the reset because we will loose the error message
@@ -515,7 +515,7 @@ namespace Contensive.Addons.SafeAddonManager {
                         if (AllowInstallFromFolder) {
                             //InstallFolder = core.asv.config.physicalFilePath & InstallFolderName & "\"
                             if (core.privateFiles.pathExists(privateFilesInstallPath)) {
-                                UpgradeOK = collectionController.InstallCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, true, ref nonCriticalErrorList);
+                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, true, ref nonCriticalErrorList);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         errorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");
@@ -591,7 +591,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                 ColSortable[3] = false;
                                 //
                                 LocalCollections = new XmlDocument();
-                                LocalCollectionXML = collectionController.getLocalCollectionStoreListXml(core);
+                                LocalCollectionXML = CollectionController.getLocalCollectionStoreListXml(core);
                                 LocalCollections.LoadXml(LocalCollectionXML);
                                 foreach (XmlNode CDef_Node in LocalCollections.DocumentElement.ChildNodes) {
                                     if (genericController.vbLCase(CDef_Node.Name) == "collection") {

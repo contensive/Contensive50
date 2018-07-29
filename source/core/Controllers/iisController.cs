@@ -22,13 +22,13 @@ namespace Contensive.Processor.Controllers {
     /// Code dedicated to processing iis input and output. lazy Constructed. (see coreHtmlClass for html processing)
     /// What belongs here is everything that would have to change if we converted to apache
     /// </summary>
-    public class iisController {
+    public class IisController {
         //
         // enum this, not consts --  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
         public const string httpResponseStatus200 = "200 OK";
         public const string httpResponseStatus404 = "404 Not Found";
         //
-        private coreController core;
+        private CoreController core;
         //
         // if this instance is a webRole, retain pointer for callbacks
         //
@@ -113,17 +113,17 @@ namespace Contensive.Processor.Controllers {
         //------------------------------------------------------------------------
         //
         //   QueryString, Form and cookie Processing variables
-        public class cookieClass {
+        public class CookieClass {
             public string name;
             public string value;
         }
-        public Dictionary<string, cookieClass> requestCookies;
+        public Dictionary<string, CookieClass> requestCookies;
         //
         //====================================================================================================
         //
-        public iisController(coreController core) : base() {
+        public IisController(CoreController core) : base() {
             this.core = core;
-            requestCookies = new Dictionary<string, cookieClass>();
+            requestCookies = new Dictionary<string, CookieClass>();
         }
         //
         //=======================================================================================
@@ -285,13 +285,14 @@ namespace Contensive.Processor.Controllers {
                     System.Web.HttpPostedFile file = iisContext.Request.Files[formName];
                     if (file != null) {
                         if ((file.ContentLength > 0) && (!string.IsNullOrEmpty(file.FileName))) {
-                            docPropertiesClass prop = new docPropertiesClass();
-                            prop.Name = formName;
-                            prop.Value = file.FileName;
-                            prop.NameValue = encodeRequestVariable(prop.Name) + "=" + encodeRequestVariable(prop.Value);
-                            prop.IsFile = true;
-                            prop.IsForm = true;
-                            prop.tempfilename = instanceId + "-" + filePtr.ToString() + ".bin";
+                            docPropertiesClass prop = new docPropertiesClass {
+                                Name = formName,
+                                Value = file.FileName,
+                                NameValue = encodeRequestVariable(formName) + "=" + encodeRequestVariable(file.FileName),
+                                IsFile = true,
+                                IsForm = true,
+                                tempfilename = instanceId + "-" + filePtr.ToString() + ".bin"
+                        };
                             file.SaveAs(core.tempFiles.joinPath(core.tempFiles.localAbsRootPath, prop.tempfilename));
                             core.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
                             prop.FileSize = encodeInteger(file.ContentLength);
@@ -591,7 +592,7 @@ namespace Contensive.Processor.Controllers {
             if (requestCookies.ContainsKey(cookieKey)) {
                 requestCookies.Remove(cookieKey);
             }
-            requestCookies.Add(cookieKey, new iisController.cookieClass {
+            requestCookies.Add(cookieKey, new IisController.CookieClass {
                 name = cookieKey,
                 value = cookieValue
             });
@@ -606,7 +607,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="domain"></param>
         /// <param name="Path"></param>
         /// <param name="Secure"></param>
-        public void addResponseCookie(string cookieName, string iCookieValue, DateTime DateExpires = default(DateTime), string domain = "", string Path = "", bool Secure = false) {
+        public void addResponseCookie(string cookieName, string iCookieValue, DateTime DateExpires = default(DateTime), string domain = "", string Path = "/", bool Secure = false) {
             try {
                 string s = null;
                 //
@@ -619,10 +620,13 @@ namespace Contensive.Processor.Controllers {
                             if (!isMinDate(DateExpires)) {
                                 iisContext.Response.Cookies[cookieName].Expires = DateExpires;
                             }
-                            if (!isMissing(Path)) {
-                                iisContext.Response.Cookies[cookieName].Path = genericController.encodeText(Path);
+                            if (!string.IsNullOrEmpty(domain)) {
+                                iisContext.Response.Cookies[cookieName].Domain = domain;
                             }
-                            if (!isMissing(Secure)) {
+                            if (!string.IsNullOrEmpty(Path)) {
+                                iisContext.Response.Cookies[cookieName].Path = Path;
+                            }
+                            if (Secure) {
                                 iisContext.Response.Cookies[cookieName].Secure = Secure;
                             }
                         } else {
@@ -641,19 +645,19 @@ namespace Contensive.Processor.Controllers {
                             bufferCookies = bufferCookies + "\r\n" + s;
                             //
                             s = "";
-                            if (!isMissing(domain)) {
-                                s = genericController.encodeText(domain);
+                            if (!string.IsNullOrEmpty(domain)) {
+                                s = domain;
                             }
                             bufferCookies = bufferCookies + "\r\n" + s;
                             //
                             s = "/";
-                            if (!isMissing(Path)) {
-                                s = genericController.encodeText(Path);
+                            if (!string.IsNullOrEmpty(Path)) {
+                                s = Path;
                             }
                             bufferCookies = bufferCookies + "\r\n" + s;
                             //
                             s = "false";
-                            if (genericController.encodeBoolean(Secure)) {
+                            if (Secure) {
                                 s = "true";
                             }
                             bufferCookies = bufferCookies + "\r\n" + s;
@@ -785,7 +789,7 @@ namespace Contensive.Processor.Controllers {
                             // -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink;
                         } else {
-                            setResponseStatus(iisController.httpResponseStatus404);
+                            setResponseStatus(IisController.httpResponseStatus404);
                         }
                     } else {
 
@@ -846,7 +850,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="rootPublicFilesPath"></param>
         /// <param name="defaultDocOrBlank"></param>
         /// '
-        public static void verifySite(coreController core, string appName, string DomainName, string rootPublicFilesPath, string defaultDocOrBlank) {
+        public static void verifySite(CoreController core, string appName, string DomainName, string rootPublicFilesPath, string defaultDocOrBlank) {
             try {
                 verifyAppPool(core, appName);
                 verifyWebsite(core, appName, DomainName, rootPublicFilesPath, appName);
@@ -861,7 +865,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="poolName"></param>
-        public static void verifyAppPool(coreController core, string poolName) {
+        public static void verifyAppPool(CoreController core, string poolName) {
             try {
                 using (ServerManager serverManager = new ServerManager()) {
                     bool poolFound = false;
@@ -897,7 +901,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="domainName"></param>
         /// <param name="phyPath"></param>
         /// <param name="appPool"></param>
-        private static void verifyWebsite(coreController core, string appName, string domainName, string phyPath, string appPool) {
+        private static void verifyWebsite(CoreController core, string appName, string domainName, string phyPath, string appPool) {
             try {
 
                 using (ServerManager iisManager = new ServerManager()) {
@@ -949,7 +953,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="site"></param>
         /// <param name="bindingInformation"></param>
         /// <param name="bindingProtocol"></param>
-        private static void verifyWebsite_Binding(coreController core, Site site, string bindingInformation, string bindingProtocol) {
+        private static void verifyWebsite_Binding(CoreController core, Site site, string bindingInformation, string bindingProtocol) {
             try {
                 using (ServerManager iisManager = new ServerManager()) {
                     Binding binding = null;
@@ -977,7 +981,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private static void verifyWebsite_VirtualDirectory(coreController core, Site site, string appName, string virtualFolder, string physicalPath) {
+        private static void verifyWebsite_VirtualDirectory(CoreController core, Site site, string appName, string virtualFolder, string physicalPath) {
             try {
                 bool found = false;
                 foreach ( Application iisApp in site.Applications) {
@@ -1024,7 +1028,7 @@ namespace Contensive.Processor.Controllers {
         //   returns true if the redirect happened OK
         //========================================================================
         //
-        public static bool main_RedirectByRecord_ReturnStatus(coreController core, string ContentName, int RecordID, string FieldName = "") {
+        public static bool main_RedirectByRecord_ReturnStatus(CoreController core, string ContentName, int RecordID, string FieldName = "") {
             bool tempmain_RedirectByRecord_ReturnStatus = false;
             int CSPointer = 0;
             string MethodName = null;
@@ -1125,7 +1129,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public static string getBrowserAcceptLanguage(coreController core) {
+        public static string getBrowserAcceptLanguage(CoreController core) {
             try {
                 string AcceptLanguageString = genericController.encodeText(core.webServer.requestLanguage) + ",";
                 int CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",");
