@@ -222,7 +222,7 @@ namespace Contensive.Processor {
         public string cookies {
             get {
                 string cookieString = "";
-                foreach (KeyValuePair<string, IisController.CookieClass> kvp in cp.core.webServer.requestCookies) {
+                foreach (KeyValuePair<string, WebServerController.CookieClass> kvp in cp.core.webServer.requestCookies) {
                     cookieString += "&" + kvp.Key + "=" + kvp.Value.value;
                 }
                 if (cookieString.Length > 0) {
@@ -237,7 +237,7 @@ namespace Contensive.Processor {
                     ampSplit = value.Split('&');
                     ampSplitCount = ampSplit.GetUpperBound(0) + 1;
                     for (var ampSplitPointer = 0; ampSplitPointer < ampSplitCount; ampSplitPointer++) {
-                        IisController.CookieClass newCookie = new IisController.CookieClass();
+                        WebServerController.CookieClass newCookie = new WebServerController.CookieClass();
                         string cookieName = null;
                         string NameValue = ampSplit[ampSplitPointer];
                         string[] ValuePair = NameValue.Split('=');

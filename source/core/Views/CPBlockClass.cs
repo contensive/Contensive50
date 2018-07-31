@@ -26,7 +26,7 @@ namespace Contensive.Processor {
         private CoreController core { get; set; }
         private CPClass cp { get; set; }
         private string accum { get; set; }
-        private Controllers.htmlController htmlDoc { get; set; }
+        private Controllers.HtmlController htmlDoc { get; set; }
         protected bool disposed { get; set; } = false;
         //
         //====================================================================================================
@@ -40,7 +40,7 @@ namespace Contensive.Processor {
                 cp = cpParent;
                 core = cp.core;
                 try {
-                    htmlDoc = new Controllers.htmlController(core);
+                    htmlDoc = new Controllers.HtmlController(core);
                 } catch (Exception ex) {
                     logController.handleError( core,ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.");
                     throw;

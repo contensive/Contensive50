@@ -105,7 +105,7 @@ namespace Contensive.Processor {
         public override string CookieString {
             get {
                 string returnCookies = "";
-                foreach (KeyValuePair<string, IisController.CookieClass> kvp in core.webServer.requestCookies) {
+                foreach (KeyValuePair<string, WebServerController.CookieClass> kvp in core.webServer.requestCookies) {
                     returnCookies += "&" + kvp.Key + "=" + kvp.Value.value;
                 }
                 if (returnCookies.Length > 0) {

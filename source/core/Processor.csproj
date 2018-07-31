@@ -236,7 +236,7 @@
     <Compile Include="Controllers\htmlParserController.cs" />
     <Compile Include="Controllers\htmlToTextControllers.cs" />
     <Compile Include="Controllers\httpRequestController.cs" />
-    <Compile Include="Controllers\iisController.cs" />
+    <Compile Include="Controllers\WebServerController.cs" />
     <Compile Include="Controllers\imageEditController.cs" />
     <Compile Include="Controllers\ipDaemonController.cs" />
     <Compile Include="Controllers\keyPtrController.cs" />

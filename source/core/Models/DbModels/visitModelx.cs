@@ -99,7 +99,7 @@ namespace Contensive.Processor.Models.DbModels {
             visitModelx result = null;
             try {
                 if (recordId > 0) {
-                    string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId);
+                    string cacheName = Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, recordId);
                     result = core.cache.getObject<visitModelx>(cacheName);
                     if (result == null) {
                         result = loadObject(core, "id=" + recordId.ToString(), ref cacheNameList);
@@ -123,7 +123,7 @@ namespace Contensive.Processor.Models.DbModels {
             visitModelx result = null;
             try {
                 if (!string.IsNullOrEmpty(recordGuid)) {
-                    string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", recordGuid);
+                    string cacheName = Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", recordGuid);
                     result = core.cache.getObject<visitModelx>(cacheName);
                     if (result == null) {
                         result = loadObject(core, "ccGuid=" + core.db.encodeSQLText(recordGuid), ref cacheNameList);
@@ -196,11 +196,11 @@ namespace Contensive.Processor.Models.DbModels {
                         //
                         // -- set primary and secondary caches
                         // -- add all cachenames to the injected cachenamelist
-                        string cacheName0 = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", result.id.ToString());
+                        string cacheName0 = Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "id", result.id.ToString());
                         cacheNameList.Add(cacheName0);
                         core.cache.setObject(cacheName0, result);
                         //
-                        string cacheName1 = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", result.ccGuid);
+                        string cacheName1 = Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", result.ccGuid);
                         cacheNameList.Add(cacheName1);
                         core.cache.setAlias(cacheName1, cacheName0);
                     }
@@ -285,7 +285,7 @@ namespace Contensive.Processor.Models.DbModels {
                 cs.close();
                 //
                 // -- object is here, but the cache was invalidated, setting
-                core.cache.setObject(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.id.ToString()), this);
+                core.cache.setObject(Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "id", this.id.ToString()), this);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -367,7 +367,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="core"></param>
         /// <param name="recordId"></param>
         public static void invalidateIdCache(CoreController core, int recordId) {
-            core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
+            core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, recordId));
             //
             // -- always clear the cache with the content name
             //?? '?? core.cache.invalidateObject(primaryContentName)
@@ -380,7 +380,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="core"></param>
         /// <param name="guid"></param>
         public static void invalidateGuidCache(CoreController core, string guid) {
-            core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", guid));
+            core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", guid));
             //
             // -- always clear the cache with the content name
             //?? core.cache.invalidateObject(primaryContentName)

@@ -29,7 +29,7 @@ namespace Contensive.Processor.Controllers {
         /// server configuration - this is the node's configuration, including everything needed to attach to resources required (db,cache,filesystem,etc)
         /// and the configuration of all applications within this group of servers. This file is shared between all servers in the group.
         /// </summary>
-        public serverConfigModel serverConfig { get; set; }
+        public ServerConfigModel serverConfig { get; set; }
         //
         //===================================================================================================
         /// <summary>
@@ -42,7 +42,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// The configuration for this app, a copy of the data in the serverconfig file
         /// </summary>
-        public appConfigModel appConfig { get; set; }
+        public AppConfigModel appConfig { get; set; }
         //
         //===================================================================================================
         // todo move persistent objects to .doc (keeping of document scope persistence)
@@ -56,9 +56,9 @@ namespace Contensive.Processor.Controllers {
         /// Set true and sendSmtp adds all email to mockSmtpList of smtpEmailClass
         /// </summary>
         public bool mockSmtp = false;
-        public List<smtpEmailClass> mockSmtpList = new List<smtpEmailClass>();
-        public class smtpEmailClass {
-            public emailController.emailClass email;
+        public List<SmtpEmailClass> mockSmtpList = new List<SmtpEmailClass>();
+        public class SmtpEmailClass {
+            public EmailController.EmailClass email;
             public string smtpServer;
             public string AttachmentFilename;
         }
@@ -116,28 +116,17 @@ namespace Contensive.Processor.Controllers {
             }
         }
         private DocController _doc;
-        ////
-        ////===================================================================================================
-        //public menuTabController menuTab {
-        //    get {
-        //        if (_menuTab == null) {
-        //            _menuTab = new menuTabController(this);
-        //        }
-        //        return _menuTab;
-        //    }
-        //}
-        //private menuTabController _menuTab;
         //
         //===================================================================================================
-        public Controllers.htmlController html {
+        public Controllers.HtmlController html {
             get {
                 if (_html == null) {
-                    _html = new Controllers.htmlController(this);
+                    _html = new Controllers.HtmlController(this);
                 }
                 return _html;
             }
         }
-        private Controllers.htmlController _html;
+        private Controllers.HtmlController _html;
         //
         //===================================================================================================
         public Controllers.AddonController addon {
@@ -151,59 +140,59 @@ namespace Contensive.Processor.Controllers {
         private Controllers.AddonController _addon;
         //
         //===================================================================================================
-        public menuFlyoutController menuFlyout {
+        public MenuFlyoutController menuFlyout {
             get {
                 if (_menuFlyout == null) {
-                    _menuFlyout = new menuFlyoutController(this);
+                    _menuFlyout = new MenuFlyoutController(this);
                 }
                 return _menuFlyout;
             }
         }
-        private menuFlyoutController _menuFlyout;
+        private MenuFlyoutController _menuFlyout;
         //
         //===================================================================================================
-        public propertyModelClass userProperty {
+        public PropertyModelClass userProperty {
             get {
                 if (_userProperty == null) {
-                    _userProperty = new propertyModelClass(this, PropertyTypeMember);
+                    _userProperty = new PropertyModelClass(this, PropertyTypeMember);
                 }
                 return _userProperty;
             }
         }
-        private propertyModelClass _userProperty;
+        private PropertyModelClass _userProperty;
         //
         //===================================================================================================
-        public propertyModelClass visitorProperty {
+        public PropertyModelClass visitorProperty {
             get {
                 if (_visitorProperty == null) {
-                    _visitorProperty = new propertyModelClass(this, PropertyTypeVisitor);
+                    _visitorProperty = new PropertyModelClass(this, PropertyTypeVisitor);
                 }
                 return _visitorProperty;
             }
         }
-        private propertyModelClass _visitorProperty;
+        private PropertyModelClass _visitorProperty;
         //
         //===================================================================================================
-        public propertyModelClass visitProperty {
+        public PropertyModelClass visitProperty {
             get {
                 if (_visitProperty == null) {
-                    _visitProperty = new propertyModelClass(this, PropertyTypeVisit);
+                    _visitProperty = new PropertyModelClass(this, PropertyTypeVisit);
                 }
                 return _visitProperty;
             }
         }
-        private propertyModelClass _visitProperty;
+        private PropertyModelClass _visitProperty;
         //
         //===================================================================================================
-        public docPropertyController docProperties {
+        public DocPropertyController docProperties {
             get {
                 if (_docProperties == null) {
-                    _docProperties = new docPropertyController(this);
+                    _docProperties = new DocPropertyController(this);
                 }
                 return _docProperties;
             }
         }
-        private docPropertyController _docProperties = null;
+        private DocPropertyController _docProperties = null;
         //
         //===================================================================================================
         /// <summary>
@@ -212,120 +201,120 @@ namespace Contensive.Processor.Controllers {
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public sitePropertiesController siteProperties {
+        public SitePropertiesController siteProperties {
             get {
                 if (_siteProperties == null) {
-                    _siteProperties = new sitePropertiesController(this);
+                    _siteProperties = new SitePropertiesController(this);
                 }
                 return _siteProperties;
             }
         }
-        private sitePropertiesController _siteProperties = null;
+        private SitePropertiesController _siteProperties = null;
         //
         //===================================================================================================
-        public IisController webServer {
+        public WebServerController webServer {
             get {
                 if (_webServer == null) {
-                    _webServer = new IisController(this);
+                    _webServer = new WebServerController(this);
                 }
                 return _webServer;
             }
         }
-        private IisController _webServer;
+        private WebServerController _webServer;
         //
         //===================================================================================================
-        public fileController appRootFiles {
+        public FileController appRootFiles {
             get {
                 if (_appRootFiles == null) {
                     if (appConfig != null) {
                         if (appConfig.enabled) {
-                            _appRootFiles = new fileController(this, serverConfig.isLocalFileSystem, appConfig.localWwwPath, appConfig.remoteWwwPath);
+                            _appRootFiles = new FileController(this, serverConfig.isLocalFileSystem, appConfig.localWwwPath, appConfig.remoteWwwPath);
                         }
                     }
                 }
                 return _appRootFiles;
             }
         }
-        private fileController _appRootFiles = null;
+        private FileController _appRootFiles = null;
         //
         //===================================================================================================
-        public fileController tempFiles {
+        public FileController tempFiles {
             get {
                 if (_tmpFiles == null) {
                     //
                     // local server -- everything is ephemeral
-                    _tmpFiles = new fileController(this, true, appConfig.localTempPath,"");
+                    _tmpFiles = new FileController(this, true, appConfig.localTempPath,"");
                 }
                 return _tmpFiles;
             }
         }
-        private fileController _tmpFiles = null;
+        private FileController _tmpFiles = null;
         //
         //===================================================================================================
-        public fileController privateFiles {
+        public FileController privateFiles {
             get {
                 if (_privateFiles == null) {
                     if (appConfig != null) {
                         if (appConfig.enabled) {
-                            _privateFiles = new fileController(this, serverConfig.isLocalFileSystem, appConfig.localPrivatePath, appConfig.remotePrivatePath);
+                            _privateFiles = new FileController(this, serverConfig.isLocalFileSystem, appConfig.localPrivatePath, appConfig.remotePrivatePath);
                         }
                     }
                 }
                 return _privateFiles;
             }
         }
-        private fileController _privateFiles = null;
+        private FileController _privateFiles = null;
         //
         //===================================================================================================
-        public fileController programDataFiles {
+        public FileController programDataFiles {
             get {
                 if (_programDataFiles == null) {
                     //
                     // -- always local -- must be because this object is used to read serverConfig, before the object is valid
-                    string programDataPath = fileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\";
-                    _programDataFiles = new fileController(this, true, programDataPath, "");
+                    string programDataPath = FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\";
+                    _programDataFiles = new FileController(this, true, programDataPath, "");
                 }
                 return _programDataFiles;
             }
         }
-        private fileController _programDataFiles = null;
+        private FileController _programDataFiles = null;
         //
         //===================================================================================================
-        public fileController programFiles {
+        public FileController programFiles {
             get {
                 if (_programFiles == null) {
                     //
                     // -- always local
-                    _programFiles = new fileController(this, true, serverConfig.programFilesPath,"");
+                    _programFiles = new FileController(this, true, serverConfig.programFilesPath,"");
                 }
                 return _programFiles;
             }
         }
-        private fileController _programFiles = null;
+        private FileController _programFiles = null;
         //
         //===================================================================================================
-        public fileController cdnFiles {
+        public FileController cdnFiles {
             get {
                 if (_cdnFiles == null) {
                     if (appConfig != null) {
                         if (appConfig.enabled) {
-                            _cdnFiles = new fileController(this, serverConfig.isLocalFileSystem, appConfig.localFilesPath,appConfig.remoteFilePath);
+                            _cdnFiles = new FileController(this, serverConfig.isLocalFileSystem, appConfig.localFilesPath,appConfig.remoteFilePath);
                         }
                     }
                 }
                 return _cdnFiles;
             }
         }
-        private fileController _cdnFiles = null;
+        private FileController _cdnFiles = null;
         //
         //===================================================================================================
-        public addonModel.addonCacheClass addonCache {
+        public AddonModel.AddonCacheClass addonCache {
             get {
                 if (_addonCache == null) {
-                    _addonCache = cache.getObject<addonModel.addonCacheClass>("addonCache");
+                    _addonCache = cache.getObject<AddonModel.AddonCacheClass>("addonCache");
                     if (_addonCache == null) {
-                        _addonCache = new addonModel.addonCacheClass();
-                        foreach (addonModel addon in addonModel.createList(this, "")) {
+                        _addonCache = new AddonModel.AddonCacheClass();
+                        foreach (AddonModel addon in AddonModel.createList(this, "")) {
                             _addonCache.add(this, addon);
                         }
                         cache.setObject("addonCache", _addonCache);
@@ -334,7 +323,7 @@ namespace Contensive.Processor.Controllers {
                 return _addonCache;
             }
         }
-        private addonModel.addonCacheClass _addonCache = null;
+        private AddonModel.AddonCacheClass _addonCache = null;
         //
         //===================================================================================================
         /// <summary>
@@ -343,10 +332,10 @@ namespace Contensive.Processor.Controllers {
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public domainModel domain {
+        public DomainModel domain {
             get {
                 if (_domains == null) {
-                    _domains = new domainModel();
+                    _domains = new DomainModel();
                 }
                 return _domains;
             }
@@ -354,11 +343,11 @@ namespace Contensive.Processor.Controllers {
                 _domains = value;
             }
         }
-        private domainModel _domains = null;
+        private DomainModel _domains = null;
         /// <summary>
         /// domains configured for this app. keys are lowercase
         /// </summary>
-        public Dictionary<string, domainModel> domainDictionary;
+        public Dictionary<string, DomainModel> domainDictionary;
         //
         //===================================================================================================
         public System.Web.Script.Serialization.JavaScriptSerializer json {
@@ -372,26 +361,26 @@ namespace Contensive.Processor.Controllers {
         private System.Web.Script.Serialization.JavaScriptSerializer _json;
         //
         //===================================================================================================
-        public workflowController workflow {
+        public WorkflowController workflow {
             get {
                 if (_workflow == null) {
-                    _workflow = new workflowController(this);
+                    _workflow = new WorkflowController(this);
                 }
                 return _workflow;
             }
         }
-        private workflowController _workflow = null;
+        private WorkflowController _workflow = null;
         //
         //===================================================================================================
-        public Controllers.cacheController cache {
+        public Controllers.CacheController cache {
             get {
                 if (_cache == null) {
-                    _cache = new Controllers.cacheController(this);
+                    _cache = new Controllers.CacheController(this);
                 }
                 return _cache;
             }
         }
-        private Controllers.cacheController _cache = null;
+        private Controllers.CacheController _cache = null;
         //
         //===================================================================================================
         // todo - convert to dictionary, one entry per datasource, remove datasource selection from all methods
@@ -412,15 +401,15 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// db access to the server to add and query catalogs
         /// </summary>
-        public dbServerController dbServer {
+        public DbServerController dbServer {
             get {
                 if (_dbEngine == null) {
-                    _dbEngine = new dbServerController(this);
+                    _dbEngine = new DbServerController(this);
                 }
                 return _dbEngine;
             }
         }
-        private dbServerController _dbEngine;
+        private DbServerController _dbEngine;
         //
         //====================================================================================================
         /// <summary>
@@ -434,7 +423,7 @@ namespace Contensive.Processor.Controllers {
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
             //
-            serverConfig = Models.Context.serverConfigModel.getObject(this);
+            serverConfig = Models.Context.ServerConfigModel.getObject(this);
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
             webServer.iisContext = null;
             constructorInitialize(false);
@@ -452,9 +441,9 @@ namespace Contensive.Processor.Controllers {
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
             //
-            serverConfig = serverConfigModel.getObject(this);
+            serverConfig = ServerConfigModel.getObject(this);
             serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
-            appConfig = appConfigModel.getObject(this, serverConfig, applicationName);
+            appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
             if (appConfig != null) {
                 webServer.iisContext = null;
                 constructorInitialize(false);
@@ -467,7 +456,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public CoreController(CPClass cp, string applicationName, serverConfigModel serverConfig) : base() {
+        public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) : base() {
             cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -475,8 +464,8 @@ namespace Contensive.Processor.Controllers {
             //
             this.serverConfig = serverConfig;
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
-            appConfig = appConfigModel.getObject(this, serverConfig, applicationName);
-            appConfig.appStatus = appConfigModel.appStatusEnum.ok;
+            appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
+            appConfig.appStatus = AppConfigModel.appStatusEnum.ok;
             webServer.iisContext = null;
             constructorInitialize(false);
         }
@@ -487,7 +476,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public CoreController(CPClass cp, string applicationName, serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
+        public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -495,8 +484,8 @@ namespace Contensive.Processor.Controllers {
             //
             this.serverConfig = serverConfig;
             this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
-            appConfig = appConfigModel.getObject(this, serverConfig, applicationName);
-            this.appConfig.appStatus = appConfigModel.appStatusEnum.ok;
+            appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
+            this.appConfig.appStatus = AppConfigModel.appStatusEnum.ok;
             webServer.initWebContext(httpContext);
             constructorInitialize(true);
         }
@@ -510,9 +499,9 @@ namespace Contensive.Processor.Controllers {
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
             //
-            serverConfig = serverConfigModel.getObject(this);
+            serverConfig = ServerConfigModel.getObject(this);
             serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
-            appConfig = appConfigModel.getObject(this, serverConfig, applicationName);
+            appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
             if (appConfig != null) {
                 webServer.initWebContext(httpContext);
                 constructorInitialize(true);
@@ -540,7 +529,7 @@ namespace Contensive.Processor.Controllers {
                 if (appConfig != null) {
                     //
                     // -- test fix for 404 response during routing - could it be a response left over from processing before we are called
-                    webServer.setResponseStatus(IisController.httpResponseStatus200);
+                    webServer.setResponseStatus(WebServerController.httpResponseStatus200);
                     //
                     // -- execute intercept methods first, like login, that run before the route that returns the page
                     // -- intercept routes should be addons alos
@@ -758,7 +747,7 @@ namespace Contensive.Processor.Controllers {
                             case CPSiteBaseClass.routeTypeEnum.admin: {
                                     //
                                     // -- admin site
-                                    addonModel addon = addonModel.create(this, addonGuidAdminSite);
+                                    AddonModel addon = AddonModel.create(this, addonGuidAdminSite);
                                     if (addon == null) {
                                         logController.handleError( this,new ApplicationException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
                                         return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -u )";
@@ -772,7 +761,7 @@ namespace Contensive.Processor.Controllers {
                             case CPSiteBaseClass.routeTypeEnum.remoteMethod: {
                                     //
                                     // -- remote method
-                                    addonModel addon = addonCache.getAddonById(route.remoteMethodAddonId);
+                                    AddonModel addon = addonCache.getAddonById(route.remoteMethodAddonId);
                                     if (addon == null) {
                                         logController.handleError( this,new ApplicationException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
                                         return "";
@@ -859,7 +848,7 @@ namespace Contensive.Processor.Controllers {
                             personalizationPeopleId = session.user.id,
                             errorContextMessage = "calling default route addon [" + defaultAddonId + "] during execute route method"
                         };
-                        return this.addon.execute(Models.DbModels.addonModel.create(this, defaultAddonId), executeContext);
+                        return this.addon.execute(Models.DbModels.AddonModel.create(this, defaultAddonId), executeContext);
                     }
                     //
                     // -- no route
@@ -1094,7 +1083,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- server mode, there is no application
                     session = SessionController.create(this, false);
-                } else if (appConfig.appStatus != appConfigModel.appStatusEnum.ok) {
+                } else if (appConfig.appStatus != AppConfigModel.appStatusEnum.ok) {
                     //} else if ((appConfig.appMode != appConfigModel.appModeEnum.normal) | (appConfig.appStatus != appConfigModel.appStatusEnum.OK)) {
                     //
                     // -- application is not ready, might be error, or in maintainence mode
@@ -1195,7 +1184,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     if (serverConfig != null) {
                         if (appConfig != null) {
-                            if (appConfig.appStatus == appConfigModel.appStatusEnum.ok) {
+                            if (appConfig.appStatus == AppConfigModel.appStatusEnum.ok) {
                                 //if ((appConfig.appMode == appConfigModel.appModeEnum.normal) && (appConfig.appStatus == appConfigModel.appStatusEnum.OK))
                                 if (siteProperties.allowVisitTracking) {
                                     //

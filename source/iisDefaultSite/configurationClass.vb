@@ -32,8 +32,8 @@ Public Class configurationClass
     ''' Create serverConfig object from appConfig or webConfig. This is alternative to configuration with config.json file
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function getServerConfig() As serverConfigModel
-        Dim serverConfig As New serverConfigModel()
+    Public Shared Function getServerConfig() As ServerConfigModel
+        Dim serverConfig As New ServerConfigModel()
         Try
             serverConfig.allowTaskRunnerService = False
             serverConfig.allowTaskSchedulerService = False
@@ -51,7 +51,7 @@ Public Class configurationClass
             serverConfig.password = ConfigurationManager.AppSettings("ContensiveServerGroupPassword")
             serverConfig.programFilesPath = ""
             serverConfig.username = ConfigurationManager.AppSettings("ContensiveServerGroupUsername")
-            Dim appConfig As New appConfigModel
+            Dim appConfig As New AppConfigModel
             appConfig.name = getAppName()
             appConfig.adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute")
             appConfig.localWwwPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath")

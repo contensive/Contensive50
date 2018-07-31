@@ -51,7 +51,7 @@ namespace Contensive.Processor {
         /// constructor for non-Internet app use. Configuration provided manually
         /// </summary>
         /// <remarks></remarks>
-        public CPClass(string appName, serverConfigModel serverConfig ) : base() {
+        public CPClass(string appName, ServerConfigModel serverConfig ) : base() {
             core = new CoreController(this, appName, serverConfig);
         }
         //
@@ -61,7 +61,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="httpContext"></param>
         /// <remarks></remarks>
-        public CPClass(string appName, serverConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
+        public CPClass(string appName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
             core = new CoreController(this, appName, serverConfig, httpContext);
         }
         //
@@ -77,7 +77,7 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         //
-        public appConfigModel.appStatusEnum status {
+        public AppConfigModel.appStatusEnum status {
             get {
                 return core.appConfig.appStatus;
             }
@@ -125,7 +125,7 @@ namespace Contensive.Processor {
                 if (core != null) {
                     if (core.serverConfig != null) {
                         if (core.appConfig != null) {
-                            return (core.appConfig.appStatus == appConfigModel.appStatusEnum.ok);
+                            return (core.appConfig.appStatus == AppConfigModel.appStatusEnum.ok);
                         }
                     }
                 }
@@ -162,7 +162,7 @@ namespace Contensive.Processor {
                 if (genericController.isGuid(addonNameOrGuid)) {
                     //
                     // -- call by guid
-                    addonModel addon = Models.DbModels.addonModel.create(core, addonNameOrGuid);
+                    AddonModel addon = Models.DbModels.AddonModel.create(core, addonNameOrGuid);
                     if ( addon == null ) {
                         throw new ApplicationException("Addon [" + addonNameOrGuid + "] could not be found.");
                     } else {
@@ -172,7 +172,7 @@ namespace Contensive.Processor {
                         });
                     }
                 } else {
-                    addonModel addon = Models.DbModels.addonModel.createByName(core, addonNameOrGuid);
+                    AddonModel addon = Models.DbModels.AddonModel.createByName(core, addonNameOrGuid);
                     if ( addon != null ) {
                         //
                         // -- call by name
@@ -205,7 +205,7 @@ namespace Contensive.Processor {
         public string executeAddon(int addonId, Contensive.BaseClasses.CPUtilsBaseClass.addonContext addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) {
             string result = "";
             try {
-                addonModel addon = addonModel.create(core, addonId);
+                AddonModel addon = AddonModel.create(core, addonId);
                 if ( addon == null) {
                     throw new ApplicationException("Addon [#" + addonId.ToString() + "] could not be found.");
                 } else {

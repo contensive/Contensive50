@@ -370,19 +370,19 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     RecordID = genericController.encodeInteger(CFields[f_LookupContentID, CFieldPtr]);
                                     RecordName = CacheLookup(RecordID, Contents);
-                                    sb.Append(" LookupContent=\"" + htmlController.encodeHtml(RecordName) + "\"");
+                                    sb.Append(" LookupContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                     //
                                     RecordID = genericController.encodeInteger(CFields[f_RedirectContentID, CFieldPtr]);
                                     RecordName = CacheLookup(RecordID, Contents);
-                                    sb.Append(" RedirectContent=\"" + htmlController.encodeHtml(RecordName) + "\"");
+                                    sb.Append(" RedirectContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                     //
                                     RecordID = genericController.encodeInteger(CFields[f_ManyToManyContentID, CFieldPtr]);
                                     RecordName = CacheLookup(RecordID, Contents);
-                                    sb.Append(" ManyToManyContent=\"" + htmlController.encodeHtml(RecordName) + "\"");
+                                    sb.Append(" ManyToManyContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                     //
                                     RecordID = genericController.encodeInteger(CFields[f_ManyToManyRuleContentID, CFieldPtr]);
                                     RecordName = CacheLookup(RecordID, Contents);
-                                    sb.Append(" ManyToManyRuleContent=\"" + htmlController.encodeHtml(RecordName) + "\"");
+                                    sb.Append(" ManyToManyRuleContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                     //
                                     RecordID = genericController.encodeInteger(CFields[f_MemberSelectGroupId, CFieldPtr]);
                                     RecordName = "";
@@ -667,7 +667,7 @@ namespace Contensive.Processor.Controllers {
         //
         private string encodeXMLattribute(string Source) {
             string tempEncodeXMLattribute = null;
-            tempEncodeXMLattribute = htmlController.encodeHtml(Source);
+            tempEncodeXMLattribute = HtmlController.encodeHtml(Source);
             tempEncodeXMLattribute = genericController.vbReplace(tempEncodeXMLattribute, "\r\n", " ");
             tempEncodeXMLattribute = genericController.vbReplace(tempEncodeXMLattribute, "\r", "");
             return genericController.vbReplace(tempEncodeXMLattribute, "\n", "");

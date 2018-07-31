@@ -39,8 +39,8 @@ namespace Contensive.Processor.Models.Complex {
                     }
                     //
                     // -- remote methods
-                    List<Contensive.Processor.Models.DbModels.addonModel> remoteMethods = Contensive.Processor.Models.DbModels.addonModel.createList_RemoteMethods(core, new List<string>());
-                    foreach (Contensive.Processor.Models.DbModels.addonModel remoteMethod in remoteMethods) {
+                    List<Contensive.Processor.Models.DbModels.AddonModel> remoteMethods = Contensive.Processor.Models.DbModels.AddonModel.createList_RemoteMethods(core, new List<string>());
+                    foreach (Contensive.Processor.Models.DbModels.AddonModel remoteMethod in remoteMethods) {
                         string route = genericController.normalizeRoute(remoteMethod.name);
                         if (!string.IsNullOrWhiteSpace(route)) {
                             if (result.ContainsKey(route)) {
@@ -102,7 +102,7 @@ namespace Contensive.Processor.Models.Complex {
         //====================================================================================================
         public static void setCache(CoreController core, Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> routeDictionary) {
             var dependentKeyList = new List<string>();
-            dependentKeyList.Add(Models.DbModels.addonModel.contentTableName);
+            dependentKeyList.Add(Models.DbModels.AddonModel.contentTableName);
             dependentKeyList.Add(Models.DbModels.linkAliasModel.contentTableName);
             dependentKeyList.Add(Models.DbModels.linkForwardModel.contentTableName);
             core.cache.setObject(cacheNameRouteDictionary, routeDictionary,dependentKeyList);

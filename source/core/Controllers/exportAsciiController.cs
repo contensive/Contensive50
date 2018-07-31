@@ -98,7 +98,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             while (core.db.csOk(CSPointer)) {
                                 if (!(core.db.csGetBoolean(CSPointer, "Developer"))) {
-                                    Copy = securityController.encodeToken(core, core.db.csGetInteger(CSPointer, "ID"), core.doc.profileStartTime);
+                                    Copy = SecurityController.encodeToken(core, core.db.csGetInteger(CSPointer, "ID"), core.doc.profileStartTime);
                                     sb.Append("\"" + Copy + "\"");
                                     Delimiter = ",";
                                     FieldNameVariant = core.db.csGetFirstFieldName(CSPointer);

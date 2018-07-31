@@ -53,7 +53,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// current domain for website documents. For all others this is the primary domain for the application.
         /// </summary>
-        public domainModel domain { get; set; }
+        public DomainModel domain { get; set; }
         /// <summary>
         /// if this document is composed of page content records and templates, this object provides supporting properties and methods
         /// </summary>
@@ -234,7 +234,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         internal Dictionary<int,int> addonRecursionDepth { get; set; } = new Dictionary<int, int>();
         //
-        public Stack<Models.DbModels.addonModel> addonModelStack = new Stack<addonModel>();
+        public Stack<Models.DbModels.AddonModel> addonModelStack = new Stack<AddonModel>();
         //
         // -- todo
         public int addonInstanceCnt { get; set; } = 0;
@@ -309,7 +309,7 @@ namespace Contensive.Processor.Controllers {
             this.core = core;
             //
             pageController = new pageContentController();
-            domain = new domainModel();
+            domain = new DomainModel();
             cdefDictionary = new Dictionary<string, Models.Complex.cdefModel>();
             tableSchemaDictionary = null;
             wysiwygAddonList = new Dictionary<contentTypeEnum, string>();
@@ -432,7 +432,7 @@ namespace Contensive.Processor.Controllers {
                         if (!string.IsNullOrEmpty(LinkLabel)) {
                             result += "\r<li class=\"ccListItem\">";
                             if (!string.IsNullOrEmpty(Link)) {
-                                result += genericController.csv_GetLinkedText("<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID) + "\">", LinkLabel);
+                                result += genericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID) + "\">", LinkLabel);
                             } else {
                                 result += LinkLabel;
                             }
@@ -490,7 +490,7 @@ namespace Contensive.Processor.Controllers {
                 this.core.db.csClose(ref CS);
                 //
                 if (this.core.visitProperty.getBoolean("AllowAdvancedEditor")) {
-                    result = adminUIController.getEditWrapper( core, "Watch List [" + ListName + "]", result);
+                    result = AdminUIController.getEditWrapper( core, "Watch List [" + ListName + "]", result);
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -511,7 +511,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(returnHtml)) {
                     returnHtml = pageCaption;
                 } else {
-                    returnHtml = "<a href=\"" + htmlController.encodeHtml(pageContentController.getPageLink(core, testpage.id, "", true, false)) + "\">" + pageCaption + "</a>" + BreadCrumbDelimiter + returnHtml;
+                    returnHtml = "<a href=\"" + HtmlController.encodeHtml(pageContentController.getPageLink(core, testpage.id, "", true, false)) + "\">" + pageCaption + "</a>" + BreadCrumbDelimiter + returnHtml;
                 }
             }
             return returnHtml;
@@ -1033,14 +1033,14 @@ namespace Contensive.Processor.Controllers {
                 CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
                 Link = "/" + core.appConfig.adminRoute + "?af=" + AdminFormPublishing;
                 Copy = Msg_AuthoringSubmittedNotification;
-                Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + htmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");
+                Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + HtmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");
                 Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName);
                 Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName);
                 Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString());
                 Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", core.doc.profileStartTime.ToString());
                 Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", core.session.user.name);
                 //
-                emailController.queueGroupEmail(core, core.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
+                EmailController.queueGroupEmail(core, core.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
                 //
                 return;
                 //
@@ -1404,7 +1404,7 @@ namespace Contensive.Processor.Controllers {
                     Models.Complex.routeDictionaryModel.invalidateCache(core);
                     routeDictionaryChanges = true;
                     break;
-                case addonModel.contentTableName:
+                case AddonModel.contentTableName:
                     //
                     Models.Complex.routeDictionaryModel.invalidateCache(core);
                     routeDictionaryChanges = true;
@@ -1705,8 +1705,8 @@ namespace Contensive.Processor.Controllers {
                 CS = core.db.csOpen("Meta Content", Criteria, "", false, 0, false, false, FieldList);
                 if (core.db.csOk(CS)) {
                     MetaContentID = core.db.csGetInteger(CS, "ID");
-                    core.html.addTitle(htmlController.encodeHtml(core.db.csGetText(CS, "Name")), "page content");
-                    core.html.addMetaDescription(htmlController.encodeHtml(core.db.csGetText(CS, "MetaDescription")), "page content");
+                    core.html.addTitle(HtmlController.encodeHtml(core.db.csGetText(CS, "Name")), "page content");
+                    core.html.addMetaDescription(HtmlController.encodeHtml(core.db.csGetText(CS, "MetaDescription")), "page content");
                     core.html.addHeadTag(core.db.csGetText(CS, "OtherHeadTags"), "page content");
                     if (true) {
                         KeywordList = genericController.vbReplace(core.db.csGetText(CS, "MetaKeywordList"), "\r\n", ",");
@@ -1733,7 +1733,7 @@ namespace Contensive.Processor.Controllers {
                         KeywordList = KeywordList.Substring(1);
                     }
                     //KeyWordList = Mid(KeyWordList, 2)
-                    KeywordList = htmlController.encodeHtml(KeywordList);
+                    KeywordList = HtmlController.encodeHtml(KeywordList);
                     core.html.addMetaKeywordList(KeywordList, "page content");
                 }
                 core.db.csClose(ref CS);

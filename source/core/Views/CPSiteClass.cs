@@ -267,7 +267,7 @@ namespace Contensive.Processor {
         //
         public override void RequestTask(string Command, string SQL, string ExportName, string Filename) {
             try {
-                var ExportCSVAddon = Models.DbModels.addonModel.create(core, addonGuidExportCSV);
+                var ExportCSVAddon = Models.DbModels.AddonModel.create(core, addonGuidExportCSV);
                 if (ExportCSVAddon == null) {
                     logController.handleError( core,new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {
@@ -299,7 +299,7 @@ namespace Contensive.Processor {
             if ( string.IsNullOrWhiteSpace(DomainName)) {
                 return GetInteger("LandingPageID", 0);
             } else {
-                var domain = domainModel.createByName(CP.core, DomainName);
+                var domain = DomainModel.createByName(CP.core, DomainName);
                 if ( domain == null) {
                     return GetInteger("LandingPageID", 0);
                 } else {

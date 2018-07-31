@@ -37,7 +37,7 @@ namespace Contensive.Addons.Tools {
             CoreController core = cp.core;
             try {
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                Stream.Add(adminUIController.getToolFormTitle("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));
+                Stream.Add(AdminUIController.getToolFormTitle("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));
                 //
                 // Get the members SQL Queue
                 //
@@ -163,7 +163,7 @@ namespace Contensive.Addons.Tools {
                                         } else if (string.IsNullOrEmpty(CellData)) {
                                             Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
                                         } else {
-                                            Stream.Add(ColumnStart + htmlController.encodeHtml(genericController.encodeText(CellData)) + ColumnEnd);
+                                            Stream.Add(ColumnStart + HtmlController.encodeHtml(genericController.encodeText(CellData)) + ColumnEnd);
                                         }
                                     }
                                     Stream.Add(RowEnd);
@@ -185,13 +185,13 @@ namespace Contensive.Addons.Tools {
                     } else {
                         core.userProperty.setProperty("ManualQueryInputRows", SQLRows.ToString());
                     }
-                    Stream.Add(adminUIController.getDefaultEditor_TextArea(core, "SQL", SQL, false, "SQL"));
+                    Stream.Add(AdminUIController.getDefaultEditor_TextArea(core, "SQL", SQL, false, "SQL"));
                     Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
                 }
                 //
                 // -- data source
                 bool isEmptyList = false;
-                Stream.Add(adminUIController.getToolFormInputRow(core, "Data Source", adminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.ID, Processor.Models.Complex.cdefModel.getContentId(core, "data sources"), ref isEmptyList)));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.ID, Processor.Models.Complex.cdefModel.getContentId(core, "data sources"), ref isEmptyList)));
                 {
                     //
                     // -- sql list
@@ -202,25 +202,25 @@ namespace Contensive.Addons.Tools {
                         lookupList.Add(new nameValueClass() { name = sql, value=sql });
                     }
 
-                    string inputSelect = adminUIController.getDefaultEditor_LookupList(core, "SQLList", "0" , lookupList,false, "SQLList");
+                    string inputSelect = AdminUIController.getDefaultEditor_LookupList(core, "SQLList", "0" , lookupList,false, "SQLList");
                     inputSelect = inputSelect.Replace("<select ", "<select onChange=\"SQL.value=SQLList.value\" ");
-                    Stream.Add(adminUIController.getToolFormInputRow(core, "Previous Queries", inputSelect));
+                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Previous Queries", inputSelect));
                 }
                 //
                 // -- page size
                 if (IsNull(PageSize)) PageSize = 100;
-                Stream.Add(adminUIController.getToolFormInputRow(core, "Page Size", adminUIController.getDefaultEditor_Text(core, "PageSize", PageSize.ToString())));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Page Size", AdminUIController.getDefaultEditor_Text(core, "PageSize", PageSize.ToString())));
                 //
                 // -- page number
                 if (IsNull(PageNumber)) PageNumber = 1;
-                Stream.Add(adminUIController.getToolFormInputRow(core, "Page Number", adminUIController.getDefaultEditor_Text(core, "PageNumber", PageNumber.ToString())));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Page Number", AdminUIController.getDefaultEditor_Text(core, "PageNumber", PageNumber.ToString())));
                 //
                 // -- timeout
                 if (IsNull(Timeout)) Timeout = 30;
-                Stream.Add(adminUIController.getToolFormInputRow(core, "Timeout (sec)", adminUIController.getDefaultEditor_Text(core, "Timeout", Timeout.ToString())));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Timeout (sec)", AdminUIController.getDefaultEditor_Text(core, "Timeout", Timeout.ToString())));
                 //
                 // -- assemble form
-                returnHtml = adminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonRun);
+                returnHtml = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonRun);
             } catch (Exception ex) {
                 logController.handleError(core, ex);
                 throw;

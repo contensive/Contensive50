@@ -42,8 +42,8 @@ namespace Contensive.Processor.Controllers {
                     // if anything is needed that is not there yet, I need to build a list of adds to run after the app goes to app status ok
                     // -- Update server config file
                     logController.logInfo(core, "Update configuration file");
-                    if (!core.appConfig.appStatus.Equals(appConfigModel.appStatusEnum.ok)) {
-                        core.appConfig.appStatus = appConfigModel.appStatusEnum.ok;
+                    if (!core.appConfig.appStatus.Equals(AppConfigModel.appStatusEnum.ok)) {
+                        core.appConfig.appStatus = AppConfigModel.appStatusEnum.ok;
                         core.serverConfig.saveObject(core);
                     }
                     //
@@ -57,7 +57,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- verify iis configuration
                     logController.logInfo(core, "Verify iis configuration");
-                    Controllers.IisController.verifySite(core, core.appConfig.name, primaryDomain, core.appConfig.localWwwPath, "default.aspx");
+                    Controllers.WebServerController.verifySite(core, core.appConfig.name, primaryDomain, core.appConfig.localWwwPath, "default.aspx");
                     //
                     // -- verify root developer
                     logController.logInfo(core, "verify developer user");
@@ -205,9 +205,9 @@ namespace Contensive.Processor.Controllers {
                     core.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->");
                     core.siteProperties.getText("TrapEmail", "");
                     core.siteProperties.getText("TrapErrors", "0");
-                    addonModel defaultRouteAddon = addonModel.create(core, core.siteProperties.defaultRouteId);
+                    AddonModel defaultRouteAddon = AddonModel.create(core, core.siteProperties.defaultRouteId);
                     if (defaultRouteAddon == null) {
-                        defaultRouteAddon = addonModel.create(core, addonGuidPageManager);
+                        defaultRouteAddon = AddonModel.create(core, addonGuidPageManager);
                         if (defaultRouteAddon != null) {
                             core.siteProperties.defaultRouteId = defaultRouteAddon.id;
                         }
@@ -233,9 +233,9 @@ namespace Contensive.Processor.Controllers {
                     if (isNewBuild) {
                         //
                         // -- primary domain
-                        domainModel domain = domainModel.createByName(core, primaryDomain);
+                        DomainModel domain = DomainModel.createByName(core, primaryDomain);
                         if (domain == null) {
-                            domain = domainModel.add(core);
+                            domain = DomainModel.add(core);
                             domain.name = primaryDomain;
                         }
                         //
@@ -260,7 +260,7 @@ namespace Contensive.Processor.Controllers {
                         domain.name = primaryDomain;
                         domain.pageNotFoundPageId = landingPage.id;
                         domain.rootPageId = landingPage.id;
-                        domain.typeId = (int) domainModel.domainTypeEnum.Normal;
+                        domain.typeId = (int) DomainModel.domainTypeEnum.Normal;
                         domain.visited = false;
                         domain.save(core);
                         //

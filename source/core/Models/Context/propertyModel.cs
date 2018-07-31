@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Context {
-    public class propertyModelClass {
+    public class PropertyModelClass {
         //
         private CoreController core;
         //
@@ -34,7 +34,7 @@ namespace Contensive.Processor.Models.Context {
         /// <param name="cp"></param>
         /// <param name="propertyTypeId"></param>
         /// <remarks></remarks>
-        public propertyModelClass(CoreController core, int propertyTypeId) {
+        public PropertyModelClass(CoreController core, int propertyTypeId) {
             this.core = core;
             this.propertyTypeId = propertyTypeId;
         }

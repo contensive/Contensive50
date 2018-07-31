@@ -388,7 +388,7 @@ namespace Contensive.MonitorService {
                                     //    ' Paused
                                     //    '
                                     //    Call appendMonitorLog(AppName & " paused")
-                                } else if (AppStatus == (int)appConfigModel.appStatusEnum.ok) {
+                                } else if (AppStatus == (int)AppConfigModel.appStatusEnum.ok) {
                                     //
                                     // Running
                                     //

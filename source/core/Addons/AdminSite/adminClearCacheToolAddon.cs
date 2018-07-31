@@ -34,9 +34,9 @@ namespace Contensive.Addons.AdminSite {
                     // Not Admin Error
                     //
                     ButtonList = constants.ButtonCancel;
-                    Content.Add(adminUIController.GetFormBodyAdminOnly());
+                    Content.Add(AdminUIController.getFormBodyAdminOnly());
                 } else {
-                    Content.Add(adminUIController.EditTableOpen);
+                    Content.Add(AdminUIController.editTableOpen);
                     //
                     // Set defaults
                     //
@@ -65,12 +65,12 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Close Tables
                     //
-                    Content.Add(adminUIController.EditTableClose);
-                    Content.Add(htmlController.inputHidden(constants.rnAdminSourceForm, constants.AdminFormClearCache));
+                    Content.Add(AdminUIController.editTableClose);
+                    Content.Add(HtmlController.inputHidden(constants.rnAdminSourceForm, constants.AdminFormClearCache));
                 }
                 //
                 Description = "Hit Apply or OK to clear all current content caches";
-                returnHtml = adminUIController.getBody(core, "Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                returnHtml = AdminUIController.getBody(core, "Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
                 logController.handleError(core, ex);

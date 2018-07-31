@@ -104,7 +104,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string DecodeHTML(string Source) {
-            return htmlController.decodeHtml(Source);
+            return HtmlController.decodeHtml(Source);
         }
         //
         // ====================================================================================================
@@ -113,7 +113,7 @@ namespace Contensive.Processor {
             string returnValue = "";
             //
             if (!string.IsNullOrEmpty(Source)) {
-                returnValue = htmlController.encodeHtml(Source);
+                returnValue = HtmlController.encodeHtml(Source);
             }
             return returnValue;
         }
@@ -179,13 +179,13 @@ namespace Contensive.Processor {
         private string ExecuteAddon(string IdGuidOrName, addonExecuteContext executeContext) {
             if (IdGuidOrName.IsNumeric()) {
                 executeContext.errorContextMessage += " addon id:" + IdGuidOrName;
-                return CP.core.addon.execute(Models.DbModels.addonModel.create(CP.core, genericController.encodeInteger(IdGuidOrName)), executeContext);
+                return CP.core.addon.execute(Models.DbModels.AddonModel.create(CP.core, genericController.encodeInteger(IdGuidOrName)), executeContext);
             } else if (genericController.isGuid(IdGuidOrName)) {
                 executeContext.errorContextMessage += " addon guid:" + IdGuidOrName;
-                return CP.core.addon.execute(Models.DbModels.addonModel.create(CP.core, IdGuidOrName), executeContext);
+                return CP.core.addon.execute(Models.DbModels.AddonModel.create(CP.core, IdGuidOrName), executeContext);
             } else {
                 executeContext.errorContextMessage += "addon " + IdGuidOrName;
-                return CP.core.addon.execute(Models.DbModels.addonModel.createByName(CP.core, IdGuidOrName), executeContext);
+                return CP.core.addon.execute(Models.DbModels.AddonModel.createByName(CP.core, IdGuidOrName), executeContext);
             }
         }
         //

@@ -46,7 +46,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public bool load(string pathFilename, fileController fileSystem) {
+        public bool load(string pathFilename, FileController fileSystem) {
             bool returnOk = false;
             try {
                 fileSystem.copyRemoteToLocal(pathFilename);
@@ -65,7 +65,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public bool save(string pathFilename, fileController fileSystem) {
+        public bool save(string pathFilename, FileController fileSystem) {
             bool returnOk = false;
             try {
                 if (loaded) {

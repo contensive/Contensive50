@@ -27,7 +27,7 @@ namespace Contensive.Processor.Controllers {
     /// - on remote system, ALL filenames will be converted lowercase
     /// 
     /// </summary>
-    public class fileController : IDisposable {
+    public class FileController : IDisposable {
         /// <summary>
         /// core object
         /// </summary>
@@ -75,7 +75,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="isLocal">If true, thie object reads/saves to the local filesystem</param>
         /// <param name="rootLocalPath"></param>
         /// <param name="remotePathPrefix">If not isLocal, this is added to the remote content path. Ex a\ with content b\c.txt = a\b\c.txt</param>
-        public fileController(CoreController core, bool isLocal, string rootLocalPath, string remotePathPrefix) {
+        public FileController(CoreController core, bool isLocal, string rootLocalPath, string remotePathPrefix) {
             if (string.IsNullOrEmpty(rootLocalPath)) {
                 logController.handleError( core,new ArgumentException("Blank file system root path not permitted."));
             } else {
@@ -489,7 +489,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="srcPathFilename"></param>
         /// <param name="dstPathFilename"></param>
         /// <param name="dstFileSystem"></param>
-        public void copyFile(string srcPathFilename, string dstPathFilename, fileController dstFileSystem = null) {
+        public void copyFile(string srcPathFilename, string dstPathFilename, FileController dstFileSystem = null) {
             try {
                 if (dstFileSystem == null) {
                     dstFileSystem = this;
@@ -934,7 +934,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="srcAbsDosPath"></param>
         /// <param name="absDstFolder"></param>
-        private void copyFolder_srcLocal(string srcAbsDosPath, string dstDosPath, fileController dstFileSystem = null) {
+        private void copyFolder_srcLocal(string srcAbsDosPath, string dstDosPath, FileController dstFileSystem = null) {
             try {
                 if (Directory.Exists(srcAbsDosPath)) {
                     if (dstFileSystem == null ) {
@@ -979,7 +979,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="srcAbsDosPath"></param>
         /// <param name="absDstFolder"></param>
-        private void copyFolder_srcRemote(string srcAbsDosPath, string dstDosPath, fileController dstFileSystem = null) {
+        private void copyFolder_srcRemote(string srcAbsDosPath, string dstDosPath, FileController dstFileSystem = null) {
             try {
                 if (Directory.Exists(srcAbsDosPath)) {
                     if (dstFileSystem == null) {
@@ -1025,7 +1025,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="srcPath"></param>
         /// <param name="dstPath"></param>
         /// <param name="dstFileSystem"></param>
-        public void copyFolder(string srcPath, string dstPath, fileController dstFileSystem = null) {
+        public void copyFolder(string srcPath, string dstPath, FileController dstFileSystem = null) {
             try {
                 srcPath = normalizeDosPath(srcPath);
                 dstPath = normalizeDosPath(dstPath);
@@ -1275,7 +1275,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.docProperties.containsKey(key)) {
                     var docProperty = core.docProperties.getProperty(key);
                     if ((docProperty.IsFile) && (docProperty.Name.ToLower() == key)) {
-                        string dosPathFilename = fileController.normalizeDosPath(path);
+                        string dosPathFilename = FileController.normalizeDosPath(path);
                         returnFilename = encodeDosFilename(docProperty.Value);
                         dosPathFilename += returnFilename;
                         deleteFile(dosPathFilename);
@@ -1631,7 +1631,7 @@ namespace Contensive.Processor.Controllers {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~fileController() {
+        ~FileController() {
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();

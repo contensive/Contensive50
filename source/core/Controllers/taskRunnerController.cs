@@ -141,7 +141,7 @@ namespace Contensive.Processor.Controllers {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 //
-                foreach (KeyValuePair<string, Models.Context.appConfigModel> appKVP in serverCore.serverConfig.apps) {
+                foreach (KeyValuePair<string, Models.Context.AppConfigModel> appKVP in serverCore.serverConfig.apps) {
                     //
                     // query tasks that need to be run
                     //
@@ -149,7 +149,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         logController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "]");
                         //
-                        if (cpApp.core.appConfig.appStatus == appConfigModel.appStatusEnum.ok) {
+                        if (cpApp.core.appConfig.appStatus == AppConfigModel.appStatusEnum.ok) {
                             try {
                                 bool tasksRemaining = false;
                                 do {
@@ -172,7 +172,7 @@ namespace Contensive.Processor.Controllers {
                                         cmdDetailClass cmdDetail = cpApp.core.json.Deserialize<cmdDetailClass>( task.cmdDetail);
                                         switch ((task.Command.ToLower())) {
                                             case taskQueueCommandEnumModule.runAddon:
-                                                cpApp.core.addon.execute(addonModel.create(cpApp.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                                                cpApp.core.addon.execute(AddonModel.create(cpApp.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                                     backgroundProcess = true,
                                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
                                                     instanceArguments = cmdDetail.docProperties,

@@ -18,7 +18,7 @@ using System.Text;
 using System.Security.Cryptography;
 //
 namespace Contensive.Processor.Controllers {
-    public class securityController {
+    public class SecurityController {
         //
         //====================================================================================================
         /// <summary>

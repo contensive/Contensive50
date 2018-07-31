@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Complex;
 using Contensive.Addons.Tools;
-using static Contensive.Processor.adminUIController;
+using static Contensive.Processor.AdminUIController;
 //
 namespace Contensive.Addons.AdminSite {
     /// <summary>
@@ -65,7 +65,7 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// the record being edited
         /// </summary>
-        public editRecordClass editRecord = null;
+        public EditRecordClass editRecord = null;
         /// <summary>
         /// Value returned from a submit button, process into action/form
         /// </summary>
@@ -275,7 +275,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // editRecord init
                 //
-                editRecord = new editRecordClass {
+                editRecord = new EditRecordClass {
                     Loaded = false
                 };
                 requestedRecordId = core.docProperties.getInteger("id");

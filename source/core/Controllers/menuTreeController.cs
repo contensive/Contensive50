@@ -318,7 +318,7 @@ namespace Contensive.Processor.Controllers {
                         // The Node has not already been used in this branch
                         //
                         Caption = iEntry[NodePointer].Caption;
-                        Link = htmlController.encodeHtml(iEntry[NodePointer].Link);
+                        Link = HtmlController.encodeHtml(iEntry[NodePointer].Link);
                         if (!string.IsNullOrEmpty(Link)) {
                             Caption = "<A TARGET=\"_blank\" HREF=\"" + Link + "\">" + Caption + "</A>";
                         }

@@ -18,11 +18,11 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string test1 = genericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 string test2 = genericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 // act
-                emailController.addToBlockList(cp.core, test1);
-                string blockList = Contensive.Processor.Controllers.emailController.getBlockList(cp.core);
+                EmailController.addToBlockList(cp.core, test1);
+                string blockList = Contensive.Processor.Controllers.EmailController.getBlockList(cp.core);
                 // assert
-                Assert.IsTrue(emailController.isOnBlockedList(cp.core, test1));
-                Assert.IsFalse(emailController.isOnBlockedList(cp.core, test2));
+                Assert.IsTrue(EmailController.isOnBlockedList(cp.core, test1));
+                Assert.IsFalse(EmailController.isOnBlockedList(cp.core, test2));
             }
         }
         //
@@ -33,11 +33,11 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // arrange
                 // act
                 // assert
-                Assert.IsFalse(emailController.verifyEmailAddress(cp.core, "123"));
-                Assert.IsFalse(emailController.verifyEmailAddress(cp.core, "123@"));
-                Assert.IsFalse(emailController.verifyEmailAddress(cp.core, "123@2"));
-                Assert.IsFalse(emailController.verifyEmailAddress(cp.core, "123@2."));
-                Assert.IsTrue(emailController.verifyEmailAddress(cp.core, "123@2.com"));
+                Assert.IsFalse(EmailController.verifyEmailAddress(cp.core, "123"));
+                Assert.IsFalse(EmailController.verifyEmailAddress(cp.core, "123@"));
+                Assert.IsFalse(EmailController.verifyEmailAddress(cp.core, "123@2"));
+                Assert.IsFalse(EmailController.verifyEmailAddress(cp.core, "123@2."));
+                Assert.IsTrue(EmailController.verifyEmailAddress(cp.core, "123@2.com"));
             }
         }
         //
@@ -50,12 +50,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string sendStatus = "";
                 string ResultLogFilename = "";
                 // act
-                emailController.queueAdHocEmail(cp.core, "to@kma.net", "from@kma.net", "subject", body,"bounce@kma.net","replyTo@kma.net", ResultLogFilename, true, true, 0, ref sendStatus);
+                EmailController.queueAdHocEmail(cp.core, "to@kma.net", "from@kma.net", "subject", body,"bounce@kma.net","replyTo@kma.net", ResultLogFilename, true, true, 0, ref sendStatus);
                 Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.processEmailClass();
                 addon.Execute(cp);
                 // assert
                 Assert.AreEqual(1, cp.core.mockSmtpList.Count);
-                CoreController.smtpEmailClass sentEmail = cp.core.mockSmtpList.First();
+                CoreController.SmtpEmailClass sentEmail = cp.core.mockSmtpList.First();
                 Assert.AreEqual("", sentEmail.AttachmentFilename);
                 Assert.AreEqual("to@kma.net", sentEmail.email.toAddress);
                 Assert.AreEqual("from@kma.net", sentEmail.email.fromAddress);
@@ -80,12 +80,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 toPerson.save(cp.core);
                 string sendStatus = "";
                 // act
-                Assert.IsTrue( emailController.queuePersonEmail(cp.core, toPerson, "from@kma.net", "subject", body, "bounce@kma.net", "replyTo@kma.net", true, true, 0, "", true, ref sendStatus, ""));
+                Assert.IsTrue( EmailController.queuePersonEmail(cp.core, toPerson, "from@kma.net", "subject", body, "bounce@kma.net", "replyTo@kma.net", true, true, 0, "", true, ref sendStatus, ""));
                 Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.processEmailClass();
                 addon.Execute(cp);
                 // assert
                 Assert.AreEqual(1, cp.core.mockSmtpList.Count);
-                CoreController.smtpEmailClass sentEmail = cp.core.mockSmtpList.First();
+                CoreController.SmtpEmailClass sentEmail = cp.core.mockSmtpList.First();
                 Assert.AreEqual("", sentEmail.AttachmentFilename);
                 Assert.AreEqual( toPerson.Email, sentEmail.email.toAddress);
                 Assert.AreEqual("from@kma.net", sentEmail.email.fromAddress);

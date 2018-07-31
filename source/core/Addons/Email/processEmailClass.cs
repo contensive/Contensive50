@@ -43,7 +43,7 @@ namespace Contensive.Addons.Email {
                 ProcessConditionalEmail(core, IsNewHour, IsNewDay);
                 //
                 // -- send queue
-                emailController.sendEmailInQueue(core);
+                EmailController.sendEmailInQueue(core);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }
@@ -502,7 +502,7 @@ namespace Contensive.Addons.Email {
                         //
                         // Send
                         //
-                        emailController.queueAdHocEmail(core, emailToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", true, true, 0, ref EmailStatus);
+                        EmailController.queueAdHocEmail(core, emailToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", true, true, 0, ref EmailStatus);
                         if (string.IsNullOrEmpty(EmailStatus)) {
                             EmailStatus = "ok";
                         }
@@ -589,7 +589,7 @@ namespace Contensive.Addons.Email {
                         + BR;
                     string queryStringForLinkAppend = rnEmailClickFlag + "=" + EmailDropID + "&" + rnEmailMemberID + "=" + person.id;
                     string sendStatus = "";
-                    emailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + core.appConfig.domainList[0], ConfirmBody,"","",true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend);
+                    EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + core.appConfig.domainList[0], ConfirmBody,"","",true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend);
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);

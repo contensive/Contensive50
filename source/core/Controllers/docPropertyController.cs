@@ -20,13 +20,13 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// doc properties are properties limited in scope to this single hit, or viewing
     /// </summary>
-    public class docPropertyController {
+    public class DocPropertyController {
         //
         private CoreController core;
         //
         private Dictionary<string, docPropertiesClass> docPropertiesDict = new Dictionary<string, docPropertiesClass>();
         //
-        public docPropertyController(CoreController core) : base() {
+        public DocPropertyController(CoreController core) : base() {
             this.core = core;
         }
         //

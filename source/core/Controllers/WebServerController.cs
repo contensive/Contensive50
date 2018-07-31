@@ -22,7 +22,7 @@ namespace Contensive.Processor.Controllers {
     /// Code dedicated to processing iis input and output. lazy Constructed. (see coreHtmlClass for html processing)
     /// What belongs here is everything that would have to change if we converted to apache
     /// </summary>
-    public class IisController {
+    public class WebServerController {
         //
         // enum this, not consts --  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
         public const string httpResponseStatus200 = "200 OK";
@@ -121,7 +121,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public IisController(CoreController core) : base() {
+        public WebServerController(CoreController core) : base() {
             this.core = core;
             requestCookies = new Dictionary<string, CookieClass>();
         }
@@ -312,7 +312,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 //--------------------------------------------------------------------------
                 //
-                if (core.appConfig.appStatus != appConfigModel.appStatusEnum.ok) {
+                if (core.appConfig.appStatus != AppConfigModel.appStatusEnum.ok) {
                     //
                     // did not initialize correctly
                     //
@@ -369,7 +369,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         DateTime cookieDetectDate = new DateTime();
                         int CookieDetectVisitId = 0;
-                        securityController.decodeToken(core,CookieDetectKey, ref CookieDetectVisitId, ref  cookieDetectDate);
+                        SecurityController.decodeToken(core,CookieDetectKey, ref CookieDetectVisitId, ref  cookieDetectDate);
                         if (CookieDetectVisitId != 0) {
                             core.db.executeQuery("update ccvisits set CookieSupport=1 where id=" + CookieDetectVisitId);
                             core.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
@@ -387,11 +387,11 @@ namespace Contensive.Processor.Controllers {
                     core.domain.visited = false;
                     core.domain.id = 0;
                     core.domain.forwardUrl = ""; 
-                    core.domainDictionary = core.cache.getObject<Dictionary<string, domainModel>>("domainContentList");
+                    core.domainDictionary = core.cache.getObject<Dictionary<string, DomainModel>>("domainContentList");
                     if (core.domainDictionary == null) {
                         //
                         //  no cache found, build domainContentList from database
-                        core.domainDictionary = domainModel.createDictionary(core, "(active<>0)and(name is not null)");
+                        core.domainDictionary = DomainModel.createDictionary(core, "(active<>0)and(name is not null)");
                         updateDomainCache = true;
                     }
                     //
@@ -399,7 +399,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (string domain in core.appConfig.domainList) {
                         if (!core.domainDictionary.ContainsKey(domain.ToLower())) {
                             logController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLower() + "]");
-                            var newDomain = domainModel.add(core);
+                            var newDomain = DomainModel.add(core);
                             newDomain.name = domain;
                             newDomain.rootPageId = 0;
                             newDomain.noFollow = false;
@@ -418,7 +418,7 @@ namespace Contensive.Processor.Controllers {
                     // -- verify request domain
                     if (!core.domainDictionary.ContainsKey(requestDomain.ToLower())) {
                         logController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLower() + "] not found");
-                        var newDomain = domainModel.add( core );
+                        var newDomain = DomainModel.add( core );
                         newDomain.name = requestDomain;
                         newDomain.rootPageId = 0;
                         newDomain.noFollow = false;
@@ -445,7 +445,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.domain.id == 0) {
                         //
                         // this is a default domain or a new domain -- add to the domain table
-                        var domain = new domainModel() {
+                        var domain = new DomainModel() {
                             name = requestDomain,
                             typeId = 1,
                             rootPageId = core.domain.rootPageId,
@@ -592,7 +592,7 @@ namespace Contensive.Processor.Controllers {
             if (requestCookies.ContainsKey(cookieKey)) {
                 requestCookies.Remove(cookieKey);
             }
-            requestCookies.Add(cookieKey, new IisController.CookieClass {
+            requestCookies.Add(cookieKey, new WebServerController.CookieClass {
                 name = cookieKey,
                 value = cookieValue
             });
@@ -725,7 +725,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IsPageNotFound"></param>
         /// <param name="allowDebugMessage">If true, when visit property debugging is enabled, the routine returns </param>
         public string redirect(string NonEncodedLink, string RedirectReason = "No explaination provided", bool IsPageNotFound = false, bool allowDebugMessage = true) {
-            string result = htmlController.div( "Redirecting to [" + NonEncodedLink + "], reason [" + RedirectReason + "]", "ccWarningBox" );
+            string result = HtmlController.div( "Redirecting to [" + NonEncodedLink + "], reason [" + RedirectReason + "]", "ccWarningBox" );
             try {
                 const string rnRedirectCycleFlag = "cycleFlag";
                 string EncodedLink = null;
@@ -789,7 +789,7 @@ namespace Contensive.Processor.Controllers {
                             // -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink;
                         } else {
-                            setResponseStatus(IisController.httpResponseStatus404);
+                            setResponseStatus(WebServerController.httpResponseStatus404);
                         }
                     } else {
 
@@ -800,7 +800,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink;
-                            result = "<div style=\"padding:20px;border:1px dashed black;background-color:white;color:black;\">" + RedirectReason + "<p>Click to continue the redirect to <a href=" + EncodedLink + ">" + htmlController.encodeHtml(NonEncodedLink) + "</a>...</p></div>";
+                            result = "<div style=\"padding:20px;border:1px dashed black;background-color:white;color:black;\">" + RedirectReason + "<p>Click to continue the redirect to <a href=" + EncodedLink + ">" + HtmlController.encodeHtml(NonEncodedLink) + "</a>...</p></div>";
                         } else {
                             //
                             // -- Redirect now

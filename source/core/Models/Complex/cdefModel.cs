@@ -1985,7 +1985,7 @@ namespace Contensive.Processor.Models.Complex {
             cdefModel result = null;
             try {
                 try {
-                    string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
+                    string cacheName = Controllers.CacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
                     result = core.cache.getObject<Models.Complex.cdefModel>(cacheName);
                 } catch (Exception ex) {
                     logController.handleError( core,ex);
@@ -1997,7 +1997,7 @@ namespace Contensive.Processor.Models.Complex {
         //====================================================================================================
         //
         public static void setCache(CoreController core, int contentId, cdefModel cdef) {
-            string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
+            string cacheName = Controllers.CacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
             //
             // -- make it dependant on cacheNameInvalidateAll. If invalidated, all cdef will invalidate
             List<string> dependantList = new List<string>();
@@ -2008,7 +2008,7 @@ namespace Contensive.Processor.Models.Complex {
         //====================================================================================================
         //
         public static void invalidateCache(CoreController core, int contentId) {
-            string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
+            string cacheName = Controllers.CacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
             core.cache.invalidate(cacheName);
         }
         //

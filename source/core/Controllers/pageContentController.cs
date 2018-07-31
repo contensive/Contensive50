@@ -55,7 +55,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // -- OnBodyStart add-ons
-                foreach (addonModel addon in core.addonCache.getOnBodyStartAddonList()) {
+                foreach (AddonModel addon in core.addonCache.getOnBodyStartAddonList()) {
                     CPUtilsBaseClass.addonExecuteContext bodyStartContext = new CPUtilsBaseClass.addonExecuteContext() {
                         addonType = CPUtilsBaseClass.addonContext.ContextOnBodyStart,
                         errorContextMessage = "calling onBodyStart addon [" + addon.name + "] in HtmlBodyTemplate"
@@ -112,7 +112,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Add template editing
                         if (core.visitProperty.getBoolean("AllowAdvancedEditor") & core.session.isEditing("Page Templates")) {
-                            returnBody = adminUIController.getEditWrapper( core, "Page Template [" + LocalTemplateName + "]", adminUIController.getRecordEditLink(core, "Page Templates", LocalTemplateID, false, LocalTemplateName, core.session.isEditing("Page Templates")) + returnBody);
+                            returnBody = AdminUIController.getEditWrapper( core, "Page Template [" + LocalTemplateName + "]", AdminUIController.getRecordEditLink(core, "Page Templates", LocalTemplateID, false, LocalTemplateName, core.session.isEditing("Page Templates")) + returnBody);
                         }
                     }
                     //
@@ -179,7 +179,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Display Admin Warnings with Edits for record errors
                     if (core.doc.adminWarningPageID != 0) {
-                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + adminUIController.getRecordEditLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
+                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + AdminUIController.getRecordEditLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
                     }
                     //
@@ -192,7 +192,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.redirectLink != "") {
                     return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
                 } else if (AllowEditWrapper) {
-                    returnHtml = adminUIController.getEditWrapper( core, "Page Content", returnHtml);
+                    returnHtml = AdminUIController.getEditWrapper( core, "Page Content", returnHtml);
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -315,12 +315,12 @@ namespace Contensive.Processor.Controllers {
                 CopyResult = "&nbsp;";
             }
             return "<tr>" 
-                + htmlController.td("<nobr>" + CopyCaption + "</nobr>", "150", 0, EvenRow, "right") 
-                + htmlController.td(CopyResult, "100%", 0, EvenRow, "left") 
+                + HtmlController.td("<nobr>" + CopyCaption + "</nobr>", "150", 0, EvenRow, "right") 
+                + HtmlController.td(CopyResult, "100%", 0, EvenRow, "left") 
                 + kmaEndTableRow;
         }
         //
-        public static void loadPage(CoreController core, int requestedPageId, domainModel domain) {
+        public static void loadPage(CoreController core, int requestedPageId, DomainModel domain) {
             try {
                 if (domain == null) {
                     //
@@ -422,7 +422,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // -- set this new template to all domains without a template
-                            foreach (domainModel d in domainModel.createList(core, "((DefaultTemplateId=0)or(DefaultTemplateId is null))")) {
+                            foreach (DomainModel d in DomainModel.createList(core, "((DefaultTemplateId=0)or(DefaultTemplateId is null))")) {
                                 d.defaultTemplateId = core.doc.pageController.template.id;
                                 d.save(core);
                             }
@@ -446,7 +446,7 @@ namespace Contensive.Processor.Controllers {
         //
         //---------------------------------------------------------------------------
         //
-        public static pageContentModel getLandingPage(CoreController core, domainModel domain) {
+        public static pageContentModel getLandingPage(CoreController core, DomainModel domain) {
             pageContentModel landingPage = null;
             try {
                 if (domain == null) {
@@ -768,7 +768,7 @@ namespace Contensive.Processor.Controllers {
                         int posDot = 0;
                         int loopCnt = 10;
                         do {
-                            core.doc.domain = domainModel.createByName(core, domainTest);
+                            core.doc.domain = DomainModel.createByName(core, domainTest);
                             posDot = domainTest.IndexOf('.');
                             if ((posDot >= 0) && (domainTest.Length > 1)) {
                                 domainTest = domainTest.Substring(posDot + 1);
@@ -802,10 +802,10 @@ namespace Contensive.Processor.Controllers {
 
                     //
                     // -- execute template Dependencies
-                    List<Models.DbModels.addonModel> templateAddonList = addonModel.createList_templateDependencies(core, core.doc.pageController.template.id);
+                    List<Models.DbModels.AddonModel> templateAddonList = AddonModel.createList_templateDependencies(core, core.doc.pageController.template.id);
                     if (templateAddonList.Count > 0) {
                         string addonContextMessage = executeContext.errorContextMessage;
-                        foreach (addonModel addon in templateAddonList) {
+                        foreach (AddonModel addon in templateAddonList) {
                             executeContext.errorContextMessage = "executing template dependency [" + addon.name + "]";
                             result += core.addon.executeDependency(addon, executeContext);
                         }
@@ -813,10 +813,10 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- execute page Dependencies
-                    List<Models.DbModels.addonModel> pageAddonList = addonModel.createList_pageDependencies(core, core.doc.pageController.page.id);
+                    List<Models.DbModels.AddonModel> pageAddonList = AddonModel.createList_pageDependencies(core, core.doc.pageController.page.id);
                     if ( pageAddonList.Count> 0 ) {
                         string addonContextMessage = executeContext.errorContextMessage;
-                        foreach (addonModel addon in pageAddonList) {
+                        foreach (AddonModel addon in pageAddonList) {
                             executeContext.errorContextMessage = "executing page dependency [" + addon.name + "]";
                             result += core.addon.executeDependency(addon, executeContext);
                         }
@@ -830,7 +830,7 @@ namespace Contensive.Processor.Controllers {
                     // -- Add cookie test
                     bool AllowCookieTest = core.siteProperties.allowVisitTracking && (core.session.visit.PageVisits == 1);
                     if (AllowCookieTest) {
-                        core.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" + securityController.encodeToken( core,core.session.visit.id, core.doc.profileStartTime) + "')};", "Cookie Test");
+                        core.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" + SecurityController.encodeToken( core,core.session.visit.id, core.doc.profileStartTime) + "')};", "Cookie Test");
                     }
                     //
                     //--------------------------------------------------------------------------
@@ -840,7 +840,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     if (core.docProperties.getInteger("ContensiveUserForm") == 1) {
                         string FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
-                        emailController.queueFormEmail(core, core.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + core.webServer.requestReferer);
+                        EmailController.queueFormEmail(core, core.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + core.webServer.requestReferer);
                         int cs = core.db.csInsertRecord("User Form Response");
                         if (core.db.csOk(cs)) {
                             core.db.csSet(cs, "name", "Form " + core.webServer.requestReferrer);
@@ -879,7 +879,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.redirectRecordID != 0) {
                             string contentName = Models.Complex.cdefModel.getContentNameByID(core, core.doc.redirectContentID);
                             if (!string.IsNullOrEmpty(contentName)) {
-                                if (IisController.main_RedirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID)) {
+                                if (WebServerController.main_RedirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID)) {
                                     //
                                     //Call AppendLog("main_init(), 3210 - exit for rc/ri redirect ")
                                     //
@@ -899,7 +899,7 @@ namespace Contensive.Processor.Controllers {
                     if (!string.IsNullOrEmpty(RecordEID)) {
                         DateTime tokenDate = default(DateTime);
                         int downloadId = 0;
-                        securityController.decodeToken(core, RecordEID, ref downloadId, ref tokenDate);
+                        SecurityController.decodeToken(core, RecordEID, ref downloadId, ref tokenDate);
                         if (downloadId != 0) {
                             //
                             // -- lookup record and set clicks
@@ -1216,7 +1216,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- block with login
                                     core.doc.continueProcessing = false;
-                                    return core.addon.execute(addonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
+                                    return core.addon.execute(AddonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
                                         addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                         errorContextMessage = "calling login page addon [" + addonGuidLoginPage + "] because page is blocked"
                                     });
@@ -1306,7 +1306,7 @@ namespace Contensive.Processor.Controllers {
                     // new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                     //
                     logController.addSiteWarning(core, "Page Not Found", "Page Not Found", "", 0, "Page Not Found from [" + core.webServer.requestUrlSource + "]", "Page Not Found", "Page Not Found");
-                    core.webServer.setResponseStatus(IisController.httpResponseStatus404);
+                    core.webServer.setResponseStatus(WebServerController.httpResponseStatus404);
                     core.docProperties.setProperty(rnPageId, getPageNotFoundPageId(core));
                     //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
                     if (core.session.isAuthenticatedAdmin(core)) {
@@ -1379,12 +1379,12 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     core.db.csClose(ref CS);
                                     if (!Success) {
-                                        errorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + htmlController.encodeHtml(FormValue) + "] has already been used.");
+                                        errorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                     }
                                 }
                                 if ((tempVar.REquired | genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
-                                    errorController.addUserError(core, "The field [" + htmlController.encodeHtml(tempVar.Caption) + "] is required.");
+                                    errorController.addUserError(core, "The field [" + HtmlController.encodeHtml(tempVar.Caption) + "] is required.");
                                 } else {
                                     if (!core.db.csOk(CSPeople)) {
                                         CSPeople = core.db.csOpenRecord("people", core.session.user.id);
@@ -1463,7 +1463,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         DateTime tokenDate = default(DateTime);
                         int GroupIDToJoinOnSuccess = 0;
-                        securityController.decodeToken(core, core.docProperties.getText("SuccessID"), ref GroupIDToJoinOnSuccess, ref tokenDate);
+                        SecurityController.decodeToken(core, core.docProperties.getText("SuccessID"), ref GroupIDToJoinOnSuccess, ref tokenDate);
                         //GroupIDToJoinOnSuccess = main_DecodeKeyNumber(main_GetStreamText2("SuccessID"))
                         if (GroupIDToJoinOnSuccess != 0) {
                             groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, GroupIDToJoinOnSuccess));
@@ -1640,7 +1640,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             GroupValue = core.session.isMemberOfGroup(core, tempVar.GroupName);
                             Body = f.RepeatCell;
-                            Body = genericController.vbReplace(Body, "{{CAPTION}}", htmlController.checkbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
+                            Body = genericController.vbReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
                             Body = genericController.vbReplace(Body, "{{FIELD}}", tempVar.Caption);
                             RepeatBody = RepeatBody + Body;
                             GroupRowPtr = GroupRowPtr + 1;
@@ -1657,14 +1657,14 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 string innerHtml = ""
-                    + htmlController.inputHidden("ContensiveFormPageID", FormPageID) 
-                    + htmlController.inputHidden("SuccessID", securityController.encodeToken(core, GroupIDToJoinOnSuccess, core.doc.profileStartTime)) 
+                    + HtmlController.inputHidden("ContensiveFormPageID", FormPageID) 
+                    + HtmlController.inputHidden("SuccessID", SecurityController.encodeToken(core, GroupIDToJoinOnSuccess, core.doc.profileStartTime)) 
                     + f.PreRepeat 
                     + RepeatBody 
                     + f.PostRepeat;
                 result = ""
                     + errorController.getUserError(core)
-                    + htmlController.formMultipart(core, innerHtml, core.doc.refreshQueryString, "", "ccForm");
+                    + HtmlController.formMultipart(core, innerHtml, core.doc.refreshQueryString, "", "ccForm");
             } catch (Exception ex) {
                 logController.handleError( core,ex);
             }
@@ -1814,7 +1814,7 @@ namespace Contensive.Processor.Controllers {
                                         // -- not recognized
                                         BlockForm = ""
                                             + "<p>This content has limited access. If you have an account, please login using this form.</p>"
-                                            + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                            + core.addon.execute(AddonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                                 addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                                 errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user not recognized"
                                             });
@@ -1823,7 +1823,7 @@ namespace Contensive.Processor.Controllers {
                                         // -- recognized, not authenticated
                                         BlockForm = ""
                                             + "<p>This content has limited access. You were recognized as \"<b>" + core.session.user.name + "</b>\", but you need to login to continue. To login to this account or another, please use this form.</p>"
-                                            + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                            + core.addon.execute(AddonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                                 addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                                 errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user not authenticated"
                                             });
@@ -1834,7 +1834,7 @@ namespace Contensive.Processor.Controllers {
                                     BlockForm = ""
                                         + "<p>You are currently logged in as \"<b>" + core.session.user.name + "</b>\". If this is not you, please <a href=\"?" + core.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
                                         + "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>"
-                                        + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                        + core.addon.execute(AddonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                             errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user does not have access to content"
                                         });
@@ -1855,7 +1855,7 @@ namespace Contensive.Processor.Controllers {
                                     BlockForm = ""
                                         + "<p>This content has limited access. If you have an account, please login using this form.</p>"
                                         + "<p>If you do not have an account, <a href=?" + core.doc.refreshQueryString + "&subform=0>click here to register</a>.</p>"
-                                        + core.addon.execute(addonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
+                                        + core.addon.execute(AddonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                             errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked for registration"
                                         });
@@ -1959,7 +1959,7 @@ namespace Contensive.Processor.Controllers {
                                     string Body = "";
                                     Body = Body + "<p><b>Page Hit Notification.</b></p>";
                                     Body = Body + "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>";
-                                    Body = Body + htmlController.tableStart(4, 1, 1);
+                                    Body = Body + HtmlController.tableStart(4, 1, 1);
                                     Body = Body + "<tr><td align=\"right\" width=\"150\" Class=\"ccPanelHeader\">Description<br><img alt=\"image\" src=\"http://" + core.webServer.requestDomain + "/ccLib/images/spacer.gif\" width=\"150\" height=\"1\"></td><td align=\"left\" width=\"100%\" Class=\"ccPanelHeader\">Value</td></tr>";
                                     Body = Body + get2ColumnTableRow("Domain", core.webServer.requestDomain, true);
                                     Body = Body + get2ColumnTableRow("Link", core.webServer.requestUrl, false);
@@ -1976,7 +1976,7 @@ namespace Contensive.Processor.Controllers {
                                     Body = Body + kmaEndTable;
                                     string queryStringForLinkAppend = "";
                                     string emailStatus = "";
-                                    emailController.queuePersonEmail(core, person, core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain), "Page Hit Notification", Body, "", "", false, true, 0, "", false, ref emailStatus, queryStringForLinkAppend);
+                                    EmailController.queuePersonEmail(core, person, core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain), "Page Hit Notification", Body, "", "", false, true, 0, "", false, ref emailStatus, queryStringForLinkAppend);
                                 }
                             }
                         }
@@ -1993,7 +1993,7 @@ namespace Contensive.Processor.Controllers {
                                 // Always
                                 //
                                 if (SystemEMailID != 0) {
-                                    emailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
+                                    EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                 }
                                 if (main_AddGroupID != 0) {
                                     groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, main_AddGroupID));
@@ -2009,7 +2009,7 @@ namespace Contensive.Processor.Controllers {
                                 if (ConditionGroupID != 0) {
                                     if (core.session.isMemberOfGroup(core, groupController.group_GetGroupName(core, ConditionGroupID))) {
                                         if (SystemEMailID != 0) {
-                                            emailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
+                                            EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                         }
                                         if (main_AddGroupID != 0) {
                                             groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, main_AddGroupID));
@@ -2033,7 +2033,7 @@ namespace Contensive.Processor.Controllers {
                                             groupController.group_DeleteGroupMember(core, groupController.group_GetGroupName(core, RemoveGroupID));
                                         }
                                         if (SystemEMailID != 0) {
-                                            emailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
+                                            EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                         }
                                     }
                                 }
@@ -2074,8 +2074,8 @@ namespace Contensive.Processor.Controllers {
                     // Set the Meta Content flag
                     //---------------------------------------------------------------------------------
                     //
-                    core.html.addTitle(htmlController.encodeHtml(core.doc.pageController.page.pageTitle), "page content");
-                    core.html.addMetaDescription(htmlController.encodeHtml(core.doc.pageController.page.metaDescription), "page content");
+                    core.html.addTitle(HtmlController.encodeHtml(core.doc.pageController.page.pageTitle), "page content");
+                    core.html.addMetaDescription(HtmlController.encodeHtml(core.doc.pageController.page.metaDescription), "page content");
                     core.html.addHeadTag(core.doc.pageController.page.OtherHeadTags, "page content");
                     core.html.addMetaKeywordList(core.doc.pageController.page.MetaKeywordList, "page content");
                     //
@@ -2085,8 +2085,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- OnPageStartEvent
                     core.doc.bodyContent = returnHtml;
-                    List<addonModel> addonList = addonModel.createList_OnPageStartEvent(core, new List<string>());
-                    foreach (Models.DbModels.addonModel addon in addonList) {
+                    List<AddonModel> addonList = AddonModel.createList_OnPageStartEvent(core, new List<string>());
+                    foreach (Models.DbModels.AddonModel addon in addonList) {
                         CPUtilsBaseClass.addonExecuteContext pageStartContext = new CPUtilsBaseClass.addonExecuteContext() {
                             instanceGuid = "-1",
                             instanceArguments = instanceArguments,
@@ -2099,7 +2099,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- OnPageEndEvent / filter
                     core.doc.bodyContent = returnHtml;
-                    foreach (addonModel addon in core.addonCache.getOnPageEndAddonList()) {
+                    foreach (AddonModel addon in core.addonCache.getOnPageEndAddonList()) {
                         CPUtilsBaseClass.addonExecuteContext pageEndContext = new CPUtilsBaseClass.addonExecuteContext() {
                             instanceGuid = "-1",
                             instanceArguments = instanceArguments,
@@ -2124,7 +2124,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.adminWarning != "") {
                     //
                     if (core.doc.adminWarningPageID != 0) {
-                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + adminUIController.getRecordEditLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
+                        core.doc.adminWarning = core.doc.adminWarning + "</p>" + AdminUIController.getRecordEditLink(core, "Page Content", core.doc.adminWarningPageID, true, "Page " + core.doc.adminWarningPageID, core.session.isAuthenticatedAdmin(core)) + "&nbsp;Edit the page<p>";
                         core.doc.adminWarningPageID = 0;
                     }
                     returnHtml = ""
@@ -2164,9 +2164,9 @@ namespace Contensive.Processor.Controllers {
                         string LiveBody = getContentBox_content_Body(core, OrderByClause, AllowChildPageList, false, core.doc.pageController.pageToRootList.Last().id, AllowReturnLink, pageContentModel.contentName, ArchivePages);
                         bool isRootPage = (core.doc.pageController.pageToRootList.Count == 1);
                         if (core.session.isAdvancedEditing(core, "")) {
-                            result += adminUIController.getRecordEditLink(core, pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody;
+                            result += AdminUIController.getRecordEditLink(core, pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody;
                         } else if (isEditing) {
-                            result += adminUIController.getEditWrapper( core, "", adminUIController.getRecordEditLink(core, pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody);
+                            result += AdminUIController.getEditWrapper( core, "", AdminUIController.getRecordEditLink(core, pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody);
                         } else {
                             result += LiveBody;
                         }
@@ -2259,7 +2259,7 @@ namespace Contensive.Processor.Controllers {
                     // ----- Headline
                     //
                     if (core.doc.pageController.page.Headline != "") {
-                        string headline = htmlController.encodeHtml(core.doc.pageController.page.Headline);
+                        string headline = HtmlController.encodeHtml(core.doc.pageController.page.Headline);
                         Cell = Cell + "\r<h1>" + headline + "</h1>";
                         //
                         // Add AC end here to force the end of any left over AC tags (like language)
@@ -2286,7 +2286,7 @@ namespace Contensive.Processor.Controllers {
                         if (!allowChildListComposite) {
                             Cell = Cell + core.html.getAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
                         }
-                        addonModel addon = addonModel.create(core, addonGuidChildList);
+                        AddonModel addon = AddonModel.create(core, addonGuidChildList);
                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                             hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
@@ -2407,12 +2407,12 @@ namespace Contensive.Processor.Controllers {
                                     SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
                                 }
                                 if (IsEditingLocal) {
-                                    result += adminUIController.getRecordEditLink(core, "See Also", (core.db.csGetInteger(CS, "ID")), false, "", core.session.isEditing("See Also"));
+                                    result += AdminUIController.getRecordEditLink(core, "See Also", (core.db.csGetInteger(CS, "ID")), false, "", core.session.isEditing("See Also"));
                                 }
-                                result += "<a href=\"" + htmlController.encodeHtml(SeeAlsoLink) + "\" target=\"_blank\">" + (core.db.csGetText(CS, "Name")) + "</A>";
+                                result += "<a href=\"" + HtmlController.encodeHtml(SeeAlsoLink) + "\" target=\"_blank\">" + (core.db.csGetText(CS, "Name")) + "</A>";
                                 string Copy = (core.db.csGetText(CS, "Brief"));
                                 if (!string.IsNullOrEmpty(Copy)) {
-                                    result += "<br>" + htmlController.span(Copy, "ccListCopy");
+                                    result += "<br>" + HtmlController.span(Copy, "ccListCopy");
                                 }
                                 SeeAlsoCount = SeeAlsoCount + 1;
                                 result += "</li>";
@@ -2423,7 +2423,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         if (IsEditingLocal) {
                             SeeAlsoCount = SeeAlsoCount + 1;
-                            result += "\r<li class=\"ccListItem\">" + adminUIController.getRecordAddLink(core, "See Also", "RecordID=" + RecordID + ",ContentID=" + ContentID) + "</LI>";
+                            result += "\r<li class=\"ccListItem\">" + AdminUIController.getRecordAddLink(core, "See Also", "RecordID=" + RecordID + ",ContentID=" + ContentID) + "</LI>";
                         }
                     }
                     //
@@ -2501,7 +2501,7 @@ namespace Contensive.Processor.Controllers {
                         if (person != null) {
                             string sendStatus = "";
                             string queryStringForLinkAppend = "";
-                            emailController.queuePersonEmail(core, person, NoteFromEmail, "Feedback Form Submitted", NoteCopy, "", "", false, true, 0, "", false, ref sendStatus, queryStringForLinkAppend);
+                            EmailController.queuePersonEmail(core, person, NoteFromEmail, "Feedback Form Submitted", NoteCopy, "", "", false, true, 0, "", false, ref sendStatus, queryStringForLinkAppend);
                         }
                         //
                         // ----- Note sent, say thanks
@@ -2522,28 +2522,28 @@ namespace Contensive.Processor.Controllers {
                         //
                         Copy = core.session.user.name;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Name</p></td>";
-                        Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + htmlController.encodeHtml(Copy) + "\"></span></td>";
+                        Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";
                         //
                         // ----- From Email address
                         //
                         Copy = core.session.user.Email;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Email</p></td>";
-                        Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + htmlController.encodeHtml(Copy) + "\"></span></td>";
+                        Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";
                         //
                         // ----- Message
                         //
                         Copy = "";
                         Panel = Panel + "<td align=\"right\" width=\"100\" valign=\"top\"><p>Feedback</p></td>";
-                        Panel = Panel + "<td>" + htmlController.inputText(core, "NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
+                        Panel = Panel + "<td>" + HtmlController.inputText(core, "NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
                         //Panel = Panel & "<td><textarea ID=""TextArea"" rows=""4"" cols=""40"" name=""NoteCopy"">" & Copy & "</textarea></td>"
                         Panel = Panel + "</tr><tr>";
                         //
                         // ----- submit button
                         //
                         Panel = Panel + "<td>&nbsp;</td>";
-                        Panel = Panel + "<td>" + htmlController.getHtmlInputSubmit(FeedbackButtonSubmit, "fbb") + "</td>";
+                        Panel = Panel + "<td>" + HtmlController.getHtmlInputSubmit(FeedbackButtonSubmit, "fbb") + "</td>";
                         //Panel = Panel + "<td><input type=\"submit\" name=\"fbb\" value=\"" + FeedbackButtonSubmit + "\"></td>";
                         Panel = Panel + "</tr></table>";
                         Panel = Panel + "</form>";
@@ -2608,7 +2608,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     string pageEditLink = "";
                     if (core.session.isEditing(ContentName)) {
-                        pageEditLink = adminUIController.getRecordEditLink(core, ContentName, childPage.id, true, childPage.name, true);
+                        pageEditLink = AdminUIController.getRecordEditLink(core, ContentName, childPage.id, true, childPage.name, true);
                     }
                     //
                     string link = PageLink;
@@ -2619,7 +2619,7 @@ namespace Contensive.Processor.Controllers {
                     if (childPage.BlockContent | childPage.BlockPage) {
                         blockContentComposite = !core.doc.bypassContentBlock(childPage.contentControlID, childPage.id);
                     }
-                    string LinkedText = genericController.csv_GetLinkedText("<a href=\"" + htmlController.encodeHtml(link) + "\">", pageMenuHeadline);
+                    string LinkedText = genericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(link) + "\">", pageMenuHeadline);
                     if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.ParentListName != "") & (!isAuthoring)) {
                         //
                         // ----- Requested orphan list, and this record is in a named list, and not editing, do not display
@@ -2721,7 +2721,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Add Link
                 //
                 if (!ArchivePages) {
-                    string AddLink = adminUIController.getRecordAddLink(core, ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true);
+                    string AddLink = AdminUIController.getRecordAddLink(core, ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true);
                     if (!string.IsNullOrEmpty(AddLink)) {
                         inactiveList = inactiveList + "\r<li class=\"ccListItem\">" + AddLink + "</LI>";
                     }

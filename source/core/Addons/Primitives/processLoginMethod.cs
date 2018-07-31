@@ -34,7 +34,7 @@ namespace Contensive.Addons.Primitives {
                 core.doc.continueProcessing = false;
                 Dictionary<string, string> addonArguments = new Dictionary<string, string>();
                 addonArguments.Add("Force Default Login", "false");
-                return core.addon.execute(addonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
+                return core.addon.execute(AddonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
                     instanceArguments = addonArguments,
                     forceHtmlDocument = true,

@@ -21,7 +21,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// Site Properties
     /// </summary>
-    public class sitePropertiesController {
+    public class SitePropertiesController {
         //
         private CoreController core;
         //
@@ -30,7 +30,7 @@ namespace Contensive.Processor.Controllers {
         /// new
         /// </summary>
         /// <param name="core"></param>
-        public sitePropertiesController(CoreController core) : base() {
+        public SitePropertiesController(CoreController core) : base() {
             this.core = core;
         }
         //
@@ -65,7 +65,7 @@ namespace Contensive.Processor.Controllers {
         //
         private bool dbNotReady {
             get {
-                return (core.appConfig.appStatus != appConfigModel.appStatusEnum.ok);
+                return (core.appConfig.appStatus != AppConfigModel.appStatusEnum.ok);
             }
         }
         //

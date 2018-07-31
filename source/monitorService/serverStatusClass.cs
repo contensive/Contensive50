@@ -248,7 +248,7 @@ namespace Contensive.MonitorService {
                             Content = Content + StatusLine(0, "");
                             Content = Content + StatusLine(0, "Applications");
 
-                            foreach (KeyValuePair<string, appConfigModel> kvp in cpCore.serverConfig.apps) {
+                            foreach (KeyValuePair<string, AppConfigModel> kvp in cpCore.serverConfig.apps) {
                                 AppName = kvp.Value.name;
                                 cpApp = new CPClass(AppName);
                                 if (cpApp.core.appConfig.allowSiteMonitor) {
@@ -311,7 +311,7 @@ namespace Contensive.MonitorService {
                                         //        '    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application starting")
                                         //        '    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //        '    ErrorCount = ErrorCount + 1
-                                        case appConfigModel.appStatusEnum.ok:
+                                        case AppConfigModel.appStatusEnum.ok:
                                             if (true) {
                                                 //
                                                 // access content server for this application

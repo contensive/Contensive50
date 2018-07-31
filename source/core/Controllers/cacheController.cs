@@ -57,7 +57,7 @@ namespace Contensive.Processor.Controllers {
     ///         - objects like addonList depend on it, and are flushed if ANY record in that table is updated
     ///         
     /// </summary>
-    public class cacheController : IDisposable {
+    public class CacheController : IDisposable {
         //
         // ====================================================================================================
         // ----- constants
@@ -225,7 +225,7 @@ namespace Contensive.Processor.Controllers {
                         string serializedDataObject = null;
                         using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, wrapperKey)) {
                             mutex.WaitOne();
-                            serializedDataObject = core.privateFiles.readFileText("appCache\\" + fileController.encodeDosFilename(wrapperKey + ".txt"));
+                            serializedDataObject = core.privateFiles.readFileText("appCache\\" + FileController.encodeDosFilename(wrapperKey + ".txt"));
                             mutex.ReleaseMutex();
                         }
                         if (string.IsNullOrEmpty(serializedDataObject)) {
@@ -577,7 +577,7 @@ namespace Contensive.Processor.Controllers {
             } else if (tableName.ToLower() == linkForwardModel.contentTableName.ToLower()) {
                 //
                 Models.Complex.routeDictionaryModel.invalidateCache(core);
-            } else if (tableName.ToLower() == addonModel.contentTableName.ToLower()) {
+            } else if (tableName.ToLower() == AddonModel.contentTableName.ToLower()) {
                 //
                 Models.Complex.routeDictionaryModel.invalidateCache(core);
             }
@@ -646,7 +646,7 @@ namespace Contensive.Processor.Controllers {
         /// Initializes cache client
         /// </summary>
         /// <remarks></remarks>
-        public cacheController(CoreController core) {
+        public CacheController(CoreController core) {
             try {
                 this.core = core;
                 //
@@ -703,7 +703,7 @@ namespace Contensive.Processor.Controllers {
                         string serializedData = Newtonsoft.Json.JsonConvert.SerializeObject(wrappedContent);
                         using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, wrapperKey)) {
                             mutex.WaitOne();
-                            core.privateFiles.saveFile("appCache\\" + fileController.encodeDosFilename(wrapperKey + ".txt"), serializedData);
+                            core.privateFiles.saveFile("appCache\\" + FileController.encodeDosFilename(wrapperKey + ".txt"), serializedData);
                             mutex.ReleaseMutex();
                         }
                     }
@@ -750,7 +750,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~cacheController() {
+        ~CacheController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }

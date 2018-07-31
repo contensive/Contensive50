@@ -32,14 +32,14 @@ namespace Contensive.Addons.Primitives {
                 if (core.session.isAuthenticated & core.session.isAuthenticatedAdmin(core)) {
                     int addonId = core.docProperties.getInteger("AddonID");
                     if (addonId > 0) {
-                       addonModel styleAddon =addonModel.create(core, addonId);
+                       AddonModel styleAddon =AddonModel.create(core, addonId);
                         if (styleAddon.StylesFilename.content != core.docProperties.getText("CustomStyles")) {
                             styleAddon.StylesFilename.content = core.docProperties.getText("CustomStyles");
                             styleAddon.save(core);
                             //
                             // Clear Caches
                             //
-                            core.cache.invalidateAllInContent(addonModel.contentName);
+                            core.cache.invalidateAllInContent(AddonModel.contentName);
                         }
                     }
                 }

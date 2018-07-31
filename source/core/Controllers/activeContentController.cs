@@ -132,7 +132,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 string AnchorQuery = "";
                 if (addLinkAuthenticationToAllLinks && (personalizationPeopleId != 0)) {
-                    AnchorQuery = AnchorQuery + "&eid=" + securityController.encodeToken(core, personalizationPeopleId, DateTime.Now);
+                    AnchorQuery = AnchorQuery + "&eid=" + SecurityController.encodeToken(core, personalizationPeopleId, DateTime.Now);
                 }
                 //
                 if (!string.IsNullOrEmpty(queryStringToAppendToAllLinks)) {
@@ -278,7 +278,7 @@ namespace Contensive.Processor.Controllers {
                                                     // -- Add-on
                                                     NotUsedID = 0;
                                                     AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                    addonOptionString = htmlController.decodeHtml(AddonOptionStringHTMLEncoded);
+                                                    addonOptionString = HtmlController.decodeHtml(AddonOptionStringHTMLEncoded);
                                                     if (IsEmailContent) {
                                                         //
                                                         // -- Addon for email
@@ -288,7 +288,7 @@ namespace Contensive.Processor.Controllers {
                                                                     //
                                                                     // -- start block text
                                                                     Copy = "";
-                                                                    string GroupIDList = htmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
+                                                                    string GroupIDList = HtmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
                                                                     if (!core.session.isMemberOfGroupIdList(core, personalizationPeopleId, true, GroupIDList, true)) {
                                                                         //
                                                                         // Block content if not allowed
@@ -331,7 +331,7 @@ namespace Contensive.Processor.Controllers {
                                                                         instanceGuid = ACInstanceID,
                                                                         errorContextMessage = "rendering addon found in active content within an email"
                                                                     };
-                                                                    addonModel addon = addonModel.createByName(core, ACName);
+                                                                    AddonModel addon = AddonModel.createByName(core, ACName);
                                                                     Copy = core.addon.execute(addon, executeContext);
                                                                     break;
                                                             }
@@ -445,7 +445,7 @@ namespace Contensive.Processor.Controllers {
                                                                     // all Src and Instance vars are already encoded correctly
                                                                     if (!string.IsNullOrEmpty(SrcOptionName)) {
                                                                         // since AddonOptionString is encoded, InstanceOptionValue will be also
-                                                                        string InstanceOptionValue = htmlController.getAddonOptionStringValue(SrcOptionName, addonOptionString);
+                                                                        string InstanceOptionValue = HtmlController.getAddonOptionStringValue(SrcOptionName, addonOptionString);
                                                                         //InstanceOptionValue = core.csv_GetAddonOption(SrcOptionName, AddonOptionString)
                                                                         string ResultOptionSelector = core.html.getAddonSelector(SrcOptionName, genericController.encodeNvaArgument(InstanceOptionValue), SrcOptionSelector);
                                                                         //ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
@@ -457,7 +457,7 @@ namespace Contensive.Processor.Controllers {
                                                                 }
                                                             }
                                                             string ACNameCaption = genericController.vbReplace(ACName, "\"", "");
-                                                            ACNameCaption = htmlController.encodeHtml(ACNameCaption);
+                                                            ACNameCaption = HtmlController.encodeHtml(ACNameCaption);
                                                             string IDControlString = "AC," + ACType + "," + NotUsedID + "," + genericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
                                                             Copy = AddonController.getAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0);
                                                         } else if (EncodeNonCachableTags) {
@@ -539,7 +539,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     string fieldName = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"));
                                                     if (string.IsNullOrEmpty(fieldName)) {
-                                                        fieldName = htmlController.getAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"));
+                                                        fieldName = HtmlController.getAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"));
                                                     }
                                                     string fieldNameInitialCaps = genericController.encodeInitialCaps(fieldName);
                                                     if (string.IsNullOrEmpty(fieldNameInitialCaps)) {
@@ -572,7 +572,7 @@ namespace Contensive.Processor.Controllers {
                                                     } else if (EncodeNonCachableTags) {
                                                         if (personalizationPeopleId != 0) {
                                                             if (genericController.vbUCase(fieldNameInitialCaps) == "EID") {
-                                                                Copy = securityController.encodeToken(core, personalizationPeopleId, DateTime.Now);
+                                                                Copy = SecurityController.encodeToken(core, personalizationPeopleId, DateTime.Now);
                                                             } else {
                                                                 if (!core.db.csOk(csPeople)) {
                                                                     csPeople = core.db.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
@@ -764,7 +764,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // ----- Create Template Content
                                                     AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                    addonOptionString = htmlController.decodeHtml(AddonOptionStringHTMLEncoded);
+                                                    addonOptionString = HtmlController.decodeHtml(AddonOptionStringHTMLEncoded);
                                                     NotUsedID = 0;
                                                     if (encodeForWysiwygEditor) {
                                                         //
@@ -776,8 +776,8 @@ namespace Contensive.Processor.Controllers {
                                                     } else if (EncodeNonCachableTags) {
                                                         //
                                                         // Add in the Content Page
-                                                        string NewName = htmlController.getAddonOptionStringValue("new", addonOptionString);
-                                                        string TextName = htmlController.getAddonOptionStringValue("name", addonOptionString);
+                                                        string NewName = HtmlController.getAddonOptionStringValue("new", addonOptionString);
+                                                        string TextName = HtmlController.getAddonOptionStringValue("name", addonOptionString);
                                                         if (string.IsNullOrEmpty(TextName)) {
                                                             TextName = "Default";
                                                         }
@@ -789,7 +789,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // ----- Formatting Tag
                                                     AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                    addonOptionString = htmlController.decodeHtml(AddonOptionStringHTMLEncoded);
+                                                    addonOptionString = HtmlController.decodeHtml(AddonOptionStringHTMLEncoded);
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
@@ -959,7 +959,7 @@ namespace Contensive.Processor.Controllers {
                                                     ElementText = genericController.vbReplace(ElementText, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
                                                     ImageSrcOriginal = genericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
                                                 }
-                                                ImageSrc = htmlController.decodeHtml(ImageSrcOriginal);
+                                                ImageSrc = HtmlController.decodeHtml(ImageSrcOriginal);
                                                 ImageSrc = decodeURL(ImageSrc);
                                                 //
                                                 // problem with this case is if the addon icon image is from another site.
@@ -1035,7 +1035,7 @@ namespace Contensive.Processor.Controllers {
                                                                         RecordID = genericController.encodeInteger(ACInstanceName);
                                                                         ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH");
                                                                         ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT");
-                                                                        ImageAlt = htmlController.encodeHtml(DHTML.ElementAttribute(ElementPointer, "Alt"));
+                                                                        ImageAlt = HtmlController.encodeHtml(DHTML.ElementAttribute(ElementPointer, "Alt"));
                                                                         ImageVSpace = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"));
                                                                         ImageHSpace = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"));
                                                                         ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align");
@@ -1119,14 +1119,14 @@ namespace Contensive.Processor.Controllers {
                                                                         // I find it VERY odd that this could be the case
                                                                         //
                                                                         QSHTMLEncoded = genericController.encodeText(ACQueryString);
-                                                                        QueryString = htmlController.decodeHtml(QSHTMLEncoded);
+                                                                        QueryString = HtmlController.decodeHtml(QSHTMLEncoded);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
                                                                             Pos = genericController.vbInstr(1, QSSplit[QSPtr], "[");
                                                                             if (Pos > 0) {
                                                                                 QSSplit[QSPtr] = QSSplit[QSPtr].Left(Pos - 1);
                                                                             }
-                                                                            QSSplit[QSPtr] = htmlController.encodeHtml(QSSplit[QSPtr]);
+                                                                            QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
                                                                     }
@@ -1149,7 +1149,7 @@ namespace Contensive.Processor.Controllers {
                                                                         QueryString = genericController.encodeText(ImageIDArray[4]);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = htmlController.encodeHtml(QSSplit[QSPtr]);
+                                                                            QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
 
@@ -1163,10 +1163,10 @@ namespace Contensive.Processor.Controllers {
                                                                     QueryString = "";
                                                                     if (ImageIDArrayCount > 4) {
                                                                         QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                        QueryString = htmlController.decodeHtml(QueryString);
+                                                                        QueryString = HtmlController.decodeHtml(QueryString);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = htmlController.encodeHtml(QSSplit[QSPtr]);
+                                                                            QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
                                                                     }
@@ -1179,10 +1179,10 @@ namespace Contensive.Processor.Controllers {
                                                                     QueryString = "";
                                                                     if (ImageIDArrayCount > 4) {
                                                                         QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                        QueryString = htmlController.decodeHtml(QueryString);
+                                                                        QueryString = HtmlController.decodeHtml(QueryString);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = htmlController.encodeHtml(QSSplit[QSPtr]);
+                                                                            QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
                                                                     }
@@ -1195,10 +1195,10 @@ namespace Contensive.Processor.Controllers {
                                                                     QueryString = "";
                                                                     if (ImageIDArrayCount > 4) {
                                                                         QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                        QueryString = htmlController.decodeHtml(QueryString);
+                                                                        QueryString = HtmlController.decodeHtml(QueryString);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = htmlController.encodeHtml(QSSplit[QSPtr]);
+                                                                            QSSplit[QSPtr] = HtmlController.encodeHtml(QSSplit[QSPtr]);
                                                                         }
                                                                         QueryString = string.Join("&", QSSplit);
                                                                     }
@@ -1381,14 +1381,14 @@ namespace Contensive.Processor.Controllers {
                                                                                             NewImageFilename = ImageFilenameNoExt + "-" + ImageAltSize + "." + ImageFilenameExt;
                                                                                             // images included in email have spaces that must be converted to "%20" or they 404
                                                                                             imageNewLink = genericController.encodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename);
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, htmlController.encodeHtml(imageNewLink));
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(imageNewLink));
                                                                                         } else if ((RecordWidth < ImageWidth) || (RecordHeight < ImageHeight)) {
                                                                                             //
                                                                                             // OK
                                                                                             // reize image larger then original - go with it as is
                                                                                             //
                                                                                             // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, htmlController.encodeHtml(genericController.encodeURL(genericController.getCdnFileLink(core, RecordVirtualFilename))));
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(genericController.encodeURL(genericController.getCdnFileLink(core, RecordVirtualFilename))));
                                                                                         } else {
                                                                                             //
                                                                                             // resized image - create NewImageFilename (and add new alt size to the record)
@@ -1474,12 +1474,12 @@ namespace Contensive.Processor.Controllers {
                                                                                                 }
                                                                                                 //
                                                                                                 // Change the image src to the AltSize
-                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, htmlController.encodeHtml(genericController.encodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename)));
+                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(genericController.encodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename)));
                                                                                             }
                                                                                         }
                                                                                     }
+                                                                                    file.save(core);
                                                                                 }
-                                                                                file.save(core);
                                                                             }
                                                                         }
                                                                     }
@@ -1611,7 +1611,7 @@ namespace Contensive.Processor.Controllers {
                                             addonOptionString = "";
                                         } else {
                                             addonOptionString = AcCmdSplit[1];
-                                            addonOptionString = htmlController.decodeHtml(addonOptionString);
+                                            addonOptionString = HtmlController.decodeHtml(addonOptionString);
                                         }
                                         //
                                         // execute the command
@@ -1634,7 +1634,7 @@ namespace Contensive.Processor.Controllers {
                                                     instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString),
                                                     errorContextMessage = "rendering a dynamic form found in active content"
                                                 };
-                                                addonModel addon = addonModel.create(core, addonGuidDynamicForm);
+                                                AddonModel addon = AddonModel.create(core, addonGuidDynamicForm);
                                                 result += core.addon.execute(addon, executeContext);
                                                 break;
                                             //case ACTypeChildList:
@@ -1724,7 +1724,7 @@ namespace Contensive.Processor.Controllers {
                                     if (ArgCnt > 1) {
                                         if (!string.IsNullOrEmpty(ArgSplit[1])) {
                                             addonOptionString = ArgSplit[1].Substring(1, ArgSplit[1].Length - 2);
-                                            addonOptionString = htmlController.decodeHtml(addonOptionString.Trim(' '));
+                                            addonOptionString = HtmlController.decodeHtml(addonOptionString.Trim(' '));
                                         }
                                         if (ArgCnt > 2) {
                                             if (!string.IsNullOrEmpty(ArgSplit[2])) {
@@ -1755,9 +1755,9 @@ namespace Contensive.Processor.Controllers {
                                         errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
                                     };
                                     if (!string.IsNullOrEmpty(AddonGuid)) {
-                                        Copy = core.addon.execute(Models.DbModels.addonModel.create(core, AddonGuid), executeContext);
+                                        Copy = core.addon.execute(Models.DbModels.AddonModel.create(core, AddonGuid), executeContext);
                                     } else {
-                                        Copy = core.addon.execute(Models.DbModels.addonModel.createByName(core, AddonName), executeContext);
+                                        Copy = core.addon.execute(Models.DbModels.AddonModel.createByName(core, AddonName), executeContext);
                                     }
                                 }
                             }
@@ -1797,13 +1797,13 @@ namespace Contensive.Processor.Controllers {
                     }
                     if (isEditingAnything) {
                         if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
-                            string Copy = adminUIController.getEditWrapper(core, "Aggregate Script", "##MARKER##");
+                            string Copy = AdminUIController.getEditWrapper(core, "Aggregate Script", "##MARKER##");
                             string[] Wrapper = genericController.stringSplit(Copy, "##MARKER##");
                             result = genericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
                             result = genericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
                         }
                         if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase) != -1) {
-                            string Copy = adminUIController.getEditWrapper(core, "Aggregate Replacement", "##MARKER##");
+                            string Copy = AdminUIController.getEditWrapper(core, "Aggregate Replacement", "##MARKER##");
                             string[] Wrapper = genericController.stringSplit(Copy, "##MARKER##");
                             result = genericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, 1);
                             result = genericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, 1);

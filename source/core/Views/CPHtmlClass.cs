@@ -55,37 +55,37 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string div(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("div", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("div", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string p(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("p", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("p", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string li(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("li", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("li", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string ul(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("ul", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("ul", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string ol(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("ol", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("ol", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string CheckBox(string HtmlName, bool HtmlValue = false, string HtmlClass = "", string HtmlId = "") {
-            return htmlController.checkbox(HtmlName, HtmlValue, HtmlId, false, HtmlClass);
+            return HtmlController.checkbox(HtmlName, HtmlValue, HtmlId, false, HtmlClass);
         }
         //
         // ====================================================================================================
@@ -98,46 +98,46 @@ namespace Contensive.Processor {
         //Inherits BaseClasses.CPHtmlBaseClass.CheckBox 
         public override string Form(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "", string ActionQueryString = "", string Method = "post") {
             if (Method.ToLower() == "get") {
-                return htmlController.form(core, InnerHtml, ActionQueryString, HtmlName, HtmlId, Method);
+                return HtmlController.form(core, InnerHtml, ActionQueryString, HtmlName, HtmlId, Method);
             } else {
-                return htmlController.formMultipart(core, InnerHtml, ActionQueryString, HtmlName, HtmlClass, HtmlId);
+                return HtmlController.formMultipart(core, InnerHtml, ActionQueryString, HtmlName, HtmlClass, HtmlId);
             }
         }
         //
         // ==========================================================================================
         //
         public override string h1(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h1", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("h1", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ==========================================================================================
         //
         public override string h2(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h2", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("h2", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ==========================================================================================
         //
         public override string h3(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h3", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("h3", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ==========================================================================================
         //
         public override string h4(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h4", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("h4", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ==========================================================================================
         //
         public override string h5(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h5", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("h5", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ====================================================================================================
         //
         public override string h6(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.genericBlockTag("h6", InnerHtml, HtmlClass, HtmlId, HtmlName);
+            return HtmlController.genericBlockTag("h6", InnerHtml, HtmlClass, HtmlId, HtmlName);
         }
         //
         // ==========================================================================================
@@ -170,7 +170,7 @@ namespace Contensive.Processor {
         //
         public override string SelectList(string HtmlName, string HtmlValue, string OptionList, string NoneCaption = "", string HtmlClass = "", string HtmlId = "") {
             string tempSelectList = null;
-            tempSelectList = htmlController.selectFromList( core, HtmlName, genericController.encodeInteger( HtmlValue ), OptionList.Split(','), NoneCaption, HtmlId);
+            tempSelectList = HtmlController.selectFromList( core, HtmlName, genericController.encodeInteger( HtmlValue ), OptionList.Split(','), NoneCaption, HtmlId);
             if (!string.IsNullOrEmpty(HtmlClass)) {
                 tempSelectList = tempSelectList.Replace("<select ", "<select class=\"" + HtmlClass + "\" ");
             }
@@ -196,13 +196,13 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass = "", string HtmlId = "") {
-            return htmlController.inputHidden(HtmlName, HtmlValue, HtmlId);
+            return HtmlController.inputHidden(HtmlName, HtmlValue, HtmlId);
         }
         //
         // ====================================================================================================
         //
         public override string InputDate(string HtmlName, string HtmlValue = "", string Width = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.inputDate(core, HtmlName, encodeDate(HtmlValue), Width, HtmlId, HtmlClass);
+            return HtmlController.inputDate(core, HtmlName, encodeDate(HtmlValue), Width, HtmlId, HtmlClass);
         }
         //
         // ====================================================================================================
@@ -214,7 +214,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string InputText(string HtmlName, string HtmlValue = "", string Height = "", string Width = "", bool IsPassword = false, string HtmlClass = "", string HtmlId = "") {
-            string returnValue = htmlController.inputText( core,HtmlName, HtmlValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), HtmlId, IsPassword, false, HtmlClass);
+            string returnValue = HtmlController.inputText( core,HtmlName, HtmlValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), HtmlId, IsPassword, false, HtmlClass);
             returnValue = returnValue.Replace(" SIZE=\"60\"", "");
             return returnValue;
         }
@@ -222,7 +222,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string InputTextExpandable(string HtmlName, string HtmlValue = "", int Rows = 0, string StyleWidth = "", bool ignore = false, string HtmlClass = "", string HtmlId = "") {
-            string result = htmlController.inputTextarea( core,HtmlName, HtmlValue, Rows, 20, HtmlId, ignore,false,HtmlClass);
+            string result = HtmlController.inputTextarea( core,HtmlName, HtmlValue, Rows, 20, HtmlId, ignore,false,HtmlClass);
             if (!string.IsNullOrEmpty(StyleWidth)) {
                 result = result.Replace(">", " style=\"width:" + StyleWidth + "\">");
             }
@@ -312,7 +312,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string Button(string HtmlName, string HtmlValue = "", string HtmlClass = "", string HtmlId = "") {
-            return htmlController.getHtmlInputSubmit(HtmlValue, HtmlName, HtmlId,"",false, HtmlClass);
+            return HtmlController.getHtmlInputSubmit(HtmlValue, HtmlName, HtmlId,"",false, HtmlClass);
         }
         //
         // ====================================================================================================

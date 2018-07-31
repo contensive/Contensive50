@@ -39,7 +39,7 @@ namespace Contensive.Addons.Primitives {
                             recipient.save(core);
                             //
                             // -- Email spam footer was clicked, clear the AllowBulkEmail field
-                            emailController.addToBlockList(core, recipientEmailToBlock);
+                            EmailController.addToBlockList(core, recipientEmailToBlock);
                             //
                             // -- log entry to track the result of this email drop
                             int emailDropId = core.docProperties.getInteger(rnEmailBlockRequestDropID);

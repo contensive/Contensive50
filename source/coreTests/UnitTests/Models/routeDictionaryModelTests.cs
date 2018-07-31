@@ -17,7 +17,7 @@ namespace Contensive.Processor.Tests.UnitTests.Models {
         public void Models_RouteDictionary_NoRoutes() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                cp.core.db.executeNonQuery("delete from " + addonModel.contentTableName);
+                cp.core.db.executeNonQuery("delete from " + AddonModel.contentTableName);
                 cp.core.db.executeNonQuery("delete from " + linkAliasModel.contentTableName);
                 cp.core.db.executeNonQuery("delete from " + linkForwardModel.contentTableName);
                 // act

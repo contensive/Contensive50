@@ -87,7 +87,7 @@ namespace Contensive.Processor.Models.DbModels {
             oldPageTemplateModel result = null;
             try {
                 if (recordId > 0) {
-                    string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId);
+                    string cacheName = Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, recordId);
                     result = core.cache.getObject<oldPageTemplateModel>(cacheName);
                     if (result == null) {
                         using (csController cs = new csController(core)) {
@@ -116,7 +116,7 @@ namespace Contensive.Processor.Models.DbModels {
             oldPageTemplateModel result = null;
             try {
                 if (!string.IsNullOrEmpty(recordGuid)) {
-                    string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", recordGuid);
+                    string cacheName = Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", recordGuid);
                     result = core.cache.getObject<oldPageTemplateModel>(cacheName);
                     if (result == null) {
                         using (csController cs = new csController(core)) {
@@ -171,13 +171,13 @@ namespace Contensive.Processor.Models.DbModels {
             oldPageTemplateModel result = null;
             try {
                 if (!string.IsNullOrEmpty(recordName)) {
-                    string nameKey = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "name", recordName);
+                    string nameKey = Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "name", recordName);
                     result = core.cache.getObject<oldPageTemplateModel>(nameKey);
                     if (result == null) {
                         using (csController cs = new csController(core)) {
                             if (cs.open(primaryContentName, "(name=" + core.db.encodeSQLText(recordName) + ")", "id")) {
                                 result = loadRecord(core, cs, ref callersCacheNameList);
-                                string primaryKey = cacheController.getCacheKey_Entity(primaryContentTableName, result.ID);
+                                string primaryKey = CacheController.getCacheKey_Entity(primaryContentTableName, result.ID);
                                 core.cache.setObject(primaryKey, result);
                                 core.cache.setAlias(nameKey, primaryKey);
                             }
@@ -239,11 +239,11 @@ namespace Contensive.Processor.Models.DbModels {
                         // -- set primary cache to the object created
                         // -- set secondary caches to the primary cache
                         // -- add all cachenames to the injected cachenamelist
-                        string key = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", result.ID.ToString());
+                        string key = Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "id", result.ID.ToString());
                         callersCacheNameList.Add(key);
                         core.cache.setObject(key, result);
                         //
-                        string pointerKey = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", result.ccGuid);
+                        string pointerKey = Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", result.ccGuid);
                         callersCacheNameList.Add(pointerKey);
                         core.cache.setAlias(pointerKey, key);
                         //
@@ -325,7 +325,7 @@ namespace Contensive.Processor.Models.DbModels {
                 //
                 // -- object is here, but the cache was invalidated, setting
                 // -- added tablename as depedant object - any change to any template flushes this cache
-                core.cache.setObject(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.ID.ToString()), this, primaryContentTableName);
+                core.cache.setObject(Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "id", this.ID.ToString()), this, primaryContentTableName);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -344,7 +344,7 @@ namespace Contensive.Processor.Models.DbModels {
             try {
                 if (recordId > 0) {
                     core.db.deleteContentRecords(primaryContentName, "id=" + recordId.ToString());
-                    core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
+                    core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, recordId));
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -437,10 +437,10 @@ namespace Contensive.Processor.Models.DbModels {
         /// <param name="core"></param>
         /// <param name="recordId"></param>
         public static void invalidatePrimaryCache(CoreController core, int recordId) {
-            core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
+            core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, recordId));
             //
             // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-            core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
+            core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
         }
         //
         //====================================================================================================

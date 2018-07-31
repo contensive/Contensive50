@@ -39,7 +39,7 @@ namespace Contensive.Addons.Tools {
             CoreController core = cp.core;
             try {
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                Stream.Add(adminUIController.getToolFormTitle("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));
+                Stream.Add(AdminUIController.getToolFormTitle("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));
                 //
                 // process form
                 string button = cp.Doc.GetText("button");
@@ -51,11 +51,11 @@ namespace Contensive.Addons.Tools {
                 //
                 // display form
                 bool isEmptyList = false;
-                Stream.Add(adminUIController.getToolFormInputRow(core, "Caption", adminUIController.getDefaultEditor_LookupContent(core, "countryId", countryId, Processor.Models.Complex.cdefModel.getContentId(core, "countries"), ref isEmptyList)));
-                Stream.Add(adminUIController.getToolFormInputRow(core, "Caption", adminUIController.getDefaultEditor_Text(core, "PageSize", PageSize.ToString())));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_LookupContent(core, "countryId", countryId, Processor.Models.Complex.cdefModel.getContentId(core, "countries"), ref isEmptyList)));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_Text(core, "PageSize", PageSize.ToString())));
                 //
                 // -- assemble form
-                returnHtml = adminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonRun);
+                returnHtml = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonRun);
 
             } catch (Exception) {
                 throw;

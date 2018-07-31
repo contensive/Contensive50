@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
-    public class menuFlyoutController {
+    public class MenuFlyoutController {
         //
         //==============================================================================
         //
@@ -67,7 +67,7 @@ namespace Contensive.Processor.Controllers {
         /// constructor
         /// </summary>
         /// <remarks></remarks>
-        public menuFlyoutController(CoreController core) : base() {
+        public MenuFlyoutController(CoreController core) : base() {
             this.core = core;
             //
             EntryIndexName = new keyPtrController();
@@ -323,7 +323,7 @@ namespace Contensive.Processor.Controllers {
                                 break;
                         }
                         //
-                        Link = htmlController.encodeHtml(iEntry[EntryPointer].Link);
+                        Link = HtmlController.encodeHtml(iEntry[EntryPointer].Link);
                         if (!string.IsNullOrEmpty(iEntry[EntryPointer].Image)) {
                             //
                             // Create hotspot from image
@@ -494,7 +494,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // ----- Link but no child panel
                                     //
-                                    PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" href=\"" + htmlController.encodeHtml(iEntry[EntryPointer].Link) + "\"" + target + " onmouseover=\"ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" + StyleSheetPrefix + "');\">" + HotSpotHTML + "</a>";
+                                    PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" href=\"" + HtmlController.encodeHtml(iEntry[EntryPointer].Link) + "\"" + target + " onmouseover=\"ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" + StyleSheetPrefix + "');\">" + HotSpotHTML + "</a>";
                                 }
                             } else {
                                 if (string.IsNullOrEmpty(iEntry[EntryPointer].Link)) {
@@ -511,9 +511,9 @@ namespace Contensive.Processor.Controllers {
                                     // ----- Child Panel and a link
                                     //
                                     if (FlyoutHover) {
-                                        PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" onmouseover=\"ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" + MenuFlyoutNamePrefix + "_" + iEntry[EntryPointer].Name + "','" + StyleSheetPrefix + "');\" onmouseout=\"ccFlyoutHoverMode(0);\" href=\"" + htmlController.encodeHtml(iEntry[EntryPointer].Link) + "\"" + target + ">" + HotSpotHTML + MenuFlyoutIcon_Local + "</a>";
+                                        PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" onmouseover=\"ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" + MenuFlyoutNamePrefix + "_" + iEntry[EntryPointer].Name + "','" + StyleSheetPrefix + "');\" onmouseout=\"ccFlyoutHoverMode(0);\" href=\"" + HtmlController.encodeHtml(iEntry[EntryPointer].Link) + "\"" + target + ">" + HotSpotHTML + MenuFlyoutIcon_Local + "</a>";
                                     } else {
-                                        PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" onmouseover=\"ccFlyoutPanelButtonHover(event,'" + MenuFlyoutNamePrefix + "_" + iEntry[EntryPointer].Name + "','" + StyleSheetPrefix + "');\" href=\"" + htmlController.encodeHtml(iEntry[EntryPointer].Link) + "\"" + target + ">" + HotSpotHTML + MenuFlyoutIcon_Local + "</a>";
+                                        PanelButtons = PanelButtons + "<a class=\"" + PanelButtonStyle + "\" onmouseover=\"ccFlyoutPanelButtonHover(event,'" + MenuFlyoutNamePrefix + "_" + iEntry[EntryPointer].Name + "','" + StyleSheetPrefix + "');\" href=\"" + HtmlController.encodeHtml(iEntry[EntryPointer].Link) + "\"" + target + ">" + HotSpotHTML + MenuFlyoutIcon_Local + "</a>";
                                     }
                                 }
                             }

@@ -24,7 +24,7 @@ namespace Contensive.Processor.Models.Context {
     //   saveObject( cp ) - saves instance properties, returns the record id
     //
     [Serializable()]
-    public class appConfigModel {
+    public class AppConfigModel {
         /// <summary>
         /// name for the app. Must be unique within the server group. Difficulate to change later.
         /// </summary>
@@ -123,7 +123,7 @@ namespace Contensive.Processor.Models.Context {
         /// <summary>
         /// Create an empty object. needed for deserialization. Use newModel() method as constructor, includes cache
         /// </summary>
-        public appConfigModel() { }
+        public AppConfigModel() { }
         //
         //====================================================================================================
         /// <summary>
@@ -131,8 +131,8 @@ namespace Contensive.Processor.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static appConfigModel getObject(CoreController core, serverConfigModel serverConfig, string appName) {
-            appConfigModel returnModel = null;
+        public static AppConfigModel getObject(CoreController core, ServerConfigModel serverConfig, string appName) {
+            AppConfigModel returnModel = null;
             try {
                 if (!string.IsNullOrEmpty(appName)) {
                     if (!serverConfig.apps.ContainsKey(appName.ToLower())) {

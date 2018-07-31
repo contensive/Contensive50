@@ -107,10 +107,10 @@ namespace Contensive.Processor.Controllers {
                         EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
                     } else {
                         Copy = core.db.csGet(CSPointer, strFieldName);
-                        EditorPanel = EditorPanel + htmlController.inputHidden("Type", FormTypeActiveEditor);
-                        EditorPanel = EditorPanel + htmlController.inputHidden("cid", ContentID);
-                        EditorPanel = EditorPanel + htmlController.inputHidden("ID", intRecordId);
-                        EditorPanel = EditorPanel + htmlController.inputHidden("fn", strFieldName);
+                        EditorPanel = EditorPanel + HtmlController.inputHidden("Type", FormTypeActiveEditor);
+                        EditorPanel = EditorPanel + HtmlController.inputHidden("cid", ContentID);
+                        EditorPanel = EditorPanel + HtmlController.inputHidden("ID", intRecordId);
+                        EditorPanel = EditorPanel + HtmlController.inputHidden("fn", strFieldName);
                         EditorPanel = EditorPanel + genericController.encodeText(FormElements);
                         EditorPanel = EditorPanel + core.html.getFormInputHTML("ContentCopy", Copy, "3", "45", false, true);
                         //EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
@@ -122,7 +122,7 @@ namespace Contensive.Processor.Controllers {
             }
             Stream = Stream + core.html.getPanelHeader("Contensive Active Content Editor");
             Stream = Stream + core.html.getPanel(EditorPanel);
-            Stream = htmlController.form(core, Stream );
+            Stream = HtmlController.form(core, Stream );
             return Stream;
         }
         //

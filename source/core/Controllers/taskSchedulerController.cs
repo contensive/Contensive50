@@ -123,11 +123,11 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // -- run tasks for each app
-                foreach (KeyValuePair<string, Models.Context.appConfigModel> appKvp in coreServer.serverConfig.apps) {
+                foreach (KeyValuePair<string, Models.Context.AppConfigModel> appKvp in coreServer.serverConfig.apps) {
                     logController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
                     using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
                         CoreController coreApp = cpApp.core;
-                        if (!(coreApp.appConfig.appStatus == appConfigModel.appStatusEnum.ok)) {
+                        if (!(coreApp.appConfig.appStatus == AppConfigModel.appStatusEnum.ok)) {
                             //
                             logController.logTrace(coreApp, "scheduleTasks, app status not ok");
                         //} else if (!(coreApp.appConfig.appMode == appConfigModel.appModeEnum.normal)) {

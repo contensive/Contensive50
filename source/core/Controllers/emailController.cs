@@ -11,7 +11,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// manage email send and receive
     /// </summary>
-    public class emailController {
+    public class EmailController {
         //
         private const string emailBlockListFilename = "Config\\SMTPBlockList.txt";
         //
@@ -56,7 +56,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static bool verifyEmail(CoreController core, emailClass email, ref string returnUserWarning) {
+        public static bool verifyEmail(CoreController core, EmailClass email, ref string returnUserWarning) {
             bool result = false;
             try {
                 if (!verifyEmailAddress(core, email.toAddress)) {
@@ -185,7 +185,7 @@ namespace Contensive.Processor.Controllers {
                             + "<body class=\"ccBodyEmail\">" + htmlBody + "</body>"
                             + "</html>";
                     }
-                    queueEmail(core, isImmediate, new emailClass() {
+                    queueEmail(core, isImmediate, new EmailClass() {
                         attempts = 0,
                         BounceAddress = bounceAddress,
                         fromAddress = fromAddress,
@@ -265,7 +265,7 @@ namespace Contensive.Processor.Controllers {
                             + "<body class=\"ccBodyEmail\">" + htmlBody + "</body>"
                             + "</html>";
                     }
-                    var email = new emailClass() {
+                    var email = new EmailClass() {
                         attempts = 0,
                         BounceAddress = bounceAddress,
                         emailId = 0,
@@ -356,7 +356,7 @@ namespace Contensive.Processor.Controllers {
                         // This field is default true, and non-authorable
                         // It will be true in all cases, except a possible unforseen exception
                         //
-                        EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + htmlController.encodeHtml("http://" + core.appConfig.domainList[0] + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                        EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml("http://" + core.appConfig.domainList[0] + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                     }
                     //
                     // --- Send message to the additional member
@@ -501,7 +501,7 @@ namespace Contensive.Processor.Controllers {
                         // This field is default true, and non-authorable
                         // It will be true in all cases, except a possible unforseen exception
                         //
-                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + htmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                         EmailBody = genericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress");
                     }
                     //
@@ -678,7 +678,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// add email to the email queue
         /// </summary>
-        private static void queueEmail(CoreController core, bool immediate, emailClass email) {
+        private static void queueEmail(CoreController core, bool immediate, EmailClass email) {
             try {
                 var record = emailQueueModel.add(core);
                 record.immediate = immediate;
@@ -701,7 +701,7 @@ namespace Contensive.Processor.Controllers {
                 List<emailQueueModel> queue = emailQueueModel.createList(core, "", "immediate,id desc");
                 foreach (emailQueueModel queueRecord in queue) {
                     emailQueueModel.delete(core, queueRecord.id);
-                    emailClass email = Newtonsoft.Json.JsonConvert.DeserializeObject<emailClass>(queueRecord.content);
+                    EmailClass email = Newtonsoft.Json.JsonConvert.DeserializeObject<EmailClass>(queueRecord.content);
                     string reasonForFail = "";
                     if (smtpController.sendSmtp(core, email, ref reasonForFail)) {
                         //
@@ -760,7 +760,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// object for email queue serialization
         /// </summary>
-        public class emailClass {
+        public class EmailClass {
             public string toAddress;
             public string fromAddress;
             public string BounceAddress;

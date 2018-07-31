@@ -193,7 +193,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         Console.WriteLine(message);
                         //
-                        fileController fileSystem = null;
+                        FileController fileSystem = null;
                         if (core.serverConfig != null) {
                             if (core.appConfig != null) {
                                 //

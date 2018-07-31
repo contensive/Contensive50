@@ -100,9 +100,9 @@ namespace Contensive.Processor.Controllers {
                     // -- create the action query
                     string QueryString = genericController.modifyQueryString(core.webServer.requestQueryString, RequestNameHardCodedPage, "", false);
                     QueryString = genericController.modifyQueryString(QueryString, "requestbinary", "", false);
-                    loginForm += htmlController.inputHidden("Type", FormTypeLogin);
-                    loginForm += htmlController.inputHidden("email", core.session.user.Email);
-                    result = htmlController.form(core, loginForm, QueryString);
+                    loginForm += HtmlController.inputHidden("Type", FormTypeLogin);
+                    loginForm += HtmlController.inputHidden("email", core.session.user.Email);
+                    result = HtmlController.form(core, loginForm, QueryString);
                     //string Panel = errorController.getUserError(core) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
                     //
                     // ----- Password Form
@@ -110,7 +110,7 @@ namespace Contensive.Processor.Controllers {
                         result += getSendPasswordForm(core);
                     }
                     //
-                    result = htmlController.div(result, "ccLoginFormCon"); 
+                    result = HtmlController.div(result, "ccLoginFormCon"); 
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -133,7 +133,7 @@ namespace Contensive.Processor.Controllers {
                     if (loginAddonID != 0) {
                         //
                         // -- Custom Login
-                        addonModel addon = addonModel.create(core, loginAddonID);
+                        AddonModel addon = AddonModel.create(core, loginAddonID);
                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                             errorContextMessage = "calling login form addon [" + loginAddonID + "] from internal method"
@@ -179,7 +179,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // write out all of the form input (except state) to hidden fields so they can be read after login
                     returnResult = ""
-                    + returnResult + htmlController.inputHidden("Type", FormTypeSendPassword) + "";
+                    + returnResult + HtmlController.inputHidden("Type", FormTypeSendPassword) + "";
                     foreach (string key in core.docProperties.getKeyList()) {
                         var tempVar = core.docProperties.getProperty(key);
                         if (tempVar.IsForm) {
@@ -192,7 +192,7 @@ namespace Contensive.Processor.Controllers {
                                 case "EMAIL":
                                     break;
                                 default:
-                                    returnResult = returnResult + htmlController.inputHidden(tempVar.Name, tempVar.Value);
+                                    returnResult = returnResult + HtmlController.inputHidden(tempVar.Name, tempVar.Value);
                                     break;
                             }
                         }
@@ -200,7 +200,7 @@ namespace Contensive.Processor.Controllers {
                     QueryString = core.doc.refreshQueryString;
                     QueryString = genericController.modifyQueryString(QueryString, "S", "");
                     QueryString = genericController.modifyQueryString(QueryString, "ccIPage", "");
-                    returnResult = htmlController.form( core,returnResult,QueryString);
+                    returnResult = HtmlController.form( core,returnResult,QueryString);
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -318,7 +318,7 @@ namespace Contensive.Processor.Controllers {
                         if (true) {
                             sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + core.db.encodeSQLDate(DateTime.Now) + "))";
                         }
-                        CS = core.db.csOpen("People", sqlCriteria, "ID", SelectFieldList: "username,password", PageSize: 1);
+                        CS = core.db.csOpen("People", sqlCriteria, "ID", sqlSelectFieldList: "username,password", PageSize: 1);
                         if (!core.db.csOk(CS)) {
                             //
                             // valid login account for this email not found
@@ -446,7 +446,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (result) {
                     string sendStatus = "";
-                    emailController.queueAdHocEmail(core, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
+                    EmailController.queueAdHocEmail(core, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);

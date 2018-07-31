@@ -54,9 +54,9 @@ namespace Contensive.Addons.Tools {
                     // Not Admin Error
                     //
                     ButtonList = ButtonCancel;
-                    Content.Add(adminUIController.GetFormBodyAdminOnly());
+                    Content.Add(AdminUIController.getFormBodyAdminOnly());
                 } else {
-                    Content.Add(adminUIController.EditTableOpen);
+                    Content.Add(AdminUIController.editTableOpen);
                     //
                     // Process Requests
                     //
@@ -102,9 +102,9 @@ namespace Contensive.Addons.Tools {
                     //
                     // KeywordList
                     //
-                    Copy = htmlController.inputTextarea(core, "KeywordList", "", 10);
+                    Copy = HtmlController.inputTextarea(core, "KeywordList", "", 10);
                     Copy += "<div>Paste your Meta Keywords into this text box, separated by either commas or enter keys. When you hit Save or OK, Meta Keyword records will be made out of each word. These can then be checked on any content page.</div>";
-                    Content.Add(adminUIController.getEditRowLegacy(core, Copy, "Paste Meta Keywords", "", false, false, ""));
+                    Content.Add(AdminUIController.getEditRowLegacy(core, Copy, "Paste Meta Keywords", "", false, false, ""));
                     //
                     // Buttons
                     //
@@ -112,12 +112,12 @@ namespace Contensive.Addons.Tools {
                     //
                     // Close Tables
                     //
-                    Content.Add(adminUIController.EditTableClose);
-                    Content.Add(htmlController.inputHidden(rnAdminSourceForm, AdminFormSecurityControl));
+                    Content.Add(AdminUIController.editTableClose);
+                    Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormSecurityControl));
                 }
                 //
                 Description = "Use this tool to enter multiple Meta Keywords";
-                tempGetForm_MetaKeywordTool = adminUIController.getBody(core, "Meta Keyword Entry Tool", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                tempGetForm_MetaKeywordTool = AdminUIController.getBody(core, "Meta Keyword Entry Tool", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
                 //
                 ///Dim th as integer: Exit Function

@@ -130,7 +130,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result += "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:10px;\">Name</td>"
-                    + cr2 + "<td class=\"qeRow qeRight\">" + htmlController.inputText(core, "name", core.doc.pageController.page.name, 1, 0, "", false, readOnlyField) + "</td>"
+                    + cr2 + "<td class=\"qeRow qeRight\">" + HtmlController.inputText(core, "name", core.doc.pageController.page.name, 1, 0, "", false, readOnlyField) + "</td>"
                     + "\r</tr>"
                     + "";
                 string PageList = null;
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Child pages
                 //
-                addonModel addon = addonModel.create(core, addonGuidChildList);
+                AddonModel addon = AddonModel.create(core, addonGuidChildList);
                 CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
                     hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
@@ -189,10 +189,10 @@ namespace Contensive.Processor.Controllers {
                 // Form Wrapper
                 //
                 result += ""
-                    + htmlController.inputHidden("Type", FormTypePageAuthoring)
-                    + htmlController.inputHidden("ID", core.doc.pageController.page.id)
-                    + htmlController.inputHidden("ContentName", pageContentModel.contentName);
-                result = htmlController.formMultipart(core, result, core.webServer.requestQueryString, "", "ccForm");
+                    + HtmlController.inputHidden("Type", FormTypePageAuthoring)
+                    + HtmlController.inputHidden("ID", core.doc.pageController.page.id)
+                    + HtmlController.inputHidden("ContentName", pageContentModel.contentName);
+                result = HtmlController.formMultipart(core, result, core.webServer.requestQueryString, "", "ccForm");
                 result = "<div class=\"ccCon\">" + result + "</div>";
             } catch (Exception ex) {
                 logController.handleError(core, ex);

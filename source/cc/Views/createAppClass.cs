@@ -35,7 +35,7 @@ namespace Contensive.CLI {
                     //
                     // -- create app
                     Console.Write("\n\nCreate application within the server group [" + cp.core.serverConfig.name + "].");
-                    appConfigModel appConfig = new appConfigModel();
+                    AppConfigModel appConfig = new AppConfigModel();
                     //
                     // -- app name
                     bool appNameOk = false;
@@ -196,11 +196,11 @@ namespace Contensive.CLI {
                     //
                     // -- save the app configuration and reload the server using this app
                     Contensive.Processor.Controllers.logController.logInfo(cp.core, "Save app configuration.");
-                    appConfig.appStatus = appConfigModel.appStatusEnum.maintenance;
+                    appConfig.appStatus = AppConfigModel.appStatusEnum.maintenance;
                     cp.core.serverConfig.apps.Add(appName, appConfig);
                     cp.core.serverConfig.saveObject(cp.core);
-                    cp.core.serverConfig = serverConfigModel.getObject(cp.core);
-                    cp.core.appConfig = appConfigModel.getObject(cp.core, cp.core.serverConfig, appName);
+                    cp.core.serverConfig = ServerConfigModel.getObject(cp.core);
+                    cp.core.appConfig = AppConfigModel.getObject(cp.core, cp.core.serverConfig, appName);
                     // 
                     // update local host file
                     //
@@ -238,7 +238,7 @@ namespace Contensive.CLI {
                 //
                 using (CPClass cp = new CPClass(appName)) {
                     Contensive.Processor.Controllers.logController.logInfo(cp.core, "Verify website.");
-                    Processor.Controllers.IisController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
+                    Processor.Controllers.WebServerController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
                     //
                     Contensive.Processor.Controllers.logController.logInfo(cp.core, "Run db upgrade.");
                     Processor.Controllers.appBuilderController.upgrade(cp.core, true, true);

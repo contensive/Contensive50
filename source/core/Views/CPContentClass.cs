@@ -57,7 +57,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetAddLink(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
-            return adminUIController.getRecordAddLink2(core, ContentName, PresetNameValueList, AllowPaste, IsEditing);
+            return AdminUIController.getRecordAddLink2(core, ContentName, PresetNameValueList, AllowPaste, IsEditing);
         }
         //
         //====================================================================================================
@@ -93,7 +93,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetEditLink(string ContentName, string RecordID, bool AllowCut, string RecordName, bool IsEditing) {
-            return adminUIController.getRecordEditLink(core,ContentName, genericController.encodeInteger(RecordID), AllowCut, RecordName, IsEditing);
+            return AdminUIController.getRecordEditLink(core,ContentName, genericController.encodeInteger(RecordID), AllowCut, RecordName, IsEditing);
         }
         //
         //====================================================================================================
@@ -330,7 +330,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetListLink(string ContentName) {
-            return adminUIController.getIconEditAdminLink(core, Models.Complex.cdefModel.getCdef(core, ContentName));
+            return AdminUIController.getIconEditAdminLink(core, Models.Complex.cdefModel.getCdef(core, ContentName));
         }
         //
         //====================================================================================================

@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
-    public class workflowController : IDisposable {
+    public class WorkflowController : IDisposable {
         //
         //------------------------------------------------------------------------------------------------------------------------
         // objects passed in that are not disposed
@@ -64,7 +64,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cluster"></param>
         /// <param name="appName"></param>
         /// <remarks></remarks>
-        public workflowController(CoreController core) : base() {
+        public WorkflowController(CoreController core) : base() {
             try {
                 //
                 this.core = core;
@@ -1152,7 +1152,7 @@ namespace Contensive.Processor.Controllers {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~workflowController() {
+        ~WorkflowController() {
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();

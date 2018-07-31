@@ -24,7 +24,7 @@ namespace Contensive.Processor.Models.Context {
     //   saveObject( cp ) - saves instance properties, returns the record id
     //
     [Serializable()]
-    public class serverConfigModel {
+    public class ServerConfigModel {
         //
         // -- public properties
         //
@@ -78,7 +78,7 @@ namespace Contensive.Processor.Models.Context {
         //Public appPattern As String
         //
         // -- List of all apps on this server
-        public Dictionary<string, appConfigModel> apps = new Dictionary<string, appConfigModel>();
+        public Dictionary<string, AppConfigModel> apps = new Dictionary<string, AppConfigModel>();
         //
         // -- the specific application in use for this instance (may be empty if this instance is not initialized
 //        [NonSerialized()]
@@ -127,7 +127,7 @@ namespace Contensive.Processor.Models.Context {
         /// <summary>
         /// Create an empty object. needed for deserialization. Use newModel() method as constructor, includes cache
         /// </summary>
-        public serverConfigModel() {
+        public ServerConfigModel() {
             //
         }
         //
@@ -137,8 +137,8 @@ namespace Contensive.Processor.Models.Context {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static serverConfigModel getObject(CoreController core) {
-            serverConfigModel returnModel = null;
+        public static ServerConfigModel getObject(CoreController core) {
+            ServerConfigModel returnModel = null;
             try {
                 System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
                 string JSONTemp;
@@ -150,12 +150,12 @@ namespace Contensive.Processor.Models.Context {
                     //
                     // for now it fails, maybe later let it autobuild a local cluster
                     //
-                    returnModel = new Models.Context.serverConfigModel();
+                    returnModel = new Models.Context.ServerConfigModel();
                     returnModel.allowTaskRunnerService = false;
                     returnModel.allowTaskSchedulerService = false;
                     core.programDataFiles.saveFile("config.json", json_serializer.Serialize(returnModel));
                 } else {
-                    returnModel = json_serializer.Deserialize<serverConfigModel>(JSONTemp);
+                    returnModel = json_serializer.Deserialize<ServerConfigModel>(JSONTemp);
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex, "exception in serverConfigModel.getObject");

@@ -123,12 +123,12 @@ namespace Contensive.Processor.Controllers {
                             //
                             // This tab is linked to a page
                             //
-                            TabLink = htmlController.encodeHtml(Tabs[TabPtr].Link);
+                            TabLink = HtmlController.encodeHtml(Tabs[TabPtr].Link);
                         } else {
                             //
                             // This tab has a visible body
                             //
-                            TabLink = htmlController.encodeHtml(Tabs[TabPtr].Link);
+                            TabLink = HtmlController.encodeHtml(Tabs[TabPtr].Link);
                             if (!FirstLiveBodyShown) {
                                 FirstLiveBodyShown = true;
                                 TabBody = TabBody + "<div style=\"visibility: visible; position: absolute; left: 0px;\" class=\"" + Tabs[TabPtr].StylePrefix + "Body\" id=\"" + TabID + "\"></div>";

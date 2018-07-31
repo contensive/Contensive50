@@ -65,7 +65,7 @@ namespace Contensive.CLI {
                                     } else {
                                         //
                                         // -- flush all apps
-                                        foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                        foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
                                             String housekeepAppName = kvp.Key;
                                             using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
                                                 cpApp.Cache.InvalidateAll();
@@ -108,7 +108,7 @@ namespace Contensive.CLI {
                                             Console.WriteLine("Collection was not found on the distribution server");
                                         } else {
                                             if (string.IsNullOrEmpty(appName)) {
-                                                foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                                foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
                                                     using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(kvp.Key)) {
                                                         string returnErrorMessage = "";
                                                         CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
@@ -141,7 +141,7 @@ namespace Contensive.CLI {
                                     } else {
                                         //
                                         // -- housekeep all apps
-                                        foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
+                                        foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
                                             String housekeepAppName = kvp.Key;
                                             using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
                                                 cpApp.Doc.SetProperty("force", "1");
@@ -206,8 +206,8 @@ namespace Contensive.CLI {
                                         Console.WriteLine("Logging:");
                                         Console.WriteLine("    enableLogging: " + cp.core.serverConfig.enableLogging.ToString());
                                         Console.WriteLine("Applications: " + cp.core.serverConfig.apps.Count);
-                                        foreach (KeyValuePair<string, appConfigModel> kvp in cp.core.serverConfig.apps) {
-                                            appConfigModel app = kvp.Value;
+                                        foreach (KeyValuePair<string, AppConfigModel> kvp in cp.core.serverConfig.apps) {
+                                            AppConfigModel app = kvp.Value;
                                             Console.WriteLine("    name: " + app.name);
                                             Console.WriteLine("        enabled: " + app.enabled);
                                             Console.WriteLine("        admin route: " + app.adminRoute);
@@ -409,7 +409,7 @@ namespace Contensive.CLI {
             } else {
                 //
                 // -- upgrade all apps
-                foreach (KeyValuePair<String, appConfigModel> kvp in cp.core.serverConfig.apps) {
+                foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
                     using (Contensive.Processor.CPClass upgradeApp = new Contensive.Processor.CPClass(kvp.Key)) {
                         Processor.Controllers.appBuilderController.upgrade(upgradeApp.core, false, repair);
                     }

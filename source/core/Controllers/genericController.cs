@@ -432,14 +432,14 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ApplicationStatus"></param>
         /// <returns></returns>
-        public static string GetApplicationStatusMessage(appConfigModel.appStatusEnum ApplicationStatus) {
+        public static string GetApplicationStatusMessage(AppConfigModel.appStatusEnum ApplicationStatus) {
             string tempGetApplicationStatusMessage = null;
 
             switch (ApplicationStatus) {
-                case appConfigModel.appStatusEnum.ok:
+                case AppConfigModel.appStatusEnum.ok:
                     tempGetApplicationStatusMessage = "Application OK";
                     break;
-                case appConfigModel.appStatusEnum.maintenance:
+                case AppConfigModel.appStatusEnum.maintenance:
                     tempGetApplicationStatusMessage = "Application building";
                     break;
                 default:
@@ -2357,7 +2357,7 @@ namespace Contensive.Processor.Controllers {
         public static string TextDeScramble(CoreController core, string Copy) {
             string result = "";
             try {
-                result = securityController.twoWayDecrypt(core, Copy);
+                result = SecurityController.twoWayDecrypt(core, Copy);
             } catch (Exception) {
                 //
                 if (!core.siteProperties.allowLegacyDescrambleFallback) {
@@ -2429,7 +2429,7 @@ namespace Contensive.Processor.Controllers {
         //=============================================================================
         // 
         public static string TextScramble(CoreController core, string Copy) {
-            return securityController.twoWayEncrypt(core, Copy);
+            return SecurityController.twoWayEncrypt(core, Copy);
         }
         //
         //====================================================================================================

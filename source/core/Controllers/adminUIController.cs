@@ -19,13 +19,13 @@ namespace Contensive.Processor {
     /// REFACTOR - add  try-catch
     /// not IDisposable - not contained classes that need to be disposed
     /// </summary>
-    public class adminUIController {
+    public class AdminUIController {
         //
         //====================================================================================================
         /// <summary>
         /// structure used in admin edit forms at the top
         /// </summary>
-        public class recordEditHeaderInfoClass {
+        public class RecordEditHeaderInfoClass {
             //public string description;
             public string recordName;
             public int recordId;
@@ -37,7 +37,7 @@ namespace Contensive.Processor {
             public int recordLockById;
         }
         //
-        public class editButtonBarInfoClass {
+        public class EditButtonBarInfoClass {
             public bool allowDelete = false;
             public bool allowCancel = false;
             public bool allowSave = false;
@@ -53,7 +53,7 @@ namespace Contensive.Processor {
             public bool allowDeactivate = false;
         }
         //
-        //========================================================================
+        //====================================================================================================
         /// <summary>
         /// admin filter methods (includes, equals, greaterthan, etc)
         /// </summary>
@@ -76,21 +76,21 @@ namespace Contensive.Processor {
         }
         //
         //
-        public class indexConfigSortClass {
+        public class IndexConfigSortClass {
             //Dim FieldPtr As Integer
             public string fieldName;
             public int direction; // 1=forward, 2=reverse, 0=ignore/remove this sort
             public int order; // 1...n, if multiple sorts, the order of the sort
         }
         //
-        public class indexConfigFindWordClass {
+        public class IndexConfigFindWordClass {
             public string Name;
             public string Value;
             public int Type;
             public FindWordMatchEnum MatchOption;
         }
         //
-        public class indexConfigColumnClass {
+        public class IndexConfigColumnClass {
             public string Name;
             //Public FieldId As Integer
             public int Width;
@@ -98,7 +98,7 @@ namespace Contensive.Processor {
             public int SortDirection;
         }
         //
-        public class indexConfigClass {
+        public class IndexConfigClass {
             public bool Loaded;
             public int ContentID;
             public int PageNumber;
@@ -106,7 +106,7 @@ namespace Contensive.Processor {
             public int RecordTop;
 
             //FindWordList As String
-            public Dictionary<string, indexConfigFindWordClass> FindWords = new Dictionary<string, indexConfigFindWordClass>();
+            public Dictionary<string, IndexConfigFindWordClass> FindWords = new Dictionary<string, IndexConfigFindWordClass>();
             //Public FindWordCnt As Integer
             public bool ActiveOnly;
             public bool LastEditedByMe;
@@ -115,17 +115,17 @@ namespace Contensive.Processor {
             public bool LastEditedPast30Days;
             public bool Open;
             //public SortCnt As Integer
-            public Dictionary<string, indexConfigSortClass> Sorts = new Dictionary<string, indexConfigSortClass>();
+            public Dictionary<string, IndexConfigSortClass> Sorts = new Dictionary<string, IndexConfigSortClass>();
             public int GroupListCnt;
             public string[] GroupList;
             //public ColumnCnt As Integer
-            public List<indexConfigColumnClass> columns = new List<indexConfigColumnClass>() { };
+            public List<IndexConfigColumnClass> columns = new List<IndexConfigColumnClass>() { };
             //public Dictionary<string, indexConfigColumnClass> Columns = new Dictionary<string, indexConfigColumnClass>();
             //SubCDefs() as integer
             //SubCDefCnt as integer
             public int SubCDefID;
         }
-        public class buttonMetadata {
+        public class ButtonMetadata {
             public string name = "button";
             public string value = "";
             public string classList = "";
@@ -136,15 +136,15 @@ namespace Contensive.Processor {
         /// <summary>
         /// Storage for current EditRecord, loaded in LoadEditRecord
         /// </summary>
-        public class editRecordFieldClass {
+        public class EditRecordFieldClass {
             public object dbValue;
             public object value;
         }
         /// <summary>
         /// 
         /// </summary>
-        public class editRecordClass {
-            public Dictionary<string, editRecordFieldClass> fieldsLc = new Dictionary<string, editRecordFieldClass>();
+        public class EditRecordClass {
+            public Dictionary<string, EditRecordFieldClass> fieldsLc = new Dictionary<string, EditRecordFieldClass>();
             /// <summary>
             /// ID field of edit record (Record to be edited)
             /// </summary>
@@ -211,7 +211,7 @@ namespace Contensive.Processor {
             public DateTime EditLockExpires; // Time when the edit lock expires
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         /// <summary>
         /// Title Bar
         /// </summary>
@@ -219,29 +219,29 @@ namespace Contensive.Processor {
         /// <param name="Title"></param>
         /// <param name="Description"></param>
         /// <returns></returns>
-        public static string GetTitleBar(CoreController core, string Title, string Description) {
+        public static string getTitleBar(CoreController core, string Title, string Description) {
             string result = "";
             try {
                 result = Title;
                 if (core.doc.debug_iUserError != "") {
-                    Description += htmlController.div( errorController.getUserError(core));
+                    Description += HtmlController.div( errorController.getUserError(core));
                 }
                 if (!string.IsNullOrEmpty(Description)) {
-                    result += htmlController.div(Description);
+                    result += HtmlController.div(Description);
                     //result += htmlController.div(Description, "ccAdminInfoBar ccPanel3DReverse");
                 }
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
-            result = htmlController.div(result, "ccAdminTitleBar");
+            result = HtmlController.div(result, "ccAdminTitleBar");
             return result;
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         /// <summary>
         /// Get the Normal Edit Button Bar String, used on Normal Edit and others
         /// </summary>
-        public static string getButtonBarForEdit(CoreController core, editButtonBarInfoClass info) {
+        public static string getButtonBarForEdit(CoreController core, EditButtonBarInfoClass info) {
             string buttonsLeft = "";
             string buttonsRight = "";
             try {
@@ -271,7 +271,7 @@ namespace Contensive.Processor {
             return getButtonBar(core, buttonsLeft, buttonsRight);
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         /// <summary>
         /// Return a panel header with the header message reversed out of the left
         /// </summary>
@@ -279,7 +279,7 @@ namespace Contensive.Processor {
         /// <param name="HeaderMessage"></param>
         /// <param name="RightSideMessage"></param>
         /// <returns></returns>
-        public static string GetHeader(CoreController core, string HeaderMessage, string RightSideMessage = "") {
+        public static string getHeader(CoreController core, string HeaderMessage, string RightSideMessage = "") {
             string s = "";
             try {
                 if (string.IsNullOrEmpty(RightSideMessage)) {
@@ -311,12 +311,11 @@ namespace Contensive.Processor {
             return s;
         }
         //
-        // ====================================================================================================
-        //
-        public static string getButtonsFromList(CoreController core, List<buttonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
+        //====================================================================================================
+        public static string getButtonsFromList(CoreController core, List<ButtonMetadata> ButtonList, bool AllowDelete, bool AllowAdd) {
             string s = "";
             try {
-                foreach (buttonMetadata button in ButtonList) {
+                foreach (ButtonMetadata button in ButtonList) {
 
                     if (button.isDelete) {
                         s += getButtonDanger(button.value, "if(!DeleteCheck()) return false;", !AllowDelete);
@@ -335,13 +334,12 @@ namespace Contensive.Processor {
             return s;
         }
         //
-        // ====================================================================================================
-        //
-        public static string GetButtonsFromList(CoreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
+        //====================================================================================================
+        public static string getButtonsFromList(CoreController core, string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
             return getButtonsFromList(core, buttonStringToButtonList(ButtonList), AllowDelete, AllowAdd);
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         /// <summary>
         /// Return a bootstrap button bar
         /// </summary>
@@ -358,7 +356,7 @@ namespace Contensive.Processor {
             }
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         /// <summary>
         /// get button bar for the index form
         /// </summary>
@@ -374,38 +372,37 @@ namespace Contensive.Processor {
             string result = "";
             string LeftButtons = "";
             string RightButtons = "";
-            LeftButtons = LeftButtons + adminUIController.getButtonPrimary(ButtonCancel);
-            LeftButtons += adminUIController.getButtonPrimary(ButtonRefresh);
+            LeftButtons = LeftButtons + AdminUIController.getButtonPrimary(ButtonCancel);
+            LeftButtons += AdminUIController.getButtonPrimary(ButtonRefresh);
             if (AllowAdd) {
-                LeftButtons += adminUIController.getButtonPrimary(ButtonAdd, "");
+                LeftButtons += AdminUIController.getButtonPrimary(ButtonAdd, "");
             } else {
-                LeftButtons += adminUIController.getButtonPrimary(ButtonAdd, "", true);
+                LeftButtons += AdminUIController.getButtonPrimary(ButtonAdd, "", true);
             }
             LeftButtons += "<span class=\"custom-divider-vertical\">&nbsp&nbsp&nbsp</span>";
             if (pageNumber == 1) {
-                LeftButtons += adminUIController.getButtonPrimary(ButtonFirst, "", true);
-                LeftButtons += adminUIController.getButtonPrimary(ButtonPrevious, "", true);
+                LeftButtons += AdminUIController.getButtonPrimary(ButtonFirst, "", true);
+                LeftButtons += AdminUIController.getButtonPrimary(ButtonPrevious, "", true);
             } else {
-                LeftButtons += adminUIController.getButtonPrimary(ButtonFirst);
-                LeftButtons += adminUIController.getButtonPrimary(ButtonPrevious);
+                LeftButtons += AdminUIController.getButtonPrimary(ButtonFirst);
+                LeftButtons += AdminUIController.getButtonPrimary(ButtonPrevious);
             }
             if (recordCnt > (pageNumber * recordsPerPage)) {
-                LeftButtons += adminUIController.getButtonPrimary(ButtonNext);
+                LeftButtons += AdminUIController.getButtonPrimary(ButtonNext);
             } else {
-                LeftButtons += adminUIController.getButtonPrimary(ButtonNext, "", true);
+                LeftButtons += AdminUIController.getButtonPrimary(ButtonNext, "", true);
             }
             if (AllowDelete) {
-                RightButtons += adminUIController.getButtonDanger(ButtonDelete, "if(!DeleteCheck())return false;");
+                RightButtons += AdminUIController.getButtonDanger(ButtonDelete, "if(!DeleteCheck())return false;");
             } else {
-                RightButtons += adminUIController.getButtonDanger(ButtonDelete, "", true);
+                RightButtons += AdminUIController.getButtonDanger(ButtonDelete, "", true);
             }
             result = getButtonBar(core, LeftButtons, RightButtons);
             return result;
             //return adminUIController.getForm_index_pageNavigation(core, LeftButtons, RightButtons, pageNumber, recordsPerPage, PageCount, recordCnt, contentName);
         }
         //
-        // ====================================================================================================
-        //
+        //====================================================================================================
         public static string getForm_index_pageNavigation(CoreController core, int PageNumber, int recordsPerPage, int recordCnt, string contentName) {
             string result = null;
             try {
@@ -461,8 +458,7 @@ namespace Contensive.Processor {
             return result;
         }
         //
-        // ====================================================================================================
-        //
+        //====================================================================================================
         public static string getBody(CoreController core, string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
             string result = "";
             try {
@@ -474,10 +470,10 @@ namespace Contensive.Processor {
                 // Build ButtonBar
                 //
                 if (!string.IsNullOrEmpty(ButtonListLeft.Trim(' '))) {
-                    LeftButtons = GetButtonsFromList(core, ButtonListLeft, AllowDelete, AllowAdd, "Button");
+                    LeftButtons = getButtonsFromList(core, ButtonListLeft, AllowDelete, AllowAdd, "Button");
                 }
                 if (!string.IsNullOrEmpty(ButtonListRight.Trim(' '))) {
-                    RightButtons = GetButtonsFromList(core, ButtonListRight, AllowDelete, AllowAdd, "Button");
+                    RightButtons = getButtonsFromList(core, ButtonListRight, AllowDelete, AllowAdd, "Button");
                 }
                 ButtonBar = getButtonBar(core, LeftButtons, RightButtons);
                 if (!string.IsNullOrEmpty(ContentSummary)) {
@@ -488,27 +484,26 @@ namespace Contensive.Processor {
                 }
                 result += ""
                     + ButtonBar 
-                    + GetTitleBar(core, Caption, Description)
+                    + getTitleBar(core, Caption, Description)
                     + CellContentSummary 
                     + "<div style=\"padding:" + ContentPadding + "px;\">" + Content + "\r</div>"
                     + ButtonBar;
-                result = htmlController.formMultipart(core, result, core.doc.refreshQueryString,"","ccForm");
+                result = HtmlController.formMultipart(core, result, core.doc.refreshQueryString,"","ccForm");
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
             return result;
         }
         //
-        // ====================================================================================================
-        //
-        public static string GetEditSubheadRow(CoreController core, string Caption) {
+        //====================================================================================================
+        public static string getEditSubheadRow(CoreController core, string Caption) {
             return "<tr><td colspan=2 class=\"ccAdminEditSubHeader\">" + Caption + "</td></tr>";
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         // GetEditPanel, An edit panel is a section of an admin page, under a subhead. When in tab mode, the subhead is blocked, and the panel is assumed to go in its own tab windows
         //
-        public static string GetEditPanel(CoreController core, bool AllowHeading, string PanelHeading, string PanelDescription, string PanelBody) {
+        public static string getEditPanel(CoreController core, bool AllowHeading, string PanelHeading, string PanelDescription, string PanelBody) {
             string result = "";
             try {
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
@@ -534,17 +529,17 @@ namespace Contensive.Processor {
             return result;
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         // Edit Table Open
-        public static string EditTableOpen {
+        public static string editTableOpen {
             get {
                 return "<table border=0 cellpadding=3 cellspacing=0 width=\"100%\">";
             }
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         // Edit Table Close
-        public static string EditTableClose {
+        public static string editTableClose {
             get {
                 string tempEditTableClose = null;
                 tempEditTableClose = "<tr>"
@@ -557,9 +552,8 @@ namespace Contensive.Processor {
 
         }
         //
-        // ====================================================================================================
-        //
-        private static string GetReport_Cell(CoreController core, string Copy, string Align, int Columns, int RowPointer) {
+        //====================================================================================================
+        private static string getReport_Cell(CoreController core, string Copy, string Align, int Columns, int RowPointer) {
             string tempGetReport_Cell = null;
             string iAlign = null;
             string Style = null;
@@ -585,7 +579,7 @@ namespace Contensive.Processor {
             return tempGetReport_Cell + "><span class=\"ccSmall\">" + CellCopy + "</span></td>";
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         //   Report Cell Header
         //       ColumnPtr       :   0 based column number
         //       Title
@@ -597,7 +591,7 @@ namespace Contensive.Processor {
         //       RQS
         //       SortingState
         //
-        private static string GetReport_CellHeader(CoreController core, int ColumnPtr, string Title, string Width, string Align, string ClassStyle, string RefreshQueryString, SortingStateEnum SortingState) {
+        private static string getReport_CellHeader(CoreController core, int ColumnPtr, string Title, string Width, string Align, string ClassStyle, string RefreshQueryString, SortingStateEnum SortingState) {
             string result = "";
             try {
                 string Style = null;
@@ -652,14 +646,14 @@ namespace Contensive.Processor {
             return result;
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         /// <summary>
         /// returns the integer column ptr of the column last selected
         /// </summary>
         /// <param name="core"></param>
         /// <param name="DefaultSortColumnPtr"></param>
         /// <returns></returns>
-        public static int GetReportSortColumnPtr(CoreController core, int DefaultSortColumnPtr) {
+        public static int getReportSortColumnPtr(CoreController core, int DefaultSortColumnPtr) {
             int tempGetReportSortColumnPtr = 0;
             string VarText;
             //
@@ -671,7 +665,7 @@ namespace Contensive.Processor {
             return tempGetReportSortColumnPtr;
         }
         //
-        // ====================================================================================================
+        //====================================================================================================
         //   Get Sort Column Type
         //
         //   returns the integer for the type of sorting last requested
@@ -683,7 +677,7 @@ namespace Contensive.Processor {
         //   It is up to the calling program to call GetReportOrderBy to get the orderby and use it in the query to generate the cells
         //   This call returns a comma delimited list of integers representing the columns to sort
         //
-        public static int GetReportSortType(CoreController core) {
+        public static int getReportSortType(CoreController core) {
             int tempGetReportSortType = 0;
             string VarText;
             //
@@ -699,9 +693,8 @@ namespace Contensive.Processor {
             return tempGetReportSortType;
         }
         //
-        // ====================================================================================================
-        //
-        public static string GetReport(CoreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle) {
+        //====================================================================================================
+        public static string getReport(CoreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle) {
             string result = "";
             try {
                 int ColCnt = Cells.GetUpperBound(1);
@@ -710,16 +703,15 @@ namespace Contensive.Processor {
                     ColSortable[Ptr] = false;
                 }
                 //
-                result = GetReport2(core, RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle, ColSortable, 0);
+                result = getReport2(core, RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle, ColSortable, 0);
             } catch (Exception ex) {
                 logController.handleError(core, ex);
             }
             return result;
         }
         //
-        // ====================================================================================================
-        //
-        public static string GetReport2(CoreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle, bool[] ColSortable, int DefaultSortColumnPtr) {
+        //====================================================================================================
+        public static string getReport2(CoreController core, int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle, bool[] ColSortable, int DefaultSortColumnPtr) {
             string result = "";
             try {
                 string RQS = null;
@@ -759,34 +751,34 @@ namespace Contensive.Processor {
                 //End If
                 RQS = core.doc.refreshQueryString;
                 //
-                SortColPtr = GetReportSortColumnPtr(core, DefaultSortColumnPtr);
-                SortColType = GetReportSortType(core);
+                SortColPtr = getReportSortColumnPtr(core, DefaultSortColumnPtr);
+                SortColType = getReportSortType(core);
                 //
                 // ----- Start the table
                 //
-                Content.Add(htmlController.tableStart(3, 1, 0));
+                Content.Add(HtmlController.tableStart(3, 1, 0));
                 //
                 // ----- Header
                 //
                 Content.Add("\r\n<tr>");
-                Content.Add(GetReport_CellHeader(core, 0, "Row", "50", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
+                Content.Add(getReport_CellHeader(core, 0, "Row", "50", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
                 for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
                     ColumnWidth = ColWidth[ColumnPtr];
                     if (!ColSortable[ColumnPtr]) {
                         //
                         // not sortable column
                         //
-                        Content.Add(GetReport_CellHeader(core, ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
+                        Content.Add(getReport_CellHeader(core, ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
                     } else if (ColumnPtr == SortColPtr) {
                         //
                         // This is the current sort column
                         //
-                        Content.Add(GetReport_CellHeader(core, ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, (SortingStateEnum)SortColType));
+                        Content.Add(getReport_CellHeader(core, ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, (SortingStateEnum)SortColType));
                     } else {
                         //
                         // Column is sortable, but not selected
                         //
-                        Content.Add(GetReport_CellHeader(core, ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet));
+                        Content.Add(getReport_CellHeader(core, ColumnPtr, ColCaption[ColumnPtr], ColumnWidth, ColAlign[ColumnPtr], "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet));
                     }
 
                     //If ColumnPtr = SortColPtr Then
@@ -804,16 +796,16 @@ namespace Contensive.Processor {
                 //
                 if (RowCount == 0) {
                     Content.Add("\r\n<tr>");
-                    Content.Add(GetReport_Cell(core, (RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
-                    Content.Add(GetReport_Cell(core, "-- End --", "left", ColumnCount, 0));
+                    Content.Add(getReport_Cell(core, (RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
+                    Content.Add(getReport_Cell(core, "-- End --", "left", ColumnCount, 0));
                     Content.Add("\r\n</tr>");
                 } else {
                     RowBAse = (ReportPageSize * (ReportPageNumber - 1)) + 1;
                     for (RowPointer = 0; RowPointer < RowCount; RowPointer++) {
                         Content.Add("\r\n<tr>");
-                        Content.Add(GetReport_Cell(core, (RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
+                        Content.Add(getReport_Cell(core, (RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
                         for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
-                            Content.Add(GetReport_Cell(core, Cells[RowPointer, ColumnPtr], ColAlign[ColumnPtr], 1, RowPointer));
+                            Content.Add(getReport_Cell(core, Cells[RowPointer, ColumnPtr], ColAlign[ColumnPtr], 1, RowPointer));
                         }
                         Content.Add("\r\n</tr>");
                     }
@@ -882,14 +874,14 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string GetFormBodyAdminOnly() {
+        public static string getFormBodyAdminOnly() {
             return "<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">This page requires administrator permissions.</div>";
         }
         //
         // ====================================================================================================
         //
         public static string getButtonPrimary(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "", string htmlName = "button") {
-            return htmlController.getHtmlInputSubmit(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
+            return HtmlController.getHtmlInputSubmit(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
             // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
             // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
         }
@@ -897,21 +889,21 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public static string getButtonDanger(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "") {
-            return htmlController.getHtmlInputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-danger mr-1 btn-sm");
+            return HtmlController.getHtmlInputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-danger mr-1 btn-sm");
             // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
             // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
         }
         //
         // ====================================================================================================
         //
-        public static List<buttonMetadata> buttonStringToButtonList(string ButtonList) {
-            var result = new List<buttonMetadata>();
+        public static List<ButtonMetadata> buttonStringToButtonList(string ButtonList) {
+            var result = new List<ButtonMetadata>();
             string[] Buttons = null;
             if (!string.IsNullOrEmpty(ButtonList.Trim(' '))) {
                 Buttons = ButtonList.Split(',');
                 foreach (string buttonValue in Buttons) {
                     string buttonValueTrim = buttonValue.Trim();
-                    result.Add(new buttonMetadata() {
+                    result.Add(new ButtonMetadata() {
                         name = "button",
                         value = buttonValue,
                         isAdd = buttonValueTrim.Equals(ButtonAdd),
@@ -940,18 +932,18 @@ namespace Contensive.Processor {
         /// <param name="core"></param>
         /// <param name="headerInfo"></param>
         /// <returns></returns>
-        public static string getEditForm_TitleBarDetails(CoreController core, recordEditHeaderInfoClass headerInfo, editRecordClass editRecord) {
+        public static string getEditForm_TitleBarDetails(CoreController core, RecordEditHeaderInfoClass headerInfo, EditRecordClass editRecord) {
             string result = "";
             bool alt = true;
             if (alt) {
                 if (editRecord.id == 0) {
-                    result += htmlController.div( "New record" , "col-sm-12");
+                    result += HtmlController.div( "New record" , "col-sm-12");
                 } else {
-                    result += htmlController.div(htmlController.strong( editRecord.contentControlId_Name + ":&nbsp;#" ) + headerInfo.recordId + ", " + editRecord.nameLc , "col-sm-4");
-                    result += htmlController.div(htmlController.strong("Created:&nbsp;" ) + getEditForm_TitleBarDetails_EditorString(editRecord.dateAdded, editRecord.createdBy, "unknown"), "col-sm-4");
-                    result += htmlController.div(htmlController.strong("Modified:&nbsp;") + getEditForm_TitleBarDetails_EditorString( editRecord.modifiedDate, editRecord.modifiedBy, "not modified" ), "col-sm-4");
+                    result += HtmlController.div(HtmlController.strong( editRecord.contentControlId_Name + ":&nbsp;#" ) + headerInfo.recordId + ", " + editRecord.nameLc , "col-sm-4");
+                    result += HtmlController.div(HtmlController.strong("Created:&nbsp;" ) + getEditForm_TitleBarDetails_EditorString(editRecord.dateAdded, editRecord.createdBy, "unknown"), "col-sm-4");
+                    result += HtmlController.div(HtmlController.strong("Modified:&nbsp;") + getEditForm_TitleBarDetails_EditorString( editRecord.modifiedDate, editRecord.modifiedBy, "not modified" ), "col-sm-4");
                 }
-                result = htmlController.div(result, "row");
+                result = HtmlController.div(result, "row");
             } else {
                 if (headerInfo.recordId == 0) {
                     result = "<div>New Record</div>";
@@ -1045,8 +1037,8 @@ namespace Contensive.Processor {
         /// <param name="htmlValue"></param>
         /// <returns></returns>
         public static string getDefaultEditor_Bool(CoreController core, string htmlName, bool htmlValue, bool readOnly = false, string htmlId = "") {
-            string result = htmlController.div(htmlController.checkbox(htmlName, htmlValue, htmlId, false, "", readOnly), "checkbox");
-            if (readOnly)  result += htmlController.inputHidden(htmlName, htmlValue);
+            string result = HtmlController.div(HtmlController.checkbox(htmlName, htmlValue, htmlId, false, "", readOnly), "checkbox");
+            if (readOnly)  result += HtmlController.inputHidden(htmlName, htmlValue);
             return result;
         }
         //
@@ -1065,7 +1057,7 @@ namespace Contensive.Processor {
             if ((fieldValue.IndexOf("\n") == -1) && (fieldValue.Length < 80)) {
                 //
                 // text field shorter then 40 characters without a CR
-                return htmlController.inputText( core,fieldName, fieldValue, 1, -1, htmlId, false, readOnly, "text form-control", 255);
+                return HtmlController.inputText( core,fieldName, fieldValue, 1, -1, htmlId, false, readOnly, "text form-control", 255);
             }
             return getDefaultEditor_TextArea(core, fieldName, fieldValue, readOnly, htmlId);
         }
@@ -1084,7 +1076,7 @@ namespace Contensive.Processor {
         public static string getDefaultEditor_TextArea(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
             //
             // longer text data, or text that contains a CR
-            return htmlController.inputTextarea(core, fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false, 255);
+            return HtmlController.inputTextarea(core, fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false, 255);
         }
         //
         // ====================================================================================================
@@ -1092,7 +1084,7 @@ namespace Contensive.Processor {
         public static string getDefaultEditor_Html( CoreController core, string fieldName, string fieldValue, string editorAddonListJSON, string styleList, string styleOptionList, bool readONly = false, string htmlId = "" ) {
             string result = "";
             if (readONly) {
-                result += htmlController.inputHidden(fieldName, fieldValue);
+                result += HtmlController.inputHidden(fieldName, fieldValue);
             } else if (string.IsNullOrEmpty(fieldValue)) {
                 //
                 // editor needs a starting p tag to setup correctly
@@ -1114,7 +1106,7 @@ namespace Contensive.Processor {
         /// <param name="htmlId"></param>
         /// <returns></returns>
         public static string getDefaultEditor_Password(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
-            return htmlController.inputText( core,fieldName, fieldValue, -1, -1, htmlId, true, readOnly, "password form-control", 255);
+            return HtmlController.inputText( core,fieldName, fieldValue, -1, -1, htmlId, true, readOnly, "password form-control", 255);
         }
         //
         // ====================================================================================================
@@ -1138,14 +1130,14 @@ namespace Contensive.Processor {
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
-                result += (htmlController.inputHidden(fieldName, genericController.encodeText(fieldValue)));
+                result += (HtmlController.inputHidden(fieldName, genericController.encodeText(fieldValue)));
                 if (!string.IsNullOrEmpty(LookupContentName)) {
                     int CSLookup = core.db.csOpen2(LookupContentName, fieldValue, false, false, "Name,ContentControlID");
                     if (core.db.csOk(CSLookup)) {
                         if (core.db.csGet(CSLookup, "Name") == "") {
                             result += ("No Name");
                         } else {
-                            result += (htmlController.encodeHtml(core.db.csGet(CSLookup, "Name")));
+                            result += (HtmlController.encodeHtml(core.db.csGet(CSLookup, "Name")));
                         }
                         result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                     } else {
@@ -1191,7 +1183,7 @@ namespace Contensive.Processor {
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
-                result += (htmlController.inputHidden(htmlName, defaultLookupIndexBaseOne.ToString()));
+                result += (HtmlController.inputHidden(htmlName, defaultLookupIndexBaseOne.ToString()));
                 if (defaultLookupIndexBaseOne < 1) {
                     result += "None";
                 } else if (defaultLookupIndexBaseOne > (lookupArray.GetUpperBound(0) + 1)) {
@@ -1202,9 +1194,9 @@ namespace Contensive.Processor {
                 result += WhyReadOnlyMsg;
             } else {
                 if (!fieldRequired) {
-                    result += htmlController.selectFromList( core, htmlName, defaultLookupIndexBaseOne, lookupArray, "Select One", "", "select form-control");
+                    result += HtmlController.selectFromList( core, htmlName, defaultLookupIndexBaseOne, lookupArray, "Select One", "", "select form-control");
                 } else {
-                    result += htmlController.selectFromList( core, htmlName, defaultLookupIndexBaseOne, lookupArray, "", "", "select form-control");
+                    result += HtmlController.selectFromList( core, htmlName, defaultLookupIndexBaseOne, lookupArray, "", "", "select form-control");
                 }
 
             }
@@ -1215,7 +1207,7 @@ namespace Contensive.Processor {
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
-                result += (htmlController.inputHidden(htmlName, genericController.encodeText(defaultValue)));
+                result += (HtmlController.inputHidden(htmlName, genericController.encodeText(defaultValue)));
                 nameValueClass nameValue = lookupList.Find(x => x.name.ToLower() == htmlName.ToLower());
                 if (nameValue == null) {
                     result += "none";
@@ -1225,9 +1217,9 @@ namespace Contensive.Processor {
                 result += WhyReadOnlyMsg;
             } else {
                 if (!fieldRequired) {
-                    result += htmlController.selectFromList(core, htmlName, defaultValue, lookupList, "Select One", "", "select form-control");
+                    result += HtmlController.selectFromList(core, htmlName, defaultValue, lookupList, "Select One", "", "select form-control");
                 } else {
-                    result += htmlController.selectFromList(core, htmlName, defaultValue, lookupList, "", "", "select form-control");
+                    result += HtmlController.selectFromList(core, htmlName, defaultValue, lookupList, "", "", "select form-control");
                 }
 
             }
@@ -1248,13 +1240,13 @@ namespace Contensive.Processor {
             if (readOnly) {
                 //
                 // -- readOnly
-                result += htmlController.inputHidden(fieldName, fieldValue_text);
-                result += htmlController.inputText( core,fieldName, fieldValue_text, -1, -1, "", false, true, "date form-control");
+                result += HtmlController.inputHidden(fieldName, fieldValue_text);
+                result += HtmlController.inputText( core,fieldName, fieldValue_text, -1, -1, "", false, true, "date form-control");
                 result += WhyReadOnlyMsg;
             } else {
                 //
                 // -- editable
-                result += htmlController.inputDate( core,fieldName, encodeDate(fieldValue_text),"",htmlId, "date form-control", readOnly, fieldRequired);
+                result += HtmlController.inputDate( core,fieldName, encodeDate(fieldValue_text),"",htmlId, "date form-control", readOnly, fieldRequired);
             }
             return result;
         }
@@ -1263,10 +1255,17 @@ namespace Contensive.Processor {
         //
         public static string getDefaultEditor_memberSelect(CoreController core, string htmlName, int selectedRecordId, int groupId, string groupName, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
             string EditorString = "";
+            if ( (groupId>0)&(string.IsNullOrWhiteSpace(groupName))) {
+                var group = groupModel.create(core, groupId);
+                if ( group != null) {
+                    groupName = "Group " + group.id.ToString();
+                    group.save(core);
+                }
+            }
             if (readOnly) {
                 //
                 // -- readOnly
-                EditorString += htmlController.inputHidden(htmlName, selectedRecordId.ToString() );
+                EditorString += HtmlController.inputHidden(htmlName, selectedRecordId.ToString() );
                 if (selectedRecordId == 0) {
                     EditorString += "None";
                 } else {
@@ -1274,7 +1273,7 @@ namespace Contensive.Processor {
                     if ( selectedUser==null) {
                         EditorString += "Deleted";
                     } else {
-                        EditorString += (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : htmlController.encodeHtml(selectedUser.name);
+                        EditorString += (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : HtmlController.encodeHtml(selectedUser.name);
                         EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                     }
                 }
@@ -1288,8 +1287,8 @@ namespace Contensive.Processor {
                     if (selectedUser == null) {
                         EditorString += "Deleted";
                     } else {
-                        string recordName = (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : htmlController.encodeHtml(selectedUser.name);
-                        EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + htmlController.encodeHtml( recordName ) + "</a>]";
+                        string recordName = (string.IsNullOrWhiteSpace(selectedUser.name)) ? "No Name" : HtmlController.encodeHtml(selectedUser.name);
+                        EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + HtmlController.encodeHtml( recordName ) + "</a>]";
                     }
                 }
                 EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + Models.Complex.cdefModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
@@ -1370,7 +1369,7 @@ namespace Contensive.Processor {
                                     // Create checkbox addon_execute_getFormContent_decodeSelector
                                     //
                                     bool selected = (genericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + genericController.vbLCase(OptionValue) + ",") != 0);
-                                    result = htmlController.checkbox(SitePropertyName + OptionPtr, selected, "", false, "", false, OptionValue, OptionCaption);
+                                    result = HtmlController.checkbox(SitePropertyName + OptionPtr, selected, "", false, "", false, OptionValue, OptionCaption);
                                     //if (genericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + genericController.vbLCase(OptionValue) + ",") != 0) {
                                     //    result += "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + SitePropertyName + OptionPtr + "\" value=\"" + OptionValue + "\" checked=\"checked\">" + OptionCaption + "</div>";
                                     //} else {
@@ -1406,7 +1405,7 @@ namespace Contensive.Processor {
                         case "checkbox":
                             //
                             //
-                            Copy += htmlController.inputHidden(SitePropertyName + "CheckBoxCnt", OptionCnt);
+                            Copy += HtmlController.inputHidden(SitePropertyName + "CheckBoxCnt", OptionCnt);
                             break;
                         case "radio":
                             //
@@ -1449,7 +1448,7 @@ namespace Contensive.Processor {
         /// <param name="editorHelpRow"></param>
         /// <returns></returns>
         public static string getEditRow(CoreController core, string EditorString, string Caption, string editorHelpRow, bool fieldRequired = false, bool ignore = false, string fieldHtmlId = "") {
-            return htmlController.div(htmlController.label(Caption, fieldHtmlId) + htmlController.div(EditorString, "ml-5") + htmlController.div( htmlController.small( editorHelpRow, "form-text text-muted"), "ml-5"), "p-2 ccEditRow");
+            return HtmlController.div(HtmlController.label(Caption, fieldHtmlId) + HtmlController.div(EditorString, "ml-5") + HtmlController.div( HtmlController.small( editorHelpRow, "form-text text-muted"), "ml-5"), "p-2 ccEditRow");
         }
         //
         // ====================================================================================================
@@ -1495,7 +1494,7 @@ namespace Contensive.Processor {
         /// <param name="recordCnt"></param>
         /// <param name="ContentAccessLimitMessage"></param>
         /// <returns></returns>
-        public static string getForm_Index_Header(CoreController core, indexConfigClass IndexConfig, cdefModel content, int recordCnt, string ContentAccessLimitMessage) {
+        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, cdefModel content, int recordCnt, string ContentAccessLimitMessage) {
             //
             // ----- TitleBar
             //
@@ -1521,7 +1520,7 @@ namespace Contensive.Processor {
                 filterLine = filterLine + ", last edited" + filterLastEdited;
             }
             foreach (var kvp in IndexConfig.FindWords) {
-                indexConfigFindWordClass findWord = kvp.Value;
+                IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
                     string FieldCaption = cdefModel.GetContentFieldProperty(core, content.name, findWord.Name, "caption");
                     switch (findWord.MatchOption) {
@@ -1591,7 +1590,7 @@ namespace Contensive.Processor {
             //
             string sortLine = "";
             foreach (var kvp in IndexConfig.Sorts) {
-                indexConfigSortClass sort = kvp.Value;
+                IndexConfigSortClass sort = kvp.Value;
                 if (sort.direction > 0) {
                     sortLine = sortLine + ", then " + content.fields[sort.fieldName].caption;
                     if (sort.direction > 1) {
@@ -1600,16 +1599,16 @@ namespace Contensive.Processor {
                 }
             }
             string pageNavigation = getForm_index_pageNavigation(core, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, content.name);
-            Title = htmlController.div("<strong>" + content.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
+            Title = HtmlController.div("<strong>" + content.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
             int TitleRows = 0;
             if (!string.IsNullOrEmpty(filterLine)) {
                 string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexFilterRemoveAll=1";
-                Title += htmlController.div(getIconDeleteLink(link) + "&nbsp;Filter: " + htmlController.encodeHtml(filterLine.Substring(2)));
+                Title += HtmlController.div(getIconDeleteLink(link) + "&nbsp;Filter: " + HtmlController.encodeHtml(filterLine.Substring(2)));
                 TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(sortLine)) {
                 string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexSortRemoveAll=1";
-                Title += htmlController.div(getIconDeleteLink(link) + "&nbsp;Sort: " + htmlController.encodeHtml(sortLine.Substring(6)));
+                Title += HtmlController.div(getIconDeleteLink(link) + "&nbsp;Sort: " + HtmlController.encodeHtml(sortLine.Substring(6)));
                 TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(ContentAccessLimitMessage)) {
@@ -1625,12 +1624,12 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public static string getIconDeleteLink(string link) { return htmlController.a(iconDelete, link); }
-        public static string getIconArrowRightLink(string link) { return htmlController.a(iconArrowRight, link); }
-        public static string getIconArrowLeftLink(string link) { return htmlController.a(iconArrowLeft, link); }
-        public static string getIconPlusLink(string link, string caption = "") { return htmlController.a(iconPlus + caption, link); }
-        public static string getIconExpandLink(string link) { return htmlController.a(iconExpand, link); }
-        public static string getIconContractLink(string link) { return htmlController.a(iconContract, link); }
+        public static string getIconDeleteLink(string link) { return HtmlController.a(iconDelete, link); }
+        public static string getIconArrowRightLink(string link) { return HtmlController.a(iconArrowRight, link); }
+        public static string getIconArrowLeftLink(string link) { return HtmlController.a(iconArrowLeft, link); }
+        public static string getIconPlusLink(string link, string caption = "") { return HtmlController.a(iconPlus + caption, link); }
+        public static string getIconExpandLink(string link) { return HtmlController.a(iconExpand, link); }
+        public static string getIconContractLink(string link) { return HtmlController.a(iconContract, link); }
         //
         //
         // ====================================================================================================
@@ -1639,7 +1638,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public static  string getIconRefreshLink(string link) {return htmlController.a( iconRefresh, link );}
+        public static  string getIconRefreshLink(string link) {return HtmlController.a( iconRefresh, link );}
         //
         // ====================================================================================================
         /// <summary>
@@ -1647,8 +1646,8 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public static string getIconEditLink(string link) { return htmlController.a(iconEdit, link); }
-        public static string getIconEditLink(string link, string htmlClass) { return htmlController.a(iconEdit, link, htmlClass); }
+        public static string getIconEditLink(string link) { return HtmlController.a(iconEdit, link); }
+        public static string getIconEditLink(string link, string htmlClass) { return HtmlController.a(iconEdit, link, htmlClass); }
         /// <summary>
         /// get a link to edit a record in the admin site
         /// </summary>
@@ -1661,7 +1660,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public static string getToolFormTitle(string Title, string Description) {
-            return htmlController.h2(Title) + htmlController.p(Description);
+            return HtmlController.h2(Title) + HtmlController.p(Description);
         }
         //
         //====================================================================================================
@@ -1670,55 +1669,21 @@ namespace Contensive.Processor {
             string buttonHtml = (string.IsNullOrWhiteSpace(buttonList)) ? "" : core.html.getPanelButtons(buttonList, "Button");
             string result = ""
                 + buttonHtml 
-                + htmlController.div(innerHtml, "p-4 bg-light") 
+                + HtmlController.div(innerHtml, "p-4 bg-light") 
                 + buttonHtml;
-            return htmlController.form(core, result);
+            return HtmlController.form(core, result);
         }
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// legacy compatibility
-        ///// </summary>
-        ///// <param name="core"></param>
-        ///// <param name="ButtonList"></param>
-        ///// <returns></returns>
-        //public static string getToolFormClose(coreController core, string ButtonList) {
-        //    string templegacy_closeFormTable = null;
-        //    if (!string.IsNullOrEmpty(ButtonList)) {
-        //        templegacy_closeFormTable = core.html.getPanelButtons(ButtonList, "Button") + "</form>";
-        //    } else {
-        //        templegacy_closeFormTable = "</form>";
-        //    }
-        //    return templegacy_closeFormTable;
-        //}
         //
         //====================================================================================================
-        /// <summary>
-        /// legacy compatibility
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="ButtonList"></param>
-        /// <returns></returns>
-        //public static string getToolFormOpen(coreController core, string ButtonList) {
-        //    string result = "";
-        //    try {
-
-        //        result = htmlController.form_start(core);
-        //        if (!string.IsNullOrEmpty(ButtonList)) {
-        //            result += core.html.getPanelButtons(ButtonList, "Button");
-        //        }
-        //    } catch (Exception ex) {
-        //        logController.handleError(core, ex);
-        //    }
-        //    return result;
-        //}
         //
         public static string getToolFormRow( CoreController core, string asdf) {
-            return htmlController.div(asdf, "p-1"); 
+            return HtmlController.div(asdf, "p-1"); 
         }
         //
+        //====================================================================================================
+        //
         public static string getToolFormInputRow( CoreController core, string label, string input ) {
-            return getToolFormRow(core, htmlController.label(label) + "<br>" + input);
+            return getToolFormRow(core, HtmlController.label(label) + "<br>" + input);
 
             //"<div class=\"p-1\">Page Number:<br>" + htmlController.inputText(core, "PageNumber", PageNumber.ToString()) + "</div>";
         }
@@ -1740,11 +1705,11 @@ namespace Contensive.Processor {
         public static  string getEditWrapper(CoreController core, string caption, string content) {
             string result = content;
             if (core.session.isEditingAnything()) {
-                result = htmlController.div(result, "ccEditWrapperContent");
+                result = HtmlController.div(result, "ccEditWrapperContent");
                 if (!string.IsNullOrEmpty(caption)) {
-                    result = htmlController.div(caption, "ccEditWrapperCaption") + result;
+                    result = HtmlController.div(caption, "ccEditWrapperCaption") + result;
                 }
-                result = htmlController.div(result, "ccEditWrapper", "editWrapper" + core.doc.editWrapperCnt++);
+                result = HtmlController.div(result, "ccEditWrapper", "editWrapper" + core.doc.editWrapperCnt++);
                 //result = "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccEditWrapper\">";
                 ////result = html_GetLegacySiteStyles() + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccEditWrapper\">";
                 //if (!string.IsNullOrEmpty(Caption)) {
@@ -1767,7 +1732,7 @@ namespace Contensive.Processor {
         public static string getRecordEditLink(CoreController core, string contentName, int recordID, bool allowCut, string RecordName, bool IsEditing) {
             string result = "";
             try {
-                string ContentCaption = htmlController.encodeHtml(contentName);
+                string ContentCaption = HtmlController.encodeHtml(contentName);
                 ContentCaption += " record";
                 if (!string.IsNullOrEmpty(RecordName)) ContentCaption += ", named '" + RecordName + "'";
                 if (string.IsNullOrEmpty(contentName)) {
@@ -1781,11 +1746,11 @@ namespace Contensive.Processor {
                             if ( cdef==null) {
                                 throw new ApplicationException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
                             } else {
-                                result += adminUIController.getIconEditAdminLink(core, cdef, recordID);
+                                result += AdminUIController.getIconEditAdminLink(core, cdef, recordID);
                                 if (allowCut) {
                                     int ContentID = 0;
                                     string WorkingLink = genericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) + "." + genericController.encodeText(recordID), true);
-                                    result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
+                                    result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
                                 }
                                 result = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + result + "</span>";
                             }
@@ -1849,7 +1814,7 @@ namespace Contensive.Processor {
                             }
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a"
                                 + " TabIndex=-1"
-                                + " href=\"" + htmlController.encodeHtml(Link) + "\"";
+                                + " href=\"" + HtmlController.encodeHtml(Link) + "\"";
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "><img"
                                 + " src=\"/ccLib/images/IconContentAdd.gif\""
                                 + " border=\"0\""
@@ -1898,7 +1863,7 @@ namespace Contensive.Processor {
                                                 PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, iContentID.ToString(), true);
                                                 PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, ParentID.ToString(), true);
                                                 PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, true);
-                                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + htmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste record in clipboard here\" title=\"Paste record in clipboard here\" align=\"absmiddle\"></a>";
+                                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste record in clipboard here\" title=\"Paste record in clipboard here\" align=\"absmiddle\"></a>";
                                             }
                                         }
                                     }
@@ -1912,7 +1877,7 @@ namespace Contensive.Processor {
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.getMenu(LowestRequiredMenuName, 0);
                             tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "class=\"ccFlyoutButton\" ", "", 1, 99, 1);
                             if (!string.IsNullOrEmpty(PasteLink)) {
-                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + htmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
+                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + HtmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
                             }
                         }
                         //

@@ -70,7 +70,7 @@ namespace Contensive.Addons.Tools {
                 //
                 Stream.Add("<tr>");
                 Stream.Add("<TD>&nbsp;</td>");
-                Stream.Add("<TD>" + htmlController.getHtmlInputSubmit(ButtonCreateFields) + "</td>");
+                Stream.Add("<TD>" + HtmlController.getHtmlInputSubmit(ButtonCreateFields) + "</td>");
                 //Stream.Add("<TD><INPUT type=\"submit\" value=\"" + ButtonCreateFields + "\" name=\"Button\"></td>");
                 Stream.Add("</tr>");
                 //
@@ -100,7 +100,7 @@ namespace Contensive.Addons.Tools {
                     }
                 }
                 string ButtonList = "";
-                result = adminUIController.getToolForm(core, Stream.Text, ButtonList);
+                result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 logController.handleError(core, ex);

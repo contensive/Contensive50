@@ -17,7 +17,7 @@ using static Contensive.Processor.constants;
 using Contensive.BaseClasses;
 using System.Runtime.InteropServices;
 using System.IO;
-using static Contensive.Processor.Controllers.fileController;
+using static Contensive.Processor.Controllers.FileController;
 //
 namespace Contensive.Processor {
     public class CPFileSystemClass : BaseClasses.CPFileSystemBaseClass, IDisposable {
@@ -31,14 +31,14 @@ namespace Contensive.Processor {
         private Contensive.Processor.Controllers.CoreController core;
         protected bool disposed = false;
         //
-        private fileController fileSystem;
+        private FileController fileSystem;
         //
         //==========================================================================================
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="core"></param>
-        public CPFileSystemClass(Contensive.Processor.Controllers.CoreController core, fileController fileSystem) : base() {
+        public CPFileSystemClass(Contensive.Processor.Controllers.CoreController core, FileController fileSystem) : base() {
             this.core = core;
             this.fileSystem = fileSystem;
         }

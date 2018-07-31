@@ -620,7 +620,7 @@ namespace Contensive.Processor.Controllers {
                 saveTransactionLog_InProcess = true;
                 //
                 // -- block before appStatus OK because need site properties
-                if ((core.serverConfig.enableLogging) && (core.appConfig.appStatus == appConfigModel.appStatusEnum.ok)) {
+                if ((core.serverConfig.enableLogging) && (core.appConfig.appStatus == AppConfigModel.appStatusEnum.ok)) {
                     if (core.siteProperties.allowTransactionLog) {
                         string LogEntry = ("duration [" + ElapsedMilliseconds + "ms], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
                         logController.logDebug(core, "dbController: " + LogEntry);
@@ -1276,147 +1276,110 @@ namespace Contensive.Processor.Controllers {
         /// Opens a dataTable for the table/row definied by the contentname and criteria
         /// </summary>
         /// <param name="ContentName"></param>
-        /// <param name="Criteria"></param>
-        /// <param name="SortFieldList"></param>
-        /// <param name="ActiveOnly"></param>
-        /// <param name="MemberID"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sqlOrderBy"></param>
+        /// <param name="activeOnly"></param>
+        /// <param name="memberId"></param>
         /// <param name="ignorefalse2"></param>
         /// <param name="ignorefalse"></param>
-        /// <param name="SelectFieldList"></param>
+        /// <param name="sqlSelectFieldList"></param>
         /// <param name="PageSize"></param>
         /// <param name="PageNumber"></param>
         /// <returns></returns>
         //========================================================================
         //
-        public int csOpen(string ContentName, string Criteria = "", string SortFieldList = "", bool ActiveOnly = true, int MemberID = 0, bool ignorefalse2 = false, bool ignorefalse = false, string SelectFieldList = "", int PageSize = 9999, int PageNumber = 1) {
+        public int csOpen(string ContentName, string sqlCriteria = "", string sqlOrderBy = "", bool activeOnly = true, int memberId = 0, bool ignorefalse2 = false, bool ignorefalse = false, string sqlSelectFieldList = "", int PageSize = 9999, int PageNumber = 1) {
             int returnCs = -1;
             try {
-                string[] SortFields = null;
-                string SortField = null;
-                int Ptr = 0;
-                int Cnt = 0;
-                string ContentCriteria = null;
-                string TableName = null;
-                string DataSourceName = null;
-                bool iActiveOnly = false;
-                string iSortFieldList = null;
-                //Dim iWorkflowRenderingMode As Boolean
-                //Dim AllowWorkflowSave As Boolean
-                int iMemberID = 0;
-                string iCriteria = null;
-                string iSelectFieldList = null;
-                cdefModel CDef = null;
-                string TestUcaseFieldList = null;
-                string SQL = null;
-                //
                 if (string.IsNullOrEmpty(ContentName)) {
-                    throw new ApplicationException("ContentName cannot be blank");
+                    throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    CDef = cdefModel.getCdef(core, ContentName);
+                    cdefModel CDef = cdefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw (new ApplicationException("No content found For [" + ContentName + "]"));
                     } else if (CDef.id <= 0) {
                         throw (new ApplicationException("No content found For [" + ContentName + "]"));
                     } else {
-                        //
-                        //hint = hint & ", 100"
-                        iActiveOnly = ((ActiveOnly));
-                        iSortFieldList = genericController.encodeEmpty(SortFieldList, CDef.defaultSortMethod);
-                        iMemberID = MemberID;
-                        iCriteria = genericController.encodeEmpty(Criteria, "");
-                        iSelectFieldList = genericController.encodeEmpty(SelectFieldList, CDef.selectCommaList);
+                        sqlOrderBy = genericController.encodeEmpty(sqlOrderBy, CDef.defaultSortMethod);
+                        sqlSelectFieldList = genericController.encodeEmpty(sqlSelectFieldList, CDef.selectCommaList);
                         //
                         // verify the sortfields are in this table
-                        //
-                        if (!string.IsNullOrEmpty(iSortFieldList)) {
-                            SortFields = iSortFieldList.Split(',');
-                            Cnt = SortFields.GetUpperBound(0) + 1;
-                            for (Ptr = 0; Ptr < Cnt; Ptr++) {
-                                SortField = SortFields[Ptr].ToLower();
+                        if (!string.IsNullOrEmpty(sqlOrderBy)) {
+                            string[] SortFields = sqlOrderBy.Split(',');
+                            for (int ptr = 0; ptr < SortFields.GetUpperBound(0) + 1; ptr++) {
+                                string SortField = SortFields[ptr].ToLower();
                                 SortField = genericController.vbReplace(SortField, "asc", "", 1, 99, 1);
                                 SortField = genericController.vbReplace(SortField, "desc", "", 1, 99, 1);
                                 SortField = SortField.Trim(' ');
                                 if (!CDef.selectList.Contains(SortField)) {
-                                    //throw (New ApplicationException("Unexpected exception"))
-                                    throw (new ApplicationException("The field [" + SortField + "] was used In a sort method For content [" + ContentName + "], but the content does not include this field."));
+                                    throw (new ApplicationException("The field [" + SortField + "] was used in sqlOrderBy for content [" + ContentName + "], but the content does not include this field."));
                                 }
                             }
                         }
                         //
                         // ----- fixup the criteria to include the ContentControlID(s) / EditSourceID
-                        //
-                        ContentCriteria = CDef.contentControlCriteria;
-                        if (string.IsNullOrEmpty(ContentCriteria)) {
-                            ContentCriteria = "(1=1)";
+                        string sqlContentCriteria = CDef.contentControlCriteria;
+                        if (string.IsNullOrEmpty(sqlContentCriteria)) {
+                            sqlContentCriteria = "(1=1)";
                         } else {
                             //
-                            // remove tablename from contentcontrolcriteria - if in workflow mode, and authoringtable is different, this would be wrong
-                            // also makes sql smaller, and is not necessary
-                            //
-                            ContentCriteria = genericController.vbReplace(ContentCriteria, CDef.contentTableName + ".", "");
+                            // remove tablename from contentcontrolcriteria - if in workflow mode, and authoringtable is different, this would be wrong, also makes sql smaller, and is not necessary
+                            sqlContentCriteria = genericController.vbReplace(sqlContentCriteria, CDef.contentTableName + ".", "");
                         }
-                        if (!string.IsNullOrEmpty(iCriteria)) {
-                            ContentCriteria = ContentCriteria + "And(" + iCriteria + ")";
+                        if (!string.IsNullOrEmpty(sqlCriteria)) {
+                            sqlContentCriteria = sqlContentCriteria + "and(" + sqlCriteria + ")";
                         }
                         //
                         // ----- Active Only records
-                        //
-                        if (iActiveOnly) {
-                            ContentCriteria = ContentCriteria + "And(Active<>0)";
-                            //ContentCriteria = ContentCriteria & "And(" & TableName & ".Active<>0)"
+                        if (activeOnly) {
+                            sqlContentCriteria = sqlContentCriteria + "and(active<>0)";
                         }
                         //
                         // ----- Process Select Fields, make sure ContentControlID,ID,Name,Active are included
-                        //
-                        iSelectFieldList = genericController.vbReplace(iSelectFieldList, "\t", " ");
-                        while (genericController.vbInstr(1, iSelectFieldList, " ,") != 0) {
-                            iSelectFieldList = genericController.vbReplace(iSelectFieldList, " ,", ",");
+                        sqlSelectFieldList = genericController.vbReplace(sqlSelectFieldList, "\t", " ");
+                        while (genericController.vbInstr(1, sqlSelectFieldList, " ,") != 0) {
+                            sqlSelectFieldList = genericController.vbReplace(sqlSelectFieldList, " ,", ",");
                         }
-                        while (genericController.vbInstr(1, iSelectFieldList, ", ") != 0) {
-                            iSelectFieldList = genericController.vbReplace(iSelectFieldList, ", ", ",");
+                        while (genericController.vbInstr(1, sqlSelectFieldList, ", ") != 0) {
+                            sqlSelectFieldList = genericController.vbReplace(sqlSelectFieldList, ", ", ",");
                         }
-                        if ((!string.IsNullOrEmpty(iSelectFieldList)) && (iSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) == -1)) {
-                            TestUcaseFieldList = genericController.vbUCase("," + iSelectFieldList + ",");
+                        if ((!string.IsNullOrEmpty(sqlSelectFieldList)) && (sqlSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) == -1)) {
+                            string TestUcaseFieldList = genericController.vbUCase("," + sqlSelectFieldList + ",");
                             if (genericController.vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", 1) == 0) {
-                                iSelectFieldList = iSelectFieldList + ",ContentControlID";
+                                sqlSelectFieldList = sqlSelectFieldList + ",ContentControlID";
                             }
                             if (genericController.vbInstr(1, TestUcaseFieldList, ",NAME,", 1) == 0) {
-                                iSelectFieldList = iSelectFieldList + ",Name";
+                                sqlSelectFieldList = sqlSelectFieldList + ",Name";
                             }
                             if (genericController.vbInstr(1, TestUcaseFieldList, ",ID,", 1) == 0) {
-                                iSelectFieldList = iSelectFieldList + ",ID";
+                                sqlSelectFieldList = sqlSelectFieldList + ",ID";
                             }
                             if (genericController.vbInstr(1, TestUcaseFieldList, ",ACTIVE,", 1) == 0) {
-                                iSelectFieldList = iSelectFieldList + ",ACTIVE";
+                                sqlSelectFieldList = sqlSelectFieldList + ",ACTIVE";
                             }
                         }
                         //
-                        TableName = CDef.contentTableName;
-                        DataSourceName = CDef.contentDataSourceName;
-                        //
                         // ----- Check for blank Tablename or DataSource
-                        //
-                        if (string.IsNullOrEmpty(TableName)) {
-                            throw (new Exception("Error opening csv_ContentSet because Content Definition [" + ContentName + "] does not reference a valid table"));
-                        } else if (string.IsNullOrEmpty(DataSourceName)) {
-                            throw (new Exception("Error opening csv_ContentSet because Table Definition [" + TableName + "] does not reference a valid datasource"));
+                        if (string.IsNullOrEmpty(CDef.contentTableName)) {
+                            throw (new Exception("Content metadata [" + ContentName + "] does not reference a valid table"));
+                        } else if (string.IsNullOrEmpty(CDef.contentDataSourceName)) {
+                            throw (new Exception("Table metadata [" + CDef.contentTableName + "] does not reference a valid datasource"));
                         }
                         //
                         // ----- If no select list, use *
-                        //
-                        if (string.IsNullOrEmpty(iSelectFieldList)) {
-                            iSelectFieldList = "*";
+                        if (string.IsNullOrEmpty(sqlSelectFieldList)) {
+                            sqlSelectFieldList = "*";
                         }
                         //
                         // ----- Open the csv_ContentSet
-                        returnCs = csInit(iMemberID);
+                        returnCs = csInit(memberId);
                         {
                             DbController.ContentSetClass contentSet = contentSetStore[returnCs];
                             contentSet.Updateable = true;
                             contentSet.ContentName = ContentName;
-                            contentSet.DataSource = DataSourceName;
+                            contentSet.DataSource = CDef.contentDataSourceName;
                             contentSet.CDef = CDef;
-                            contentSet.SelectTableFieldList = iSelectFieldList;
+                            contentSet.SelectTableFieldList = sqlSelectFieldList;
                             contentSet.PageNumber = PageNumber;
                             contentSet.PageSize = PageSize;
                             if (contentSet.PageNumber <= 0) {
@@ -1427,28 +1390,17 @@ namespace Contensive.Processor.Controllers {
                             } else if (contentSet.PageSize == 0) {
                                 contentSet.PageSize = pageSizeDefault;
                             }
+                            string SQL = null;
                             //
-                            if (!string.IsNullOrWhiteSpace(iSortFieldList)) {
-                                SQL = "Select " + iSelectFieldList + " FROM " + TableName + " WHERE (" + ContentCriteria + ") ORDER BY " + iSortFieldList;
+                            if (!string.IsNullOrWhiteSpace(sqlOrderBy)) {
+                                SQL = "Select " + sqlSelectFieldList + " FROM " + CDef.contentTableName + " WHERE (" + sqlContentCriteria + ") ORDER BY " + sqlOrderBy;
                             } else {
-                                SQL = "Select " + iSelectFieldList + " FROM " + TableName + " WHERE (" + ContentCriteria + ")";
+                                SQL = "Select " + sqlSelectFieldList + " FROM " + CDef.contentTableName + " WHERE (" + sqlContentCriteria + ")";
                             }
                             contentSet.Source = SQL;
                             if (!contentSetOpenWithoutRecords) {
-                                contentSet.dt = executeQuery(SQL, DataSourceName, contentSet.PageSize * (contentSet.PageNumber - 1), contentSet.PageSize);
+                                contentSet.dt = executeQuery(SQL, CDef.contentDataSourceName, contentSet.PageSize * (contentSet.PageNumber - 1), contentSet.PageSize);
                             }
-                            ////
-                            //if (contentSetOpenWithoutRecords) {
-                            //    //
-                            //    // Save the source, but do not open the recordset
-                            //    //
-                            //    contentSetStore[returnCs].Source = SQL;
-                            //} else {
-                            //    //
-                            //    // Run the query
-                            //    //
-                            //    contentSetStore[returnCs].dt = executeQuery(SQL, DataSourceName, contentSet.PageSize * (contentSet.PageNumber - 1), contentSet.PageSize);
-                            //}
                         }
                         csInitData(returnCs);
                     }
@@ -2042,9 +1994,9 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         if (string.IsNullOrEmpty(OriginalFilename)) {
-                            returnFilename = fileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, fieldTypeId);
+                            returnFilename = FileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, fieldTypeId);
                         } else {
-                            returnFilename = fileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, OriginalFilename);
+                            returnFilename = FileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, OriginalFilename);
                         }
                     }
                 }
@@ -2286,7 +2238,7 @@ namespace Contensive.Processor.Controllers {
                         List<string> invaldiateObjectList = new List<string>();
                         CSPointer = csOpen(ContentName, Criteria, "", false, MemberID, true, true);
                         while (csOk(CSPointer)) {
-                            invaldiateObjectList.Add(Controllers.cacheController.getCacheKey_Entity(CDef.contentTableName, "id", csGetInteger(CSPointer, "id").ToString()));
+                            invaldiateObjectList.Add(Controllers.CacheController.getCacheKey_Entity(CDef.contentTableName, "id", csGetInteger(CSPointer, "id").ToString()));
                             csDeleteRecord(CSPointer);
                             csGoNext(CSPointer);
                         }
@@ -3305,7 +3257,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- reset the ContentTimeStamp to csv_ClearBake
                                 //
-                                core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(LiveTableName, "id", LiveRecordID.ToString()));
+                                core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(LiveTableName, "id", LiveRecordID.ToString()));
                                 //
                                 // ----- mark the record NOT UpToDate for SpiderDocs
                                 //
@@ -3580,9 +3532,9 @@ namespace Contensive.Processor.Controllers {
                         fieldTypeId = CDef.fields[FieldName.ToLower()].fieldTypeId;
                         //
                         if (string.IsNullOrEmpty(OriginalFilename)) {
-                            returnResult = fileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, fieldTypeId);
+                            returnResult = FileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, fieldTypeId);
                         } else {
-                            returnResult = fileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, OriginalFilename);
+                            returnResult = FileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, OriginalFilename);
                         }
                     }
                 }
@@ -4861,7 +4813,7 @@ namespace Contensive.Processor.Controllers {
                     ContentControlID = (core.db.csGetInteger(iCSPointer, "contentcontrolid"));
                     ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentControlID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        result = adminUIController.getRecordEditLink(core,ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
+                        result = AdminUIController.getRecordEditLink(core,ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
                     }
                 }
             }
@@ -4973,7 +4925,7 @@ namespace Contensive.Processor.Controllers {
                     if (string.IsNullOrEmpty(ContentName)) {
                         logController.logWarn(core, "getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.");
                     } else {
-                        result = adminUIController.getRecordAddLink(core,ContentName, PresetNameValueList, AllowPaste);
+                        result = AdminUIController.getRecordAddLink(core,ContentName, PresetNameValueList, AllowPaste);
                     }
                 }
             } catch (Exception ex) {

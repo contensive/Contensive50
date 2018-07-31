@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Complex;
 using Contensive.Addons.Tools;
-using static Contensive.Processor.adminUIController;
+using static Contensive.Processor.AdminUIController;
 //
 namespace Contensive.Addons.AdminSite {
     public class toolSetListColumnsClass {
@@ -42,7 +42,7 @@ namespace Contensive.Addons.AdminSite {
                     //   Process reset
                     core.userProperty.setProperty(adminContextClass.IndexConfigPrefix + adminContent.id.ToString(), "");
                 }
-                indexConfigClass IndexConfig = getHtmlBodyClass.LoadIndexConfig(core, adminContext);
+                IndexConfigClass IndexConfig = getHtmlBodyClass.LoadIndexConfig(core, adminContext);
                 int ToolsAction = core.docProperties.getInteger("dta");
                 int TargetFieldID = core.docProperties.getInteger("fi");
                 string TargetFieldName = core.docProperties.getText("FieldName");
@@ -56,7 +56,7 @@ namespace Contensive.Addons.AdminSite {
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string Title = "Set Columns: " + adminContent.name;
                 string Description = "Use the icons to add, remove and modify your personal column prefernces for this content (" + adminContent.name + "). Hit OK when complete. Hit Reset to restore your column preferences for this content to the site's default column preferences.";
-                Stream.Add(adminUIController.getToolFormTitle(Title, Description));
+                Stream.Add(AdminUIController.getToolFormTitle(Title, Description));
                 //
                 //--------------------------------------------------------------------------------
                 // Process actions
@@ -139,12 +139,12 @@ namespace Contensive.Addons.AdminSite {
                                     // Add a field to the index form
                                     //
                                     if (FieldIDToAdd != 0) {
-                                        indexConfigColumnClass column = null;
+                                        IndexConfigColumnClass column = null;
                                         foreach (var columnx in IndexConfig.columns) {
                                             columnx.Width = encodeInteger((columnx.Width * 80) / (double)ColumnWidthTotal);
                                         }
                                         {
-                                            column = new indexConfigColumnClass();
+                                            column = new IndexConfigColumnClass();
                                             int CSPointer = core.db.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
                                             if (core.db.csOk(CSPointer)) {
                                                 column.Name = core.db.csGet(CSPointer, "name");
@@ -162,7 +162,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // Remove a field to the index form
                                     int columnWidthTotal = 0;
-                                    var dstColumns = new List<indexConfigColumnClass>() { };
+                                    var dstColumns = new List<IndexConfigColumnClass>() { };
                                     foreach (var column in IndexConfig.columns) {
                                         if (column.Name != TargetFieldName.ToLower()) {
                                             dstColumns.Add(column);
@@ -334,15 +334,15 @@ namespace Contensive.Addons.AdminSite {
                                 }
                                 //adminUIController Adminui = new adminUIController(core);
                                 int ColumnPtr = 0;
-                                string link = "?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns; 
+                                string link = "?" + core.doc.refreshQueryString + "&FieldName=" + HtmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns; 
                                 //string AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
                                 Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">");
                                 //Stream.Add("<img src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\" >");
-                                Stream.Add(htmlController.div(adminUIController.getIconDeleteLink(link + "&dta=" + ToolsActionRemoveField),"text-center"));
-                                Stream.Add(htmlController.div(adminUIController.getIconArrowRightLink(link + "&dta=" + ToolsActionMoveFieldRight), "text-center"));
-                                Stream.Add(htmlController.div(adminUIController.getIconArrowLeftLink(link + "&dta=" + ToolsActionMoveFieldLeft), "text-center"));
-                                Stream.Add(htmlController.div(adminUIController.getIconExpandLink(link + "&dta=" + ToolsActionExpand), "text-center"));
-                                Stream.Add(htmlController.div(adminUIController.getIconContractLink(link + "&dta=" + ToolsActionContract), "text-center"));
+                                Stream.Add(HtmlController.div(AdminUIController.getIconDeleteLink(link + "&dta=" + ToolsActionRemoveField),"text-center"));
+                                Stream.Add(HtmlController.div(AdminUIController.getIconArrowRightLink(link + "&dta=" + ToolsActionMoveFieldRight), "text-center"));
+                                Stream.Add(HtmlController.div(AdminUIController.getIconArrowLeftLink(link + "&dta=" + ToolsActionMoveFieldLeft), "text-center"));
+                                Stream.Add(HtmlController.div(AdminUIController.getIconExpandLink(link + "&dta=" + ToolsActionExpand), "text-center"));
+                                Stream.Add(HtmlController.div(AdminUIController.getIconContractLink(link + "&dta=" + ToolsActionContract), "text-center"));
                                 Stream.Add("</td>");
                             }
                             Stream.Add("</tr>");
@@ -370,52 +370,52 @@ namespace Contensive.Addons.AdminSite {
                                 if (field.fieldTypeId == FieldTypeIdFile) {
                                     //
                                     // file can not be search
-                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (file field)"));
+                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileText) {
                                     //
                                     // filename can not be search
-                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (text file field)"));
+                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (text file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileHTML) {
                                     //
                                     // filename can not be search
-                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (html file field)"));
+                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (html file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileCSS) {
                                     //
                                     // css filename can not be search
-                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (css file field)"));
+                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (css file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileXML) {
                                     //
                                     // xml filename can not be search
-                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (xml file field)"));
+                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (xml file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileJavascript) {
                                     //
                                     // javascript filename can not be search
-                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (javascript file field)"));
+                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (javascript file field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdLongText) {
                                     //
                                     // long text can not be search
-                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
+                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdHTML) {
                                     //
                                     // long text can not be search
-                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
+                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdFileImage) {
                                     //
                                     // long text can not be search
-                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (image field)"));
+                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (image field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdRedirect) {
                                     //
                                     // long text can not be search
-                                    Stream.Add(htmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (redirect field)"));
+                                    Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (redirect field)"));
                                 } else if (field.fieldTypeId == FieldTypeIdManyToMany) {
                                     //
                                     // many to many can not be search
-                                    Stream.Add(htmlController.div( iconNotAvailable + "&nbsp;" + field.caption + " (many-to-many field)"));
+                                    Stream.Add(HtmlController.div( iconNotAvailable + "&nbsp;" + field.caption + " (many-to-many field)"));
                                 } else {
                                     //
                                     // can be used as column header
                                     string link = "?" + core.doc.refreshQueryString + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldID + "=" + field.id + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
-                                    Stream.Add(htmlController.div(adminUIController.getIconPlusLink(link, "&nbsp;" + field.caption)));
+                                    Stream.Add(HtmlController.div(AdminUIController.getIconPlusLink(link, "&nbsp;" + field.caption)));
                                 }
                             }
                         }
@@ -435,14 +435,14 @@ namespace Contensive.Addons.AdminSite {
                 //Stream.Add( core.main_GetFormInputHidden("NeedToReloadConfig", NeedToReloadConfig))
                 string Content = ""
                     + Stream.Text
-                    + htmlController.inputHidden("cid", adminContent.id.ToString())
-                    + htmlController.inputHidden(rnAdminForm, "1")
-                    + htmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns)
+                    + HtmlController.inputHidden("cid", adminContent.id.ToString())
+                    + HtmlController.inputHidden(rnAdminForm, "1")
+                    + HtmlController.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns)
                     + "";
                 //
                 // -- assemble form
 
-                result = adminUIController.getToolForm(core, Content, ButtonOK + "," + ButtonReset);
+                result = AdminUIController.getToolForm(core, Content, ButtonOK + "," + ButtonReset);
                 //result = adminUIController.getBody(core, Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
                 //
                 //

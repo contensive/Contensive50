@@ -583,11 +583,11 @@ namespace Contensive.Processor.Models.DbModels {
                         // -- add all cachenames to the injected cachenamelist
                         baseModel baseInstance = modelInstance as baseModel;
                         if (baseInstance != null) {
-                            string cacheName0 = Controllers.cacheController.getCacheKey_Entity(tableName, "id", baseInstance.id.ToString());
+                            string cacheName0 = Controllers.CacheController.getCacheKey_Entity(tableName, "id", baseInstance.id.ToString());
                             callersCacheNameList.Add(cacheName0);
                             core.cache.setObject(cacheName0, modelInstance);
                             //
-                            string cacheName1 = Controllers.cacheController.getCacheKey_Entity(tableName, "ccguid", baseInstance.ccguid);
+                            string cacheName1 = Controllers.CacheController.getCacheKey_Entity(tableName, "ccguid", baseInstance.ccguid);
                             callersCacheNameList.Add(cacheName1);
                             core.cache.setAlias(cacheName1, cacheName0);
                         }
@@ -734,7 +734,7 @@ namespace Contensive.Processor.Models.DbModels {
                                                 //
                                                 // -- save content
                                                 if (string.IsNullOrEmpty(filename)) {
-                                                    filename = fileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, fieldTypeId);
+                                                    filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, fieldTypeId);
                                                 }
                                                 core.cdnFiles.saveFile(filename, content);
                                                 cs.setFieldFilename(instanceProperty.Name, filename);
@@ -812,7 +812,7 @@ namespace Contensive.Processor.Models.DbModels {
                     //core.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
                     //
                     // -- object is here, but the cache was invalidated, setting
-                    core.cache.setObject(Controllers.cacheController.getCacheKey_Entity(tableName, "id", this.id.ToString()), this);
+                    core.cache.setObject(Controllers.CacheController.getCacheKey_Entity(tableName, "id", this.id.ToString()), this);
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -843,7 +843,7 @@ namespace Contensive.Processor.Models.DbModels {
                         string contentName = derivedContentName(instanceType);
                         string tableName = derivedContentTableName(instanceType);
                         core.db.deleteContentRecords(contentName, "id=" + recordId.ToString());
-                        core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
+                        core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(tableName, recordId));
                     }
                 }
             } catch (Exception ex) {
@@ -974,10 +974,10 @@ namespace Contensive.Processor.Models.DbModels {
                 } else {
                     object instanceType = typeof(T);
                     string tableName = derivedContentTableName((Type)instanceType);
-                    core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
+                    core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(tableName, recordId));
                     //
                     // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-                    core.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, "id", "0"));
+                    core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(tableName, "id", "0"));
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -1148,7 +1148,7 @@ namespace Contensive.Processor.Models.DbModels {
         private static T readModelCache<T>(CoreController core, string fieldName, string fieldValue) where T : baseModel {
             Type instanceType = typeof(T);
             string tableName = derivedContentTableName(instanceType);
-            string cacheName = Controllers.cacheController.getCacheKey_Entity(tableName, fieldName, fieldValue);
+            string cacheName = Controllers.CacheController.getCacheKey_Entity(tableName, fieldName, fieldValue);
             return core.cache.getObject<T>(cacheName);
         }
         //

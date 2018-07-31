@@ -800,34 +800,15 @@ namespace Contensive.Processor.Controllers {
             bool tempDownloadCollectionFiles = false;
             tempDownloadCollectionFiles = false;
             try {
-                //
-                int CollectionFileCnt = 0;
-                string CollectionFilePath = null;
-                XmlDocument Doc = new XmlDocument();
-                string URL = null;
-                string ResourceFilename = null;
-                string ResourceLink = null;
-                string CollectionVersion = null;
-                string CollectionFileLink = null;
-                XmlDocument CollectionFile = new XmlDocument();
-                string Collectionname = null;
-                int Pos = 0;
-                string UserError = null;
-                string errorPrefix = null;
-                int downloadRetry = 0;
-                const int downloadRetryMax = 3;
-                //
                 logController.logInfo(core, "downloading collection [" + CollectionGuid + "]");
                 //
-                //---------------------------------------------------------------------------------------------------------------
                 // Request the Download file for this collection
-                //---------------------------------------------------------------------------------------------------------------
-                //
-                Doc = new XmlDocument();
-                URL = "http://support.contensive.com/GetCollection?iv=" + core.codeVersion() + "&guid=" + CollectionGuid;
-                errorPrefix = "DownloadCollectionFiles, Error reading the collection library status file from the server for Collection [" + CollectionGuid + "], download URL [" + URL + "]. ";
-                downloadRetry = 0;
+                XmlDocument Doc = new XmlDocument();
+                string URL = "http://support.contensive.com/GetCollection?iv=" + core.codeVersion() + "&guid=" + CollectionGuid;
+                string errorPrefix = "DownloadCollectionFiles, Error reading the collection library status file from the server for Collection [" + CollectionGuid + "], download URL [" + URL + "]. ";
+                int downloadRetry = 0;
                 int downloadDelay = 2000;
+                const int downloadRetryMax = 3;
                 do {
                     try {
                         tempDownloadCollectionFiles = true;
@@ -844,11 +825,9 @@ namespace Contensive.Processor.Controllers {
                         XmlTextReader reader = new XmlTextReader(responseStream);
                         Doc.Load(reader);
                         break;
-                        //Call Doc.Load(URL)
                     } catch (Exception ex) {
                         //
                         // this error could be data related, and may not be critical. log issue and continue
-                        //
                         downloadDelay += 2000;
                         return_ErrorMessage = "There was an error while requesting the download details for collection [" + CollectionGuid + "]";
                         tempDownloadCollectionFiles = false;
@@ -859,28 +838,30 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(return_ErrorMessage)) {
                     //
                     // continue if no errors
-                    //
                     if (Doc.DocumentElement.Name.ToLower() != genericController.vbLCase(DownloadFileRootNode)) {
                         return_ErrorMessage = "The collection file from the server was not valid for collection [" + CollectionGuid + "]";
                         tempDownloadCollectionFiles = false;
                         logController.logInfo(core, errorPrefix + "The response has a basename [" + Doc.DocumentElement.Name + "] but [" + DownloadFileRootNode + "] was expected.");
                     } else {
                         //
-                        //------------------------------------------------------------------
                         // Parse the Download File and download each file into the working folder
-                        //------------------------------------------------------------------
-                        //
                         if (Doc.DocumentElement.ChildNodes.Count == 0) {
                             return_ErrorMessage = "The collection library status file from the server has a valid basename, but no childnodes.";
                             logController.logInfo(core, errorPrefix + "The collection library status file from the server has a valid basename, but no childnodes. The collection was probably Not found");
                             tempDownloadCollectionFiles = false;
                         } else {
+                            //
+                            int CollectionFileCnt = 0;
                             foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
+                                string ResourceFilename = null;
+                                string ResourceLink = null;
+                                string CollectionVersion = null;
+                                string CollectionFileLink = null;
+                                string Collectionname = null;
                                 switch (genericController.vbLCase(CDefSection.Name)) {
                                     case "collection":
                                         //
                                         // Read in the interfaces and save to Add-ons
-                                        //
                                         ResourceFilename = "";
                                         ResourceLink = "";
                                         Collectionname = "";
@@ -888,6 +869,8 @@ namespace Contensive.Processor.Controllers {
                                         CollectionVersion = "";
                                         CollectionFileLink = "";
                                         foreach (XmlNode CDefInterfaces in CDefSection.ChildNodes) {
+                                            int Pos = 0;
+                                            string UserError = null;
                                             switch (genericController.vbLCase(CDefInterfaces.Name)) {
                                                 case "name":
                                                     Collectionname = CDefInterfaces.InnerText;
@@ -913,16 +896,10 @@ namespace Contensive.Processor.Controllers {
                                                         if ((Pos <= 0) && (Pos < CollectionFileLink.Length)) {
                                                             //
                                                             // Skip this file because the collecion file link has no slash (no file)
-                                                            //
                                                             logController.logInfo(core, errorPrefix + "Collection [" + Collectionname + "] was not installed because the Collection File Link does not point to a valid file [" + CollectionFileLink + "]");
                                                         } else {
-                                                            CollectionFilePath = workingPath + CollectionFileLink.Substring(Pos);
+                                                            string CollectionFilePath = workingPath + CollectionFileLink.Substring(Pos);
                                                             core.privateFiles.saveHttpRequestToFile(CollectionFileLink, CollectionFilePath);
-                                                            // BuildCollectionFolder takes care of the unzipping.
-                                                            //If genericController.vbLCase(Right(CollectionFilePath, 4)) = ".zip" Then
-                                                            //    Call UnzipAndDeleteFile_AndWait(CollectionFilePath)
-                                                            //End If
-                                                            //DownloadCollectionFiles = True
                                                         }
                                                     }
                                                     break;
@@ -930,7 +907,6 @@ namespace Contensive.Processor.Controllers {
                                                 case "resourcelink":
                                                     //
                                                     // save the filenames and download them only if OKtoinstall
-                                                    //
                                                     ResourceFilename = "";
                                                     ResourceLink = "";
                                                     foreach (XmlNode ActiveXNode in CDefInterfaces.ChildNodes) {
@@ -950,7 +926,6 @@ namespace Contensive.Processor.Controllers {
                                                         if (string.IsNullOrEmpty(ResourceFilename)) {
                                                             //
                                                             // Take Filename from Link
-                                                            //
                                                             Pos = ResourceLink.LastIndexOf("/") + 1;
                                                             if (Pos != 0) {
                                                                 ResourceFilename = ResourceLink.Substring(Pos);
@@ -975,18 +950,6 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                //
-                // no - register anything that downloaded correctly - if this collection contains an import, and one of the imports has a problem, all the rest need to continue
-                //
-                //
-                //If Not DownloadCollectionFiles Then
-                //    '
-                //    ' Must clear these out, if there is an error, a reset will keep the error message from making it to the page
-                //    '
-                //    Return_IISResetRequired = False
-                //    Return_RegisterList = ""
-                //End If
-                //
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -1857,7 +1820,7 @@ namespace Contensive.Processor.Controllers {
                                                             filename = core.privateFiles.correctFilenameCase(CollectionVersionFolder + SrcPath + filename);
                                                             //
                                                             // == normalize dst
-                                                            string dstDosPath = fileController.normalizeDosPath(dstPath);
+                                                            string dstDosPath = FileController.normalizeDosPath(dstPath);
                                                             //
                                                             // -- 
                                                             switch (resourceType.ToLower()) {
@@ -2559,7 +2522,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // -- execute onInstall addon if found
                                                 if (!string.IsNullOrEmpty( onInstallAddonGuid )) {
-                                                    var addon = Models.DbModels.addonModel.create(core, onInstallAddonGuid);
+                                                    var addon = Models.DbModels.AddonModel.create(core, onInstallAddonGuid);
                                                     if ( addon != null) {
                                                         var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                                             addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,

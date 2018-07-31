@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.DbModels {
-    public class domainModel : baseModel {
+    public class DomainModel : baseModel {
         //
         //====================================================================================================
         //-- const
@@ -66,43 +66,43 @@ namespace Contensive.Processor.Models.DbModels {
         public bool allowCORS { get; set; }
         //
         //====================================================================================================
-        public static domainModel add(CoreController core) {
-            return add<domainModel>(core);
+        public static DomainModel add(CoreController core) {
+            return add<DomainModel>(core);
         }
         //
         //====================================================================================================
-        public static domainModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<domainModel>(core, ref callersCacheNameList);
+        public static DomainModel add(CoreController core, ref List<string> callersCacheNameList) {
+            return add<DomainModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static domainModel create(CoreController core, int recordId) {
-            return create<domainModel>(core, recordId);
+        public static DomainModel create(CoreController core, int recordId) {
+            return create<DomainModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static domainModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<domainModel>(core, recordId, ref callersCacheNameList);
+        public static DomainModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<DomainModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static domainModel create(CoreController core, string recordGuid) {
-            return create<domainModel>(core, recordGuid);
+        public static DomainModel create(CoreController core, string recordGuid) {
+            return create<DomainModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static domainModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<domainModel>(core, recordGuid, ref callersCacheNameList);
+        public static DomainModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<DomainModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static domainModel createByName(CoreController core, string recordName) {
-            return createByName<domainModel>(core, recordName);
+        public static DomainModel createByName(CoreController core, string recordName) {
+            return createByName<DomainModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static domainModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<domainModel>(core, recordName, ref callersCacheNameList);
+        public static DomainModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<DomainModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -112,57 +112,57 @@ namespace Contensive.Processor.Models.DbModels {
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {
-            delete<domainModel>(core, recordId);
+            delete<DomainModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void delete(CoreController core, string ccGuid) {
-            delete<domainModel>(core, ccGuid);
+            delete<DomainModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<domainModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<domainModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<DomainModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<DomainModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<domainModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<domainModel>(core, sqlCriteria, sqlOrderBy);
+        public static List<DomainModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<DomainModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<domainModel> createList(CoreController core, string sqlCriteria) {
-            return createList<domainModel>(core, sqlCriteria);
+        public static List<DomainModel> createList(CoreController core, string sqlCriteria) {
+            return createList<DomainModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
         public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCacheSingleRecord<domainModel>(core, recordId);
+            invalidateCacheSingleRecord<DomainModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return baseModel.getRecordName<domainModel>(core, recordId);
+            return baseModel.getRecordName<DomainModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return baseModel.getRecordName<domainModel>(core, ccGuid);
+            return baseModel.getRecordName<DomainModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return baseModel.getRecordId<domainModel>(core, ccGuid);
+            return baseModel.getRecordId<DomainModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static domainModel createDefault(CoreController core) {
-            return createDefault<domainModel>(core);
+        public static DomainModel createDefault(CoreController core) {
+            return createDefault<DomainModel>(core);
         }
         //
         //====================================================================================================
-        public static Dictionary<string,domainModel> createDictionary(CoreController core, string sqlCriteria) {
-            var result = new Dictionary<string, domainModel> { };
+        public static Dictionary<string,DomainModel> createDictionary(CoreController core, string sqlCriteria) {
+            var result = new Dictionary<string, DomainModel> { };
             foreach (var domain in createList(core, sqlCriteria)) {
                 if (!result.ContainsKey(domain.name.ToLower())) {
                     result.Add(domain.name.ToLower(), domain);

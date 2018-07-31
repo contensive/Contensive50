@@ -36,11 +36,11 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // arrange
                 string source = "All work and no play makes johnny a dull boy.";
                 // act
-                string resultEncrypted = securityController.twoWayEncrypt(cp.core, source);
-                string resultDecrypted = securityController.twoWayDecrypt(cp.core, resultEncrypted);
-                string blankEncrypted = securityController.twoWayEncrypt(cp.core, "");
-                string blankDecrypted = securityController.twoWayDecrypt(cp.core, "");
-                string invalidDecrypted = securityController.twoWayDecrypt(cp.core, source);
+                string resultEncrypted = SecurityController.twoWayEncrypt(cp.core, source);
+                string resultDecrypted = SecurityController.twoWayDecrypt(cp.core, resultEncrypted);
+                string blankEncrypted = SecurityController.twoWayEncrypt(cp.core, "");
+                string blankDecrypted = SecurityController.twoWayDecrypt(cp.core, "");
+                string invalidDecrypted = SecurityController.twoWayDecrypt(cp.core, source);
                 // assert
                 Assert.AreEqual(source, resultDecrypted);
                 Assert.AreNotEqual("", blankEncrypted);

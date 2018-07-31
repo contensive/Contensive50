@@ -20,7 +20,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// Manage the sql server (adding catalogs, etc.)
     /// </summary>
-    public class dbServerController : IDisposable {
+    public class DbServerController : IDisposable {
         //
         // objects passed in that are not disposed
         //
@@ -36,7 +36,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public dbServerController(CoreController core) : base() {
+        public DbServerController(CoreController core) : base() {
             try {
                 this.core = core;
             } catch (Exception ex) {
@@ -180,7 +180,7 @@ namespace Contensive.Processor.Controllers {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~dbServerController() {
+        ~DbServerController() {
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();

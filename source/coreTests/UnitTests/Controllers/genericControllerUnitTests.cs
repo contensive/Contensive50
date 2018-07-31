@@ -297,8 +297,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             string test1 = "&quot; &amp; &apos; &minus; &lt; &gt;";
             string test2 = "&#34; &#35; &#36; &#37;";
             // act
-            string result1 = htmlController.decodeHtml(test1);
-            string result2 = htmlController.decodeHtml(test2);
+            string result1 = HtmlController.decodeHtml(test1);
+            string result2 = HtmlController.decodeHtml(test2);
             // assert
             Assert.AreEqual(result1, "\" & ' − < >");
             Assert.AreEqual(result2, "\" # $ %");
@@ -461,8 +461,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_span_test1() {
             // arrange
             // act
-            string result = htmlController.span("test", "testClass");
-            string resultNoClass = htmlController.span("test");
+            string result = HtmlController.span("test", "testClass");
+            string resultNoClass = HtmlController.span("test");
             // assert
             Assert.AreEqual("<span class=\"testClass\">test</span>", result);
             Assert.AreEqual("<span>test</span>", resultNoClass);
