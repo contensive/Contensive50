@@ -1109,10 +1109,11 @@ namespace Contensive.Processor.Controllers {
             if (!string.IsNullOrWhiteSpace(htmlClass)) {
                 result +=  " class=\"" + htmlClass + "\"";
             }
+            result += ">";
             if (!string.IsNullOrWhiteSpace(label)) {
-                result = "<label>" + result + "&nbsp;" + label + "</label>";
+                result = div( "<label>" + result + "&nbsp;" + label + "</label>", "checkbox");
             }
-            return div( result + ">","checkbox");
+            return result;
         }
         //
         //====================================================================================================

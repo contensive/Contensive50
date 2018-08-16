@@ -72,6 +72,7 @@ namespace Contensive.Processor.Controllers {
         /// add a link alias to a page as the primary
         /// </summary>
         public static void addLinkAlias(CoreController core, string linkAlias, int PageID, string QueryStringSuffix, bool OverRideDuplicate, bool DupCausesWarning, ref string return_WarningMessage) {
+            string hint = "";
             try {
                 const string SafeStringLc = "0123456789abcdefghijklmnopqrstuvwxyz-_/";
                 bool AllowLinkAlias = core.siteProperties.getBoolean("allowLinkAlias", false);
@@ -231,7 +232,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception) {
-
+                logController.handleError(core, ex, "addLinkAlias exception, hint [" + hint + "]");
                 throw;
             }
         }
