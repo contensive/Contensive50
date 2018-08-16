@@ -874,7 +874,7 @@ namespace Contensive.Processor.Models.DbModels {
                         string contentName = derivedContentName(instanceType);
                         baseModel instance = create<baseModel>(core, ccguid);
                         if (instance != null) {
-                            invalidateCacheSingleRecord<T>(core, instance.id);
+                            invalidateCache<T>(core, instance.id);
                             core.db.deleteContentRecords(contentName, "(ccguid=" + core.db.encodeSQLText(ccguid) + ")");
                         }
                     }
@@ -961,7 +961,7 @@ namespace Contensive.Processor.Models.DbModels {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="recordId"></param>
-        protected static void invalidateCacheSingleRecord<T>(CoreController core, int recordId) where T : baseModel {
+        protected static void invalidateCache<T>(CoreController core, int recordId) where T : baseModel {
             try {
                 if (core.serverConfig == null) {
                     //

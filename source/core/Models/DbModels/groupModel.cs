@@ -103,7 +103,7 @@ namespace Contensive.Processor.Models.DbModels {
         //
         //====================================================================================================
         public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCacheSingleRecord<groupModel>(core, recordId);
+            invalidateCache<groupModel>(core, recordId);
         }
         //
         //====================================================================================================

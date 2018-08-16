@@ -85,9 +85,9 @@ namespace Contensive.Addons.Housekeeping {
                         logHousekeeping(core, "Updating local collections from Library returned an error, " + ErrorMessage);
                     }
                     //
+                    // 20180816, no, core is v.41
                     // Verify core installation
-                    //
-                    CollectionController.installCollectionFromRemoteRepo(core, CoreCollectionGuid, ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
+                    //CollectionController.installCollectionFromRemoteRepo(core, CoreCollectionGuid, ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
                     //
                     string DomainNamePrimary = core.appConfig.domainList[0];
                     int Pos = genericController.vbInstr(1, DomainNamePrimary, ",");

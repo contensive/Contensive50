@@ -101,20 +101,20 @@ namespace Contensive.Addons.Email {
                         core.db.csClose(ref CSDrop);
                         //
                         // Select all people in the groups for this email
-                        string SQL = "select Distinct " + SQLTablePeople + ".ID as MemberID," + SQLTablePeople + ".email"
+                        string SQL = "select Distinct ccMembers.ID as MemberID,ccMembers.email"
                             + " From ((((ccemail"
                             + " left join ccEmailGroups on ccEmailGroups.EmailID=ccEmail.ID)"
-                            + " left join " + SQLTableGroups + " on " + SQLTableGroups + ".ID = ccEmailGroups.GroupID)"
-                            + " left join " + SQLTableMemberRules + " on " + SQLTableGroups + ".ID = " + SQLTableMemberRules + ".GroupID)"
-                            + " left join " + SQLTablePeople + " on " + SQLTablePeople + ".ID = " + SQLTableMemberRules + ".MemberID)"
+                            + " left join ccGroups on ccGroups.ID = ccEmailGroups.GroupID)"
+                            + " left join ccMemberRules on ccGroups.ID = ccMemberRules.GroupID)"
+                            + " left join ccMembers on ccMembers.ID = ccMemberRules.MemberID)"
                             + " Where (ccEmail.ID=" + emailID + ")"
-                            + " and (" + SQLTableGroups + ".active<>0)"
-                            + " and (" + SQLTableGroups + ".AllowBulkEmail<>0)"
-                            + " and (" + SQLTablePeople + ".active<>0)"
-                            + " and (" + SQLTablePeople + ".AllowBulkEmail<>0)"
-                            + " and (" + SQLTablePeople + ".email<>'')"
-                            + " and ((" + SQLTableMemberRules + ".DateExpires is null)or(" + SQLTableMemberRules + ".DateExpires>" + SQLDateNow + "))"
-                            + " order by " + SQLTablePeople + ".email," + SQLTablePeople + ".id";
+                            + " and (ccGroups.active<>0)"
+                            + " and (ccGroups.AllowBulkEmail<>0)"
+                            + " and (ccMembers.active<>0)"
+                            + " and (ccMembers.AllowBulkEmail<>0)"
+                            + " and (ccMembers.email<>'')"
+                            + " and ((ccMemberRules.DateExpires is null)or(ccMemberRules.DateExpires>" + SQLDateNow + "))"
+                            + " order by ccMembers.email,ccMembers.id";
                         int CSPeople = core.db.csOpenSql(SQL,"Default");
                         //
                         // Send the email to all selected people
@@ -170,9 +170,6 @@ namespace Contensive.Addons.Email {
         private void ProcessConditionalEmail(CoreController core, bool IsNewHour, bool IsNewDay) {
             try {
                 int dataSourceType = core.db.getDataSourceType("default");
-                string SQLTablePeople = cdefModel.getContentTablename(core, "People");
-                string SQLTableMemberRules = cdefModel.getContentTablename(core, "Member Rules");
-                string SQLTableGroups = cdefModel.getContentTablename(core, "Groups");
                 string BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
                 DateTime rightNow = DateTime.Now;
                 DateTime rightNowDate = rightNow.Date;
@@ -185,36 +182,26 @@ namespace Contensive.Addons.Email {
                 //   Housekeep logs far > 1 day
                 //
                 if (IsNewDay) {
-                    string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID as EmailID," + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
-                    string sqlDateTest = "";
-                    if (dataSourceType == DataSourceTypeODBCSQLServer) {
-                        sqlDateTest = ""
-                            + " AND (CAST(" + SQLTableMemberRules + ".DateAdded as datetime)+ccEmail.ConditionPeriod < " + SQLDateNow + ")"
-                            + " AND (CAST(" + SQLTableMemberRules + ".DateAdded as datetime)+ccEmail.ConditionPeriod+1.0 > " + SQLDateNow + ")"
-                            + "";
-                    } else {
-                        sqlDateTest = ""
-                            + " AND (" + SQLTableMemberRules + ".DateAdded+ccEmail.ConditionPeriod < " + SQLDateNow + ")"
-                            + " AND (" + SQLTableMemberRules + ".DateAdded+ccEmail.ConditionPeriod+1.0 > " + SQLDateNow + ")"
-                            + "";
-                    }
+                    string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID as EmailID,ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                     string SQL = "SELECT Distinct " + FieldList + " FROM ((((ccEmail"
                         + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
-                        + " LEFT JOIN " + SQLTableGroups + " ON ccEmailGroups.GroupID = " + SQLTableGroups + ".ID)"
-                        + " LEFT JOIN " + SQLTableMemberRules + " ON " + SQLTableGroups + ".ID = " + SQLTableMemberRules + ".GroupID)"
-                        + " LEFT JOIN " + SQLTablePeople + " ON " + SQLTableMemberRules + ".MemberID = " + SQLTablePeople + ".ID)"
+                        + " LEFT JOIN ccGroups ON ccEmailGroups.GroupID = ccGroups.ID)"
+                        + " LEFT JOIN ccMemberRules ON ccGroups.ID = ccMemberRules.GroupID)"
+                        + " LEFT JOIN ccMembers ON ccMemberRules.MemberID = ccMembers.ID)"
                         + " Where (ccEmail.id Is Not Null)"
-                        + sqlDateTest + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
+                        + " and(DATEADD(day, ccEmail.ConditionPeriod, ccMemberRules.dateAdded) < " + SQLDateNow + ")" // dont send before
+                        + " and(DATEADD(day, ccEmail.ConditionPeriod+1.0, ccMemberRules.dateAdded) > " + SQLDateNow + ")" // don't send after 1-day
+                        + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
                         + " AND (ccEmail.ScheduleDate < " + SQLDateNow + " OR ccEmail.ScheduleDate IS NULL)"
                         + " AND (ccEmail.Submitted <> 0)"
                         + " AND (ccEmail.ConditionID = 2)"
                         + " AND (ccEmail.ConditionPeriod IS NOT NULL)"
-                        + " AND (" + SQLTableGroups + ".Active <> 0)"
-                        + " AND (" + SQLTableGroups + ".AllowBulkEmail <> 0)"
-                        + " AND (" + SQLTablePeople + ".ID IS NOT NULL)"
-                        + " AND (" + SQLTablePeople + ".Active <> 0)"
-                        + " AND (" + SQLTablePeople + ".AllowBulkEmail <> 0)"
-                        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" + SQLTablePeople + ".ID))";
+                        + " AND (ccGroups.Active <> 0)"
+                        + " AND (ccGroups.AllowBulkEmail <> 0)"
+                        + " AND (ccMembers.ID IS NOT NULL)"
+                        + " AND (ccMembers.Active <> 0)"
+                        + " AND (ccMembers.AllowBulkEmail <> 0)"
+                        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID))";
                     int CSEmailBig = core.db.csOpenSql(SQL,"Default");
                     while (core.db.csOk(CSEmailBig)) {
                         int emailID = core.db.csGetInteger(CSEmailBig, "EmailID");
@@ -241,36 +228,38 @@ namespace Contensive.Addons.Email {
                 // Send Conditional Email - Offset days Before Expiration
                 //
                 if (IsNewDay) {
-                    string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, " + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
+                    string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                     string sqlDateTest = "";
                     if (dataSourceType == DataSourceTypeODBCSQLServer) {
                         sqlDateTest = ""
-                            + " AND (CAST(" + SQLTableMemberRules + ".DateExpires as datetime)-ccEmail.ConditionPeriod > " + SQLDateNow + ")"
-                            + " AND (CAST(" + SQLTableMemberRules + ".DateExpires as datetime)-ccEmail.ConditionPeriod-1.0 < " + SQLDateNow + ")"
+                            + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod > " + SQLDateNow + ")"
+                            + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod-1.0 < " + SQLDateNow + ")"
                             + "";
                     } else {
                         sqlDateTest = ""
-                            + " AND (" + SQLTableMemberRules + ".DateExpires-ccEmail.ConditionPeriod > " + SQLDateNow + ")"
-                            + " AND (" + SQLTableMemberRules + ".DateExpires-ccEmail.ConditionPeriod-1.0 < " + SQLDateNow + ")"
+                            + " AND (ccMemberRules.DateExpires-ccEmail.ConditionPeriod > " + SQLDateNow + ")"
+                            + " AND (ccMemberRules.DateExpires-ccEmail.ConditionPeriod-1.0 < " + SQLDateNow + ")"
                             + "";
                     }
                     string SQL = "SELECT DISTINCT " + FieldList + " FROM ((((ccEmail"
                         + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
-                        + " LEFT JOIN " + SQLTableGroups + " ON ccEmailGroups.GroupID = " + SQLTableGroups + ".ID)"
-                        + " LEFT JOIN " + SQLTableMemberRules + " ON " + SQLTableGroups + ".ID = " + SQLTableMemberRules + ".GroupID)"
-                        + " LEFT JOIN " + SQLTablePeople + " ON " + SQLTableMemberRules + ".MemberID = " + SQLTablePeople + ".ID)"
+                        + " LEFT JOIN ccGroups ON ccEmailGroups.GroupID = ccGroups.ID)"
+                        + " LEFT JOIN ccMemberRules ON ccGroups.ID = ccMemberRules.GroupID)"
+                        + " LEFT JOIN ccMembers ON ccMemberRules.MemberID = ccMembers.ID)"
                         + " Where (ccEmail.id Is Not Null)"
-                        + sqlDateTest + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
+                        + " and(DATEADD(day, -ccEmail.ConditionPeriod, ccMemberRules.DateExpires) < " + SQLDateNow + ")" // dont send before
+                        + " and(DATEADD(day, -ccEmail.ConditionPeriod-1.0, ccMemberRules.DateExpires) > " + SQLDateNow + ")" // don't send after 1-day
+                        + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
                         + " AND (ccEmail.ScheduleDate < " + SQLDateNow + " OR ccEmail.ScheduleDate IS NULL)"
                         + " AND (ccEmail.Submitted <> 0)"
                         + " AND (ccEmail.ConditionID = 1)"
                         + " AND (ccEmail.ConditionPeriod IS NOT NULL)"
-                        + " AND (" + SQLTableGroups + ".Active <> 0)"
-                        + " AND (" + SQLTableGroups + ".AllowBulkEmail <> 0)"
-                        + " AND (" + SQLTablePeople + ".ID IS NOT NULL)"
-                        + " AND (" + SQLTablePeople + ".Active <> 0)"
-                        + " AND (" + SQLTablePeople + ".AllowBulkEmail <> 0)"
-                        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" + SQLTablePeople + ".ID))";
+                        + " AND (ccGroups.Active <> 0)"
+                        + " AND (ccGroups.AllowBulkEmail <> 0)"
+                        + " AND (ccMembers.ID IS NOT NULL)"
+                        + " AND (ccMembers.Active <> 0)"
+                        + " AND (ccMembers.AllowBulkEmail <> 0)"
+                        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID))";
                     int CSEmailBig = core.db.csOpenSql(SQL,"Default");
                     while (core.db.csOk(CSEmailBig)) {
                         int emailID = core.db.csGetInteger(CSEmailBig, "EmailID");
@@ -297,26 +286,26 @@ namespace Contensive.Addons.Email {
                 // Send Conditional Email - Birthday
                 //
                 if (IsNewDay) {
-                    string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, " + SQLTablePeople + ".ID AS MemberID, " + SQLTableMemberRules + ".DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
+                    string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                     string SQL = "SELECT DISTINCT " + FieldList + " FROM ((((ccEmail"
                         + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
-                        + " LEFT JOIN " + SQLTableGroups + " ON ccEmailGroups.GroupID = " + SQLTableGroups + ".ID)"
-                        + " LEFT JOIN " + SQLTableMemberRules + " ON " + SQLTableGroups + ".ID = " + SQLTableMemberRules + ".GroupID)"
-                        + " LEFT JOIN " + SQLTablePeople + " ON " + SQLTableMemberRules + ".MemberID = " + SQLTablePeople + ".ID)"
+                        + " LEFT JOIN ccGroups ON ccEmailGroups.GroupID = ccGroups.ID)"
+                        + " LEFT JOIN ccMemberRules ON ccGroups.ID = ccMemberRules.GroupID)"
+                        + " LEFT JOIN ccMembers ON ccMemberRules.MemberID = ccMembers.ID)"
                         + " Where (ccEmail.id Is Not Null)"
                         + " AND (ccEmail.ConditionExpireDate > " + SQLDateNow + " OR ccEmail.ConditionExpireDate IS NULL)"
                         + " AND (ccEmail.ScheduleDate < " + SQLDateNow + " OR ccEmail.ScheduleDate IS NULL)"
                         + " AND (ccEmail.Submitted <> 0)"
                         + " AND (ccEmail.ConditionID = 3)"
-                        + " AND (" + SQLTableGroups + ".Active <> 0)"
-                        + " AND (" + SQLTableGroups + ".AllowBulkEmail <> 0)"
-                        + " AND ((" + SQLTableMemberRules + ".DateExpires is null)or(" + SQLTableMemberRules + ".DateExpires > " + SQLDateNow + "))"
-                        + " AND (" + SQLTablePeople + ".ID IS NOT NULL)"
-                        + " AND (" + SQLTablePeople + ".Active <> 0)"
-                        + " AND (" + SQLTablePeople + ".AllowBulkEmail <> 0)"
-                        + " AND (" + SQLTablePeople + ".BirthdayMonth=" + DateTime.Now.Month + ")"
-                        + " AND (" + SQLTablePeople + ".BirthdayDay=" + DateTime.Now.Day + ")"
-                        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" + SQLTablePeople + ".ID and ccEmailLog.DateAdded>=" + core.db.encodeSQLDate(DateTime.Now.Date) + "))";
+                        + " AND (ccGroups.Active <> 0)"
+                        + " AND (ccGroups.AllowBulkEmail <> 0)"
+                        + " AND ((ccMemberRules.DateExpires is null)or(ccMemberRules.DateExpires > " + SQLDateNow + "))"
+                        + " AND (ccMembers.ID IS NOT NULL)"
+                        + " AND (ccMembers.Active <> 0)"
+                        + " AND (ccMembers.AllowBulkEmail <> 0)"
+                        + " AND (ccMembers.BirthdayMonth=" + DateTime.Now.Month + ")"
+                        + " AND (ccMembers.BirthdayDay=" + DateTime.Now.Day + ")"
+                        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID and ccEmailLog.DateAdded>=" + core.db.encodeSQLDate(DateTime.Now.Date) + "))";
                     int CSEmailBig = core.db.csOpenSql(SQL,"Default");
                     while (core.db.csOk(CSEmailBig)) {
                         int emailID = core.db.csGetInteger(CSEmailBig, "EmailID");

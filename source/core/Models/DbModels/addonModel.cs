@@ -164,7 +164,7 @@ namespace Contensive.Processor.Models.DbModels {
         //
         //====================================================================================================
         public static void invalidateCache(CoreController core, int recordId) {
-            invalidateCacheSingleRecord<AddonModel>(core, recordId);
+            invalidateCache<AddonModel>(core, recordId);
             Models.Complex.routeDictionaryModel.invalidateCache(core);
         }
         //

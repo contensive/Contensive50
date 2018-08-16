@@ -113,7 +113,7 @@ namespace Contensive.Processor.Models.DbModels {
         //
         //====================================================================================================
         public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCacheSingleRecord<NavigatorEntryModel>(core, recordId);
+            invalidateCache<NavigatorEntryModel>(core, recordId);
         }
         //
         //====================================================================================================

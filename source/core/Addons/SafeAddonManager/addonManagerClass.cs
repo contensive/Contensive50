@@ -448,14 +448,15 @@ namespace Contensive.Addons.SafeAddonManager {
                                     }
                                 }
                             }
-                            //
-                            //---------------------------------------------------------------------------------------------
-                            // Reinstall core collection
-                            //---------------------------------------------------------------------------------------------
-                            //
-                            if (core.session.isAuthenticatedDeveloper(core) & core.docProperties.getBoolean("InstallCore")) {
-                                UpgradeOK = CollectionController.installCollectionFromRemoteRepo(core, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
-                            }
+                            // this is the v4.1 core (v5 only has base collection)
+                            ////
+                            ////---------------------------------------------------------------------------------------------
+                            //// Reinstall core collection
+                            ////---------------------------------------------------------------------------------------------
+                            ////
+                            //if (core.session.isAuthenticatedDeveloper(core) & core.docProperties.getBoolean("InstallCore")) {
+                            //    UpgradeOK = CollectionController.installCollectionFromRemoteRepo(core, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
+                            //}
                             //
                             //---------------------------------------------------------------------------------------------
                             // Upload new collection files
@@ -842,9 +843,10 @@ namespace Contensive.Addons.SafeAddonManager {
                                     Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>");
                                 } else {
                                     Body.Add(AdminUIController.editTableOpen);
-                                    if (core.session.isAuthenticatedDeveloper(core)) {
-                                        Body.Add(AdminUIController.getEditRowLegacy(core,HtmlController.checkbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
-                                    }
+                                    // core is v4.1, for v5 re-install base through the CLI
+                                    //if (core.session.isAuthenticatedDeveloper(core)) {
+                                    //    Body.Add(AdminUIController.getEditRowLegacy(core,HtmlController.checkbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
+                                    //}
                                     Body.Add(AdminUIController.getEditRowLegacy(core,core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
                                     FormInput = ""
                                         + "<table id=\"UploadInsert\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"

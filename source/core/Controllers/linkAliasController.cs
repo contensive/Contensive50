@@ -231,7 +231,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-            } catch (Exception) {
+            } catch (Exception ex) {
                 logController.handleError(core, ex, "addLinkAlias exception, hint [" + hint + "]");
                 throw;
             }

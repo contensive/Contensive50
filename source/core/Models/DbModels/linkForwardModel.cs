@@ -102,7 +102,7 @@ namespace Contensive.Processor.Models.DbModels {
         //
         //====================================================================================================
         public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCacheSingleRecord<linkForwardModel>(core, recordId);
+            invalidateCache<linkForwardModel>(core, recordId);
         }
         //
         //====================================================================================================

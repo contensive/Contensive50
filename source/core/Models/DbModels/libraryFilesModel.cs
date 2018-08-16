@@ -108,7 +108,7 @@ namespace Contensive.Processor.Models.DbModels {
         //
         //====================================================================================================
         public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCacheSingleRecord<libraryFilesModel>(core, recordId);
+            invalidateCache<libraryFilesModel>(core, recordId);
         }
         //
         //====================================================================================================

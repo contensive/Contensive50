@@ -54,7 +54,8 @@ namespace Contensive.Processor {
         public const string IconWidthHeight = " width=21 height=22 ";
         //
         public const string baseCollectionGuid = "{7C6601A7-9D52-40A3-9570-774D0D43D758}"; // part of software dist - base cdef plus addons with classes in in core library, plus depenancy on coreCollection
-        public const string CoreCollectionGuid = "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}"; // contains core Contensive objects, loaded from Library
+        // 20180816, no, core is v.41
+        // public const string CoreCollectionGuid = "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}"; // contains core Contensive objects, loaded from Library
         public const string ApplicationCollectionGuid = "{C58A76E2-248B-4DE8-BF9C-849A960F79C6}"; // exported from application during upgrade
         public const string AdminNavigatorGuid = "{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}";
         //

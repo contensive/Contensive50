@@ -719,7 +719,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // -- fail, retry
-                        if (email.attempts > 3) {
+                        if (email.attempts >= 3) {
                             //
                             // -- too many retries, log error
                             var log = emailLogModel.add(core);
