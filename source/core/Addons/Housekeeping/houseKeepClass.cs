@@ -257,6 +257,11 @@ namespace Contensive.Addons.Housekeeping {
                             }
                             HouseKeep_PageViewSummary(core, datePtr, Yesterday, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                         }
+                        //
+                        // -- Properties
+                        housekeep_userProperties(core);
+                        housekeep_visitProperties(core);
+                        housekeep_visitorProperties(core);
                     }
                     //
                     // Each hour, summarize the visits and viewings into the Visit Summary table
@@ -2149,6 +2154,30 @@ namespace Contensive.Addons.Housekeeping {
             } catch (Exception ex) {
                 throw new ApplicationException("Unexpected Exception", ex);
             }
+        }
+        //
+        //====================================================================================================
+        //
+        public void housekeep_userProperties(CoreController core) {
+            string sqlInner = "select p.id from ccProperties p left join ccmembers m on m.id=p.KeyID where (p.TypeID=" + PropertyTypeMember + ") and (m.ID is null)";
+            string sql = "delete from ccProperties where id in (" + sqlInner + ")";
+            core.db.executeNonQueryAsync(sql);
+        }
+        //
+        //====================================================================================================
+        //
+        public void housekeep_visitProperties(CoreController core) {
+            string sqlInner = "select p.id from ccProperties p left join ccvisits m on m.id=p.KeyID where (p.TypeID=" + PropertyTypeVisit + ") and (m.ID is null)";
+            string sql = "delete from ccProperties where id in (" + sqlInner + ")";
+            core.db.executeNonQueryAsync(sql);
+        }
+        //
+        //====================================================================================================
+        //
+        public void housekeep_visitorProperties(CoreController core) {
+            string sqlInner = "select p.id from ccProperties p left join ccvisitors m on m.id=p.KeyID where (p.TypeID=" + PropertyTypeVisitor + ") and (m.ID is null)";
+            string sql = "delete from ccProperties where id in (" + sqlInner + ")";
+            core.db.executeNonQueryAsync(sql);
         }
     }
 }
