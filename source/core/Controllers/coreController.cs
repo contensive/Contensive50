@@ -86,6 +86,9 @@ namespace Contensive.Processor.Controllers {
                     _assemblySkipList = cache.getObject<List<string>>(cacheNameAssemblySkipList);
                     if (_assemblySkipList == null) {
                         _assemblySkipList = new List<string>();
+                        _assemblySkipList.Add(programFiles.localAbsRootPath + "v8-base-ia32.dll");
+                        _assemblySkipList.Add(programFiles.localAbsRootPath + "v8-ia32.dll");
+                        _assemblySkipList.Add(programFiles.localAbsRootPath + "ClearScriptV8-32.dll");
                     }
                     _assemblySkipList_CountWhenLoaded = _assemblySkipList.Count;
                 }
