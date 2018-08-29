@@ -200,9 +200,10 @@ namespace Contensive.Processor {
         public override object ExecuteSQL(string SQL, string DataSourcename = "Default", string ignoreRetries = "0", string ignorePageSize = "10", string ignorePageNumber = "1") {
             int recordsAffected = 0;
             cp.core.db.executeNonQuery(SQL, DataSourcename,ref recordsAffected);
-            if ( !recordsAffected.Equals(0)) {
-                throw new NotImplementedException("ExecuteSql no longer supports returning recordsets, as ADODB is not supported. Convert to executeQuery, executeNonQuery and executeNonQueryAsync");
-            }
+            // 20180829 - no, update queries return recordsAffected>0
+            //if ( !recordsAffected.Equals(0)) {
+            //    throw new NotImplementedException("ExecuteSql no longer supports returning recordsets, as ADODB is not supported. Convert to executeQuery, executeNonQuery and executeNonQueryAsync");
+            //}
             return null;
             //return cp.core.db.executeSql_getRecordSet(SQL, DataSourcename, Controllers.genericController.encodeInteger(PageNumber) * Controllers.genericController.encodeInteger(PageSize), Controllers.genericController.encodeInteger(PageSize));
         }
