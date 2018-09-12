@@ -20,23 +20,77 @@ namespace Contensive.BaseClasses
 	{
 		public enum addonContext
 		{
+            /// <summary>
+            /// Addon placed on a page.
+            /// </summary>
 			ContextPage = 1,
+            /// <summary>
+            /// Addon run by the admin site addon, to be displayed in the dashboard space
+            /// </summary>
 			ContextAdmin = 2,
+            /// <summary>
+            /// Addon placed on a template
+            /// </summary>
 			ContextTemplate = 3,
+            /// <summary>
+            /// Addon executed when an email is being rendered for an individual
+            /// </summary>
 			ContextEmail = 4,
+            /// <summary>
+            /// Addon executed as a remote method and is expected to return html (as opposed to JSON)
+            /// </summary>
 			ContextRemoteMethodHtml = 5,
+            /// <summary>
+            /// Addon executed because when a new visit is created. The return is ignored.
+            /// </summary>
 			ContextOnNewVisit = 6,
+            /// <summary>
+            /// Addon executed right before the body end html tag. The return is placed in the html
+            /// </summary>
 			ContextOnPageEnd = 7,
+            /// <summary>
+            /// Addon executed right after the open body tag. The return is placed in the html.
+            /// </summary>
 			ContextOnPageStart = 8,
+            /// <summary>
+            /// Addon executed because it is set as the editor for a content field type. It reads details from the doc and creates an html edit tag(s).
+            /// </summary>
 			ContextEditor = 9,
+            /// <summary>
+            /// deprecated
+            /// </summary>
 			ContextHelpUser = 10,
+            /// <summary>
+            /// deprecated
+            /// </summary>
 			ContextHelpAdmin = 11,
+            /// <summary>
+            /// deprecated
+            /// </summary>
 			ContextHelpDeveloper = 12,
+            /// <summary>
+            /// Addon executed by admin site when a content record is changed. Reads details from doc properties and act on the change
+            /// </summary>
 			ContextOnContentChange = 13,
+            /// <summary>
+            /// Executes when the html page is complete. Can modify the html document in core.docBody
+            /// </summary>
 			ContextFilter = 14,
+            /// <summary>
+            /// Return the addon's return, add artifacts like css to document.
+            /// </summary>
 			ContextSimple = 15,
+            /// <summary>
+            /// Executes right after the body start. Return is placed in the html document
+            /// </summary>
 			ContextOnBodyStart = 16,
+            /// <summary>
+            /// Executes right before the end body. Return is placed in the html body
+            /// </summary>
 			ContextOnBodyEnd = 17,
+            /// <summary>
+            /// Executes as a remote method. If return is a string, it is returned. If the return is any other type, it is serialized to JSON.
+            /// </summary>
 			ContextRemoteMethodJson = 18
 		}
 		//

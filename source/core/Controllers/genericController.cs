@@ -1433,16 +1433,20 @@ namespace Contensive.Processor.Controllers {
             if (expression == null) {
                 return 0;
             } else {
-                double number = 0;
                 string tmpString = expression.ToString();
                 if (String.IsNullOrWhiteSpace(tmpString)) {
                     return 0;
                 } else {
                     int result = 0;
+                    //double number = 0;
                     if (Int32.TryParse(tmpString, out result)) {
                         return result;
-                    } else if (Double.TryParse(tmpString, out number)) {
-                        return Convert.ToInt32(number);
+                    //} else if (Double.TryParse(tmpString, out number)) {
+                    //    if (Int32.TryParse(tmpString, out result)) {
+                    //        return result;
+                    //    } else {
+                    //        return 0;
+                    //    }
                     } else {
                         return 0;
                     }

@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.DbModels;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+//using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 //
 using Contensive.BaseClasses;
@@ -95,7 +95,7 @@ namespace Contensive.Processor {
         //
         public string statusMessage {
                 get {
-                    return GetApplicationStatusMessage(core.appConfig.appStatus);
+                    return genericController.GetApplicationStatusMessage(core.appConfig.appStatus);
                 }
             }
         //
@@ -119,7 +119,9 @@ namespace Contensive.Processor {
         }
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// returns true if the current application has status set OK (not disabled)
+        /// </summary>
         public bool appOk {
             get {
                 if (core != null) {
@@ -183,7 +185,7 @@ namespace Contensive.Processor {
                     } else if (addonNameOrGuid.IsNumeric() ) {
                         //
                         // -- compatibility - call by id
-                        result = executeAddon(encodeInteger(addonNameOrGuid), addonContext);
+                        result = executeAddon(genericController.encodeInteger(addonNameOrGuid), addonContext);
                     } else {
                         throw new ApplicationException("Addon [" + addonNameOrGuid + "] could not be found.");
                     }
