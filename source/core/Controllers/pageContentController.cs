@@ -838,25 +838,26 @@ namespace Contensive.Processor.Controllers {
                     //       if a form is created in the editor, process it by emailing and saving to the User Form Response content
                     //--------------------------------------------------------------------------
                     //
-                    if (core.docProperties.getInteger("ContensiveUserForm") == 1) {
-                        string FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
-                        EmailController.queueFormEmail(core, core.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + core.webServer.requestReferer);
-                        int cs = core.db.csInsertRecord("User Form Response");
-                        if (core.db.csOk(cs)) {
-                            core.db.csSet(cs, "name", "Form " + core.webServer.requestReferrer);
-                            string Copy = "";
+                    // 20180914 -- deprecated
+                    //if (core.docProperties.getInteger("ContensiveUserForm") == 1) {
+                    //    string FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
+                    //    EmailController.queueFormEmail(core, core.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + core.webServer.requestReferer);
+                    //    int cs = core.db.csInsertRecord("User Form Response");
+                    //    if (core.db.csOk(cs)) {
+                    //        core.db.csSet(cs, "name", "Form " + core.webServer.requestReferrer);
+                    //        string Copy = "";
 
-                            foreach (string key in core.docProperties.getKeyList()) {
-                                docPropertiesClass docProperty = core.docProperties.getProperty(key);
-                                if (key.ToLower() != "contensiveuserform") {
-                                    Copy += docProperty.Name + "=" + docProperty.Value + "\r\n";
-                                }
-                            }
-                            core.db.csSet(cs, "copy", Copy);
-                            core.db.csSet(cs, "VisitId", core.session.visit.id);
-                        }
-                        core.db.csClose(ref cs);
-                    }
+                    //        foreach (string key in core.docProperties.getKeyList()) {
+                    //            docPropertiesClass docProperty = core.docProperties.getProperty(key);
+                    //            if (key.ToLower() != "contensiveuserform") {
+                    //                Copy += docProperty.Name + "=" + docProperty.Value + "\r\n";
+                    //            }
+                    //        }
+                    //        core.db.csSet(cs, "copy", Copy);
+                    //        core.db.csSet(cs, "VisitId", core.session.visit.id);
+                    //    }
+                    //    core.db.csClose(ref cs);
+                    //}
                     //
                     //--------------------------------------------------------------------------
                     //   Contensive Form Page Processing
@@ -2263,7 +2264,7 @@ namespace Contensive.Processor.Controllers {
                         Cell = Cell + "\r<h1>" + headline + "</h1>";
                         //
                         // Add AC end here to force the end of any left over AC tags (like language)
-                        Cell = Cell + ACTagEnd;
+                        //Cell = Cell + ACTagEnd;
                     }
                     //
                     // ----- Page Copy
@@ -2274,7 +2275,7 @@ namespace Contensive.Processor.Controllers {
                             bodyCopy = "\r<p><!-- Empty Content Placeholder --></p>";
                         }
                     } else {
-                        bodyCopy = bodyCopy + "\r" + ACTagEnd;
+                       // bodyCopy = bodyCopy + "\r" + ACTagEnd;
                     }
                     //
                     // ----- Wrap content body
@@ -2316,13 +2317,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Allow More Info
                 if ((core.doc.pageController.page.ContactMemberID != 0) & core.doc.pageController.page.AllowMoreInfo) {
-                    result += "\r<ac TYPE=\"" + ACTypeContact + "\">";
+                    result += getMoreInfoHtml(core, core.doc.pageController.page.ContactMemberID);
+                    //result += "\r<ac TYPE=\"" + ACTypeContact + "\">";
                 }
-                //
-                // ----- Feedback
-                if ((core.doc.pageController.page.ContactMemberID != 0) & core.doc.pageController.page.AllowFeedback) {
-                    result += "\r<ac TYPE=\"" + ACTypeFeedback + "\">";
-                }
+                ////
+                //// ----- Feedback
+                //if ((core.doc.pageController.page.ContactMemberID != 0) & core.doc.pageController.page.AllowFeedback) {
+                //    result += "\r<ac TYPE=\"" + ACTypeFeedback + "\">";
+                //}
                 //
                 // ----- Last Modified line
                 if ((core.doc.pageController.page.modifiedDate != DateTime.MinValue) & core.doc.pageController.page.AllowLastModifiedFooter) {

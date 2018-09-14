@@ -249,29 +249,32 @@ namespace Contensive.Processor {
         // ----- Active Content Definitions
         //-----------------------------------------------------------------------
         //
-        public const string ACTypeDate = "DATE";
-        public const string ACTypeVisit = "VISIT";
-        public const string ACTypeVisitor = "VISITOR";
-        public const string ACTypeMember = "MEMBER";
-        public const string ACTypeOrganization = "ORGANIZATION";
-        //public const string ACTypeChildList = "CHILDLIST";
-        public const string ACTypeContact = "CONTACT";
-        public const string ACTypeFeedback = "FEEDBACK";
-        public const string ACTypeLanguage = "LANGUAGE";
         public const string ACTypeAggregateFunction = "AGGREGATEFUNCTION";
         public const string ACTypeAddon = "ADDON";
-        public const string ACTypeImage = "IMAGE";
-        public const string ACTypeDownload = "DOWNLOAD";
-        public const string ACTypeEnd = "END";
         public const string ACTypeTemplateContent = "CONTENT";
         public const string ACTypeTemplateText = "TEXT";
-        //Public Const ACTypeDynamicMenu  As String  = "DYNAMICMENU"
-        public const string ACTypeWatchList = "WATCHLIST";
-        public const string ACTypeRSSLink = "RSSLINK";
-        public const string ACTypePersonalization = "PERSONALIZATION";
-        public const string ACTypeDynamicForm = "DYNAMICFORM";
         //
-        public const string ACTagEnd = "<ac type=\"" + ACTypeEnd + "\">";
+        // deprecate
+        //
+        //public const string ACTypePersonalization = "PERSONALIZATION";
+        //public const string ACTypeDate = "DATE";
+        //public const string ACTypeVisit = "VISIT";
+        //public const string ACTypeVisitor = "VISITOR";
+        //public const string ACTypeMember = "MEMBER";
+        //public const string ACTypeOrganization = "ORGANIZATION";
+        //public const string ACTypeChildList = "CHILDLIST";
+        //public const string ACTypeContact = "CONTACT";
+        //public const string ACTypeFeedback = "FEEDBACK";
+        //public const string ACTypeLanguage = "LANGUAGE";
+        //public const string ACTypeImage = "IMAGE";
+        //public const string ACTypeDownload = "DOWNLOAD";
+        //public const string ACTypeEnd = "END";
+        //Public Const ACTypeDynamicMenu  As String  = "DYNAMICMENU"
+        //public const string ACTypeWatchList = "WATCHLIST";
+        //public const string ACTypeRSSLink = "RSSLINK";
+        //public const string ACTypeDynamicForm = "DYNAMICFORM";
+        //
+        //public const string ACTagEnd = "<ac type=\"" + ACTypeEnd + "\">";
         //
         // ----- PropertyType Definitions
         //
