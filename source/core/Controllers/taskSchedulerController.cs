@@ -172,7 +172,7 @@ namespace Contensive.Processor.Controllers {
                                         cmdDetailClass cmdDetail = new cmdDetailClass();
                                         cmdDetail.addonId = coreApp.db.csGetInteger(CS, "ID");
                                         cmdDetail.addonName = addonName;
-                                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
+                                        cmdDetail.args = genericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
                                         addTaskToQueue(coreApp, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                                     } else if (coreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
                                         //

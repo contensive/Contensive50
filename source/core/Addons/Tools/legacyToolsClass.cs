@@ -2896,7 +2896,7 @@ namespace Contensive.Addons.Tools {
                     taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, new cmdDetailClass() {
                         addonId = 0,
                         addonName = "commandRestart",
-                        docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, "")
+                        args = genericController.convertAddonArgumentstoDocPropertiesList(core, "")
                     }, false);
                 }
                 //
@@ -3373,7 +3373,7 @@ namespace Contensive.Addons.Tools {
                         cmdDetailClass cmdDetail = new cmdDetailClass();
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
-                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, QS);
+                        cmdDetail.args = genericController.convertAddonArgumentstoDocPropertiesList(core, QS);
                         taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                         Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
@@ -3435,9 +3435,7 @@ namespace Contensive.Addons.Tools {
         }
         //
         //=============================================================================
-        // GUID Tools
-        //=============================================================================
-        //
+        // todo change iisreset to an addon
         private string GetForm_IISReset() {
             string result = "";
             try {
@@ -3460,7 +3458,7 @@ namespace Contensive.Addons.Tools {
                     cmdDetailClass cmdDetail = new cmdDetailClass();
                     cmdDetail.addonId = 0;
                     cmdDetail.addonName = "GetForm_IISReset";
-                    cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, "");
+                    cmdDetail.args = genericController.convertAddonArgumentstoDocPropertiesList(core, "");
                     taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                 }
                 //

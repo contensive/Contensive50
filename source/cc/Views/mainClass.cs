@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
+using Contensive.Processor.Models.Db;
+using Contensive.Processor;
 
 namespace Contensive.CLI {
     class mainClass {
@@ -19,10 +21,10 @@ namespace Contensive.CLI {
                 } else {
                     //
                     // -- create an instance of cp to execute commands
-                    using (Processor.CPClass cp = new Processor.CPClass()) {
+                    using (Processor.CPClass cpServer = new Processor.CPClass()) {
                         //
                         // -- if logging enabled, tell user the output includes log append
-                        if (cp.core.serverConfig.enableLogging) {
+                        if (cpServer.core.serverConfig.enableLogging) {
                             Console.WriteLine("Logging enabled, all internal logging will be included.");
                         }
                         //
@@ -37,16 +39,16 @@ namespace Contensive.CLI {
                         EventLog.WriteEntry(eventLogSource, eventLogEvent, EventLogEntryType.Information);
                         //
                         // -- set programfiles path if empty
-                        if (String.IsNullOrEmpty(cp.core.serverConfig.programFilesPath)) {
+                        if (String.IsNullOrEmpty(cpServer.core.serverConfig.programFilesPath)) {
                             string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
                             if (executePath.ToLower().IndexOf("\\git\\") == 0) {
                                 //  -- save if not in developer execution path
-                                cp.core.serverConfig.programFilesPath = executePath;
+                                cpServer.core.serverConfig.programFilesPath = executePath;
                             } else {
                                 //  -- developer, fake a path
-                                cp.core.serverConfig.programFilesPath = "c:\\Program Files (x86)\\kma\\Contensive5\\";
+                                cpServer.core.serverConfig.programFilesPath = "c:\\Program Files (x86)\\kma\\Contensive5\\";
                             }
-                            cp.core.serverConfig.saveObject(cp.core);
+                            cpServer.core.serverConfig.saveObject(cpServer.core);
                         }
                         //
                         // -- loop through arguments and execute each command
@@ -65,7 +67,7 @@ namespace Contensive.CLI {
                                     } else {
                                         //
                                         // -- flush all apps
-                                        foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
+                                        foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
                                             String housekeepAppName = kvp.Key;
                                             using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
                                                 cpApp.Cache.InvalidateAll();
@@ -96,7 +98,7 @@ namespace Contensive.CLI {
                                         //
                                         // -- determine guid of collection
                                         var collectionList = new List<CollectionController.CollectionStoreClass>();
-                                        CollectionController.getRemoteCollectionStoreList(cp.core, ref collectionList);
+                                        CollectionController.getRemoteCollectionStoreList(cpServer.core, ref collectionList);
                                         string collectionGuid = "";
                                         foreach (var collection in collectionList) {
                                             if (collection.name.ToLower() == collectionName.ToLower()) {
@@ -108,7 +110,7 @@ namespace Contensive.CLI {
                                             Console.WriteLine("Collection was not found on the distribution server");
                                         } else {
                                             if (string.IsNullOrEmpty(appName)) {
-                                                foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
+                                                foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
                                                     using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(kvp.Key)) {
                                                         string returnErrorMessage = "";
                                                         CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
@@ -141,7 +143,7 @@ namespace Contensive.CLI {
                                     } else {
                                         //
                                         // -- housekeep all apps
-                                        foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
+                                        foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
                                             String housekeepAppName = kvp.Key;
                                             using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
                                                 cpApp.Doc.SetProperty("force", "1");
@@ -155,7 +157,7 @@ namespace Contensive.CLI {
                                 case "-v":
                                     //
                                     // display core version
-                                    Console.WriteLine("version " + cp.core.codeVersion());
+                                    Console.WriteLine("version " + cpServer.core.codeVersion());
                                     exitArgumentProcessing = true;
                                     break;
                                 case "--newapp":
@@ -176,37 +178,37 @@ namespace Contensive.CLI {
                                 case "-s":
                                     //
                                     // -- display ServerGroup and application status
-                                    if (!cp.serverOk) {
+                                    if (!cpServer.serverOk) {
                                         //
                                         // -- something went wrong with server initialization
                                         Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] not found or not valid. Run cc --configure");
                                     } else {
                                         Console.WriteLine("Configuration File [c:\\ProgramData\\Contensive\\config.json] found.");
-                                        Console.WriteLine("ServerGroup name: " + cp.core.serverConfig.name);
+                                        Console.WriteLine("ServerGroup name: " + cpServer.core.serverConfig.name);
                                         Console.WriteLine("Cache: ");
-                                        Console.WriteLine("    enableLocalMemoryCache: " + cp.core.serverConfig.enableLocalMemoryCache);
-                                        Console.WriteLine("    enableLocalFileCache: " + cp.core.serverConfig.enableLocalFileCache);
-                                        Console.WriteLine("    enableRemoteCache: " + cp.core.serverConfig.enableRemoteCache);
-                                        Console.WriteLine("    ElastiCacheConfigurationEndpoint: " + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint);
+                                        Console.WriteLine("    enableLocalMemoryCache: " + cpServer.core.serverConfig.enableLocalMemoryCache);
+                                        Console.WriteLine("    enableLocalFileCache: " + cpServer.core.serverConfig.enableLocalFileCache);
+                                        Console.WriteLine("    enableRemoteCache: " + cpServer.core.serverConfig.enableRemoteCache);
+                                        Console.WriteLine("    ElastiCacheConfigurationEndpoint: " + cpServer.core.serverConfig.awsElastiCacheConfigurationEndpoint);
                                         Console.WriteLine("File System:");
-                                        Console.WriteLine("    isLocal: " + cp.core.serverConfig.isLocalFileSystem.ToString());
+                                        Console.WriteLine("    isLocal: " + cpServer.core.serverConfig.isLocalFileSystem.ToString());
                                         //Console.WriteLine("    cdnFilesRemoteEndpoint: " + cp.core.serverConfig.cdnFilesRemoteEndpoint);
-                                        Console.WriteLine("    awsBucketRegionName: " + cp.core.serverConfig.awsBucketRegionName);
-                                        Console.WriteLine("    awsBucketName: " + cp.core.serverConfig.awsBucketName);
-                                        Console.WriteLine("    awsAccessKey: " + cp.core.serverConfig.awsAccessKey);
-                                        Console.WriteLine("    awsSecretAccessKey: " + cp.core.serverConfig.awsSecretAccessKey);
+                                        Console.WriteLine("    awsBucketRegionName: " + cpServer.core.serverConfig.awsBucketRegionName);
+                                        Console.WriteLine("    awsBucketName: " + cpServer.core.serverConfig.awsBucketName);
+                                        Console.WriteLine("    awsAccessKey: " + cpServer.core.serverConfig.awsAccessKey);
+                                        Console.WriteLine("    awsSecretAccessKey: " + cpServer.core.serverConfig.awsSecretAccessKey);
                                         Console.WriteLine("Database:");
-                                        Console.WriteLine("    defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress.ToString());
-                                        Console.WriteLine("    defaultDataSourceType: " + cp.core.serverConfig.defaultDataSourceType.ToString());
-                                        Console.WriteLine("    defaultDataSourceUsername: " + cp.core.serverConfig.defaultDataSourceUsername.ToString());
+                                        Console.WriteLine("    defaultDataSourceAddress: " + cpServer.core.serverConfig.defaultDataSourceAddress.ToString());
+                                        Console.WriteLine("    defaultDataSourceType: " + cpServer.core.serverConfig.defaultDataSourceType.ToString());
+                                        Console.WriteLine("    defaultDataSourceUsername: " + cpServer.core.serverConfig.defaultDataSourceUsername.ToString());
                                         Console.WriteLine("Services:");
-                                        Console.WriteLine("    TaskScheduler: " + cp.core.serverConfig.allowTaskSchedulerService.ToString());
-                                        Console.WriteLine("    TaskRunner: " + cp.core.serverConfig.allowTaskRunnerService.ToString());
-                                        Console.WriteLine("    TaskRunner-MaxConcurrentTasksPerServer: " + cp.core.serverConfig.maxConcurrentTasksPerServer.ToString());
+                                        Console.WriteLine("    TaskScheduler: " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
+                                        Console.WriteLine("    TaskRunner: " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
+                                        Console.WriteLine("    TaskRunner-MaxConcurrentTasksPerServer: " + cpServer.core.serverConfig.maxConcurrentTasksPerServer.ToString());
                                         Console.WriteLine("Logging:");
-                                        Console.WriteLine("    enableLogging: " + cp.core.serverConfig.enableLogging.ToString());
-                                        Console.WriteLine("Applications: " + cp.core.serverConfig.apps.Count);
-                                        foreach (KeyValuePair<string, AppConfigModel> kvp in cp.core.serverConfig.apps) {
+                                        Console.WriteLine("    enableLogging: " + cpServer.core.serverConfig.enableLogging.ToString());
+                                        Console.WriteLine("Applications: " + cpServer.core.serverConfig.apps.Count);
+                                        foreach (KeyValuePair<string, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
                                             AppConfigModel app = kvp.Value;
                                             Console.WriteLine("    name: " + app.name);
                                             Console.WriteLine("        enabled: " + app.enabled);
@@ -216,7 +218,7 @@ namespace Contensive.CLI {
                                             Console.WriteLine("            private path: " + app.localPrivatePath);
                                             Console.WriteLine("            cdn path: " + app.localFilesPath);
                                             Console.WriteLine("            temp path: " + app.localTempPath);
-                                            if (!cp.core.serverConfig.isLocalFileSystem) {
+                                            if (!cpServer.core.serverConfig.isLocalFileSystem) {
                                                 Console.WriteLine("        remote file storage");
                                                 Console.WriteLine("            app path: " + app.remoteWwwPath);
                                                 Console.WriteLine("            private path: " + app.remotePrivatePath);
@@ -232,12 +234,12 @@ namespace Contensive.CLI {
                                     break;
                                 case "--repair":
                                 case "-r":
-                                    upgrade(cp, appName, true);
+                                    upgrade(cpServer, appName, true);
                                     exitArgumentProcessing = true;
                                     break;
                                 case "--upgrade":
                                 case "-u":
-                                    upgrade(cp, appName, false);
+                                    upgrade(cpServer, appName, false);
                                     exitArgumentProcessing = true;
                                     break;
                                 case "--taskscheduler":
@@ -257,9 +259,9 @@ namespace Contensive.CLI {
                                         } else {
                                             //
                                             // turn the windows service scheduler on/off
-                                            cp.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
-                                            cp.core.serverConfig.saveObject(cp.core);
-                                            Console.WriteLine("allowtaskscheduler set " + cp.core.serverConfig.allowTaskSchedulerService.ToString());
+                                            cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cpServer.core.serverConfig.saveObject(cpServer.core);
+                                            Console.WriteLine("allowtaskscheduler set " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
                                         }
                                     }
                                     break;
@@ -281,9 +283,9 @@ namespace Contensive.CLI {
                                         } else {
                                             //
                                             // -- turn the windows service scheduler on/off
-                                            cp.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
-                                            cp.core.serverConfig.saveObject(cp.core);
-                                            Console.WriteLine("allowtaskrunner set " + cp.core.serverConfig.allowTaskRunnerService.ToString());
+                                            cpServer.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cpServer.core.serverConfig.saveObject(cpServer.core);
+                                            Console.WriteLine("allowtaskrunner set " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
                                         }
                                     }
                                     break;
@@ -311,11 +313,11 @@ namespace Contensive.CLI {
                                             //
                                             // turn the windows service scheduler on/off
                                             //
-                                            cp.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
-                                            cp.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
-                                            cp.core.serverConfig.saveObject(cp.core);
-                                            Console.WriteLine("allowTaskScheduler set " + cp.core.serverConfig.allowTaskSchedulerService.ToString());
-                                            Console.WriteLine("allowTaskRunner set " + cp.core.serverConfig.allowTaskRunnerService.ToString());
+                                            cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cpServer.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cpServer.core.serverConfig.saveObject(cpServer.core);
+                                            Console.WriteLine("allowTaskScheduler set " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
+                                            Console.WriteLine("allowTaskRunner set " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
                                         }
                                     }
                                     break;
@@ -324,12 +326,26 @@ namespace Contensive.CLI {
                                     // -- logging
                                     if (argPtr != (args.Length + 1)) {
                                         argPtr++;
-                                        cp.core.serverConfig.enableLogging = genericController.encodeBoolean(args[argPtr].ToLower());
-                                        cp.core.serverConfig.saveObject(cp.core);
-                                        Console.WriteLine("enableLogging set " + cp.core.serverConfig.enableLogging.ToString());
+                                        cpServer.core.serverConfig.enableLogging = genericController.encodeBoolean(args[argPtr].ToLower());
+                                        cpServer.core.serverConfig.saveObject(cpServer.core);
+                                        Console.WriteLine("enableLogging set " + cpServer.core.serverConfig.enableLogging.ToString());
                                     }
                                     break;
-
+                                case "--runtask":
+                                    //
+                                    // -- run task in ccTasks table in application appName 
+                                    if (argPtr != (args.Length + 1)) {
+                                        argPtr++;
+                                        appName = args[argPtr];
+                                        string runnerGuid = "";
+                                        if (argPtr < (args.Length + 1)) {
+                                            argPtr++;
+                                            runnerGuid = args[argPtr];
+                                        }
+                                        Console.WriteLine("runTask, appName [" + appName + "], runnerGuid [" + runnerGuid + "]");
+                                        taskRunnerController.runTask(appName, runnerGuid);
+                                    }
+                                    break;
                                 default:
                                     Console.Write(helpText);
                                     exitArgumentProcessing = true;
@@ -391,6 +407,9 @@ namespace Contensive.CLI {
             + "\r\n"
             + "\r\n--version (-v)"
             + "\r\n    display code version"
+            + "\r\n"
+            + "\r\n--runtask appName {taskGuid}"
+            + "\r\n    executes the ccTask table record with cmdRunner=(taskGuid)"
             + "";
         //
         // ====================================================================================================

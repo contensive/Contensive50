@@ -278,7 +278,7 @@ namespace Contensive.Processor {
                     var cmdDetail = new cmdDetailClass() {
                         addonId = ExportCSVAddon.id,
                         addonName = ExportCSVAddon.name,
-                        docProperties = docProperties
+                        args = docProperties
                     };
                     taskSchedulerController.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
                 }

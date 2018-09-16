@@ -16,23 +16,17 @@ using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
+    /// <summary>
+    /// taskRunner polls the task queue and runs commands when found
+    /// </summary>
     public class taskRunnerController : IDisposable {
-        //
-        //==================================================================================================
-        //
-        // Only a single instance of this class exists, held by the taskService, which windows only creates once during service start.
-        //
-        //   taskScheduler queries each application from addons that need to run and adds them to the tasks queue (tasks sql table or SQS queue)
-        //       taskScheduleTimer
-        //
-        //   taskRunner polls the task queue and runs commands when found
-        //       taskRunnerTimer
-        //==================================================================================================
-        //
-        private string runnerGuid { get; set; } // set in constructor. used to tag tasks assigned to this runner
-        //
-        // ----- Task Timer
-        //
+        /// <summary>
+        /// set in constructor. used to tag tasks assigned to this runner
+        /// </summary>
+        private string runnerGuid { get; set; }
+        /// <summary>
+        /// Task Timer
+        /// </summary>
         private System.Timers.Timer processTimer { get; set; }
         private const int ProcessTimerMsecPerTick = 5000; // Check processs every 5 seconds
         private bool ProcessTimerInProcess { get; set; }
@@ -161,27 +155,21 @@ namespace Contensive.Processor.Controllers {
                                         + "\r\n update cctasks set cmdRunner=" + cpApp.core.db.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
                                         + "\r\n COMMIT TRANSACTION";
                                     cpApp.core.db.executeQuery(sql);
-                                    var taskList = taskModel.createList(cpApp.core, "(cmdRunner=" + cpApp.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)","id");
-                                    foreach (var task in taskList) {
+                                    //
+                                    // -- two execution methods, 1) run task here, 2) start process and wait (so bad addon code does not memory link)
+                                    if (cpApp.Site.GetBoolean("Run tasks in service process")) {
                                         //
-                                        logController.logTrace(cpApp.core, "runTasks, task [" + task.name + "], command [" + task.Command + "], cmdDetail [" + task.cmdDetail + "]");
+                                        // -- execute here
+                                        runTask(cpApp.Site.Name, runnerGuid);
+                                    } else {
                                         //
-                                        tasksRemaining = true;
-                                        task.DateStarted = DateTime.Now;
-                                        task.save(cpApp.core);
-                                        cmdDetailClass cmdDetail = cpApp.core.json.Deserialize<cmdDetailClass>( task.cmdDetail);
-                                        switch ((task.Command.ToLower())) {
-                                            case taskQueueCommandEnumModule.runAddon:
-                                                cpApp.core.addon.execute(AddonModel.create(cpApp.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
-                                                    backgroundProcess = true,
-                                                    addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
-                                                    instanceArguments = cmdDetail.docProperties,
-                                                    errorContextMessage = "running task, addon [" + cmdDetail.addonId + "]"
-                                                });
-                                                break;
-                                        }
-                                        task.DateCompleted = DateTime.Now;
-                                        task.save(cpApp.core);
+                                        // -- execute in new  process
+                                        Process process = new Process();
+                                        process.StartInfo.FileName = "cc.exe";
+                                        process.StartInfo.Arguments = " --runTask " + appKVP.Value.name + " " + runnerGuid;
+                                        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                                        process.Start();
+                                        process.WaitForExit();
                                     }
                                 } while (tasksRemaining);
                             } catch (Exception ex) {
@@ -193,6 +181,43 @@ namespace Contensive.Processor.Controllers {
                 Console.WriteLine("runTasks, exit (" + sw.ElapsedMilliseconds + "ms)");
             } catch (Exception ex) {
                 logController.handleError(serverCore, ex);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// run as single task from the cctasks table of an app, makred with a runnerGuid
+        /// called from runTasks or from the cli in a different process
+        /// </summary>
+        public static void runTask(string appName, string runnerGuid) {
+            try {
+                using (var cp = new Contensive.Processor.CPClass(appName)) {
+                    //
+                    // -- execute here
+                    foreach (var task in taskModel.createList(cp.core, "(cmdRunner=" + cp.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
+                        //
+                        logController.logTrace(cp.core, "runTask, task [" + task.name + "], command [" + task.Command + "], cmdDetail [" + task.cmdDetail + "]");
+                        //
+                        //tasksRemaining = true;
+                        task.DateStarted = DateTime.Now;
+                        task.save(cp.core);
+                        cmdDetailClass cmdDetail = cp.core.json.Deserialize<cmdDetailClass>(task.cmdDetail);
+                        switch ((task.Command.ToLower())) {
+                            case taskQueueCommandEnumModule.runAddon:
+                                cp.core.addon.execute(AddonModel.create(cp.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                                    backgroundProcess = true,
+                                    addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
+                                    instanceArguments = cmdDetail.args,
+                                    errorContextMessage = "running task, addon [" + cmdDetail.addonId + "]"
+                                });
+                                break;
+                        }
+                        task.DateCompleted = DateTime.Now;
+                        task.save(cp.core);
+                    }
+                }
+            } catch (Exception ex) {
+                Console.WriteLine("Error: [" + ex.ToString() + "]");
             }
         }
         #region  IDisposable Support 

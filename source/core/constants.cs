@@ -1818,7 +1818,7 @@ namespace Contensive.Processor {
     public class cmdDetailClass {
         public int addonId;
         public string addonName;
-        public Dictionary<string, string> docProperties;
+        public Dictionary<string, string> args;
     }
     //
     //-----------------------------------------------------------------------

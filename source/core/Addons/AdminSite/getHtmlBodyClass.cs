@@ -10993,7 +10993,7 @@ namespace Contensive.Addons.AdminSite {
                                             var cmdDetail = new cmdDetailClass() {
                                                 addonId = ExportCSVAddon.id,
                                                 addonName = ExportCSVAddon.name,
-                                                docProperties = docProperties
+                                                args = docProperties
                                             };
                                             taskSchedulerController.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
                                         }
@@ -11011,7 +11011,7 @@ namespace Contensive.Addons.AdminSite {
                                             var cmdDetail = new cmdDetailClass() {
                                                 addonId = ExportXMLAddon.id,
                                                 addonName = ExportXMLAddon.name,
-                                                docProperties = docProperties
+                                                args = docProperties
                                             };
                                             taskSchedulerController.addTaskToQueue(core, taskCommandBuildXml, cmdDetail, false);
                                         }

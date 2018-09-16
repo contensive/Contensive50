@@ -194,6 +194,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="personalizationIsAuthenticated"></param>
         /// <returns></returns>
         public static string executeContentCommands(CoreController core,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+            //
+            // -- exit if empty
+            if (string.IsNullOrWhiteSpace(src)) return src;
             string returnValue = "";
             try {
                 //

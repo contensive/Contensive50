@@ -1943,7 +1943,7 @@ namespace Contensive.Processor.Controllers {
                     cmdDetailClass cmdDetail = new cmdDetailClass {
                         addonId = addon.id,
                         addonName = addon.name,
-                        docProperties = genericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString)
+                        args = genericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString)
                     };
                     taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
