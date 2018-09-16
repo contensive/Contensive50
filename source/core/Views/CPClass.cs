@@ -9,13 +9,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 //using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 //
 using Contensive.BaseClasses;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor {
     public class CPClass : CPBaseClass, IDisposable {
@@ -77,7 +77,7 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         //
-        public AppConfigModel.appStatusEnum status {
+        public AppConfigModel.AppStatusEnum status {
             get {
                 return core.appConfig.appStatus;
             }
@@ -127,7 +127,7 @@ namespace Contensive.Processor {
                 if (core != null) {
                     if (core.serverConfig != null) {
                         if (core.appConfig != null) {
-                            return (core.appConfig.appStatus == AppConfigModel.appStatusEnum.ok);
+                            return (core.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok);
                         }
                     }
                 }
@@ -164,7 +164,7 @@ namespace Contensive.Processor {
                 if (genericController.isGuid(addonNameOrGuid)) {
                     //
                     // -- call by guid
-                    AddonModel addon = Models.DbModels.AddonModel.create(core, addonNameOrGuid);
+                    AddonModel addon = Models.Db.AddonModel.create(core, addonNameOrGuid);
                     if ( addon == null ) {
                         throw new ApplicationException("Addon [" + addonNameOrGuid + "] could not be found.");
                     } else {
@@ -174,7 +174,7 @@ namespace Contensive.Processor {
                         });
                     }
                 } else {
-                    AddonModel addon = Models.DbModels.AddonModel.createByName(core, addonNameOrGuid);
+                    AddonModel addon = Models.Db.AddonModel.createByName(core, addonNameOrGuid);
                     if ( addon != null ) {
                         //
                         // -- call by name

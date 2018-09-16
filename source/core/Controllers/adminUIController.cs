@@ -5,11 +5,11 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
-using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor {
     //
@@ -1126,7 +1126,7 @@ namespace Contensive.Processor {
         public static string getDefaultEditor_LookupContent( CoreController core, string fieldName, int fieldValue, int lookupContentID, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
             string result = "";
             string LookupContentName = "";
-            if (lookupContentID != 0) LookupContentName = genericController.encodeText(Models.Complex.cdefModel.getContentNameByID(core, lookupContentID));
+            if (lookupContentID != 0) LookupContentName = genericController.encodeText(Models.Domain.CDefModel.getContentNameByID(core, lookupContentID));
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
@@ -1256,7 +1256,7 @@ namespace Contensive.Processor {
         public static string getDefaultEditor_memberSelect(CoreController core, string htmlName, int selectedRecordId, int groupId, string groupName, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
             string EditorString = "";
             if ( (groupId>0)&(string.IsNullOrWhiteSpace(groupName))) {
-                var group = groupModel.create(core, groupId);
+                var group = GroupModel.create(core, groupId);
                 if ( group != null) {
                     groupName = "Group " + group.id.ToString();
                     group.save(core);
@@ -1291,19 +1291,19 @@ namespace Contensive.Processor {
                         EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + HtmlController.encodeHtml( recordName ) + "</a>]";
                     }
                 }
-                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + Models.Complex.cdefModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
+                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + Models.Domain.CDefModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
             }
             return EditorString;
         }
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_manyToMany(CoreController core, cdefFieldModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly = false, string WhyReadOnlyMsg = "" ) {
+        public static string getDefaultEditor_manyToMany(CoreController core, CDefFieldModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly = false, string WhyReadOnlyMsg = "" ) {
             string result = "";
             //
-            string MTMContent0 =   cdefModel.getContentNameByID(core, field.contentId);
-            string MTMContent1 = cdefModel.getContentNameByID(core, field.manyToManyContentID);
-            string MTMRuleContent = cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
+            string MTMContent0 =   CDefModel.getContentNameByID(core, field.contentId);
+            string MTMContent1 = CDefModel.getContentNameByID(core, field.manyToManyContentID);
+            string MTMRuleContent = CDefModel.getContentNameByID(core, field.manyToManyRuleContentID);
             string MTMRuleField0 = field.ManyToManyRulePrimaryField;
             string MTMRuleField1 = field.ManyToManyRuleSecondaryField;
             result += core.html.getCheckList(htmlName, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, currentValueCommaList);
@@ -1494,7 +1494,7 @@ namespace Contensive.Processor {
         /// <param name="recordCnt"></param>
         /// <param name="ContentAccessLimitMessage"></param>
         /// <returns></returns>
-        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, cdefModel content, int recordCnt, string ContentAccessLimitMessage) {
+        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, CDefModel content, int recordCnt, string ContentAccessLimitMessage) {
             //
             // ----- TitleBar
             //
@@ -1522,7 +1522,7 @@ namespace Contensive.Processor {
             foreach (var kvp in IndexConfig.FindWords) {
                 IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
-                    string FieldCaption = cdefModel.GetContentFieldProperty(core, content.name, findWord.Name, "caption");
+                    string FieldCaption = CDefModel.GetContentFieldProperty(core, content.name, findWord.Name, "caption");
                     switch (findWord.MatchOption) {
                         case FindWordMatchEnum.MatchEmpty:
                             filterLine = filterLine + ", " + FieldCaption + " is empty";
@@ -1553,7 +1553,7 @@ namespace Contensive.Processor {
                 }
             }
             if (IndexConfig.SubCDefID > 0) {
-                string ContentName = cdefModel.getContentNameByID(core, IndexConfig.SubCDefID);
+                string ContentName = CDefModel.getContentNameByID(core, IndexConfig.SubCDefID);
                 if (!string.IsNullOrEmpty(ContentName)) {
                     filterLine = filterLine + ", in Sub-content '" + ContentName + "'";
                 }
@@ -1654,8 +1654,8 @@ namespace Contensive.Processor {
         /// <param name="core"></param>
         /// <param name="cdef"></param>
         /// <returns></returns>
-        public static string getIconEditAdminLink(CoreController core, Models.Complex.cdefModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
-        public static string getIconEditAdminLink(CoreController core, Models.Complex.cdefModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, Models.Domain.CDefModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, Models.Domain.CDefModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
         //
         //====================================================================================================
         //
@@ -1742,7 +1742,7 @@ namespace Contensive.Processor {
                         throw (new ApplicationException("RecordID [" + recordID + "] is invalid"));
                     } else {
                         if (IsEditing) {
-                            var cdef = Models.Complex.cdefModel.getCdef(core, contentName);
+                            var cdef = Models.Domain.CDefModel.getCdef(core, contentName);
                             if ( cdef==null) {
                                 throw new ApplicationException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
                             } else {
@@ -1802,7 +1802,7 @@ namespace Contensive.Processor {
                     if (string.IsNullOrEmpty(iContentName)) {
                         throw (new ApplicationException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
                     } else {
-                        iContentID = Models.Complex.cdefModel.getContentId(core, iContentName);
+                        iContentID = Models.Domain.CDefModel.getContentId(core, iContentName);
                         csChildContent = core.db.csOpen("Content", "ParentID=" + iContentID, "", true, 0, false, false, "id");
                         useFlyout = core.db.csOk(csChildContent);
                         core.db.csClose(ref csChildContent);
@@ -1841,7 +1841,7 @@ namespace Contensive.Processor {
                                         ClipboardContentID = genericController.encodeInteger(ClipBoardArray[0]);
                                         ClipChildRecordID = genericController.encodeInteger(ClipBoardArray[1]);
                                         //iContentID = main_GetContentID(iContentName)
-                                        if (Models.Complex.cdefModel.isWithinContent(core, ClipboardContentID, iContentID)) {
+                                        if (Models.Domain.CDefModel.isWithinContent(core, ClipboardContentID, iContentID)) {
                                             if (genericController.vbInstr(1, iPresetNameValueList, "PARENTID=", 1) != 0) {
                                                 //
                                                 // must test for main_IsChildRecord
@@ -2008,7 +2008,7 @@ namespace Contensive.Processor {
                             // ----- No entry found, this member does not have access, just main_Get ContentID
                             //
                             ContentRecordFound = true;
-                            ContentID = Models.Complex.cdefModel.getContentId(core, ContentName);
+                            ContentID = Models.Domain.CDefModel.getContentId(core, ContentName);
                             ContentAllowAdd = false;
                             GroupRulesAllowAdd = false;
                             MemberRulesAllow = false;

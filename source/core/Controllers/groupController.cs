@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -54,7 +54,7 @@ namespace Contensive.Processor.Controllers {
                 if (dt.Rows.Count > 0) {
                     returnGroupId = genericController.encodeInteger(dt.Rows[0]["ID"]);
                 } else {
-                    cid = Models.Complex.cdefModel.getContentId(core, "groups");
+                    cid = Models.Domain.CDefModel.getContentId(core, "groups");
                     createkey = genericController.GetRandomInteger(core);
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" + cid + ",1," + createkey + "," + sqlGroupName + "," + sqlGroupName + ")";
                     core.db.executeQuery(sql);

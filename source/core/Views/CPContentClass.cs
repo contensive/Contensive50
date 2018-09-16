@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -63,31 +63,31 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetContentControlCriteria(string ContentName) {
-            return Models.Complex.cdefModel.getContentControlCriteria(core, ContentName);
+            return Models.Domain.CDefModel.getContentControlCriteria(core, ContentName);
         }
         //
         //====================================================================================================
         //
         public override string GetFieldProperty(string ContentName, string FieldName, string PropertyName) {
-            return Models.Complex.cdefModel.GetContentFieldProperty(core, ContentName, FieldName, PropertyName);
+            return Models.Domain.CDefModel.GetContentFieldProperty(core, ContentName, FieldName, PropertyName);
         }
         //
         //====================================================================================================
         //
         public override int GetID(string ContentName) {
-            return Models.Complex.cdefModel.getContentId(core, ContentName);
+            return Models.Domain.CDefModel.getContentId(core, ContentName);
         }
         //
         //====================================================================================================
         //
         public override string GetProperty(string ContentName, string PropertyName) {
-            return Models.Complex.cdefModel.GetContentProperty(cp.core, ContentName, PropertyName);
+            return Models.Domain.CDefModel.GetContentProperty(cp.core, ContentName, PropertyName);
         }
         //
         //====================================================================================================
         //
         public override string GetDataSource(string ContentName) {
-            return Models.Complex.cdefModel.getContentDataSource(core, ContentName);
+            return Models.Domain.CDefModel.getContentDataSource(core, ContentName);
         }
         //
         //====================================================================================================
@@ -128,7 +128,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetTable(string ContentName) {
-            return Models.Complex.cdefModel.getContentTablename(core, ContentName);
+            return Models.Domain.CDefModel.getContentTablename(core, ContentName);
         }
         //
         //====================================================================================================
@@ -141,7 +141,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool IsField(string ContentName, string FieldName) {
-            return Models.Complex.cdefModel.isContentFieldSupported(core, ContentName, FieldName);
+            return Models.Domain.CDefModel.isContentFieldSupported(core, ContentName, FieldName);
         }
         //
         //====================================================================================================
@@ -153,7 +153,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool IsChildContent(string ChildContentID, string ParentContentID) {
-            return Models.Complex.cdefModel.isWithinContent(cp.core, genericController.encodeInteger(ChildContentID), genericController.encodeInteger(ParentContentID));
+            return Models.Domain.CDefModel.isWithinContent(cp.core, genericController.encodeInteger(ChildContentID), genericController.encodeInteger(ParentContentID));
         }
         //
         //====================================================================================================
@@ -259,19 +259,19 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void DeleteContent(string ContentName) {
-            contentModel.delete(core, Models.Complex.cdefModel.getContentId(core, ContentName));
+            ContentModel.delete(core, Models.Domain.CDefModel.getContentId(core, ContentName));
         }
         //
         //====================================================================================================
         //
         public override int AddContentField(string ContentName, string FieldName, int FieldType) {
-            Models.Complex.cdefFieldModel field = new Models.Complex.cdefFieldModel();
+            Models.Domain.CDefFieldModel field = new Models.Domain.CDefFieldModel();
             field.active = true;
             field.adminOnly = false;
             field.authorable = true;
             field.blockAccess = false;
             field.caption = FieldName;
-            field.contentId = Models.Complex.cdefModel.getContentId(core, ContentName);
+            field.contentId = Models.Domain.CDefModel.getContentId(core, ContentName);
             field.developerOnly = false;
             field.editSortPriority = 9999;
             field.editTabName = "";
@@ -304,7 +304,7 @@ namespace Contensive.Processor {
             field.Scramble = false;
             field.textBuffered = false;
             field.uniqueName = false;
-            return Models.Complex.cdefModel.verifyCDefField_ReturnID(core, ContentName, field);
+            return Models.Domain.CDefModel.verifyCDefField_ReturnID(core, ContentName, field);
         }
         //
         //====================================================================================================
@@ -323,14 +323,14 @@ namespace Contensive.Processor {
         //
         public override int AddContent(string ContentName, string sqlTableName, string dataSourceName) {
             var tmpList = new List<string> { };
-            dataSourceModel dataSource = dataSourceModel.createByName(core, dataSourceName, ref tmpList);
-            return Models.Complex.cdefModel.addContent(core, true, dataSource, sqlTableName, ContentName, false, false, true, false, "", "sort order", "name", false, false, false, false, false, false, "", 0, 0, 0, "", false, "", true);
+            DataSourceModel dataSource = DataSourceModel.createByName(core, dataSourceName, ref tmpList);
+            return Models.Domain.CDefModel.addContent(core, true, dataSource, sqlTableName, ContentName, false, false, true, false, "", "sort order", "name", false, false, false, false, false, false, "", 0, 0, 0, "", false, "", true);
         }
         //
         //====================================================================================================
         //
         public override string GetListLink(string ContentName) {
-            return AdminUIController.getIconEditAdminLink(core, Models.Complex.cdefModel.getCdef(core, ContentName));
+            return AdminUIController.getIconEditAdminLink(core, Models.Domain.CDefModel.getCdef(core, ContentName));
         }
         //
         //====================================================================================================

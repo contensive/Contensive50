@@ -10,7 +10,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Contensive.BaseClasses;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -97,7 +97,7 @@ namespace Contensive.Addons.Housekeeping {
                     int DataSourceType = core.db.getDataSourceType("default");
                     //
                     string DefaultMemberName = "";
-                    int PeopleCID = Processor.Models.Complex.cdefModel.getContentId(core, "people");
+                    int PeopleCID = Processor.Models.Domain.CDefModel.getContentId(core, "people");
                     string SQL = "select defaultvalue from ccfields where name='name' and contentid=(" + PeopleCID + ")";
                     int CS = core.db.csOpenSql(SQL,"Default");
                     if (core.db.csOk(CS)) {
@@ -428,9 +428,9 @@ namespace Contensive.Addons.Housekeeping {
                 TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
                 //
-                SQLTablePeople = Processor.Models.Complex.cdefModel.getContentTablename(core, "People");
-                SQLTableMemberRules = Processor.Models.Complex.cdefModel.getContentTablename(core, "Member Rules");
-                SQLTableGroups = Processor.Models.Complex.cdefModel.getContentTablename(core, "Groups");
+                SQLTablePeople = Processor.Models.Domain.CDefModel.getContentTablename(core, "People");
+                SQLTableMemberRules = Processor.Models.Domain.CDefModel.getContentTablename(core, "Member Rules");
+                SQLTableGroups = Processor.Models.Domain.CDefModel.getContentTablename(core, "Groups");
                 SQLDateMidnightTwoDaysAgo = core.db.encodeSQLDate(MidnightTwoDaysAgo);
                 //
                 // Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
@@ -1278,7 +1278,7 @@ namespace Contensive.Addons.Housekeeping {
                 TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
                 //
-                SQLTablePeople = Processor.Models.Complex.cdefModel.getContentTablename(core, "People");
+                SQLTablePeople = Processor.Models.Domain.CDefModel.getContentTablename(core, "People");
                 //
                 appName = core.appConfig.name;
                 DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);
@@ -1336,7 +1336,7 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 // Set long timeout (30 min) needed for heavy work on big tables
                 core.db.sqlCommandTimeout = 1800;
-                string SQLTablePeople = Processor.Models.Complex.cdefModel.getContentTablename(core, "People");
+                string SQLTablePeople = Processor.Models.Domain.CDefModel.getContentTablename(core, "People");
                 string DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);
                 //
                 logHousekeeping(core, "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");

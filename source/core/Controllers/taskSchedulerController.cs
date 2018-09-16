@@ -9,11 +9,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     public class taskSchedulerController : IDisposable {
@@ -123,11 +123,11 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // -- run tasks for each app
-                foreach (KeyValuePair<string, Models.Context.AppConfigModel> appKvp in coreServer.serverConfig.apps) {
+                foreach (KeyValuePair<string, Models.Domain.AppConfigModel> appKvp in coreServer.serverConfig.apps) {
                     logController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
                     using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
                         CoreController coreApp = cpApp.core;
-                        if (!(coreApp.appConfig.appStatus == AppConfigModel.appStatusEnum.ok)) {
+                        if (!(coreApp.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok)) {
                             //
                             logController.logTrace(coreApp, "scheduleTasks, app status not ok");
                         //} else if (!(coreApp.appConfig.appMode == appConfigModel.appModeEnum.normal)) {

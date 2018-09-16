@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -196,25 +196,14 @@ namespace Contensive.Processor.Controllers {
         public static string executeContentCommands(CoreController core,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
-                bool badCmd = false;
-                bool notFound = false;
-                int posOpen = 0;
-                int posClose = 0;
-                string Cmd = null;
-                string cmdResult = null;
-                int posDq = 0;
-                int posSq = 0;
-                int Ptr = 0;
-                int ptrLast = 0;
-                string dst = null;
-                string escape = null;
                 //
-                dst = "";
-                ptrLast = 1;
+                string dst = "";
+                int Ptr = 0;
                 do {
-                    Cmd = "";
-                    posOpen = genericController.vbInstr(ptrLast, src, contentReplaceEscapeStart);
+                    int ptrLast = 1;
+                    int posOpen = genericController.vbInstr(ptrLast, src, contentReplaceEscapeStart);
                     Ptr = posOpen;
+                    int posClose = 0;
                     if (Ptr == 0) {
                         //
                         // not found, copy the rest of src to dst
@@ -223,7 +212,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // scan until we have passed all double and single quotes that are before the next
                         //
-                        notFound = true;
+                        bool notFound = true;
                         do {
                             posClose = genericController.vbInstr(Ptr, src, contentReplaceEscapeEnd);
                             if (posClose == 0) {
@@ -233,7 +222,8 @@ namespace Contensive.Processor.Controllers {
                                 posOpen = 0;
                                 notFound = false;
                             } else {
-                                posDq = Ptr;
+                                int posDq = Ptr;
+                                string escape = null;
                                 do {
                                     posDq = genericController.vbInstr(posDq + 1, src, "\"");
                                     escape = "";
@@ -241,7 +231,7 @@ namespace Contensive.Processor.Controllers {
                                         escape = src.Substring(posDq - 2, 1);
                                     }
                                 } while (escape == "\\");
-                                posSq = Ptr;
+                                int posSq = Ptr;
                                 do {
                                     posSq = genericController.vbInstr(posSq + 1, src, "'");
                                     escape = "";
@@ -313,8 +303,9 @@ namespace Contensive.Processor.Controllers {
                         //
                         // cmd found, process it and add the results to the dst
                         //
-                        Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
-                        cmdResult = executeSingleCommand( core,  Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                        string Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
+                        bool badCmd = false;
+                        string cmdResult = executeSingleCommand(core, Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
                         if (badCmd) {
                             //
                             // the command was bad, put it back in place (?) in case it was not a command

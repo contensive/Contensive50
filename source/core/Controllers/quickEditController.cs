@@ -5,7 +5,7 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -41,7 +41,7 @@ namespace Contensive.Processor.Controllers {
                 core.html.addStyleLink("/quickEditor/styles.css", "Quick Editor");
                 //
                 // -- First Active Record - Output Quick Editor form
-                Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(core, pageContentModel.contentName);
+                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, pageContentModel.contentName);
                 bool IsEditLocked = core.workflow.GetEditLockStatus(pageContentModel.contentName, core.doc.pageController.page.id);
                 string editLockMemberName = "";
                 DateTime editLockDateExpires = default(DateTime);
@@ -72,7 +72,7 @@ namespace Contensive.Processor.Controllers {
                 bool AllowDelete = false;
                 bool readOnlyField = false;
                 core.doc.getAuthoringPermissions(pageContentModel.contentName, core.doc.pageController.page.id, ref AllowInsert, ref AllowCancel, ref allowSave, ref AllowDelete, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref readOnlyField);
-                bool AllowMarkReviewed = Models.Complex.cdefModel.isContentFieldSupported(core, pageContentModel.contentName, "DateReviewed");
+                bool AllowMarkReviewed = Models.Domain.CDefModel.isContentFieldSupported(core, pageContentModel.contentName, "DateReviewed");
                 string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(core, false, IsEditLocked, editLockMemberName, editLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
                 //
                 // Set Editing Authoring Control

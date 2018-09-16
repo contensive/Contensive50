@@ -2,13 +2,13 @@
 using System;
 using System.Xml;
 using System.Collections.Generic;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 using System.IO;
 using System.Data;
 using System.Threading;
-using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Domain;
 using System.Linq;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 
@@ -35,19 +35,19 @@ namespace Contensive.Processor.Controllers {
         /// Overlay a Src CDef on to the current one (Dst). Any Src CDEf entries found in Src are added to Dst.
         /// if SrcIsUserCDef is true, then the Src is overlayed on the Dst if there are any changes -- and .CDefChanged flag set
         /// </summary>
-        private static bool addMiniCollectionSrcToDst(CoreController core, ref miniCollectionModel dstCollection, miniCollectionModel srcCollection) {
+        private static bool addMiniCollectionSrcToDst(CoreController core, ref MiniCollectionModel dstCollection, MiniCollectionModel srcCollection) {
             bool returnOk = true;
             try {
                 string SrcFieldName = null;
                 bool updateDst = false;
-                Models.Complex.cdefModel srcCdef = null;
+                Models.Domain.CDefModel srcCdef = null;
                 //
                 // If the Src is the BaseCollection, the Dst must be the Application Collectio
                 //   in this case, reset any BaseContent or BaseField attributes in the application that are not in the base
                 //
                 if (srcCollection.isBaseCollection) {
                     foreach (var dstKeyValuePair in dstCollection.cdef) {
-                        Models.Complex.cdefModel dstWorkingCdef = dstKeyValuePair.Value;
+                        Models.Domain.CDefModel dstWorkingCdef = dstKeyValuePair.Value;
                         string contentName = dstWorkingCdef.name;
                         if (dstCollection.cdef[contentName.ToLower()].isBaseContent) {
                             //
@@ -61,7 +61,7 @@ namespace Contensive.Processor.Controllers {
                                 tempVar.isBaseContent = false;
                                 tempVar.dataChanged = true;
                                 foreach (var dstFieldKeyValuePair in tempVar.fields) {
-                                    Models.Complex.cdefFieldModel field = dstFieldKeyValuePair.Value;
+                                    Models.Domain.CDefFieldModel field = dstFieldKeyValuePair.Value;
                                     if (field.isBaseField) {
                                         field.isBaseField = false;
                                         //field.Changed = True
@@ -91,12 +91,12 @@ namespace Contensive.Processor.Controllers {
                     // Search for this cdef in the Dst
                     //
                     updateDst = false;
-                    Models.Complex.cdefModel dstCdef = null;
+                    Models.Domain.CDefModel dstCdef = null;
                     if (!dstCollection.cdef.ContainsKey(srcName.ToLower())) {
                         //
                         // add src to dst
                         //
-                        dstCdef = new Models.Complex.cdefModel();
+                        dstCdef = new Models.Domain.CDefModel();
                         dstCollection.cdef.Add(srcName.ToLower(), dstCdef);
                         updateDst = true;
                     } else {
@@ -179,7 +179,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     //Call AppendClassLogFile(core.app.config.name,"UpgradeCDef_AddSrcToDst", "CollectionSrc.CDef[SrcPtr].fields.count=" & CollectionSrc.CDef[SrcPtr].fields.count)
                     foreach (var srcFieldKeyValuePair in srcCdef.fields) {
-                        Models.Complex.cdefFieldModel srcCdefField = srcFieldKeyValuePair.Value;
+                        Models.Domain.CDefFieldModel srcCdefField = srcFieldKeyValuePair.Value;
                         SrcFieldName = srcCdefField.nameLc;
                         updateDst = false;
                         if (!dstCollection.cdef.ContainsKey(srcName.ToLower())) {
@@ -190,7 +190,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             dstCdef = dstCollection.cdef[srcName.ToLower()];
                             bool HelpChanged = false;
-                            Models.Complex.cdefFieldModel dstCdefField = null;
+                            Models.Domain.CDefFieldModel dstCdefField = null;
                             if (dstCdef.fields.ContainsKey(SrcFieldName.ToLower())) {
                                 //
                                 // Src field was found in Dst fields
@@ -250,7 +250,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // field was not found in dst, add it and populate
                                 //
-                                dstCdef.fields.Add(SrcFieldName.ToLower(), new Models.Complex.cdefFieldModel());
+                                dstCdef.fields.Add(SrcFieldName.ToLower(), new Models.Domain.CDefFieldModel());
                                 dstCdefField = dstCdef.fields[SrcFieldName.ToLower()];
                                 updateDst = true;
                                 HelpChanged = true;
@@ -319,15 +319,15 @@ namespace Contensive.Processor.Controllers {
                 // Check SQL Indexes
                 // -------------------------------------------------------------------------------------------------
                 //
-                foreach (miniCollectionModel.miniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
+                foreach (MiniCollectionModel.miniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
                     string srcName = (srcSqlIndex.DataSourceName + "-" + srcSqlIndex.TableName + "-" + srcSqlIndex.IndexName).ToLower();
                     updateDst = false;
                     //
                     // Search for this name in the Dst
                     bool indexFound = false;
                     bool indexChanged = false;
-                    miniCollectionModel.miniCollectionSQLIndexModel indexToUpdate = new miniCollectionModel.miniCollectionSQLIndexModel() { };
-                    foreach (miniCollectionModel.miniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
+                    MiniCollectionModel.miniCollectionSQLIndexModel indexToUpdate = new MiniCollectionModel.miniCollectionSQLIndexModel() { };
+                    foreach (MiniCollectionModel.miniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
                         dstName = (dstSqlIndex.DataSourceName + "-" + dstSqlIndex.TableName + "-" + dstSqlIndex.IndexName).ToLower();
                         if (textMatch(dstName, srcName)) {
                             //
@@ -361,7 +361,7 @@ namespace Contensive.Processor.Controllers {
                 string DataBuildVersion = core.siteProperties.dataBuildVersion;
                 foreach (var srcKvp in srcCollection.menus) {
                     string srcKey = srcKvp.Key.ToLower() ;
-                    miniCollectionModel.miniCollectionMenuModel srcMenu = srcKvp.Value;
+                    MiniCollectionModel.miniCollectionMenuModel srcMenu = srcKvp.Value;
                     string srcName = srcMenu.Name.ToLower();
                     string srcGuid = srcMenu.Guid;
                     string SrcParentName = genericController.vbLCase(srcMenu.ParentName);
@@ -370,13 +370,13 @@ namespace Contensive.Processor.Controllers {
                     updateDst = false;
                     //
                     // Search for match using guid
-                    miniCollectionModel.miniCollectionMenuModel dstMenuMatch = new miniCollectionModel.miniCollectionMenuModel() { } ;
+                    MiniCollectionModel.miniCollectionMenuModel dstMenuMatch = new MiniCollectionModel.miniCollectionMenuModel() { } ;
                     bool IsMatch = false;
                     string DstKey = null;
                     bool DstIsNavigator = false;
                     foreach (var dstKvp in dstCollection.menus) {
                         string dstKey = dstKvp.Key.ToLower();
-                        miniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
+                        MiniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
                         string dstGuid = dstMenu.Guid;
                         if (dstGuid == srcGuid) {
                             DstIsNavigator = dstMenu.IsNavigator;
@@ -395,7 +395,7 @@ namespace Contensive.Processor.Controllers {
                         // no match found on guid, try name and ( either namespace or parentname )
                         foreach (var dstKvp in dstCollection.menus) {
                             string dstKey = dstKvp.Key.ToLower();
-                            miniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
+                            MiniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
                             dstName = genericController.vbLCase(dstMenu.Name);
                             if ((srcName == dstName) && (SrcIsNavigator == DstIsNavigator)) {
                                 if (SrcIsNavigator) {
@@ -568,8 +568,8 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private static miniCollectionModel installCollection_GetApplicationMiniCollection(CoreController core, bool isNewBuild) {
-            miniCollectionModel returnColl = new miniCollectionModel();
+        private static MiniCollectionModel installCollection_GetApplicationMiniCollection(CoreController core, bool isNewBuild) {
+            MiniCollectionModel returnColl = new MiniCollectionModel();
             try {
                 //
                 string ExportFilename = null;
@@ -585,7 +585,7 @@ namespace Contensive.Processor.Controllers {
                     exportApplicationCDefXml(core, ExportPathPage, true);
                     CollectionData = core.privateFiles.readFileText(ExportPathPage);
                     core.privateFiles.deleteFile(ExportPathPage);
-                    returnColl = installCollection_LoadXmlToMiniCollection(core, CollectionData, false, false, isNewBuild, new miniCollectionModel());
+                    returnColl = installCollection_LoadXmlToMiniCollection(core, CollectionData, false, false, isNewBuild, new MiniCollectionModel());
                 }
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -596,7 +596,7 @@ namespace Contensive.Processor.Controllers {
        //
         //====================================================================================================
         //
-        private static string GetMenuNameSpace(CoreController core, Dictionary<string,miniCollectionModel.miniCollectionMenuModel> menus, miniCollectionModel.miniCollectionMenuModel menu, string UsedIDList) {
+        private static string GetMenuNameSpace(CoreController core, Dictionary<string,MiniCollectionModel.miniCollectionMenuModel> menus, MiniCollectionModel.miniCollectionMenuModel menu, string UsedIDList) {
             string returnAttr = "";
             try {
                 string ParentName = null;
@@ -609,7 +609,7 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(ParentName)) {
                     LCaseParentName = genericController.vbLCase(ParentName);
                     foreach ( var kvp in menus) {
-                        miniCollectionModel.miniCollectionMenuModel testMenu = kvp.Value;
+                        MiniCollectionModel.miniCollectionMenuModel testMenu = kvp.Value;
                         if (genericController.vbInstr(1, "," + UsedIDList + ",", "," + Ptr.ToString() + ",") == 0) {
                             if (LCaseParentName == genericController.vbLCase(testMenu.Name) && (menu.IsNavigator == testMenu.IsNavigator)) {
                                 Prefix = GetMenuNameSpace(core, menus, testMenu, UsedIDList + "," + menu.Guid);
@@ -645,7 +645,7 @@ namespace Contensive.Processor.Controllers {
                 sqlList.add("CreatedBy", "0");
                 sqlList.add("OrderByClause", core.db.encodeSQLText(OrderByCriteria));
                 sqlList.add("active", SQLTrue);
-                sqlList.add("ContentControlID", Models.Complex.cdefModel.getContentId(core, "Sort Methods").ToString());
+                sqlList.add("ContentControlID", Models.Domain.CDefModel.getContentId(core, "Sort Methods").ToString());
                 //
                 dt = core.db.openTable("Default", "ccSortMethods", "Name=" + core.db.encodeSQLText(Name), "ID", "ID", 1);
                 if (dt.Rows.Count > 0) {
@@ -736,7 +736,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 RowsNeeded = FieldTypeIdMax - RowsFound;
                 if (RowsNeeded > 0) {
-                    CID = Models.Complex.cdefModel.getContentId(core, "Content Field Types");
+                    CID = Models.Domain.CDefModel.getContentId(core, "Content Field Types");
                     if (CID <= 0) {
                         //
                         // Problem
@@ -784,7 +784,7 @@ namespace Contensive.Processor.Controllers {
         //
         public static void exportApplicationCDefXml(CoreController core, string privateFilesPathFilename, bool IncludeBaseFields) {
             try {
-                collectionXmlController XML = new collectionXmlController(core);
+                CollectionXmlController XML = new CollectionXmlController(core);
                 string Content = XML.getApplicationCollectionXml(IncludeBaseFields);
                 core.privateFiles.saveFile(privateFilesPathFilename, Content);
                 XML = null;
@@ -1747,7 +1747,7 @@ namespace Contensive.Processor.Controllers {
                                             bool CollectionUpdatable_fileValueOK = false;
                                             //												Dim CollectionblockNavigatorNode_fileValueOK As Boolean
                                             bool CollectionSystem = genericController.encodeBoolean(xmlController.GetXMLAttribute(core, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
-                                            int Parent_NavID = appBuilderController.verifyNavigatorEntry(core, addonGuidManageAddon, "", "Manage Add-ons", "", "", "", false, false, false, true, "", "", "", 0);
+                                            int Parent_NavID = AppBuilderController.verifyNavigatorEntry(core, addonGuidManageAddon, "", "Manage Add-ons", "", "", "", false, false, false, true, "", "", "", 0);
                                             bool CollectionUpdatable = genericController.encodeBoolean(xmlController.GetXMLAttribute(core, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
                                             bool CollectionblockNavigatorNode = genericController.encodeBoolean(xmlController.GetXMLAttribute(core, CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
                                             string FileGuid =xmlController.GetXMLAttribute(core, IsFound, Doc.DocumentElement, "guid", Collectionname);
@@ -1920,7 +1920,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (CollectionLastChangeDate == DateTime.MinValue) {
                                                         logController.logInfo(core, "collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has the collection, but the new version has no lastchangedate, so it will upgrade to this unknown (manual) version.");
                                                         OKToInstall = true;
-                                                    } else if (collection.LastChangeDate < CollectionLastChangeDate) {
+                                                    } else if (collection.lastChangeDate < CollectionLastChangeDate) {
                                                         logController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an older version of collection. It will be upgraded.");
                                                         OKToInstall = true;
                                                     } else if(repair) {
@@ -1960,14 +1960,14 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // ----- set or clear all fields
                                                     collection.name = Collectionname;
-                                                    collection.Help = "";
+                                                    collection.help = "";
                                                     collection.ccguid = CollectionGuid;
-                                                    collection.LastChangeDate = CollectionLastChangeDate;
+                                                    collection.lastChangeDate = CollectionLastChangeDate;
                                                     if (CollectionSystem_fileValueOK) {
-                                                        collection.System = CollectionSystem;
+                                                        collection.system = CollectionSystem;
                                                     }
                                                     if (CollectionUpdatable_fileValueOK) {
-                                                        collection.Updatable = CollectionUpdatable;
+                                                        collection.updatable = CollectionUpdatable;
                                                     }
                                                     if (CollectionblockNavigatorNode_fileValueOK) {
                                                         collection.blockNavigatorNode = CollectionblockNavigatorNode;
@@ -1979,8 +1979,8 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Store all resource found, new way and compatibility way
                                                     //
-                                                    collection.ContentFileList = ContentFileList;
-                                                    collection.ExecFileList = ExecFileList;
+                                                    collection.contentFileList = ContentFileList;
+                                                    collection.execFileList = ExecFileList;
                                                     collection.wwwFileList = wwwFileList;
                                                     //
                                                     // ----- remove any current navigator nodes installed by the collection previously
@@ -2056,7 +2056,7 @@ namespace Contensive.Processor.Controllers {
                                                                         //
                                                                         // setup cdef rule
                                                                         //
-                                                                        int ContentID = Models.Complex.cdefModel.getContentId(core, ContentName);
+                                                                        int ContentID = Models.Domain.CDefModel.getContentId(core, ContentName);
                                                                         if (ContentID > 0) {
                                                                             int CS = core.db.csInsertRecord("Add-on Collection CDef Rules", 0);
                                                                             if (core.db.csOk(CS)) {
@@ -2108,7 +2108,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 // create or update the record
                                                                                 //
-                                                                                Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                                                                                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                                                                                 int cs = -1;
                                                                                 if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                     cs = core.db.csOpen(ContentName, "ccguid=" + core.db.encodeSQLText(ContentRecordGuid));
@@ -2427,7 +2427,7 @@ namespace Contensive.Processor.Controllers {
                                                                             string ContentRecordGuid =xmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                             string ContentRecordName =xmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                             if ((!string.IsNullOrEmpty(ContentRecordGuid)) | (!string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                                                                                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                                                                                 int cs = -1;
                                                                                 if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                     cs = core.db.csOpen(ContentName, "ccguid=" + core.db.encodeSQLText(ContentRecordGuid));
@@ -2444,7 +2444,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             int fieldTypeId = -1;
                                                                                             int FieldLookupContentID = -1;
                                                                                             foreach (var keyValuePair in CDef.fields) {
-                                                                                                Models.Complex.cdefFieldModel field = keyValuePair.Value;
+                                                                                                Models.Domain.CDefFieldModel field = keyValuePair.Value;
                                                                                                 if (genericController.vbLCase(field.nameLc) == FieldName) {
                                                                                                     fieldTypeId = field.fieldTypeId;
                                                                                                     FieldLookupContentID = field.lookupContentID;
@@ -2465,9 +2465,9 @@ namespace Contensive.Processor.Controllers {
                                                                                                             //
                                                                                                             // read in text value, if a guid, use it, otherwise assume name
                                                                                                             if (FieldLookupContentID != 0) {
-                                                                                                                string FieldLookupContentName = Models.Complex.cdefModel.getContentNameByID(core, FieldLookupContentID);
+                                                                                                                string FieldLookupContentName = Models.Domain.CDefModel.getContentNameByID(core, FieldLookupContentID);
                                                                                                                 if (!string.IsNullOrEmpty(FieldLookupContentName)) {
-                                                                                                                    if ((FieldValue.Left(1) == "{") && (FieldValue.Substring(FieldValue.Length - 1) == "}") && Models.Complex.cdefModel.isContentFieldSupported(core, FieldLookupContentName, "ccguid")) {
+                                                                                                                    if ((FieldValue.Left(1) == "{") && (FieldValue.Substring(FieldValue.Length - 1) == "}") && Models.Domain.CDefModel.isContentFieldSupported(core, FieldLookupContentName, "ccguid")) {
                                                                                                                         //
                                                                                                                         // Lookup by guid
                                                                                                                         int fieldLookupId = genericController.encodeInteger(core.db.getRecordIDByGuid(FieldLookupContentName, FieldValue));
@@ -2517,12 +2517,12 @@ namespace Contensive.Processor.Controllers {
                                                     // --- end of pass
                                                     //
                                                 }
-                                                collection.DataRecordList = DataRecordList;
+                                                collection.dataRecordList = DataRecordList;
                                                 collection.save(core);
                                                 //
                                                 // -- execute onInstall addon if found
                                                 if (!string.IsNullOrEmpty( onInstallAddonGuid )) {
-                                                    var addon = Models.DbModels.AddonModel.create(core, onInstallAddonGuid);
+                                                    var addon = Models.Db.AddonModel.create(core, onInstallAddonGuid);
                                                     if ( addon != null) {
                                                         var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                                             addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
@@ -3192,7 +3192,7 @@ namespace Contensive.Processor.Controllers {
                                                 NavIconTypeString = "Addon";
                                             }
                                             //Dim builder As New coreBuilderClass(core)
-                                            appBuilderController.verifyNavigatorEntry(core, "", menuNameSpace, addonName, "", "", "", false, false, false, true, addonName, NavIconTypeString, addonName, CollectionID);
+                                            AppBuilderController.verifyNavigatorEntry(core, "", menuNameSpace, addonName, "", "", "", false, false, false, true, addonName, NavIconTypeString, addonName, CollectionID);
                                         }
                                         break;
                                     case "argument":
@@ -3646,7 +3646,7 @@ namespace Contensive.Processor.Controllers {
                     throw new ApplicationException("Cannot load aoBase5.xml [" + core.programFiles.localAbsRootPath + "aoBase5.xml]");
                 } else {
                     logController.logInfo(core, "Verify base collection -- new build");
-                    miniCollectionModel baseCollection = installCollection_LoadXmlToMiniCollection(core, baseCollectionXml, true, true, isNewBuild, new miniCollectionModel());
+                    MiniCollectionModel baseCollection = installCollection_LoadXmlToMiniCollection(core, baseCollectionXml, true, true, isNewBuild, new MiniCollectionModel());
                     installCollection_BuildDbFromMiniCollection(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, repair, ref nonCriticalErrorList);
                     //
                     // now treat as a regular collection and install - to pickup everything else 
@@ -3674,8 +3674,8 @@ namespace Contensive.Processor.Controllers {
                 logController.logInfo(core, "Application: " + core.appConfig.name);
                 //
                 // ----- Import any CDef files, allowing for changes
-                miniCollectionModel miniCollectionToAdd = new miniCollectionModel();
-                miniCollectionModel miniCollectionWorking = installCollection_GetApplicationMiniCollection(core, isNewBuild);
+                MiniCollectionModel miniCollectionToAdd = new MiniCollectionModel();
+                MiniCollectionModel miniCollectionWorking = installCollection_GetApplicationMiniCollection(core, isNewBuild);
                 miniCollectionToAdd = installCollection_LoadXmlToMiniCollection(core, XMLText, isBaseCollection, false, isNewBuild, miniCollectionWorking);
                 addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
                 installCollection_BuildDbFromMiniCollection(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, repair, ref nonCriticalErrorList);
@@ -3689,13 +3689,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// create a collection class from a collection xml file, cdef are added to the cdefs in the application collection
         /// </summary>
-        private static miniCollectionModel installCollection_LoadXmlToMiniCollection(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, miniCollectionModel defaultCollection) {
-            miniCollectionModel result = null;
+        private static MiniCollectionModel installCollection_LoadXmlToMiniCollection(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, MiniCollectionModel defaultCollection) {
+            MiniCollectionModel result = null;
             try {
-                Models.Complex.cdefModel DefaultCDef = null;
-                Models.Complex.cdefFieldModel DefaultCDefField = null;
+                Models.Domain.CDefModel DefaultCDef = null;
+                Models.Domain.CDefFieldModel DefaultCDefField = null;
                 string contentNameLc = null;
-                collectionXmlController XMLTools = new collectionXmlController(core);
+                CollectionXmlController XMLTools = new CollectionXmlController(core);
                 //Dim AddonClass As New addonInstallClass(core)
                 string status = null;
                 string CollectionGuid = null;
@@ -3721,7 +3721,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 logController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_LoadDataToCollection");
                 //
-                result = new miniCollectionModel();
+                result = new MiniCollectionModel();
                 //
                 if (string.IsNullOrEmpty(srcCollecionXml)) {
                     //
@@ -3789,7 +3789,7 @@ namespace Contensive.Processor.Controllers {
                                         if (defaultCollection.cdef.ContainsKey(contentNameLc)) {
                                             DefaultCDef = defaultCollection.cdef[contentNameLc];
                                         } else {
-                                            DefaultCDef = new Models.Complex.cdefModel();
+                                            DefaultCDef = new Models.Domain.CDefModel();
                                         }
                                         //
                                         ContentTableName =xmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.contentTableName);
@@ -3805,12 +3805,12 @@ namespace Contensive.Processor.Controllers {
                                             // ----- Add CDef if not already there
                                             //
                                             if (!result.cdef.ContainsKey(ContentName.ToLower())) {
-                                                result.cdef.Add(ContentName.ToLower(), new Models.Complex.cdefModel());
+                                                result.cdef.Add(ContentName.ToLower(), new Models.Domain.CDefModel());
                                             }
                                             //
                                             // Get CDef attributes
                                             //
-                                            Models.Complex.cdefModel tempVar = result.cdef[ContentName.ToLower()];
+                                            Models.Domain.CDefModel tempVar = result.cdef[ContentName.ToLower()];
                                             string activeDefaultText = "1";
                                             if (!(DefaultCDef.active)) {
                                                 activeDefaultText = "0";
@@ -3849,7 +3849,7 @@ namespace Contensive.Processor.Controllers {
                                             tempVar.developerOnly =xmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "DeveloperOnly", DefaultCDef.developerOnly);
                                             tempVar.dropDownFieldList =xmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DropDownFieldList", DefaultCDef.dropDownFieldList);
                                             tempVar.editorGroupName =xmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "EditorGroupName", DefaultCDef.editorGroupName);
-                                            tempVar.fields = new Dictionary<string, Models.Complex.cdefFieldModel>();
+                                            tempVar.fields = new Dictionary<string, Models.Domain.CDefFieldModel>();
                                             tempVar.iconLink =xmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "IconLink", DefaultCDef.iconLink);
                                             tempVar.iconHeight =xmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconHeight", DefaultCDef.iconHeight);
                                             tempVar.iconWidth =xmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconWidth", DefaultCDef.iconWidth);
@@ -3880,11 +3880,11 @@ namespace Contensive.Processor.Controllers {
                                                     if (DefaultCDef.fields.ContainsKey(FieldName)) {
                                                         DefaultCDefField = DefaultCDef.fields[FieldName];
                                                     } else {
-                                                        DefaultCDefField = new Models.Complex.cdefFieldModel();
+                                                        DefaultCDefField = new Models.Domain.CDefFieldModel();
                                                     }
                                                     //
                                                     if (!(result.cdef[ContentName.ToLower()].fields.ContainsKey(FieldName.ToLower()))) {
-                                                        result.cdef[ContentName.ToLower()].fields.Add(FieldName.ToLower(), new Models.Complex.cdefFieldModel());
+                                                        result.cdef[ContentName.ToLower()].fields.Add(FieldName.ToLower(), new Models.Domain.CDefFieldModel());
                                                     }
                                                     var cdefField = result.cdef[ContentName.ToLower()].fields[FieldName.ToLower()];
                                                     cdefField.nameLc = FieldName.ToLower();
@@ -3982,8 +3982,8 @@ namespace Contensive.Processor.Controllers {
                                         DataSourceName = "default";
                                     }
                                     bool removeDup = false;
-                                    miniCollectionModel.miniCollectionSQLIndexModel dupToRemove = new miniCollectionModel.miniCollectionSQLIndexModel();
-                                    foreach (miniCollectionModel.miniCollectionSQLIndexModel index in result.sqlIndexes) {
+                                    MiniCollectionModel.miniCollectionSQLIndexModel dupToRemove = new MiniCollectionModel.miniCollectionSQLIndexModel();
+                                    foreach (MiniCollectionModel.miniCollectionSQLIndexModel index in result.sqlIndexes) {
                                         if (textMatch(index.IndexName, IndexName) & textMatch(index.TableName, TableName) & textMatch(index.DataSourceName, DataSourceName)) {
                                             dupToRemove = index;
                                             removeDup = true;
@@ -3993,7 +3993,7 @@ namespace Contensive.Processor.Controllers {
                                     if (removeDup) {
                                         result.sqlIndexes.Remove(dupToRemove);
                                     }
-                                    miniCollectionModel.miniCollectionSQLIndexModel newIndex = new miniCollectionModel.miniCollectionSQLIndexModel {
+                                    MiniCollectionModel.miniCollectionSQLIndexModel newIndex = new MiniCollectionModel.miniCollectionSQLIndexModel {
                                         IndexName = IndexName,
                                         TableName = TableName,
                                         DataSourceName = DataSourceName,
@@ -4021,7 +4021,7 @@ namespace Contensive.Processor.Controllers {
                                         if (string.IsNullOrEmpty(ActiveText)) {
                                             ActiveText = "1";
                                         }
-                                        result.menus.Add(MenuKey, new miniCollectionModel.miniCollectionMenuModel() {
+                                        result.menus.Add(MenuKey, new MiniCollectionModel.miniCollectionMenuModel() {
                                             dataChanged = setAllDataChanged,
                                             Name = MenuName,
                                             Guid = MenuGuid,
@@ -4048,11 +4048,11 @@ namespace Contensive.Processor.Controllers {
                                     // Aggregate Objects (just make them -- there are not too many
                                     //
                                     Name =xmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Name", "");
-                                    miniCollectionModel.miniCollectionAddOnModel addon;
+                                    MiniCollectionModel.miniCollectionAddOnModel addon;
                                     if (result.addOns.ContainsKey(Name.ToLower())) {
                                         addon = result.addOns[Name.ToLower()];
                                     } else {
-                                        addon = new miniCollectionModel.miniCollectionAddOnModel();
+                                        addon = new MiniCollectionModel.miniCollectionAddOnModel();
                                         result.addOns.Add(Name.ToLower(), addon);
                                     }
                                     addon.dataChanged = setAllDataChanged;
@@ -4107,7 +4107,7 @@ namespace Contensive.Processor.Controllers {
                                             status = "The collection you selected [" + Collectionname + "] can not be downloaded because it does not include a valid GUID.";
                                             //core.AppendLog("builderClass.UpgradeCDef_LoadDataToCollection, UserError [" & status & "], The error was [" & Doc.ParseError.reason & "]")
                                         } else {
-                                            result.collectionImports.Add(new miniCollectionModel.ImportCollectionType() {
+                                            result.collectionImports.Add(new MiniCollectionModel.ImportCollectionType() {
                                                 Name = Collectionname,
                                                 Guid = CollectionGuid
                                             });
@@ -4161,7 +4161,7 @@ namespace Contensive.Processor.Controllers {
                         // Convert Menus.ParentName to Menu.menuNameSpace
                         //
                         foreach ( var kvp in result.menus) {
-                            miniCollectionModel.miniCollectionMenuModel menu = kvp.Value;
+                            MiniCollectionModel.miniCollectionMenuModel menu = kvp.Value;
                             if ( !string.IsNullOrEmpty( menu.ParentName )) {
                                 menu.menuNameSpace = GetMenuNameSpace(core, result.menus, menu, "");
                             }
@@ -4179,7 +4179,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Verify ccContent and ccFields records from the cdef nodes of a a collection file. This is the last step of loading teh cdef nodes of a collection file. ParentId field is set based on ParentName node.
         /// </summary>
-        private static void installCollection_BuildDbFromMiniCollection(CoreController core, miniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        private static void installCollection_BuildDbFromMiniCollection(CoreController core, MiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
             try {
                 //
                 logController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
@@ -4188,7 +4188,7 @@ namespace Contensive.Processor.Controllers {
                 logController.logInfo(core, "CDef Load, stage 1: verify core sql tables");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                appBuilderController.VerifyBasicTables(core);
+                AppBuilderController.VerifyBasicTables(core);
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 logController.logInfo(core, "CDef Load, stage 2: create SQL tables in default datasource");
@@ -4198,7 +4198,7 @@ namespace Contensive.Processor.Controllers {
                 if (true) {
                     string UsedTables = "";
                     foreach (var keypairvalue in Collection.cdef) {
-                        Models.Complex.cdefModel workingCdef = keypairvalue.Value;
+                        Models.Domain.CDefModel workingCdef = keypairvalue.Value;
                         ContentName = workingCdef.name;
                         if (workingCdef.dataChanged) {
                             logController.logInfo(core, "creating sql table [" + workingCdef.contentTableName + "], datasource [" + workingCdef.contentDataSourceName + "]");
@@ -4282,10 +4282,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 int FieldHelpCID = core.db.getRecordID("content", "Content Field Help");
                 foreach (var keypairvalue in Collection.cdef) {
-                    Models.Complex.cdefModel workingCdef = keypairvalue.Value;
+                    Models.Domain.CDefModel workingCdef = keypairvalue.Value;
                     //ContentName = workingCdef.name;
                     foreach (var fieldKeyValuePair in workingCdef.fields) {
-                        Models.Complex.cdefFieldModel workingField = fieldKeyValuePair.Value;
+                        Models.Domain.CDefFieldModel workingField = fieldKeyValuePair.Value;
                         //string FieldName = field.nameLc;
                         //var field2 = Collection.cdef[ContentName.ToLower()].fields[((string)null).ToLower()];
                         if (workingField.HelpChanged) {
@@ -4331,7 +4331,7 @@ namespace Contensive.Processor.Controllers {
                 logController.logInfo(core, "CDef Load, stage 8: create SQL indexes");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                foreach (miniCollectionModel.miniCollectionSQLIndexModel index in Collection.sqlIndexes) {
+                foreach (MiniCollectionModel.miniCollectionSQLIndexModel index in Collection.sqlIndexes) {
                     if (index.dataChanged) {
                         logController.logInfo(core, "creating index [" + index.IndexName + "], fields [" + index.FieldNameList + "], on table [" + index.TableName + "]");
                         core.db.createSQLIndex(index.DataSourceName, index.TableName, index.IndexName, index.FieldNameList);
@@ -4348,7 +4348,7 @@ namespace Contensive.Processor.Controllers {
                     var menu = kvp.Value;
                     if (menu.dataChanged) {
                         logController.logInfo(core, "creating navigator entry [" + menu.Name + "], namespace [" + menu.menuNameSpace + "], guid [" + menu.Guid + "]");
-                        appBuilderController.verifyNavigatorEntry(core, menu.Guid, menu.menuNameSpace, menu.Name, menu.ContentName, menu.LinkPage, menu.SortOrder, menu.AdminOnly, menu.DeveloperOnly, menu.NewWindow, menu.Active, menu.AddonName, menu.NavIconType, menu.NavIconTitle, 0);
+                        AppBuilderController.verifyNavigatorEntry(core, menu.Guid, menu.menuNameSpace, menu.Name, menu.ContentName, menu.LinkPage, menu.SortOrder, menu.AdminOnly, menu.DeveloperOnly, menu.NewWindow, menu.Active, menu.AddonName, menu.NavIconType, menu.NavIconTitle, 0);
                     }
                 }
                 //
@@ -4461,16 +4461,16 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Update a table from a collection cdef node
         /// </summary>
-        private static void installCollection_BuildDbFromCollection_AddCDefToDb(CoreController core, Models.Complex.cdefModel cdef, string BuildVersion) {
+        private static void installCollection_BuildDbFromCollection_AddCDefToDb(CoreController core, Models.Domain.CDefModel cdef, string BuildVersion) {
             try {
                 //
                 logController.logInfo(core, "Update db cdef [" + cdef.name + "]");
                 //
                 int ContentID = 0;
                 bool ContentIsBaseContent = false;
-                int FieldHelpCID = Models.Complex.cdefModel.getContentId(core, "Content Field Help");
+                int FieldHelpCID = Models.Domain.CDefModel.getContentId(core, "Content Field Help");
                 var tmpList = new List<string> { };
-                Contensive.Processor.Models.DbModels.dataSourceModel datasource = dataSourceModel.createByName(core, cdef.contentDataSourceName, ref tmpList);
+                Contensive.Processor.Models.Db.DataSourceModel datasource = DataSourceModel.createByName(core, cdef.contentDataSourceName, ref tmpList);
                 {
                     //
                     // -- get contentid and protect content with IsBaseContent true
@@ -4499,7 +4499,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- update definition (use SingleRecord as an update flag)
-                    Models.Complex.cdefModel.addContent(core, true, datasource, cdef.contentTableName, cdef.name, cdef.adminOnly, cdef.developerOnly, cdef.allowAdd, cdef.allowDelete, cdef.parentName, cdef.defaultSortMethod, cdef.dropDownFieldList, false, cdef.allowCalendarEvents, cdef.allowContentTracking, cdef.allowTopicRules, cdef.allowContentChildTool, false, cdef.iconLink, cdef.iconWidth, cdef.iconHeight, cdef.iconSprites, cdef.guid, cdef.isBaseContent, cdef.installedByCollectionGuid);
+                    Models.Domain.CDefModel.addContent(core, true, datasource, cdef.contentTableName, cdef.name, cdef.adminOnly, cdef.developerOnly, cdef.allowAdd, cdef.allowDelete, cdef.parentName, cdef.defaultSortMethod, cdef.dropDownFieldList, false, cdef.allowCalendarEvents, cdef.allowContentTracking, cdef.allowTopicRules, cdef.allowContentChildTool, false, cdef.iconLink, cdef.iconWidth, cdef.iconHeight, cdef.iconSprites, cdef.guid, cdef.isBaseContent, cdef.installedByCollectionGuid);
                     if (ContentID == 0) {
                         logController.logInfo(core, "Could not determine contentid after createcontent3 for [" + cdef.name + "], upgrade for this cdef aborted.");
                     } else {
@@ -4528,10 +4528,10 @@ namespace Contensive.Processor.Controllers {
                     throw (new ApplicationException("Unexpected exception"));
                 } else {
                     foreach (var nameValuePair in cdef.fields) {
-                        Models.Complex.cdefFieldModel field = nameValuePair.Value;
+                        Models.Domain.CDefFieldModel field = nameValuePair.Value;
                         int fieldId = 0;
                         if (field.dataChanged) {
-                            fieldId = Models.Complex.cdefModel.verifyCDefField_ReturnID(core, cdef.name, field);
+                            fieldId = Models.Domain.CDefModel.verifyCDefField_ReturnID(core, cdef.name, field);
                         }
                         //
                         // -- update content field help records

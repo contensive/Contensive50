@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -27,7 +27,7 @@ namespace Contensive.Addons.PageManager {
             string result = "";
             try {
                 CoreController core = ((CPClass)cp).core;
-                result = pageContentController.getChildPageList(core, cp.Doc.GetText("List Name"), Processor.Models.DbModels.pageContentModel.contentName, core.doc.pageController.page.id, true);
+                result = pageContentController.getChildPageList(core, cp.Doc.GetText("List Name"), Processor.Models.Db.pageContentModel.contentName, core.doc.pageController.page.id, true);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

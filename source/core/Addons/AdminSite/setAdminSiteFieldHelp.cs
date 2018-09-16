@@ -9,8 +9,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
-using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Db;
+using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -34,13 +34,13 @@ namespace Contensive.Addons.AdminSite {
                     ContentFieldHelpModel help = ContentFieldHelpModel.createByFieldId(core, fieldId);
                     if (help == null) {
                         help = ContentFieldHelpModel.add(core);
-                        help.FieldID = fieldId;
+                        help.fieldID = fieldId;
                     }
-                    help.HelpCustom = cp.Doc.GetText("helpcustom");
+                    help.helpCustom = cp.Doc.GetText("helpcustom");
                     help.save(core);
-                    contentFieldModel contentField = contentFieldModel.create(core, fieldId);
+                    ContentFieldModel contentField = ContentFieldModel.create(core, fieldId);
                     if (contentField != null) {
-                        cdefModel.invalidateCache(core, contentField.ContentID);
+                        CDefModel.invalidateCache(core, contentField.contentID);
                     }
                 }
             } catch (Exception ex) {

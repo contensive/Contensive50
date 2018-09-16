@@ -9,13 +9,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 using System.Net;
 using System.Text;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 using System.Web;
 
 namespace Contensive.Processor.Controllers {
@@ -432,14 +432,14 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ApplicationStatus"></param>
         /// <returns></returns>
-        public static string GetApplicationStatusMessage(AppConfigModel.appStatusEnum ApplicationStatus) {
+        public static string GetApplicationStatusMessage(AppConfigModel.AppStatusEnum ApplicationStatus) {
             string tempGetApplicationStatusMessage = null;
 
             switch (ApplicationStatus) {
-                case AppConfigModel.appStatusEnum.ok:
+                case AppConfigModel.AppStatusEnum.ok:
                     tempGetApplicationStatusMessage = "Application OK";
                     break;
-                case AppConfigModel.appStatusEnum.maintenance:
+                case AppConfigModel.AppStatusEnum.maintenance:
                     tempGetApplicationStatusMessage = "Application building";
                     break;
                 default:

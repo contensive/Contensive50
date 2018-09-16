@@ -1,7 +1,7 @@
 ﻿
 using System;
 using Contensive.BaseClasses;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 
@@ -9,77 +9,30 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// interpret dynamic elements with content including <AC></AC> tags and {% {} %} JSON-based content commands.
     /// </summary>
-    public class activeContentController {
-        //
-        //====================================================================================================
+    public class ActiveContentController {
         //
         //  active content:
         //      1) addons dropped into wysiwyg editor
         //              processed here
         //      2) json formatted content commands
         //              contentCommandController called (see contentcommandcontroller for syntax and details
-        //  
-        //
-        //
-        //      addons drag-dropped into wysiwyg editor
-        //          format: <ac type="AGGREGATEFUNCTION" name="(addon's Name)" guid="(addon's guid)" acinstanceid="(guid for this instance)" querystring="(qs formatted addon arguments)">
-        //
-        // Deprecate all of this:
-        //   <Ac Type="Date">
-        //   <Ac Type="Member" Field="Name">
-        //   <Ac Type="Organization" Field="Name">
-        //   <Ac Type="Visitor" Field="Name">
-        //   <Ac Type="Visit" Field="Name">
-        //   <Ac Type="Contact" Member="PeopleID">
-        //       displays a For More info block of copy
-        //   <Ac Type="Feedback" Member="PeopleID">
-        //       displays a feedback note block
-        //   <Ac Type="ChildList" Name="ChildListName">
-        //       displays a list of child blocks that reference this CHildList Element
-        //   <Ac Type="Language" Name="All|English|Spanish|etc.">
-        //       blocks content to next language tag to eveyone without this PeopleLanguage
-        //   <Ac Type="Image" Record="" Width="" Height="" Alt="" Align="">
-        //   <AC Type="Download" Record="" Alt="">
-        //       renders as an anchored download icon, with the alt tag
-        //       the rendered anchor points back to the root/index, which increments the resource's download count
-        //
-        //   During Editing, AC tags are converted (Encoded) to EditIcons
-        //       these are image tags with AC information stored in the ID attribute
-        //       except AC-Image, which are converted into the actual image for editing
-        //       during the edit save, the EditIcons are converted (Decoded) back
-        //
-        //   Remarks
-        //
-        //   First <Member.FieldName> encountered opens the Members Table, etc.
-        //       ( does <OpenTable name="Member" Tablename="ccMembers" ID=(current PeopleID)> )
-        //   The copy is divided into Blocks, starting at every tag and running to the next tag.
-        //   BlockTag()  The tag without the braces found
-        //   BlockCopy() The copy following the tag up to the next tag
-        //   BlockLabel()    the string identifier for the block
-        //   BlockCount  the total blocks in the message
-        //   BlockPointer    the current block being examined
-        //
-        //====================================================================================================
         /// <summary>
-        /// shortcut to renderActiveContent - see renderActiveContent for arguments
+        /// 
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="Source"></param>
-        /// <param name="ContextContentName">content of the data being rendered</param>
-        /// <param name="ContextRecordID">id of the record of the data being rendered</param>
-        /// <param name="ContextContactPeopleID">the id of the person who should be contacted for this content</param>
-        /// <param name="ProtocolHostString"></param>
-        /// <param name="DefaultWrapperID"></param>
-        /// <param name="addonContext"></param>
+        /// <param name="source"></param>
+        /// <param name="contextContentName">optional, content from which the data being rendered originated (like 'Page Content')</param>
+        /// <param name="ContextRecordID">optional, id of the record from which the data being rendered originated</param>
+        /// <param name="ContextContactPeopleID">optional, the id of the person who should be contacted for this content. If 0, uses current user.</param>
+        /// <param name="ProtocolHostString">The protocol + domain to be used to build URLs if the content includes dynamically generated images (resource library active content) and the domain is different from where the content is being rendered already. Leave blank and the URL will start with a slash.</param>
+        /// <param name="DefaultWrapperID">optional, if provided and addon is html on a page, the content will be wrapped in the wrapper indicated</param>
+        /// <param name="addonContext">Where this addon is being executed, like as a process, or in an email, or on a page. If not provided page context is assumed (adding assets like js and css to document)</param>
         /// <returns></returns>
-        public static string renderHtmlForWeb(CoreController core, string Source, string ContextContentName = "", int ContextRecordID = 0, int ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
-            string result = Source;
-            result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, core.session.user.id, core.session.visit.VisitAuthenticated);
-            result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.session.isAuthenticated, null, core.session.isEditingAnything());
-            return result;
+        public static string renderHtmlForWeb(CoreController core, string source, string contextContentName = "", int ContextRecordID = 0, int ContextContactPeopleID = 0, string ProtocolHostString = "", int DefaultWrapperID = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
+            string result = ContentCmdController.executeContentCommands(core, source, CPUtilsBaseClass.addonContext.ContextAdmin, core.session.user.id, core.session.visit.VisitAuthenticated);
+            return encode(core, result, core.session.user.id, contextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, core.session.isAuthenticated, null, core.session.isEditingAnything());
         }
         //
-        // todo - remove EncodeCachableTags
         //====================================================================================================
         /// <summary>
         /// render addLinkAuthToAllLinks, ActiveFormatting, ActiveImages and ActiveEditIcons. 
@@ -96,7 +49,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ContextRecordID">If this content is from a DbModel, this is the record id.</param>
         /// <param name="moreInfoPeopleId">If the content includes either a more-information link, or a feedback form, this is the person to whom the feedback or more-information applies.</param>
         /// <param name="addLinkAuthenticationToAllLinks">If true, link authentication is added to all anchor tags</param>
-        /// <param name="EncodeCachableTags">to be deprecated: some tags could be cached and some not, this was a way to divide them.</param>
+        /// <param name="ignore"></param>
         /// <param name="encodeACResourceLibraryImages">To be deprecated: this was a way to store only a reference to library images in the content, then replace with img tag while rendering</param>
         /// <param name="encodeForWysiwygEditor">When true, active content (and addons?) are converted to images for the editor. process</param>
         /// <param name="EncodeNonCachableTags">to be deprecated: some tags could be cached and some not, this was a way to divide them.</param>
@@ -107,78 +60,66 @@ namespace Contensive.Processor.Controllers {
         /// <param name="personalizationIsAuthenticated"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private static string renderActiveContent(CoreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool addLinkAuthenticationToAllLinks, bool EncodeCachableTags, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string protocolHost, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
-            string result = "";
+        private static string renderActiveContent(CoreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool addLinkAuthenticationToAllLinks, bool ignore, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string protocolHost, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
+            string result = sourceHtmlContent;
             try {
-                int csPeople = -1;
-                int csOrganization = -1;
-                string serverFilePath = "";
-                string ReplaceInstructions = "";
-                string Link = null;
-                int NotUsedID = 0;
-                string addonOptionString = null;
-                string AddonOptionStringHTMLEncoded = null;
-                string[] SrcOptions = null;
-                string SrcOptionName = null;
-                int FormCount = 0;
-                int FormInputCount = 0;
-                string ACInstanceID = null;
-                string workingContent = null;
-                //
-                //
-                workingContent = sourceHtmlContent;
                 //
                 // Fixup Anchor Query (additional AddonOptionString pairs to add to the end)
-                //
                 string AnchorQuery = "";
                 if (addLinkAuthenticationToAllLinks && (personalizationPeopleId != 0)) {
-                    AnchorQuery = AnchorQuery + "&eid=" + SecurityController.encodeToken(core, personalizationPeopleId, DateTime.Now);
+                    AnchorQuery += "&eid=" + SecurityController.encodeToken(core, personalizationPeopleId, DateTime.Now);
                 }
                 //
                 if (!string.IsNullOrEmpty(queryStringToAppendToAllLinks)) {
-                    AnchorQuery = AnchorQuery + "&" + queryStringToAppendToAllLinks;
+                    AnchorQuery += "&" + queryStringToAppendToAllLinks;
                 }
                 //
                 if (!string.IsNullOrEmpty(AnchorQuery)) {
                     AnchorQuery = AnchorQuery.Substring(1);
                 }
-                //
-                // ----- xml contensive process instruction
-                {
-                    int Pos = genericController.vbInstr(1, workingContent, "<?contensive", 1);
-                    if (Pos > 0) {
-                        throw new ApplicationException("Structured xml data commands are no longer supported");
-                    }
-                }
+                ////
+                //// ----- xml contensive process instruction
+                //{
+                //    int Pos = genericController.vbInstr(1, workingContent, "<?contensive", 1);
+                //    if (Pos > 0) {
+                //        throw new ApplicationException("Structured xml data commands are no longer supported");
+                //    }
+                //}
                 //
                 // -- start-end gtroup - deprecated
-                if (workingContent.IndexOf("<!-- STARTGROUPACCESS ") > 0) {
-                    throw new ApplicationException("Structured xml data commands are no longer supported");
-                }
-                if (workingContent.IndexOf("<!-- ENDGROUPACCESS ") > 0) {
-                    throw new ApplicationException("Structured xml data commands are no longer supported");
-                }
+                //if (workingContent.IndexOf("<!-- STARTGROUPACCESS ") > 0) {
+                //    throw new ApplicationException("Structured xml data commands are no longer supported");
+                //}
+                //if (workingContent.IndexOf("<!-- ENDGROUPACCESS ") > 0) {
+                //    throw new ApplicationException("Structured xml data commands are no longer supported");
+                //}
                 //
                 // Test early if this needs to run at all
-                bool ProcessACTags = (((EncodeCachableTags || EncodeNonCachableTags || encodeACResourceLibraryImages || encodeForWysiwygEditor)) & (workingContent.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) != -1));
-                bool ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) & (workingContent.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase) != -1);
-                if ((!string.IsNullOrEmpty(workingContent)) & (ProcessAnchorTags || ProcessACTags)) {
+                bool ProcessACTags = (((EncodeNonCachableTags || encodeACResourceLibraryImages || encodeForWysiwygEditor)) & (result.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) != -1));
+                bool ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) & (result.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase) != -1);
+                if ((!string.IsNullOrEmpty(result)) & (ProcessAnchorTags || ProcessACTags)) {
                     //
                     // ----- Load the Active Elements
                     //
                     htmlParserController KmaHTML = new htmlParserController(core);
-                    KmaHTML.Load(workingContent);
+                    KmaHTML.Load(result);
                     stringBuilderLegacyController Stream = new stringBuilderLegacyController(); int ElementPointer = 0;
+                    int FormCount = 0;
+                    int FormInputCount = 0;
                     if (KmaHTML.ElementCount > 0) {
                         ElementPointer = 0;
-                        workingContent = "";
-                        serverFilePath = protocolHost + "/" + core.appConfig.name + "/files/";
+                        result = "";
+                        string serverFilePath = protocolHost + "/" + core.appConfig.name + "/files/";
                         while (ElementPointer < KmaHTML.ElementCount) {
                             string Copy = KmaHTML.Text(ElementPointer).ToString();
                             if (KmaHTML.IsTag(ElementPointer)) {
                                 string ElementTag = genericController.vbUCase(KmaHTML.TagName(ElementPointer));
                                 string ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME");
                                 string ACType = "";
+                                int NotUsedID = 0;
+                                string addonOptionString = null;
+                                string AddonOptionStringHTMLEncoded = null;
+                                string ACInstanceID = null;
                                 switch (ElementTag) {
                                     case "FORM":
                                         //
@@ -223,7 +164,7 @@ namespace Contensive.Processor.Controllers {
                                                     string Name = KmaHTML.ElementAttributeName(ElementPointer, AttributePointer);
                                                     string Value = KmaHTML.ElementAttributeValue(ElementPointer, AttributePointer);
                                                     if (genericController.vbUCase(Name) == "HREF") {
-                                                        Link = Value;
+                                                        string Link = Value;
                                                         int Pos = genericController.vbInstr(1, Link, "://");
                                                         if (Pos > 0) {
                                                             Link = Link.Substring(Pos + 2);
@@ -422,9 +363,9 @@ namespace Contensive.Processor.Controllers {
                                                                 ResultOptionListHTMLEncoded = "";
                                                                 SrcOptionList = genericController.vbReplace(SrcOptionList, "\r\n", "\r");
                                                                 SrcOptionList = genericController.vbReplace(SrcOptionList, "\n", "\r");
-                                                                SrcOptions = genericController.stringSplit(SrcOptionList, "\r");
+                                                                string[] SrcOptions = genericController.stringSplit(SrcOptionList, "\r");
                                                                 for (int Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
-                                                                    SrcOptionName = SrcOptions[Ptr];
+                                                                    string SrcOptionName = SrcOptions[Ptr];
                                                                     int LoopPtr2 = 0;
 
                                                                     while ((SrcOptionName.Length > 1) && (SrcOptionName.Left(1) == "\t") && (LoopPtr2 < 100)) {
@@ -814,18 +755,8 @@ namespace Contensive.Processor.Controllers {
                             ElementPointer = ElementPointer + 1;
                         }
                     }
-                    workingContent = Stream.Text;
-                    //
-                    // Add Contensive User Form if needed
-                    //
-                    if (FormCount == 0 && FormInputCount > 0) {
-                    }
-                    workingContent = ReplaceInstructions + workingContent;
-                    core.db.csClose(ref csPeople);
-                    core.db.csClose(ref csOrganization);
-                    KmaHTML = null;
+                    result = Stream.Text;
                 }
-                result = workingContent;
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -846,99 +777,29 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sourceHtmlContent"></param>
         /// <returns></returns>
         public static string processWysiwygResponseForSave(CoreController core, string sourceHtmlContent) {
-            string result = "";
+            string result = sourceHtmlContent;
             try {
-                string imageNewLink = null;
-                string ACQueryString = "";
-                string ACGuid = null;
-                string ACIdentifier = null;
-                string RecordFilename = null;
-                string RecordFilenameNoExt = null;
-                string RecordFilenameExt = null;
-                int Ptr = 0;
-                string ACInstanceID = null;
-                string QSHTMLEncoded = null;
-                int Pos = 0;
-                string ImageSrcOriginal = null;
-                string VirtualFilePathBad = null;
-                string[] Paths = null;
-                string ImageVirtualFilename = null;
-                string ImageFilename = null;
-                string ImageFilenameExt = null;
-                string ImageFilenameNoExt = null;
-                string[] SizeTest = null;
-                string[] Styles = null;
-                string StyleName = null;
-                string StyleValue = null;
-                int StyleValueInt = 0;
-                string[] Style = null;
-                string ImageVirtualFilePath = null;
-                string RecordVirtualFilename = null;
-                int RecordWidth = 0;
-                int RecordHeight = 0;
-                string RecordAltSizeList = null;
-                string ImageAltSize = null;
-                string NewImageFilename = null;
-                htmlParserController DHTML = new htmlParserController(core);
-                int ElementPointer = 0;
-                int ElementCount = 0;
-                int AttributeCount = 0;
-                string ACType = null;
-                string ACFieldName = null;
-                string ACInstanceName = null;
-                int RecordID = 0;
-                string ImageWidthText = null;
-                string ImageHeightText = null;
-                int ImageWidth = 0;
-                int ImageHeight = 0;
-                string ElementText = null;
-                string ImageID = null;
-                string ImageSrc = null;
-                string ImageAlt = null;
-                int ImageVSpace = 0;
-                int ImageHSpace = 0;
-                string ImageAlign = null;
-                string ImageBorder = null;
-                string ImageLoop = null;
-                string ImageStyle = null;
-                string[] IMageStyleArray = null;
-                int ImageStyleArrayCount = 0;
-                int ImageStyleArrayPointer = 0;
-                string ImageStylePair = null;
-                int PositionColon = 0;
-                string ImageStylePairName = null;
-                string ImageStylePairValue = null;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                string[] ImageIDArray = { };
-                int ImageIDArrayCount = 0;
-                string QueryString = null;
-                string[] QSSplit = null;
-                int QSPtr = 0;
-                string serverFilePath = null;
-                bool ImageAllowSFResize = false;
-                imageEditController sf = null;
-                //
-                result = sourceHtmlContent;
                 if (!string.IsNullOrEmpty(result)) {
                     //
-                    // leave this in to make sure old <acform tags are converted back
-                    // new editor deals with <form, so no more converting
-                    //
+                    // leave this in to make sure old <acform tags are converted back, new editor deals with <form, so no more converting
                     result = genericController.vbReplace(result, "<ACFORM>", "<FORM>");
                     result = genericController.vbReplace(result, "<ACFORM ", "<FORM ");
                     result = genericController.vbReplace(result, "</ACFORM>", "</form>");
                     result = genericController.vbReplace(result, "</ACFORM ", "</FORM ");
+                    htmlParserController DHTML = new htmlParserController(core);
                     if (DHTML.Load(result)) {
                         result = "";
-                        ElementCount = DHTML.ElementCount;
+                        int ElementCount = DHTML.ElementCount;
+                        stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                         if (ElementCount > 0) {
                             //
-                            // ----- Locate and replace IMG Edit icons with AC tags
-                            //
+                            // ----- Locate and replace IMG Edit icons with {$ {} %} notation
                             Stream = new stringBuilderLegacyController();
+                            int ElementPointer = 0;
                             for (ElementPointer = 0; ElementPointer < ElementCount; ElementPointer++) {
-                                ElementText = DHTML.Text(ElementPointer).ToString();
+                                string ElementText = DHTML.Text(ElementPointer).ToString();
                                 if (DHTML.IsTag(ElementPointer)) {
+                                    int AttributeCount = 0;
                                     switch (genericController.vbUCase(DHTML.TagName(ElementPointer))) {
                                         case "FORM":
                                             //
@@ -951,10 +812,10 @@ namespace Contensive.Processor.Controllers {
                                             AttributeCount = DHTML.ElementAttributeCount(ElementPointer);
 
                                             if (AttributeCount > 0) {
-                                                ImageID = DHTML.ElementAttribute(ElementPointer, "id");
-                                                ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src");
-                                                VirtualFilePathBad = core.appConfig.name + "/files/";
-                                                serverFilePath = "/" + VirtualFilePathBad;
+                                                string ImageID = DHTML.ElementAttribute(ElementPointer, "id");
+                                                string ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src");
+                                                string VirtualFilePathBad = core.appConfig.name + "/files/";
+                                                string serverFilePath = "/" + VirtualFilePathBad;
                                                 if (ImageSrcOriginal.ToLower().Left(VirtualFilePathBad.Length) == genericController.vbLCase(VirtualFilePathBad)) {
                                                     //
                                                     // if the image is from the virtual file path, but the editor did not include the root path, add it
@@ -962,19 +823,22 @@ namespace Contensive.Processor.Controllers {
                                                     ElementText = genericController.vbReplace(ElementText, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
                                                     ImageSrcOriginal = genericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
                                                 }
-                                                ImageSrc = HtmlController.decodeHtml(ImageSrcOriginal);
+                                                string ImageSrc = HtmlController.decodeHtml(ImageSrcOriginal);
                                                 ImageSrc = decodeURL(ImageSrc);
                                                 //
                                                 // problem with this case is if the addon icon image is from another site.
                                                 // not sure how it happened, but I do not think the src of an addon edit icon
                                                 // should be able to prevent the addon from executing.
                                                 //
-                                                ACIdentifier = "";
-                                                ACType = "";
-                                                ACFieldName = "";
-                                                ACInstanceName = "";
-                                                ACGuid = "";
-                                                ImageIDArrayCount = 0;
+                                                string ACIdentifier = "";
+                                                string ACType = "";
+                                                string ACFieldName = "";
+                                                string ACInstanceName = "";
+                                                string ACGuid = "";
+                                                int ImageIDArrayCount = 0;
+                                                string ACQueryString = "";
+                                                int Ptr = 0;
+                                                string[] ImageIDArray = { };
                                                 if (0 != genericController.vbInstr(1, ImageID, ",")) {
                                                     ImageIDArray = ImageID.Split(',');
                                                     ImageIDArrayCount = ImageIDArray.GetUpperBound(0) + 1;
@@ -1017,17 +881,23 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                     }
                                                 }
+                                                int Pos = 0;
+                                                int RecordID = 0;
+                                                string ImageStyle = null;
                                                 if (ACIdentifier == "AC") {
                                                     if (true) {
                                                         if (true) {
                                                             //
                                                             // ----- Process AC Tag
                                                             //
-                                                            ACInstanceID = DHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
+                                                            string ACInstanceID = DHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
                                                             if (string.IsNullOrEmpty(ACInstanceID)) {
                                                                 ACInstanceID = genericController.getGUID();
                                                             }
                                                             ElementText = "";
+                                                            string QueryString = null;
+                                                            string[] QSSplit = null;
+                                                            int QSPtr = 0;
                                                             //----------------------------- change to ACType
                                                             switch (genericController.vbUCase(ACType)) {
                                                                 case "IMAGE":
@@ -1036,28 +906,29 @@ namespace Contensive.Processor.Controllers {
                                                                     //
                                                                     if (ImageIDArrayCount >= 4) {
                                                                         RecordID = genericController.encodeInteger(ACInstanceName);
-                                                                        ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH");
-                                                                        ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT");
-                                                                        ImageAlt = HtmlController.encodeHtml(DHTML.ElementAttribute(ElementPointer, "Alt"));
-                                                                        ImageVSpace = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"));
-                                                                        ImageHSpace = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"));
-                                                                        ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align");
-                                                                        ImageBorder = DHTML.ElementAttribute(ElementPointer, "BORDER");
-                                                                        ImageLoop = DHTML.ElementAttribute(ElementPointer, "LOOP");
+                                                                        string ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH");
+                                                                        string ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT");
+                                                                        string ImageAlt = HtmlController.encodeHtml(DHTML.ElementAttribute(ElementPointer, "Alt"));
+                                                                        int ImageVSpace = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"));
+                                                                        int ImageHSpace = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"));
+                                                                        string ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align");
+                                                                        string ImageBorder = DHTML.ElementAttribute(ElementPointer, "BORDER");
+                                                                        string ImageLoop = DHTML.ElementAttribute(ElementPointer, "LOOP");
                                                                         ImageStyle = DHTML.ElementAttribute(ElementPointer, "STYLE");
 
                                                                         if (!string.IsNullOrEmpty(ImageStyle)) {
                                                                             //
                                                                             // ----- Process styles, which override attributes
                                                                             //
-                                                                            IMageStyleArray = ImageStyle.Split(';');
-                                                                            ImageStyleArrayCount = IMageStyleArray.GetUpperBound(0) + 1;
+                                                                            string[] IMageStyleArray = ImageStyle.Split(';');
+                                                                            int ImageStyleArrayCount = IMageStyleArray.GetUpperBound(0) + 1;
+                                                                            int ImageStyleArrayPointer = 0;
                                                                             for (ImageStyleArrayPointer = 0; ImageStyleArrayPointer < ImageStyleArrayCount; ImageStyleArrayPointer++) {
-                                                                                ImageStylePair = IMageStyleArray[ImageStyleArrayPointer].Trim(' ');
-                                                                                PositionColon = genericController.vbInstr(1, ImageStylePair, ":");
+                                                                                string ImageStylePair = IMageStyleArray[ImageStyleArrayPointer].Trim(' ');
+                                                                                int PositionColon = genericController.vbInstr(1, ImageStylePair, ":");
                                                                                 if (PositionColon > 1) {
-                                                                                    ImageStylePairName = (ImageStylePair.Left(PositionColon - 1)).Trim(' ');
-                                                                                    ImageStylePairValue = (ImageStylePair.Substring(PositionColon)).Trim(' ');
+                                                                                    string ImageStylePairName = (ImageStylePair.Left(PositionColon - 1)).Trim(' ');
+                                                                                    string ImageStylePairValue = (ImageStylePair.Substring(PositionColon)).Trim(' ');
                                                                                     switch (genericController.vbUCase(ImageStylePairName)) {
                                                                                         case "WIDTH":
                                                                                             ImageStylePairValue = genericController.vbReplace(ImageStylePairValue, "px", "");
@@ -1121,7 +992,7 @@ namespace Contensive.Processor.Controllers {
                                                                         // I had added an Add-on and was saving
                                                                         // I find it VERY odd that this could be the case
                                                                         //
-                                                                        QSHTMLEncoded = genericController.encodeText(ACQueryString);
+                                                                        string QSHTMLEncoded = genericController.encodeText(ACQueryString);
                                                                         QueryString = HtmlController.decodeHtml(QSHTMLEncoded);
                                                                         QSSplit = QueryString.Split('&');
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
@@ -1211,26 +1082,26 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                     }
                                                 } else if (genericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1) != 0) {
-                                                    ImageAllowSFResize = core.siteProperties.getBoolean("ImageAllowSFResize", true);
+                                                    bool ImageAllowSFResize = core.siteProperties.getBoolean("ImageAllowSFResize", true);
                                                     if (ImageAllowSFResize && true) {
                                                         //
                                                         // if it is a real image, check for resize
                                                         //
                                                         Pos = genericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1);
                                                         if (Pos != 0) {
-                                                            ImageVirtualFilename = ImageSrc.Substring(Pos - 1);
-                                                            Paths = ImageVirtualFilename.Split('/');
+                                                            string ImageVirtualFilename = ImageSrc.Substring(Pos - 1);
+                                                            string[] Paths = ImageVirtualFilename.Split('/');
                                                             if (Paths.GetUpperBound(0) > 2) {
                                                                 if (genericController.vbLCase(Paths[1]) == "filename") {
                                                                     RecordID = genericController.encodeInteger(Paths[2]);
                                                                     if (RecordID != 0) {
-                                                                        ImageFilename = Paths[3];
-                                                                        ImageVirtualFilePath = genericController.vbReplace(ImageVirtualFilename, ImageFilename, "");
+                                                                        string ImageFilename = Paths[3];
+                                                                        string ImageVirtualFilePath = genericController.vbReplace(ImageVirtualFilename, ImageFilename, "");
                                                                         Pos = ImageFilename.LastIndexOf(".") + 1;
                                                                         if (Pos > 0) {
                                                                             string ImageFilenameAltSize = "";
-                                                                            ImageFilenameExt = ImageFilename.Substring(Pos);
-                                                                            ImageFilenameNoExt = ImageFilename.Left(Pos - 1);
+                                                                            string ImageFilenameExt = ImageFilename.Substring(Pos);
+                                                                            string ImageFilenameNoExt = ImageFilename.Left(Pos - 1);
                                                                             Pos = ImageFilenameNoExt.LastIndexOf("-") + 1;
                                                                             if (Pos > 0) {
                                                                                 //
@@ -1241,7 +1112,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 //  on the properties dialog before the save. The width and height come from this suffix
                                                                                 //
                                                                                 ImageFilenameAltSize = ImageFilenameNoExt.Substring(Pos);
-                                                                                SizeTest = ImageFilenameAltSize.Split('x');
+                                                                                string[] SizeTest = ImageFilenameAltSize.Split('x');
                                                                                 if (SizeTest.GetUpperBound(0) != 1) {
                                                                                     ImageFilenameAltSize = "";
                                                                                 } else {
@@ -1259,14 +1130,16 @@ namespace Contensive.Processor.Controllers {
                                                                                 // Determine ImageWidth and ImageHeight
                                                                                 //
                                                                                 ImageStyle = DHTML.ElementAttribute(ElementPointer, "style");
-                                                                                ImageWidth = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "width"));
-                                                                                ImageHeight = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "height"));
+                                                                                int ImageWidth = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "width"));
+                                                                                int ImageHeight = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "height"));
                                                                                 if (!string.IsNullOrEmpty(ImageStyle)) {
-                                                                                    Styles = ImageStyle.Split(';');
+                                                                                    string[] Styles = ImageStyle.Split(';');
                                                                                     for (Ptr = 0; Ptr <= Styles.GetUpperBound(0); Ptr++) {
-                                                                                        Style = Styles[Ptr].Split(':');
+                                                                                        string[] Style = Styles[Ptr].Split(':');
                                                                                         if (Style.GetUpperBound(0) > 0) {
-                                                                                            StyleName = genericController.vbLCase(Style[0].Trim(' '));
+                                                                                            string StyleName = genericController.vbLCase(Style[0].Trim(' '));
+                                                                                            string StyleValue = null;
+                                                                                            int StyleValueInt = 0;
                                                                                             if (StyleName == "width") {
                                                                                                 StyleValue = genericController.vbLCase(Style[1].Trim(' '));
                                                                                                 StyleValue = genericController.vbReplace(StyleValue, "px", "");
@@ -1290,22 +1163,23 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 libraryFilesModel file = libraryFilesModel.create(core, RecordID);
                                                                                 if (file != null) {
-                                                                                    RecordVirtualFilename = file.filename;
-                                                                                    RecordWidth = file.width;
-                                                                                    RecordHeight = file.height;
-                                                                                    RecordAltSizeList = file.altSizeList;
-                                                                                    RecordFilename = RecordVirtualFilename;
+                                                                                    string RecordVirtualFilename = file.filename;
+                                                                                    int RecordWidth = file.width;
+                                                                                    int RecordHeight = file.height;
+                                                                                    string RecordAltSizeList = file.altSizeList;
+                                                                                    string RecordFilename = RecordVirtualFilename;
                                                                                     Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
                                                                                     if (Pos > 0) {
                                                                                         RecordFilename = RecordVirtualFilename.Substring(Pos);
                                                                                     }
-                                                                                    RecordFilenameExt = "";
-                                                                                    RecordFilenameNoExt = RecordFilename;
+                                                                                    string RecordFilenameExt = "";
+                                                                                    string RecordFilenameNoExt = RecordFilename;
                                                                                     Pos = RecordFilenameNoExt.LastIndexOf(".") + 1;
                                                                                     if (Pos > 0) {
                                                                                         RecordFilenameExt = RecordFilenameNoExt.Substring(Pos);
                                                                                         RecordFilenameNoExt = RecordFilenameNoExt.Left(Pos - 1);
                                                                                     }
+                                                                                    imageEditController sf = null;
                                                                                     //
                                                                                     // if recordwidth or height are missing, get them from the file
                                                                                     //
@@ -1365,7 +1239,8 @@ namespace Contensive.Processor.Controllers {
                                                                                         // if the actual image is a few rounding-error pixels off does not matter
                                                                                         // if either is 0, let altsize be 0, set real value for image height/width
                                                                                         //
-                                                                                        ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
+                                                                                        string ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
+                                                                                        string NewImageFilename = null;
                                                                                         //
                                                                                         // determine if we are OK, or need to rebuild
                                                                                         //
@@ -1383,7 +1258,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             //
                                                                                             NewImageFilename = ImageFilenameNoExt + "-" + ImageAltSize + "." + ImageFilenameExt;
                                                                                             // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                            imageNewLink = genericController.encodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename);
+                                                                                            string imageNewLink = genericController.encodeURL(genericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename);
                                                                                             ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(imageNewLink));
                                                                                         } else if ((RecordWidth < ImageWidth) || (RecordHeight < ImageHeight)) {
                                                                                             //
@@ -1538,8 +1413,8 @@ namespace Contensive.Processor.Controllers {
         public static string encode(CoreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
             string result = sourceHtmlContent;
             try {
-                const string StartFlag = "<!-- ADDON";
-                const string EndFlag = " -->";
+                //const string StartFlag = "<!-- ADDON";
+                //const string EndFlag = " -->";
                 if (!string.IsNullOrEmpty(sourceHtmlContent)) {
                     int LineStart = 0;
                     //

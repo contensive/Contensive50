@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -33,8 +33,8 @@ namespace Contensive.Addons.Primitives {
                     int addonId = core.docProperties.getInteger("AddonID");
                     if (addonId > 0) {
                        AddonModel styleAddon =AddonModel.create(core, addonId);
-                        if (styleAddon.StylesFilename.content != core.docProperties.getText("CustomStyles")) {
-                            styleAddon.StylesFilename.content = core.docProperties.getText("CustomStyles");
+                        if (styleAddon.stylesFilename.content != core.docProperties.getText("CustomStyles")) {
+                            styleAddon.stylesFilename.content = core.docProperties.getText("CustomStyles");
                             styleAddon.save(core);
                             //
                             // Clear Caches

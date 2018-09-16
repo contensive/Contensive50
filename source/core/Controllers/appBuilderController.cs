@@ -2,12 +2,12 @@
 using System;
 using System.Xml;
 using System.Collections.Generic;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 using System.Data;
 using System.Linq;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -16,7 +16,7 @@ namespace Contensive.Processor.Controllers {
     /// code to built and upgrade apps
     /// not IDisposable - not contained classes that need to be disposed
     /// </summary>
-    public class appBuilderController {
+    public class AppBuilderController {
         // 
         //=========================================================================
         //
@@ -42,8 +42,8 @@ namespace Contensive.Processor.Controllers {
                     // if anything is needed that is not there yet, I need to build a list of adds to run after the app goes to app status ok
                     // -- Update server config file
                     logController.logInfo(core, "Update configuration file");
-                    if (!core.appConfig.appStatus.Equals(AppConfigModel.appStatusEnum.ok)) {
-                        core.appConfig.appStatus = AppConfigModel.appStatusEnum.ok;
+                    if (!core.appConfig.appStatus.Equals(AppConfigModel.AppStatusEnum.ok)) {
+                        core.appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
                         core.serverConfig.saveObject(core);
                     }
                     //
@@ -87,12 +87,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- verify site managers group
                     logController.logInfo(core, "verify site managers groups");
-                    var group = groupModel.create(core, defaultSiteManagerGuid);
+                    var group = GroupModel.create(core, defaultSiteManagerGuid);
                     if (group == null) {
                         logController.logInfo(core, "verify site manager group");
                         group.name = defaultSiteManagerName;
-                        group.Caption = defaultSiteManagerName;
-                        group.AllowBulkEmail = true;
+                        group.caption = defaultSiteManagerName;
+                        group.allowBulkEmail = true;
                         group.ccguid = defaultSiteManagerGuid;
                         try {
                             group.save(core);
@@ -142,13 +142,13 @@ namespace Contensive.Processor.Controllers {
                     //
                     //  menus are created in ccBase.xml, this just checks for dups
                     VerifyAdminMenus(core, DataBuildVersion);
-                    VerifyLanguageRecords(core);
-                    VerifyCountries(core);
-                    VerifyStates(core);
+                    verifyLanguageRecords(core);
+                    verifyCountries(core);
+                    verifyStates(core);
                     VerifyLibraryFolders(core);
                     VerifyLibraryFileTypes(core);
-                    VerifyDefaultGroups(core);
-                    VerifyScriptingRecords(core);
+                    verifyDefaultGroups(core);
+                    verifyScriptingRecords(core);
                     //
                     //---------------------------------------------------------------------
                     // ----- Set Default SitePropertyDefaults
@@ -505,7 +505,7 @@ namespace Contensive.Processor.Controllers {
                 string sql3 = null;
                 //
                 Active = !InActive;
-                Models.Complex.cdefModel cdef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                Models.Domain.CDefModel cdef = Models.Domain.CDefModel.getCdef(core, ContentName);
                 string tableName = cdef.contentTableName;
                 int cid = cdef.id;
                 //
@@ -536,18 +536,18 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
-                var tableList = Models.DbModels.tableModel.createList(core, "");
+                var tableList = Models.Db.tableModel.createList(core, "");
                 foreach (tableModel table in tableList) {
-                    var tableSchema = Models.Complex.TableSchemaModel.getTableSchema(core, table.name, "");
+                    var tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, table.name, "");
                     if (tableSchema != null) {
-                        foreach (Models.Complex.TableSchemaModel.ColumnSchemaModel column in tableSchema.columns) {
+                        foreach (Models.Domain.TableSchemaModel.ColumnSchemaModel column in tableSchema.columns) {
                             if ((column.DATA_TYPE.ToLower() == "datetime2") & (column.DATETIME_PRECISION < 3)) {
                                 //
                                 logController.logInfo(core, "verifySqlFieldCompatibility, conversion required, table [" + table.name + "], field [" + column.COLUMN_NAME + "], reason [datetime precision too low (" + column.DATETIME_PRECISION.ToString() + ")]");
                                 //
                                 // drop any indexes that use this field
                                 bool indexDropped = false;
-                                foreach( Models.Complex.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
+                                foreach( Models.Domain.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
                                     if ( index.indexKeyList.Contains(column.COLUMN_NAME) ) {
                                         //
                                         logController.logInfo(core, "verifySqlFieldCompatibility, index [" + index.index_name + "] must be dropped");
@@ -567,7 +567,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // recreate dropped indexes
                                 if (indexDropped) {
-                                    foreach (Models.Complex.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
+                                    foreach (Models.Domain.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
                                         if (index.indexKeyList.Contains(column.COLUMN_NAME)) {
                                             //
                                             logController.logInfo(core, "verifySqlFieldCompatibility, recreating index [" + index.index_name + "]");
@@ -610,7 +610,7 @@ namespace Contensive.Processor.Controllers {
         //=========================================================================================
         //
         //
-        public static void VerifyScriptingRecords(CoreController core) {
+        public static void verifyScriptingRecords(CoreController core) {
             try {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.");
@@ -625,7 +625,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyLanguageRecords(CoreController core) {
+        public static void verifyLanguageRecords(CoreController core) {
             try {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.");
@@ -800,7 +800,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyStates(CoreController core) {
+        public static void verifyStates(CoreController core) {
             try {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyStates", "Verify States");
@@ -900,7 +900,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyCountries(CoreController core) {
+        public static void verifyCountries(CoreController core) {
             try {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCountries", "Verify Countries");
@@ -925,7 +925,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================
         //
-        public static void VerifyDefaultGroups(CoreController core) {
+        public static void verifyDefaultGroups(CoreController core) {
             try {
                 //
                 int GroupID = 0;
@@ -1079,9 +1079,9 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(EntryName.Trim())) {
                     int addonId = core.db.getRecordID(cnAddons, AddonName);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menuNameSpace);
-                    int contentId = Models.Complex.cdefModel.getContentId(core, ContentName);
+                    int contentId = Models.Domain.CDefModel.getContentId(core, ContentName);
                     string listCriteria = "(name=" + core.db.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
-                    List<Models.DbModels.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
+                    List<Models.Db.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
                     NavigatorEntryModel entry = null;
                     if (entryList.Count == 0) {
                         entry = NavigatorEntryModel.add(core);

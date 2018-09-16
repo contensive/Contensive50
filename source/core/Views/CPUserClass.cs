@@ -9,11 +9,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor {
     public class CPUserClass : BaseClasses.CPUserBaseClass, IDisposable {

@@ -3,11 +3,11 @@ using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 using Contensive.BaseClasses;
-using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -477,7 +477,7 @@ namespace Contensive.Processor.Controllers {
                                 // lazy create a user if/when it is needed
                                 string DefaultMemberName = resultSessionContext.visit.name;
                                 if (DefaultMemberName.Left(5).ToLower() == "visit") {
-                                    DefaultMemberName = cdefModel.GetContentFieldProperty(core, "people", "name", "default");
+                                    DefaultMemberName = CDefModel.GetContentFieldProperty(core, "people", "name", "default");
                                 }
                                 resultSessionContext.user = new personModel {
                                     name = DefaultMemberName
@@ -900,7 +900,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // admin is content manager if the CDef is not developer only
                         //
-                        cdefModel CDef = cdefModel.getCdef(core, ContentName);
+                        CDefModel CDef = CDefModel.getCdef(core, ContentName);
                         if (CDef.id != 0) {
                             if (!CDef.developerOnly) {
                                 returnAllowEdit = true;
@@ -912,7 +912,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Authenticated and not admin or developer
                         //
-                        ContentID = cdefModel.getContentId(core, ContentName);
+                        ContentID = CDefModel.getContentId(core, ContentName);
                         getContentAccessRights_NonAdminByContentId(core, ContentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, "");
                     }
                 }
@@ -940,7 +940,7 @@ namespace Contensive.Processor.Controllers {
                 int CSPointer = 0;
                 int ParentID = 0;
                 string ContentName = null;
-                Models.Complex.cdefModel CDef = null;
+                Models.Domain.CDefModel CDef = null;
                 //
                 returnAllowEdit = false;
                 returnAllowAdd = false;
@@ -990,9 +990,9 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Not a content manager for this one, check the parent
                         //
-                        ContentName = cdefModel.getContentNameByID(core, ContentID);
+                        ContentName = CDefModel.getContentNameByID(core, ContentID);
                         if (!string.IsNullOrEmpty(ContentName)) {
-                            CDef = cdefModel.getCdef(core, ContentName);
+                            CDef = CDefModel.getCdef(core, ContentName);
                             ParentID = CDef.parentID;
                             if (ParentID > 0) {
                                 getContentAccessRights_NonAdminByContentId(core, ParentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, usedContentIdList + "," + ContentID.ToString());
@@ -1175,7 +1175,7 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedMember(CoreController core) {
             bool result = false;
             try {
-                result = visit.VisitAuthenticated & (Models.Complex.cdefModel.isWithinContent(core, user.contentControlID, cdefModel.getContentId(core, "members")));
+                result = visit.VisitAuthenticated & (Models.Domain.CDefModel.isWithinContent(core, user.contentControlID, CDefModel.getContentId(core, "members")));
                 //If (Not property_user_isMember_isLoaded) And (visit_initialized) Then
                 //    property_user_isMember = isAuthenticated() And core.IsWithinContent(user.ContentControlID, core.main_GetContentID("members"))
                 //    property_user_isMember_isLoaded = True
@@ -1349,7 +1349,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.visitProperty.getBoolean("AllowEditing") | core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                             if (!string.IsNullOrEmpty(contentNameOrId)) {
                                 if (contentNameOrId.IsNumeric()) {
-                                    contentNameOrId = cdefModel.getContentNameByID(core, encodeInteger(contentNameOrId));
+                                    contentNameOrId = CDefModel.getContentNameByID(core, encodeInteger(contentNameOrId));
                                 }
                             }
                             result = isAuthenticatedContentManager(core, contentNameOrId);

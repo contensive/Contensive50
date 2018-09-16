@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -36,7 +36,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public static string getLinkAlias(CoreController core, int PageID, string QueryStringSuffix, string DefaultLink) {
             string linkAlias = DefaultLink;
-            List<Models.DbModels.linkAliasModel> linkAliasList = linkAliasModel.createList(core, PageID, QueryStringSuffix);
+            List<Models.Db.linkAliasModel> linkAliasList = linkAliasModel.createList(core, PageID, QueryStringSuffix);
             if (linkAliasList.Count > 0) {
                 linkAlias = linkAliasList.First().name;
                 if (linkAlias.Left(1) != "/") {
@@ -207,12 +207,12 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         if (DupCausesWarning) {
                                             if (LinkAliasPageID == 0) {
-                                                int PageContentCID = Models.Complex.cdefModel.getContentId(core, "Page Content");
+                                                int PageContentCID = Models.Domain.CDefModel.getContentId(core, "Page Content");
                                                 return_WarningMessage = ""
                                                     + "This page has been saved, but the Link Alias could not be created (" + WorkingLinkAlias + ") because it is already in use for another page."
                                                     + " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique on this site. To set or change the Link Alias, clicke the Link Alias tab and select a name not used by another page or a folder in your website.";
                                             } else {
-                                                int PageContentCID = Models.Complex.cdefModel.getContentId(core, "Page Content");
+                                                int PageContentCID = Models.Domain.CDefModel.getContentId(core, "Page Content");
                                                 return_WarningMessage = ""
                                                     + "This page has been saved, but the Link Alias could not be created (" + WorkingLinkAlias + ") because it is already in use for another page (<a href=\"?af=4&cid=" + PageContentCID + "&id=" + LinkAliasPageID + "\">edit</a>)."
                                                     + " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique. To set or change the Link Alias, click the Link Alias tab and select a name not used by another page or a folder in your website.";
@@ -226,7 +226,7 @@ namespace Contensive.Processor.Controllers {
                             core.cache.invalidateContent_Entity(core, linkAliasModel.contentTableName, linkAliasId);
                             //
                             // -- force route reload if this is a webserver page
-                            Models.Complex.routeDictionaryModel.invalidateCache(core);
+                            Models.Domain.RouteDictionaryModel.invalidateCache(core);
                             core.doc.routeDictionaryChanges = true;
                         }
                     }

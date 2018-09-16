@@ -14,8 +14,7 @@ using static Contensive.Processor.Controllers.genericController;
 using System.Reflection;
 using System.Timers;
 using System.Threading;
-using Contensive.Processor.Models.Complex;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.MonitorService {
     public class siteCheckClass {
@@ -388,7 +387,7 @@ namespace Contensive.MonitorService {
                                     //    ' Paused
                                     //    '
                                     //    Call appendMonitorLog(AppName & " paused")
-                                } else if (AppStatus == (int)AppConfigModel.appStatusEnum.ok) {
+                                } else if (AppStatus == (int)AppConfigModel.AppStatusEnum.ok) {
                                     //
                                     // Running
                                     //

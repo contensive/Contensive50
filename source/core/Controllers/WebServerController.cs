@@ -9,13 +9,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 //
 using Microsoft.Web.Administration;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -312,7 +312,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 //--------------------------------------------------------------------------
                 //
-                if (core.appConfig.appStatus != AppConfigModel.appStatusEnum.ok) {
+                if (core.appConfig.appStatus != AppConfigModel.AppStatusEnum.ok) {
                     //
                     // did not initialize correctly
                     //
@@ -1075,7 +1075,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             LinkPrefix = core.webServer.requestContentWatchPrefix;
                             ContentID = (core.db.csGetInteger(CSPointer, "ContentID"));
-                            HostContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
+                            HostContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentID);
                             if (string.IsNullOrEmpty(HostContentName)) {
                                 //
                                 // ----- Content Watch with a bad ContentID, mark inactive
@@ -1106,7 +1106,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- if a content watch record is blocked, delete the content tracking
                                 //
-                                core.db.deleteContentRules(Models.Complex.cdefModel.getContentId(core, HostContentName), HostRecordID);
+                                core.db.deleteContentRules(Models.Domain.CDefModel.getContentId(core, HostContentName), HostRecordID);
                             }
                             break;
                     }

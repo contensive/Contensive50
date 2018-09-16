@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -55,11 +55,11 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- convert editor active edit icons
                     //
-                    ContentCopy = activeContentController.processWysiwygResponseForSave(core,ContentCopy);
+                    ContentCopy = ActiveContentController.processWysiwygResponseForSave(core,ContentCopy);
                     //
                     // ----- save the content
                     //
-                    ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
+                    ContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         CS = core.db.csOpen(ContentName, "ID=" + core.db.encodeSQLNumber(RecordID), "", false);
                         if (core.db.csOk(CS)) {
@@ -94,12 +94,12 @@ namespace Contensive.Processor.Controllers {
             strFieldName = genericController.encodeText(FieldName);
             //
             EditorPanel = "";
-            ContentID = Models.Complex.cdefModel.getContentId(core, intContentName);
+            ContentID = Models.Domain.CDefModel.getContentId(core, intContentName);
             if ((ContentID < 1) || (intRecordId < 1) || (string.IsNullOrEmpty(strFieldName))) {
                 PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
                 EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
             } else {
-                intContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
+                intContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(intContentName)) {
                     CSPointer = core.db.csOpen(intContentName, "ID=" + intRecordId);
                     if (!core.db.csOk(CSPointer)) {

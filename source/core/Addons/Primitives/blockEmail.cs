@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -44,13 +44,13 @@ namespace Contensive.Addons.Primitives {
                             // -- log entry to track the result of this email drop
                             int emailDropId = core.docProperties.getInteger(rnEmailBlockRequestDropID);
                             if (emailDropId != 0) {
-                                emailDropModel emailDrop = emailDropModel.create(core, emailDropId);
+                                EmailDropModel emailDrop = EmailDropModel.create(core, emailDropId);
                                 if (emailDrop != null) {
-                                    emailLogModel log = new emailLogModel() {
+                                    EmailLogModel log = new EmailLogModel() {
                                         name = "User " + recipient.name + " clicked linked spam block from email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),
-                                        EmailDropID = emailDrop.id,
-                                        MemberID = recipient.id,
-                                        LogType = EmailLogTypeBlockRequest
+                                        emailDropID = emailDrop.id,
+                                        memberID = recipient.id,
+                                        logType = EmailLogTypeBlockRequest
                                     };
                                 }
                             }

@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -233,8 +233,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     returnSendStatus = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
                 } else {
-                    subject = activeContentController.renderHtmlForEmail(core, subject, person.id, queryStringForLinkAppend);
-                    body = activeContentController.renderHtmlForEmail(core, body, person.id, queryStringForLinkAppend);
+                    subject = ActiveContentController.renderHtmlForEmail(core, subject, person.id, queryStringForLinkAppend);
+                    body = ActiveContentController.renderHtmlForEmail(core, body, person.id, queryStringForLinkAppend);
                     body = genericController.vbReplace(body, "#member_id#", person.id.ToString());
                     body = genericController.vbReplace(body, "#member_email#", person.Email);
                     string htmlBody;
@@ -249,7 +249,7 @@ namespace Contensive.Processor.Controllers {
                         if (!string.IsNullOrWhiteSpace(template)) {
                             //
                             // -- encode template
-                            template = activeContentController.renderHtmlForEmail(core, template, person.id, queryStringForLinkAppend);
+                            template = ActiveContentController.renderHtmlForEmail(core, template, person.id, queryStringForLinkAppend);
                             if (template.IndexOf(fpoContentBox) != -1) {
                                 htmlBody = genericController.vbReplace(template, fpoContentBox, htmlBody);
                             } else {
@@ -341,9 +341,9 @@ namespace Contensive.Processor.Controllers {
                     if (string.IsNullOrEmpty(BounceAddress)) {
                         BounceAddress = EmailFrom;
                     }
-                    emailTemplateModel emailTemplate = emailTemplateModel.create(core, email.EmailTemplateID);
+                    EmailTemplateModel emailTemplate = EmailTemplateModel.create(core, email.EmailTemplateID);
                     if (emailTemplate != null) {
-                        EmailTemplateSource = emailTemplate.BodyHTML;
+                        EmailTemplateSource = emailTemplate.bodyHTML;
                     }
                     if (string.IsNullOrWhiteSpace(EmailTemplateSource)) {
                         EmailTemplateSource = "<div style=\"padding:10px\"><ac type=content></div>";
@@ -680,7 +680,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         private static void queueEmail(CoreController core, bool immediate, EmailClass email) {
             try {
-                var record = emailQueueModel.add(core);
+                var record = EmailQueueModel.add(core);
                 record.immediate = immediate;
                 record.toAddress = email.toAddress;
                 record.subject = email.subject;
@@ -698,22 +698,22 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public static void sendEmailInQueue(CoreController core) {
             try {
-                List<emailQueueModel> queue = emailQueueModel.createList(core, "", "immediate,id desc");
-                foreach (emailQueueModel queueRecord in queue) {
-                    emailQueueModel.delete(core, queueRecord.id);
+                List<EmailQueueModel> queue = EmailQueueModel.createList(core, "", "immediate,id desc");
+                foreach (EmailQueueModel queueRecord in queue) {
+                    EmailQueueModel.delete(core, queueRecord.id);
                     EmailClass email = Newtonsoft.Json.JsonConvert.DeserializeObject<EmailClass>(queueRecord.content);
                     string reasonForFail = "";
                     if (smtpController.sendSmtp(core, email, ref reasonForFail)) {
                         //
                         // -- success, log the send
-                        var log = emailLogModel.add(core);
-                        log.ToAddress = email.toAddress;
-                        log.FromAddress = email.fromAddress;
-                        log.Subject = email.subject;
+                        var log = EmailLogModel.add(core);
+                        log.toAddress = email.toAddress;
+                        log.fromAddress = email.fromAddress;
+                        log.subject = email.subject;
                         log.body = email.htmlBody;
-                        log.SendStatus = "ok";
-                        log.LogType = EmailLogTypeImmediateSend;
-                        log.EmailID = email.emailId;
+                        log.sendStatus = "ok";
+                        log.logType = EmailLogTypeImmediateSend;
+                        log.emailID = email.emailId;
                         log.save(core);
                         logController.logInfo(core, "sendEmailInQueue, send successful, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "]");
                     } else {
@@ -722,28 +722,28 @@ namespace Contensive.Processor.Controllers {
                         if (email.attempts >= 3) {
                             //
                             // -- too many retries, log error
-                            var log = emailLogModel.add(core);
-                            log.ToAddress = email.toAddress;
-                            log.FromAddress = email.fromAddress;
-                            log.Subject = email.subject;
+                            var log = EmailLogModel.add(core);
+                            log.toAddress = email.toAddress;
+                            log.fromAddress = email.fromAddress;
+                            log.subject = email.subject;
                             log.body = email.htmlBody;
-                            log.SendStatus = "failed after 3 retries, reason [" + reasonForFail + "]";
-                            log.LogType = EmailLogTypeImmediateSend;
-                            log.EmailID = email.emailId;
+                            log.sendStatus = "failed after 3 retries, reason [" + reasonForFail + "]";
+                            log.logType = EmailLogTypeImmediateSend;
+                            log.emailID = email.emailId;
                             log.save(core);
                             logController.logInfo(core, "sendEmailInQueue, send FAILED [" + reasonForFail + "], NOT resent because too many retries, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");
                         } else {
                             //
                             // -- fail, add back to end of queue for retry
                             email.attempts += 1;
-                            var log = emailLogModel.add(core);
-                            log.ToAddress = email.toAddress;
-                            log.FromAddress = email.fromAddress;
-                            log.Subject = email.subject;
+                            var log = EmailLogModel.add(core);
+                            log.toAddress = email.toAddress;
+                            log.fromAddress = email.fromAddress;
+                            log.subject = email.subject;
                             log.body = email.htmlBody;
-                            log.SendStatus = "failed attempt (" + email.attempts.ToString() + " of 3), reason [" + reasonForFail + "]";
-                            log.LogType = EmailLogTypeImmediateSend;
-                            log.EmailID = email.emailId;
+                            log.sendStatus = "failed attempt (" + email.attempts.ToString() + " of 3), reason [" + reasonForFail + "]";
+                            log.logType = EmailLogTypeImmediateSend;
+                            log.emailID = email.emailId;
                             log.save(core);
                             queueEmail(core, false, email);
                             logController.logInfo(core, "sendEmailInQueue, failed attempt (" + email.attempts.ToString() + " of 3), reason [" + reasonForFail + "], added to end of queue, toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "], subject [" + email.subject + "], attempts [" + email.attempts + "]");

@@ -9,7 +9,7 @@ using System.Security.Permissions;
 using System.Security;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.CLI {
     class CreateAppClass {
@@ -197,7 +197,7 @@ namespace Contensive.CLI {
                     //
                     // -- save the app configuration and reload the server using this app
                     Contensive.Processor.Controllers.logController.logInfo(cp.core, "Save app configuration.");
-                    appConfig.appStatus = AppConfigModel.appStatusEnum.maintenance;
+                    appConfig.appStatus = AppConfigModel.AppStatusEnum.maintenance;
                     cp.core.serverConfig.apps.Add(appName, appConfig);
                     cp.core.serverConfig.saveObject(cp.core);
                     cp.core.serverConfig = ServerConfigModel.getObject(cp.core);
@@ -242,7 +242,7 @@ namespace Contensive.CLI {
                     Processor.Controllers.WebServerController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
                     //
                     Contensive.Processor.Controllers.logController.logInfo(cp.core, "Run db upgrade.");
-                    Processor.Controllers.appBuilderController.upgrade(cp.core, true, true);
+                    Processor.Controllers.AppBuilderController.upgrade(cp.core, true, true);
                     //
                     // -- set the application back to normal mode
                     cp.core.serverConfig.saveObject(cp.core);

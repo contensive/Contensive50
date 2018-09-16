@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -153,19 +153,19 @@ namespace Contensive.Processor {
         public override void OpenCopy(string copyRecordNameOrGuid) {
             try {
                 accum = "";
-                copyContentModel copy;
+                CopyContentModel copy;
                 if (copyRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
-                    copy = copyContentModel.create(core, genericController.encodeInteger(copyRecordNameOrGuid));
+                    copy = CopyContentModel.create(core, genericController.encodeInteger(copyRecordNameOrGuid));
                 } else if (genericController.isGuid(copyRecordNameOrGuid)) {
                     //
                     // -- record guid
-                    copy = copyContentModel.create(core, copyRecordNameOrGuid);
+                    copy = CopyContentModel.create(core, copyRecordNameOrGuid);
                 } else {
                     //
                     // -- record name
-                    copy = copyContentModel.createByName(core, copyRecordNameOrGuid);
+                    copy = CopyContentModel.createByName(core, copyRecordNameOrGuid);
                 }
                 if (copy != null ) {
                     accum = copy.copy;

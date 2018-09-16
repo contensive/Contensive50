@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Amazon;
 
 namespace Contensive.CLI {
@@ -93,7 +93,7 @@ namespace Contensive.CLI {
                     }
                     //
                     // -- Sql Server Driver
-                    cp.core.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
+                    cp.core.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
                     //
                     // -- Sql Server end-point
                     Console.Write("\n\nSql Server endpoint. Use (local) for Sql Server on this machine, or the AWS RDS endpoint (url:port):");

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -65,7 +65,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 string LocalCollectionXML = null;
                 bool DisplaySystem = false;
                 bool DbUpToDate = false;
-                collectionXmlController XMLTools = new collectionXmlController(core);
+                CollectionXmlController XMLTools = new CollectionXmlController(core);
                 string GuidFieldName = null;
                 List<int> InstalledCollectionIDList = new List<int>();
                 List<string> InstalledCollectionGuidList = new List<string>();

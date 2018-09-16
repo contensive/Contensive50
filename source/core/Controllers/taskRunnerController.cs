@@ -9,11 +9,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     public class taskRunnerController : IDisposable {
@@ -141,7 +141,7 @@ namespace Contensive.Processor.Controllers {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 //
-                foreach (KeyValuePair<string, Models.Context.AppConfigModel> appKVP in serverCore.serverConfig.apps) {
+                foreach (KeyValuePair<string, Models.Domain.AppConfigModel> appKVP in serverCore.serverConfig.apps) {
                     //
                     // query tasks that need to be run
                     //
@@ -149,7 +149,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         logController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "]");
                         //
-                        if (cpApp.core.appConfig.appStatus == AppConfigModel.appStatusEnum.ok) {
+                        if (cpApp.core.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok) {
                             try {
                                 bool tasksRemaining = false;
                                 do {

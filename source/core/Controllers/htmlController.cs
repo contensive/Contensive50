@@ -12,7 +12,7 @@ using System.Data.SqlClient;
 
 using Contensive.BaseClasses;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -117,7 +117,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 const string MenuNameFPO = "<MenuName>";
                 const string NoneCaptionFPO = "<NoneCaption>";
-                Models.Complex.cdefModel CDef = null;
+                Models.Domain.CDefModel CDef = null;
                 string ContentControlCriteria = null;
                 string LcaseCriteria = null;
                 int CSPointer = 0;
@@ -176,7 +176,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // This was commented out -- I really do not know why -- seems like the best way
                     //
-                    CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                    CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     TableName = CDef.contentTableName;
                     DataSource = CDef.contentDataSourceName;
                     ContentControlCriteria = CDef.contentControlCriteria;
@@ -477,7 +477,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Generate Drop Down Field Names
                         //
-                        string DropDownFieldList = Models.Complex.cdefModel.GetContentProperty(core, "people", "DropDownFieldList");
+                        string DropDownFieldList = Models.Domain.CDefModel.GetContentProperty(core, "people", "DropDownFieldList");
                         if (string.IsNullOrEmpty(DropDownFieldList)) {
                             DropDownFieldList = "NAME";
                         }
@@ -1133,16 +1133,16 @@ namespace Contensive.Processor.Controllers {
                 int FieldLookupContentID = 0;
                 int FieldMemberSelectGroupID = 0;
                 string FieldLookupContentName = null;
-                Models.Complex.cdefModel Contentdefinition = null;
+                Models.Domain.CDefModel Contentdefinition = null;
                 bool FieldHTMLContent = false;
                 int CSLookup = 0;
                 string FieldLookupList = "";
                 //
                 if (true) {
                     fieldFound = false;
-                    Contentdefinition = Models.Complex.cdefModel.getCdef(core, ContentName);
-                    foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in Contentdefinition.fields) {
-                        Models.Complex.cdefFieldModel field = keyValuePair.Value;
+                    Contentdefinition = Models.Domain.CDefModel.getCdef(core, ContentName);
+                    foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
+                        Models.Domain.CDefFieldModel field = keyValuePair.Value;
                         if (genericController.vbUCase(field.nameLc) == genericController.vbUCase(FieldName)) {
                             FieldValueVariant = field.defaultValue;
                             fieldTypeId = field.fieldTypeId;
@@ -1291,7 +1291,7 @@ namespace Contensive.Processor.Controllers {
                                     break;
                                 case FieldTypeIdLookup:
                                     FieldValueInteger = genericController.encodeInteger(FieldValueVariant);
-                                    FieldLookupContentName = Models.Complex.cdefModel.getContentNameByID(core, FieldLookupContentID);
+                                    FieldLookupContentName = Models.Domain.CDefModel.getContentNameByID(core, FieldLookupContentID);
                                     if (!string.IsNullOrEmpty(FieldLookupContentName)) {
                                         //
                                         // Lookup into Content
@@ -1451,7 +1451,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Personalization Tag
                         //
-                        string FieldList = Models.Complex.cdefModel.GetContentProperty(core, "people", "SelectFieldList");
+                        string FieldList = Models.Domain.CDefModel.GetContentProperty(core, "people", "SelectFieldList");
                         FieldList = genericController.vbReplace(FieldList, ",", "|");
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + FieldList + "]";
                         IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
@@ -1791,7 +1791,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 //
                                 // ListField
-                                int CID = Models.Complex.cdefModel.getContentId(core, ContentName);
+                                int CID = Models.Domain.CDefModel.getContentId(core, ContentName);
                                 CS = core.db.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, false, false, "ID,Name");
                             }
 
@@ -2007,7 +2007,7 @@ namespace Contensive.Processor.Controllers {
                     AddonModel addon = AddonModel.create(core, addonGuidChildList);
                     if (addon != null) {
                         FoundAddon = true;
-                        AddonOptionConstructor = addon.ArgumentList;
+                        AddonOptionConstructor = addon.argumentList;
                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r\n", "\r");
                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\n", "\r");
                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r", "\r\n");
@@ -2015,7 +2015,7 @@ namespace Contensive.Processor.Controllers {
                             if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
                                 AddonOptionConstructor = AddonOptionConstructor + "\r\n";
                             }
-                            if (addon.IsInline) {
+                            if (addon.isInline) {
                                 AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Inline;
                             } else {
                                 AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Block;
@@ -2071,14 +2071,14 @@ namespace Contensive.Processor.Controllers {
                 AddonModel addon = core.addonCache.getAddonByName(AddonName);
                 if (addon != null) {
                     FoundAddon = true;
-                    AddonOptionConstructor = addon.ArgumentList;
+                    AddonOptionConstructor = addon.argumentList;
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r\n", "\r");
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\n", "\r");
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r", "\r\n");
                     if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
                         AddonOptionConstructor = AddonOptionConstructor + "\r\n";
                     }
-                    if (genericController.encodeBoolean(addon.IsInline)) {
+                    if (genericController.encodeBoolean(addon.isInline)) {
                         AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Inline;
                     } else {
                         AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Block;
@@ -2191,7 +2191,7 @@ namespace Contensive.Processor.Controllers {
                     if (PosACInstanceID == 0) {
                         logController.handleError( core,new Exception("AC Instance [" + ACInstanceID + "] not found in record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                     } else {
-                        Copy = activeContentController.optimizeLibraryFileImagesInHtmlContent(core, Copy);
+                        Copy = ActiveContentController.optimizeLibraryFileImagesInHtmlContent(core, Copy);
                         ParseOK = false;
                         PosStart = Copy.LastIndexOf("<ac ", PosACInstanceID - 1, System.StringComparison.OrdinalIgnoreCase) + 1;
                         if (PosStart != 0) {
@@ -2209,14 +2209,14 @@ namespace Contensive.Processor.Controllers {
                                     AddonModel embeddedAddon = core.addonCache.getAddonByName(AddonName);
                                     if (embeddedAddon != null) {
                                         FoundAddon = true;
-                                        AddonOptionConstructor = genericController.encodeText(embeddedAddon.ArgumentList);
+                                        AddonOptionConstructor = genericController.encodeText(embeddedAddon.argumentList);
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r\n", "\r");
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\n", "\r");
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r", "\r\n");
                                         if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
                                             AddonOptionConstructor = AddonOptionConstructor + "\r\n";
                                         }
-                                        if (genericController.encodeBoolean(embeddedAddon.IsInline)) {
+                                        if (genericController.encodeBoolean(embeddedAddon.isInline)) {
                                             AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Inline;
                                         } else {
                                             AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Block;
@@ -2374,7 +2374,7 @@ namespace Contensive.Processor.Controllers {
             string returnHtml = "";
             try {
                 bool CanSeeHiddenFields = false;
-                Models.Complex.cdefModel SecondaryCDef = null;
+                Models.Domain.CDefModel SecondaryCDef = null;
                 List<int> ContentIDList = new List<int>();
                 bool Found = false;
                 int RecordID = 0;
@@ -2403,8 +2403,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     //
-                    int PrimaryContentID = Models.Complex.cdefModel.getContentId(core, PrimaryContentName);
-                    SecondaryCDef = Models.Complex.cdefModel.getCdef(core, SecondaryContentName);
+                    int PrimaryContentID = Models.Domain.CDefModel.getContentId(core, PrimaryContentName);
+                    SecondaryCDef = Models.Domain.CDefModel.getCdef(core, SecondaryContentName);
                     string SecondaryTablename = SecondaryCDef.contentTableName;
                     int SecondaryContentID = SecondaryCDef.id;
                     ContentIDList.Add(SecondaryContentID);
@@ -2412,7 +2412,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     //
                     //
-                    string rulesTablename = Models.Complex.cdefModel.getContentTablename(core, RulesContentName);
+                    string rulesTablename = Models.Domain.CDefModel.getContentTablename(core, RulesContentName);
                     SingularPrefixHtmlEncoded = HtmlController.encodeHtml(genericController.getSingular_Sortof(SecondaryContentName)) + "&nbsp;";
                     //
                     int main_MemberShipCount = 0;
@@ -3408,7 +3408,7 @@ namespace Contensive.Processor.Controllers {
                     contactPeopleId = core.db.csGetInteger(CS, "modifiedBy");
                     returnCopy = core.db.csGet(CS, "Copy");
                     //returnCopy = contentCmdController.executeContentCommands(core, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, ref Return_ErrorMessage);
-                    returnCopy = activeContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
+                    returnCopy = ActiveContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
                     //
                     if (true) {
                         if (core.session.isEditingAnything()) {
@@ -3484,11 +3484,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Test if RuleCopy is supported
                 //
-                SupportRuleCopy = Models.Complex.cdefModel.isContentFieldSupported(core, rulesContentName, "RuleCopy");
+                SupportRuleCopy = Models.Domain.CDefModel.isContentFieldSupported(core, rulesContentName, "RuleCopy");
                 if (SupportRuleCopy) {
-                    SupportRuleCopy = SupportRuleCopy && Models.Complex.cdefModel.isContentFieldSupported(core, secondaryContentName, "AllowRuleCopy");
+                    SupportRuleCopy = SupportRuleCopy && Models.Domain.CDefModel.isContentFieldSupported(core, secondaryContentName, "AllowRuleCopy");
                     if (SupportRuleCopy) {
-                        SupportRuleCopy = SupportRuleCopy && Models.Complex.cdefModel.isContentFieldSupported(core, secondaryContentName, "RuleCopyCaption");
+                        SupportRuleCopy = SupportRuleCopy && Models.Domain.CDefModel.isContentFieldSupported(core, secondaryContentName, "RuleCopyCaption");
                     }
                 }
                 //
@@ -3499,7 +3499,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 currentRulesCnt = 0;
                 dupRuleIdList = "";
-                rulesTablename = Models.Complex.cdefModel.getContentTablename(core, rulesContentName);
+                rulesTablename = Models.Domain.CDefModel.getContentTablename(core, rulesContentName);
                 SQL = "select " + rulesSecondaryFieldName + ",id from " + rulesTablename + " where (" + rulesPrimaryFieldname + "=" + primaryRecordID + ")and(active<>0) order by " + rulesSecondaryFieldName;
                 currentRulesCnt = 0;
                 currentRules = core.db.executeQuery(SQL);

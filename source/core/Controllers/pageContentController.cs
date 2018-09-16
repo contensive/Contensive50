@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -34,7 +34,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// current page to it's root
         /// </summary>
-        public List<Models.DbModels.pageContentModel> pageToRootList { get; set; }
+        public List<Models.Db.pageContentModel> pageToRootList { get; set; }
         /// <summary>
         /// current template
         /// </summary>
@@ -94,7 +94,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // ----- Encode Template
-                    returnBody += activeContentController.renderHtmlForWeb(core, LocalTemplateBody, "Page Templates", LocalTemplateID, 0, core.webServer.requestProtocol + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
+                    returnBody += ActiveContentController.renderHtmlForWeb(core, LocalTemplateBody, "Page Templates", LocalTemplateID, 0, core.webServer.requestProtocol + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
                     //
                     //
                     if (returnBody.IndexOf(fpoContentBox)  != -1) {
@@ -227,7 +227,7 @@ namespace Contensive.Processor.Controllers {
         internal static string getDefaultBlockMessage(CoreController core, bool UseContentWatchLink) {
             string result = "";
             try {
-                var copyRecord = copyContentModel.createByName(core, ContentBlockCopyName);  
+                var copyRecord = CopyContentModel.createByName(core, ContentBlockCopyName);  
                 if (copyRecord!=null) {
                     result = copyRecord.copy;
                 }
@@ -240,7 +240,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Do not allow blank message - if still nothing, create default
                 if (string.IsNullOrEmpty(result)) {
                     result = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=\"?method=login\" rel=\"nofollow\">Click Here</a>. For more information, please contact the administrator.</p>";
-                    copyRecord = copyContentModel.add(core);
+                    copyRecord = CopyContentModel.add(core);
                     copyRecord.name = ContentBlockCopyName;
                     copyRecord.copy = result;
                     copyRecord.save(core);
@@ -347,7 +347,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- build parentpageList (first = current page, last = root)
                     // -- add a 0, then repeat until another 0 is found, or there is a repeat
-                    core.doc.pageController.pageToRootList = new List<Models.DbModels.pageContentModel>();
+                    core.doc.pageController.pageToRootList = new List<Models.Db.pageContentModel>();
                     List<int> usedPageIdList = new List<int>();
                     int targetPageId = requestedPage.id;
                     usedPageIdList.Add(0);
@@ -375,7 +375,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- get template from pages
                     core.doc.pageController.template = null;
-                    foreach (Models.DbModels.pageContentModel page in core.doc.pageController.pageToRootList) {
+                    foreach (Models.Db.pageContentModel page in core.doc.pageController.pageToRootList) {
                         if (page.TemplateID > 0) {
                             core.doc.pageController.template = pageTemplateModel.create(core, page.TemplateID );
                             if (core.doc.pageController.template == null) {
@@ -633,7 +633,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- domain -- determine if the domain has any template requirements, and if so, is this template allowed
                 string SqlCriteria = "(domainId=" + core.doc.domain.id + ")";
-                List<Models.DbModels.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(core, SqlCriteria);
+                List<Models.Db.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(core, SqlCriteria);
                 bool templateAllowed = false;
                 foreach (TemplateDomainRuleModel rule in allowTemplateRuleList) {
                     if (rule.templateId == core.doc.pageController.template.id) {
@@ -707,7 +707,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 result = (ChildRecordID == ParentRecordID);
                 if (!result) {
-                    Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                    Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     if (genericController.isInDelimitedString(CDef.selectCommaList.ToUpper(), "PARENTID", ",")) {
                         result = main_IsChildRecord_Recurse(core, CDef.contentDataSourceName, CDef.contentTableName, ChildRecordID, ParentRecordID, "");
                     }
@@ -802,7 +802,7 @@ namespace Contensive.Processor.Controllers {
 
                     //
                     // -- execute template Dependencies
-                    List<Models.DbModels.AddonModel> templateAddonList = AddonModel.createList_templateDependencies(core, core.doc.pageController.template.id);
+                    List<Models.Db.AddonModel> templateAddonList = AddonModel.createList_templateDependencies(core, core.doc.pageController.template.id);
                     if (templateAddonList.Count > 0) {
                         string addonContextMessage = executeContext.errorContextMessage;
                         foreach (AddonModel addon in templateAddonList) {
@@ -813,7 +813,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- execute page Dependencies
-                    List<Models.DbModels.AddonModel> pageAddonList = AddonModel.createList_pageDependencies(core, core.doc.pageController.page.id);
+                    List<Models.Db.AddonModel> pageAddonList = AddonModel.createList_pageDependencies(core, core.doc.pageController.page.id);
                     if ( pageAddonList.Count> 0 ) {
                         string addonContextMessage = executeContext.errorContextMessage;
                         foreach (AddonModel addon in pageAddonList) {
@@ -878,7 +878,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.doc.redirectContentID != 0) {
                         core.doc.redirectRecordID = (core.docProperties.getInteger(rnRedirectRecordId));
                         if (core.doc.redirectRecordID != 0) {
-                            string contentName = Models.Complex.cdefModel.getContentNameByID(core, core.doc.redirectContentID);
+                            string contentName = Models.Domain.CDefModel.getContentNameByID(core, core.doc.redirectContentID);
                             if (!string.IsNullOrEmpty(contentName)) {
                                 if (WebServerController.main_RedirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID)) {
                                     //
@@ -951,7 +951,7 @@ namespace Contensive.Processor.Controllers {
                         core.visitProperty.setProperty("Clipboard", "");
                         genericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentContentID, "");
                         genericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentRecordID, "");
-                        string ClipParentContentName = Models.Complex.cdefModel.getContentNameByID(core, ClipParentContentID);
+                        string ClipParentContentName = Models.Domain.CDefModel.getContentNameByID(core, ClipParentContentID);
                         if (string.IsNullOrEmpty(ClipParentContentName)) {
                             // state not working...
                         } else if (string.IsNullOrEmpty(ClipBoard)) {
@@ -973,13 +973,13 @@ namespace Contensive.Processor.Controllers {
                                     } else {
                                         int ClipChildContentID = genericController.encodeInteger(ClipBoardArray[0]);
                                         int ClipChildRecordID = genericController.encodeInteger(ClipBoardArray[1]);
-                                        if (!Models.Complex.cdefModel.isWithinContent(core, ClipChildContentID, ClipParentContentID)) {
+                                        if (!Models.Domain.CDefModel.isWithinContent(core, ClipChildContentID, ClipParentContentID)) {
                                             errorController.addUserError(core, "The paste operation failed because the destination location is not compatible with the clipboard data.");
                                         } else {
                                             //
                                             // the content definition relationship is OK between the child and parent record
                                             //
-                                            string ClipChildContentName = Models.Complex.cdefModel.getContentNameByID(core, ClipChildContentID);
+                                            string ClipChildContentName = Models.Domain.CDefModel.getContentNameByID(core, ClipChildContentID);
                                             if (!(!string.IsNullOrEmpty(ClipChildContentName))) {
                                                 errorController.addUserError(core, "The paste operation failed because the clipboard data content is undefined.");
                                             } else {
@@ -1170,7 +1170,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             if (!string.IsNullOrEmpty(linkAliasTest1 + linkAliasTest2)) {
                                 string sqlLinkAliasCriteria = "(name=" + core.db.encodeSQLText(linkAliasTest1) + ")or(name=" + core.db.encodeSQLText(linkAliasTest2) + ")";
-                                List<Models.DbModels.linkAliasModel> linkAliasList = linkAliasModel.createList(core, sqlLinkAliasCriteria, "id desc");
+                                List<Models.Db.linkAliasModel> linkAliasList = linkAliasModel.createList(core, sqlLinkAliasCriteria, "id desc");
                                 if (linkAliasList.Count > 0) {
                                     linkAliasModel linkAlias = linkAliasList.First();
                                     string LinkQueryString = rnPageId + "=" + linkAlias.PageID + "&" + linkAlias.QueryStringSuffix;
@@ -1238,7 +1238,7 @@ namespace Contensive.Processor.Controllers {
                     // -- check secure certificate required
                     bool SecureLink_Template_Required = core.doc.pageController.template.isSecure;
                     bool SecureLink_Page_Required = false;
-                    foreach (Models.DbModels.pageContentModel page in core.doc.pageController.pageToRootList) {
+                    foreach (Models.Db.pageContentModel page in core.doc.pageController.pageToRootList) {
                         if (core.doc.pageController.page.IsSecure) {
                             SecureLink_Page_Required = true;
                             break;
@@ -1273,7 +1273,7 @@ namespace Contensive.Processor.Controllers {
                     // -- if endpoint is domain + route (link alias), the route determines the page, which may determine the core.doc.pageController.template. If this template is not allowed for this domain, redirect to the domain's landingcore.doc.pageController.page.
                     //
                     Sql = "(domainId=" + core.doc.domain.id + ")";
-                    List<Models.DbModels.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(core, Sql);
+                    List<Models.Db.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(core, Sql);
                     if (allowTemplateRuleList.Count == 0) {
                         //
                         // -- current template has no domain preference, use current
@@ -1372,7 +1372,7 @@ namespace Contensive.Processor.Controllers {
                                 // People Record
                                 //
                                 FormValue = core.docProperties.getText(tempVar.PeopleField);
-                                if ((!string.IsNullOrEmpty(FormValue)) & genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "uniquename"))) {
+                                if ((!string.IsNullOrEmpty(FormValue)) & genericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "uniquename"))) {
                                     string SQL = "select count(*) from ccMembers where " + tempVar.PeopleField + "=" + core.db.encodeSQLText(FormValue);
                                     CS = core.db.csOpenSql(SQL);
                                     if (core.db.csOk(CS)) {
@@ -1383,7 +1383,7 @@ namespace Contensive.Processor.Controllers {
                                         errorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                     }
                                 }
-                                if ((tempVar.REquired | genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
+                                if ((tempVar.REquired | genericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
                                     errorController.addUserError(core, "The field [" + HtmlController.encodeHtml(tempVar.Caption) + "] is required.");
                                 } else {
@@ -1624,7 +1624,7 @@ namespace Contensive.Processor.Controllers {
                                 CSPeople = core.db.csOpenRecord("people", core.session.user.id);
                             }
                             Caption = tempVar.Caption;
-                            if (tempVar.REquired | genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
+                            if (tempVar.REquired | genericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
                                 Caption = "*" + Caption;
                             }
                             if (core.db.csOk(CSPeople)) {
@@ -1910,7 +1910,7 @@ namespace Contensive.Processor.Controllers {
                     // Encode the copy
                     //
                     //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
-                    returnHtml = activeContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                    returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                     if (core.doc.refreshQueryString != "") {
                         returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + core.doc.refreshQueryString, 1, 99, 1);
                     }
@@ -1932,12 +1932,12 @@ namespace Contensive.Processor.Controllers {
                             // Link authoring, workflow rendering -> do encoding, but no tracking
                             //
                             //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
-                            returnHtml = activeContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                            returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         } else {
                             //
                             // Live content
                             //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
-                            returnHtml = activeContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                            returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             core.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.pageController.page.id);
                         }
                         //
@@ -2087,7 +2087,7 @@ namespace Contensive.Processor.Controllers {
                     // -- OnPageStartEvent
                     core.doc.bodyContent = returnHtml;
                     List<AddonModel> addonList = AddonModel.createList_OnPageStartEvent(core, new List<string>());
-                    foreach (Models.DbModels.AddonModel addon in addonList) {
+                    foreach (Models.Db.AddonModel addon in addonList) {
                         CPUtilsBaseClass.addonExecuteContext pageStartContext = new CPUtilsBaseClass.addonExecuteContext() {
                             instanceGuid = "-1",
                             instanceArguments = instanceArguments,
@@ -2386,7 +2386,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 if (RecordID > 0) {
-                    int ContentID = Models.Complex.cdefModel.getContentId(core, ContentName);
+                    int ContentID = Models.Domain.CDefModel.getContentId(core, ContentName);
                     bool IsEditingLocal = false;
                     if (ContentID > 0) {
                         //
@@ -2395,7 +2395,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // ----- if iContentName was bad, maybe they put table in, no authoring
-                        ContentID = Models.Complex.cdefModel.getContentIDByTablename(core, ContentName);
+                        ContentID = Models.Domain.CDefModel.getContentIDByTablename(core, ContentName);
                     }
                     int SeeAlsoCount = 0;
                     if (ContentID > 0) {

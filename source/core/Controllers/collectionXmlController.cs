@@ -9,13 +9,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
-    public class collectionXmlController {
+    public class CollectionXmlController {
         //
         // ----- global scope variables
         //
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        public collectionXmlController(CoreController core) {
+        public CollectionXmlController(CoreController core) {
             this.core = core;
         }
         //

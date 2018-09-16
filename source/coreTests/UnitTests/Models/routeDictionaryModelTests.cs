@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models;
-using Contensive.Processor.Models.Complex;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Domain;
+using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Tests.testConstants;
 
 namespace Contensive.Processor.Tests.UnitTests.Models {
@@ -21,7 +21,7 @@ namespace Contensive.Processor.Tests.UnitTests.Models {
                 cp.core.db.executeNonQuery("delete from " + linkAliasModel.contentTableName);
                 cp.core.db.executeNonQuery("delete from " + linkForwardModel.contentTableName);
                 // act
-                var routes = routeDictionaryModel.create(cp.core);
+                var routes = RouteDictionaryModel.create(cp.core);
                 // assert only one route, matching the default admin route
                 Assert.AreEqual(1, routes.Count);
                 Assert.AreEqual(genericController.normalizeRoute(cp.core.appConfig.adminRoute), routes.First().Key);

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -29,15 +29,15 @@ namespace Contensive.Addons.Primitives {
                 CoreController core = ((CPClass)cp).core;
                 //
                 // -- Email click detected
-                emailDropModel emailDrop = emailDropModel.create(core, core.docProperties.getInteger(rnEmailClickFlag));
+                EmailDropModel emailDrop = EmailDropModel.create(core, core.docProperties.getInteger(rnEmailClickFlag));
                 if (emailDrop != null) {
                     personModel recipient = personModel.create(core, core.docProperties.getInteger(rnEmailMemberID));
                     if (recipient != null) {
-                        emailLogModel log = new emailLogModel() {
+                        EmailLogModel log = new EmailLogModel() {
                             name = "User " + recipient.name + " clicked link from email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),
-                            EmailDropID = emailDrop.id,
-                            MemberID = recipient.id,
-                            LogType = EmailLogTypeOpen
+                            emailDropID = emailDrop.id,
+                            memberID = recipient.id,
+                            logType = EmailLogTypeOpen
                         };
                     }
                 }

@@ -7,8 +7,7 @@ Imports Contensive.Processor.Controllers
 Imports Contensive.Processor.Controllers.genericController
 Imports System.Web.Routing
 Imports System.IO
-Imports Contensive.Processor.Models.Complex
-Imports Contensive.Processor.Models.Context
+Imports Contensive.Processor.Models.Domain
 
 Public Class configurationClass
     '

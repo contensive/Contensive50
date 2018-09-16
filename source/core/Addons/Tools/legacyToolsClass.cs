@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -399,7 +399,7 @@ namespace Contensive.Addons.Tools {
                 string Caption = null;
                 int NavID = 0;
                 int ParentNavID = 0;
-                dataSourceModel datasource = dataSourceModel.create(core, core.docProperties.getInteger("DataSourceID"));
+                DataSourceModel datasource = DataSourceModel.create(core, core.docProperties.getInteger("DataSourceID"));
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 Caption = "Create Content Definition";
@@ -423,7 +423,7 @@ namespace Contensive.Addons.Tools {
                         core.db.createContentFromSQLTable(datasource, TableName, ContentName);
                         core.cache.invalidateAll();
                         core.doc.clearMetaData();
-                        ContentID = Processor.Models.Complex.cdefModel.getContentId(core, ContentName);
+                        ContentID = Processor.Models.Domain.CDefModel.getContentId(core, ContentName);
                         ParentNavID = core.db.getRecordID(cnNavigatorEntries, "Manage Site Content");
                         if (ParentNavID != 0) {
                             CS = core.db.csOpen(cnNavigatorEntries, "(name=" + core.db.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
@@ -446,7 +446,7 @@ namespace Contensive.Addons.Tools {
                                 core.db.csClose(ref CS);
                             }
                         }
-                        ContentID = Processor.Models.Complex.cdefModel.getContentId(core, ContentName);
+                        ContentID = Processor.Models.Domain.CDefModel.getContentId(core, ContentName);
                         Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentID + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
                     } else {
                         Stream.Add("<P>Error, a required field is missing. Content not created.</P>");
@@ -483,7 +483,7 @@ namespace Contensive.Addons.Tools {
                 string AStart = null;
                 int CSPointer = 0;
                 int ContentID = 0;
-                Processor.Models.Complex.cdefModel CDef = null;
+                Processor.Models.Domain.CDefModel CDef = null;
                 string ContentName = null;
                 int CS1 = 0;
                 int TargetFieldID = 0;
@@ -530,7 +530,7 @@ namespace Contensive.Addons.Tools {
                 if (ContentID != 0) {
                     ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
                     ContentName = Local_GetContentNameByID(ContentID);
-                    CDef = Processor.Models.Complex.cdefModel.getCdef(core, ContentID, true, false);
+                    CDef = Processor.Models.Domain.CDefModel.getCdef(core, ContentID, true, false);
                     if (ToolsAction != 0) {
                         //
                         // Block contentautoload, then force a load at the end
@@ -542,7 +542,7 @@ namespace Contensive.Addons.Tools {
                         //
                         if (FieldIDToAdd != 0) {
                             foreach (var keyValuePair in CDef.fields) {
-                                Processor.Models.Complex.cdefFieldModel field = keyValuePair.Value;
+                                Processor.Models.Domain.CDefFieldModel field = keyValuePair.Value;
                                 if (field.id == FieldIDToAdd) {
                                     //If field.Name = FieldNameToAdd Then
                                     if (field.inherited) {
@@ -569,8 +569,8 @@ namespace Contensive.Addons.Tools {
                         //
                         ColumnNumberMax = 0;
                         foreach (var keyValuePair in CDef.adminColumns) {
-                            Processor.Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                            Processor.Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
+                            Processor.Models.Domain.CDefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                            Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
@@ -605,8 +605,8 @@ namespace Contensive.Addons.Tools {
                                         columnPtr = 0;
                                         if (CDef.adminColumns.Count > 1) {
                                             foreach (var keyValuePair in CDef.adminColumns) {
-                                                Processor.Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                                Processor.Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
+                                                Processor.Models.Domain.CDefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                                Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                                 CSPointer = core.db.csOpenRecord("Content Fields", field.id);
                                                 core.db.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
                                                 core.db.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 80) / (double)ColumnWidthTotal));
@@ -634,8 +634,8 @@ namespace Contensive.Addons.Tools {
                                     if (CDef.adminColumns.Count > 1) {
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
-                                            Processor.Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Processor.Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
+                                            Processor.Models.Domain.CDefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             CSPointer = core.db.csOpenRecord("Content Fields", field.id);
                                             if (fieldId == TargetFieldID) {
                                                 core.db.csSet(CSPointer, "IndexColumn", 0);
@@ -661,8 +661,8 @@ namespace Contensive.Addons.Tools {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
-                                            Processor.Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Processor.Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
+                                            Processor.Models.Domain.CDefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             CS1 = core.db.csOpenRecord("Content Fields", field.id);
                                             if ((CDef.fields[FieldName.ToLower()].id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
@@ -699,8 +699,8 @@ namespace Contensive.Addons.Tools {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns.Reverse()) {
-                                            Processor.Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Processor.Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
+                                            Processor.Models.Domain.CDefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             CS1 = core.db.csOpenRecord("Content Fields", field.id);
                                             if ((field.id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
@@ -875,7 +875,7 @@ namespace Contensive.Addons.Tools {
                         //
                         // Get a new copy of the content definition
                         //
-                        CDef = Processor.Models.Complex.cdefModel.getCdef(core, ContentID, true, false);
+                        CDef = Processor.Models.Domain.CDefModel.getCdef(core, ContentID, true, false);
                     }
                     if (Button == ButtonSaveandInvalidateCache) {
                         core.cache.invalidateAll();
@@ -926,7 +926,7 @@ namespace Contensive.Addons.Tools {
                         //
                         // Calc total width
                         //
-                        foreach (KeyValuePair<string, Processor.Models.Complex.cdefModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                        foreach (KeyValuePair<string, Processor.Models.Domain.CDefModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
                             ColumnWidthTotal += kvp.Value.Width;
                         }
                         //For ColumnCount = 0 To CDef.adminColumns.Count - 1
@@ -935,7 +935,7 @@ namespace Contensive.Addons.Tools {
                         if (ColumnWidthTotal > 0) {
                             Stream.Add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
                             int ColumnCount = 0;
-                            foreach (KeyValuePair<string, Processor.Models.Complex.cdefModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                            foreach (KeyValuePair<string, Processor.Models.Domain.CDefModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
                                 //
                                 // print column headers - anchored so they sort columns
                                 //
@@ -979,15 +979,15 @@ namespace Contensive.Addons.Tools {
                     } else {
                         Stream.Add(SpanClassAdminNormal + "<br>");
                         bool skipField = false;
-                        foreach (KeyValuePair<string, Processor.Models.Complex.cdefFieldModel> keyValuePair in CDef.fields) {
-                            Processor.Models.Complex.cdefFieldModel field = keyValuePair.Value;
+                        foreach (KeyValuePair<string, Processor.Models.Domain.CDefFieldModel> keyValuePair in CDef.fields) {
+                            Processor.Models.Domain.CDefFieldModel field = keyValuePair.Value;
                             //
                             // test if this column is in use
                             //
                             skipField = false;
                             //ColumnPointer = CDef.adminColumns.Count
                             if (CDef.adminColumns.Count > 0) {
-                                foreach (KeyValuePair<string, Processor.Models.Complex.cdefModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                                foreach (KeyValuePair<string, Processor.Models.Domain.CDefModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
                                     if (field.nameLc == kvp.Value.Name) {
                                         skipField = true;
                                         break;
@@ -1653,7 +1653,7 @@ namespace Contensive.Addons.Tools {
                         // Create Definition
                         //
                         Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]");
-                        Processor.Models.Complex.cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
+                        Processor.Models.Domain.CDefModel.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();
@@ -1746,7 +1746,7 @@ namespace Contensive.Addons.Tools {
             string returnValue = "";
             try {
                 int CSContent = 0;
-                Processor.Models.Complex.cdefModel CD = null;
+                Processor.Models.Domain.CDefModel CD = null;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string[,] ContentNameArray = null;
                 int ContentNameCount = 0;
@@ -1765,13 +1765,13 @@ namespace Contensive.Addons.Tools {
                     CSContent = core.db.csOpen("Content", "", "", false, 0, false, false, "id");
                     if (core.db.csOk(CSContent)) {
                         do {
-                            CD = Processor.Models.Complex.cdefModel.getCdef(core, core.db.csGetInteger(CSContent, "id"));
+                            CD = Processor.Models.Domain.CDefModel.getCdef(core, core.db.csGetInteger(CSContent, "id"));
                             TableName = CD.contentTableName;
                             Stream.Add("Synchronizing Content " + CD.name + " to table " + TableName + "<br>");
                             core.db.createSQLTable(CD.contentDataSourceName, TableName);
                             if (CD.fields.Count > 0) {
                                 foreach (var keyValuePair in CD.fields) {
-                                    Processor.Models.Complex.cdefFieldModel field = keyValuePair.Value;
+                                    Processor.Models.Domain.CDefFieldModel field = keyValuePair.Value;
                                     Stream.Add("...Field " + field.nameLc + "<br>");
                                     core.db.createSQLTableField(CD.contentDataSourceName, TableName, field.nameLc, field.fieldTypeId);
                                 }
@@ -2152,7 +2152,7 @@ namespace Contensive.Addons.Tools {
                 string ButtonList = null;
                 DataTable RSSchema = null;
                 var tmpList = new List<string> { };
-                dataSourceModel datasource = dataSourceModel.create(core, core.docProperties.getInteger("DataSourceID"),ref tmpList);
+                DataSourceModel datasource = DataSourceModel.create(core, core.docProperties.getInteger("DataSourceID"),ref tmpList);
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
@@ -2916,8 +2916,8 @@ namespace Contensive.Addons.Tools {
         //
         //
         //
-        private Processor.Models.Complex.cdefModel GetCDef(string ContentName) {
-            return Processor.Models.Complex.cdefModel.getCdef(core, ContentName);
+        private Processor.Models.Domain.CDefModel GetCDef(string ContentName) {
+            return Processor.Models.Domain.CDefModel.getCdef(core, ContentName);
         }
 
 

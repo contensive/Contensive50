@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 //
@@ -65,7 +65,7 @@ namespace Contensive.Processor.Controllers {
         //
         private bool dbNotReady {
             get {
-                return (core.appConfig.appStatus != AppConfigModel.appStatusEnum.ok);
+                return (core.appConfig.appStatus != AppConfigModel.AppStatusEnum.ok);
             }
         }
         //
@@ -363,7 +363,7 @@ namespace Contensive.Processor.Controllers {
                             core.db.executeNonQuery(SQL, "", ref recordsAffected);
                             if (recordsAffected == 0) {
                                 SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES("
-                            + SQLTrue + "," + core.db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(core, "site properties")) + "," + core.db.encodeSQLText(propertyName.ToUpper()) + "," + core.db.encodeSQLText(Value) + "," + SQLNow + "," + SQLNow + ");";
+                            + SQLTrue + "," + core.db.encodeSQLNumber(Models.Domain.CDefModel.getContentId(core, "site properties")) + "," + core.db.encodeSQLText(propertyName.ToUpper()) + "," + core.db.encodeSQLText(Value) + "," + SQLNow + "," + SQLNow + ");";
                                 core.db.executeQuery(SQL);
                             }
                             //

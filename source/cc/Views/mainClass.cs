@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.CLI {
     class mainClass {
@@ -404,14 +404,14 @@ namespace Contensive.CLI {
                 //
                 // -- upgrade app
                 using (Contensive.Processor.CPClass upgradeApp = new Contensive.Processor.CPClass(appName)) {
-                    Processor.Controllers.appBuilderController.upgrade(upgradeApp.core, false, repair);
+                    Processor.Controllers.AppBuilderController.upgrade(upgradeApp.core, false, repair);
                 }
             } else {
                 //
                 // -- upgrade all apps
                 foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
                     using (Contensive.Processor.CPClass upgradeApp = new Contensive.Processor.CPClass(kvp.Key)) {
-                        Processor.Controllers.appBuilderController.upgrade(upgradeApp.core, false, repair);
+                        Processor.Controllers.AppBuilderController.upgrade(upgradeApp.core, false, repair);
                     }
                 }
             }

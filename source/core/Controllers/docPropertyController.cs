@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -139,7 +139,7 @@ namespace Contensive.Processor.Controllers {
         //
         public string getRenderedActiveContent(string RequestName) {
             try {
-                return activeContentController.processWysiwygResponseForSave(core, genericController.encodeText(getProperty(RequestName).Value));
+                return ActiveContentController.processWysiwygResponseForSave(core, genericController.encodeText(getProperty(RequestName).Value));
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;

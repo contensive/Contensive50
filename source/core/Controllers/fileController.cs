@@ -8,7 +8,7 @@ using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
 using System.Threading.Tasks;
 using Contensive.Processor.Models;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 using Amazon.Runtime;

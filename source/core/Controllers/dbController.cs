@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Complex;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
+using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 //
@@ -104,7 +104,7 @@ namespace Contensive.Processor.Controllers {
             /// <summary>
             /// 
             /// </summary>
-            public Models.Complex.cdefModel CDef;
+            public Models.Domain.CDefModel CDef;
             /// <summary>
             /// ID of the member who opened the csv_ContentSet
             /// </summary>
@@ -206,7 +206,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     //
                     // -- lookup dataSource
-                    string normalizedDataSourceName = dataSourceModel.normalizeDataSourceName(dataSourceName);
+                    string normalizedDataSourceName = DataSourceModel.normalizeDataSourceName(dataSourceName);
                     if ((string.IsNullOrEmpty(normalizedDataSourceName)) || (normalizedDataSourceName == "default")) {
                         //
                         // -- default datasource
@@ -258,7 +258,7 @@ namespace Contensive.Processor.Controllers {
             //
             string returnConnString = "";
             try {
-                string normalizedDataSourceName = dataSourceModel.normalizeDataSourceName(dataSourceName);
+                string normalizedDataSourceName = DataSourceModel.normalizeDataSourceName(dataSourceName);
                 string defaultConnString = "";
                 string serverUrl = core.serverConfig.defaultDataSourceAddress;
                 if (serverUrl.IndexOf(":") > 0) {
@@ -620,7 +620,7 @@ namespace Contensive.Processor.Controllers {
                 saveTransactionLog_InProcess = true;
                 //
                 // -- block before appStatus OK because need site properties
-                if ((core.serverConfig.enableLogging) && (core.appConfig.appStatus == AppConfigModel.appStatusEnum.ok)) {
+                if ((core.serverConfig.enableLogging) && (core.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok)) {
                     if (core.siteProperties.allowTransactionLog) {
                         string LogEntry = ("duration [" + ElapsedMilliseconds + "ms], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
                         logController.logDebug(core, "dbController: " + LogEntry);
@@ -644,7 +644,7 @@ namespace Contensive.Processor.Controllers {
         public bool isSQLTableField(string DataSourceName, string TableName, string FieldName) {
             bool returnOK = false;
             try {
-                Models.Complex.TableSchemaModel tableSchema = Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                Models.Domain.TableSchemaModel tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (tableSchema != null) {
                     returnOK = (null != tableSchema.columns.Find(x => x.COLUMN_NAME.ToLower() == FieldName.ToLower()));
                 }
@@ -665,7 +665,7 @@ namespace Contensive.Processor.Controllers {
         public bool isSQLTable(string DataSourceName, string TableName) {
             bool ReturnOK = false;
             try {
-                ReturnOK = (!(Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null));
+                ReturnOK = (!(Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null));
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -703,7 +703,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Local table -- create if not in schema
                     //
-                    if (Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null) {
+                    if (Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null) {
                         if (!AllowAutoIncrement) {
                             string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) + ");";
                             executeQuery(SQL, DataSourceName).Dispose();
@@ -741,7 +741,7 @@ namespace Contensive.Processor.Controllers {
                     createSQLIndex(DataSourceName, TableName, TableName + "ModifiedDate", "MODIFIEDDATE");
                     createSQLIndex(DataSourceName, TableName, TableName + "ccGuid", "CCGUID");
                 }
-                Models.Complex.TableSchemaModel.tableSchemaListClear(core);
+                Models.Domain.TableSchemaModel.tableSchemaListClear(core);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -875,9 +875,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="clearMetaCache"></param>
         public void createSQLIndex(string DataSourceName, string TableName, string IndexName, string FieldNames, bool clearMetaCache = false) {
             try {
-                Models.Complex.TableSchemaModel ts = null;
+                Models.Domain.TableSchemaModel ts = null;
                 if (!(string.IsNullOrEmpty(TableName) && string.IsNullOrEmpty(IndexName) & string.IsNullOrEmpty(FieldNames))) {
-                    ts = Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                    ts = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                     if (ts != null) {
                         if (null == ts.indexes.Find(x => x.index_name.ToLower() == IndexName.ToLower())) {
                             executeQuery("CREATE INDEX [" + IndexName + "] ON [" + TableName + "]( " + FieldNames + " );", DataSourceName);
@@ -1056,11 +1056,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IndexName"></param>
         public void deleteSqlIndex(string DataSourceName, string TableName, string IndexName) {
             try {
-                Models.Complex.TableSchemaModel ts = null;
+                Models.Domain.TableSchemaModel ts = null;
                 int DataSourceType = 0;
                 string sql = null;
                 //
-                ts = Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                ts = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (ts != null) {
                     if (null != ts.indexes.Find(x => x.index_name.ToLower() == IndexName.ToLower())) {
                         DataSourceType = getDataSourceType(DataSourceName);
@@ -1294,7 +1294,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    cdefModel CDef = cdefModel.getCdef(core, ContentName);
+                    CDefModel CDef = CDefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw (new ApplicationException("No content found For [" + ContentName + "]"));
                     } else if (CDef.id <= 0) {
@@ -1448,7 +1448,7 @@ namespace Contensive.Processor.Controllers {
                         // delete any files (only if filename is part of select)
                         //
                         string fieldName = null;
-                        Models.Complex.cdefFieldModel field = null;
+                        Models.Domain.CDefFieldModel field = null;
                         foreach (var selectedFieldName in contentSetStore[CSPointer].CDef.selectList) {
                             if (contentSetStore[CSPointer].CDef.fields.ContainsKey(selectedFieldName.ToLower())) {
                                 field = contentSetStore[CSPointer].CDef.fields[selectedFieldName.ToLower()];
@@ -1962,7 +1962,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // CS is SQL-based, use the contentname
                             //
-                            TableName = cdefModel.getContentTablename(core, ContentName);
+                            TableName = CDefModel.getContentTablename(core, ContentName);
                         } else {
                             //
                             // no Contentname given
@@ -2218,14 +2218,14 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 int CSPointer = 0;
-                Models.Complex.cdefModel CDef = null;
+                Models.Domain.CDefModel CDef = null;
                 //
                 if (string.IsNullOrEmpty(ContentName.Trim())) {
                     throw new ArgumentException("contentName cannot be blank");
                 } else if (string.IsNullOrEmpty(Criteria.Trim())) {
                     throw new ArgumentException("criteria cannot be blank");
                 } else {
-                    CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                    CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw new ArgumentException("ContentName [" + ContentName + "] was not found");
                     } else if (CDef.id == 0) {
@@ -2267,7 +2267,7 @@ namespace Contensive.Processor.Controllers {
                 string DataSourceName = null;
                 string FieldName = null;
                 string TableName = null;
-                Models.Complex.cdefModel CDef = null;
+                Models.Domain.CDefModel CDef = null;
                 string DefaultValueText = null;
                 string LookupContentName = null;
                 int Ptr = 0;
@@ -2278,7 +2278,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(ContentName.Trim())) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                    CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw new ApplicationException("content [" + ContentName + "] could Not be found.");
                     } else if (CDef.id <= 0) {
@@ -2293,8 +2293,8 @@ namespace Contensive.Processor.Controllers {
                         DataSourceName = CDef.contentDataSourceName;
                         TableName = CDef.contentTableName;
                         if (CDef.fields.Count > 0) {
-                            foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in CDef.fields) {
-                                Models.Complex.cdefFieldModel field = keyValuePair.Value;
+                            foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in CDef.fields) {
+                                Models.Domain.CDefFieldModel field = keyValuePair.Value;
                                 FieldName = field.nameLc;
                                 if ((!string.IsNullOrEmpty(FieldName)) && (!string.IsNullOrEmpty(field.defaultValue))) {
                                     switch (genericController.vbUCase(FieldName)) {
@@ -2348,7 +2348,7 @@ namespace Contensive.Processor.Controllers {
                                                         DefaultValueText = "null";
                                                     } else {
                                                         if (field.lookupContentID != 0) {
-                                                            LookupContentName = Models.Complex.cdefModel.getContentNameByID(core, field.lookupContentID);
+                                                            LookupContentName = Models.Domain.CDefModel.getContentNameByID(core, field.lookupContentID);
                                                             if (!string.IsNullOrEmpty(LookupContentName)) {
                                                                 DefaultValueText = getRecordID(LookupContentName, DefaultValueText).ToString();
                                                             }
@@ -2470,7 +2470,7 @@ namespace Contensive.Processor.Controllers {
                 int DestRecordID = 0;
                 string DestFilename = null;
                 string SourceFilename = null;
-                Models.Complex.cdefModel DestCDef = null;
+                Models.Domain.CDefModel DestCDef = null;
                 //
                 if (!csOk(CSSource)) {
                     throw new ArgumentException("source dataset is not valid");
@@ -2609,7 +2609,7 @@ namespace Contensive.Processor.Controllers {
                         // Updateable -- enterprete the value
                         //
                         //ContentName = .ContentName
-                        Models.Complex.cdefFieldModel field = null;
+                        Models.Domain.CDefFieldModel field = null;
                         if (!tempVar.CDef.fields.ContainsKey(FieldName.ToLower())) {
                             try {
                                 fieldValue = genericController.encodeText(csGetValue(CSPointer, FieldName));
@@ -2630,8 +2630,8 @@ namespace Contensive.Processor.Controllers {
                                 DataTable rs = null;
                                 if (tempVar.CDef.fields.ContainsKey("id")) {
                                     RecordID = genericController.encodeInteger(csGetValue(CSPointer, "id"));
-                                    ContentName = Models.Complex.cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
-                                    DbTable = Models.Complex.cdefModel.getContentTablename(core, ContentName);
+                                    ContentName = Models.Domain.CDefModel.getContentNameByID(core, field.manyToManyRuleContentID);
+                                    DbTable = Models.Domain.CDefModel.getContentTablename(core, ContentName);
                                     SQL = "Select " + field.ManyToManyRuleSecondaryField + " from " + DbTable + " where " + field.ManyToManyRulePrimaryField + "=" + RecordID;
                                     rs = executeQuery(SQL);
                                     if (DbController.isDataTableOk(rs)) {
@@ -2681,7 +2681,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             if (FieldValueVariant.IsNumeric()) {
                                                 fieldLookupId = field.lookupContentID;
-                                                LookupContentName = Models.Complex.cdefModel.getContentNameByID(core, fieldLookupId);
+                                                LookupContentName = Models.Domain.CDefModel.getContentNameByID(core, fieldLookupId);
                                                 LookupList = field.lookupList;
                                                 if (!string.IsNullOrEmpty(LookupContentName)) {
                                                     //
@@ -2815,7 +2815,7 @@ namespace Contensive.Processor.Controllers {
                             FieldValue = "";
                         }
                         if (!string.IsNullOrEmpty(tempVar.CDef.name)) {
-                            Models.Complex.cdefFieldModel field = null;
+                            Models.Domain.CDefFieldModel field = null;
                             if (!tempVar.CDef.fields.ContainsKey(FieldNameLc)) {
                                 throw new ArgumentException("The field [" + FieldName + "] could Not be found In content [" + tempVar.CDef.name + "]");
                             } else {
@@ -3063,7 +3063,7 @@ namespace Contensive.Processor.Controllers {
                         int ContentID = contentSet.CDef.id;
                         int LiveRecordID = csGetInteger(CSPointer, "ID");
                         int LiveRecordContentControlID = csGetInteger(CSPointer, "CONTENTCONTROLID");
-                        string LiveRecordContentName = Models.Complex.cdefModel.getContentNameByID(core, LiveRecordContentControlID);
+                        string LiveRecordContentName = Models.Domain.CDefModel.getContentNameByID(core, LiveRecordContentControlID);
                         bool LiveRecordInactive = !csGetBoolean(CSPointer, "ACTIVE");
                         string SQLLiveDelimiter = "";
                         string SQLLiveUpdate = "";
@@ -3095,7 +3095,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 LiveRecordInactive = (UcaseFieldName == "ACTIVE" && (!genericController.encodeBoolean(writeCacheValue)));
                                 FieldFoundCount += 1;
-                                Models.Complex.cdefFieldModel field = contentSet.CDef.fields[FieldName.ToLower()];
+                                Models.Domain.CDefFieldModel field = contentSet.CDef.fields[FieldName.ToLower()];
                                 string SQLSetPair = "";
                                 bool FieldReadOnly = field.readOnly;
                                 bool FieldAdminAuthorable = ((!field.readOnly) & (!field.notEditable) & (field.authorable));
@@ -3509,7 +3509,7 @@ namespace Contensive.Processor.Controllers {
                 int fieldTypeId = 0;
                 string TableName = null;
                 //Dim iOriginalFilename As String
-                Models.Complex.cdefModel CDef = null;
+                Models.Domain.CDefModel CDef = null;
                 //
                 if (string.IsNullOrEmpty(ContentName.Trim())) {
                     throw new ArgumentException("contentname cannot be blank");
@@ -3518,7 +3518,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (RecordID <= 0) {
                     throw new ArgumentException("recordid is not valid");
                 } else {
-                    CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                    CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     if (CDef.id == 0) {
                         throw new ApplicationException("contentname [" + ContentName + "] is not a valid content");
                     } else {
@@ -3683,8 +3683,8 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     ContentRecordKey = ContentID.ToString() + "." + RecordID.ToString();
                     Criteria = "(ContentRecordKey=" + encodeSQLText(ContentRecordKey) + ")";
-                    ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
-                    TableName = Models.Complex.cdefModel.getContentTablename(core, ContentName);
+                    ContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentID);
+                    TableName = Models.Domain.CDefModel.getContentTablename(core, ContentName);
                     //
                     // ----- Table Specific rules
                     //
@@ -4024,7 +4024,7 @@ namespace Contensive.Processor.Controllers {
         public string getSQLIndexList(string DataSourceName, string TableName) {
             string returnList = "";
             try {
-                Models.Complex.TableSchemaModel ts = Models.Complex.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                Models.Domain.TableSchemaModel ts = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (ts != null) {
                     foreach ( TableSchemaModel.IndexSchemaModel index in ts.indexes) {
                         returnList += "," + index.index_name;
@@ -4162,7 +4162,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="TableName"></param>
         /// <param name="ContentName"></param>
         //
-        public void createContentFromSQLTable(dataSourceModel DataSource, string TableName, string ContentName) {
+        public void createContentFromSQLTable(DataSourceModel DataSource, string TableName, string ContentName) {
             try {
                 //string DateAddedString = core.db.encodeSQLDate(DateTime.Now);
                 //string sqlGuid = encodeSQLText( createGuid());
@@ -4191,12 +4191,12 @@ namespace Contensive.Processor.Controllers {
                     // --- Find/Create the Content Definition
                     //----------------------------------------------------------------
                     //
-                    ContentID = Models.Complex.cdefModel.getContentId(core, ContentName);
+                    ContentID = Models.Domain.CDefModel.getContentId(core, ContentName);
                     if (ContentID <= 0) {
                         //
                         // ----- Content definition not found, create it
                         //
-                        Models.Complex.cdefModel.addContent(core, true, DataSource, TableName, ContentName);
+                        Models.Domain.CDefModel.addContent(core, true, DataSource, TableName, ContentName);
                         //ContentID = csv_GetContentID(ContentName)
                         SQL = "Select ID from ccContent where name=" + core.db.encodeSQLText(ContentName);
                         dt = core.db.executeQuery(SQL);
@@ -4274,7 +4274,7 @@ namespace Contensive.Processor.Controllers {
         public void createContentFieldFromTableField(string ContentName, string FieldName, int ADOFieldType) {
             try {
                 //
-                cdefFieldModel field = new cdefFieldModel {
+                CDefFieldModel field = new CDefFieldModel {
                     fieldTypeId = core.db.getFieldTypeIdByADOType(ADOFieldType),
                     caption = FieldName,
                     editSortPriority = 1000,
@@ -4463,7 +4463,7 @@ namespace Contensive.Processor.Controllers {
                         field.defaultValue = "0";
                         break;
                 }
-                Models.Complex.cdefModel.verifyCDefField_ReturnID(core, ContentName, field);
+                Models.Domain.CDefModel.verifyCDefField_ReturnID(core, ContentName, field);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -4627,10 +4627,10 @@ namespace Contensive.Processor.Controllers {
                         if (KeySplit.GetUpperBound(0) == 1) {
                             ContentID = genericController.encodeInteger(KeySplit[0]);
                             if (ContentID != 0) {
-                                ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentID);
+                                ContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentID);
                                 RecordID = genericController.encodeInteger(KeySplit[1]);
                                 if (!string.IsNullOrEmpty(ContentName) & RecordID != 0) {
-                                    if (Models.Complex.cdefModel.getContentTablename(core, ContentName) == "ccPageContent") {
+                                    if (Models.Domain.CDefModel.getContentTablename(core, ContentName) == "ccPageContent") {
                                         CSPointer = core.db.csOpenRecord(ContentName, RecordID, false, false, "TemplateID,ParentID");
                                         if (csOk(CSPointer)) {
                                             recordfound = true;
@@ -4643,7 +4643,7 @@ namespace Contensive.Processor.Controllers {
                                             // This content record does not exist - remove any records with this ContentRecordKey pointer
                                             //
                                             deleteContentRecords("Content Watch", "ContentRecordKey=" + encodeSQLText(ContentRecordKey));
-                                            core.db.deleteContentRules(Models.Complex.cdefModel.getContentId(core, ContentName), RecordID);
+                                            core.db.deleteContentRules(Models.Domain.CDefModel.getContentId(core, ContentName), RecordID);
                                         } else {
 
                                             if (templateId != 0) {
@@ -4654,8 +4654,8 @@ namespace Contensive.Processor.Controllers {
                                                 csClose(ref CSPointer);
                                             }
                                             if (string.IsNullOrEmpty(result) && ParentID != 0) {
-                                                TableName = Models.Complex.cdefModel.getContentTablename(core, ContentName);
-                                                DataSource = Models.Complex.cdefModel.getContentDataSource(core, ContentName);
+                                                TableName = Models.Domain.CDefModel.getContentTablename(core, ContentName);
+                                                DataSource = Models.Domain.CDefModel.getContentDataSource(core, ContentName);
                                                 CSPointer = csOpenSql_rev(DataSource, "Select ContentControlID from " + TableName + " where ID=" + RecordID);
                                                 if (csOk(CSPointer)) {
                                                     ParentContentID = genericController.encodeInteger(csGetText(CSPointer, "ContentControlID"));
@@ -4811,7 +4811,7 @@ namespace Contensive.Processor.Controllers {
                     RecordID = (core.db.csGetInteger(iCSPointer, "ID"));
                     RecordName = core.db.csGetText(iCSPointer, "Name");
                     ContentControlID = (core.db.csGetInteger(iCSPointer, "contentcontrolid"));
-                    ContentName = Models.Complex.cdefModel.getContentNameByID(core, ContentControlID);
+                    ContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentControlID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         result = AdminUIController.getRecordEditLink(core,ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
                     }

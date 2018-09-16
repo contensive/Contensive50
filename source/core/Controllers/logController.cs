@@ -121,7 +121,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================================
         /// <summary>
-        /// log any level with NLOG without considering configuration. Onle use in extreme cases where the application environment is not stable.
+        /// log any level with NLOG without considering configuration. Only use in extreme cases where the application environment is not stable.
         /// </summary>
         /// <param name="core"></param>
         /// <param name="message"></param>

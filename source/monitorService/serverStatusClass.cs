@@ -9,15 +9,14 @@ using System.Xml.Linq;
 
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Complex;
-using Contensive.Processor.Models.Context;
+using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 using static Contensive.MonitorService.constants;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 
 namespace Contensive.MonitorService {
-    public class statusServerClass {
+    public class StatusServerClass {
         private ipDaemonController cmdListener = new ipDaemonController();
         private CoreController cpCore;
         //
@@ -311,7 +310,7 @@ namespace Contensive.MonitorService {
                                         //        '    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application starting")
                                         //        '    Content = Content & StatusLine(2, errors(ErrorCount))
                                         //        '    ErrorCount = ErrorCount + 1
-                                        case AppConfigModel.appStatusEnum.ok:
+                                        case AppConfigModel.AppStatusEnum.ok:
                                             if (true) {
                                                 //
                                                 // access content server for this application
@@ -434,7 +433,7 @@ namespace Contensive.MonitorService {
             appendMonitorLog("unexepected error in " + methodName + ", " + exToString);
         }
 
-        public statusServerClass(CoreController cpCore) : base() {
+        public StatusServerClass(CoreController cpCore) : base() {
             this.cpCore = cpCore;
         }
     }

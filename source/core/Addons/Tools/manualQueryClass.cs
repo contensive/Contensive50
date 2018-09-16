@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -69,7 +69,7 @@ namespace Contensive.Addons.Tools {
                 if (string.IsNullOrEmpty(SQL)) {
                     SQL = core.docProperties.getText("SQLList");
                 }
-                dataSourceModel datasource = dataSourceModel.create(core, core.docProperties.getInteger("dataSourceid"));
+                DataSourceModel datasource = DataSourceModel.create(core, core.docProperties.getInteger("dataSourceid"));
                 //
                 if ((core.docProperties.getText("button")) == ButtonRun) {
                     //
@@ -191,7 +191,7 @@ namespace Contensive.Addons.Tools {
                 //
                 // -- data source
                 bool isEmptyList = false;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.ID, Processor.Models.Complex.cdefModel.getContentId(core, "data sources"), ref isEmptyList)));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.ID, Processor.Models.Domain.CDefModel.getContentId(core, "data sources"), ref isEmptyList)));
                 {
                     //
                     // -- sql list

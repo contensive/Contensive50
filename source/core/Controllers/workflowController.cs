@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -832,9 +832,9 @@ namespace Contensive.Processor.Controllers {
                 string sqlCriteria = null;
                 double EditLockTimeoutDays = 0;
                 double EditLockTimeoutMinutes = 0;
-                Models.Complex.cdefModel CDef = null;
+                Models.Domain.CDefModel CDef = null;
                 //
-                CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                 ContentID = CDef.id;
                 if (ContentID != 0) {
                     AuthoringCriteria = getAuthoringControlCriteria(ContentName, RecordID);
@@ -888,7 +888,7 @@ namespace Contensive.Processor.Controllers {
         public void getAuthoringStatus(string ContentName, int RecordID, ref bool IsSubmitted, ref bool IsApproved, ref string SubmittedName, ref string ApprovedName, ref bool IsInserted, ref bool IsDeleted, ref bool IsModified, ref string ModifiedName, ref DateTime ModifiedDate, ref DateTime SubmittedDate, ref DateTime ApprovedDate) {
             try {
                 int ContentID = 0;
-                Models.Complex.cdefModel CDef = null;
+                Models.Domain.CDefModel CDef = null;
                 //
                 IsModified = false;
                 ModifiedName = "";
@@ -905,7 +905,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Get Workflow Locks
                     //
-                    CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                    CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     ContentID = CDef.id;
                     if (ContentID > 0) {
                         //If false And core.siteProperties.allowWorkflowAuthoring Then

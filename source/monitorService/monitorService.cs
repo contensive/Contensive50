@@ -15,7 +15,7 @@ namespace Contensive.MonitorService {
             InitializeComponent();
         }
 
-        private statusServerClass serverStatus;
+        private StatusServerClass serverStatus;
         private siteCheckClass siteCheck;
         private CPClass cp;
 
@@ -26,7 +26,7 @@ namespace Contensive.MonitorService {
             // store auth token in a config file
             //
             cp = new CPClass();
-            serverStatus = new statusServerClass(cp.core);
+            serverStatus = new StatusServerClass(cp.core);
             serverStatus.startListening();
             siteCheck = new siteCheckClass(cp.core);
             siteCheck.StartMonitoring();

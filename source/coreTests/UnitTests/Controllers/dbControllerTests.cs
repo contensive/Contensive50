@@ -67,8 +67,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                     cp.core.db.csClose(ref cs3);
                 }
                 // assert
-                var person_test1 = Contensive.Processor.Models.DbModels.personModel.create(cp.core, testId_test1);
-                var person_test2 = Contensive.Processor.Models.DbModels.personModel.create(cp.core, testId_test2);
+                var person_test1 = Contensive.Processor.Models.Db.personModel.create(cp.core, testId_test1);
+                var person_test2 = Contensive.Processor.Models.Db.personModel.create(cp.core, testId_test2);
                 //
                 Assert.AreEqual("a", person_test1.Username);
                 Assert.AreEqual("b", person_test1.Password);
@@ -132,7 +132,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 CPCSBaseClass cs = cp.CSNew();
                 string impossibleName = cp.Utils.CreateGuid();
                 // act
-                cs.Open(Contensive.Processor.Models.DbModels.personModel.contentName, "(name=" + cp.Db.EncodeSQLText(impossibleName) + ")");
+                cs.Open(Contensive.Processor.Models.Db.personModel.contentName, "(name=" + cp.Db.EncodeSQLText(impossibleName) + ")");
                 int resultNoData = cs.GetRowCount();
                 cs.Close();
                 // assert

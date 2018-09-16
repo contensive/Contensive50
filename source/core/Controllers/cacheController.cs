@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -95,7 +95,7 @@ namespace Contensive.Processor.Controllers {
                 if (!(string.IsNullOrEmpty(key))) {
                     //
                     // -- read cacheWrapper
-                    cacheWrapperClass wrappedContent = getWrappedContent(key);
+                    CacheWrapperClass wrappedContent = getWrappedContent(key);
                     if (wrappedContent != null) {
                         //
                         // -- test for global invalidation
@@ -109,10 +109,10 @@ namespace Contensive.Processor.Controllers {
                             // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
                             bool cacheMiss = false;
                             foreach (string dependentKey in wrappedContent.dependentKeyList) {
-                                cacheWrapperClass dependantObject = getWrappedContent(dependentKey);
+                                CacheWrapperClass dependantObject = getWrappedContent(dependentKey);
                                 if (dependantObject == null) {
                                     // create dummy cache to validate future cache requests, fake saveDate as last globalinvalidationdate
-                                    setWrappedContent(dependentKey, new cacheWrapperClass() {
+                                    setWrappedContent(dependentKey, new CacheWrapperClass() {
                                         aliasPointsToKey = null,
                                         content = "",
                                         saveDate = globalInvalidationDate
@@ -174,8 +174,8 @@ namespace Contensive.Processor.Controllers {
         /// <typeparam name="returnType"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
-        private cacheWrapperClass getWrappedContent(string key) {
-            cacheWrapperClass result = null;
+        private CacheWrapperClass getWrappedContent(string key) {
+            CacheWrapperClass result = null;
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
                 if (string.IsNullOrEmpty(key)) {
@@ -186,7 +186,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- use remote cache
                         try {
-                            result = cacheClient.Get<cacheWrapperClass>(wrapperKey);
+                            result = cacheClient.Get<CacheWrapperClass>(wrapperKey);
                         } catch (Exception ex) {
                             //
                             // --client does not throw its own errors, so try to differentiate by message
@@ -212,7 +212,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- local memory cache
                         //Dim cache As ObjectCache = MemoryCache.Default
-                        result = (cacheWrapperClass)MemoryCache.Default[wrapperKey];
+                        result = (CacheWrapperClass)MemoryCache.Default[wrapperKey];
                         if (result != null) {
                             logController.logTrace(core, "getCacheWrapper(" + key + "), memoryCache hit");
                         } else {
@@ -232,7 +232,7 @@ namespace Contensive.Processor.Controllers {
                             logController.logTrace(core,"getCacheWrapper(" + key + "), file miss");
                         } else {
                             //logController.appendCacheLog(core,"getCacheWrapper(" + key + "), file hit, write to memory cache");
-                            result = Newtonsoft.Json.JsonConvert.DeserializeObject<cacheWrapperClass>(serializedDataObject);
+                            result = Newtonsoft.Json.JsonConvert.DeserializeObject<CacheWrapperClass>(serializedDataObject);
                             setWrappedContent_MemoryCache(wrapperKey, result);
                         }
                         if (result != null) {
@@ -267,7 +267,7 @@ namespace Contensive.Processor.Controllers {
         public void setObject(string key, object content) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
-                cacheWrapperClass wrappedContent = new cacheWrapperClass {
+                CacheWrapperClass wrappedContent = new CacheWrapperClass {
                     content = content,
                     saveDate = DateTime.Now,
                     invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
@@ -293,7 +293,7 @@ namespace Contensive.Processor.Controllers {
         public void setObject(string key, object content, DateTime invalidationDate) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
-                cacheWrapperClass wrappedContent = new cacheWrapperClass {
+                CacheWrapperClass wrappedContent = new CacheWrapperClass {
                     content = content,
                     saveDate = DateTime.Now,
                     invalidationDate = invalidationDate
@@ -317,7 +317,7 @@ namespace Contensive.Processor.Controllers {
         public void setObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
-                cacheWrapperClass wrappedContent = new cacheWrapperClass {
+                CacheWrapperClass wrappedContent = new CacheWrapperClass {
                     content = content,
                     saveDate = DateTime.Now,
                     invalidationDate = invalidationDate,
@@ -342,7 +342,7 @@ namespace Contensive.Processor.Controllers {
         public void setObject(string key, object content, DateTime invalidationDate, string dependantKey) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
-                cacheWrapperClass cacheWrapper = new cacheWrapperClass {
+                CacheWrapperClass cacheWrapper = new CacheWrapperClass {
                     content = content,
                     saveDate = DateTime.Now,
                     invalidationDate = invalidationDate,
@@ -370,7 +370,7 @@ namespace Contensive.Processor.Controllers {
         public void setObject(string key, object content, List<string> dependentKeyList) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
-                cacheWrapperClass cacheWrapper = new cacheWrapperClass {
+                CacheWrapperClass cacheWrapper = new CacheWrapperClass {
                     content = content,
                     saveDate = DateTime.Now,
                     invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
@@ -414,7 +414,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 keyAlias = Regex.Replace(keyAlias, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
-                cacheWrapperClass cacheWrapper = new cacheWrapperClass {
+                CacheWrapperClass cacheWrapper = new CacheWrapperClass {
                     saveDate = DateTime.Now,
                     invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
                     aliasPointsToKey = key
@@ -433,7 +433,7 @@ namespace Contensive.Processor.Controllers {
         public void invalidateAll() {
             try {
                 string key = Regex.Replace(cacheNameGlobalInvalidationDate, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
-                setWrappedContent(key, new cacheWrapperClass { saveDate = DateTime.Now });
+                setWrappedContent(key, new CacheWrapperClass { saveDate = DateTime.Now });
                 _globalInvalidationDate = null;
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -452,17 +452,17 @@ namespace Contensive.Processor.Controllers {
                 if ((recursionLimit>0) && (!string.IsNullOrWhiteSpace(key.Trim()))) {
                     key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
                     // if key is an alias, we need to invalidate the real key
-                    cacheWrapperClass wrapper = getWrappedContent(key);
+                    CacheWrapperClass wrapper = getWrappedContent(key);
                     if (wrapper == null) {
                         // no cache for this key, if this is a dependency for another key, save invalidated
-                        setWrappedContent(key, new cacheWrapperClass { saveDate = DateTime.Now });
+                        setWrappedContent(key, new CacheWrapperClass { saveDate = DateTime.Now });
                     } else { 
                         if (!string.IsNullOrWhiteSpace(wrapper.aliasPointsToKey)) {
                             // this key is an alias, invalidate it's parent key
                             invalidate(wrapper.aliasPointsToKey, --recursionLimit);
                         } else {
                             // key is a valid cache, invalidate it
-                            setWrappedContent(key, new cacheWrapperClass { saveDate = DateTime.Now });
+                            setWrappedContent(key, new CacheWrapperClass { saveDate = DateTime.Now });
                         }
                     }
                 }
@@ -484,7 +484,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- save the cache key that represents any record in the content, set as a dependent key for saves
                 invalidate(ContentName);
-                invalidate(Models.Complex.cdefModel.getContentTablename(core, ContentName));
+                invalidate(Models.Domain.CDefModel.getContentTablename(core, ContentName));
             } catch (Exception ex) {
                 logController.handleError( core,ex);
                 throw;
@@ -573,13 +573,13 @@ namespace Contensive.Processor.Controllers {
             invalidate(getCacheKey_Entity(tableName, recordId));
             if (tableName.ToLower() == linkAliasModel.contentTableName.ToLower()) {
                 //
-                Models.Complex.routeDictionaryModel.invalidateCache(core);
+                Models.Domain.RouteDictionaryModel.invalidateCache(core);
             } else if (tableName.ToLower() == linkForwardModel.contentTableName.ToLower()) {
                 //
-                Models.Complex.routeDictionaryModel.invalidateCache(core);
+                Models.Domain.RouteDictionaryModel.invalidateCache(core);
             } else if (tableName.ToLower() == AddonModel.contentTableName.ToLower()) {
                 //
-                Models.Complex.routeDictionaryModel.invalidateCache(core);
+                Models.Domain.RouteDictionaryModel.invalidateCache(core);
             }
         }
         //
@@ -588,7 +588,7 @@ namespace Contensive.Processor.Controllers {
         /// cache data wrapper to include tags and save datetime
         /// </summary>
         [Serializable()]
-        public class cacheWrapperClass {
+        public class CacheWrapperClass {
             //
             // if populated, all other properties are ignored and the primary tag b
             public string aliasPointsToKey;
@@ -617,7 +617,7 @@ namespace Contensive.Processor.Controllers {
             get {
                 bool setDefault = false;
                 if (_globalInvalidationDate == null) {
-                    cacheWrapperClass dataObject = getWrappedContent(cacheNameGlobalInvalidationDate);
+                    CacheWrapperClass dataObject = getWrappedContent(cacheNameGlobalInvalidationDate);
                     if (dataObject != null) {
                         _globalInvalidationDate = dataObject.saveDate;
                     }
@@ -634,7 +634,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (setDefault) {
                     _globalInvalidationDate = new DateTime(1990, 8, 7);
-                    setWrappedContent(cacheNameGlobalInvalidationDate, new cacheWrapperClass { saveDate = encodeDate(_globalInvalidationDate) });
+                    setWrappedContent(cacheNameGlobalInvalidationDate, new CacheWrapperClass { saveDate = encodeDate(_globalInvalidationDate) });
                 }
                 return encodeDate(_globalInvalidationDate);
             }
@@ -660,8 +660,9 @@ namespace Contensive.Processor.Controllers {
                         if (cacheEndpointSplit.GetUpperBound(0) > 1) {
                             cacheEndpointPort = genericController.encodeInteger(cacheEndpointSplit[1]);
                         }
-                        Amazon.ElastiCacheCluster.ElastiCacheClusterConfig cacheConfig = new Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(cacheEndpointSplit[0], cacheEndpointPort);
-                        cacheConfig.Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary;
+                        Amazon.ElastiCacheCluster.ElastiCacheClusterConfig cacheConfig = new Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(cacheEndpointSplit[0], cacheEndpointPort) {
+                            Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
+                        };
                         cacheClient = new Enyim.Caching.MemcachedClient(cacheConfig);
                         if (cacheClient != null) {
                             remoteCacheInitialized = true;
@@ -683,7 +684,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="wrappedContent">Either a string, a date, or a serializable object</param>
         /// <param name="invalidationDate"></param>
         /// <remarks></remarks>
-        private void setWrappedContent(string key, cacheWrapperClass wrappedContent) {
+        private void setWrappedContent(string key, CacheWrapperClass wrappedContent) {
             try {
                 //
                 //logController.appendCacheLog(core,"setWrappedContent(" + key + ")");
@@ -726,10 +727,11 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="wrapperKey"></param>
         /// <param name="wrappedContent"></param>
-        public void setWrappedContent_MemoryCache(string wrapperKey, cacheWrapperClass wrappedContent) {
+        public void setWrappedContent_MemoryCache(string wrapperKey, CacheWrapperClass wrappedContent) {
             ObjectCache cache = MemoryCache.Default;
-            CacheItemPolicy policy = new CacheItemPolicy();
-            policy.AbsoluteExpiration = wrappedContent.invalidationDate; // DateTime.Now.AddMinutes(100);
+            CacheItemPolicy policy = new CacheItemPolicy {
+                AbsoluteExpiration = wrappedContent.invalidationDate // DateTime.Now.AddMinutes(100);
+            };
             cache.Set(wrapperKey, wrappedContent, policy);
         }
         //

@@ -24,43 +24,71 @@ Public Class Global_asax
                 DefaultSite.configurationClass.loadRouteMap(cp)
             End Using
         Catch ex As Exception
-            Contensive.Processor.Controllers.logController.forceNLog("Global.asax, Application_Start exception [" & configurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Processor.Controllers.logController.logLevel.Fatal)
+            logController.forceNLog("Global.asax, Application_Start exception [" & configurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Processor.Controllers.logController.logLevel.Fatal)
         End Try
     End Sub
-
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' Fires when the session is started
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Sub Session_Start(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires when the session is started
         logController.forceNLog("Global.asax, Session_Start [" + e.ToString() + "]", logController.logLevel.Trace)
     End Sub
-
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' Fires at the beginning of each request
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Sub Application_BeginRequest(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires at the beginning of each request
         logController.forceNLog("Global.asax, Application_BeginRequest [" + e.ToString() + "]", logController.logLevel.Trace)
     End Sub
-
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' Fires when iis attempts to authenticate the use
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Sub Application_AuthenticateRequest(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires upon attempting to authenticate the use
         logController.forceNLog("Global.asax, Application_AuthenticateRequest [" + e.ToString() + "]", logController.logLevel.Trace)
     End Sub
-
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' Fires when an error occurs
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Sub Application_Error(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires when an error occurs
-        'logController.forceNLog("Global.asax, Application_Error [" + e.ToString() + "]", logController.logLevel.Error)
         logController.forceNLog("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", logController.logLevel.Error)
-        '
     End Sub
-
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' Fires when the session ends
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Sub Session_End(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires when the session ends
         logController.forceNLog("Global.asax, Session_End [" + e.ToString() + "]", logController.logLevel.Trace)
     End Sub
-
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' Fires when the application ends
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Sub Application_End(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires when the application ends
         logController.forceNLog("Global.asax, Application_End [" + e.ToString() + "]", logController.logLevel.Trace)
     End Sub
     '
-    '
+    '====================================================================================================
     Private Function getAppDescription(eventName As String) As String
         Dim builder As New StringBuilder
         '

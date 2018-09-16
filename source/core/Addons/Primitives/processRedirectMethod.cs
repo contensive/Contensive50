@@ -9,11 +9,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
-using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Addons.Primitives {
     public class processRedirectMethodClass : Contensive.BaseClasses.AddonBaseClass {
@@ -34,7 +34,7 @@ namespace Contensive.Addons.Primitives {
                 core.doc.redirectContentID = core.docProperties.getInteger(rnRedirectContentId);
                 core.doc.redirectRecordID = core.docProperties.getInteger(rnRedirectRecordId);
                 if (core.doc.redirectContentID != 0 & core.doc.redirectRecordID != 0) {
-                    string ContentName = cdefModel.getContentNameByID(core, core.doc.redirectContentID);
+                    string ContentName = CDefModel.getContentNameByID(core, core.doc.redirectContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         WebServerController.main_RedirectByRecord_ReturnStatus(core, ContentName, core.doc.redirectRecordID);
                         result = "";

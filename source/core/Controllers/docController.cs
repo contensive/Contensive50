@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
 using Contensive.BaseClasses;
@@ -234,16 +234,16 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         internal Dictionary<int,int> addonRecursionDepth { get; set; } = new Dictionary<int, int>();
         //
-        public Stack<Models.DbModels.AddonModel> addonModelStack = new Stack<AddonModel>();
+        public Stack<Models.Db.AddonModel> addonModelStack = new Stack<AddonModel>();
         //
         // -- todo
         public int addonInstanceCnt { get; set; } = 0;
         //
         // -- persistant store for cdef complex model
-        internal Dictionary<string, Models.Complex.cdefModel> cdefDictionary { get; set; }
+        internal Dictionary<string, Models.Domain.CDefModel> cdefDictionary { get; set; }
         //
         // -- persistant store for tableSchema complex mode
-        internal Dictionary<string, Models.Complex.TableSchemaModel> tableSchemaDictionary { get; set; }
+        internal Dictionary<string, Models.Domain.TableSchemaModel> tableSchemaDictionary { get; set; }
         //
         // -- Email Block List - these are people who have asked to not have email sent to them from this site, Loaded ondemand by csv_GetEmailBlockList
         public string emailBlockListStore { get; set; } = "";
@@ -258,7 +258,7 @@ namespace Contensive.Processor.Controllers {
             get {
                 if (_contentNameIdDictionary == null) {
                     _contentNameIdDictionary = new Dictionary<string, int>();
-                    foreach (KeyValuePair<int, contentModel> kvp in contentIdDict) {
+                    foreach (KeyValuePair<int, ContentModel> kvp in contentIdDict) {
                         string key = kvp.Value.name.Trim().ToLower();
                         if (!string.IsNullOrEmpty(key)) {
                             if (!_contentNameIdDictionary.ContainsKey(key)) {
@@ -276,10 +276,10 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         // -- lookup contentModel by contentId
-        internal Dictionary<int, contentModel> contentIdDict {
+        internal Dictionary<int, ContentModel> contentIdDict {
             get {
                 if (_contentIdDict == null) {
-                    _contentIdDict = contentModel.createDict(core, new List<string>());
+                    _contentIdDict = ContentModel.createDict(core, new List<string>());
                 }
                 return _contentIdDict;
             }
@@ -298,7 +298,7 @@ namespace Contensive.Processor.Controllers {
         internal void contentIdDictClear() {
             _contentIdDict = null;
         }
-        private Dictionary<int, contentModel> _contentIdDict = null;
+        private Dictionary<int, ContentModel> _contentIdDict = null;
         //
         //====================================================================================================
         /// <summary>
@@ -310,7 +310,7 @@ namespace Contensive.Processor.Controllers {
             //
             pageController = new pageContentController();
             domain = new DomainModel();
-            cdefDictionary = new Dictionary<string, Models.Complex.cdefModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.CDefModel>();
             tableSchemaDictionary = null;
             wysiwygAddonList = new Dictionary<contentTypeEnum, string>();
         }
@@ -424,7 +424,7 @@ namespace Contensive.Processor.Controllers {
                 CSPointer = main_OpenCSWhatsNew(core, SortFieldList);
                 //
                 if (this.core.db.csOk(CSPointer)) {
-                    ContentID = Models.Complex.cdefModel.getContentId(core, "Content Watch");
+                    ContentID = Models.Domain.CDefModel.getContentId(core, "Content Watch");
                     while (this.core.db.csOk(CSPointer)) {
                         Link = this.core.db.csGetText(CSPointer, "link");
                         LinkLabel = this.core.db.csGetText(CSPointer, "LinkLabel");
@@ -467,7 +467,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 if (this.core.db.csOk(CS)) {
-                    ContentID = Models.Complex.cdefModel.getContentId(core, "Content Watch");
+                    ContentID = Models.Domain.CDefModel.getContentId(core, "Content Watch");
                     while (this.core.db.csOk(CS)) {
                         Link = this.core.db.csGetText(CS, "link");
                         LinkLabel = this.core.db.csGetText(CS, "LinkLabel");
@@ -590,7 +590,7 @@ namespace Contensive.Processor.Controllers {
                     pageContentModel page = pageContentModel.create(core, RecordID);
                     if (page != null) {
                         Copy = core.docProperties.getText("copyFilename");
-                        Copy = activeContentController.processWysiwygResponseForSave(core, Copy);
+                        Copy = ActiveContentController.processWysiwygResponseForSave(core, Copy);
                         if (Copy != page.Copyfilename.content) {
                             page.Copyfilename.content = Copy;
                             SaveButNoChanges = false;
@@ -719,7 +719,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (core.session.isAuthenticatedAdmin(core)) {
                     tempbypassContentBlock = true;
-                } else if (core.session.isAuthenticatedContentManager(core, Models.Complex.cdefModel.getContentNameByID(core, ContentID))) {
+                } else if (core.session.isAuthenticatedContentManager(core, Models.Domain.CDefModel.getContentNameByID(core, ContentID))) {
                     tempbypassContentBlock = true;
                 } else {
                     SQL = "SELECT ccMemberRules.MemberID"
@@ -844,7 +844,7 @@ namespace Contensive.Processor.Controllers {
                 string SubmittedName = "";
                 string ApprovedName = "";
                 string ModifiedName = "";
-                Models.Complex.cdefModel CDef = null;
+                Models.Domain.CDefModel CDef = null;
                 DateTime ModifiedDate = default(DateTime);
                 DateTime SubmittedDate = default(DateTime);
                 DateTime ApprovedDate = default(DateTime);
@@ -853,7 +853,7 @@ namespace Contensive.Processor.Controllers {
                     core.workflow.getAuthoringStatus(ContentName, RecordID, ref IsSubmitted, ref IsApproved, ref SubmittedName, ref ApprovedName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
                 }
                 //
-                CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                 //
                 // Set Buttons based on Status
                 //
@@ -1024,13 +1024,13 @@ namespace Contensive.Processor.Controllers {
         //
         public void sendPublishSubmitNotice(string ContentName, int RecordID, string RecordName) {
             try {
-                Models.Complex.cdefModel CDef = null;
+                Models.Domain.CDefModel CDef = null;
                 string Copy = null;
                 string Link = null;
                 string FromAddress = null;
                 //
                 FromAddress = core.siteProperties.getText("EmailPublishSubmitFrom", core.siteProperties.emailAdmin);
-                CDef = Models.Complex.cdefModel.getCdef(core, ContentName);
+                CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                 Link = "/" + core.appConfig.adminRoute + "?af=" + AdminFormPublishing;
                 Copy = Msg_AuthoringSubmittedNotification;
                 Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + HtmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");
@@ -1061,7 +1061,7 @@ namespace Contensive.Processor.Controllers {
         public string getContentWatchLinkByName(string ContentName, int RecordID, string DefaultLink = "", bool IncrementClicks = true) {
             string result = "";
             try {
-                string ContentRecordKey = Models.Complex.cdefModel.getContentId(core, genericController.encodeText(ContentName)) + "." + genericController.encodeInteger(RecordID);
+                string ContentRecordKey = Models.Domain.CDefModel.getContentId(core, genericController.encodeText(ContentName)) + "." + genericController.encodeInteger(RecordID);
                 result = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks);
             } catch (Exception ex) {
                 logController.handleError( core,ex);
@@ -1383,8 +1383,8 @@ namespace Contensive.Processor.Controllers {
             int ContentID = 0;
             int ActivityLogOrganizationID = 0;
             //
-            ContentID = Models.Complex.cdefModel.getContentId(core, ContentName);
-            TableName = Models.Complex.cdefModel.getContentTablename(core, ContentName);
+            ContentID = Models.Domain.CDefModel.getContentId(core, ContentName);
+            TableName = Models.Domain.CDefModel.getContentTablename(core, ContentName);
             markRecordReviewed(ContentName, RecordID);
             //
             // -- invalidate the specific cache for this record
@@ -1396,17 +1396,17 @@ namespace Contensive.Processor.Controllers {
             switch (genericController.vbLCase(TableName)) {
                 case linkForwardModel.contentTableName:
                     //
-                    Models.Complex.routeDictionaryModel.invalidateCache(core);
+                    Models.Domain.RouteDictionaryModel.invalidateCache(core);
                     routeDictionaryChanges = true;
                     break;
                 case linkAliasModel.contentTableName:
                     //
-                    Models.Complex.routeDictionaryModel.invalidateCache(core);
+                    Models.Domain.RouteDictionaryModel.invalidateCache(core);
                     routeDictionaryChanges = true;
                     break;
                 case AddonModel.contentTableName:
                     //
-                    Models.Complex.routeDictionaryModel.invalidateCache(core);
+                    Models.Domain.RouteDictionaryModel.invalidateCache(core);
                     routeDictionaryChanges = true;
                     core.cache.invalidate("addonCache");
                     core.cache.invalidateContent_Entity(core, TableName, RecordID);
@@ -1663,11 +1663,11 @@ namespace Contensive.Processor.Controllers {
         //
         public void markRecordReviewed(string ContentName, int RecordID) {
             try {
-                if (Models.Complex.cdefModel.isContentFieldSupported(core, ContentName, "DateReviewed")) {
-                    string DataSourceName = Models.Complex.cdefModel.getContentDataSource(core, ContentName);
-                    string TableName = Models.Complex.cdefModel.getContentTablename(core, ContentName);
+                if (Models.Domain.CDefModel.isContentFieldSupported(core, ContentName, "DateReviewed")) {
+                    string DataSourceName = Models.Domain.CDefModel.getContentDataSource(core, ContentName);
+                    string TableName = Models.Domain.CDefModel.getContentTablename(core, ContentName);
                     string SQL = "update " + TableName + " set DateReviewed=" + core.db.encodeSQLDate(core.doc.profileStartTime);
-                    if (Models.Complex.cdefModel.isContentFieldSupported(core, ContentName, "ReviewedBy")) {
+                    if (Models.Domain.CDefModel.isContentFieldSupported(core, ContentName, "ReviewedBy")) {
                         SQL += ",ReviewedBy=" + core.session.user.id;
                     }
                     //

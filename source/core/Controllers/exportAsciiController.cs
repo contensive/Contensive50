@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -65,7 +65,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 core.webServer.setResponseContentType("text/plain");
                 core.html.enableOutputBuffer(false);
-                TableName = DbController.getDbObjectTableName(Models.Complex.cdefModel.getContentTablename(core, iContentName));
+                TableName = DbController.getDbObjectTableName(Models.Domain.CDefModel.getContentTablename(core, iContentName));
                 switch (genericController.vbUCase(TableName)) {
                     case "CCMEMBERS":
                         //

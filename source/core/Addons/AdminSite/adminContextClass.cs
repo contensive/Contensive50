@@ -9,11 +9,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
-using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
 //
@@ -61,7 +61,7 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// the content being edited
         /// </summary>
-        public cdefModel adminContent = null;
+        public CDefModel adminContent = null;
         /// <summary>
         /// the record being edited
         /// </summary>
@@ -253,16 +253,16 @@ namespace Contensive.Addons.AdminSite {
                 // adminContext.content init
                 requestedContentId = core.docProperties.getInteger("cid");
                 if (requestedContentId != 0) {
-                    adminContent = cdefModel.getCdef(core, requestedContentId);
+                    adminContent = CDefModel.getCdef(core, requestedContentId);
                     if (adminContent == null) {
-                        adminContent = new cdefModel();
+                        adminContent = new CDefModel();
                         adminContent.id = 0;
                         errorController.addUserError(core, "There is no content with the requested id [" + requestedContentId + "]");
                         requestedContentId = 0;
                     }
                 }
                 if (adminContent == null) {
-                    adminContent = new cdefModel();
+                    adminContent = new CDefModel();
                 }
                 //
                 // determine user rights to this content
@@ -290,7 +290,7 @@ namespace Contensive.Addons.AdminSite {
                         if (adminContent.id <= 0) {
                             adminContent.id = requestedContentId;
                         } else if (adminContent.id != requestedContentId) {
-                            adminContent = cdefModel.getCdef(core, adminContent.id);
+                            adminContent = CDefModel.getCdef(core, adminContent.id);
                         }
                     }
                     core.db.csClose(ref CS);
@@ -487,7 +487,7 @@ namespace Contensive.Addons.AdminSite {
         public static  bool userHasContentAccess(CoreController core, int ContentID) {
             bool result = false;
             try {
-                string ContentName = cdefModel.getContentNameByID(core, ContentID);
+                string ContentName = CDefModel.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(ContentName)) {
                     result = core.session.isAuthenticatedContentManager(core, ContentName);
                 }

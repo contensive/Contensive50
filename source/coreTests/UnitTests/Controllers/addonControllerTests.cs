@@ -21,7 +21,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_Addon_simpleDoNothingAddon() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                var addon = Processor.Models.DbModels.AddonModel.add(cp.core);
+                var addon = Processor.Models.Db.AddonModel.add(cp.core);
                 addon.save(cp.core);
                 // act
                 string result = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
@@ -61,8 +61,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_Addon_copy() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                var addon = Processor.Models.DbModels.AddonModel.add(cp.core);
-                addon.Copy = "test" + genericController.GetRandomInteger(cp.core).ToString();
+                var addon = Processor.Models.Db.AddonModel.add(cp.core);
+                addon.copy = "test" + genericController.GetRandomInteger(cp.core).ToString();
                 addon.save(cp.core);
                 // act
                 string result = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
@@ -86,7 +86,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                     wrapperID = 0
                 });
                 // assert
-                Assert.AreEqual(addon.Copy, result);
+                Assert.AreEqual(addon.copy, result);
                 Assert.AreEqual(0, cp.core.doc.htmlAssetList.Count);
                 Assert.AreEqual(false, cp.core.doc.isHtml);
                 Assert.AreEqual("", cp.core.doc.htmlForEndOfBody);

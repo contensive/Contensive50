@@ -24,10 +24,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string source = "<ac Type=\"Date\">";
                 // act
                 DateTime dateBefore = DateTime.Now.AddSeconds(-1);
-                string resultString = Contensive.Processor.Controllers.activeContentController.renderHtmlForWeb(
+                string resultString = Contensive.Processor.Controllers.ActiveContentController.renderHtmlForWeb(
                     core: cp.core,
-                    Source: source,
-                    ContextContentName: "",
+                    source: source,
+                    contextContentName: "",
                     ContextRecordID: 0,
                     ContextContactPeopleID: 0,
                     ProtocolHostString: "",
@@ -51,15 +51,15 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // arrange
                 string source = "<Ac Type=\"Member\" Field=\"Name\">";
                 string testPersonName = "test" + genericController.GetRandomInteger(cp.core);
-                var testPerson = Contensive.Processor.Models.DbModels.personModel.add(cp.core);
+                var testPerson = Contensive.Processor.Models.Db.personModel.add(cp.core);
                 testPerson.name = testPersonName;
                 testPerson.save(cp.core);
                 cp.User.LoginByID(testPerson.id);
                 // act
                 DateTime dateBefore = DateTime.Now;
-                string resultString = Contensive.Processor.Controllers.activeContentController.renderHtmlForWeb(
+                string resultString = Contensive.Processor.Controllers.ActiveContentController.renderHtmlForWeb(
                     core: cp.core,
-                    Source: source,
+                    source: source,
                     addonContext: BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                 );
                 // assert
@@ -77,10 +77,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // arrange
                 string source = "<Ac Type=\"Organization\" Field=\"Name\">";
                 string testOrgName = "testOrg" + genericController.GetRandomInteger(cp.core);
-                var testOrg = Contensive.Processor.Models.DbModels.organizationModel.add(cp.core);
+                var testOrg = Contensive.Processor.Models.Db.organizationModel.add(cp.core);
                 testOrg.name = testOrgName;
                 testOrg.save(cp.core);
-                var testPerson = Contensive.Processor.Models.DbModels.personModel.add(cp.core);
+                var testPerson = Contensive.Processor.Models.Db.personModel.add(cp.core);
                 testPerson.OrganizationID = testOrg.id;
                 string testPersonName = "testPerson" + genericController.GetRandomInteger(cp.core);
                 testPerson.name = testPersonName;
@@ -89,9 +89,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
 
                 // act
                 DateTime dateBefore = DateTime.Now;
-                string resultString = Contensive.Processor.Controllers.activeContentController.renderHtmlForWeb(
+                string resultString = Contensive.Processor.Controllers.ActiveContentController.renderHtmlForWeb(
                     core: cp.core,
-                    Source: source,
+                    source: source,
                     addonContext: BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                 );
                 // assert

@@ -9,11 +9,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
-using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Domain;
 using Contensive.BaseClasses;
 //
 namespace Contensive.Addons.Email {
@@ -68,9 +68,9 @@ namespace Contensive.Addons.Email {
                     + "";
                 int CSEmail = core.db.csOpen("Email", Criteria);
                 if (core.db.csOk(CSEmail)) {
-                    string SQLTablePeople = cdefModel.getContentTablename(core, "People");
-                    string SQLTableMemberRules =  cdefModel.getContentTablename(core, "Member Rules");
-                    string SQLTableGroups = cdefModel.getContentTablename(core, "Groups");
+                    string SQLTablePeople = CDefModel.getContentTablename(core, "People");
+                    string SQLTableMemberRules =  CDefModel.getContentTablename(core, "Member Rules");
+                    string SQLTableGroups = CDefModel.getContentTablename(core, "Groups");
                     string BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
                     string PrimaryLink = "http://" + core.appConfig.domainList[0];
                     while (core.db.csOk(CSEmail)) {
@@ -420,12 +420,12 @@ namespace Contensive.Addons.Email {
                         // Encode body and subject
                         //
                         //EmailBodyEncoded = contentCmdController.executeContentCommands(core, EmailBodyEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
-                        EmailBodyEncoded = activeContentController.renderHtmlForEmail(core, EmailBodyEncoded, MemberID, ClickFlagQuery);
+                        EmailBodyEncoded = ActiveContentController.renderHtmlForEmail(core, EmailBodyEncoded, MemberID, ClickFlagQuery);
                         //EmailBodyEncoded = core.html.convertActiveContent_internal(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         //EmailBodyEncoded = core.csv_EncodeContent8(Nothing, EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         //
                         //EmailSubjectEncoded = contentCmdController.executeContentCommands(core, EmailSubjectEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
-                        EmailSubjectEncoded = activeContentController.renderHtmlForEmail(core, EmailSubjectEncoded, MemberID, ClickFlagQuery);
+                        EmailSubjectEncoded = ActiveContentController.renderHtmlForEmail(core, EmailSubjectEncoded, MemberID, ClickFlagQuery);
                         //EmailSubjectEncoded = core.html.convertActiveContent_internal(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         //EmailSubjectEncoded = core.csv_EncodeContent8(Nothing, EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         //
@@ -441,7 +441,7 @@ namespace Contensive.Addons.Email {
                             // use provided template
                             //
                             //EmailTemplateEncoded = contentCmdController.executeContentCommands(core, EmailTemplateEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
-                            EmailTemplateEncoded = activeContentController.renderHtmlForEmail(core, EmailTemplate, MemberID, ClickFlagQuery);
+                            EmailTemplateEncoded = ActiveContentController.renderHtmlForEmail(core, EmailTemplate, MemberID, ClickFlagQuery);
                             //EmailTemplateEncoded = core.html.convertActiveContent_internal(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, protocolHostLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                             //EmailTemplateEncoded = core.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                             //EmailTemplateEncoded = core.csv_encodecontent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)
@@ -521,9 +521,9 @@ namespace Contensive.Addons.Email {
         //====================================================================================================
         //
         private string getEmailTemplate(CoreController core, int EmailTemplateID) {
-            var emailTemplate = Processor.Models.DbModels.emailTemplateModel.create(core, EmailTemplateID);
+            var emailTemplate = Processor.Models.Db.EmailTemplateModel.create(core, EmailTemplateID);
             if ( emailTemplate != null ) {
-                return emailTemplate.BodyHTML;
+                return emailTemplate.bodyHTML;
             }
             return "";
             //string tempGetEmailTemplate = "";

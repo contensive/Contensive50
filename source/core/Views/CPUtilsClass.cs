@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -98,7 +98,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string EncodeContentForWeb(string Source, string ContextContentName = "", int ContextRecordID = 0, int WrapperID = 0) {
-            return activeContentController.renderHtmlForWeb(CP.core, Source, ContextContentName, ContextRecordID, 0, "", WrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+            return ActiveContentController.renderHtmlForWeb(CP.core, Source, ContextContentName, ContextRecordID, 0, "", WrapperID, CPUtilsBaseClass.addonContext.ContextPage);
         }
         //
         // ====================================================================================================
@@ -179,13 +179,13 @@ namespace Contensive.Processor {
         private string ExecuteAddon(string IdGuidOrName, addonExecuteContext executeContext) {
             if (IdGuidOrName.IsNumeric()) {
                 executeContext.errorContextMessage += " addon id:" + IdGuidOrName;
-                return CP.core.addon.execute(Models.DbModels.AddonModel.create(CP.core, genericController.encodeInteger(IdGuidOrName)), executeContext);
+                return CP.core.addon.execute(Models.Db.AddonModel.create(CP.core, genericController.encodeInteger(IdGuidOrName)), executeContext);
             } else if (genericController.isGuid(IdGuidOrName)) {
                 executeContext.errorContextMessage += " addon guid:" + IdGuidOrName;
-                return CP.core.addon.execute(Models.DbModels.AddonModel.create(CP.core, IdGuidOrName), executeContext);
+                return CP.core.addon.execute(Models.Db.AddonModel.create(CP.core, IdGuidOrName), executeContext);
             } else {
                 executeContext.errorContextMessage += "addon " + IdGuidOrName;
-                return CP.core.addon.execute(Models.DbModels.AddonModel.createByName(CP.core, IdGuidOrName), executeContext);
+                return CP.core.addon.execute(Models.Db.AddonModel.createByName(CP.core, IdGuidOrName), executeContext);
             }
         }
         //
@@ -493,7 +493,7 @@ namespace Contensive.Processor {
         /// <param name="Source"></param>
         /// <returns></returns>
         public override string EncodeHtmlForWysiwygEditor(string Source) {
-            return activeContentController.renderHtmlForWysiwygEditor(CP.core, Source);
+            return ActiveContentController.renderHtmlForWysiwygEditor(CP.core, Source);
         }
         //
         //====================================================================================================
@@ -503,7 +503,7 @@ namespace Contensive.Processor {
         /// <param name="Source"></param>
         /// <returns></returns>
         public override string DecodeHtmlFromWysiwygEditor(string Source) {
-            return activeContentController.processWysiwygResponseForSave(CP.core, Source);
+            return ActiveContentController.processWysiwygResponseForSave(CP.core, Source);
         }
         //
         // ====================================================================================================

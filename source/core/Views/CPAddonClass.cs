@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
@@ -61,7 +61,7 @@ namespace Contensive.Processor {
         //
         public override bool Admin {
             get {
-                return cp.core.doc.addonModelStack.Peek().Admin;
+                return cp.core.doc.addonModelStack.Peek().admin;
             }
         }
         //
@@ -69,7 +69,7 @@ namespace Contensive.Processor {
         //
         public override string ArgumentList {
             get {
-                return cp.core.doc.addonModelStack.Peek().ArgumentList;
+                return cp.core.doc.addonModelStack.Peek().argumentList;
             }
         }
         //
@@ -77,7 +77,7 @@ namespace Contensive.Processor {
         //
         public override bool AsAjax {
             get {
-                return cp.core.doc.addonModelStack.Peek().Admin;
+                return cp.core.doc.addonModelStack.Peek().admin;
             }
         }
         //
@@ -103,7 +103,7 @@ namespace Contensive.Processor {
         //
         public override int CollectionID {
             get {
-                return cp.core.doc.addonModelStack.Peek().CollectionID;
+                return cp.core.doc.addonModelStack.Peek().collectionID;
             }
         }
         //
@@ -111,7 +111,7 @@ namespace Contensive.Processor {
         //
         public override bool Content {
             get {
-                return cp.core.doc.addonModelStack.Peek().Content;
+                return cp.core.doc.addonModelStack.Peek().content;
             }
         }
         //
@@ -119,7 +119,7 @@ namespace Contensive.Processor {
         //
         public override string Copy {
             get {
-                return cp.core.doc.addonModelStack.Peek().Copy;
+                return cp.core.doc.addonModelStack.Peek().copy;
 
             }
         }
@@ -128,7 +128,7 @@ namespace Contensive.Processor {
         //
         public override string CopyText {
             get {
-                return cp.core.doc.addonModelStack.Peek().CopyText;
+                return cp.core.doc.addonModelStack.Peek().copyText;
             }
         }
         //
@@ -146,7 +146,7 @@ namespace Contensive.Processor {
         [Obsolete("This is no longer supported.", true)]
         public override string DefaultStyles {
             get {
-                return cp.core.doc.addonModelStack.Peek().StylesFilename.content;
+                return cp.core.doc.addonModelStack.Peek().stylesFilename.content;
             }
         }
         //
@@ -163,7 +163,7 @@ namespace Contensive.Processor {
         // todo finish the methods -- read from doc addonmodelstack peak
         public override string DotNetClass {
             get {
-                return cp.core.doc.addonModelStack.Peek().DotNetClass;
+                return cp.core.doc.addonModelStack.Peek().dotNetClass;
             }
         }
         //
@@ -171,7 +171,7 @@ namespace Contensive.Processor {
         //
         public override string FormXML {
             get {
-                return cp.core.doc.addonModelStack.Peek().FormXML;
+                return cp.core.doc.addonModelStack.Peek().formXML;
             }
         }
         //
@@ -179,7 +179,7 @@ namespace Contensive.Processor {
         //
         public override string Help {
             get {
-                return cp.core.doc.addonModelStack.Peek().Help;
+                return cp.core.doc.addonModelStack.Peek().help;
             }
         }
         //
@@ -187,7 +187,7 @@ namespace Contensive.Processor {
         //
         public override string HelpLink {
             get {
-                return cp.core.doc.addonModelStack.Peek().HelpLink;
+                return cp.core.doc.addonModelStack.Peek().helpLink;
             }
         }
         //
@@ -195,7 +195,7 @@ namespace Contensive.Processor {
         //
         public override string IconFilename {
             get {
-                return cp.core.doc.addonModelStack.Peek().IconFilename;
+                return cp.core.doc.addonModelStack.Peek().iconFilename;
             }
         }
         //
@@ -203,7 +203,7 @@ namespace Contensive.Processor {
         //
         public override int IconHeight {
             get {
-                return cp.core.doc.addonModelStack.Peek().IconHeight;
+                return cp.core.doc.addonModelStack.Peek().iconHeight;
             }
         }
         //
@@ -211,7 +211,7 @@ namespace Contensive.Processor {
         //
         public override int IconSprites {
             get {
-                return cp.core.doc.addonModelStack.Peek().IconSprites;
+                return cp.core.doc.addonModelStack.Peek().iconSprites;
             }
         }
         //
@@ -219,7 +219,7 @@ namespace Contensive.Processor {
         //
         public override int IconWidth {
             get {
-                return cp.core.doc.addonModelStack.Peek().IconWidth;
+                return cp.core.doc.addonModelStack.Peek().iconWidth;
             }
         }
         //
@@ -235,7 +235,7 @@ namespace Contensive.Processor {
         //
         public override bool InFrame {
             get {
-                return cp.core.doc.addonModelStack.Peek().InFrame;
+                return cp.core.doc.addonModelStack.Peek().inFrame;
             }
         }
         //
@@ -243,7 +243,7 @@ namespace Contensive.Processor {
         //
         public override bool IsInline {
             get {
-                return cp.core.doc.addonModelStack.Peek().IsInline;
+                return cp.core.doc.addonModelStack.Peek().isInline;
             }
         }
         //
@@ -280,7 +280,7 @@ namespace Contensive.Processor {
         //
         public override string Link {
             get {
-                return cp.core.doc.addonModelStack.Peek().Link;
+                return cp.core.doc.addonModelStack.Peek().link;
             }
         }
         //
@@ -288,7 +288,7 @@ namespace Contensive.Processor {
         //
         public override string MetaDescription {
             get {
-                return cp.core.doc.addonModelStack.Peek().MetaDescription;
+                return cp.core.doc.addonModelStack.Peek().metaDescription;
             }
         }
         //
@@ -296,7 +296,7 @@ namespace Contensive.Processor {
         //
         public override string MetaKeywordList {
             get {
-                return cp.core.doc.addonModelStack.Peek().MetaKeywordList;
+                return cp.core.doc.addonModelStack.Peek().metaKeywordList;
             }
         }
         //
@@ -313,7 +313,7 @@ namespace Contensive.Processor {
         public override string NavIconType {
             get {
                 string result = "";
-                switch(cp.core.doc.addonModelStack.Peek().NavTypeID) {
+                switch(cp.core.doc.addonModelStack.Peek().navTypeID) {
                     case 2:
                         result = "Report";
                         break;
@@ -335,7 +335,7 @@ namespace Contensive.Processor {
         //
         public override string ObjectProgramID {
             get {
-                return cp.core.doc.addonModelStack.Peek().ObjectProgramID;
+                return cp.core.doc.addonModelStack.Peek().objectProgramID;
             }
         }
         //
@@ -343,7 +343,7 @@ namespace Contensive.Processor {
         //
         public override bool OnBodyEnd {
             get {
-                return cp.core.doc.addonModelStack.Peek().OnBodyEnd;
+                return cp.core.doc.addonModelStack.Peek().onBodyEnd;
             }
         }
         //
@@ -351,7 +351,7 @@ namespace Contensive.Processor {
         //
         public override bool OnBodyStart {
             get {
-                return cp.core.doc.addonModelStack.Peek().OnBodyStart;
+                return cp.core.doc.addonModelStack.Peek().onBodyStart;
             }
         }
         //
@@ -359,7 +359,7 @@ namespace Contensive.Processor {
         //
         public override bool OnContentEnd {
             get {
-                return cp.core.doc.addonModelStack.Peek().OnPageEndEvent;
+                return cp.core.doc.addonModelStack.Peek().onPageEndEvent;
             }
         }
         //
@@ -367,7 +367,7 @@ namespace Contensive.Processor {
         //
         public override bool OnContentStart {
             get {
-                return cp.core.doc.addonModelStack.Peek().OnPageStartEvent;
+                return cp.core.doc.addonModelStack.Peek().onPageStartEvent;
             }
         }
         //
@@ -389,7 +389,7 @@ namespace Contensive.Processor {
         //
         public override string OtherHeadTags {
             get {
-                return cp.core.doc.addonModelStack.Peek().OtherHeadTags;
+                return cp.core.doc.addonModelStack.Peek().otherHeadTags;
             }
         }
         //
@@ -397,7 +397,7 @@ namespace Contensive.Processor {
         //
         public override string PageTitle {
             get {
-                return cp.core.doc.addonModelStack.Peek().PageTitle;
+                return cp.core.doc.addonModelStack.Peek().pageTitle;
             }
         }
         //
@@ -405,7 +405,7 @@ namespace Contensive.Processor {
         //
         public override string ProcessInterval {
             get {
-                return cp.core.doc.addonModelStack.Peek().ProcessInterval.ToString();
+                return cp.core.doc.addonModelStack.Peek().processInterval.ToString();
             }
         }
         //
@@ -413,7 +413,7 @@ namespace Contensive.Processor {
         //
         public override DateTime ProcessNextRun {
             get {
-                return cp.core.doc.addonModelStack.Peek().ProcessNextRun;
+                return cp.core.doc.addonModelStack.Peek().processNextRun;
             }
         }
         //
@@ -421,7 +421,7 @@ namespace Contensive.Processor {
         //
         public override bool ProcessRunOnce {
             get {
-                return cp.core.doc.addonModelStack.Peek().ProcessRunOnce;
+                return cp.core.doc.addonModelStack.Peek().processRunOnce;
             }
         }
         //
@@ -429,7 +429,7 @@ namespace Contensive.Processor {
         //
         public override string RemoteAssetLink {
             get {
-                return cp.core.doc.addonModelStack.Peek().RemoteAssetLink;
+                return cp.core.doc.addonModelStack.Peek().remoteAssetLink;
             }
         }
         //
@@ -437,7 +437,7 @@ namespace Contensive.Processor {
         //
         public override bool RemoteMethod {
             get {
-                return cp.core.doc.addonModelStack.Peek().RemoteMethod;
+                return cp.core.doc.addonModelStack.Peek().remoteMethod;
             }
         }
         //
@@ -445,7 +445,7 @@ namespace Contensive.Processor {
         //
         public override string RobotsTxt {
             get {
-                return cp.core.doc.addonModelStack.Peek().RobotsTxt;
+                return cp.core.doc.addonModelStack.Peek().robotsTxt;
             }
         }
         //
@@ -453,7 +453,7 @@ namespace Contensive.Processor {
         //
         public override string ScriptCode {
             get {
-                return cp.core.doc.addonModelStack.Peek().ScriptingCode;
+                return cp.core.doc.addonModelStack.Peek().scriptingCode;
             }
         }
         //
@@ -461,7 +461,7 @@ namespace Contensive.Processor {
         //
         public override string ScriptEntryPoint {
             get {
-                return cp.core.doc.addonModelStack.Peek().ScriptingEntryPoint;
+                return cp.core.doc.addonModelStack.Peek().scriptingEntryPoint;
             }
         }
         //
@@ -469,7 +469,7 @@ namespace Contensive.Processor {
         //
         public override string ScriptLanguage {
             get {
-                if (cp.core.doc.addonModelStack.Peek().ScriptingLanguageID.Equals(2)) {
+                if (cp.core.doc.addonModelStack.Peek().scriptingLanguageID.Equals(2)) {
                     return "javascript";
                 } else {
                     return "vbscript";
@@ -490,7 +490,7 @@ namespace Contensive.Processor {
         //
         public override bool Template {
             get {
-                return cp.core.doc.addonModelStack.Peek().Template;
+                return cp.core.doc.addonModelStack.Peek().template;
             }
         }
         #region  IDisposable Support 

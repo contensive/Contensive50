@@ -3,8 +3,8 @@ using System;
 using System.Reflection;
 using Contensive.BaseClasses;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Context;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Domain;
+using Contensive.Processor.Models.Db;
 using System.Collections.Generic;
 using static Contensive.Processor.constants;
 using System.Diagnostics;
@@ -99,15 +99,15 @@ namespace Contensive.Processor.Controllers {
         private int _assemblySkipList_CountWhenLoaded;
         //
         //===================================================================================================
-        public Dictionary<string, dataSourceModel> dataSourceDictionary {
+        public Dictionary<string, DataSourceModel> dataSourceDictionary {
             get {
                 if (_dataSources == null) {
-                    _dataSources = dataSourceModel.getNameDict(this);
+                    _dataSources = DataSourceModel.getNameDict(this);
                 }
                 return _dataSources;
             }
         }
-        private Dictionary<string, dataSourceModel> _dataSources = null;
+        private Dictionary<string, DataSourceModel> _dataSources = null;
         //
         //===================================================================================================
         public DocController doc {
@@ -426,8 +426,8 @@ namespace Contensive.Processor.Controllers {
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
             //
-            serverConfig = Models.Context.ServerConfigModel.getObject(this);
-            this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
+            serverConfig = Models.Domain.ServerConfigModel.getObject(this);
+            this.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
             webServer.iisContext = null;
             constructorInitialize(false);
         }
@@ -445,7 +445,7 @@ namespace Contensive.Processor.Controllers {
             session = new SessionController(this);
             //
             serverConfig = ServerConfigModel.getObject(this);
-            serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
+            serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
             appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
             if (appConfig != null) {
                 webServer.iisContext = null;
@@ -466,9 +466,9 @@ namespace Contensive.Processor.Controllers {
             session = new SessionController(this);
             //
             this.serverConfig = serverConfig;
-            this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
+            this.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
             appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
-            appConfig.appStatus = AppConfigModel.appStatusEnum.ok;
+            appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
             webServer.iisContext = null;
             constructorInitialize(false);
         }
@@ -486,9 +486,9 @@ namespace Contensive.Processor.Controllers {
             session = new SessionController(this);
             //
             this.serverConfig = serverConfig;
-            this.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
+            this.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
             appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
-            this.appConfig.appStatus = AppConfigModel.appStatusEnum.ok;
+            this.appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
             webServer.initWebContext(httpContext);
             constructorInitialize(true);
         }
@@ -503,7 +503,7 @@ namespace Contensive.Processor.Controllers {
             session = new SessionController(this);
             //
             serverConfig = ServerConfigModel.getObject(this);
-            serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
+            serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
             appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
             if (appConfig != null) {
                 webServer.initWebContext(httpContext);
@@ -851,7 +851,7 @@ namespace Contensive.Processor.Controllers {
                             personalizationPeopleId = session.user.id,
                             errorContextMessage = "calling default route addon [" + defaultAddonId + "] during execute route method"
                         };
-                        return this.addon.execute(Models.DbModels.AddonModel.create(this, defaultAddonId), executeContext);
+                        return this.addon.execute(Models.Db.AddonModel.create(this, defaultAddonId), executeContext);
                     }
                     //
                     // -- no route
@@ -1086,7 +1086,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- server mode, there is no application
                     session = SessionController.create(this, false);
-                } else if (appConfig.appStatus != AppConfigModel.appStatusEnum.ok) {
+                } else if (appConfig.appStatus != AppConfigModel.AppStatusEnum.ok) {
                     //} else if ((appConfig.appMode != appConfigModel.appModeEnum.normal) | (appConfig.appStatus != appConfigModel.appStatusEnum.OK)) {
                     //
                     // -- application is not ready, might be error, or in maintainence mode
@@ -1126,7 +1126,7 @@ namespace Contensive.Processor.Controllers {
         public Dictionary<string, CPSiteBaseClass.routeClass> routeDictionary {
             get {
                 // -- when an addon changes, the route map has to reload on page exit so it is ready on the next hit. lazy cache here clears on page load, so this does work
-                return Models.Complex.routeDictionaryModel.create(this);
+                return Models.Domain.RouteDictionaryModel.create(this);
                 //If (_routeDictionary Is Nothing) Then
                 //    _routeDictionary = Models.Complex.routeDictionaryModel.create(Me)
                 //End If
@@ -1187,7 +1187,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     if (serverConfig != null) {
                         if (appConfig != null) {
-                            if (appConfig.appStatus == AppConfigModel.appStatusEnum.ok) {
+                            if (appConfig.appStatus == AppConfigModel.AppStatusEnum.ok) {
                                 //if ((appConfig.appMode == appConfigModel.appModeEnum.normal) && (appConfig.appStatus == appConfigModel.appStatusEnum.OK))
                                 if (siteProperties.allowVisitTracking) {
                                     //
@@ -1210,7 +1210,7 @@ namespace Contensive.Processor.Controllers {
                                     string SQL = "insert into ccviewings ("
                                         + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID,ExcludeFromAnalytics,pagetitle"
                                         + ")values("
-                                        + " " + db.encodeSQLText(ViewingName) + "," + db.encodeSQLNumber(session.visit.id) + "," + db.encodeSQLNumber(session.user.id) + "," + db.encodeSQLText(webServer.requestDomain) + "," + db.encodeSQLText(webServer.requestPath) + "," + db.encodeSQLText(webServer.requestPage) + "," + db.encodeSQLText(webServer.requestQueryString.Left(255)) + "," + db.encodeSQLText(requestFormSerialized.Left(255)) + "," + db.encodeSQLText(webServer.requestReferrer.Left(255)) + "," + db.encodeSQLDate(doc.profileStartTime) + "," + db.encodeSQLBoolean(session.visit_stateOK) + "," + db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(this, "Viewings")) + "," + db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) + ",1"
+                                        + " " + db.encodeSQLText(ViewingName) + "," + db.encodeSQLNumber(session.visit.id) + "," + db.encodeSQLNumber(session.user.id) + "," + db.encodeSQLText(webServer.requestDomain) + "," + db.encodeSQLText(webServer.requestPath) + "," + db.encodeSQLText(webServer.requestPage) + "," + db.encodeSQLText(webServer.requestQueryString.Left(255)) + "," + db.encodeSQLText(requestFormSerialized.Left(255)) + "," + db.encodeSQLText(webServer.requestReferrer.Left(255)) + "," + db.encodeSQLDate(doc.profileStartTime) + "," + db.encodeSQLBoolean(session.visit_stateOK) + "," + db.encodeSQLNumber(Models.Domain.CDefModel.getContentId(this, "Viewings")) + "," + db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) + ",1"
                                         + "," + db.encodeSQLNumber(0) + "," + db.encodeSQLNumber(PageID);
                                     SQL += "," + db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics);
                                     SQL += "," + db.encodeSQLText(pagetitle);

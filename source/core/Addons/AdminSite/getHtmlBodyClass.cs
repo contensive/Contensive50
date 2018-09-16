@@ -9,11 +9,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Contensive.Processor;
-using Contensive.Processor.Models.DbModels;
+using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.genericController;
 using static Contensive.Processor.constants;
-using Contensive.Processor.Models.Complex;
+using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
 //
@@ -347,7 +347,7 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminContext.AdminForm == AdminFormDownloads) {
                             adminBody = (GetForm_Downloads());
                         } else if (adminContext.AdminForm == AdminformRSSControl) {
-                            adminBody = core.webServer.redirect("?cid=" + cdefModel.getContentId(core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
+                            adminBody = core.webServer.redirect("?cid=" + CDefModel.getContentId(core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
                         } else if (adminContext.AdminForm == AdminFormImportWizard) {
                             adminBody = core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
@@ -396,7 +396,7 @@ namespace Contensive.Addons.AdminSite {
                             if (addon != null) {
                                 addonId = addon.id;
                                 AddonName = addon.name;
-                                string AddonHelpCopy = addon.Help;
+                                string AddonHelpCopy = addon.help;
                                 core.doc.addRefreshQueryString(RequestNameRunAddon, addonId.ToString());
                             }
                             string InstanceOptionString = core.userProperty.getText("Addon [" + AddonName + "] Options", "");
@@ -490,7 +490,7 @@ namespace Contensive.Addons.AdminSite {
                         AddonName = core.db.csGet(CS, "Name");
                         AddonHelpCopy = core.db.csGet(CS, "help");
                         AddonDateAdded = core.db.csGetDate(CS, "dateadded");
-                        if (cdefModel.isContentFieldSupported(core, cnAddons, "lastupdated")) {
+                        if (CDefModel.isContentFieldSupported(core, cnAddons, "lastupdated")) {
                             AddonLastUpdated = core.db.csGetDate(CS, "lastupdated");
                         }
                         if (AddonLastUpdated == DateTime.MinValue) {
@@ -567,10 +567,10 @@ namespace Contensive.Addons.AdminSite {
                         Collectionname = core.db.csGet(CS, "Name");
                         CollectionHelpCopy = core.db.csGet(CS, "help");
                         CollectionDateAdded = core.db.csGetDate(CS, "dateadded");
-                        if (cdefModel.isContentFieldSupported(core, "Add-on Collections", "lastupdated")) {
+                        if (CDefModel.isContentFieldSupported(core, "Add-on Collections", "lastupdated")) {
                             CollectionLastUpdated = core.db.csGetDate(CS, "lastupdated");
                         }
-                        if (cdefModel.isContentFieldSupported(core, "Add-on Collections", "helplink")) {
+                        if (CDefModel.isContentFieldSupported(core, "Add-on Collections", "helplink")) {
                             CollectionHelpLink = core.db.csGet(CS, "helplink");
                         }
                         if (CollectionLastUpdated == DateTime.MinValue) {
@@ -659,8 +659,8 @@ namespace Contensive.Addons.AdminSite {
                 // ----- From Clause - build joins for Lookup fields in columns, in the findwords, and in sorts
                 //
                 return_sqlFrom = adminContext.adminContent.contentTableName;
-                foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContext.adminContent.fields) {
-                    cdefFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContext.adminContent.fields) {
+                    CDefFieldModel field = keyValuePair.Value;
                     FieldPtr = field.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                     IncludedInColumns = false;
                     IncludedInLeftJoin = false;
@@ -701,10 +701,10 @@ namespace Contensive.Addons.AdminSite {
                         if (field.fieldTypeId == FieldTypeIdMemberSelect) {
                             LookupContentName = "people";
                         } else {
-                            LookupContentName = cdefModel.getContentNameByID(core, field.lookupContentID);
+                            LookupContentName = CDefModel.getContentNameByID(core, field.lookupContentID);
                         }
                         if (!string.IsNullOrEmpty(LookupContentName)) {
-                            JoinTablename = cdefModel.getContentTablename(core, LookupContentName);
+                            JoinTablename = CDefModel.getContentTablename(core, LookupContentName);
                         }
                         IncludedInLeftJoin = IncludedInColumns;
                         if (IndexConfig.FindWords.Count > 0) {
@@ -750,8 +750,8 @@ namespace Contensive.Addons.AdminSite {
                 // Sub CDef filter
                 //
                 if (IndexConfig.SubCDefID > 0) {
-                    ContentName = cdefModel.getContentNameByID(core, IndexConfig.SubCDefID);
-                    return_SQLWhere += "AND(" + cdefModel.getContentControlCriteria(core, ContentName) + ")";
+                    ContentName = CDefModel.getContentNameByID(core, IndexConfig.SubCDefID);
+                    return_SQLWhere += "AND(" + CDefModel.getContentControlCriteria(core, ContentName) + ")";
                 }
                 //
                 // Return_sqlFrom and Where Clause for Groups filter
@@ -789,7 +789,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // This person can see all the records
                     //
-                    return_SQLWhere += "AND(" + cdefModel.getContentControlCriteria(core, adminContext.adminContent.name) + ")";
+                    return_SQLWhere += "AND(" + CDefModel.getContentControlCriteria(core, adminContext.adminContent.name) + ")";
                 } else {
                     //
                     // Limit the Query to what they can see
@@ -812,7 +812,7 @@ namespace Contensive.Addons.AdminSite {
                                     ContentID = genericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
                                     if (ContentID > 0 && (ContentID != adminContext.adminContent.id) & adminContextClass.userHasContentAccess(core, ContentID)) {
                                         SubQuery = SubQuery + "OR(" + adminContext.adminContent.contentTableName + ".ContentControlID=" + ContentID + ")";
-                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + cdefModel.getContentNameByID(core, ContentID) + "</a>'";
+                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + CDefModel.getContentNameByID(core, ContentID) + "</a>'";
                                         SubContactList += "," + ContentID;
                                         SubContentCnt = SubContentCnt + 1;
                                     }
@@ -870,8 +870,8 @@ namespace Contensive.Addons.AdminSite {
                         // Verify that the fieldname called out is in this table
                         //
                         if (adminContext.adminContent.fields.Count > 0) {
-                            foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContext.adminContent.fields) {
-                                cdefFieldModel field = keyValuePair.Value;
+                            foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContext.adminContent.fields) {
+                                CDefFieldModel field = keyValuePair.Value;
                                 if (genericController.vbUCase(field.nameLc) == genericController.vbUCase(adminContext.WherePair[0, WCount])) {
                                     //
                                     // found it, add it in the sql
@@ -902,8 +902,8 @@ namespace Contensive.Addons.AdminSite {
                             // Get FieldType
                             //
                             if (adminContext.adminContent.fields.Count > 0) {
-                                foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContext.adminContent.fields) {
-                                    cdefFieldModel field = keyValuePair.Value;
+                                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContext.adminContent.fields) {
+                                    CDefFieldModel field = keyValuePair.Value;
                                     // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                                     FieldPtr = field.id;
                                     if (genericController.vbLCase(field.nameLc) == FindWordName) {
@@ -1297,7 +1297,7 @@ namespace Contensive.Addons.AdminSite {
                     Stream.Add(GetForm_Error("Access to this content [" + adminContext.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminContext.adminContent.name + "] has no field records."));
                 } else {
                     List<string> tmp = new List<string> { };
-                    dataSourceModel datasource = dataSourceModel.create(core, adminContext.adminContent.dataSourceId, ref tmp);
+                    DataSourceModel datasource = DataSourceModel.create(core, adminContext.adminContent.dataSourceId, ref tmp);
                     //
                     // get access rights
                     bool allowCMEdit = false;
@@ -1805,7 +1805,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 IndexConfig = LoadIndexConfig(core, adminContext);
                 //
-                ContentName = cdefModel.getContentNameByID(core, adminContext.adminContent.id);
+                ContentName = CDefModel.getContentNameByID(core, adminContext.adminContent.id);
                 RQS = "cid=" + adminContext.adminContent.id + "&af=1";
                 //
                 //-------------------------------------------------------------------------------------
@@ -1854,7 +1854,7 @@ namespace Contensive.Addons.AdminSite {
                     string SubContentName = null;
                     SubFilterList = "";
                     if (IndexConfig.SubCDefID > 0) {
-                        SubContentName = cdefModel.getContentNameByID(core, IndexConfig.SubCDefID);
+                        SubContentName = CDefModel.getContentNameByID(core, IndexConfig.SubCDefID);
                         QS = RQS;
                         QS = genericController.modifyQueryString(QS, "IndexFilterRemoveCDef", encodeText(IndexConfig.SubCDefID));
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1903,7 +1903,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     foreach (var findWordKvp in IndexConfig.FindWords) {
                         IndexConfigFindWordClass findWord = findWordKvp.Value;
-                        FieldCaption = genericController.encodeText(cdefModel.GetContentFieldProperty(core, ContentName, findWord.Name, "caption"));
+                        FieldCaption = genericController.encodeText(CDefModel.GetContentFieldProperty(core, ContentName, findWord.Name, "caption"));
                         QS = RQS;
                         QS = genericController.modifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1978,7 +1978,7 @@ namespace Contensive.Addons.AdminSite {
                 // Sub Content Definitions
                 //
                 SubFilterList = "";
-                list = cdefModel.getContentControlCriteria(core, ContentName);
+                list = CDefModel.getContentControlCriteria(core, ContentName);
                 if (!string.IsNullOrEmpty(list)) {
                     ListSplit = list.Split('=');
                     Cnt = ListSplit.GetUpperBound(0) + 1;
@@ -1988,7 +1988,7 @@ namespace Contensive.Addons.AdminSite {
                             if (Pos > 0) {
                                 subContentID = genericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
                                 if (subContentID > 0 && (subContentID != adminContext.adminContent.id) & (subContentID != IndexConfig.SubCDefID)) {
-                                    Caption = "<span style=\"white-space:nowrap;\">" + cdefModel.getContentNameByID(core, subContentID) + "</span>";
+                                    Caption = "<span style=\"white-space:nowrap;\">" + CDefModel.getContentNameByID(core, subContentID) + "</span>";
                                     QS = RQS;
                                     QS = genericController.modifyQueryString(QS, "IndexFilterAddCDef", subContentID.ToString(), true);
                                     Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -2004,7 +2004,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // people filters
                 //
-                TableName = cdefModel.getContentTablename(core, ContentName);
+                TableName = CDefModel.getContentTablename(core, ContentName);
                 SubFilterList = "";
                 if (genericController.vbLCase(TableName) == genericController.vbLCase("ccMembers")) {
                     SQL = core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");
@@ -2475,7 +2475,7 @@ namespace Contensive.Addons.AdminSite {
                                     ProcessActionSave(adminContext, UseContentWatchLink);
                                     core.doc.processAfterSave(false, adminContext.adminContent.name, adminContext.editRecord.id, adminContext.editRecord.nameLc, adminContext.editRecord.parentID, UseContentWatchLink);
                                     if (!(core.doc.debug_iUserError != "")) {
-                                        if (!cdefModel.isWithinContent(core, adminContext.editRecord.contentControlId, cdefModel.getContentId(core, "Group Email"))) {
+                                        if (!CDefModel.isWithinContent(core, adminContext.editRecord.contentControlId, CDefModel.getContentId(core, "Group Email"))) {
                                             errorController.addUserError(core, "The send action only supports Group Email.");
                                         } else {
                                             CS = core.db.csOpenRecord("Group Email", adminContext.editRecord.id);
@@ -2509,7 +2509,7 @@ namespace Contensive.Addons.AdminSite {
                                     // no save, page was read only - Call ProcessActionSave
                                     LoadEditRecord(adminContext);
                                     if (!(core.doc.debug_iUserError != "")) {
-                                        if (!cdefModel.isWithinContent(core, adminContext.editRecord.contentControlId, cdefModel.getContentId(core, "Conditional Email"))) {
+                                        if (!CDefModel.isWithinContent(core, adminContext.editRecord.contentControlId, CDefModel.getContentId(core, "Conditional Email"))) {
                                             errorController.addUserError(core, "The deactivate action only supports Conditional Email.");
                                         } else {
                                             CS = core.db.csOpenRecord("Conditional Email", adminContext.editRecord.id);
@@ -2536,7 +2536,7 @@ namespace Contensive.Addons.AdminSite {
                                     ProcessActionSave(adminContext, UseContentWatchLink);
                                     core.doc.processAfterSave(false, adminContext.adminContent.name, adminContext.editRecord.id, adminContext.editRecord.nameLc, adminContext.editRecord.parentID, UseContentWatchLink);
                                     if (!(core.doc.debug_iUserError != "")) {
-                                        if (!cdefModel.isWithinContent(core, adminContext.editRecord.contentControlId, cdefModel.getContentId(core, "Conditional Email"))) {
+                                        if (!CDefModel.isWithinContent(core, adminContext.editRecord.contentControlId, CDefModel.getContentId(core, "Conditional Email"))) {
                                             errorController.addUserError(core, "The activate action only supports Conditional Email.");
                                         } else {
                                             CS = core.db.csOpenRecord("Conditional Email", adminContext.editRecord.id);
@@ -2599,7 +2599,7 @@ namespace Contensive.Addons.AdminSite {
                                                     //
                                                     // non-Workflow Delete
                                                     //
-                                                    ContentName = cdefModel.getContentNameByID(core, core.db.csGetInteger(CSEditRecord, "ContentControlID"));
+                                                    ContentName = CDefModel.getContentNameByID(core, core.db.csGetInteger(CSEditRecord, "ContentControlID"));
                                                     core.cache.invalidate(CacheController.getCacheKey_Entity(adminContext.adminContent.contentTableName, RecordID));
                                                     core.doc.processAfterSave(true, ContentName, RecordID, "", 0, UseContentWatchLink);
                                                 }
@@ -3030,7 +3030,7 @@ namespace Contensive.Addons.AdminSite {
                 int Ptr = 0;
                 string defaultValue = null;
                 EditRecordFieldClass editRecordField = null;
-                cdefFieldModel field = null;
+                CDefFieldModel field = null;
                 editrecord.active = true;
                 editrecord.contentControlId = adminContext.adminContent.id;
                 editrecord.contentControlId_Name = adminContext.adminContent.name;
@@ -3074,7 +3074,7 @@ namespace Contensive.Addons.AdminSite {
                                         editrecord.fieldsLc[field.nameLc].value = DefaultValueText;
                                     } else {
                                         if (field.lookupContentID != 0) {
-                                            LookupContentName = cdefModel.getContentNameByID(core, field.lookupContentID);
+                                            LookupContentName = CDefModel.getContentNameByID(core, field.lookupContentID);
                                             if (!string.IsNullOrEmpty(LookupContentName)) {
                                                 editrecord.fieldsLc[field.nameLc].value = core.db.getRecordID(LookupContentName, DefaultValueText);
                                             }
@@ -3143,7 +3143,7 @@ namespace Contensive.Addons.AdminSite {
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
                 string DefaultValueText = null;
                 foreach (var keyValuePair in adminContext.adminContent.fields) {
-                    cdefFieldModel field = keyValuePair.Value;
+                    CDefFieldModel field = keyValuePair.Value;
                     DefaultValueText = adminContext.GetWherePairValue(field.nameLc);
                     if (field.active & (!string.IsNullOrEmpty(DefaultValueText))) {
                         switch (field.fieldTypeId) {
@@ -3200,7 +3200,7 @@ namespace Contensive.Addons.AdminSite {
                 int CSPointer = 0;
                 // todo refactor these out
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
-                cdefModel adminContent = adminContext.adminContent;
+                CDefModel adminContent = adminContext.adminContent;
                 //Dim WorkflowAuthoring As Boolean
                 //
                 // ----- test for content problem
@@ -3271,7 +3271,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         NullVariant = null;
                         foreach (var keyValuePair in adminContent.fields) {
-                            cdefFieldModel adminContentcontent = keyValuePair.Value;
+                            CDefFieldModel adminContentcontent = keyValuePair.Value;
                             string fieldNameLc = adminContentcontent.nameLc;
                             EditRecordFieldClass editRecordField = null;
                             //
@@ -3380,7 +3380,7 @@ namespace Contensive.Addons.AdminSite {
                                     break;
                                 case "CONTENTCONTROLID":
                                     editrecord.contentControlId = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
-                                    editrecord.contentControlId_Name = cdefModel.getContentNameByID(core, editrecord.contentControlId);
+                                    editrecord.contentControlId_Name = CDefModel.getContentNameByID(core, editrecord.contentControlId);
                                     break;
                                 case "ID":
                                     editrecord.id = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
@@ -3460,10 +3460,10 @@ namespace Contensive.Addons.AdminSite {
                     // fixup the string so it can be reduced by each field found, leaving and empty string if all correct
                     //
                     var tmpList = new List<string>();
-                    dataSourceModel datasource = dataSourceModel.create(core, adminContext.adminContent.dataSourceId, ref tmpList);
+                    DataSourceModel datasource = DataSourceModel.create(core, adminContext.adminContent.dataSourceId, ref tmpList);
                     //DataSourceName = core.db.getDataSourceNameByID(adminContext.content.dataSourceId)
                     foreach (var keyValuePair in adminContext.adminContent.fields) {
-                        cdefFieldModel field = keyValuePair.Value;
+                        CDefFieldModel field = keyValuePair.Value;
                         LoadEditRecord_RequestField(adminContext, field, datasource.Name, FormFieldLcListToBeLoaded, FormEmptyFieldLcList);
                     }
                     //
@@ -3550,7 +3550,7 @@ namespace Contensive.Addons.AdminSite {
         //   Read the Form into the fields array
         //========================================================================
         //
-        private void LoadEditRecord_RequestField(adminContextClass adminContext, cdefFieldModel field, string ignore, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
+        private void LoadEditRecord_RequestField(adminContextClass adminContext, CDefFieldModel field, string ignore, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -3807,7 +3807,7 @@ namespace Contensive.Addons.AdminSite {
                                                 // this is a fix for when Site Managers leave white space in the editor, and do not realize it
                                                 //   then cannot fixgure out how to remove it
                                                 //
-                                                ResponseFieldValueText = activeContentController.processWysiwygResponseForSave(core, ResponseFieldValueText);
+                                                ResponseFieldValueText = ActiveContentController.processWysiwygResponseForSave(core, ResponseFieldValueText);
                                                 if (string.IsNullOrEmpty(ResponseFieldValueText.ToLower().Replace(' '.ToString(), "").Replace("&nbsp;", ""))) {
                                                     ResponseFieldValueText = "";
                                                 }
@@ -3895,7 +3895,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // ----- Do the unique check for this field
                                     //
-                                    string SQLUnique = "select id from " + adminContext.adminContent.contentTableName + " where (" + field.nameLc + "=" + core.db.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + cdefModel.getContentControlCriteria(core, adminContext.adminContent.name) + ")";
+                                    string SQLUnique = "select id from " + adminContext.adminContent.contentTableName + " where (" + field.nameLc + "=" + core.db.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + CDefModel.getContentControlCriteria(core, adminContext.adminContent.name) + ")";
                                     if (editRecord.id > 0) {
                                         //
                                         // --editing record
@@ -4215,7 +4215,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         bool fieldChanged = false;
                         foreach (var keyValuePair in adminContext.adminContent.fields) {
-                            cdefFieldModel field = keyValuePair.Value;
+                            CDefFieldModel field = keyValuePair.Value;
                             EditRecordFieldClass editRecordField = editRecord.fieldsLc[field.nameLc];
                             object fieldValueObject = editRecordField.value;
                             string FieldValueText = genericController.encodeText(fieldValueObject);
@@ -4417,7 +4417,7 @@ namespace Contensive.Addons.AdminSite {
                                             //MTMRuleContent = cdefmodel.getContentNameByID(core,.manyToManyRuleContentID)
                                             //MTMRuleField0 = .ManyToManyRulePrimaryField
                                             //MTMRuleField1 = .ManyToManyRuleSecondaryField
-                                            core.html.processCheckList("field" + field.id, cdefModel.getContentNameByID(core, field.contentId), encodeText(editRecord.id), cdefModel.getContentNameByID(core, field.manyToManyContentID), cdefModel.getContentNameByID(core, field.manyToManyRuleContentID), field.ManyToManyRulePrimaryField, field.ManyToManyRuleSecondaryField);
+                                            core.html.processCheckList("field" + field.id, CDefModel.getContentNameByID(core, field.contentId), encodeText(editRecord.id), CDefModel.getContentNameByID(core, field.manyToManyContentID), CDefModel.getContentNameByID(core, field.manyToManyRuleContentID), field.ManyToManyRulePrimaryField, field.ManyToManyRuleSecondaryField);
                                             break;
                                         }
                                     default: {
@@ -4475,9 +4475,9 @@ namespace Contensive.Addons.AdminSite {
                             // -- clear cache
                             string tableName = "";
                             if (editRecord.contentControlId == 0) {
-                                tableName = cdefModel.getContentTablename(core, adminContext.adminContent.name);
+                                tableName = CDefModel.getContentTablename(core, adminContext.adminContent.name);
                             } else {
-                                tableName = cdefModel.getContentTablename(core, editRecord.contentControlId_Name);
+                                tableName = CDefModel.getContentTablename(core, editRecord.contentControlId_Name);
                             }
                             //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
                             //							Select Case tableName.ToLower()
@@ -4520,9 +4520,9 @@ namespace Contensive.Addons.AdminSite {
                         // ----- if admin content is changed, reload the adminContext.content data in case this is a save, and not an OK
                         //
                         if (recordChanged && SaveCCIDValue != 0) {
-                            cdefModel.setContentControlId(core, editRecord.contentControlId, editRecord.id, SaveCCIDValue);
-                            editRecord.contentControlId_Name = cdefModel.getContentNameByID(core, SaveCCIDValue);
-                            adminContext.adminContent = cdefModel.getCdef(core, editRecord.contentControlId_Name);
+                            CDefModel.setContentControlId(core, editRecord.contentControlId, editRecord.id, SaveCCIDValue);
+                            editRecord.contentControlId_Name = CDefModel.getContentNameByID(core, SaveCCIDValue);
+                            adminContext.adminContent = CDefModel.getCdef(core, editRecord.contentControlId_Name);
                             adminContext.adminContent.id = adminContext.adminContent.id;
                             adminContext.adminContent.name = adminContext.adminContent.name;
                             // false = core.siteProperties.allowWorkflowAuthoring And adminContext.content.AllowWorkflowAuthoring
@@ -4703,7 +4703,7 @@ namespace Contensive.Addons.AdminSite {
                     // xx  I do not know why the following section says "reload even if it is loaded", but lets try this
                     //
                     foreach (var keyValuePair in adminContext.adminContent.fields) {
-                        cdefFieldModel field = keyValuePair.Value;
+                        CDefFieldModel field = keyValuePair.Value;
                         switch (field.fieldTypeId) {
                             case FieldTypeIdFile:
                             case FieldTypeIdFileImage:
@@ -4757,10 +4757,10 @@ namespace Contensive.Addons.AdminSite {
                 Stream.Add(GetForm_EditFormStart(adminContext, AdminFormEdit));
                 bool IsLandingPageParent = false;
                 int TemplateIDForStyles = 0;
-                bool IsTemplateTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.DbModels.pageTemplateModel.contentTableName);
-                bool IsPageContentTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.DbModels.pageContentModel.contentTableName);
-                bool IsSectionTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.DbModels.siteSectionModel.contentTableName);
-                bool IsEmailTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.DbModels.emailModel.contentTableName);
+                bool IsTemplateTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.Db.pageTemplateModel.contentTableName);
+                bool IsPageContentTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.Db.pageContentModel.contentTableName);
+                bool IsSectionTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.Db.siteSectionModel.contentTableName);
+                bool IsEmailTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.Db.EmailModel.contentTableName);
                 int emailIdForStyles = IsEmailTable ? editRecord.id : 0;
                 bool IsLandingPage = false;
                 bool IsRootPage = false;
@@ -4926,13 +4926,13 @@ namespace Contensive.Addons.AdminSite {
                         if (adminContext.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
-                } else if (adminContentTableNameLower == emailModel.contentTableName.ToLower()) {
+                } else if (adminContentTableNameLower == EmailModel.contentTableName.ToLower()) {
                     //
                     // -- email
                     bool EmailSubmitted = false;
                     bool EmailSent = false;
-                    int SystemEmailCID = cdefModel.getContentId(core, "System Email");
-                    int ConditionalEmailCID = cdefModel.getContentId(core, "Conditional Email");
+                    int SystemEmailCID = CDefModel.getContentId(core, "System Email");
+                    int ConditionalEmailCID = CDefModel.getContentId(core, "Conditional Email");
                     DateTime LastSendTestDate = DateTime.MinValue;
                     bool AllowEmailSendWithoutTest = (core.siteProperties.getBoolean("AllowEmailSendWithoutTest", false));
                     if (editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
@@ -4942,7 +4942,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // Must be admin
                         Stream.Add(GetForm_Error("This edit form requires Member Administration access.", "This edit form requires Member Administration access."));
-                    } else if (cdefModel.isWithinContent(core, editRecord.contentControlId, SystemEmailCID)) {
+                    } else if (CDefModel.isWithinContent(core, editRecord.contentControlId, SystemEmailCID)) {
                         //
                         // System Email
                         EmailSubmitted = false;
@@ -4974,7 +4974,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContext), adminContext.allowAdminTabs));
                         if (adminContext.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
                         Stream.Add(EditSectionButtonBar);
-                    } else if (cdefModel.isWithinContent(core, editRecord.contentControlId, ConditionalEmailCID)) {
+                    } else if (CDefModel.isWithinContent(core, editRecord.contentControlId, ConditionalEmailCID)) {
                         //
                         // Conditional Email
                         EmailSubmitted = false;
@@ -5036,7 +5036,7 @@ namespace Contensive.Addons.AdminSite {
                         if (adminContext.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
-                } else if (adminContext.adminContent.contentTableName.ToLower() == contentModel.contentTableName.ToLower()) {
+                } else if (adminContext.adminContent.contentTableName.ToLower() == ContentModel.contentTableName.ToLower()) {
                     if (!(core.session.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
@@ -5206,8 +5206,8 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // All other tables (User definined)
-                    bool IsPageContent = cdefModel.isWithinContent(core, adminContext.adminContent.id, cdefModel.getContentId(core, "Page Content"));
-                    bool HasChildRecords = cdefModel.isContentFieldSupported(core, adminContext.adminContent.name, "parentid");
+                    bool IsPageContent = CDefModel.isWithinContent(core, adminContext.adminContent.id, CDefModel.getContentId(core, "Page Content"));
+                    bool HasChildRecords = CDefModel.isContentFieldSupported(core, adminContext.adminContent.name, "parentid");
                     bool AllowMarkReviewed = core.db.isSQLTableField("default", adminContext.adminContent.contentTableName, "DateReviewed");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
@@ -5660,9 +5660,9 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // ----- Build an index to sort the fields by EditSortOrder
-                    Dictionary<string, cdefFieldModel> sortingFields = new Dictionary<string, cdefFieldModel>();
+                    Dictionary<string, CDefFieldModel> sortingFields = new Dictionary<string, CDefFieldModel>();
                     foreach (var keyValuePair in adminContext.adminContent.fields) {
-                        cdefFieldModel field = keyValuePair.Value;
+                        CDefFieldModel field = keyValuePair.Value;
                         if (field.editTabName.ToLower() == EditTab.ToLower()) {
                             if (IsVisibleUserField(field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminContext.adminContent.contentTableName)) {
                                 AlphaSort = genericController.getIntegerString(field.editSortPriority, 10) + "-" + genericController.getIntegerString(field.id, 10);
@@ -5675,7 +5675,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     AllowHelpIcon = core.visitProperty.getBoolean("AllowHelpIcon");
                     foreach (var kvp in sortingFields) {
-                        cdefFieldModel field = kvp.Value;
+                        CDefFieldModel field = kvp.Value;
                         fieldId = field.id;
                         WhyReadOnlyMsg = "";
                         fieldTypeId = field.fieldTypeId;
@@ -6751,7 +6751,7 @@ namespace Contensive.Addons.AdminSite {
                 {
                     string HTMLFieldString = "";
                     string FieldHelp = "The content in which this record is stored. This is similar to a database table.";
-                    cdefFieldModel field = null;
+                    CDefFieldModel field = null;
                     if (adminContext.adminContent.fields.ContainsKey("contentcontrolid")) {
                         field = adminContext.adminContent.fields["contentcontrolid"];
                         //
@@ -6763,7 +6763,7 @@ namespace Contensive.Addons.AdminSite {
                             HTMLFieldString = HTMLFieldString + HtmlController.inputHidden("ContentControlID", FieldValueInteger);
                         } else {
                             string RecordContentName = editRecord.contentControlId_Name;
-                            string TableName2 = cdefModel.getContentTablename(core, RecordContentName);
+                            string TableName2 = CDefModel.getContentTablename(core, RecordContentName);
                             int TableID = core.db.getRecordID("Tables", TableName2);
                             //
                             // Test for parentid
@@ -6800,21 +6800,21 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 string sqlFilter = "(ContentTableID=" + TableID + ")";
-                                int contentCID = core.db.getRecordID(Processor.Models.DbModels.contentModel.contentName, Processor.Models.DbModels.contentModel.contentName);
+                                int contentCID = core.db.getRecordID(Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
                                 HTMLFieldString += AdminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
                                 FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
                             } else {
                                 //
                                 // Limit the list to only those cdefs that are within the record's parent contentid
                                 RecordContentName = editRecord.contentControlId_Name;
-                                TableName2 = cdefModel.getContentTablename(core, RecordContentName);
+                                TableName2 = CDefModel.getContentTablename(core, RecordContentName);
                                 TableID = core.db.getRecordID("Tables", TableName2);
                                 int CSPointer = core.db.csOpen("Content", "ContentTableID=" + TableID, "", true, 0, false, false, "ContentControlID");
                                 string CIDList = "";
                                 while (core.db.csOk(CSPointer)) {
                                     int ChildCID = core.db.csGetInteger(CSPointer, "ID");
-                                    if (cdefModel.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
-                                        if ((core.session.isAuthenticatedAdmin(core)) | (core.session.isAuthenticatedContentManager(core, cdefModel.getContentNameByID(core, ChildCID)))) {
+                                    if (CDefModel.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
+                                        if ((core.session.isAuthenticatedAdmin(core)) | (core.session.isAuthenticatedContentManager(core, CDefModel.getContentNameByID(core, ChildCID)))) {
                                             CIDList = CIDList + "," + ChildCID;
                                         }
                                     }
@@ -6824,7 +6824,7 @@ namespace Contensive.Addons.AdminSite {
                                 if (!string.IsNullOrEmpty(CIDList)) {
                                     CIDList = CIDList.Substring(1);
                                     string sqlFilter = "(id in (" + CIDList + "))";
-                                    int contentCID = core.db.getRecordID(Processor.Models.DbModels.contentModel.contentName, Processor.Models.DbModels.contentModel.contentName);
+                                    int contentCID = core.db.getRecordID(Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
                                     HTMLFieldString += AdminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
                                     FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited. This record includes a Parent field, so your choices for controlling content are limited to those compatible with the parent of this record.)";
                                 }
@@ -6970,8 +6970,8 @@ namespace Contensive.Addons.AdminSite {
                 SitePropertyName = "";
                 SitePropertyValue = "";
                 selector = "";
-                foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContext.adminContent.fields) {
-                    cdefFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContext.adminContent.fields) {
+                    CDefFieldModel field = keyValuePair.Value;
                     //
                     FieldName = field.nameLc;
                     if (genericController.vbLCase(FieldName) == "name") {
@@ -7588,7 +7588,7 @@ namespace Contensive.Addons.AdminSite {
                     + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + s + "</span></td>"
                     + "</tr><tr>"
                     + "<td class=\"ccAdminEditCaption\">&nbsp;</td>"
-                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + cdefModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>"
+                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + CDefModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>"
                     + "</tr>";
                 s = AdminUIController.editTableOpen + s + AdminUIController.editTableClose;
                 s = AdminUIController.getEditPanel(core, (!adminContext.allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
@@ -7620,7 +7620,7 @@ namespace Contensive.Addons.AdminSite {
                     + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + s + "</span></td>"
                     + "</tr><tr>"
                     + "<td class=\"ccAdminEditCaption\">&nbsp;</td>"
-                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + cdefModel.getContentId(core, "Topics") + " target=_blank>Manage Topics</a>]</span></td>"
+                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + CDefModel.getContentId(core, "Topics") + " target=_blank>Manage Topics</a>]</span></td>"
                     + "</tr>";
                 s = AdminUIController.editTableOpen + s + AdminUIController.editTableClose;
                 s = AdminUIController.getEditPanel(core, (!adminContext.allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
@@ -7686,8 +7686,8 @@ namespace Contensive.Addons.AdminSite {
                 stringBuilderLegacyController body = new stringBuilderLegacyController();
                 //
                 // ----- Gather all the SecondaryContent that associates to the PrimaryContent
-                int PeopleContentID = cdefModel.getContentId(core, "People");
-                int GroupContentID = cdefModel.getContentId(core, "Groups");
+                int PeopleContentID = CDefModel.getContentId(core, "People");
+                int GroupContentID = CDefModel.getContentId(core, "Groups");
                 //
                 int MembershipCount = 0;
                 int MembershipSize = 0;
@@ -7788,7 +7788,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 body.Add("<tr>");
                 body.Add("<td class=\"ccAdminEditCaption\">&nbsp;</td>");
-                body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + cdefModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
+                body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + CDefModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
                 body.Add("</tr>");
 
                 result = AdminUIController.getEditPanel(core, (!adminContext.allowAdminTabs), "Group Membership", "This person is a member of these groups", AdminUIController.editTableOpen + body.Text + AdminUIController.editTableClose);
@@ -8349,7 +8349,7 @@ namespace Contensive.Addons.AdminSite {
                 Criteria = "(Active<>0)";
                 if (!string.IsNullOrEmpty(MenuContentName)) {
                     //ContentControlCriteria = core.csv_GetContentControlCriteria(MenuContentName)
-                    Criteria = Criteria + "AND" + cdefModel.getContentControlCriteria(core, MenuContentName);
+                    Criteria = Criteria + "AND" + CDefModel.getContentControlCriteria(core, MenuContentName);
                 }
                 iParentCriteria = genericController.encodeEmpty(ParentCriteria, "");
                 if (core.session.isAuthenticatedDeveloper(core)) {
@@ -8373,7 +8373,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     string CMCriteria = null;
 
-                    editableCdefIdList = cdefModel.getEditableCdefIdList(core);
+                    editableCdefIdList = CDefModel.getEditableCdefIdList(core);
                     if (editableCdefIdList.Count == 0) {
                         CMCriteria = "(1=0)";
                     } else if (editableCdefIdList.Count == 1) {
@@ -8503,12 +8503,12 @@ namespace Contensive.Addons.AdminSite {
                                 case ButtonCancel:
                                     adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                     adminContext.AdminForm = AdminFormRoot;
-                                    adminContext.adminContent = new cdefModel();
+                                    adminContext.adminContent = new CDefModel();
                                     break;
                                 case ButtonClose:
                                     adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                     adminContext.AdminForm = AdminFormRoot;
-                                    adminContext.adminContent = new cdefModel();
+                                    adminContext.adminContent = new CDefModel();
                                     break;
                                 case ButtonAdd:
                                     adminContext.Admin_Action = adminContextClass.AdminActionNop;
@@ -8814,7 +8814,7 @@ namespace Contensive.Addons.AdminSite {
         // true if the field is an editable user field (can edit on edit form and save to database)
         //=============================================================================================
         //
-        private bool IsFieldEditable(adminContextClass adminContext, cdefFieldModel Field) {
+        private bool IsFieldEditable(adminContextClass adminContext, CDefFieldModel Field) {
             bool tempIsFieldEditable = false;
             try {
                 //
@@ -9308,9 +9308,9 @@ namespace Contensive.Addons.AdminSite {
                                 } else if (Format == "CSV") {
                                     CS = core.db.csInsertRecord("Tasks");
                                     if (core.db.csOk(CS)) {
-                                        ContentName = cdefModel.getContentNameByID(core, ContentID);
-                                        TableName = cdefModel.getContentTablename(core, ContentName);
-                                        Criteria = cdefModel.getContentControlCriteria(core, ContentName);
+                                        ContentName = CDefModel.getContentNameByID(core, ContentID);
+                                        TableName = CDefModel.getContentTablename(core, ContentName);
+                                        Criteria = CDefModel.getContentControlCriteria(core, ContentName);
                                         Name = "CSV Download, " + ContentName;
                                         Filename = genericController.vbReplace(ContentName, " ", "") + "_" + encodeText(genericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger(core)) + ".csv";
                                         core.db.csSet(CS, "Name", Name);
@@ -9325,9 +9325,9 @@ namespace Contensive.Addons.AdminSite {
                                 } else if (Format == "XML") {
                                     CS = core.db.csInsertRecord("Tasks");
                                     if (core.db.csOk(CS)) {
-                                        ContentName = cdefModel.getContentNameByID(core, ContentID);
-                                        TableName = cdefModel.getContentTablename(core, ContentName);
-                                        Criteria = cdefModel.getContentControlCriteria(core, ContentName);
+                                        ContentName = CDefModel.getContentNameByID(core, ContentID);
+                                        TableName = CDefModel.getContentTablename(core, ContentName);
+                                        Criteria = CDefModel.getContentControlCriteria(core, ContentName);
                                         Name = "XML Download, " + ContentName;
                                         Filename = genericController.vbReplace(ContentName, " ", "") + "_" + encodeText(genericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger(core)) + ".xml";
                                         core.db.csSet(CS, "Name", Name);
@@ -9600,8 +9600,8 @@ namespace Contensive.Addons.AdminSite {
                 // ----- read in help
                 //
                 IDList = "";
-                foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContext.adminContent.fields) {
-                    cdefFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContext.adminContent.fields) {
+                    CDefFieldModel field = keyValuePair.Value;
                     IDList = IDList + "," + field.id;
                 }
                 if (!string.IsNullOrEmpty(IDList)) {
@@ -9630,8 +9630,8 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 FormFieldList = ",";
-                foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContext.adminContent.fields) {
-                    cdefFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContext.adminContent.fields) {
+                    CDefFieldModel field = keyValuePair.Value;
                     if ((field.authorable) & (field.active) && (!TabsFound.Contains(field.editTabName.ToLower()))) {
                         TabsFound.Add(field.editTabName.ToLower());
                         fieldNameLc = field.nameLc;
@@ -9994,8 +9994,8 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // block fields that must be unique
                                 //
-                                foreach (KeyValuePair<string, Contensive.Processor.Models.Complex.cdefFieldModel> keyValuePair in adminContext.adminContent.fields) {
-                                    cdefFieldModel field = keyValuePair.Value;
+                                foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.CDefFieldModel> keyValuePair in adminContext.adminContent.fields) {
+                                    CDefFieldModel field = keyValuePair.Value;
                                     if (genericController.vbLCase(field.nameLc) == "email") {
                                         if ((adminContext.adminContent.contentTableName.ToLower() == "ccmembers") && (genericController.encodeBoolean(core.siteProperties.getBoolean("allowemaillogin", false)))) {
                                             editRecord.fieldsLc[field.nameLc].value = "";
@@ -10080,7 +10080,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // content managers, need the ContentManagementList
                                 //
-                                editableCdefIdList = cdefModel.getEditableCdefIdList(core);
+                                editableCdefIdList = CDefModel.getEditableCdefIdList(core);
                             } else {
                                 editableCdefIdList = new List<int>();
                             }
@@ -10330,7 +10330,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         ParentContentID = core.docProperties.getInteger("ParentContentID");
                         if (ParentContentID == 0) {
-                            ParentContentID = cdefModel.getContentId(core, "Page Content");
+                            ParentContentID = CDefModel.getContentId(core, "Page Content");
                         }
                         AddAdminMenuEntry = true;
                         GroupID = 0;
@@ -10339,7 +10339,7 @@ namespace Contensive.Addons.AdminSite {
                         // Process input
                         //
                         ParentContentID = core.docProperties.getInteger("ParentContentID");
-                        ParentContentName = cdefModel.getContentNameByID(core, ParentContentID);
+                        ParentContentName = CDefModel.getContentNameByID(core, ParentContentID);
                         ChildContentName = core.docProperties.getText("ChildContentName");
                         AddAdminMenuEntry = core.docProperties.getBoolean("AddAdminMenuEntry");
                         GroupID = core.docProperties.getInteger("GroupID");
@@ -10354,8 +10354,8 @@ namespace Contensive.Addons.AdminSite {
                             //
                             Description = Description + "<div>&nbsp;</div>"
                                 + "<div>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]</div>";
-                            cdefModel.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
-                            ChildContentID = cdefModel.getContentId(core, ChildContentName);
+                            CDefModel.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
+                            ChildContentID = CDefModel.getContentId(core, ChildContentName);
                             //
                             // Create Group and Rule
                             //
@@ -10880,7 +10880,7 @@ namespace Contensive.Addons.AdminSite {
                 bool allowContentAdd = false;
                 bool allowContentDelete = false;
                 var tmpList = new List<string>();
-                dataSourceModel datasource = dataSourceModel.create(core, adminContext.adminContent.dataSourceId, ref tmpList);
+                DataSourceModel datasource = DataSourceModel.create(core, adminContext.adminContent.dataSourceId, ref tmpList);
                 //
                 // ----- Process Input
                 //
@@ -10981,7 +10981,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 switch (ExportType) {
                                     case 1:
-                                        var ExportCSVAddon = Processor.Models.DbModels.AddonModel.create(core, addonGuidExportCSV);
+                                        var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
                                         if (ExportCSVAddon == null) {
                                             logController.handleError(core, new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
                                         } else {
@@ -10999,7 +10999,7 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                         break;
                                     default:
-                                        var ExportXMLAddon = Processor.Models.DbModels.AddonModel.create(core, addonGuidExportXML);
+                                        var ExportXMLAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportXML);
                                         if (ExportXMLAddon == null) {
                                             logController.handleError(core, new ApplicationException(message: "ExportXML addon not found. Task could not be added to task queue."));
                                         } else {
@@ -11404,7 +11404,7 @@ namespace Contensive.Addons.AdminSite {
             IndexConfigClass returnIndexConfig = new IndexConfigClass();
             try {
                 // refactor this out
-                cdefModel content = adminContext.adminContent;
+                CDefModel content = adminContext.adminContent;
                 //
                 // Setup defaults
                 returnIndexConfig.ContentID = adminContext.adminContent.id;
@@ -11589,7 +11589,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 if ((returnIndexConfig.columns.Count == 0) && (adminContext.adminContent.adminColumns.Count > 0)) {
                     foreach (var keyValuepair in adminContext.adminContent.adminColumns) {
-                        cdefModel.CDefAdminColumnClass cdefAdminColumn = keyValuepair.Value;
+                        CDefModel.CDefAdminColumnClass cdefAdminColumn = keyValuepair.Value;
                         IndexConfigColumnClass column = new IndexConfigColumnClass();
                         column.Name = cdefAdminColumn.Name;
                         column.Width = cdefAdminColumn.Width;
@@ -11758,7 +11758,7 @@ namespace Contensive.Addons.AdminSite {
                                                     if (IndexConfig.FindWords.ContainsKey(FindName)) {
                                                         IndexConfig.FindWords[FindName].Value = FindValue;
                                                     } else {
-                                                        cdefFieldModel field = adminContext.adminContent.fields[FindName.ToLower()];
+                                                        CDefFieldModel field = adminContext.adminContent.fields[FindName.ToLower()];
                                                         IndexConfigFindWordClass findWord = new IndexConfigFindWordClass();
                                                         findWord.Name = FindName;
                                                         findWord.Value = FindValue;
@@ -12123,7 +12123,7 @@ namespace Contensive.Addons.AdminSite {
                 FindWordMatchEnum MatchOption = 0;
                 int FormFieldPtr = 0;
                 int FormFieldCnt = 0;
-                cdefModel CDef = null;
+                CDefModel CDef = null;
                 string FieldName = null;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 int FieldPtr = 0;
@@ -12228,7 +12228,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- List out all fields
                 //
-                CDef = cdefModel.getCdef(core, adminContext.adminContent.name);
+                CDef = CDefModel.getCdef(core, adminContext.adminContent.name);
                 FieldSize = 100;
                 Array.Resize(ref FieldNames, FieldSize + 1);
                 Array.Resize(ref FieldCaption, FieldSize + 1);
@@ -12238,8 +12238,8 @@ namespace Contensive.Addons.AdminSite {
                 Array.Resize(ref FieldMatchOptions, FieldSize + 1);
                 Array.Resize(ref FieldLookupContentName, FieldSize + 1);
                 Array.Resize(ref FieldLookupList, FieldSize + 1);
-                foreach (KeyValuePair<string, cdefFieldModel> keyValuePair in adminContext.adminContent.fields) {
-                    cdefFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContext.adminContent.fields) {
+                    CDefFieldModel field = keyValuePair.Value;
                     if (FieldPtr >= FieldSize) {
                         FieldSize = FieldSize + 100;
                         Array.Resize(ref FieldNames, FieldSize + 1);
@@ -12259,7 +12259,7 @@ namespace Contensive.Addons.AdminSite {
                     if (fieldTypeId[FieldPtr] == FieldTypeIdLookup) {
                         ContentID = field.lookupContentID;
                         if (ContentID > 0) {
-                            FieldLookupContentName[FieldPtr] = cdefModel.getContentNameByID(core, ContentID);
+                            FieldLookupContentName[FieldPtr] = CDefModel.getContentNameByID(core, ContentID);
                         }
                         FieldLookupList[FieldPtr] = field.lookupList;
                     }
