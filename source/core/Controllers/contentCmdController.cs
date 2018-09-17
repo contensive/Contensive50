@@ -193,20 +193,31 @@ namespace Contensive.Processor.Controllers {
         /// <param name="personalizationPeopleId"></param>
         /// <param name="personalizationIsAuthenticated"></param>
         /// <returns></returns>
-        public static string executeContentCommands(CoreController core,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        public static string executeContentCommands(CoreController core, string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             //
-            // -- exit if empty
+            // -- exit if no src to process
             if (string.IsNullOrWhiteSpace(src)) return src;
             string returnValue = "";
             try {
-                //
-                string dst = "";
+                bool badCmd = false;
+                bool notFound = false;
+                int posOpen = 0;
+                int posClose = 0;
+                string Cmd = null;
+                string cmdResult = null;
+                int posDq = 0;
+                int posSq = 0;
                 int Ptr = 0;
+                int ptrLast = 0;
+                string dst = null;
+                string escape = null;
+                //
+                dst = "";
+                ptrLast = 1;
                 do {
-                    int ptrLast = 1;
-                    int posOpen = genericController.vbInstr(ptrLast, src, contentReplaceEscapeStart);
+                    Cmd = "";
+                    posOpen = genericController.vbInstr(ptrLast, src, contentReplaceEscapeStart);
                     Ptr = posOpen;
-                    int posClose = 0;
                     if (Ptr == 0) {
                         //
                         // not found, copy the rest of src to dst
@@ -215,7 +226,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // scan until we have passed all double and single quotes that are before the next
                         //
-                        bool notFound = true;
+                        notFound = true;
                         do {
                             posClose = genericController.vbInstr(Ptr, src, contentReplaceEscapeEnd);
                             if (posClose == 0) {
@@ -225,8 +236,7 @@ namespace Contensive.Processor.Controllers {
                                 posOpen = 0;
                                 notFound = false;
                             } else {
-                                int posDq = Ptr;
-                                string escape = null;
+                                posDq = Ptr;
                                 do {
                                     posDq = genericController.vbInstr(posDq + 1, src, "\"");
                                     escape = "";
@@ -234,7 +244,7 @@ namespace Contensive.Processor.Controllers {
                                         escape = src.Substring(posDq - 2, 1);
                                     }
                                 } while (escape == "\\");
-                                int posSq = Ptr;
+                                posSq = Ptr;
                                 do {
                                     posSq = genericController.vbInstr(posSq + 1, src, "'");
                                     escape = "";
@@ -306,9 +316,8 @@ namespace Contensive.Processor.Controllers {
                         //
                         // cmd found, process it and add the results to the dst
                         //
-                        string Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
-                        bool badCmd = false;
-                        string cmdResult = executeSingleCommand(core, Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                        Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
+                        cmdResult = executeSingleCommand(core, Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
                         if (badCmd) {
                             //
                             // the command was bad, put it back in place (?) in case it was not a command
@@ -323,7 +332,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 returnValue = dst;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
                 throw;
             }
             return returnValue;
@@ -351,19 +360,19 @@ namespace Contensive.Processor.Controllers {
                     trimming = false;
                     int trimLen = cmdSrc.Length;
                     if (trimLen > 0) {
-                        string leftChr = cmdSrc.Left( 1);
+                        string leftChr = cmdSrc.Left(1);
                         string rightChr = cmdSrc.Substring(cmdSrc.Length - 1);
                         if (genericController.vbInstr(1, whiteChrs, leftChr) != 0) {
                             cmdSrc = cmdSrc.Substring(1);
                             trimming = true;
                         }
                         if (genericController.vbInstr(1, whiteChrs, rightChr) != 0) {
-                            cmdSrc = cmdSrc.Left( cmdSrc.Length - 1);
+                            cmdSrc = cmdSrc.Left(cmdSrc.Length - 1);
                             trimming = true;
                         }
                     }
                 } while (trimming);
-                string CmdAccumulator =  "";
+                string CmdAccumulator = "";
                 if (!string.IsNullOrEmpty(cmdSrc)) {
                     //
                     // convert cmdSrc to cmdCollection
@@ -388,7 +397,7 @@ namespace Contensive.Processor.Controllers {
                     // +++++
                     cmdCollection = new List<object>();
                     //cmdCollection = new Collection<object>();
-                    if ((cmdSrc.Left( 1) == "{") && (cmdSrc.Substring(cmdSrc.Length - 1) == "}")) {
+                    if ((cmdSrc.Left(1) == "{") && (cmdSrc.Substring(cmdSrc.Length - 1) == "}")) {
                         //
                         // JSON is a single command in the form of an object, like:
                         //   { "import": "test.html" }
@@ -397,7 +406,7 @@ namespace Contensive.Processor.Controllers {
                         try {
                             cmdDictionary = core.json.Deserialize<Dictionary<string, object>>(cmdSrc);
                         } catch (Exception ex) {
-                            logController.handleError( core,ex);
+                            logController.handleError(core, ex);
                             throw;
                         }
                         //
@@ -446,7 +455,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         string cmdText = cmdSrc.Trim(' ');
                         string cmdArg = "";
-                        if (cmdText.Left( 1) == "\"") {
+                        if (cmdText.Left(1) == "\"") {
                             //
                             //cmd is quoted
                             //   "open"
@@ -483,10 +492,10 @@ namespace Contensive.Processor.Controllers {
                             int Pos = genericController.vbInstr(1, cmdText, " ");
                             if (Pos > 0) {
                                 cmdArg = cmdSrc.Substring(Pos);
-                                cmdText = (cmdSrc.Left( Pos - 1)).Trim(' ');
+                                cmdText = (cmdSrc.Left(Pos - 1)).Trim(' ');
                             }
                         }
-                        if (cmdArg.Left( 1) == "\"") {
+                        if (cmdArg.Left(1) == "\"") {
                             //
                             //cmdarg is quoted
                             //
@@ -497,7 +506,7 @@ namespace Contensive.Processor.Controllers {
                                 cmdArg = cmdArg.Substring(1, Pos - 2);
                             }
                         }
-                        if ((cmdArg.Left( 1) == "{") && (cmdArg.Substring(cmdArg.Length - 1) == "}")) {
+                        if ((cmdArg.Left(1) == "{") && (cmdArg.Substring(cmdArg.Length - 1) == "}")) {
                             //
                             // argument is in the form of an object, like:
                             //   { "text name": "my text" }
@@ -555,7 +564,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             cmdText = (string)cmd;
                             cmdArgDef = new Dictionary<string, object>();
-                        } else if (cmdTypeName.Left(37)== "system.collections.generic.dictionary") {
+                        } else if (cmdTypeName.Left(37) == "system.collections.generic.dictionary") {
                             //
                             // cases C-E, (0).key=cmd, (0).value = argument (might be string or object)
                             //
@@ -887,7 +896,7 @@ namespace Contensive.Processor.Controllers {
                                         errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
                                     if (addon == null) {
-                                        logController.handleError( core,new ApplicationException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
+                                        logController.handleError(core, new ApplicationException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
                                     } else {
                                         CmdAccumulator = core.addon.execute(addon, executeContext);
                                     }
@@ -976,7 +985,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 returnValue = CmdAccumulator;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                logController.handleError(core, ex);
                 throw;
             }
             return returnValue;
@@ -985,4 +994,3 @@ namespace Contensive.Processor.Controllers {
 
     }
 }
-

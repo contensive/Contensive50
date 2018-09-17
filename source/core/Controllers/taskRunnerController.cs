@@ -132,8 +132,8 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         private void runTasks(CoreController serverCore) {
             try {
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+                Stopwatch swProcess = new Stopwatch();
+                swProcess.Start();
                 //
                 foreach (KeyValuePair<string, Models.Domain.AppConfigModel> appKVP in serverCore.serverConfig.apps) {
                     //
@@ -145,40 +145,59 @@ namespace Contensive.Processor.Controllers {
                         //
                         if (cpApp.core.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok) {
                             try {
-                                bool tasksRemaining = false;
+                                int recordsAffected = 0;
+                                int sequentialTaskCount = 0;
                                 do {
                                     //
                                     // for now run an sql to get processes, eventually cache in variant cache
-                                    tasksRemaining = false;
                                     string sql = ""
                                         + "\r\n BEGIN TRANSACTION"
                                         + "\r\n update cctasks set cmdRunner=" + cpApp.core.db.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
                                         + "\r\n COMMIT TRANSACTION";
-                                    cpApp.core.db.executeQuery(sql);
-                                    //
-                                    // -- two execution methods, 1) run task here, 2) start process and wait (so bad addon code does not memory link)
-                                    if (cpApp.Site.GetBoolean("Run tasks in service process")) {
+                                    cpApp.core.db.executeNonQuery(sql,"",ref recordsAffected);
+                                    if (recordsAffected == 0) {
                                         //
-                                        // -- execute here
-                                        runTask(cpApp.Site.Name, runnerGuid);
+                                        // -- no tasks found
+                                        logController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "], no tasks");
                                     } else {
+                                        Stopwatch swTask = new Stopwatch();
+                                        swTask.Start();
                                         //
-                                        // -- execute in new  process
-                                        Process process = new Process();
-                                        process.StartInfo.FileName = "cc.exe";
-                                        process.StartInfo.Arguments = " --runTask " + appKVP.Value.name + " " + runnerGuid;
-                                        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                                        process.Start();
-                                        process.WaitForExit();
+                                        // -- track multiple executions
+                                        if (sequentialTaskCount>0) {
+                                            logController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "], multiple tasks run in a single cycle, sequentialTaskCount [" + sequentialTaskCount + "]");
+                                        }
+                                        //
+                                        // -- two execution methods, 1) run task here, 2) start process and wait (so bad addon code does not memory link)
+                                        if (cpApp.Site.GetBoolean("Run tasks in service process")) {
+                                            //
+                                            // -- execute here
+                                            runTask(cpApp.Site.Name, runnerGuid);
+                                        } else {
+                                            //
+                                            // -- execute in new  process
+                                            Process process = new Process();
+                                            process.StartInfo.CreateNoWindow = true;
+                                            process.StartInfo.FileName = "cc.exe";
+                                            process.StartInfo.WorkingDirectory = cpApp.core.programFiles.localAbsRootPath;
+                                            process.StartInfo.Arguments = " --runTask " + appKVP.Value.name + " " + runnerGuid;
+                                            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                                            process.Start();
+                                            //
+                                            // todo manage multiple executing processes
+                                            process.WaitForExit();
+                                        }
+                                        Console.WriteLine("runTasks, task complete (" + swTask.ElapsedMilliseconds + "ms)");
                                     }
-                                } while (tasksRemaining);
+                                    sequentialTaskCount++;
+                                } while (recordsAffected > 0);
                             } catch (Exception ex) {
                                 logController.handleError(cpApp.core, ex);
                             }
                         }
                     }
                 }
-                Console.WriteLine("runTasks, exit (" + sw.ElapsedMilliseconds + "ms)");
+                Console.WriteLine("runTasks, exit (" + swProcess.ElapsedMilliseconds + "ms)");
             } catch (Exception ex) {
                 logController.handleError(serverCore, ex);
             }
@@ -196,6 +215,7 @@ namespace Contensive.Processor.Controllers {
                     // -- execute here
                     foreach (var task in taskModel.createList(cp.core, "(cmdRunner=" + cp.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
                         //
+                        Console.WriteLine("runTask, runTask, task [" + task.name + "], command [" + task.Command + "], cmdDetail [" + task.cmdDetail + "]");
                         logController.logTrace(cp.core, "runTask, task [" + task.name + "], command [" + task.Command + "], cmdDetail [" + task.cmdDetail + "]");
                         //
                         //tasksRemaining = true;
