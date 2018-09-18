@@ -31,7 +31,7 @@
 		</dependencies>
     </metadata>
     <files>
-        <file src="bin\Debug\Contensive.dll" target="lib\net461\Contensive.dll" />
+        <file src="bin\Debug\Processor.dll" target="lib\net461\Processor.dll" />
         <file src="bin\Debug\CPBase.dll" target="lib\net461\CPBase.dll" />
     </files>
 </package>

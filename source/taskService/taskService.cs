@@ -7,8 +7,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
-using Contensive.Core.Controllers;
-using Contensive.Core;
+using Contensive.Processor.Controllers;
+using Contensive.Processor;
 
 namespace Contensive.WindowsServices {
     public partial class taskService : ServiceBase {
@@ -22,25 +22,25 @@ namespace Contensive.WindowsServices {
             CPClass cp = new CPClass();
             try {
                 //
-                logController.appendLog(cp.core, "Services.OnStart enter");
+                logController.logTrace(cp.core, "Services.OnStart enter");
                 //
                 if (true) {
                     //
                     // -- start scheduler
-                    logController.appendLog(cp.core, "Services.OnStart, call taskScheduler.startTimerEvents");
+                    logController.logTrace(cp.core, "Services.OnStart, call taskScheduler.startTimerEvents");
                     taskScheduler = new taskSchedulerController();
-                    taskScheduler.startTimerEvents(true, false);
+                    taskScheduler.startTimerEvents();
                 }
                 if (true) {
                     //
                     // -- start runner
-                    logController.appendLog(cp.core, "Services.OnStart, call taskRunner.startTimerEvents");
+                    logController.logTrace(cp.core, "Services.OnStart, call taskRunner.startTimerEvents");
                     taskRunner = new taskRunnerController();
                     taskRunner.startTimerEvents();
                 }
-                logController.appendLog(cp.core, "Services.OnStart exit");
+                logController.logTrace(cp.core, "Services.OnStart exit");
             } catch (Exception ex) {
-                cp.core.handleException(ex, "taskService.OnStart Exception");
+                logController.handleError(cp.core, ex, "taskService.OnStart Exception");
             }
         }
 
@@ -48,13 +48,13 @@ namespace Contensive.WindowsServices {
             CPClass cp = new CPClass();
             try {
                 //
-                logController.appendLog(cp.core, "Services.OnStop enter");
+                logController.logTrace(cp.core, "Services.OnStop enter");
                 //
                 if (taskScheduler != null) {
                     //
                     // stop taskscheduler
                     //
-                    logController.appendLog(cp.core, "Services.OnStop, call taskScheduler.stopTimerEvents");
+                    logController.logTrace(cp.core, "Services.OnStop, call taskScheduler.stopTimerEvents");
                     taskScheduler.stopTimerEvents();
                     taskScheduler.Dispose();
                 }
@@ -62,13 +62,13 @@ namespace Contensive.WindowsServices {
                     //
                     // stop taskrunner
                     //
-                    logController.appendLog(cp.core, "Services.OnStop, call taskRunner.stopTimerEvents");
+                    logController.logTrace(cp.core, "Services.OnStop, call taskRunner.stopTimerEvents");
                     taskRunner.stopTimerEvents();
                     taskRunner.Dispose();
                 }
-                logController.appendLog(cp.core, "Services.OnStop exit");
+                logController.logTrace(cp.core, "Services.OnStop exit");
             } catch (Exception ex) {
-                cp.core.handleException(ex, "taskService.OnStop Exception");
+                logController.handleError(cp.core, ex, "taskService.OnStop Exception");
             }
         }
     }

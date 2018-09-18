@@ -252,7 +252,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\core\Processor.csproj">
+    <ProjectReference Include="..\Processor\Processor.csproj">
       <Project>{46657d07-74bc-4ddc-8fdd-9078eb1a1cd2}</Project>
       <Name>Processor</Name>
     </ProjectReference>
