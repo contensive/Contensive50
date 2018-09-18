@@ -201,28 +201,22 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //=============================================================================
-        //   Add content padding around content
-        //
+        /// <summary>
+        /// Add content padding around content
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Content"></param>
+        /// <param name="ContentPadding"></param>
+        /// <returns></returns>
         internal static string getContentBoxWrapper(CoreController core, string Content, int ContentPadding) {
-            string result = Content;
-            if (core.siteProperties.getBoolean("Compatibility ContentBox Pad With Table")) {
-                //
-                result = "<div class=\"contentBox\">" + result + "</div>";
-                if (ContentPadding > 0) {
-                    result = ""
-                        + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0>"
-                        + "<tr>"
-                        + "<td style=\"padding:" + ContentPadding + "px\">" + result + "</td>"
-                        + "</tr>"
-                        + "</table>";
-                }
+            if (ContentPadding<0) {
+                return "<div class=\"contentBox\">" + Content + "</div>";
             } else {
-                result = "<div class=\"contentBox\" style=\"padding:" + ContentPadding + "px\">" + result + "</div>";
+                return "<div class=\"contentBox\" style=\"padding:" + ContentPadding + "px\">" + Content + "</div>";
             }
-            return result;
         }
         //
-        //
+        //=============================================================================
         //
         internal static string getDefaultBlockMessage(CoreController core, bool UseContentWatchLink) {
             string result = "";
@@ -1787,9 +1781,9 @@ namespace Contensive.Processor.Controllers {
                         CS = core.db.csOpenRecord("Page Content", BlockedPageRecordID, false, false, "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding");
                         if (core.db.csOk(CS)) {
                             BlockSourceID = core.db.csGetInteger(CS, "BlockSourceID");
-                            ContentPadding = core.db.csGetInteger(CS, "ContentPadding");
                             CustomBlockMessageFilename = core.db.csGetText(CS, "CustomBlockMessage");
                             RegistrationGroupID = core.db.csGetInteger(CS, "RegistrationGroupID");
+                            ContentPadding = core.db.csGetInteger(CS, "ContentPadding");
                         }
                         core.db.csClose(ref CS);
                     }
