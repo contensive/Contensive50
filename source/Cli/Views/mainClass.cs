@@ -346,6 +346,16 @@ namespace Contensive.CLI {
                                         taskRunnerController.runTask(appName, runnerGuid);
                                     }
                                     break;
+                                case "--installservice":
+                                    string installService = "/C C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\installutil TaskService.exe";
+                                    System.Diagnostics.Process.Start("cmd.exe", installService);
+                                    break;
+                                case "--uninstallservice":
+                                    string unInstallService = "/C C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\installutil /u TaskService.exe";
+                                    System.Diagnostics.Process.Start("cmd.exe", unInstallService);
+                                    break;
+                                //
+                                // -- run task in ccTasks table in application appName 
                                 default:
                                     Console.Write(helpText);
                                     exitArgumentProcessing = true;
@@ -410,6 +420,15 @@ namespace Contensive.CLI {
             + "\r\n"
             + "\r\n--runtask appName {taskGuid}"
             + "\r\n    executes the ccTask table record with cmdRunner=(taskGuid)"
+            + "\r\n"
+            + "\r\n--install CollectionName"
+            + "\r\n    downloads and installed the addon collection named from the Contensive Support Library"
+            + "\r\n"
+            + "\r\n--installservice"
+            + "\r\n    Installs the TaskService.exe to Windows Services"
+            + "\r\n"
+            + "\r\n--uninstallservice"
+            + "\r\n    Uninstalls the TaskService.exe from Windows Services"
             + "";
         //
         // ====================================================================================================

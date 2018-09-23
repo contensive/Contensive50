@@ -1413,8 +1413,6 @@ namespace Contensive.Processor.Controllers {
         public static string encode(CoreController core, string sourceHtmlContent, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
             string result = sourceHtmlContent;
             try {
-                //const string StartFlag = "<!-- ADDON";
-                //const string EndFlag = " -->";
                 if (!string.IsNullOrEmpty(sourceHtmlContent)) {
                     int LineStart = 0;
                     //
@@ -1580,68 +1578,70 @@ namespace Contensive.Processor.Controllers {
                     // (2/16/2010) - if <!-- AC --> has four arguments, the fourth is the addon guid
                     //
                     // todo - deprecate execute addons based on this comment system "<!-- addon"
-                    //if (result.IndexOf(StartFlag) != -1) {
-                    //    int LineEnd = 0;
-                    //    while (result.IndexOf(StartFlag) != -1) {
-                    //        LineStart = genericController.vbInstr(1, result, StartFlag);
-                    //        LineEnd = genericController.vbInstr(LineStart, result, EndFlag);
-                    //        string Copy = "";
-                    //        if (LineEnd == 0) {
-                    //            logController.logWarn(core, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly");
-                    //            break;
-                    //        } else {
-                    //            string AddonName = "";
-                    //            string addonOptionString = "";
-                    //            string ACInstanceID = "";
-                    //            string AddonGuid = "";
-                    //            Copy = result.Substring(LineStart + 10, LineEnd - LineStart - 11);
-                    //            string[] ArgSplit = genericController.SplitDelimited(Copy, ",");
-                    //            int ArgCnt = ArgSplit.GetUpperBound(0) + 1;
-                    //            if (!string.IsNullOrEmpty(ArgSplit[0])) {
-                    //                AddonName = ArgSplit[0].Substring(1, ArgSplit[0].Length - 2);
-                    //                if (ArgCnt > 1) {
-                    //                    if (!string.IsNullOrEmpty(ArgSplit[1])) {
-                    //                        addonOptionString = ArgSplit[1].Substring(1, ArgSplit[1].Length - 2);
-                    //                        addonOptionString = HtmlController.decodeHtml(addonOptionString.Trim(' '));
-                    //                    }
-                    //                    if (ArgCnt > 2) {
-                    //                        if (!string.IsNullOrEmpty(ArgSplit[2])) {
-                    //                            ACInstanceID = ArgSplit[2].Substring(1, ArgSplit[2].Length - 2);
-                    //                        }
-                    //                        if (ArgCnt > 3) {
-                    //                            if (!string.IsNullOrEmpty(ArgSplit[3])) {
-                    //                                AddonGuid = ArgSplit[3].Substring(1, ArgSplit[3].Length - 2);
-                    //                            }
-                    //                        }
-                    //                    }
-                    //                }
-                    //                // dont have any way of getting fieldname yet
+                    const string StartFlag = "<!-- ADDON";
+                    const string EndFlag = " -->";
+                    if (result.IndexOf(StartFlag) != -1) {
+                        int LineEnd = 0;
+                        while (result.IndexOf(StartFlag) != -1) {
+                            LineStart = genericController.vbInstr(1, result, StartFlag);
+                            LineEnd = genericController.vbInstr(LineStart, result, EndFlag);
+                            string Copy = "";
+                            if (LineEnd == 0) {
+                                logController.logWarn(core, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly");
+                                break;
+                            } else {
+                                string AddonName = "";
+                                string addonOptionString = "";
+                                string ACInstanceID = "";
+                                string AddonGuid = "";
+                                Copy = result.Substring(LineStart + 10, LineEnd - LineStart - 11);
+                                string[] ArgSplit = genericController.SplitDelimited(Copy, ",");
+                                int ArgCnt = ArgSplit.GetUpperBound(0) + 1;
+                                if (!string.IsNullOrEmpty(ArgSplit[0])) {
+                                    AddonName = ArgSplit[0].Substring(1, ArgSplit[0].Length - 2);
+                                    if (ArgCnt > 1) {
+                                        if (!string.IsNullOrEmpty(ArgSplit[1])) {
+                                            addonOptionString = ArgSplit[1].Substring(1, ArgSplit[1].Length - 2);
+                                            addonOptionString = HtmlController.decodeHtml(addonOptionString.Trim(' '));
+                                        }
+                                        if (ArgCnt > 2) {
+                                            if (!string.IsNullOrEmpty(ArgSplit[2])) {
+                                                ACInstanceID = ArgSplit[2].Substring(1, ArgSplit[2].Length - 2);
+                                            }
+                                            if (ArgCnt > 3) {
+                                                if (!string.IsNullOrEmpty(ArgSplit[3])) {
+                                                    AddonGuid = ArgSplit[3].Substring(1, ArgSplit[3].Length - 2);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // dont have any way of getting fieldname yet
 
-                    //                CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                    //                    addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                    //                    cssContainerClass = "",
-                    //                    cssContainerId = "",
-                    //                    hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                    //                        contentName = ContextContentName,
-                    //                        fieldName = "",
-                    //                        recordId = ContextRecordID
-                    //                    },
-                    //                    personalizationAuthenticated = personalizationIsAuthenticated,
-                    //                    personalizationPeopleId = personalizationPeopleId,
-                    //                    instanceGuid = ACInstanceID,
-                    //                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString),
-                    //                    errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
-                    //                };
-                    //                if (!string.IsNullOrEmpty(AddonGuid)) {
-                    //                    Copy = core.addon.execute(Models.DbModels.AddonModel.create(core, AddonGuid), executeContext);
-                    //                } else {
-                    //                    Copy = core.addon.execute(Models.DbModels.AddonModel.createByName(core, AddonName), executeContext);
-                    //                }
-                    //            }
-                    //        }
-                    //        result = result.Left(LineStart - 1) + Copy + result.Substring(LineEnd + 3);
-                    //    }
-                    //}
+                                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                        addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                        cssContainerClass = "",
+                                        cssContainerId = "",
+                                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                            contentName = ContextContentName,
+                                            fieldName = "",
+                                            recordId = ContextRecordID
+                                        },
+                                        personalizationAuthenticated = personalizationIsAuthenticated,
+                                        personalizationPeopleId = personalizationPeopleId,
+                                        instanceGuid = ACInstanceID,
+                                        instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString),
+                                        errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
+                                    };
+                                    if (!string.IsNullOrEmpty(AddonGuid)) {
+                                        Copy = core.addon.execute(AddonModel.create(core, AddonGuid), executeContext);
+                                    } else {
+                                        Copy = core.addon.execute(AddonModel.createByName(core, AddonName), executeContext);
+                                    }
+                                }
+                            }
+                            result = result.Left(LineStart - 1) + Copy + result.Substring(LineEnd + 3);
+                        }
+                    }
                     //
                     // process out text block comments inserted by addons
                     // remove all content between BlockTextStartMarker and the next BlockTextEndMarker, or end of copy
