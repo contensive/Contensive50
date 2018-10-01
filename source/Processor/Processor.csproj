@@ -208,6 +208,7 @@
     <Compile Include="Extensions\extensionMethodsClass.cs" />
     <Compile Include="Extensions\webClientExtensionClass.cs" />
     <Compile Include="Models\Db\Datasource.cs" />
+    <Compile Include="Models\Db\SitePropertyModel.cs" />
     <Compile Include="Models\Domain\AppConfigModel.cs" />
     <Compile Include="Models\Db\EmailQueueModel.cs" />
     <Compile Include="Models\Db\ConditionalEmailModel.cs" />
@@ -225,6 +226,7 @@
     <Compile Include="Models\Db\EmailModel.cs" />
     <Compile Include="Models\Db\SiteSectionModel.cs" />
     <Compile Include="Models\Db\TaskModel.cs" />
+    <Compile Include="Models\Domain\NameValueModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

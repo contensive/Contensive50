@@ -179,7 +179,6 @@ namespace Contensive.Processor.Controllers {
                     //core.siteProperties.getText("AllowPopupErrors", "True");
                     core.siteProperties.getText("AllowTestPointLogging", "False");
                     core.siteProperties.getText("AllowTestPointPrinting", "False");
-                    core.siteProperties.getText("AllowTransactionLog", "False");
                     core.siteProperties.getText("AllowTrapEmail", "True");
                     core.siteProperties.getText("AllowTrapLog", "True");
                     core.siteProperties.getText("AllowWorkflowAuthoring", "False");

@@ -612,23 +612,11 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="LogEntry"></param>
         private void saveTransactionLog(string sql, long ElapsedMilliseconds) {
-            //
-            // -- do not allow reentry
-            // -- if during save, site properties need to be loaded, this stack-overflows
-            if (!saveTransactionLog_InProcess) {
-                saveTransactionLog_InProcess = true;
-                //
-                // -- block before appStatus OK because need site properties
-                if ((core.serverConfig.enableLogging) && (core.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok)) {
-                    if (core.siteProperties.allowTransactionLog) {
-                        string LogEntry = ("duration [" + ElapsedMilliseconds + "ms], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
-                        LogController.logDebug(core, "dbController: " + LogEntry);
-                    }
-                    if (ElapsedMilliseconds > sqlSlowThreshholdMsec) {
-                        LogController.logWarn(core, ("dbController: Slow Query " + ElapsedMilliseconds + "ms, sql: [" + sql + "]").Replace("\r", "").Replace("\n", ""));
-                    }
-                }
-                saveTransactionLog_InProcess = false;
+            string logMsg = ("duration [" + ElapsedMilliseconds + "ms], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
+            if (ElapsedMilliseconds > sqlSlowThreshholdMsec) {
+                LogController.logWarn(core, "dbController: Slow Query " + logMsg);
+            } else {
+                LogController.logDebug(core, "dbController: " + logMsg);
             }
         }
         //
